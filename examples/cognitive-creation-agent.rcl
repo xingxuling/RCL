@@ -1,0 +1,96 @@
+# RCL v0.4: natural language -> understanding -> bounded creation -> execution.
+# No LLM and no training dataset are used. Explicit language rules, knowledge,
+# evidence and candidate evaluation form a small-data cognitive loop.
+reality CognitiveGreenhouse {
+  facet greenhouse.light : Truth = false
+  facet greenhouse.safe : Truth = true
+
+  subject caretaker {
+    facet actions : Number = 0
+    warrant greenhouse.control on greenhouse
+  }
+
+  knowledge mind {
+    claim operation_safe : Truth = greenhouse.safe
+      confidence 0.99
+      evidence "policy:greenhouse-safe"
+      source "runtime:safety-state"
+      scope "greenhouse"
+      status observed
+    preserve supported(mind.operation_safe, 0.95)
+  }
+
+  language command {
+    utterance request = "请打开温室灯"
+      speaker "operator"
+      locale "zh-CN"
+      channel "text"
+      evidence "input:user-request"
+
+    intent activate_light
+      when contains(utterance_text(command.request), "打开") and contains(utterance_text(command.request), "灯")
+      action "activate"
+      target "greenhouse.light"
+      confidence 0.97
+      evidence "grammar:zh-open-light"
+      from command.request
+      slot device = "light"
+
+    preserve intent_confidence(command.activate_light) >= 0.90
+  }
+
+  understanding situation {
+    hypothesis authorized_request : Truth =
+      intent_matches(command.activate_light, "activate", "greenhouse.light") and knowledge_value(mind.operation_safe)
+      confidence 0.96
+      explanation "The utterance requests light activation and the greenhouse safety claim permits the operation."
+      evidence "model:command-plus-safety"
+      from command.activate_light, mind.operation_safe
+      coverage 1.0
+      coherence 0.98
+
+    preserve understood(situation.authorized_request, 0.90)
+  }
+
+  creation solutions {
+    candidate activate : Text = "activate"
+      when understanding_value(situation.authorized_request)
+      target "greenhouse.light"
+      novelty 0.30
+      utility 0.98
+      feasibility 0.99
+      risk 0.02
+      evidence "strategy:direct-safe-action"
+      based_on situation.authorized_request
+
+    candidate clarify : Text = "ask-for-clarification"
+      when true
+      target "operator"
+      novelty 0.20
+      utility 0.25
+      feasibility 1.0
+      risk 0.01
+      evidence "strategy:conservative-fallback"
+      based_on command.activate_light
+
+    select chosen from activate, clarify
+    preserve creation_score(solutions.chosen) >= 0.80
+  }
+
+  emergence enact_selected_solution {
+    cause caretaker
+    when selected(solutions.chosen) and creation_value(solutions.chosen) == "activate"
+    needs greenhouse.control on greenhouse
+    alter greenhouse.light <- true
+    alter caretaker.actions <- caretaker.actions + 1
+    preserve greenhouse.safe
+    witness "execution:natural-language-understanding-creation"
+  }
+
+  learn mind
+  interpret command
+  understand situation
+  create solutions
+  foresee enact_selected_solution
+  realize enact_selected_solution
+}

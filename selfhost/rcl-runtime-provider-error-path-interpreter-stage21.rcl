@@ -1,0 +1,284 @@
+reality RCLSelfHostRuntimeProviderErrorPathInterpreterStage21 {
+  facet selfhost.stage : Text = "stage21_rcl_owned_runtime_provider_error_path_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_interprets_unregistered_provider_error_path_inside_native_vm"
+  facet selfhost.boundary : Text = "provider_missing_error_path_subset_not_complete_rcl_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_runtime_provider_registered_failure_pure_sha256_and_full_history_roots"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_runtime_subset : Truth = true
+  facet gate.rcl_owned_runtime_provider_error_path_subset : Truth = true
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet target.provider_program : Text = "RuntimeProviderMissingTarget"
+  facet target.provider_root : Text = "stage21:provider-missing-manual-bytecode"
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon target_string_at(index : Number) -> Text =
+    choose(index == 0, target.provider_program,
+      choose(index == 1, target.provider_root,
+        choose(index == 2, "echo",
+          choose(index == 3, "echo.text",
+            choose(index == 4, "{\"message\":\"hello-provider\"}", "provider.reply")))))
+
+  reckon build_target_strings(index : Number, output : Sequence) -> Sequence =
+    choose(index >= 6, output,
+      build_target_strings(index + 1, sequence_append(output, target_string_at(index))))
+
+  reckon target_strings() -> Sequence =
+    build_target_strings(0, empty_sequence())
+
+  reckon target_instruction_count() -> Number = 3
+
+  reckon target_op_at(index : Number) -> Number =
+    choose(index == 0, 35,
+      choose(index == 1, 5, 31))
+
+  reckon target_a_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 5, 0))
+
+  reckon target_b_at(index : Number) -> Number =
+    choose(index == 0, 3, 0)
+
+  reckon target_c_at(index : Number) -> Number =
+    choose(index == 0, 4, 0)
+
+  reckon build_instruction_values(index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= target_instruction_count(), output,
+      build_instruction_values(
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, target_op_at(index),
+            choose(selector == 1, target_a_at(index),
+              choose(selector == 2, target_b_at(index), target_c_at(index))))),
+        selector))
+
+  reckon instruction_ops() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 1)
+
+  reckon instruction_b_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 2)
+
+  reckon instruction_c_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 3)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target_strings()), 0, length(instruction_ops())),
+      sequence_concat(
+        encode_string_pool(target_strings(), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(), instruction_a_values(), instruction_b_values(), instruction_c_values(), 0, empty_sequence())))
+
+  reckon runtime_frame(
+    pc : Number,
+    stack : Sequence,
+    state_keys : Sequence,
+    state_values : Sequence,
+    error_code : Text,
+    error_message : Text,
+    provider_count : Number
+  ) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(sequence_append(empty_sequence(), pc), stack),
+              state_keys),
+            state_values),
+          error_code),
+        error_message),
+      provider_count)
+
+  reckon frame_pc(frame : Sequence) -> Number = sequence_get(frame, 0)
+  reckon frame_stack(frame : Sequence) -> Sequence = sequence_get(frame, 1)
+  reckon frame_state_keys(frame : Sequence) -> Sequence = sequence_get(frame, 2)
+  reckon frame_state_values(frame : Sequence) -> Sequence = sequence_get(frame, 3)
+  reckon frame_error_code(frame : Sequence) -> Text = sequence_get(frame, 4)
+  reckon frame_error_message(frame : Sequence) -> Text = sequence_get(frame, 5)
+  reckon frame_provider_count(frame : Sequence) -> Number = sequence_get(frame, 6)
+
+  reckon copy_until(items : Sequence, index : Number, exclusive_end : Number, output : Sequence) -> Sequence =
+    choose(index >= exclusive_end, output,
+      copy_until(items, index + 1, exclusive_end, sequence_append(output, sequence_get(items, index))))
+
+  reckon stack_without_last(stack : Sequence) -> Sequence =
+    copy_until(stack, 0, length(stack) - 1, empty_sequence())
+
+  reckon stack_top_text(stack : Sequence) -> Text = sequence_get(stack, length(stack) - 1)
+
+  reckon update_frame(frame : Sequence, pc : Number, stack : Sequence, state_keys : Sequence, state_values : Sequence) -> Sequence =
+    runtime_frame(
+      pc,
+      stack,
+      state_keys,
+      state_values,
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_provider_count(frame))
+
+  reckon error_frame(frame : Sequence, code : Text, message : Text) -> Sequence =
+    runtime_frame(
+      frame_pc(frame),
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      code,
+      message,
+      frame_provider_count(frame))
+
+  reckon call_provider_frame(frame : Sequence) -> Sequence =
+    error_frame(
+      frame,
+      "RCL_NATIVE_PROVIDER_MISSING",
+      "Provider '" + target_string_at(target_a_at(frame_pc(frame))) + "' is not registered for capability '" + target_string_at(target_b_at(frame_pc(frame))) + "'")
+
+  reckon store_state_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      sequence_append(frame_state_keys(frame), target_string_at(target_a_at(frame_pc(frame)))),
+      sequence_append(frame_state_values(frame), stack_top_text(frame_stack(frame))))
+
+  reckon halt_frame(frame : Sequence) -> Sequence =
+    update_frame(frame, target_instruction_count(), frame_stack(frame), frame_state_keys(frame), frame_state_values(frame))
+
+  reckon step_frame(frame : Sequence) -> Sequence =
+    choose(target_op_at(frame_pc(frame)) == 35, call_provider_frame(frame),
+      choose(target_op_at(frame_pc(frame)) == 5, store_state_frame(frame), halt_frame(frame)))
+
+  reckon execute(frame : Sequence) -> Sequence =
+    choose(frame_error_code(frame) != "OK", frame,
+      choose(frame_pc(frame) >= target_instruction_count(), frame,
+        execute(step_frame(frame))))
+
+  reckon initial_frame() -> Sequence =
+    runtime_frame(0, empty_sequence(), empty_sequence(), empty_sequence(), "OK", "", 0)
+
+  facet target.provider_rbc_strings : Sequence = target_strings()
+  facet target.provider_rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.provider_rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.provider_rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet target.provider_rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet target.provider_rbc_bytes : Sequence = encode_target_rbc()
+  facet target.provider_rbc_size : Number = length(target.provider_rbc_bytes)
+  facet target.provider_bytecode_magic_0 : Number = sequence_get(target.provider_rbc_bytes, 0)
+  facet target.provider_bytecode_magic_1 : Number = sequence_get(target.provider_rbc_bytes, 1)
+  facet target.provider_bytecode_magic_2 : Number = sequence_get(target.provider_rbc_bytes, 2)
+  facet target.provider_bytecode_magic_3 : Number = sequence_get(target.provider_rbc_bytes, 3)
+
+  facet runtime.provider_final_frame : Sequence = execute(initial_frame())
+  facet runtime.provider_error_code : Text = frame_error_code(runtime.provider_final_frame)
+  facet runtime.provider_error_message : Text = frame_error_message(runtime.provider_final_frame)
+  facet runtime.provider_final_pc : Number = frame_pc(runtime.provider_final_frame)
+  facet runtime.provider_stack_count : Number = length(frame_stack(runtime.provider_final_frame))
+  facet runtime.provider_state_count : Number = length(frame_state_keys(runtime.provider_final_frame))
+  facet runtime.provider_call_count : Number = frame_provider_count(runtime.provider_final_frame)
+  facet runtime.provider_error_path_supported : Truth =
+    semantic_assert(
+      runtime.provider_error_code == "RCL_NATIVE_PROVIDER_MISSING"
+        and runtime.provider_error_message == "Provider 'echo' is not registered for capability 'echo.text'"
+        and runtime.provider_final_pc == 0
+        and runtime.provider_stack_count == 0
+        and runtime.provider_state_count == 0
+        and runtime.provider_call_count == 0,
+      "RCL_STAGE21_RUNTIME_PROVIDER_ERROR_PATH_MISMATCH",
+      selfhost.stage,
+      make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant runtime.audit on runtime
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage21_runtime_provider_error_path_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_runtime_provider_error_path_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_PROVIDER_ERROR_PATH_SUBSET_VERIFIED"
+
+    preserve runtime.provider_error_path_supported == true
+      and target.provider_rbc_size == 231
+      and length(target.provider_rbc_strings) == 6
+      and length(target.provider_rbc_instruction_ops) == 3
+      and target.provider_bytecode_magic_0 == 82
+      and target.provider_bytecode_magic_1 == 67
+      and target.provider_bytecode_magic_2 == 76
+      and target.provider_bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_runtime_provider_error_path_subset == true
+      and gate.rcl_owned_runtime_root_hashing_complete == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage21-runtime-provider-error-path-subset"
+  }
+
+  foresee verify_stage21_runtime_provider_error_path_subset
+  realize verify_stage21_runtime_provider_error_path_subset
+}

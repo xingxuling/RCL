@@ -1,0 +1,42 @@
+{
+  "format": "rcl.reality-compiler-spec.v0.43",
+  "version": "0.43.0-alpha.1",
+  "kernel": "Reality Compilation Kernel",
+  "state": {
+    "S": "structure-space coverage",
+    "T": "transformation entropy / disturbance pressure",
+    "I": "invariant controller / entropy suppressor",
+    "C": "closure field / attractor strength"
+  },
+  "feedback": {
+    "stability": "S * (1 - T) * I * C",
+    "gradient": "stability[t] - observed_stability[t-k]",
+    "noise": [
+      "low",
+      "uniform",
+      "high",
+      "bursty",
+      "adversarial",
+      "nonstationary"
+    ]
+  },
+  "compilerPasses": [
+    "state augmentation",
+    "memory declaration",
+    "hidden-regime declaration",
+    "adaptive invariant field synthesis",
+    "constraint compilation",
+    "control-policy emission",
+    "semantic guard / rollback / replay evidence"
+  ],
+  "invariants": [
+    "minimum executable path exists",
+    "state is observable or observation uncertainty is declared",
+    "feedback delay is explicit",
+    "hidden regime is explicit",
+    "multi-agent coupling is explicit",
+    "semantic guard can reject unstable compiled trajectories"
+  ],
+  "rclBoundary": "RCL must express memory, hidden regimes, delay, observer visibility, agent coupling and adaptive invariant fields explicitly; otherwise reality behavior is only projected as a shallow Markov process.",
+  "root": "0f2827403b2604f066cf5ee61f0548981bce9d24718fffa243b0c93ccb5caaa4"
+}

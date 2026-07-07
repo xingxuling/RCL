@@ -1,0 +1,385 @@
+reality RCLSelfHostTokenizedSourceLoweringStage24 {
+  facet selfhost.stage : Text = "stage24_rcl_owned_tokenized_source_lowering_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_tokenizes_and_parses_builtin_provider_source_text_to_bytecode_inside_native_vm"
+  facet selfhost.boundary : Text = "tokenized_builtin_provider_source_lowering_subset_not_complete_compiler_or_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_general_parser_ast_to_bytecode_lowering_for_facets_calls_rules_and_runtime"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_tokenizer_subset : Truth = true
+  facet gate.rcl_owned_parser_subset : Truth = true
+  facet gate.rcl_owned_tokenized_source_lowering_subset : Truth = true
+  facet gate.rcl_owned_parser_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.rcl_compiler_self_emits_without_stage0 : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet source.full : Text = "reality RuntimeBuiltinProviderSourceLoweringTarget { facet metrics.request_size : Number = length(\"request\") facet provider.reply : Text = provider_call(\"echo\", \"echo.text\", \"request\") }"
+  facet source.root : Text = "1b994e33cd89b6f911b53721b7b65404f581c24111c4dd4911919b8a516e530c"
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon checked_text(tokens : Sequence, index : Number, kind : Text, expected : Text) -> Text =
+    token_text(expect_token(sequence_get(tokens, index), kind, expected))
+
+  reckon checked_ident(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "IDENT", expected)
+
+  reckon checked_symbol(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "SYMBOL", expected)
+
+  reckon checked_string(tokens : Sequence, index : Number) -> Text =
+    checked_text(tokens, index, "STRING", "")
+
+  reckon source_program_name(tokens : Sequence) -> Text =
+    checked_ident(tokens, 1, "")
+
+  reckon source_builtin_facet_path(tokens : Sequence) -> Text =
+    checked_ident(tokens, 4, "") + checked_symbol(tokens, 5, ".") + checked_ident(tokens, 6, "")
+
+  reckon source_builtin_type(tokens : Sequence) -> Text =
+    checked_ident(tokens, 8, "Number")
+
+  reckon source_builtin_name(tokens : Sequence) -> Text =
+    checked_ident(tokens, 10, "length")
+
+  reckon source_builtin_text(tokens : Sequence) -> Text =
+    checked_string(tokens, 12)
+
+  reckon source_provider_facet_path(tokens : Sequence) -> Text =
+    checked_ident(tokens, 15, "") + checked_symbol(tokens, 16, ".") + checked_ident(tokens, 17, "")
+
+  reckon source_provider_type(tokens : Sequence) -> Text =
+    checked_ident(tokens, 19, "Text")
+
+  reckon source_provider_name(tokens : Sequence) -> Text =
+    checked_ident(tokens, 21, "provider_call")
+
+  reckon source_provider_id(tokens : Sequence) -> Text =
+    checked_string(tokens, 23)
+
+  reckon source_provider_capability(tokens : Sequence) -> Text =
+    checked_string(tokens, 25)
+
+  reckon source_provider_request(tokens : Sequence) -> Text =
+    checked_string(tokens, 27)
+
+  reckon parser_shape_supported(tokens : Sequence) -> Truth =
+    semantic_assert(
+      length(tokens) == 31
+        and checked_ident(tokens, 0, "reality") == "reality"
+        and checked_symbol(tokens, 2, char_at("{}", 0)) == char_at("{}", 0)
+        and checked_ident(tokens, 3, "facet") == "facet"
+        and checked_symbol(tokens, 7, char_at(":", 0)) == char_at(":", 0)
+        and checked_symbol(tokens, 9, char_at("=", 0)) == char_at("=", 0)
+        and checked_symbol(tokens, 11, char_at("()", 0)) == char_at("()", 0)
+        and checked_symbol(tokens, 13, char_at("()", 1)) == char_at("()", 1)
+        and checked_ident(tokens, 14, "facet") == "facet"
+        and checked_symbol(tokens, 18, char_at(":", 0)) == char_at(":", 0)
+        and checked_symbol(tokens, 20, char_at("=", 0)) == char_at("=", 0)
+        and checked_symbol(tokens, 22, char_at("()", 0)) == char_at("()", 0)
+        and checked_symbol(tokens, 24, char_at(",", 0)) == char_at(",", 0)
+        and checked_symbol(tokens, 26, char_at(",", 0)) == char_at(",", 0)
+        and checked_symbol(tokens, 28, char_at("()", 1)) == char_at("()", 1)
+        and checked_symbol(tokens, 29, char_at("{}", 1)) == char_at("{}", 1)
+        and token_kind(sequence_get(tokens, 30)) == "EOF",
+      "RCL_STAGE24_TOKENIZED_SOURCE_SHAPE_MISMATCH",
+      selfhost.stage,
+      token_span(sequence_get(tokens, 0)))
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon target_string_at(index : Number) -> Text =
+    choose(index == 0, source_program_name(parser.tokens),
+      choose(index == 1, source.root,
+        choose(index == 2, source_builtin_text(parser.tokens),
+          choose(index == 3, source_builtin_facet_path(parser.tokens),
+            choose(index == 4, source_provider_id(parser.tokens),
+              choose(index == 5, source_provider_capability(parser.tokens), source_provider_facet_path(parser.tokens)))))))
+
+  reckon build_target_strings(index : Number, output : Sequence) -> Sequence =
+    choose(index >= 7, output,
+      build_target_strings(index + 1, sequence_append(output, target_string_at(index))))
+
+  reckon target_strings() -> Sequence =
+    build_target_strings(0, empty_sequence())
+
+  reckon target_instruction_count() -> Number = 6
+
+  reckon target_op_at(index : Number) -> Number =
+    choose(index == 0, 3,
+      choose(index == 1, 30,
+        choose(index == 2, 5,
+          choose(index == 3, 35,
+            choose(index == 4, 5, 31)))))
+
+  reckon target_a_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 4,
+        choose(index == 2, 3,
+          choose(index == 3, 4,
+            choose(index == 4, 6, 0)))))
+
+  reckon target_b_at(index : Number) -> Number =
+    choose(index == 1, 1,
+      choose(index == 3, 5, 0))
+
+  reckon target_c_at(index : Number) -> Number =
+    choose(index == 3, 2, 0)
+
+  reckon build_instruction_values(index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= target_instruction_count(), output,
+      build_instruction_values(
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, target_op_at(index),
+            choose(selector == 1, target_a_at(index),
+              choose(selector == 2, target_b_at(index), target_c_at(index))))),
+        selector))
+
+  reckon instruction_ops() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 1)
+
+  reckon instruction_b_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 2)
+
+  reckon instruction_c_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 3)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target_strings()), 0, length(instruction_ops())),
+      sequence_concat(
+        encode_string_pool(target_strings(), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(), instruction_a_values(), instruction_b_values(), instruction_c_values(), 0, empty_sequence())))
+
+  facet parser.tokens : Sequence = tokenize_from(source.full, 0, 1, 1, empty_sequence())
+  facet parser.token_count : Number = length(parser.tokens)
+  facet parser.shape_supported : Truth = parser_shape_supported(parser.tokens)
+  facet parser.first_token : Text = token_text(sequence_get(parser.tokens, 0))
+  facet parser.program_token : Text = token_text(sequence_get(parser.tokens, 1))
+  facet parser.builtin_call_token : Text = token_text(sequence_get(parser.tokens, 10))
+  facet parser.provider_call_token : Text = token_text(sequence_get(parser.tokens, 21))
+  facet parser.eof_kind : Text = token_kind(sequence_get(parser.tokens, 30))
+
+  facet compiler.program : Text = source_program_name(parser.tokens)
+  facet compiler.builtin_facet_path : Text = source_builtin_facet_path(parser.tokens)
+  facet compiler.builtin_type : Text = source_builtin_type(parser.tokens)
+  facet compiler.builtin_name : Text = source_builtin_name(parser.tokens)
+  facet compiler.builtin_text : Text = source_builtin_text(parser.tokens)
+  facet compiler.provider_facet_path : Text = source_provider_facet_path(parser.tokens)
+  facet compiler.provider_type : Text = source_provider_type(parser.tokens)
+  facet compiler.provider_name : Text = source_provider_name(parser.tokens)
+  facet compiler.provider_id : Text = source_provider_id(parser.tokens)
+  facet compiler.provider_capability : Text = source_provider_capability(parser.tokens)
+  facet compiler.provider_request : Text = source_provider_request(parser.tokens)
+  facet compiler.lowered_instruction_count : Number = target_instruction_count()
+  facet compiler.source_lowering_supported : Truth =
+    semantic_assert(
+      parser.shape_supported == true
+        and compiler.program == "RuntimeBuiltinProviderSourceLoweringTarget"
+        and compiler.builtin_facet_path == "metrics.request_size"
+        and compiler.builtin_type == "Number"
+        and compiler.builtin_name == "length"
+        and compiler.builtin_text == "request"
+        and compiler.provider_facet_path == "provider.reply"
+        and compiler.provider_type == "Text"
+        and compiler.provider_name == "provider_call"
+        and compiler.provider_id == "echo"
+        and compiler.provider_capability == "echo.text"
+        and compiler.provider_request == compiler.builtin_text
+        and source.root == "1b994e33cd89b6f911b53721b7b65404f581c24111c4dd4911919b8a516e530c",
+      "RCL_STAGE24_TOKENIZED_SOURCE_LOWERING_MISMATCH",
+      selfhost.stage,
+      token_span(sequence_get(parser.tokens, 0)))
+
+  facet target.rbc_strings : Sequence = target_strings()
+  facet target.rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet target.rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet target.rbc_bytes : Sequence = encode_target_rbc()
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant parser.audit on parser
+    warrant compiler.audit on compiler
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage24_tokenized_source_lowering_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_tokenized_source_lowering_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_TOKENIZED_SOURCE_LOWERING_SUBSET_VERIFIED"
+
+    preserve parser.token_count == 31
+      and parser.shape_supported == true
+      and parser.first_token == "reality"
+      and parser.program_token == compiler.program
+      and parser.builtin_call_token == "length"
+      and parser.provider_call_token == "provider_call"
+      and parser.eof_kind == "EOF"
+      and compiler.source_lowering_supported == true
+      and target.rbc_size == 320
+      and length(target.rbc_strings) == 7
+      and length(target.rbc_instruction_ops) == 6
+      and sequence_get(target.rbc_strings, 0) == compiler.program
+      and sequence_get(target.rbc_strings, 1) == source.root
+      and sequence_get(target.rbc_strings, 2) == compiler.builtin_text
+      and sequence_get(target.rbc_strings, 3) == compiler.builtin_facet_path
+      and sequence_get(target.rbc_strings, 4) == compiler.provider_id
+      and sequence_get(target.rbc_strings, 5) == compiler.provider_capability
+      and sequence_get(target.rbc_strings, 6) == compiler.provider_facet_path
+      and sequence_get(target.rbc_instruction_ops, 0) == 3
+      and sequence_get(target.rbc_instruction_ops, 1) == 30
+      and sequence_get(target.rbc_instruction_ops, 2) == 5
+      and sequence_get(target.rbc_instruction_ops, 3) == 35
+      and sequence_get(target.rbc_instruction_ops, 4) == 5
+      and sequence_get(target.rbc_instruction_ops, 5) == 31
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_parser_complete == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.rcl_compiler_self_emits_without_stage0 == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage24-tokenized-source-lowering-subset"
+  }
+
+  foresee verify_stage24_tokenized_source_lowering_subset
+  realize verify_stage24_tokenized_source_lowering_subset
+}

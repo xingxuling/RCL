@@ -1,0 +1,32 @@
+reality RCLCompilerSeed {
+  facet source.line : Text = "facet world.value : Number = 7"
+  facet compiler.path : Text = ""
+  facet compiler.type : Text = ""
+  facet compiler.opcode : Number = 0
+  facet compiler.constant : Number = 0
+
+  subject stage1 {
+    warrant compiler.emit on compiler
+  }
+
+  emergence lower_literal_assignment {
+    cause stage1
+    when starts_with(trim(source.line), "facet")
+    needs compiler.emit on compiler
+
+    alter compiler.path <- trim(split_before(split_after(source.line, "facet"), ":"))
+    alter compiler.type <- trim(split_before(split_after(source.line, ":"), "="))
+    alter compiler.opcode <- choose(contains(source.line, ": Number"), 1, 0)
+    alter compiler.constant <- number_from_text(trim(split_after(source.line, "=")))
+
+    preserve compiler.opcode == 1
+      and compiler.path == "world.value"
+      and compiler.type == "Number"
+      and compiler.constant == 7
+
+    witness "rcl:selfhost-stage1-lowering"
+  }
+
+  foresee lower_literal_assignment
+  realize lower_literal_assignment
+}

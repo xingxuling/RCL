@@ -1,0 +1,281 @@
+reality RCLCompilerStage4 {
+  facet source.core : Text = "module core\nfacet world.value : Number = 7\nfacet world.name : Text = \"Aster\""
+  facet source.app : Text = "module app\nimport core\nrequire core world.value : Number\nrequire core world.name : Text\nfacet app.ready : Truth = true"
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon literal_kind(item : Token) -> Text =
+    choose(token_kind(item) == "NUMBER", "Number",
+      choose(token_kind(item) == "STRING", "Text", "Truth"))
+
+  reckon module_name(tokens : Sequence) -> Text =
+    choose(
+      semantic_assert(
+        token_text(expect_token(sequence_get(tokens, 0), "IDENT", "module")) == "module",
+        "RCL_MODULE_HEADER_REQUIRED",
+        "module",
+        token_span(sequence_get(tokens, 0))),
+      token_text(expect_token(sequence_get(tokens, 1), "IDENT", "")),
+      "")
+
+  reckon collect_imports(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(token_text(sequence_get(tokens, index)) == "import",
+      collect_imports(
+        tokens,
+        index + 2,
+        sequence_append(output, token_text(expect_token(sequence_get(tokens, index + 1), "IDENT", "")))),
+      output)
+
+  reckon after_imports(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index)) == "import",
+      after_imports(tokens, index + 2),
+      index)
+
+  reckon after_requires(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index)) == "require",
+      after_requires(tokens, index + 7),
+      index)
+
+  reckon literal_span(tokens : Sequence, index : Number) -> Span =
+    make_span(
+      span_offset(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+      span_line(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+      span_column(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+      span_offset(token_span(sequence_get(tokens, index + 7)))
+        + span_length(token_span(sequence_get(tokens, index + 7)))
+        - span_offset(token_span(sequence_get(tokens, index))))
+
+  reckon parse_facet(tokens : Sequence, index : Number) -> AstNode =
+    facet_ast(
+      token_text(expect_token(sequence_get(tokens, index + 1), "IDENT", ""))
+        + token_text(expect_token(sequence_get(tokens, index + 2), "SYMBOL", "."))
+        + token_text(expect_token(sequence_get(tokens, index + 3), "IDENT", "")),
+      token_text(expect_token(sequence_get(tokens, index + 5), "IDENT", "")),
+      literal_kind(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      token_text(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      literal_span(tokens, index))
+
+  reckon parse_facets(tokens : Sequence, index : Number, nodes : Sequence) -> ParseState =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF",
+      make_parse_state(index, nodes),
+      parse_facets(tokens, index + 8, sequence_append(nodes, parse_facet(tokens, index))))
+
+  reckon find_text(items : Sequence, index : Number, text_value : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(items, index) == text_value,
+        index,
+        find_text(items, index + 1, text_value)))
+
+  reckon find_symbol(symbols : Sequence, index : Number, path : Text) -> Number =
+    choose(index >= length(symbols), -1,
+      choose(symbol_path(sequence_get(symbols, index)) == path,
+        index,
+        find_symbol(symbols, index + 1, path)))
+
+  reckon qualified(module : Text, path : Text) -> Text = module + "::" + path
+
+  reckon unique_module_symbol(module : Text, symbols : Sequence, node : AstNode) -> Truth =
+    semantic_assert(
+      find_symbol(symbols, 0, qualified(module, ast_path(node))) < 0,
+      "RCL_SEMANTIC_DUPLICATE",
+      qualified(module, ast_path(node)),
+      ast_span(node))
+
+  reckon resolve_module_symbol(module : Text, node : AstNode, slot : Number, symbols : Sequence) -> Symbol =
+    choose(unique_module_symbol(module, symbols, node),
+      make_symbol(qualified(module, ast_path(node)), ast_value_type(node), slot, ast_span(node)),
+      make_symbol(qualified(module, ast_path(node)), ast_value_type(node), slot, ast_span(node)))
+
+  reckon resolve_module_symbols(module : Text, nodes : Sequence, index : Number, base_slot : Number, symbols : Sequence) -> Sequence =
+    choose(index >= length(nodes), symbols,
+      resolve_module_symbols(
+        module,
+        nodes,
+        index + 1,
+        base_slot,
+        sequence_append(symbols, resolve_module_symbol(module, sequence_get(nodes, index), base_slot + index, symbols))))
+
+  reckon append_all(source : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source), output,
+      append_all(source, index + 1, sequence_append(output, sequence_get(source, index))))
+
+  reckon validate_imports(imports : Sequence, index : Number, modules : Sequence, owner_span : Span) -> Truth =
+    choose(index >= length(imports), true,
+      choose(
+        semantic_assert(
+          find_text(modules, 0, sequence_get(imports, index)) >= 0,
+          "RCL_MODULE_MISSING",
+          sequence_get(imports, index),
+          owner_span),
+        validate_imports(imports, index + 1, modules, owner_span),
+        false))
+
+  reckon validate_requirements(tokens : Sequence, index : Number, imports : Sequence, symbols : Sequence) -> Truth =
+    choose(token_text(sequence_get(tokens, index)) != "require", true,
+      choose(
+        semantic_assert(
+          find_text(imports, 0, token_text(expect_token(sequence_get(tokens, index + 1), "IDENT", ""))) >= 0,
+          "RCL_MODULE_NOT_IMPORTED",
+          token_text(sequence_get(tokens, index + 1)),
+          token_span(sequence_get(tokens, index))),
+        choose(
+          semantic_assert(
+            find_symbol(
+              symbols,
+              0,
+              qualified(
+                token_text(sequence_get(tokens, index + 1)),
+                token_text(expect_token(sequence_get(tokens, index + 2), "IDENT", ""))
+                  + token_text(expect_token(sequence_get(tokens, index + 3), "SYMBOL", "."))
+                  + token_text(expect_token(sequence_get(tokens, index + 4), "IDENT", "")))) >= 0,
+            "RCL_MODULE_SYMBOL_MISSING",
+            token_text(sequence_get(tokens, index + 1)) + "::" + token_text(sequence_get(tokens, index + 2)) + "." + token_text(sequence_get(tokens, index + 4)),
+            token_span(sequence_get(tokens, index))),
+          choose(
+            semantic_assert(
+              symbol_type(sequence_get(
+                symbols,
+                find_symbol(
+                  symbols,
+                  0,
+                  qualified(
+                    token_text(sequence_get(tokens, index + 1)),
+                    token_text(sequence_get(tokens, index + 2)) + "." + token_text(sequence_get(tokens, index + 4))))))
+                == token_text(expect_token(sequence_get(tokens, index + 6), "IDENT", "")),
+              "RCL_MODULE_TYPE_MISMATCH",
+              token_text(sequence_get(tokens, index + 1)) + "::" + token_text(sequence_get(tokens, index + 2)) + "." + token_text(sequence_get(tokens, index + 4)),
+              token_span(sequence_get(tokens, index))),
+            validate_requirements(tokens, index + 7, imports, symbols),
+            false),
+          false),
+        false))
+
+  reckon type_valid(node : AstNode) -> Truth =
+    semantic_assert(
+      ast_value_type(node) == ast_literal_kind(node),
+      "RCL_SEMANTIC_TYPE_MISMATCH",
+      ast_path(node) + ":" + ast_value_type(node) + "<-" + ast_literal_kind(node),
+      ast_span(node))
+
+  reckon semantic_module_facet(module : Text, node : AstNode, symbols : Sequence) -> SemanticNode =
+    choose(type_valid(node),
+      make_semantic_facet(
+        qualified(module, ast_path(node)),
+        ast_value_type(node),
+        ast_literal_kind(node),
+        ast_literal_text(node),
+        symbol_slot(sequence_get(symbols, find_symbol(symbols, 0, qualified(module, ast_path(node))))),
+        ast_span(node)),
+      make_semantic_facet(qualified(module, ast_path(node)), ast_value_type(node), ast_literal_kind(node), ast_literal_text(node), 0, ast_span(node)))
+
+  reckon analyze_module(module : Text, nodes : Sequence, symbols : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(nodes), output,
+      analyze_module(
+        module,
+        nodes,
+        symbols,
+        index + 1,
+        sequence_append(output, semantic_module_facet(module, sequence_get(nodes, index), symbols))))
+
+  reckon lower_store(node : SemanticNode) -> IrNode =
+    make_ir_store(
+      "STORE_FACET",
+      semantic_path(node),
+      semantic_type(node),
+      semantic_literal_kind(node),
+      semantic_literal_text(node),
+      semantic_slot(node),
+      semantic_span(node))
+
+  reckon lower_ir(nodes : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(nodes), output,
+      lower_ir(nodes, index + 1, sequence_append(output, lower_store(sequence_get(nodes, index)))))
+
+  facet compiler.core_tokens : Sequence = tokenize_from(source.core, 0, 1, 1, empty_sequence())
+  facet compiler.app_tokens : Sequence = tokenize_from(source.app, 0, 1, 1, empty_sequence())
+  facet compiler.core_module : Text = module_name(compiler.core_tokens)
+  facet compiler.app_module : Text = module_name(compiler.app_tokens)
+  facet compiler.modules : Sequence = sequence_append(sequence_append(empty_sequence(), compiler.core_module), compiler.app_module)
+  facet compiler.core_imports : Sequence = collect_imports(compiler.core_tokens, 2, empty_sequence())
+  facet compiler.app_imports : Sequence = collect_imports(compiler.app_tokens, 2, empty_sequence())
+  facet compiler.core_start : Number = after_requires(compiler.core_tokens, after_imports(compiler.core_tokens, 2))
+  facet compiler.app_start : Number = after_requires(compiler.app_tokens, after_imports(compiler.app_tokens, 2))
+  facet compiler.core_parse : ParseState = parse_facets(compiler.core_tokens, compiler.core_start, empty_sequence())
+  facet compiler.app_parse : ParseState = parse_facets(compiler.app_tokens, compiler.app_start, empty_sequence())
+  facet compiler.core_ast : Sequence = parse_nodes(compiler.core_parse)
+  facet compiler.app_ast : Sequence = parse_nodes(compiler.app_parse)
+  facet compiler.core_symbols : Sequence = resolve_module_symbols(compiler.core_module, compiler.core_ast, 0, 0, empty_sequence())
+  facet compiler.app_symbols : Sequence = resolve_module_symbols(compiler.app_module, compiler.app_ast, 0, length(compiler.core_symbols), empty_sequence())
+  facet compiler.symbols : Sequence = append_all(compiler.app_symbols, 0, compiler.core_symbols)
+  facet compiler.core_imports_valid : Truth = validate_imports(compiler.core_imports, 0, compiler.modules, token_span(sequence_get(compiler.core_tokens, 0)))
+  facet compiler.app_imports_valid : Truth = validate_imports(compiler.app_imports, 0, compiler.modules, token_span(sequence_get(compiler.app_tokens, 0)))
+  facet compiler.app_requirements_valid : Truth = validate_requirements(compiler.app_tokens, after_imports(compiler.app_tokens, 2), compiler.app_imports, compiler.symbols)
+  facet compiler.core_semantic : Sequence = analyze_module(compiler.core_module, compiler.core_ast, compiler.symbols, 0, empty_sequence())
+  facet compiler.app_semantic : Sequence = analyze_module(compiler.app_module, compiler.app_ast, compiler.symbols, 0, empty_sequence())
+  facet compiler.semantic : Sequence = append_all(compiler.app_semantic, 0, compiler.core_semantic)
+  facet compiler.ir : Sequence = lower_ir(compiler.semantic, 0, empty_sequence())
+}

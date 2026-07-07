@@ -1,0 +1,21 @@
+{
+  "format": "rcl.debug-config.v0.39",
+  "version": "0.39.0-alpha.1",
+  "stopOnEntry": true,
+  "breakpoints": [
+    { "id": "bp-session-facet", "kind": "facet", "facet": "app.session" },
+    { "id": "bp-login-ref-semantic", "kind": "semantic-node", "semanticNodeId": "facet:app.loginRef" },
+    { "id": "bp-typed-object-event", "kind": "event-kind", "eventKind": "typed.object.creation" },
+    {
+      "id": "bp-record-value-kind-condition",
+      "kind": "facet",
+      "facet": "app.session",
+      "condition": { "op": "facet-value-kind-equals", "facet": "app.session", "valueKind": "Record" }
+    }
+  ],
+  "watchExpressions": [
+    { "id": "watch-session", "kind": "facet", "facet": "app.session" },
+    { "id": "watch-login-ref", "kind": "semantic-node", "semanticNodeId": "facet:app.loginRef" },
+    { "id": "watch-gc-root", "kind": "event-kind", "eventKind": "gc.snapshot.root" }
+  ]
+}

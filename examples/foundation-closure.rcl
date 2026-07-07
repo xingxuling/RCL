@@ -1,0 +1,82 @@
+reality FoundationClosure {
+  energy grid {
+    reservoir source : Energy = joules(100)
+    reservoir load : Energy = joules(0)
+    flow charge from source to load amount joules(40) efficiency 0.9 evidence "meter:grid-transfer"
+    preserve grid.source >= joules(0)
+    preserve grid.load >= joules(0)
+    witness "rcl:energy-conservation-with-dissipation"
+  }
+
+  element matter {
+    species hydrogen {
+      symbol "H"
+      atomic 1
+      mass 1.008
+      charge 0
+      phase "gas"
+      evidence "periodic-table:H"
+    }
+    species oxygen {
+      symbol "O"
+      atomic 8
+      mass 15.999
+      charge 0
+      phase "gas"
+      evidence "periodic-table:O"
+    }
+    compound water {
+      component hydrogen 2
+      component oxygen 1
+      bond "covalent"
+      evidence "chemistry:H2O"
+    }
+    preserve component_count(matter.water) == 2
+  }
+
+  science lab {
+    hypothesis delivered : Truth = grid.load >= joules(35)
+      confidence 0.95
+      evidence "hypothesis:transfer-efficiency"
+    experiment replication tests delivered
+      repeats 3
+      tolerance 0
+      method "deterministic-replay"
+      evidence "experiment:grid-replay"
+    conclude accepted from delivered
+      confidence 0.95
+      evidence "conclusion:replicated"
+    preserve reproducible(lab.replication)
+    preserve scientific_value(lab.accepted) == true
+  }
+
+  embodiment vessel {
+    facet vitality : Number = 1
+    system metabolism {
+      facet reserve : Energy = joules(80)
+    }
+    organ core {
+      facet integrity : Number = 1
+    }
+    bind energy grid
+    bind element matter.water
+    maintain vessel.vitality >= 0.8
+    maintain vessel.organ.core.integrity >= 0.8
+    evidence "body:integrated-systems"
+  }
+
+  spirit mind {
+    facet identity : Text = "Aster"
+    value autonomy : Number = 1 weight 1
+    purpose sustain : Truth = true priority 0.9
+    affect calm : Number = 0.8 intensity 0.7
+    preserve mind.value.autonomy >= 0.5
+    evidence "spirit:identity-value-purpose-affect"
+  }
+
+  energize grid
+  constitute matter
+  investigate lab
+  embody vessel
+  integrate mind
+}

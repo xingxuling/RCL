@@ -1,0 +1,276 @@
+reality RCLSelfHostRuleBytecodeStage8 {
+  facet source.target : Text = "reality RuleBytecodePlanTarget {\n  facet world.ready : Truth = true\n  facet world.status : Text = \"draft\"\n  subject founder {\n    warrant world.publish on world\n  }\n  emergence publish {\n    cause founder\n    when world.ready\n    needs world.publish on world\n    alter world.status <- \"published\"\n    preserve world.status == \"published\"\n    witness \"rcl:stage8:published\"\n  }\n  foresee publish\n  realize publish\n}\n"
+  facet source.program : Text = "RuleBytecodePlanTarget"
+  facet source.root : Text = "670383cdf6c4055931de6b35daae9265039a0eb73662a77ee3e2b091962aa04b"
+
+  facet selfhost.stage : Text = "stage8_rcl_owned_rule_bytecode_plan_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_data_driven_rule_instruction_plan_encodes_foresee_and_realize_bytecode_subset"
+  facet selfhost.boundary : Text = "rule_instruction_plan_subset_not_full_general_rule_lowering"
+  facet selfhost.next_rewrite_target : Text = "native_windows_packaging_and_general_rule_ast_to_plan_lowering"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_rule_bytecode_plan_subset : Truth = true
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.native_windows_fixedpoint : Truth = false
+  facet gate.js_reference_parity_required : Truth = true
+  facet gate.js_runtime_still_required : Truth = true
+
+  reckon append4_numbers(seed : Sequence, v0 : Number, v1 : Number, v2 : Number, v3 : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(seed, v0), v1), v2), v3)
+
+  reckon append5_numbers(seed : Sequence, v0 : Number, v1 : Number, v2 : Number, v3 : Number, v4 : Number) -> Sequence =
+    sequence_append(append4_numbers(seed, v0, v1, v2, v3), v4)
+
+  reckon append14_numbers(seed : Sequence, v0 : Number, v1 : Number, v2 : Number, v3 : Number, v4 : Number, v5 : Number, v6 : Number, v7 : Number, v8 : Number, v9 : Number, v10 : Number, v11 : Number, v12 : Number, v13 : Number) -> Sequence =
+    append4_numbers(
+      append5_numbers(
+        append5_numbers(seed, v0, v1, v2, v3, v4),
+        v5, v6, v7, v8, v9),
+      v10, v11, v12, v13)
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon rule_string_prefix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(),
+            source.program),
+          source.root),
+        "world.ready"),
+      "draft")
+
+  reckon rule_string_middle() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(),
+            "world.status"),
+          "founder"),
+        "world.publish"),
+      "world")
+
+  reckon rule_string_suffix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "publish"),
+        "published"),
+      "rcl:stage8:published")
+
+  reckon rule_strings() -> Sequence =
+    sequence_concat(rule_string_prefix(), sequence_concat(rule_string_middle(), rule_string_suffix()))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon instruction_setup_ops() -> Sequence =
+    append5_numbers(empty_sequence(), 2, 5, 3, 5, 22)
+
+  reckon instruction_foresee_ops() -> Sequence =
+    append14_numbers(empty_sequence(), 4, 21, 23, 24, 3, 25, 26, 4, 3, 10, 27, 26, 28, 29)
+
+  reckon instruction_realize_ops() -> Sequence =
+    append14_numbers(empty_sequence(), 4, 21, 23, 24, 3, 25, 26, 4, 3, 10, 27, 26, 28, 29)
+
+  reckon instruction_halt_ops() -> Sequence =
+    sequence_append(empty_sequence(), 31)
+
+  reckon instruction_ops() -> Sequence =
+    sequence_concat(
+      instruction_setup_ops(),
+      sequence_concat(instruction_foresee_ops(), sequence_concat(instruction_realize_ops(), instruction_halt_ops())))
+
+  reckon instruction_setup_a_values() -> Sequence =
+    append5_numbers(empty_sequence(), 1, 2, 3, 4, 5)
+
+  reckon instruction_foresee_a_values() -> Sequence =
+    append14_numbers(empty_sequence(), 2, 19, 0, 5, 9, 4, 1, 4, 9, 0, 0, 0, 10, 0)
+
+  reckon instruction_realize_a_values() -> Sequence =
+    append14_numbers(empty_sequence(), 2, 33, 1, 5, 9, 4, 1, 4, 9, 0, 0, 0, 10, 0)
+
+  reckon instruction_halt_a_values() -> Sequence =
+    sequence_append(empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    sequence_concat(
+      instruction_setup_a_values(),
+      sequence_concat(instruction_foresee_a_values(), sequence_concat(instruction_realize_a_values(), instruction_halt_a_values())))
+
+  reckon instruction_setup_b_values() -> Sequence =
+    append5_numbers(empty_sequence(), 0, 0, 0, 0, 6)
+
+  reckon instruction_foresee_b_values() -> Sequence =
+    append14_numbers(empty_sequence(), 0, 0, 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+  reckon instruction_realize_b_values() -> Sequence =
+    append14_numbers(empty_sequence(), 0, 0, 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+  reckon instruction_halt_b_values() -> Sequence =
+    sequence_append(empty_sequence(), 0)
+
+  reckon instruction_b_values() -> Sequence =
+    sequence_concat(
+      instruction_setup_b_values(),
+      sequence_concat(instruction_foresee_b_values(), sequence_concat(instruction_realize_b_values(), instruction_halt_b_values())))
+
+  reckon instruction_setup_c_values() -> Sequence =
+    append5_numbers(empty_sequence(), 0, 0, 0, 0, 7)
+
+  reckon instruction_foresee_c_values() -> Sequence =
+    append14_numbers(empty_sequence(), 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+  reckon instruction_realize_c_values() -> Sequence =
+    append14_numbers(empty_sequence(), 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+  reckon instruction_halt_c_values() -> Sequence =
+    sequence_append(empty_sequence(), 0)
+
+  reckon instruction_c_values() -> Sequence =
+    sequence_concat(
+      instruction_setup_c_values(),
+      sequence_concat(instruction_foresee_c_values(), sequence_concat(instruction_realize_c_values(), instruction_halt_c_values())))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon count_number(items : Sequence, index : Number, value : Number) -> Number =
+    choose(index >= length(items), 0,
+      choose(sequence_get(items, index) == value,
+        1 + count_number(items, index + 1, value),
+        count_number(items, index + 1, value)))
+
+  reckon count_instruction_with_a(op_values : Sequence, a_values : Sequence, index : Number, op : Number, a : Number) -> Number =
+    choose(index >= length(op_values), 0,
+      choose(sequence_get(op_values, index) == op and sequence_get(a_values, index) == a,
+        1 + count_instruction_with_a(op_values, a_values, index + 1, op, a),
+        count_instruction_with_a(op_values, a_values, index + 1, op, a)))
+
+  reckon encode_rule_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(rule_strings()), 0, length(instruction_ops())),
+      sequence_concat(
+        encode_string_pool(rule_strings(), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(), instruction_a_values(), instruction_b_values(), instruction_c_values(), 0, empty_sequence())))
+
+  facet compiler.rbc_strings : Sequence = rule_strings()
+  facet compiler.rbc_instruction_ops : Sequence = instruction_ops()
+  facet compiler.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet compiler.rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet compiler.rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet compiler.rbc_bytes : Sequence = encode_rule_rbc()
+  facet compiler.rbc_size : Number = length(compiler.rbc_bytes)
+  facet compiler.string_count : Number = length(compiler.rbc_strings)
+  facet compiler.number_count : Number = 0
+  facet compiler.instruction_count : Number = length(compiler.rbc_instruction_ops)
+  facet compiler.begin_tx_count : Number = count_number(compiler.rbc_instruction_ops, 0, 23)
+  facet compiler.foresee_tx_count : Number = count_instruction_with_a(compiler.rbc_instruction_ops, compiler.rbc_instruction_a_values, 0, 23, 0)
+  facet compiler.realize_tx_count : Number = count_instruction_with_a(compiler.rbc_instruction_ops, compiler.rbc_instruction_a_values, 0, 23, 1)
+  facet compiler.jump_if_false_count : Number = count_number(compiler.rbc_instruction_ops, 0, 21)
+  facet compiler.check_warrant_count : Number = count_number(compiler.rbc_instruction_ops, 0, 24)
+  facet compiler.stage_store_count : Number = count_number(compiler.rbc_instruction_ops, 0, 25)
+  facet compiler.projected_view_count : Number = count_instruction_with_a(compiler.rbc_instruction_ops, compiler.rbc_instruction_a_values, 0, 26, 1)
+  facet compiler.reset_view_count : Number = count_instruction_with_a(compiler.rbc_instruction_ops, compiler.rbc_instruction_a_values, 0, 26, 0)
+  facet compiler.check_preserve_count : Number = count_number(compiler.rbc_instruction_ops, 0, 27)
+  facet compiler.record_witness_count : Number = count_number(compiler.rbc_instruction_ops, 0, 28)
+  facet compiler.commit_tx_count : Number = count_number(compiler.rbc_instruction_ops, 0, 29)
+  facet compiler.bytecode_magic_0 : Number = sequence_get(compiler.rbc_bytes, 0)
+  facet compiler.bytecode_magic_1 : Number = sequence_get(compiler.rbc_bytes, 1)
+  facet compiler.bytecode_magic_2 : Number = sequence_get(compiler.rbc_bytes, 2)
+  facet compiler.bytecode_magic_3 : Number = sequence_get(compiler.rbc_bytes, 3)
+  facet compiler.rule_bytecode_plan_supported : Truth =
+    semantic_assert(compiler.rbc_size == 799 and compiler.string_count == 11 and compiler.instruction_count == 34, "RCL_RULE_BYTECODE_PLAN_SHAPE_MISMATCH", source.program, make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage8.audit on stage8
+    warrant compiler.audit on compiler
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage8_rule_bytecode_plan_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_rule_bytecode_plan_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RULE_BYTECODE_PLAN_SUBSET_VERIFIED"
+
+    preserve compiler.rule_bytecode_plan_supported == true
+      and compiler.rbc_size == 799
+      and compiler.string_count == 11
+      and compiler.number_count == 0
+      and compiler.instruction_count == 34
+      and compiler.begin_tx_count == 2
+      and compiler.foresee_tx_count == 1
+      and compiler.realize_tx_count == 1
+      and compiler.jump_if_false_count == 2
+      and compiler.check_warrant_count == 2
+      and compiler.stage_store_count == 2
+      and compiler.projected_view_count == 2
+      and compiler.reset_view_count == 2
+      and compiler.check_preserve_count == 2
+      and compiler.record_witness_count == 2
+      and compiler.commit_tx_count == 2
+      and compiler.bytecode_magic_0 == 82
+      and compiler.bytecode_magic_1 == 67
+      and compiler.bytecode_magic_2 == 76
+      and compiler.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.native_windows_fixedpoint == false
+      and gate.js_reference_parity_required == true
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage8-rule-bytecode-plan-subset"
+  }
+
+  foresee verify_stage8_rule_bytecode_plan_subset
+  realize verify_stage8_rule_bytecode_plan_subset
+}

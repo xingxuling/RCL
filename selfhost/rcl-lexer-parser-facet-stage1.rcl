@@ -1,0 +1,165 @@
+reality RCLSelfHostLexerParserFacetStage1 {
+  facet source.text : Text = "facet world.value : Number = 7\nfacet world.flag : Truth = true\nfacet world.name : Text = \"Aster\""
+
+  facet selfhost.stage : Text = "stage1_rcl_owned_lexer_parser_facet_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_executes_recursive_tokenizer_and_facet_parser_subset"
+  facet selfhost.boundary : Text = "facet_declarations_only_js_runtime_still_hosts_execution"
+  facet selfhost.next_rewrite_target : Text = "semantic_lowering_and_bytecode_emission_subset"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_lexer_subset : Truth = true
+  facet gate.rcl_owned_parser_subset : Truth = true
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_windows_still_blocked : Truth = true
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon literal_kind(item : Token) -> Text =
+    choose(token_kind(item) == "NUMBER", "Number",
+      choose(token_kind(item) == "STRING", "Text", "Truth"))
+
+  reckon parse_facet(tokens : Sequence, index : Number) -> AstNode =
+    facet_ast(
+      token_text(expect_token(sequence_get(tokens, index + 1), "IDENT", ""))
+        + token_text(expect_token(sequence_get(tokens, index + 2), "SYMBOL", "."))
+        + token_text(expect_token(sequence_get(tokens, index + 3), "IDENT", "")),
+      token_text(expect_token(sequence_get(tokens, index + 5), "IDENT", "")),
+      literal_kind(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      token_text(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      make_span(
+        span_offset(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_line(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_column(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_offset(token_span(sequence_get(tokens, index + 7)))
+          + span_length(token_span(sequence_get(tokens, index + 7)))
+          - span_offset(token_span(sequence_get(tokens, index)))))
+
+  reckon parse_facets(tokens : Sequence, index : Number, nodes : Sequence) -> ParseState =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF",
+      make_parse_state(index, nodes),
+      parse_facets(tokens, index + 8, sequence_append(nodes, parse_facet(tokens, index))))
+
+  facet stage1.tokens : Sequence = tokenize_from(source.text, 0, 1, 1, empty_sequence())
+  facet stage1.parse : ParseState = parse_facets(stage1.tokens, 0, empty_sequence())
+  facet stage1.ast : Sequence = parse_nodes(stage1.parse)
+  facet stage1.next : Number = parse_index(stage1.parse)
+  facet stage1.expected_token_count : Number = 25
+  facet stage1.expected_ast_count : Number = 3
+  facet stage1.first_path : Text = ast_path(sequence_get(stage1.ast, 0))
+  facet stage1.second_path : Text = ast_path(sequence_get(stage1.ast, 1))
+  facet stage1.third_path : Text = ast_path(sequence_get(stage1.ast, 2))
+  facet stage1.first_type : Text = ast_value_type(sequence_get(stage1.ast, 0))
+  facet stage1.second_type : Text = ast_value_type(sequence_get(stage1.ast, 1))
+  facet stage1.third_type : Text = ast_value_type(sequence_get(stage1.ast, 2))
+  facet stage1.first_literal_kind : Text = ast_literal_kind(sequence_get(stage1.ast, 0))
+  facet stage1.second_literal_kind : Text = ast_literal_kind(sequence_get(stage1.ast, 1))
+  facet stage1.third_literal_kind : Text = ast_literal_kind(sequence_get(stage1.ast, 2))
+  facet stage1.first_literal_text : Text = ast_literal_text(sequence_get(stage1.ast, 0))
+  facet stage1.second_literal_text : Text = ast_literal_text(sequence_get(stage1.ast, 1))
+  facet stage1.third_literal_text : Text = ast_literal_text(sequence_get(stage1.ast, 2))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage1.audit on stage1
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage1_facet_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_lexer_subset == true and gate.rcl_owned_parser_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_FACET_SUBSET_VERIFIED"
+
+    preserve stage1.next == 24
+      and stage1.expected_token_count == 25
+      and stage1.expected_ast_count == 3
+      and token_kind(sequence_get(stage1.tokens, 0)) == "IDENT"
+      and token_text(sequence_get(stage1.tokens, 0)) == "facet"
+      and token_kind(sequence_get(stage1.tokens, 24)) == "EOF"
+      and stage1.first_path == "world.value"
+      and stage1.second_path == "world.flag"
+      and stage1.third_path == "world.name"
+      and stage1.first_type == "Number"
+      and stage1.second_type == "Truth"
+      and stage1.third_type == "Text"
+      and stage1.first_literal_kind == "Number"
+      and stage1.second_literal_kind == "Truth"
+      and stage1.third_literal_kind == "Text"
+      and stage1.first_literal_text == "7"
+      and stage1.second_literal_text == "true"
+      and stage1.third_literal_text == "Aster"
+      and gate.full_self_hosting == false
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage1-rcl-owned-lexer-parser-facet-subset"
+  }
+
+  foresee verify_stage1_facet_subset
+  realize verify_stage1_facet_subset
+}

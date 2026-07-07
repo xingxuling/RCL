@@ -1,0 +1,23 @@
+reality TwoMinds {
+  subject alice {
+    facet trust : Number = 0
+    warrant relation.influence on bob
+  }
+
+  subject bob {
+    facet trust : Number = 0
+  }
+
+  resonance greeting {
+    from alice
+    into bob
+    when alice.trust >= 0
+    needs relation.influence on bob
+    alter alice.trust <- alice.trust + 1
+    alter bob.trust <- bob.trust + 2
+    preserve alice.trust <= 10 and bob.trust <= 10
+    witness "interaction:greeting"
+  }
+
+  realize greeting
+}

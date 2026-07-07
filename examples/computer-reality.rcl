@@ -1,0 +1,22 @@
+reality ComputerBridge {
+  facet machine.receipt : Text = "none"
+
+  subject builder {
+    warrant computer.invoke on console
+  }
+
+  host console {
+    offers emit -> Text
+  }
+
+  emergence publish {
+    cause builder
+    when machine.receipt == "none"
+    needs computer.invoke on console
+    call console.emit("RCL reached computer reality") -> machine.receipt
+    preserve length(machine.receipt) > 0
+    witness "host:console.emit"
+  }
+
+  realize publish
+}

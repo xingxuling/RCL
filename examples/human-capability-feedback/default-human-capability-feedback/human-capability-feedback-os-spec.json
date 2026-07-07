@@ -1,0 +1,460 @@
+{
+  "format": "rcl.human-capability-feedback-os-spec.v0.64",
+  "id": "rcl_human_capability_feedback_os_default_v0",
+  "version": "0.64.0-alpha.1",
+  "objective": "Compile v0.63 RNCS execution plans into human capability profiles, feedback loops, growth ledgers, agency constraints and evidence-backed capability evolution.",
+  "thresholds": {
+    "minProfiles": 8,
+    "minFeedbackLoops": 8,
+    "minAverageFeedbackScore": 0.95,
+    "requireAgencyContract": true,
+    "requireEvidenceBinding": true,
+    "requireGrowthLedger": true,
+    "requireFailureToLearningMap": true,
+    "requireHumanAuthorityGate": true
+  },
+  "feedbackPolicy": {
+    "mode": "rncs-execution-plan-to-human-capability-feedback",
+    "cadence": "weekly-review-with-daily-evidence-capture",
+    "agencyPolicy": "human remains final authority; RCL proposes capability deltas and next actions only",
+    "evidencePolicy": "every capability delta must reference RNCS WAL, evidence writeback and replay root",
+    "failurePolicy": "failed execution becomes learning evidence rather than identity judgment",
+    "nextHandoff": "v0.65 Reality Product Entry Runtime"
+  },
+  "sourceRncsBridge": {
+    "format": "rcl.rncs-execution-bridge-v2-spec.v0.63",
+    "id": "rcl_human_capability_feedback_os_source_bridge_v0",
+    "version": "0.63.0-alpha.1",
+    "objective": "Source v0.63 RNCS execution plans for human capability feedback compilation.",
+    "thresholds": {
+      "minExecutionPlans": 8,
+      "minAverageExecutionReadinessScore": 0.95,
+      "minProviderContractsPerPlan": 4,
+      "requireAuthorizationBoundaries": true,
+      "requireWalReplay": true,
+      "requireCrashRecovery": true,
+      "requireEvidenceWriteback": true,
+      "requireHumanAuthorityGate": true
+    },
+    "bridgePolicy": {
+      "mode": "technology-tree-to-rncs-execution-plan",
+      "providerPolicy": "every established technology node receives simulation, measurement, documentation and authority providers",
+      "authorizationPolicy": "no irreversible physical-world action is executable without explicit human_authority approval",
+      "walPolicy": "every plan step has deterministic prewrite, replay and rollback metadata",
+      "crashRecoveryPolicy": "every plan has idempotent retry and safe-stop recovery state",
+      "evidencePolicy": "every provider action writes evidence back to RCL evidence lineage and RNCS event log",
+      "nextHandoff": "v0.64 Human Capability Feedback OS and v0.65 Reality Product Entry Runtime"
+    },
+    "sourceCivilizationTechnologyTree": {
+      "format": "rcl.civilization-technology-tree-compiler-spec.v0.62",
+      "id": "rcl_rncs_execution_bridge_v2_source_tree_v0",
+      "version": "0.62.0-alpha.1",
+      "objective": "Source v0.62 civilization technology tree for RNCS execution bridge conversion.",
+      "thresholds": {
+        "minTechnologyNodes": 8,
+        "minAverageNodeScore": 0.95,
+        "minDependencyGraphScore": 1,
+        "minRoadmapPhaseCount": 5,
+        "requireEvidenceLineage": true,
+        "requireNegativeControlTrace": true,
+        "requireCivilizationCapabilityMap": true,
+        "requireNaturalLanguageDocs": true
+      },
+      "treePolicy": {
+        "mode": "experiment-to-civilization-technology-tree",
+        "dependencyPolicy": "derive-from-substrate-readout-interface-field-record-and-runtime-stages",
+        "stagePolicy": "substrate -> sensing -> interface -> field-control -> record-runtime -> civilization-scaling",
+        "evidencePolicy": "every node must reference notebook id, run hash, audit ledger and failure ledger",
+        "handoffPolicy": "established tree nodes may feed v0.63 RNCS Execution Bridge v2 and v0.64 Human Capability Feedback OS"
+      },
+      "sourceEmpiricalLabNotebook": {
+        "format": "rcl.empirical-lab-notebook-runtime-spec.v0.61",
+        "id": "rcl_civilization_technology_tree_source_notebooks_v0",
+        "version": "0.61.0-alpha.1",
+        "objective": "Source v0.61 replay-stable empirical lab notebook runs for civilization technology tree compilation.",
+        "thresholds": {
+          "minNotebookCount": 8,
+          "minAverageNotebookScore": 0.95,
+          "minReplayStabilityScore": 1,
+          "requireAuditLedger": true,
+          "requireReplayHash": true,
+          "requireControlComparison": true,
+          "requireFailureLedger": true,
+          "requireDerivedCandidateHandoff": true,
+          "requireNaturalLanguageDocs": true
+        },
+        "runtimePolicy": {
+          "runMode": "computational-first-lab-notebook",
+          "labelPolicy": "blind-control-labels-until-evaluation",
+          "evidencePolicy": "append-only-canonical-json-plus-sha256",
+          "replayPolicy": "deterministic-reconstruction-from-notebook-run",
+          "failurePolicy": "negative-null-and-inconclusive-results-are-first-class-evidence",
+          "nextCompilerHooks": [
+            "v0.49 unknown knowledge compiler",
+            "v0.50 directed wisher",
+            "v0.51 predictive trace derivation",
+            "v0.59 experiment design synthesizer",
+            "v0.60 mechanism-to-prototype generator"
+          ]
+        },
+        "sourceMechanismToPrototype": {
+          "format": "rcl.mechanism-to-prototype-generator-spec.v0.60",
+          "id": "rcl_empirical_lab_notebook_source_prototypes_v0",
+          "version": "0.60.0-alpha.1",
+          "objective": "Source v0.60 prototype IR and experiment objects for v0.61 empirical lab notebook runtime.",
+          "thresholds": {
+            "minPrototypeScore": 0.9,
+            "minAveragePrototypeScore": 0.92,
+            "minPrototypeCount": 8,
+            "requireExperimentObjects": true,
+            "requirePrototypeIr": true,
+            "requireControlGraphs": true,
+            "requireMetricContracts": true,
+            "requireReplayNotebooks": true,
+            "requireNaturalLanguageDocs": true
+          },
+          "prototypeRuntime": {
+            "runtimeKind": "computational-first-prototype",
+            "physicalLabMode": "deferred-until-evidence-contract-ready",
+            "evidenceMode": "hashable-replay-notebook",
+            "nextCompilerHooks": [
+              "v0.49 unknown knowledge compiler",
+              "v0.50 directed wisher",
+              "v0.51 predictive trace derivation",
+              "v0.56 akashic record compiler",
+              "v0.59 experiment design synthesizer"
+            ]
+          },
+          "sourceExperimentDesign": {
+            "format": "rcl.experiment-design-synthesizer-spec.v0.59",
+            "id": "rcl_mechanism_to_prototype_source_experiments_v0",
+            "version": "0.59.0-alpha.1",
+            "objective": "Source v0.59 experiment protocols for v0.60 mechanism-to-prototype generation.",
+            "thresholds": {
+              "minDesignScore": 0.86,
+              "minAverageDesignScore": 0.88,
+              "minPromotedProtocols": 6,
+              "requireNegativeControlsRejected": true,
+              "requireBlindHoldouts": true,
+              "requireNaturalLanguageDocs": true
+            },
+            "instrumentationLibrary": [
+              "spectral_reflectance_and_hydration_scan",
+              "thermal_relaxation_logger",
+              "weak_magnetic_phase_noise_probe",
+              "impedance_and_ion_conductivity_meter",
+              "microstructure_entropy_analyzer",
+              "time_series_blind_holdout_splitter",
+              "null_channel_baseline_monitor",
+              "observer_bias_audit_log"
+            ],
+            "candidateMechanisms": [
+              {
+                "id": "silicate_anchored_passive_memory_cell",
+                "name": "Silicate Anchored Passive Memory Cell",
+                "translation": "硅酸盐锚定被动记忆元胞",
+                "family": "material_memory",
+                "mechanism": "Non-equilibrium silicate medium stores persistent information-like residues through hydration state, lattice defects and thermal relaxation.",
+                "sourceVersions": [
+                  "v0.54"
+                ],
+                "requiredControls": [
+                  "no_anchor_control",
+                  "random_complexity_control",
+                  "thermal_erasure_control"
+                ],
+                "observables": [
+                  "anchor_persistence",
+                  "lattice_ordering",
+                  "information_retention",
+                  "self_repair"
+                ],
+                "instrumentation": [
+                  "spectral_reflectance_and_hydration_scan",
+                  "thermal_relaxation_logger",
+                  "microstructure_entropy_analyzer"
+                ],
+                "blindHoldouts": [
+                  "post_perturbation_recovery_window",
+                  "unlabeled_anchor_vs_random_sample"
+                ],
+                "falsifiers": [
+                  "Anchor signature fails to exceed random complexity control.",
+                  "Structure disappears below thermal erasure threshold.",
+                  "Readout cannot be reproduced across seeded trials."
+                ],
+                "riskClass": "low_computational_or_material_benchtop"
+              },
+              {
+                "id": "spectral_hydration_readout_protocol",
+                "name": "Spectral Hydration Readout Protocol",
+                "translation": "光谱水合读出协议",
+                "family": "readout_protocol",
+                "mechanism": "Hydration phase, reflectance drift and ion state are used as non-invasive readout channels for candidate silicate memory residues.",
+                "sourceVersions": [
+                  "v0.53"
+                ],
+                "requiredControls": [
+                  "dry_cycle_control",
+                  "hydration_cycle_control",
+                  "blinded_sample_labels"
+                ],
+                "observables": [
+                  "hydration_shift",
+                  "spectral_delta",
+                  "readout_repeatability",
+                  "false_positive_rate"
+                ],
+                "instrumentation": [
+                  "spectral_reflectance_and_hydration_scan",
+                  "impedance_and_ion_conductivity_meter",
+                  "time_series_blind_holdout_splitter"
+                ],
+                "blindHoldouts": [
+                  "hidden_sample_identity",
+                  "withheld_hydration_phase"
+                ],
+                "falsifiers": [
+                  "Spectral drift is indistinguishable from baseline hydration noise.",
+                  "Readout disappears under label blinding.",
+                  "False-positive rate exceeds allowed threshold."
+                ],
+                "riskClass": "low_measurement_protocol"
+              },
+              {
+                "id": "qi_environmental_biofield_coupling",
+                "name": "Qi Environmental Biofield Coupling",
+                "translation": "灵气环境生命场耦合",
+                "family": "biofield_coupling",
+                "mechanism": "Low-intensity environment-body coupling is modeled as measurable modulation of autonomic, thermal, electromagnetic and hydration-linked signals under constrained practice states.",
+                "sourceVersions": [
+                  "v0.55"
+                ],
+                "requiredControls": [
+                  "sham_practice_control",
+                  "resting_baseline_control",
+                  "observer_blinding_control"
+                ],
+                "observables": [
+                  "heart_rate_variability_delta",
+                  "skin_temperature_gradient",
+                  "weak_field_noise_shift",
+                  "subjective_report_blinded_mismatch"
+                ],
+                "instrumentation": [
+                  "thermal_relaxation_logger",
+                  "weak_magnetic_phase_noise_probe",
+                  "observer_bias_audit_log"
+                ],
+                "blindHoldouts": [
+                  "hidden_session_condition",
+                  "delayed_label_reveal"
+                ],
+                "falsifiers": [
+                  "Effects vanish under blinded sham comparison.",
+                  "Only subjective report changes without sensor support.",
+                  "Effect cannot survive session randomization."
+                ],
+                "riskClass": "nonmedical_observational"
+              },
+              {
+                "id": "aether_substrate_information_medium",
+                "name": "Aether Substrate Information Medium",
+                "translation": "以太底层信息媒介",
+                "family": "information_medium",
+                "mechanism": "A bounded substrate-field hypothesis is reduced to measurable correlations, phase residues and transfer constraints rather than unbounded faster-than-light claims.",
+                "sourceVersions": [
+                  "v0.55"
+                ],
+                "requiredControls": [
+                  "null_channel_control",
+                  "distance_scramble_control",
+                  "clock_drift_control"
+                ],
+                "observables": [
+                  "phase_residue",
+                  "correlation_decay",
+                  "null_channel_leakage",
+                  "clock_aligned_noise_difference"
+                ],
+                "instrumentation": [
+                  "null_channel_baseline_monitor",
+                  "weak_magnetic_phase_noise_probe",
+                  "time_series_blind_holdout_splitter"
+                ],
+                "blindHoldouts": [
+                  "withheld_distance_condition",
+                  "withheld_clock_phase"
+                ],
+                "falsifiers": [
+                  "No bounded channel residue exceeds clock drift.",
+                  "Correlation survives only when labels are visible.",
+                  "Claim requires unbounded information transfer."
+                ],
+                "riskClass": "computational_and_signal_analysis"
+              },
+              {
+                "id": "formation_spatial_constraint_array",
+                "name": "Formation Spatial Constraint Array",
+                "translation": "阵法空间约束阵列",
+                "family": "spatial_constraint",
+                "mechanism": "Symbolic-spatial layouts are compiled into measurable boundary conditions that shape flow, attention, field gradients or sensor readouts.",
+                "sourceVersions": [
+                  "v0.55"
+                ],
+                "requiredControls": [
+                  "random_layout_control",
+                  "rotated_layout_control",
+                  "masked_symbol_control"
+                ],
+                "observables": [
+                  "field_gradient_shift",
+                  "attention_path_bias",
+                  "flow_boundary_difference",
+                  "layout_specific_residual"
+                ],
+                "instrumentation": [
+                  "microstructure_entropy_analyzer",
+                  "weak_magnetic_phase_noise_probe",
+                  "observer_bias_audit_log"
+                ],
+                "blindHoldouts": [
+                  "withheld_layout_class",
+                  "masked_symbol_identity"
+                ],
+                "falsifiers": [
+                  "Randomized layouts produce equal or stronger effects.",
+                  "Layout effect vanishes when evaluator is blinded.",
+                  "No measurable boundary condition is altered."
+                ],
+                "riskClass": "low_environmental_layout"
+              },
+              {
+                "id": "akashic_substrate_memory_field",
+                "name": "Akashic Substrate Memory Field",
+                "translation": "阿卡西底层记忆场",
+                "family": "record_substrate",
+                "mechanism": "A finite, non-omniscient record substrate is modeled through material residue, temporal differential ledger and observer-state readout constraints.",
+                "sourceVersions": [
+                  "v0.56"
+                ],
+                "requiredControls": [
+                  "no_record_control",
+                  "false_memory_prompt_control",
+                  "material_residue_control"
+                ],
+                "observables": [
+                  "record_recall_specificity",
+                  "temporal_trace_consistency",
+                  "material_residue_alignment",
+                  "readout_cost_signature"
+                ],
+                "instrumentation": [
+                  "observer_bias_audit_log",
+                  "time_series_blind_holdout_splitter",
+                  "null_channel_baseline_monitor"
+                ],
+                "blindHoldouts": [
+                  "withheld_event_detail",
+                  "withheld_temporal_marker"
+                ],
+                "falsifiers": [
+                  "Readout becomes omniscient and unfalsifiable.",
+                  "Specificity collapses under false-memory prompts.",
+                  "No residue or temporal ledger can be reconstructed."
+                ],
+                "riskClass": "cognitive_record_protocol"
+              },
+              {
+                "id": "observer_state_readout_interface",
+                "name": "Observer-state Readout Interface",
+                "translation": "观测者状态读出界面",
+                "family": "observer_readout",
+                "mechanism": "Observer state is treated as an instrument that must be calibrated, blinded, logged and separated from post-hoc explanation freedom.",
+                "sourceVersions": [
+                  "v0.56"
+                ],
+                "requiredControls": [
+                  "observer_baseline_control",
+                  "blind_prompt_control",
+                  "cross_observer_null_control"
+                ],
+                "observables": [
+                  "state_dependent_accuracy",
+                  "prompt_blind_stability",
+                  "observer_drift",
+                  "cross_observer_convergence"
+                ],
+                "instrumentation": [
+                  "observer_bias_audit_log",
+                  "time_series_blind_holdout_splitter",
+                  "null_channel_baseline_monitor"
+                ],
+                "blindHoldouts": [
+                  "hidden_target_set",
+                  "delayed_feedback_labels"
+                ],
+                "falsifiers": [
+                  "Accuracy follows feedback leakage.",
+                  "Observer drift explains all effects.",
+                  "Cross-observer null control matches the active condition."
+                ],
+                "riskClass": "cognitive_protocol"
+              },
+              {
+                "id": "experiment_to_lab_notebook_bridge",
+                "name": "Experiment-to-Lab Notebook Bridge",
+                "translation": "实验到实证日志桥",
+                "family": "evidence_runtime",
+                "mechanism": "Every synthesized protocol emits a replayable lab notebook contract: raw data, transformations, hashes, failure conditions and reproduction checklist.",
+                "sourceVersions": [
+                  "v0.58",
+                  "v0.59"
+                ],
+                "requiredControls": [
+                  "hash_integrity_control",
+                  "missing_data_control",
+                  "replay_determinism_control"
+                ],
+                "observables": [
+                  "notebook_completeness",
+                  "hash_replay_integrity",
+                  "failure_condition_traceability",
+                  "reproduction_readiness"
+                ],
+                "instrumentation": [
+                  "time_series_blind_holdout_splitter",
+                  "observer_bias_audit_log"
+                ],
+                "blindHoldouts": [
+                  "withheld_transformation_step",
+                  "withheld_run_seed"
+                ],
+                "falsifiers": [
+                  "Evidence cannot be replayed from logs.",
+                  "Failure conditions are absent or mutable after the run.",
+                  "Notebook output lacks raw-to-result trace."
+                ],
+                "riskClass": "software_evidence_protocol"
+              }
+            ],
+            "negativeControls": [
+              {
+                "id": "unbounded_truth_oracle_experiment",
+                "name": "Unbounded Truth Oracle Experiment",
+                "translation": "无限真理神谕实验",
+                "mechanism": "Claims exact access to all reality without variables, controls, sensors, false conditions or cost.",
+                "requiredControls": [],
+                "observables": [],
+                "instrumentation": [],
+                "blindHoldouts": [],
+                "falsifiers": [],
+                "riskClass": "invalid_unbounded"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,627 @@
+reality RCLSelfHostRuntimeErrorPathInterpreterStage20 {
+  facet selfhost.stage : Text = "stage20_rcl_owned_runtime_error_path_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_interprets_authority_denied_and_preserve_failed_bytecode_error_paths_inside_native_vm"
+  facet selfhost.boundary : Text = "authority_preserve_error_path_subset_not_complete_rcl_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_runtime_provider_error_paths_pure_sha256_and_full_history_roots"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_runtime_subset : Truth = true
+  facet gate.rcl_owned_runtime_transaction_subset : Truth = true
+  facet gate.rcl_owned_runtime_error_path_subset : Truth = true
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet target.denied_id : Text = "denied"
+  facet target.preserve_id : Text = "preserve"
+  facet target.denied_program : Text = "RuntimeAuthorityDeniedTarget"
+  facet target.preserve_program : Text = "RuntimePreserveFailureTarget"
+  facet target.denied_root : Text = "stage20:authority-denied-manual-bytecode"
+  facet target.preserve_root : Text = "stage20:preserve-failure-manual-bytecode"
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon target_string_at(target : Text, index : Number) -> Text =
+    choose(index == 0,
+      choose(target == target.denied_id, target.denied_program, target.preserve_program),
+      choose(index == 1,
+        choose(target == target.denied_id, target.denied_root, target.preserve_root),
+        choose(index == 2, "world.ready",
+          choose(index == 3, "draft",
+            choose(index == 4, "world.status",
+              choose(index == 5,
+                choose(target == target.denied_id, "intruder", "operator"),
+                choose(index == 6, "world.publish",
+                  choose(index == 7, "world",
+                    choose(index == 8, "publish",
+                      choose(index == 9, "published", "impossible"))))))))))
+
+  reckon target_string_count(target : Text) -> Number =
+    choose(target == target.denied_id, 10, 11)
+
+  reckon build_target_strings(target : Text, index : Number, output : Sequence) -> Sequence =
+    choose(index >= target_string_count(target), output,
+      build_target_strings(target, index + 1, sequence_append(output, target_string_at(target, index))))
+
+  reckon target_strings(target : Text) -> Sequence =
+    build_target_strings(target, 0, empty_sequence())
+
+  reckon target_instruction_count(target : Text) -> Number =
+    choose(target == target.denied_id, 17, 18)
+
+  reckon denied_op_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 5,
+        choose(index == 2, 3,
+          choose(index == 3, 5,
+            choose(index == 4, 4,
+              choose(index == 5, 21,
+                choose(index == 6, 23,
+                  choose(index == 7, 24,
+                    choose(index == 8, 3,
+                      choose(index == 9, 25,
+                        choose(index == 10, 26,
+                          choose(index == 11, 4,
+                            choose(index == 12, 3,
+                              choose(index == 13, 10,
+                                choose(index == 14, 27,
+                                  choose(index == 15, 29, 31))))))))))))))))
+
+  reckon preserve_op_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 5,
+        choose(index == 2, 3,
+          choose(index == 3, 5,
+            choose(index == 4, 22,
+              choose(index == 5, 4,
+                choose(index == 6, 21,
+                  choose(index == 7, 23,
+                    choose(index == 8, 24,
+                      choose(index == 9, 3,
+                        choose(index == 10, 25,
+                          choose(index == 11, 26,
+                            choose(index == 12, 4,
+                              choose(index == 13, 3,
+                                choose(index == 14, 10,
+                                  choose(index == 15, 27,
+                                    choose(index == 16, 29, 31)))))))))))))))))
+
+  reckon target_op_at(target : Text, index : Number) -> Number =
+    choose(target == target.denied_id, denied_op_at(index), preserve_op_at(index))
+
+  reckon denied_a_at(index : Number) -> Number =
+    choose(index == 0, 1,
+      choose(index == 1, 2,
+        choose(index == 2, 3,
+          choose(index == 3, 4,
+            choose(index == 4, 2,
+              choose(index == 5, 16,
+                choose(index == 6, 1,
+                  choose(index == 7, 5,
+                    choose(index == 8, 9,
+                      choose(index == 9, 4,
+                        choose(index == 10, 1,
+                          choose(index == 11, 4,
+                            choose(index == 12, 9,
+                              choose(index == 13, 0,
+                                choose(index == 14, 0, 0)))))))))))))))
+
+  reckon preserve_a_at(index : Number) -> Number =
+    choose(index == 0, 1,
+      choose(index == 1, 2,
+        choose(index == 2, 3,
+          choose(index == 3, 4,
+            choose(index == 4, 5,
+              choose(index == 5, 2,
+                choose(index == 6, 17,
+                  choose(index == 7, 1,
+                    choose(index == 8, 5,
+                      choose(index == 9, 9,
+                        choose(index == 10, 4,
+                          choose(index == 11, 1,
+                            choose(index == 12, 4,
+                              choose(index == 13, 10,
+                                choose(index == 14, 0,
+                                  choose(index == 15, 0, 0))))))))))))))))
+
+  reckon target_a_at(target : Text, index : Number) -> Number =
+    choose(target == target.denied_id, denied_a_at(index), preserve_a_at(index))
+
+  reckon target_b_at(target : Text, index : Number) -> Number =
+    choose(target == target.denied_id,
+      choose(index == 6, 8,
+        choose(index == 7, 6, 0)),
+      choose(index == 4, 6,
+        choose(index == 7, 8,
+          choose(index == 8, 6, 0))))
+
+  reckon target_c_at(target : Text, index : Number) -> Number =
+    choose(target == target.denied_id,
+      choose(index == 6, 5,
+        choose(index == 7, 7, 0)),
+      choose(index == 4, 7,
+        choose(index == 7, 5,
+          choose(index == 8, 7, 0))))
+
+  reckon build_instruction_values(target : Text, index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= target_instruction_count(target), output,
+      build_instruction_values(
+        target,
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, target_op_at(target, index),
+            choose(selector == 1, target_a_at(target, index),
+              choose(selector == 2, target_b_at(target, index), target_c_at(target, index))))),
+        selector))
+
+  reckon instruction_ops(target : Text) -> Sequence =
+    build_instruction_values(target, 0, empty_sequence(), 0)
+
+  reckon instruction_a_values(target : Text) -> Sequence =
+    build_instruction_values(target, 0, empty_sequence(), 1)
+
+  reckon instruction_b_values(target : Text) -> Sequence =
+    build_instruction_values(target, 0, empty_sequence(), 2)
+
+  reckon instruction_c_values(target : Text) -> Sequence =
+    build_instruction_values(target, 0, empty_sequence(), 3)
+
+  reckon encode_target_rbc(target : Text) -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target_strings(target)), 0, length(instruction_ops(target))),
+      sequence_concat(
+        encode_string_pool(target_strings(target), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(target), instruction_a_values(target), instruction_b_values(target), instruction_c_values(target), 0, empty_sequence())))
+
+  reckon runtime_frame(
+    pc : Number,
+    stack : Sequence,
+    state_keys : Sequence,
+    state_values : Sequence,
+    warrant_count : Number,
+    tx_active : Truth,
+    tx_projected_view : Truth,
+    tx_change_keys : Sequence,
+    tx_change_values : Sequence,
+    error_code : Text,
+    error_message : Text,
+    history_count : Number,
+    projection_count : Number
+  ) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(sequence_append(empty_sequence(), pc), stack),
+                          state_keys),
+                        state_values),
+                      warrant_count),
+                    tx_active),
+                  tx_projected_view),
+                tx_change_keys),
+              tx_change_values),
+            error_code),
+          error_message),
+        history_count),
+      projection_count)
+
+  reckon frame_pc(frame : Sequence) -> Number = sequence_get(frame, 0)
+  reckon frame_stack(frame : Sequence) -> Sequence = sequence_get(frame, 1)
+  reckon frame_state_keys(frame : Sequence) -> Sequence = sequence_get(frame, 2)
+  reckon frame_state_values(frame : Sequence) -> Sequence = sequence_get(frame, 3)
+  reckon frame_warrant_count(frame : Sequence) -> Number = sequence_get(frame, 4)
+  reckon frame_tx_active(frame : Sequence) -> Truth = sequence_get(frame, 5)
+  reckon frame_tx_projected_view(frame : Sequence) -> Truth = sequence_get(frame, 6)
+  reckon frame_tx_change_keys(frame : Sequence) -> Sequence = sequence_get(frame, 7)
+  reckon frame_tx_change_values(frame : Sequence) -> Sequence = sequence_get(frame, 8)
+  reckon frame_error_code(frame : Sequence) -> Text = sequence_get(frame, 9)
+  reckon frame_error_message(frame : Sequence) -> Text = sequence_get(frame, 10)
+  reckon frame_history_count(frame : Sequence) -> Number = sequence_get(frame, 11)
+  reckon frame_projection_count(frame : Sequence) -> Number = sequence_get(frame, 12)
+
+  reckon copy_until(items : Sequence, index : Number, exclusive_end : Number, output : Sequence) -> Sequence =
+    choose(index >= exclusive_end, output,
+      copy_until(items, index + 1, exclusive_end, sequence_append(output, sequence_get(items, index))))
+
+  reckon stack_without_last(stack : Sequence) -> Sequence =
+    copy_until(stack, 0, length(stack) - 1, empty_sequence())
+
+  reckon stack_without_two(stack : Sequence) -> Sequence =
+    stack_without_last(stack_without_last(stack))
+
+  reckon stack_top_truth(stack : Sequence) -> Truth = sequence_get(stack, length(stack) - 1)
+  reckon stack_top_text(stack : Sequence) -> Text = sequence_get(stack, length(stack) - 1)
+  reckon stack_second_text(stack : Sequence) -> Text = sequence_get(stack, length(stack) - 2)
+
+  reckon lookup_truth(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Truth) -> Truth =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_truth(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_text(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Text) -> Text =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_text(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_projected_text(frame : Sequence, key : Text, fallback : Text) -> Text =
+    choose(frame_tx_active(frame) and frame_tx_projected_view(frame),
+      lookup_text(frame_tx_change_keys(frame), frame_tx_change_values(frame), length(frame_tx_change_keys(frame)) - 1, key,
+        lookup_text(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, key, fallback)),
+      lookup_text(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, key, fallback))
+
+  reckon update_frame(frame : Sequence, pc : Number, stack : Sequence, state_keys : Sequence, state_values : Sequence) -> Sequence =
+    runtime_frame(
+      pc,
+      stack,
+      state_keys,
+      state_values,
+      frame_warrant_count(frame),
+      frame_tx_active(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon error_frame(frame : Sequence, code : Text, message : Text) -> Sequence =
+    runtime_frame(
+      frame_pc(frame),
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame),
+      frame_tx_active(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      code,
+      message,
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon push_bool_frame(target : Text, frame : Sequence) -> Sequence =
+    update_frame(frame, frame_pc(frame) + 1, sequence_append(frame_stack(frame), target_a_at(target, frame_pc(frame)) == 1), frame_state_keys(frame), frame_state_values(frame))
+
+  reckon push_string_frame(target : Text, frame : Sequence) -> Sequence =
+    update_frame(frame, frame_pc(frame) + 1, sequence_append(frame_stack(frame), target_string_at(target, target_a_at(target, frame_pc(frame)))), frame_state_keys(frame), frame_state_values(frame))
+
+  reckon store_state_frame(target : Text, frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      sequence_append(frame_state_keys(frame), target_string_at(target, target_a_at(target, frame_pc(frame)))),
+      sequence_append(frame_state_values(frame), sequence_get(frame_stack(frame), length(frame_stack(frame)) - 1)))
+
+  reckon load_state_frame(target : Text, frame : Sequence) -> Sequence =
+    choose(target_a_at(target, frame_pc(frame)) == 2,
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(frame_stack(frame), lookup_truth(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, "world.ready", false)),
+        frame_state_keys(frame),
+        frame_state_values(frame)),
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(frame_stack(frame), lookup_projected_text(frame, target_string_at(target, target_a_at(target, frame_pc(frame))), "")),
+        frame_state_keys(frame),
+        frame_state_values(frame)))
+
+  reckon eq_text_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_two(frame_stack(frame)), stack_second_text(frame_stack(frame)) == stack_top_text(frame_stack(frame))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon jump_if_false_frame(target : Text, frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      choose(stack_top_truth(frame_stack(frame)), frame_pc(frame) + 1, target_a_at(target, frame_pc(frame))),
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon grant_warrant_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame) + 1,
+      frame_tx_active(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon begin_tx_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame),
+      true,
+      false,
+      empty_sequence(),
+      empty_sequence(),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon check_warrant_frame(target : Text, frame : Sequence) -> Sequence =
+    choose(frame_warrant_count(frame) > 0,
+      update_frame(frame, frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame)),
+      error_frame(frame, "RCL_AUTHORITY_DENIED", "Authority denied: " + target_string_at(target, target_a_at(target, frame_pc(frame))) + " lacks " + target_string_at(target, target_b_at(target, frame_pc(frame))) + " on " + target_string_at(target, target_c_at(target, frame_pc(frame)))))
+
+  reckon stage_store_frame(target : Text, frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame),
+      frame_tx_active(frame),
+      frame_tx_projected_view(frame),
+      sequence_append(frame_tx_change_keys(frame), target_string_at(target, target_a_at(target, frame_pc(frame)))),
+      sequence_append(frame_tx_change_values(frame), stack_top_text(frame_stack(frame))),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon set_projected_view_frame(target : Text, frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame),
+      frame_tx_active(frame),
+      target_a_at(target, frame_pc(frame)) == 1,
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame),
+      frame_projection_count(frame))
+
+  reckon check_preserve_frame(frame : Sequence) -> Sequence =
+    choose(stack_top_truth(frame_stack(frame)),
+      update_frame(frame, frame_pc(frame) + 1, stack_without_last(frame_stack(frame)), frame_state_keys(frame), frame_state_values(frame)),
+      runtime_frame(
+        frame_pc(frame),
+        stack_without_last(frame_stack(frame)),
+        frame_state_keys(frame),
+        frame_state_values(frame),
+        frame_warrant_count(frame),
+        frame_tx_active(frame),
+        frame_tx_projected_view(frame),
+        frame_tx_change_keys(frame),
+        frame_tx_change_values(frame),
+        "RCL_REALITY_BOUND_BROKEN",
+        "A preserve clause rejected the projected reality",
+        frame_history_count(frame),
+        frame_projection_count(frame)))
+
+  reckon commit_tx_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_warrant_count(frame),
+      false,
+      false,
+      empty_sequence(),
+      empty_sequence(),
+      frame_error_code(frame),
+      frame_error_message(frame),
+      frame_history_count(frame) + 1,
+      frame_projection_count(frame))
+
+  reckon halt_frame(target : Text, frame : Sequence) -> Sequence =
+    update_frame(frame, target_instruction_count(target), frame_stack(frame), frame_state_keys(frame), frame_state_values(frame))
+
+  reckon step_frame(target : Text, frame : Sequence) -> Sequence =
+    choose(target_op_at(target, frame_pc(frame)) == 2, push_bool_frame(target, frame),
+      choose(target_op_at(target, frame_pc(frame)) == 3, push_string_frame(target, frame),
+        choose(target_op_at(target, frame_pc(frame)) == 4, load_state_frame(target, frame),
+          choose(target_op_at(target, frame_pc(frame)) == 5, store_state_frame(target, frame),
+            choose(target_op_at(target, frame_pc(frame)) == 10, eq_text_frame(frame),
+              choose(target_op_at(target, frame_pc(frame)) == 21, jump_if_false_frame(target, frame),
+                choose(target_op_at(target, frame_pc(frame)) == 22, grant_warrant_frame(frame),
+                  choose(target_op_at(target, frame_pc(frame)) == 23, begin_tx_frame(frame),
+                    choose(target_op_at(target, frame_pc(frame)) == 24, check_warrant_frame(target, frame),
+                      choose(target_op_at(target, frame_pc(frame)) == 25, stage_store_frame(target, frame),
+                        choose(target_op_at(target, frame_pc(frame)) == 26, set_projected_view_frame(target, frame),
+                          choose(target_op_at(target, frame_pc(frame)) == 27, check_preserve_frame(frame),
+                            choose(target_op_at(target, frame_pc(frame)) == 29, commit_tx_frame(frame), halt_frame(target, frame))))))))))))))
+
+  reckon execute(target : Text, frame : Sequence) -> Sequence =
+    choose(frame_error_code(frame) != "OK", frame,
+      choose(frame_pc(frame) >= target_instruction_count(target), frame,
+        execute(target, step_frame(target, frame))))
+
+  reckon initial_frame() -> Sequence =
+    runtime_frame(0, empty_sequence(), empty_sequence(), empty_sequence(), 0, false, false, empty_sequence(), empty_sequence(), "OK", "", 0, 0)
+
+  facet target.denied_rbc_strings : Sequence = target_strings(target.denied_id)
+  facet target.preserve_rbc_strings : Sequence = target_strings(target.preserve_id)
+  facet target.denied_rbc_instruction_ops : Sequence = instruction_ops(target.denied_id)
+  facet target.denied_rbc_instruction_a_values : Sequence = instruction_a_values(target.denied_id)
+  facet target.denied_rbc_instruction_b_values : Sequence = instruction_b_values(target.denied_id)
+  facet target.denied_rbc_instruction_c_values : Sequence = instruction_c_values(target.denied_id)
+  facet target.preserve_rbc_instruction_ops : Sequence = instruction_ops(target.preserve_id)
+  facet target.preserve_rbc_instruction_a_values : Sequence = instruction_a_values(target.preserve_id)
+  facet target.preserve_rbc_instruction_b_values : Sequence = instruction_b_values(target.preserve_id)
+  facet target.preserve_rbc_instruction_c_values : Sequence = instruction_c_values(target.preserve_id)
+  facet target.denied_rbc_bytes : Sequence = encode_target_rbc(target.denied_id)
+  facet target.preserve_rbc_bytes : Sequence = encode_target_rbc(target.preserve_id)
+  facet target.denied_rbc_size : Number = length(target.denied_rbc_bytes)
+  facet target.preserve_rbc_size : Number = length(target.preserve_rbc_bytes)
+  facet target.denied_bytecode_magic_0 : Number = sequence_get(target.denied_rbc_bytes, 0)
+  facet target.denied_bytecode_magic_1 : Number = sequence_get(target.denied_rbc_bytes, 1)
+  facet target.denied_bytecode_magic_2 : Number = sequence_get(target.denied_rbc_bytes, 2)
+  facet target.denied_bytecode_magic_3 : Number = sequence_get(target.denied_rbc_bytes, 3)
+  facet target.preserve_bytecode_magic_0 : Number = sequence_get(target.preserve_rbc_bytes, 0)
+  facet target.preserve_bytecode_magic_1 : Number = sequence_get(target.preserve_rbc_bytes, 1)
+  facet target.preserve_bytecode_magic_2 : Number = sequence_get(target.preserve_rbc_bytes, 2)
+  facet target.preserve_bytecode_magic_3 : Number = sequence_get(target.preserve_rbc_bytes, 3)
+
+  facet runtime.denied_final_frame : Sequence = execute(target.denied_id, initial_frame())
+  facet runtime.preserve_final_frame : Sequence = execute(target.preserve_id, initial_frame())
+  facet runtime.denied_error_code : Text = frame_error_code(runtime.denied_final_frame)
+  facet runtime.denied_error_message : Text = frame_error_message(runtime.denied_final_frame)
+  facet runtime.denied_final_pc : Number = frame_pc(runtime.denied_final_frame)
+  facet runtime.denied_stack_count : Number = length(frame_stack(runtime.denied_final_frame))
+  facet runtime.denied_state_keys : Sequence = frame_state_keys(runtime.denied_final_frame)
+  facet runtime.denied_state_values : Sequence = frame_state_values(runtime.denied_final_frame)
+  facet runtime.denied_world_ready : Truth = lookup_truth(runtime.denied_state_keys, runtime.denied_state_values, length(runtime.denied_state_keys) - 1, "world.ready", false)
+  facet runtime.denied_world_status : Text = lookup_text(runtime.denied_state_keys, runtime.denied_state_values, length(runtime.denied_state_keys) - 1, "world.status", "")
+  facet runtime.denied_history_count : Number = frame_history_count(runtime.denied_final_frame)
+  facet runtime.denied_projection_count : Number = frame_projection_count(runtime.denied_final_frame)
+  facet runtime.preserve_error_code : Text = frame_error_code(runtime.preserve_final_frame)
+  facet runtime.preserve_error_message : Text = frame_error_message(runtime.preserve_final_frame)
+  facet runtime.preserve_final_pc : Number = frame_pc(runtime.preserve_final_frame)
+  facet runtime.preserve_stack_count : Number = length(frame_stack(runtime.preserve_final_frame))
+  facet runtime.preserve_state_keys : Sequence = frame_state_keys(runtime.preserve_final_frame)
+  facet runtime.preserve_state_values : Sequence = frame_state_values(runtime.preserve_final_frame)
+  facet runtime.preserve_world_ready : Truth = lookup_truth(runtime.preserve_state_keys, runtime.preserve_state_values, length(runtime.preserve_state_keys) - 1, "world.ready", false)
+  facet runtime.preserve_world_status : Text = lookup_text(runtime.preserve_state_keys, runtime.preserve_state_values, length(runtime.preserve_state_keys) - 1, "world.status", "")
+  facet runtime.preserve_history_count : Number = frame_history_count(runtime.preserve_final_frame)
+  facet runtime.preserve_projection_count : Number = frame_projection_count(runtime.preserve_final_frame)
+  facet runtime.error_path_supported : Truth =
+    semantic_assert(
+      runtime.denied_error_code == "RCL_AUTHORITY_DENIED"
+        and contains(runtime.denied_error_message, "intruder lacks world.publish on world")
+        and runtime.denied_stack_count == 0
+        and runtime.denied_world_ready == true
+        and runtime.denied_world_status == "draft"
+        and runtime.denied_history_count == 0
+        and runtime.denied_projection_count == 0
+        and runtime.preserve_error_code == "RCL_REALITY_BOUND_BROKEN"
+        and contains(runtime.preserve_error_message, "preserve clause rejected")
+        and runtime.preserve_stack_count == 0
+        and runtime.preserve_world_ready == true
+        and runtime.preserve_world_status == "draft"
+        and runtime.preserve_history_count == 0
+        and runtime.preserve_projection_count == 0,
+      "RCL_STAGE20_RUNTIME_ERROR_PATH_MISMATCH",
+      selfhost.stage,
+      make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant runtime.audit on runtime
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage20_runtime_error_path_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_runtime_error_path_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_ERROR_PATH_SUBSET_VERIFIED"
+
+    preserve runtime.error_path_supported == true
+      and target.denied_rbc_size == 486
+      and target.preserve_rbc_size == 516
+      and length(target.denied_rbc_strings) == 10
+      and length(target.preserve_rbc_strings) == 11
+      and length(target.denied_rbc_instruction_ops) == 17
+      and length(target.preserve_rbc_instruction_ops) == 18
+      and target.denied_bytecode_magic_0 == 82
+      and target.denied_bytecode_magic_1 == 67
+      and target.denied_bytecode_magic_2 == 76
+      and target.denied_bytecode_magic_3 == 66
+      and target.preserve_bytecode_magic_0 == 82
+      and target.preserve_bytecode_magic_1 == 67
+      and target.preserve_bytecode_magic_2 == 76
+      and target.preserve_bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_runtime_error_path_subset == true
+      and gate.rcl_owned_runtime_root_hashing_complete == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage20-runtime-error-path-subset"
+  }
+
+  foresee verify_stage20_runtime_error_path_subset
+  realize verify_stage20_runtime_error_path_subset
+}

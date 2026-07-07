@@ -1,0 +1,63 @@
+reality RclUserOnlyAbsorption {
+  dialect release {
+    layer semantic
+    domain execution
+    description "User-facing release dialect declared directly in RCL."
+    lowers_to authority, machine
+    operation declare_release {
+      output ReleasePlan
+      effect Evidence
+      lowers_to authority
+    }
+    invariant "release dialect must preserve source program and authority roots"
+  }
+
+  effect AlterReality {
+    deterministic true
+    replay "transition-delta"
+    evidence_required true
+  }
+
+  effect HostCall {
+    deterministic false
+    replay "requires-provider-receipt"
+    evidence_required true
+  }
+
+  capability_policy safe_release {
+    allow_effect Warrant, Authority, AlterReality, Preserve, Evidence
+    deny_effect HostCall
+    allow world.publish on world
+    budget max_alterations 2
+    budget max_host_calls 0
+    budget max_rules 1
+    require_deterministic_replay true
+  }
+
+  store absorption_reality {
+    branch main
+    commit "RCL user-only absorption kernel materialized"
+  }
+
+  facet world.status : Text = "draft"
+  facet world.score : Number = 0
+
+  subject founder {
+    warrant world.publish on world
+  }
+
+  emergence publish {
+    cause founder
+    when world.status == "draft"
+    needs world.publish on world
+    alter world.status <- "published"
+    alter world.score <- world.score + 1
+    preserve world.score >= 0
+    witness "rcl:user-only:absorption-kernel:published"
+  }
+
+  foresee publish
+  realize publish
+  verify safe_release
+  snapshot absorption_reality
+}

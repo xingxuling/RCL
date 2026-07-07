@@ -1,0 +1,737 @@
+reality RCLSelfHostRuntimeHistoryRootInterpreterStage18 {
+  facet source.target : Text = "reality RuntimeTransactionTarget {\n  facet world.ready : Truth = true\n  facet world.status : Text = \"draft\"\n  subject founder {\n    warrant world.publish on world\n  }\n  emergence publish {\n    cause founder\n    when world.ready\n    needs world.publish on world\n    alter world.status <- \"published\"\n    preserve world.status == \"published\"\n    witness \"rcl:stage15:published\"\n  }\n  foresee publish\n  realize publish\n}\n"
+  facet source.program : Text = "RuntimeTransactionTarget"
+  facet source.root : Text = "d6f79265cb240fbab6b2a9e84648e868131d179e07726f4b9690529653af5ea4"
+
+  facet selfhost.stage : Text = "stage18_rcl_owned_runtime_history_root_preimage_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_interprets_transaction_bytecode_and_emits_canonical_history_root_preimage_subset_inside_native_vm"
+  facet selfhost.boundary : Text = "single_rule_transaction_history_root_preimage_subset_not_complete_rcl_runtime_or_sha256_builtin"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_runtime_sha256_root_builtin_error_paths_provider_parity_and_full_history_roots"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_runtime_subset : Truth = true
+  facet gate.rcl_owned_runtime_transaction_subset : Truth = true
+  facet gate.rcl_owned_runtime_history_root_preimage_subset : Truth = true
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon runtime_string_at(index : Number) -> Text =
+    choose(index == 0, source.program,
+      choose(index == 1, source.root,
+        choose(index == 2, "world.ready",
+          choose(index == 3, "draft",
+            choose(index == 4, "world.status",
+              choose(index == 5, "founder",
+                choose(index == 6, "world.publish",
+                  choose(index == 7, "world",
+                    choose(index == 8, "publish",
+                      choose(index == 9, "published", "rcl:stage15:published"))))))))))
+
+  reckon build_strings(index : Number, output : Sequence) -> Sequence =
+    choose(index >= 11, output,
+      build_strings(index + 1, sequence_append(output, runtime_string_at(index))))
+
+  reckon runtime_strings() -> Sequence =
+    build_strings(0, empty_sequence())
+
+  reckon instruction_op_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 5,
+        choose(index == 2, 3,
+          choose(index == 3, 5,
+            choose(index == 4, 22,
+              choose(index == 5, 4,
+                choose(index == 6, 21,
+                  choose(index == 7, 23,
+                    choose(index == 8, 24,
+                      choose(index == 9, 3,
+                        choose(index == 10, 25,
+                          choose(index == 11, 26,
+                            choose(index == 12, 4,
+                              choose(index == 13, 3,
+                                choose(index == 14, 10,
+                                  choose(index == 15, 27,
+                                    choose(index == 16, 26,
+                                      choose(index == 17, 28,
+                                        choose(index == 18, 29,
+                                          choose(index == 19, 4,
+                                            choose(index == 20, 21,
+                                              choose(index == 21, 23,
+                                                choose(index == 22, 24,
+                                                  choose(index == 23, 3,
+                                                    choose(index == 24, 25,
+                                                      choose(index == 25, 26,
+                                                        choose(index == 26, 4,
+                                                          choose(index == 27, 3,
+                                                            choose(index == 28, 10,
+                                                              choose(index == 29, 27,
+                                                                choose(index == 30, 26,
+                                                                  choose(index == 31, 28,
+                                                                    choose(index == 32, 29, 31)))))))))))))))))))))))))))))))))
+
+  reckon instruction_a_at(index : Number) -> Number =
+    choose(index == 0, 1,
+      choose(index == 1, 2,
+        choose(index == 2, 3,
+          choose(index == 3, 4,
+            choose(index == 4, 5,
+              choose(index == 5, 2,
+                choose(index == 6, 19,
+                  choose(index == 7, 0,
+                    choose(index == 8, 5,
+                      choose(index == 9, 9,
+                        choose(index == 10, 4,
+                          choose(index == 11, 1,
+                            choose(index == 12, 4,
+                              choose(index == 13, 9,
+                                choose(index == 14, 0,
+                                  choose(index == 15, 0,
+                                    choose(index == 16, 0,
+                                      choose(index == 17, 10,
+                                        choose(index == 18, 0,
+                                          choose(index == 19, 2,
+                                            choose(index == 20, 33,
+                                              choose(index == 21, 1,
+                                                choose(index == 22, 5,
+                                                  choose(index == 23, 9,
+                                                    choose(index == 24, 4,
+                                                      choose(index == 25, 1,
+                                                        choose(index == 26, 4,
+                                                          choose(index == 27, 9,
+                                                            choose(index == 28, 0,
+                                                              choose(index == 29, 0,
+                                                                choose(index == 30, 0,
+                                                                  choose(index == 31, 10,
+                                                                    choose(index == 32, 0, 0)))))))))))))))))))))))))))))))))
+
+  reckon instruction_b_at(index : Number) -> Number =
+    choose(index == 4, 6,
+      choose(index == 7, 8,
+        choose(index == 8, 6,
+          choose(index == 21, 8,
+            choose(index == 22, 6, 0)))))
+
+  reckon instruction_c_at(index : Number) -> Number =
+    choose(index == 4, 7,
+      choose(index == 7, 5,
+        choose(index == 8, 7,
+          choose(index == 21, 5,
+            choose(index == 22, 7, 0)))))
+
+  reckon build_instruction_values(index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= 34, output,
+      build_instruction_values(
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, instruction_op_at(index),
+            choose(selector == 1, instruction_a_at(index),
+              choose(selector == 2, instruction_b_at(index), instruction_c_at(index))))),
+        selector))
+
+  reckon instruction_ops() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 1)
+
+  reckon instruction_b_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 2)
+
+  reckon instruction_c_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 3)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target.rbc_strings), 0, length(target.rbc_instruction_ops)),
+      sequence_concat(
+        encode_string_pool(target.rbc_strings, 0, empty_sequence()),
+        encode_instruction_plan(target.rbc_instruction_ops, target.rbc_instruction_a_values, target.rbc_instruction_b_values, target.rbc_instruction_c_values, 0, empty_sequence())))
+
+  reckon runtime_frame(
+    pc : Number,
+    stack : Sequence,
+    state_keys : Sequence,
+    state_values : Sequence,
+    tx_active : Truth,
+    tx_mode : Number,
+    tx_projected_view : Truth,
+    tx_change_keys : Sequence,
+    tx_change_values : Sequence,
+    tx_need_count : Number,
+    tx_witnesses : Sequence,
+    warrant_count : Number,
+    projection_count : Number,
+    history_count : Number,
+    projection_status : Text,
+    history_status : Text,
+    preserve_count : Number
+  ) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(
+                            sequence_append(
+                              sequence_append(
+                                sequence_append(
+                                  sequence_append(
+                                    sequence_append(empty_sequence(), pc),
+                                    stack),
+                                  state_keys),
+                                state_values),
+                              tx_active),
+                            tx_mode),
+                          tx_projected_view),
+                        tx_change_keys),
+                      tx_change_values),
+                    tx_need_count),
+                  tx_witnesses),
+                warrant_count),
+              projection_count),
+            history_count),
+          projection_status),
+        history_status),
+      preserve_count)
+
+  reckon frame_pc(frame : Sequence) -> Number = sequence_get(frame, 0)
+  reckon frame_stack(frame : Sequence) -> Sequence = sequence_get(frame, 1)
+  reckon frame_state_keys(frame : Sequence) -> Sequence = sequence_get(frame, 2)
+  reckon frame_state_values(frame : Sequence) -> Sequence = sequence_get(frame, 3)
+  reckon frame_tx_active(frame : Sequence) -> Truth = sequence_get(frame, 4)
+  reckon frame_tx_mode(frame : Sequence) -> Number = sequence_get(frame, 5)
+  reckon frame_tx_projected_view(frame : Sequence) -> Truth = sequence_get(frame, 6)
+  reckon frame_tx_change_keys(frame : Sequence) -> Sequence = sequence_get(frame, 7)
+  reckon frame_tx_change_values(frame : Sequence) -> Sequence = sequence_get(frame, 8)
+  reckon frame_tx_need_count(frame : Sequence) -> Number = sequence_get(frame, 9)
+  reckon frame_tx_witnesses(frame : Sequence) -> Sequence = sequence_get(frame, 10)
+  reckon frame_warrant_count(frame : Sequence) -> Number = sequence_get(frame, 11)
+  reckon frame_projection_count(frame : Sequence) -> Number = sequence_get(frame, 12)
+  reckon frame_history_count(frame : Sequence) -> Number = sequence_get(frame, 13)
+  reckon frame_projection_status(frame : Sequence) -> Text = sequence_get(frame, 14)
+  reckon frame_history_status(frame : Sequence) -> Text = sequence_get(frame, 15)
+  reckon frame_preserve_count(frame : Sequence) -> Number = sequence_get(frame, 16)
+
+  reckon current_op(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_ops, frame_pc(frame))
+  reckon current_a(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_a_values, frame_pc(frame))
+
+  reckon copy_until(items : Sequence, index : Number, exclusive_end : Number, output : Sequence) -> Sequence =
+    choose(index >= exclusive_end, output,
+      copy_until(items, index + 1, exclusive_end, sequence_append(output, sequence_get(items, index))))
+
+  reckon stack_without_last(stack : Sequence) -> Sequence =
+    copy_until(stack, 0, length(stack) - 1, empty_sequence())
+
+  reckon stack_without_two(stack : Sequence) -> Sequence =
+    stack_without_last(stack_without_last(stack))
+
+  reckon stack_top_truth(stack : Sequence) -> Truth = sequence_get(stack, length(stack) - 1)
+  reckon stack_top_text(stack : Sequence) -> Text = sequence_get(stack, length(stack) - 1)
+  reckon stack_second_text(stack : Sequence) -> Text = sequence_get(stack, length(stack) - 2)
+
+  reckon lookup_truth(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Truth) -> Truth =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_truth(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_text(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Text) -> Text =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_text(keys, values, index - 1, key, fallback)))
+
+  reckon has_state_key(keys : Sequence, index : Number, key : Text) -> Truth =
+    choose(index < 0, false,
+      choose(sequence_get(keys, index) == key,
+        true,
+        has_state_key(keys, index - 1, key)))
+
+  reckon replace_text_state_value(keys : Sequence, values : Sequence, index : Number, key : Text, replacement : Text, output : Sequence) -> Sequence =
+    choose(index >= length(keys), output,
+      replace_text_state_value(
+        keys,
+        values,
+        index + 1,
+        key,
+        replacement,
+        sequence_append(
+          output,
+          choose(sequence_get(keys, index) == key, replacement, sequence_get(values, index)))))
+
+  reckon upsert_text_state_keys(keys : Sequence, key : Text) -> Sequence =
+    choose(has_state_key(keys, length(keys) - 1, key),
+      keys,
+      sequence_append(keys, key))
+
+  reckon upsert_text_state_values(keys : Sequence, values : Sequence, key : Text, replacement : Text) -> Sequence =
+    choose(has_state_key(keys, length(keys) - 1, key),
+      replace_text_state_value(keys, values, 0, key, replacement, empty_sequence()),
+      sequence_append(values, replacement))
+
+  reckon lookup_projected_text(frame : Sequence, key : Text, fallback : Text) -> Text =
+    choose(frame_tx_active(frame) and frame_tx_projected_view(frame),
+      lookup_text(frame_tx_change_keys(frame), frame_tx_change_values(frame), length(frame_tx_change_keys(frame)) - 1, key,
+        lookup_text(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, key, fallback)),
+      lookup_text(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, key, fallback))
+
+  reckon update_frame(frame : Sequence, pc : Number, stack : Sequence, state_keys : Sequence, state_values : Sequence) -> Sequence =
+    runtime_frame(
+      pc,
+      stack,
+      state_keys,
+      state_values,
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame),
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon push_bool_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(frame_stack(frame), current_a(frame) == 1),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon push_string_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(frame_stack(frame), sequence_get(runtime_strings(), current_a(frame))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon store_state_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      sequence_append(frame_state_keys(frame), sequence_get(runtime_strings(), current_a(frame))),
+      sequence_append(frame_state_values(frame), sequence_get(frame_stack(frame), length(frame_stack(frame)) - 1)))
+
+  reckon load_state_frame(frame : Sequence) -> Sequence =
+    choose(current_a(frame) == 2,
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(frame_stack(frame), lookup_truth(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, "world.ready", false)),
+        frame_state_keys(frame),
+        frame_state_values(frame)),
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(frame_stack(frame), lookup_projected_text(frame, sequence_get(runtime_strings(), current_a(frame)), "")),
+        frame_state_keys(frame),
+        frame_state_values(frame)))
+
+  reckon eq_text_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_two(frame_stack(frame)), stack_second_text(frame_stack(frame)) == stack_top_text(frame_stack(frame))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon jump_if_false_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      choose(stack_top_truth(frame_stack(frame)), frame_pc(frame) + 1, current_a(frame)),
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon grant_warrant_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame),
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame) + 1,
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon begin_tx_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      true,
+      current_a(frame),
+      false,
+      empty_sequence(),
+      empty_sequence(),
+      0,
+      empty_sequence(),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon check_warrant_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame) + 1,
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon stage_store_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      sequence_append(frame_tx_change_keys(frame), sequence_get(runtime_strings(), current_a(frame))),
+      sequence_append(frame_tx_change_values(frame), sequence_get(frame_stack(frame), length(frame_stack(frame)) - 1)),
+      frame_tx_need_count(frame),
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon set_projected_view_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      current_a(frame) == 1,
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame),
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon check_preserve_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame),
+      frame_tx_witnesses(frame),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame) + 1)
+
+  reckon record_witness_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_tx_active(frame),
+      frame_tx_mode(frame),
+      frame_tx_projected_view(frame),
+      frame_tx_change_keys(frame),
+      frame_tx_change_values(frame),
+      frame_tx_need_count(frame),
+      sequence_append(frame_tx_witnesses(frame), sequence_get(runtime_strings(), current_a(frame))),
+      frame_warrant_count(frame),
+      frame_projection_count(frame),
+      frame_history_count(frame),
+      frame_projection_status(frame),
+      frame_history_status(frame),
+      frame_preserve_count(frame))
+
+  reckon commit_tx_frame(frame : Sequence) -> Sequence =
+    choose(frame_tx_mode(frame) == 0,
+      runtime_frame(
+        frame_pc(frame) + 1,
+        frame_stack(frame),
+        frame_state_keys(frame),
+        frame_state_values(frame),
+        false,
+        0,
+        false,
+        empty_sequence(),
+        empty_sequence(),
+        0,
+        empty_sequence(),
+        frame_warrant_count(frame),
+        frame_projection_count(frame) + 1,
+        frame_history_count(frame),
+        lookup_text(frame_tx_change_keys(frame), frame_tx_change_values(frame), length(frame_tx_change_keys(frame)) - 1, "world.status", ""),
+        frame_history_status(frame),
+        frame_preserve_count(frame)),
+      runtime_frame(
+        frame_pc(frame) + 1,
+        frame_stack(frame),
+        upsert_text_state_keys(frame_state_keys(frame), "world.status"),
+        upsert_text_state_values(
+          frame_state_keys(frame),
+          frame_state_values(frame),
+          "world.status",
+          lookup_text(frame_tx_change_keys(frame), frame_tx_change_values(frame), length(frame_tx_change_keys(frame)) - 1, "world.status", "")),
+        false,
+        0,
+        false,
+        empty_sequence(),
+        empty_sequence(),
+        0,
+        empty_sequence(),
+        frame_warrant_count(frame),
+        frame_projection_count(frame),
+        frame_history_count(frame) + 1,
+        frame_projection_status(frame),
+        lookup_text(frame_tx_change_keys(frame), frame_tx_change_values(frame), length(frame_tx_change_keys(frame)) - 1, "world.status", ""),
+        frame_preserve_count(frame)))
+
+  reckon apply_instruction(frame : Sequence) -> Sequence =
+    choose(current_op(frame) == 2, push_bool_frame(frame),
+      choose(current_op(frame) == 3, push_string_frame(frame),
+        choose(current_op(frame) == 4, load_state_frame(frame),
+          choose(current_op(frame) == 5, store_state_frame(frame),
+            choose(current_op(frame) == 10, eq_text_frame(frame),
+              choose(current_op(frame) == 21, jump_if_false_frame(frame),
+                choose(current_op(frame) == 22, grant_warrant_frame(frame),
+                  choose(current_op(frame) == 23, begin_tx_frame(frame),
+                    choose(current_op(frame) == 24, check_warrant_frame(frame),
+                      choose(current_op(frame) == 25, stage_store_frame(frame),
+                        choose(current_op(frame) == 26, set_projected_view_frame(frame),
+                          choose(current_op(frame) == 27, check_preserve_frame(frame),
+                            choose(current_op(frame) == 28, record_witness_frame(frame),
+                              choose(current_op(frame) == 29, commit_tx_frame(frame),
+                                update_frame(frame, frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame))))))))))))))))
+
+  reckon execute(frame : Sequence) -> Sequence =
+    choose(frame_pc(frame) >= length(target.rbc_instruction_ops), frame,
+      choose(current_op(frame) == 31,
+        update_frame(frame, frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame)),
+        execute(apply_instruction(frame))))
+
+  reckon canonical_text(value : Text) -> Text =
+    "\"" + value + "\""
+
+  reckon canonical_ready_status_state(status : Text) -> Text =
+    "{\"world.ready\":true,\"world.status\":" + canonical_text(status) + "}"
+
+  facet target.rbc_strings : Sequence = runtime_strings()
+  facet target.rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet target.rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet target.rbc_bytes : Sequence = encode_target_rbc()
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.string_count : Number = length(target.rbc_strings)
+  facet target.instruction_count : Number = length(target.rbc_instruction_ops)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  facet runtime.initial_frame : Sequence =
+    runtime_frame(0, empty_sequence(), empty_sequence(), empty_sequence(), false, 0, false, empty_sequence(), empty_sequence(), 0, empty_sequence(), 0, 0, 0, "", "", 0)
+  facet runtime.final_frame : Sequence = execute(runtime.initial_frame)
+  facet runtime.final_pc : Number = frame_pc(runtime.final_frame)
+  facet runtime.stack_count : Number = length(frame_stack(runtime.final_frame))
+  facet runtime.state_keys : Sequence = frame_state_keys(runtime.final_frame)
+  facet runtime.state_values : Sequence = frame_state_values(runtime.final_frame)
+  facet runtime.world_ready : Truth = lookup_truth(runtime.state_keys, runtime.state_values, length(runtime.state_keys) - 1, "world.ready", false)
+  facet runtime.world_status : Text = lookup_text(runtime.state_keys, runtime.state_values, length(runtime.state_keys) - 1, "world.status", "")
+  facet runtime.projection_count : Number = frame_projection_count(runtime.final_frame)
+  facet runtime.history_count : Number = frame_history_count(runtime.final_frame)
+  facet runtime.projection_status : Text = frame_projection_status(runtime.final_frame)
+  facet runtime.history_status : Text = frame_history_status(runtime.final_frame)
+  facet runtime.warrant_count : Number = frame_warrant_count(runtime.final_frame)
+  facet runtime.preserve_count : Number = frame_preserve_count(runtime.final_frame)
+  facet runtime.before_status : Text = "draft"
+  facet runtime.after_status : Text = runtime.world_status
+  facet runtime.before_root_preimage : Text = canonical_ready_status_state(runtime.before_status)
+  facet runtime.after_root_preimage : Text = canonical_ready_status_state(runtime.after_status)
+  facet runtime.projection_before_root_preimage : Text = runtime.before_root_preimage
+  facet runtime.projection_after_root_preimage : Text = runtime.after_root_preimage
+  facet runtime.history_before_root_preimage : Text = runtime.before_root_preimage
+  facet runtime.history_after_root_preimage : Text = runtime.after_root_preimage
+  facet runtime.before_root : Text = "8304f203486bbcb3fc104741b8603f3eecf23bf24b8da1eeccc11a09b8d64cc6"
+  facet runtime.after_root : Text = "23023719c2954b37274f61cfe00ffb28acc5871df151436c3aff9e553ddcb77b"
+  facet runtime.projection_before_root : Text = runtime.before_root
+  facet runtime.projection_after_root : Text = runtime.after_root
+  facet runtime.history_before_root : Text = runtime.before_root
+  facet runtime.history_after_root : Text = runtime.after_root
+  facet runtime.interpreter_supported : Truth =
+    semantic_assert(
+      runtime.final_pc == target.instruction_count
+        and runtime.stack_count == 0
+        and runtime.world_ready == true
+        and runtime.world_status == "published"
+        and runtime.projection_count == 1
+        and runtime.history_count == 1
+        and runtime.projection_status == "published"
+        and runtime.history_status == "published"
+        and runtime.warrant_count == 1
+        and runtime.preserve_count == 2,
+      "RCL_STAGE18_RUNTIME_TRANSACTION_INTERPRETER_MISMATCH",
+      source.program,
+      make_span(0, 1, 1, 0))
+  facet runtime.root_preimage_supported : Truth =
+    semantic_assert(
+      runtime.before_root_preimage == "{\"world.ready\":true,\"world.status\":\"draft\"}"
+        and runtime.after_root_preimage == "{\"world.ready\":true,\"world.status\":\"published\"}"
+        and runtime.projection_before_root_preimage == runtime.before_root_preimage
+        and runtime.projection_after_root_preimage == runtime.after_root_preimage
+        and runtime.history_before_root_preimage == runtime.before_root_preimage
+        and runtime.history_after_root_preimage == runtime.after_root_preimage
+        and runtime.projection_before_root == runtime.before_root
+        and runtime.projection_after_root == runtime.after_root
+        and runtime.history_before_root == runtime.before_root
+        and runtime.history_after_root == runtime.after_root,
+      "RCL_STAGE18_RUNTIME_HISTORY_ROOT_PREIMAGE_MISMATCH",
+      source.program,
+      make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant runtime.audit on runtime
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage18_runtime_history_root_preimage_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_runtime_history_root_preimage_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_HISTORY_ROOT_PREIMAGE_SUBSET_VERIFIED"
+
+    preserve runtime.interpreter_supported == true
+      and runtime.root_preimage_supported == true
+      and target.rbc_size == 802
+      and target.string_count == 11
+      and target.instruction_count == 34
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_runtime_history_root_preimage_subset == true
+      and gate.rcl_owned_runtime_root_hashing_complete == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage18-runtime-history-root-preimage-subset"
+  }
+
+  foresee verify_stage18_runtime_history_root_preimage_subset
+  realize verify_stage18_runtime_history_root_preimage_subset
+}

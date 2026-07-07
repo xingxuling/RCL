@@ -1,0 +1,158 @@
+reality RCLSelfHostCompilerSourceArtifactStage6 {
+  facet source.compiler : Text = "reality RCLCompilerStage9FixedPoint {\n  facet compiler.source_root : Text = \"rcl:selfhost-stage5-normalized-projection\"\n  facet compiler.stage : Text = \"stage9\"\n  facet compiler.artifact : Text = \"fixedpoint\"\n  reckon compile(source : Text) -> Text = \"semantic-fixedpoint\"\n}\n"
+  facet source.program : Text = "RCLCompilerStage9FixedPoint"
+  facet source.root : Text = "7684ab666cc847141187ec19da91b93dc07394098d14d9cf141f25485b07dbf5"
+
+  facet selfhost.stage : Text = "stage6_rcl_owned_compiler_source_artifact_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_encodes_materialized_compiler_source_rbc_artifact"
+  facet selfhost.boundary : Text = "compiler_source_to_artifact_subset_no_full_native_fixedpoint"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_rule_bytecode_and_native_runtime_packaging"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_compiler_source_to_artifact_subset : Truth = true
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.native_windows_fixedpoint : Truth = false
+  facet gate.js_reference_parity_required : Truth = true
+  facet gate.js_runtime_still_required : Truth = true
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon compiler_string_prefix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(),
+              source.program),
+            source.root),
+          "rcl:selfhost-stage5-normalized-projection"),
+        "compiler.source_root"),
+      "stage9")
+
+  reckon compiler_string_suffix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(),
+            "compiler.stage"),
+          "fixedpoint"),
+        "compiler.artifact"),
+      "semantic-fixedpoint")
+
+  reckon compiler_strings() -> Sequence =
+    sequence_concat(compiler_string_prefix(), compiler_string_suffix())
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon top_level_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(3, 2, 0, 0),
+      sequence_concat(
+        encode_instruction(5, 3, 0, 0),
+        sequence_concat(
+          encode_instruction(3, 4, 0, 0),
+          sequence_concat(
+            encode_instruction(5, 5, 0, 0),
+            sequence_concat(
+              encode_instruction(3, 6, 0, 0),
+              sequence_concat(
+                encode_instruction(5, 7, 0, 0),
+                encode_instruction(31, 0, 0, 0)))))))
+
+  reckon function_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(3, 8, 0, 0),
+      encode_instruction(34, 0, 0, 0))
+
+  reckon compiler_instructions() -> Sequence =
+    sequence_concat(top_level_instructions(), function_instructions())
+
+  reckon encode_compiler_source_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(compiler_strings()), 0, 9),
+      sequence_concat(
+        encode_string_pool(compiler_strings(), 0, empty_sequence()),
+        compiler_instructions()))
+
+  facet compiler.rbc_strings : Sequence = compiler_strings()
+  facet compiler.rbc_bytes : Sequence = encode_compiler_source_rbc()
+  facet compiler.rbc_size : Number = length(compiler.rbc_bytes)
+  facet compiler.string_count : Number = length(compiler.rbc_strings)
+  facet compiler.number_count : Number = 0
+  facet compiler.instruction_count : Number = 9
+  facet compiler.bytecode_magic_0 : Number = sequence_get(compiler.rbc_bytes, 0)
+  facet compiler.bytecode_magic_1 : Number = sequence_get(compiler.rbc_bytes, 1)
+  facet compiler.bytecode_magic_2 : Number = sequence_get(compiler.rbc_bytes, 2)
+  facet compiler.bytecode_magic_3 : Number = sequence_get(compiler.rbc_bytes, 3)
+  facet compiler.artifact_shape_supported : Truth =
+    semantic_assert(compiler.rbc_size == 434 and compiler.string_count == 9 and compiler.instruction_count == 9, "RCL_COMPILER_SOURCE_ARTIFACT_SHAPE_MISMATCH", source.program, make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage6.audit on stage6
+    warrant compiler.audit on compiler
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage6_compiler_source_artifact {
+    cause selfhost_agent
+    when gate.rcl_owned_compiler_source_to_artifact_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_COMPILER_SOURCE_ARTIFACT_SUBSET_VERIFIED"
+
+    preserve compiler.artifact_shape_supported == true
+      and compiler.rbc_size == 434
+      and compiler.string_count == 9
+      and compiler.number_count == 0
+      and compiler.instruction_count == 9
+      and compiler.bytecode_magic_0 == 82
+      and compiler.bytecode_magic_1 == 67
+      and compiler.bytecode_magic_2 == 76
+      and compiler.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.native_windows_fixedpoint == false
+      and gate.js_reference_parity_required == true
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage6-compiler-source-artifact-subset"
+  }
+
+  foresee verify_stage6_compiler_source_artifact
+  realize verify_stage6_compiler_source_artifact
+}

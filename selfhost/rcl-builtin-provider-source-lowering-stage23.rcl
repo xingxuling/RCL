@@ -1,0 +1,260 @@
+reality RCLSelfHostBuiltinProviderSourceLoweringStage23 {
+  facet selfhost.stage : Text = "stage23_rcl_owned_builtin_provider_source_lowering_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_lowers_builtin_and_provider_source_text_to_bytecode_inside_native_vm"
+  facet selfhost.boundary : Text = "builtin_and_provider_source_lowering_subset_not_complete_compiler_or_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_parser_to_bytecode_lowering_for_arbitrary_facets_calls_rules_and_runtime"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_builtin_provider_source_lowering_subset : Truth = true
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.rcl_compiler_self_emits_without_stage0 : Truth = false
+  facet gate.rcl_owned_parser_complete : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet source.full : Text = "reality RuntimeBuiltinProviderSourceLoweringTarget { facet metrics.request_size : Number = length(\"request\") facet provider.reply : Text = provider_call(\"echo\", \"echo.text\", \"request\") }"
+  facet source.root : Text = "1b994e33cd89b6f911b53721b7b65404f581c24111c4dd4911919b8a516e530c"
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon source_program_name(source : Text) -> Text =
+    split_before(split_after(source, "reality "), " {")
+
+  reckon source_builtin_facet_path(source : Text) -> Text =
+    split_before(split_after(source, "facet "), " :")
+
+  reckon source_builtin_name(source : Text) -> Text =
+    split_before(split_after(source, " = "), "(\"")
+
+  reckon source_builtin_text(source : Text) -> Text =
+    split_before(split_after(source, "length(\""), "\"")
+
+  reckon source_provider_facet_path(source : Text) -> Text =
+    split_before(split_after(source, "length(\"request\") facet "), " :")
+
+  reckon provider_tail(source : Text) -> Text =
+    split_after(source, "provider_call(\"")
+
+  reckon provider_second_tail(source : Text) -> Text =
+    split_after(provider_tail(source), "\", \"")
+
+  reckon provider_third_tail(source : Text) -> Text =
+    split_after(provider_second_tail(source), "\", \"")
+
+  reckon source_provider_id(source : Text) -> Text =
+    split_before(provider_tail(source), "\"")
+
+  reckon source_provider_capability(source : Text) -> Text =
+    split_before(provider_second_tail(source), "\"")
+
+  reckon source_provider_request(source : Text) -> Text =
+    split_before(provider_third_tail(source), "\"")
+
+  reckon target_string_at(index : Number) -> Text =
+    choose(index == 0, source_program_name(source.full),
+      choose(index == 1, source.root,
+        choose(index == 2, source_builtin_text(source.full),
+          choose(index == 3, source_builtin_facet_path(source.full),
+            choose(index == 4, source_provider_id(source.full),
+              choose(index == 5, source_provider_capability(source.full), source_provider_facet_path(source.full)))))))
+
+  reckon build_target_strings(index : Number, output : Sequence) -> Sequence =
+    choose(index >= 7, output,
+      build_target_strings(index + 1, sequence_append(output, target_string_at(index))))
+
+  reckon target_strings() -> Sequence =
+    build_target_strings(0, empty_sequence())
+
+  reckon target_instruction_count() -> Number = 6
+
+  reckon target_op_at(index : Number) -> Number =
+    choose(index == 0, 3,
+      choose(index == 1, 30,
+        choose(index == 2, 5,
+          choose(index == 3, 35,
+            choose(index == 4, 5, 31)))))
+
+  reckon target_a_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 4,
+        choose(index == 2, 3,
+          choose(index == 3, 4,
+            choose(index == 4, 6, 0)))))
+
+  reckon target_b_at(index : Number) -> Number =
+    choose(index == 1, 1,
+      choose(index == 3, 5, 0))
+
+  reckon target_c_at(index : Number) -> Number =
+    choose(index == 3, 2, 0)
+
+  reckon build_instruction_values(index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= target_instruction_count(), output,
+      build_instruction_values(
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, target_op_at(index),
+            choose(selector == 1, target_a_at(index),
+              choose(selector == 2, target_b_at(index), target_c_at(index))))),
+        selector))
+
+  reckon instruction_ops() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 1)
+
+  reckon instruction_b_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 2)
+
+  reckon instruction_c_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 3)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target_strings()), 0, length(instruction_ops())),
+      sequence_concat(
+        encode_string_pool(target_strings(), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(), instruction_a_values(), instruction_b_values(), instruction_c_values(), 0, empty_sequence())))
+
+  facet compiler.program : Text = source_program_name(source.full)
+  facet compiler.builtin_facet_path : Text = source_builtin_facet_path(source.full)
+  facet compiler.builtin_name : Text = source_builtin_name(source.full)
+  facet compiler.builtin_text : Text = source_builtin_text(source.full)
+  facet compiler.provider_facet_path : Text = source_provider_facet_path(source.full)
+  facet compiler.provider_id : Text = source_provider_id(source.full)
+  facet compiler.provider_capability : Text = source_provider_capability(source.full)
+  facet compiler.provider_request : Text = source_provider_request(source.full)
+  facet compiler.lowered_instruction_count : Number = target_instruction_count()
+  facet compiler.source_lowering_supported : Truth =
+    semantic_assert(
+      compiler.program == "RuntimeBuiltinProviderSourceLoweringTarget"
+        and compiler.builtin_facet_path == "metrics.request_size"
+        and compiler.builtin_name == "length"
+        and compiler.builtin_text == "request"
+        and compiler.provider_facet_path == "provider.reply"
+        and compiler.provider_id == "echo"
+        and compiler.provider_capability == "echo.text"
+        and compiler.provider_request == compiler.builtin_text
+        and source.root == "1b994e33cd89b6f911b53721b7b65404f581c24111c4dd4911919b8a516e530c",
+      "RCL_STAGE23_BUILTIN_PROVIDER_SOURCE_LOWERING_MISMATCH",
+      selfhost.stage,
+      make_span(0, 1, 1, 0))
+
+  facet target.rbc_strings : Sequence = target_strings()
+  facet target.rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet target.rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet target.rbc_bytes : Sequence = encode_target_rbc()
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant compiler.audit on compiler
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage23_builtin_provider_source_lowering_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_builtin_provider_source_lowering_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_BUILTIN_PROVIDER_SOURCE_LOWERING_SUBSET_VERIFIED"
+
+    preserve compiler.source_lowering_supported == true
+      and target.rbc_size == 320
+      and length(target.rbc_strings) == 7
+      and length(target.rbc_instruction_ops) == 6
+      and sequence_get(target.rbc_strings, 0) == compiler.program
+      and sequence_get(target.rbc_strings, 1) == source.root
+      and sequence_get(target.rbc_strings, 2) == compiler.builtin_text
+      and sequence_get(target.rbc_strings, 3) == compiler.builtin_facet_path
+      and sequence_get(target.rbc_strings, 4) == compiler.provider_id
+      and sequence_get(target.rbc_strings, 5) == compiler.provider_capability
+      and sequence_get(target.rbc_strings, 6) == compiler.provider_facet_path
+      and sequence_get(target.rbc_instruction_ops, 0) == 3
+      and sequence_get(target.rbc_instruction_ops, 1) == 30
+      and sequence_get(target.rbc_instruction_ops, 2) == 5
+      and sequence_get(target.rbc_instruction_ops, 3) == 35
+      and sequence_get(target.rbc_instruction_ops, 4) == 5
+      and sequence_get(target.rbc_instruction_ops, 5) == 31
+      and sequence_get(target.rbc_instruction_a_values, 1) == 4
+      and sequence_get(target.rbc_instruction_b_values, 1) == 1
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_parser_complete == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.rcl_compiler_self_emits_without_stage0 == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage23-builtin-provider-source-lowering-subset"
+  }
+
+  foresee verify_stage23_builtin_provider_source_lowering_subset
+  realize verify_stage23_builtin_provider_source_lowering_subset
+}

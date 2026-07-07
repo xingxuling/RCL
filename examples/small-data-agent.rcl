@@ -1,0 +1,65 @@
+# RCL v0.3: a basic AI program without an LLM.
+# It uses a quantified observation, explicit knowledge formation, inference,
+# bounded authority and a realized action. The encoded rules are prior
+# structure; sensor feedback supplies the small amount of experience data.
+reality SmallDataCaretaker {
+  facet room.temperature : Temperature = celsius(8)
+  facet room.heater : Truth = false
+
+  subject caretaker {
+    facet actions : Number = 0
+    warrant room.control on room
+  }
+
+  quantitative sensor {
+    measure temperature : Temperature = room.temperature
+      uncertainty celsius(0.2)
+      confidence 0.98
+      unit "°C"
+      scale interval
+      evidence "sensor:room-temperature"
+      calibrated by "calibration:room-v1"
+    preserve confidence(sensor.temperature) >= 0.95
+  }
+
+  perception sight {
+    observer caretaker
+    source room
+    channel temperature : Temperature = measure_value(sensor.temperature)
+    preserve sight.temperature >= celsius(-50)
+  }
+
+  knowledge mind {
+    claim cold : Truth = sight.temperature < celsius(12)
+      confidence confidence(sensor.temperature)
+      evidence "rule:cold-below-12c"
+      source "sensor+threshold"
+      scope "room"
+      status observed
+
+    derive should_heat : Truth = knowledge_value(mind.cold)
+      from mind.cold
+      confidence 0.95
+      evidence "policy:maintain-habitable-room"
+      source "rcl:inference"
+      scope "room"
+
+    preserve supported(mind.should_heat, 0.90)
+  }
+
+  emergence heat_room {
+    cause caretaker
+    when supported(mind.should_heat, 0.90) and knowledge_value(mind.should_heat)
+    needs room.control on room
+    alter room.heater <- true
+    alter caretaker.actions <- caretaker.actions + 1
+    preserve caretaker.actions <= 10
+    witness "execution:knowledge-to-action"
+  }
+
+  quantify sensor
+  observe sight
+  learn mind
+  foresee heat_room
+  realize heat_room
+}

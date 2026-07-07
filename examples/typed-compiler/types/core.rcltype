@@ -1,0 +1,11 @@
+module core
+export record User<T> {
+  id: Text
+  payload: T
+}
+export union AuthState {
+  Guest
+  LoggedIn(User<Text>)
+  Failed(Text)
+}
+export alias MaybeUser = Option<User<Text>>

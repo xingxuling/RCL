@@ -1,0 +1,466 @@
+reality RCLSelfHostAbsorptionLoweringStage4 {
+  facet source.full : Text = "reality AbsorptionDeclarationLoweringTarget {\n  dialect release {}\n  effect AlterReality {}\n  effect HostCall {}\n  capability_policy safe_release { allow_effect Warrant deny_effect HostCall allow world.publish on world allow computer.invoke on console budget max_alterations 3 budget max_host_calls 1 budget max_rules 1 require_deterministic_replay false }\n  store absorption_reality { branch main commit \"absorption declarations lowered\" }\n  facet world.status : Text = \"draft\"\n  facet world.score : Number = 0\n  facet world.receipt : Text = \"none\"\n  reckon ready(value : Number) -> Truth = value >= 0\n  host console { offers emit -> Text }\n  subject founder { warrant world.publish on world warrant computer.invoke on console }\n  emergence publish { cause founder when ready(world.score) needs world.publish on world needs computer.invoke on console alter world.status <- \"published\" alter world.score <- world.score + 1 alter world.receipt <- \"pending\" call console.emit(\"published\") -> world.receipt preserve world.score >= 0 witness \"rcl:whole-language-semantic:published\" }\n  foresee publish\n  realize publish\n  verify safe_release\n  snapshot absorption_reality\n}\n"
+  facet source.root : Text = "rcl:selfhost-stage4-absorption-lowering"
+
+  facet selfhost.stage : Text = "stage4_rcl_owned_absorption_lowering_default_stack"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_executes_absorption_declaration_lowering_without_node_stack_override"
+  facet selfhost.boundary : Text = "absorption_semantic_ir_only_no_full_rule_bytecode_or_native_selfhost"
+  facet selfhost.next_rewrite_target : Text = "fixedpoint_source_materialization"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_absorption_lowering : Truth = true
+  facet gate.rule_bytecode_lowering_complete : Truth = false
+  facet gate.default_node_stack_required : Truth = true
+  facet gate.stack_size_override_required : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon full_program_name(tokens : Sequence) -> Text =
+    choose(
+      semantic_assert(token_text(expect_token(sequence_get(tokens, 0), "IDENT", "reality")) == "reality", "RCL_REALITY_HEADER_REQUIRED", "reality", token_span(sequence_get(tokens, 0))),
+      token_text(expect_token(sequence_get(tokens, 1), "IDENT", "")),
+      "")
+
+  reckon is_top_keyword(text_value : Text) -> Truth =
+    text_value == "facet" or text_value == "subject" or text_value == "reckon" or text_value == "host" or
+    text_value == "dialect" or text_value == "effect" or text_value == "capability_policy" or text_value == "store" or
+    text_value == "emergence" or text_value == "resonance" or text_value == "foresee" or text_value == "realize" or
+    text_value == "verify" or text_value == "snapshot" or text_value == "physical" or text_value == "perception" or
+    text_value == "neural" or text_value == "living" or text_value == "genetic" or text_value == "quantitative" or
+    text_value == "knowledge" or text_value == "language" or text_value == "understanding" or text_value == "creation" or
+    text_value == "spacetime" or text_value == "acceleration" or text_value == "compression" or text_value == "energy" or
+    text_value == "element" or text_value == "science" or text_value == "embodiment" or text_value == "spirit" or
+    text_value == "meta"
+
+  reckon decl_kind(keyword : Text) -> Text =
+    choose(keyword == "facet", "Facet",
+      choose(keyword == "subject", "Subject",
+        choose(keyword == "reckon", "Reckon",
+          choose(keyword == "host", "Host",
+            choose(keyword == "dialect", "Dialect",
+              choose(keyword == "effect", "Effect",
+                choose(keyword == "capability_policy", "CapabilityPolicy",
+                  choose(keyword == "store", "Store",
+                    choose(keyword == "emergence", "Emergence",
+                      choose(keyword == "resonance", "Resonance",
+                        choose(keyword == "foresee", "Foresee",
+                          choose(keyword == "realize", "Realize",
+                            choose(keyword == "verify", "Verify",
+                              choose(keyword == "snapshot", "Snapshot", "Domain"))))))))))))))
+
+  reckon declaration_name(tokens : Sequence, index : Number) -> Text =
+    choose(token_text(sequence_get(tokens, index)) == "facet",
+      token_text(sequence_get(tokens, index + 1)),
+      token_text(sequence_get(tokens, index + 1)))
+
+  reckon make_decl(tokens : Sequence, index : Number) -> Text =
+    decl_kind(token_text(sequence_get(tokens, index))) + ":" + declaration_name(tokens, index)
+
+  reckon find_symbol(tokens : Sequence, index : Number, symbol : Text) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == symbol, index,
+        find_symbol(tokens, index + 1, symbol)))
+
+  reckon skip_block(tokens : Sequence, index : Number, depth : Number) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == "{",
+        skip_block(tokens, index + 1, depth + 1),
+        choose(token_text(sequence_get(tokens, index)) == "}",
+          choose(depth == 1, index + 1, skip_block(tokens, index + 1, depth - 1)),
+          skip_block(tokens, index + 1, depth))))
+
+  reckon find_next_top(tokens : Sequence, index : Number, paren_depth : Number) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == "}" and paren_depth == 0, index,
+        choose(token_text(sequence_get(tokens, index)) == "(" , find_next_top(tokens, index + 1, paren_depth + 1),
+          choose(token_text(sequence_get(tokens, index)) == ")" , find_next_top(tokens, index + 1, paren_depth - 1),
+            choose(paren_depth == 0 and is_top_keyword(token_text(sequence_get(tokens, index))), index,
+              find_next_top(tokens, index + 1, paren_depth))))))
+
+  reckon declaration_end(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index)) == "foresee" or token_text(sequence_get(tokens, index)) == "realize" or token_text(sequence_get(tokens, index)) == "verify" or token_text(sequence_get(tokens, index)) == "snapshot",
+      index + 2,
+      choose(token_text(sequence_get(tokens, index)) == "facet",
+        index + 8,
+        choose(token_text(sequence_get(tokens, index)) == "reckon",
+          find_next_top(tokens, index + 1, 0),
+          skip_block(tokens, find_symbol(tokens, index, "{"), 0))))
+
+  reckon parse_top(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF" or token_text(sequence_get(tokens, index)) == "}",
+      output,
+      parse_top(tokens, declaration_end(tokens, index), sequence_append(output, make_decl(tokens, index))))
+
+  reckon count_kind(items : Sequence, index : Number, kind : Text) -> Number =
+    choose(index >= length(items), 0,
+      choose(starts_with(sequence_get(items, index), kind + ":"),
+        1 + count_kind(items, index + 1, kind),
+        count_kind(items, index + 1, kind)))
+
+  reckon has_required_surface(items : Sequence) -> Truth =
+    count_kind(items, 0, "Facet") >= 2 and
+    count_kind(items, 0, "Subject") >= 1 and
+    count_kind(items, 0, "Reckon") >= 1 and
+    count_kind(items, 0, "Host") >= 1 and
+    count_kind(items, 0, "Dialect") >= 1 and
+    count_kind(items, 0, "Effect") >= 2 and
+    count_kind(items, 0, "CapabilityPolicy") >= 1 and
+    count_kind(items, 0, "Store") >= 1 and
+    count_kind(items, 0, "Emergence") >= 1 and
+    count_kind(items, 0, "Foresee") >= 1 and
+    count_kind(items, 0, "Realize") >= 1 and
+    count_kind(items, 0, "Verify") >= 1 and
+    count_kind(items, 0, "Snapshot") >= 1
+
+
+
+  reckon count_prefix(items : Sequence, index : Number, prefix : Text) -> Number =
+    choose(index >= length(items), 0,
+      choose(starts_with(sequence_get(items, index), prefix),
+        1 + count_prefix(items, index + 1, prefix),
+        count_prefix(items, index + 1, prefix)))
+
+  reckon find_top_start(tokens : Sequence, index : Number, keyword : Text) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF" or token_text(sequence_get(tokens, index)) == "}", index,
+      choose(token_text(sequence_get(tokens, index)) == keyword, index,
+        find_top_start(tokens, declaration_end(tokens, index), keyword)))
+
+  reckon find_keyword(tokens : Sequence, index : Number, keyword : Text) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == keyword, index,
+        find_keyword(tokens, index + 1, keyword)))
+
+  reckon find_keyword_after(tokens : Sequence, index : Number, keyword : Text) -> Number =
+    find_keyword(tokens, index + 1, keyword)
+
+  reckon path2(tokens : Sequence, index : Number) -> Text =
+    token_text(sequence_get(tokens, index)) + "." + token_text(sequence_get(tokens, index + 2))
+
+  reckon capability_on(tokens : Sequence, index : Number) -> Text =
+    path2(tokens, index) + "@" + token_text(sequence_get(tokens, index + 4))
+
+  reckon call_descriptor(tokens : Sequence, rule : Text, index : Number) -> Text =
+    "HostCall:" + rule + ":" + token_text(sequence_get(tokens, index + 1)) + "." + token_text(sequence_get(tokens, index + 3)) + "->" + path2(tokens, index + 9)
+
+  reckon semantic_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(
+                            sequence_append(
+                              sequence_append(empty_sequence(),
+                                "Subject:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "subject") + 1))),
+                              "Warrant:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "subject") + 1)) + ":" + capability_on(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "subject"), "warrant") + 1)),
+                            "Warrant:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "subject") + 1)) + ":" + capability_on(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "subject"), "warrant"), "warrant") + 1)),
+                          "Rule:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1))),
+                        "Cause:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "cause") + 1))),
+                      "Need:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + capability_on(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "needs") + 1)),
+                    "Need:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + capability_on(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "needs"), "needs") + 1)),
+                  "Alter:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + path2(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "alter") + 1)),
+                "Alter:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + path2(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "alter"), "alter") + 1)),
+              "Alter:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + path2(tokens, find_keyword_after(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "alter"), "alter"), "alter") + 1)),
+            call_descriptor(tokens, token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)), find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "call"))),
+          "Preserve:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "emergence") + 1)) + ":" + path2(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "emergence"), "preserve") + 1)),
+        "Foresee:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "foresee") + 1))),
+      "Realize:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "realize") + 1)))
+
+  reckon lower_node(node : Text) -> Text =
+    choose(starts_with(node, "Warrant:"), "IR:AuthorityGrant:" + node,
+      choose(starts_with(node, "Need:"), "IR:AuthorityCheck:" + node,
+        choose(starts_with(node, "Alter:"), "IR:AlterStore:" + node,
+          choose(starts_with(node, "Preserve:"), "IR:PreserveCheck:" + node,
+            choose(starts_with(node, "HostCall:"), "IR:ProviderCall:" + node,
+              choose(starts_with(node, "Foresee:"), "IR:ProjectionSchedule:" + node,
+                choose(starts_with(node, "Realize:"), "IR:CommitSchedule:" + node,
+                  "IR:Semantic:" + node)))))))
+
+  reckon lower_nodes(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      lower_nodes(items, index + 1, sequence_append(output, lower_node(sequence_get(items, index)))))
+
+  reckon has_semantic_lowering(items : Sequence, lowered : Sequence) -> Truth =
+    count_prefix(items, 0, "Warrant:") >= 2 and
+    count_prefix(items, 0, "Need:") >= 2 and
+    count_prefix(items, 0, "Alter:") >= 3 and
+    count_prefix(items, 0, "Preserve:") >= 1 and
+    count_prefix(items, 0, "HostCall:") >= 1 and
+    count_prefix(items, 0, "Foresee:") >= 1 and
+    count_prefix(items, 0, "Realize:") >= 1 and
+    count_prefix(lowered, 0, "IR:AuthorityCheck:") >= 2 and
+    count_prefix(lowered, 0, "IR:AlterStore:") >= 3 and
+    count_prefix(lowered, 0, "IR:ProviderCall:") >= 1
+
+
+
+  reckon absorption_decl_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "Dialect:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "dialect") + 1))),
+        "Effect:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "effect") + 1))),
+      "Effect:" + token_text(sequence_get(tokens, find_keyword_after(tokens, find_top_start(tokens, compiler.body_start, "effect"), "effect") + 1)))
+
+  reckon absorption_policy_effect_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "Policy:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "capability_policy") + 1))),
+        "PolicyAllowEffect:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "allow_effect") + 1))),
+      "PolicyDenyEffect:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "deny_effect") + 1)))
+
+  reckon absorption_policy_capability_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(empty_sequence(),
+        "PolicyAllow:" + capability_on(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "allow") + 1)),
+      "PolicyAllow:" + capability_on(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "allow"), "allow") + 1))
+
+  reckon absorption_policy_budget_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "PolicyBudget:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget") + 1)) + "=" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget") + 2))),
+        "PolicyBudget:" + token_text(sequence_get(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget"), "budget") + 1)) + "=" + token_text(sequence_get(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget"), "budget") + 2))),
+      "PolicyBudget:" + token_text(sequence_get(tokens, find_keyword_after(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget"), "budget"), "budget") + 1)) + "=" + token_text(sequence_get(tokens, find_keyword_after(tokens, find_keyword_after(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "budget"), "budget"), "budget") + 2)))
+
+  reckon absorption_policy_replay_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(empty_sequence(),
+      "ReplayRequirement:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "capability_policy"), "require_deterministic_replay") + 1)))
+
+  reckon absorption_store_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "Store:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "store") + 1))),
+        "StoreBranch:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "store"), "branch") + 1))),
+      "StoreCommit:" + token_text(sequence_get(tokens, find_keyword(tokens, find_top_start(tokens, compiler.body_start, "store"), "commit") + 1)))
+
+  reckon absorption_run_nodes(tokens : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(empty_sequence(),
+        "Verify:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "verify") + 1))),
+      "Snapshot:" + token_text(sequence_get(tokens, find_top_start(tokens, compiler.body_start, "snapshot") + 1)))
+
+  reckon absorption_nodes(tokens : Sequence) -> Sequence =
+    sequence_concat(
+      absorption_decl_nodes(tokens),
+      sequence_concat(
+        absorption_policy_effect_nodes(tokens),
+        sequence_concat(
+          absorption_policy_capability_nodes(tokens),
+          sequence_concat(
+            absorption_policy_budget_nodes(tokens),
+            sequence_concat(
+              absorption_policy_replay_nodes(tokens),
+              sequence_concat(absorption_store_nodes(tokens), absorption_run_nodes(tokens)))))))
+
+  reckon lower_absorption_node(node : Text) -> Text =
+    choose(starts_with(node, "Dialect:"), "IR:DialectRegister:" + node,
+      choose(starts_with(node, "Effect:"), "IR:EffectDeclare:" + node,
+        choose(starts_with(node, "PolicyAllowEffect:"), "IR:VerifierAllowEffect:" + node,
+          choose(starts_with(node, "PolicyDenyEffect:"), "IR:VerifierDenyEffect:" + node,
+            choose(starts_with(node, "PolicyAllow:"), "IR:VerifierCapability:" + node,
+              choose(starts_with(node, "PolicyBudget:"), "IR:VerifierBudget:" + node,
+                choose(starts_with(node, "ReplayRequirement:"), "IR:VerifierReplayRequirement:" + node,
+                  choose(starts_with(node, "Policy:"), "IR:CapabilityPolicy:" + node,
+                    choose(starts_with(node, "StoreBranch:"), "IR:StoreBranch:" + node,
+                      choose(starts_with(node, "StoreCommit:"), "IR:StoreCommitMessage:" + node,
+                        choose(starts_with(node, "Store:"), "IR:StoreDeclare:" + node,
+                          choose(starts_with(node, "Verify:"), "IR:VerifierRun:" + node,
+                            choose(starts_with(node, "Snapshot:"), "IR:StoreSnapshot:" + node,
+                              "IR:AbsorptionSemantic:" + node)))))))))))))
+
+  reckon lower_absorption_nodes(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      lower_absorption_nodes(items, index + 1, sequence_append(output, lower_absorption_node(sequence_get(items, index)))))
+
+  reckon has_absorption_source_items(items : Sequence) -> Truth =
+    count_prefix(items, 0, "Dialect:") >= 1 and
+    count_prefix(items, 0, "Effect:") >= 2 and
+    count_prefix(items, 0, "Policy:") >= 1 and
+    count_prefix(items, 0, "PolicyAllowEffect:") >= 1 and
+    count_prefix(items, 0, "PolicyDenyEffect:") >= 1 and
+    count_prefix(items, 0, "PolicyAllow:") >= 2 and
+    count_prefix(items, 0, "PolicyBudget:") >= 3 and
+    count_prefix(items, 0, "ReplayRequirement:") >= 1 and
+    count_prefix(items, 0, "Store:") >= 1 and
+    count_prefix(items, 0, "Verify:") >= 1 and
+    count_prefix(items, 0, "Snapshot:") >= 1
+
+  reckon has_absorption_ir_items(lowered : Sequence) -> Truth =
+    count_prefix(lowered, 0, "IR:DialectRegister:") >= 1 and
+    count_prefix(lowered, 0, "IR:EffectDeclare:") >= 2 and
+    count_prefix(lowered, 0, "IR:VerifierCapability:") >= 2 and
+    count_prefix(lowered, 0, "IR:VerifierBudget:") >= 3 and
+    count_prefix(lowered, 0, "IR:VerifierRun:") >= 1 and
+    count_prefix(lowered, 0, "IR:StoreSnapshot:") >= 1
+
+  reckon has_absorption_lowering(items : Sequence, lowered : Sequence) -> Truth =
+    has_absorption_source_items(items) and has_absorption_ir_items(lowered)
+
+  facet compiler.tokens : Sequence = tokenize_from(source.full, 0, 1, 1, empty_sequence())
+  facet compiler.program : Text = full_program_name(compiler.tokens)
+  facet compiler.body_start : Number = 3
+  facet compiler.declarations : Sequence = parse_top(compiler.tokens, compiler.body_start, empty_sequence())
+  facet compiler.declaration_count : Number = length(compiler.declarations)
+  facet compiler.facet_count : Number = count_kind(compiler.declarations, 0, "Facet")
+  facet compiler.subject_count : Number = count_kind(compiler.declarations, 0, "Subject")
+  facet compiler.reckon_count : Number = count_kind(compiler.declarations, 0, "Reckon")
+  facet compiler.host_count : Number = count_kind(compiler.declarations, 0, "Host")
+  facet compiler.dialect_count : Number = count_kind(compiler.declarations, 0, "Dialect")
+  facet compiler.effect_count : Number = count_kind(compiler.declarations, 0, "Effect")
+  facet compiler.capability_policy_count : Number = count_kind(compiler.declarations, 0, "CapabilityPolicy")
+  facet compiler.store_count : Number = count_kind(compiler.declarations, 0, "Store")
+  facet compiler.emergence_count : Number = count_kind(compiler.declarations, 0, "Emergence")
+  facet compiler.foresee_count : Number = count_kind(compiler.declarations, 0, "Foresee")
+  facet compiler.realize_count : Number = count_kind(compiler.declarations, 0, "Realize")
+  facet compiler.verify_count : Number = count_kind(compiler.declarations, 0, "Verify")
+  facet compiler.snapshot_count : Number = count_kind(compiler.declarations, 0, "Snapshot")
+  facet compiler.whole_parser_supported : Truth =
+    semantic_assert(has_required_surface(compiler.declarations), "RCL_WHOLE_LANGUAGE_SURFACE_NOT_PARSED", compiler.program, token_span(sequence_get(compiler.tokens, 0)))
+  facet compiler.semantic_nodes : Sequence = semantic_nodes(compiler.tokens)
+  facet compiler.lowered_ir : Sequence = lower_nodes(compiler.semantic_nodes, 0, empty_sequence())
+  facet compiler.warrant_semantic_count : Number = count_prefix(compiler.semantic_nodes, 0, "Warrant:")
+  facet compiler.need_semantic_count : Number = count_prefix(compiler.semantic_nodes, 0, "Need:")
+  facet compiler.alter_semantic_count : Number = count_prefix(compiler.semantic_nodes, 0, "Alter:")
+  facet compiler.preserve_semantic_count : Number = count_prefix(compiler.semantic_nodes, 0, "Preserve:")
+  facet compiler.hostcall_semantic_count : Number = count_prefix(compiler.semantic_nodes, 0, "HostCall:")
+  facet compiler.semantic_lowering_supported : Truth =
+    semantic_assert(has_semantic_lowering(compiler.semantic_nodes, compiler.lowered_ir), "RCL_WHOLE_LANGUAGE_SEMANTIC_NOT_LOWERED", compiler.program, token_span(sequence_get(compiler.tokens, 0)))
+  facet compiler.absorption_nodes : Sequence = absorption_nodes(compiler.tokens)
+  facet compiler.absorption_lowered_ir : Sequence = lower_absorption_nodes(compiler.absorption_nodes, 0, empty_sequence())
+  facet compiler.dialect_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Dialect:")
+  facet compiler.effect_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Effect:")
+  facet compiler.policy_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Policy:")
+  facet compiler.policy_capability_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "PolicyAllow:")
+  facet compiler.policy_budget_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "PolicyBudget:")
+  facet compiler.store_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Store:")
+  facet compiler.verify_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Verify:")
+  facet compiler.snapshot_lowering_count : Number = count_prefix(compiler.absorption_nodes, 0, "Snapshot:")
+  facet compiler.absorption_lowering_supported : Truth =
+    semantic_assert(has_absorption_lowering(compiler.absorption_nodes, compiler.absorption_lowered_ir), "RCL_ABSORPTION_DECLARATIONS_NOT_LOWERED", compiler.program, token_span(sequence_get(compiler.tokens, 0)))
+
+  facet stage4.absorption_node_count : Number = length(compiler.absorption_nodes)
+  facet stage4.absorption_ir_count : Number = length(compiler.absorption_lowered_ir)
+  facet stage4.first_absorption_node : Text = sequence_get(compiler.absorption_nodes, 0)
+  facet stage4.first_absorption_ir : Text = sequence_get(compiler.absorption_lowered_ir, 0)
+  facet stage4.verifier_capability_ir_count : Number = count_prefix(compiler.absorption_lowered_ir, 0, "IR:VerifierCapability:")
+  facet stage4.verifier_budget_ir_count : Number = count_prefix(compiler.absorption_lowered_ir, 0, "IR:VerifierBudget:")
+  facet stage4.store_snapshot_ir_count : Number = count_prefix(compiler.absorption_lowered_ir, 0, "IR:StoreSnapshot:")
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage4.audit on stage4
+    warrant compiler.audit on compiler
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage4_absorption_lowering {
+    cause selfhost_agent
+    when gate.rcl_owned_absorption_lowering == true and gate.stack_size_override_required == false
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_ABSORPTION_LOWERING_DEFAULT_STACK_VERIFIED"
+
+    preserve compiler.whole_parser_supported == true
+      and compiler.semantic_lowering_supported == true
+      and compiler.absorption_lowering_supported == true
+      and stage4.absorption_node_count == 17
+      and stage4.absorption_ir_count == 17
+      and compiler.dialect_lowering_count == 1
+      and compiler.effect_lowering_count == 2
+      and compiler.policy_lowering_count == 1
+      and compiler.policy_capability_lowering_count == 2
+      and compiler.policy_budget_lowering_count == 3
+      and compiler.store_lowering_count == 1
+      and compiler.verify_lowering_count == 1
+      and compiler.snapshot_lowering_count == 1
+      and stage4.first_absorption_node == "Dialect:release"
+      and stage4.first_absorption_ir == "IR:DialectRegister:Dialect:release"
+      and stage4.verifier_capability_ir_count == 2
+      and stage4.verifier_budget_ir_count == 3
+      and stage4.store_snapshot_ir_count == 1
+      and gate.full_self_hosting == false
+      and gate.rule_bytecode_lowering_complete == false
+      and gate.stack_size_override_required == false
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage4-absorption-lowering-default-stack"
+  }
+
+  foresee verify_stage4_absorption_lowering
+  realize verify_stage4_absorption_lowering
+}

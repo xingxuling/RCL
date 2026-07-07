@@ -1,0 +1,103 @@
+reality EightDomainWorld {
+  facet phenotype.motion_bias : Number = 0
+
+  subject founder {
+    facet awareness : Number = 0
+    warrant world.write on world
+  }
+
+  reckon clamp(value : Number, low : Number, high : Number) -> Number =
+    max(low, min(high, value))
+
+  host console {
+    offers emit -> Text
+  }
+
+  meta self_model {
+    facet revision : Number = 0
+    inspect program
+    inspect foundation
+    revise self_model.revision <- self_model.revision + 1
+    preserve self_model.revision >= 0
+  }
+
+  physical world {
+    body stone {
+      facet position : Length = meters(10)
+      facet velocity : Velocity = meters_per_second(0)
+    }
+    field gravity {
+      facet acceleration : Acceleration = meters_per_second2(-9.81)
+    }
+    law fall {
+      step dt : Time
+      when world.stone.position > meters(0)
+      evolve world.stone.velocity <- world.stone.velocity + world.gravity.acceleration * dt
+      evolve world.stone.position <- max(meters(0), world.stone.position + world.stone.velocity * dt)
+      conserve world.stone.position >= meters(0)
+      witness "physical:gravity"
+    }
+  }
+
+  perception sight {
+    observer creature
+    source world
+    channel altitude : Length = world.stone.position
+    preserve sight.altitude >= meters(0)
+  }
+
+  neural brain {
+    facet stimulus : Number = 0
+    facet response : Number = 0
+    pathway integrate {
+      when brain.stimulus > 0
+      transmit brain.response <- clamp(brain.response + brain.stimulus * 0.5, 0, 1)
+      preserve brain.response >= 0 and brain.response <= 1
+      witness "neural:integration"
+    }
+  }
+
+  living creature {
+    body world.stone
+    facet energy : Number = 1
+    sense altitude : Length from sight.altitude
+    need energy target 1 critical 0.2
+    maintain creature.energy >= 0
+    cycle survive {
+      when creature.energy > 0
+      metabolize creature.energy <- creature.energy - 0.1
+      intend brain.stimulus <- choose(creature.altitude > meters(0), 1, 0)
+      witness "life:survival-cycle"
+    }
+  }
+
+  genetic lineage {
+    gene motion_bias : Number = 0.2
+    facet expressed_motion : Number = 0
+    mutate lineage.motion_bias by 0.01
+    express lineage.expressed_motion <- lineage.motion_bias
+    express phenotype.motion_bias <- lineage.motion_bias
+    preserve lineage.motion_bias >= 0 and lineage.motion_bias <= 1
+    witness "genetic:lineage"
+  }
+
+  quantitative telemetry {
+    measure altitude : Length = world.stone.position
+      uncertainty meters(0.05)
+      confidence 0.98
+      unit "m"
+      scale ratio
+      evidence "sensor:simulated-altimeter"
+      calibrated by "rcl:foundation-calibration"
+    derive safe_altitude : Truth = lower(telemetry.altitude) >= meters(0)
+    preserve confidence(telemetry.altitude) >= 0.95
+  }
+
+  reflect self_model
+  advance world.fall steps 2 dt seconds(1)
+  observe sight
+  live creature steps 1
+  propagate brain steps 1
+  inherit lineage generations 2
+  quantify telemetry
+}

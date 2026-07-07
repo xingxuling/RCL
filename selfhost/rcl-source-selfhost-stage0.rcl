@@ -1,0 +1,72 @@
+reality RCLSourceSelfHostStage0 {
+  facet source.lexer_sha : Text = "c513ba3662f729ca6bba13f765b86cb515c3107ac67992d3f64eb71e16667941"
+  facet source.parser_sha : Text = "684e8d6692ba14524466d5d09b5aa20a66e4633a9af1d128cfe55582d09a5fc1"
+  facet source.compiler_sha : Text = "f6cd14acc3ded8efb60f98052fef9f5b81c5680a8ac45e002ba3c493a920b3a3"
+  facet source.runtime_sha : Text = "cfc90ee7431198fecc11bc8840579f49662986166156af013a03ac92ad94f69c"
+  facet source.bytecode_sha : Text = "eacf04d52889e23cc08303f39059e5713b24291181b4090c97764cd871e900c2"
+  facet source.bootstrap_sha : Text = "b0fa390362597c7fdc90e987f3271bac24ea71327886fe21ea2982a57ef92877"
+  facet source.native_vm_sha : Text = "6dda9ed40e04ece24774f25005ac93d8f84b5d91f0e2dedaaf4ed2bebd20b91f"
+  facet source.v094_file_emission_sha : Text = "ef5198d23beeb143b18535043f279227cf7ab26fbb66ad8d2b0026d381463fdb"
+
+  facet source.core_module_count : Number = 8
+  facet source.bootstrap_stage_count : Number = 9
+  facet source.rcl_owned_runtime_count : Number = 0
+  facet source.js_reference_runtime_count : Number = 8
+
+  facet selfhost.stage : Text = "stage0_source_truth_model"
+  facet selfhost.frontier : Text = "rcl_describes_and_audits_core_before_rewriting_runtime"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.next_rewrite_target : Text = "lexer_parser_facet_subset"
+  facet selfhost.native_boundary : Text = "unchecked"
+  facet selfhost.claim : Text = "not_self_hosted_yet"
+
+  facet module.lexer_status : Text = "JS_REFERENCE"
+  facet module.parser_status : Text = "JS_REFERENCE"
+  facet module.compiler_status : Text = "JS_REFERENCE"
+  facet module.runtime_status : Text = "JS_REFERENCE"
+  facet module.bytecode_status : Text = "JS_REFERENCE"
+  facet module.bootstrap_status : Text = "RCL_PARTIAL_NATIVE_DEPENDENT"
+  facet module.native_vm_status : Text = "WINDOWS_NATIVE_VM_VERIFIED"
+  facet module.v094_status : Text = "RCL_MODELED_DETERMINISTIC_SANDBOX"
+
+  facet platform.windows_native_status : Text = "NATIVE_WINDOWS_VERIFIED"
+  facet platform.native_posix_artifact : Text = "native/rclvm"
+  facet platform.native_windows_artifact : Text = "native/rclvm.exe"
+  facet platform.package_status : Text = "WINDOWS_ZIP_HAS_INVALID_COLON_PATHS"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_stage0_model_compiles : Truth = true
+  facet gate.rcl_stage0_model_runs_on_js_runtime : Truth = true
+  facet gate.native_selfhost_runs_on_windows : Truth = false
+  facet gate.v094_custom_thresholds_control_final_ok : Truth = false
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant source.audit on source
+    warrant platform.audit on platform
+    warrant gate.audit on gate
+  }
+
+  emergence establish_stage0_truth_model {
+    cause selfhost_agent
+    when source.core_module_count == 8
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "PROXY_VERIFIED"
+    alter selfhost.native_boundary <- platform.windows_native_status
+    alter selfhost.claim <- "rcl_source_is_modeled_not_rewritten"
+
+    preserve source.rcl_owned_runtime_count == 0
+      and source.js_reference_runtime_count == 8
+      and platform.windows_native_status == "NATIVE_WINDOWS_VERIFIED"
+      and gate.full_self_hosting == false
+      and gate.rcl_stage0_model_compiles == true
+      and gate.rcl_stage0_model_runs_on_js_runtime == true
+      and gate.native_selfhost_runs_on_windows == false
+
+    witness "rcl:selfhost-stage0-source-truth-model"
+  }
+
+  foresee establish_stage0_truth_model
+  realize establish_stage0_truth_model
+}

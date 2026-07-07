@@ -1,0 +1,38 @@
+{
+  "project": {
+    "name": "reality-task-board",
+    "title": "现实任务板",
+    "description": "把任务从一句话变成有状态、有记录、可导出的现实对象。",
+    "locale": "zh-CN",
+    "accent": "#6750A4"
+  },
+  "entities": [
+    {
+      "name": "tasks",
+      "label": "任务",
+      "fields": [
+        { "name": "title", "label": "任务名称", "type": "text", "required": true, "placeholder": "例如：完成RCL框架验收" },
+        { "name": "owner", "label": "负责人", "type": "text", "required": true, "placeholder": "主体名称" },
+        { "name": "priority", "label": "优先级", "type": "number", "required": true },
+        { "name": "done", "label": "已完成", "type": "boolean" },
+        { "name": "evidence", "label": "验收证据", "type": "textarea", "placeholder": "测试、文件或运行结果" }
+      ]
+    },
+    {
+      "name": "decisions",
+      "label": "决策",
+      "fields": [
+        { "name": "question", "label": "问题", "type": "text", "required": true },
+        { "name": "decision", "label": "裁决", "type": "textarea", "required": true },
+        { "name": "reversible", "label": "可逆", "type": "boolean" }
+      ]
+    }
+  ],
+  "seedData": {
+    "tasks": [
+      { "__id": "seed-1", "title": "运行三个Reality Forge演示", "owner": "architect", "priority": 1, "done": false, "evidence": "demo-summary.json" }
+    ],
+    "decisions": []
+  },
+  "features": { "offline": true, "localStorage": true, "auditTrail": true }
+}

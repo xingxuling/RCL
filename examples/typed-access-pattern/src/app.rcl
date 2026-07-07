@@ -1,0 +1,9 @@
+reality TypedAccessPatternDemo {
+  facet app.user : core.User<Text> = { id: "u-1", payload: "seed" }
+  facet app.userPayload : Text = app.user.payload
+  facet app.login : core.LoginResult<Text, Text> = Ok("accepted")
+  facet app.message : Text = match app.login {
+    Ok(value) -> value
+    Err(reason) -> reason
+  }
+}

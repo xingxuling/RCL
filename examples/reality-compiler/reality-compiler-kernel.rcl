@@ -1,0 +1,44 @@
+reality RealityCompilerKernel {
+  facet state.S : Number = 0.6
+  facet state.T : Number = 0.6
+  facet state.I : Number = 0.5
+  facet state.C : Number = 0.5
+  facet field.energy : Number = 0.25
+  facet field.floor : Number = 0.02
+  facet memory.prev_stability : Number = 0
+  facet observer.visibility : Number = 0.35
+  facet compiler.depth : Number = 3
+  facet compiler.stability : Number = 0
+
+  subject compiler {
+    facet authority : Number = 1
+    warrant state.write on state
+    warrant field.write on field
+    warrant compiler.write on compiler
+  }
+
+  emergence compile_stability {
+    cause compiler
+    when compiler.authority == 1
+    needs state.write on state
+    needs field.write on field
+    needs compiler.write on compiler
+    alter compiler.stability <- state.S * (1 - state.T) * state.I * state.C
+    alter field.energy <- field.energy + 0.01 * (compiler.stability - field.floor)
+    alter field.floor <- field.floor + 0.005 * (0.1 - compiler.stability)
+    alter state.I <- state.I + 0.04 * (1 - state.I)
+    alter state.C <- state.C + 0.04 * (1 - state.C)
+    preserve state.S >= 0
+    preserve state.S <= 1
+    preserve state.T >= 0
+    preserve state.T <= 1
+    preserve state.I >= 0
+    preserve state.I <= 1
+    preserve state.C >= 0
+    preserve state.C <= 1
+    witness "rcl:reality-compiler-kernel:v0.43"
+  }
+
+  foresee compile_stability
+  realize compile_stability
+}

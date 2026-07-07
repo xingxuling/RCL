@@ -1,0 +1,252 @@
+reality RCLSelfHostRuntimeBytecodeInterpreterStage12 {
+  facet source.target : Text = "reality RuntimeInterpreterTarget {\n  facet world.ready : Truth = true\n  facet world.name : Text = \"RCL\"\n}\n"
+  facet source.program : Text = "RuntimeInterpreterTarget"
+  facet source.root : Text = "22d386696162b03cec260db57a09622173d2e6da0742fc8647c41a0c118b3455"
+
+  facet selfhost.stage : Text = "stage12_rcl_owned_runtime_bytecode_interpreter_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_interprets_native_bytecode_state_subset_inside_native_vm"
+  facet selfhost.boundary : Text = "push_store_halt_runtime_subset_not_complete_rcl_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_runtime_control_flow_transactions_and_provider_semantics"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_runtime_subset : Truth = true
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon runtime_strings() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(),
+              source.program),
+            source.root),
+          "world.ready"),
+        "RCL"),
+      "world.name")
+
+  reckon instruction_ops() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), 2),
+            5),
+          3),
+        5),
+      31)
+
+  reckon instruction_a_values() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), 1),
+            2),
+          3),
+        4),
+      0)
+
+  reckon zero_values() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), 0),
+            0),
+          0),
+        0),
+      0)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(runtime_strings()), 0, length(instruction_ops())),
+      sequence_concat(
+        encode_string_pool(runtime_strings(), 0, empty_sequence()),
+        encode_instruction_plan(instruction_ops(), instruction_a_values(), zero_values(), zero_values(), 0, empty_sequence())))
+
+  reckon runtime_frame(pc : Number, stack : Sequence, state_keys : Sequence, state_values : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), pc),
+          stack),
+        state_keys),
+      state_values)
+
+  reckon frame_pc(frame : Sequence) -> Number =
+    sequence_get(frame, 0)
+
+  reckon frame_stack(frame : Sequence) -> Sequence =
+    sequence_get(frame, 1)
+
+  reckon frame_state_keys(frame : Sequence) -> Sequence =
+    sequence_get(frame, 2)
+
+  reckon frame_state_values(frame : Sequence) -> Sequence =
+    sequence_get(frame, 3)
+
+  reckon stack_top(stack : Sequence) -> Text =
+    sequence_get(stack, length(stack) - 1)
+
+  reckon stack_top_truth(stack : Sequence) -> Truth =
+    sequence_get(stack, length(stack) - 1)
+
+  reckon apply_instruction(frame : Sequence) -> Sequence =
+    choose(sequence_get(instruction_ops(), frame_pc(frame)) == 2,
+      runtime_frame(
+        frame_pc(frame) + 1,
+        sequence_append(frame_stack(frame), sequence_get(instruction_a_values(), frame_pc(frame)) == 1),
+        frame_state_keys(frame),
+        frame_state_values(frame)),
+      choose(sequence_get(instruction_ops(), frame_pc(frame)) == 3,
+        runtime_frame(
+          frame_pc(frame) + 1,
+          sequence_append(frame_stack(frame), sequence_get(runtime_strings(), sequence_get(instruction_a_values(), frame_pc(frame)))),
+          frame_state_keys(frame),
+          frame_state_values(frame)),
+        choose(sequence_get(instruction_ops(), frame_pc(frame)) == 5,
+          runtime_frame(
+            frame_pc(frame) + 1,
+            frame_stack(frame),
+            sequence_append(frame_state_keys(frame), sequence_get(runtime_strings(), sequence_get(instruction_a_values(), frame_pc(frame)))),
+            sequence_append(frame_state_values(frame), sequence_get(frame_stack(frame), length(frame_stack(frame)) - 1))),
+          runtime_frame(frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame)))))
+
+  reckon execute(frame : Sequence) -> Sequence =
+    choose(frame_pc(frame) >= length(instruction_ops()), frame,
+      choose(sequence_get(instruction_ops(), frame_pc(frame)) == 31,
+        runtime_frame(frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame)),
+        execute(apply_instruction(frame))))
+
+  reckon lookup_truth(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Truth) -> Truth =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_truth(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_text(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Text) -> Text =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_text(keys, values, index - 1, key, fallback)))
+
+  facet target.rbc_strings : Sequence = runtime_strings()
+  facet target.rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.rbc_bytes : Sequence = encode_target_rbc()
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.string_count : Number = length(target.rbc_strings)
+  facet target.instruction_count : Number = length(target.rbc_instruction_ops)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  facet runtime.initial_frame : Sequence = runtime_frame(0, empty_sequence(), empty_sequence(), empty_sequence())
+  facet runtime.final_frame : Sequence = execute(runtime.initial_frame)
+  facet runtime.final_pc : Number = frame_pc(runtime.final_frame)
+  facet runtime.stack : Sequence = frame_stack(runtime.final_frame)
+  facet runtime.state_keys : Sequence = frame_state_keys(runtime.final_frame)
+  facet runtime.state_values : Sequence = frame_state_values(runtime.final_frame)
+  facet runtime.state_count : Number = length(runtime.state_keys)
+  facet runtime.world_ready : Truth = lookup_truth(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "world.ready", false)
+  facet runtime.world_name : Text = lookup_text(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "world.name", "")
+  facet runtime.interpreter_supported : Truth =
+    semantic_assert(
+      runtime.final_pc == target.instruction_count
+        and runtime.state_count == 2
+        and runtime.world_ready == true
+        and runtime.world_name == "RCL",
+      "RCL_STAGE12_RUNTIME_INTERPRETER_MISMATCH",
+      source.program,
+      make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant runtime.audit on runtime
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage12_runtime_interpreter_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_runtime_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_BYTECODE_INTERPRETER_SUBSET_VERIFIED"
+
+    preserve runtime.interpreter_supported == true
+      and target.rbc_size == 248
+      and target.string_count == 5
+      and target.instruction_count == 5
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage12-runtime-bytecode-interpreter-subset"
+  }
+
+  foresee verify_stage12_runtime_interpreter_subset
+  realize verify_stage12_runtime_interpreter_subset
+}

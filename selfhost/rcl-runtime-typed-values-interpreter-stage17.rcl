@@ -1,0 +1,623 @@
+reality RCLSelfHostRuntimeTypedValuesInterpreterStage17 {
+  facet source.program : Text = "RuntimeTypedValuesTarget"
+  facet source.root : Text = "10b6835e4acc69116909bf85b8f933d32bac3d5141039c5864dcec48120db8d9"
+
+  facet selfhost.stage : Text = "stage17_rcl_owned_runtime_typed_values_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_interprets_native_bytecode_typed_records_unions_refs_inside_native_vm"
+  facet selfhost.boundary : Text = "typed_record_union_ref_runtime_subset_not_complete_rcl_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_runtime_host_rule_calls_full_history_roots_error_paths_and_complete_provider_parity"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_runtime_subset : Truth = true
+  facet gate.rcl_owned_runtime_typed_values_subset : Truth = true
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon runtime_string_at(index : Number) -> Text =
+    choose(index == 0, source.program,
+      choose(index == 1, source.root,
+        choose(index == 2, "u-3",
+          choose(index == 3, "referenced",
+            choose(index == 4, "core::User<Text>",
+              choose(index == 5, "id\npayload",
+                choose(index == 6, "accepted",
+                  choose(index == 7, "core::LoginResult<Text,Text>",
+                    choose(index == 8, "Ok",
+                      choose(index == 9, "core::Session",
+                        choose(index == 10, "user\nlogin",
+                          choose(index == 11, "app.session",
+                            choose(index == 12, "denied",
+                              choose(index == 13, "Err",
+                                choose(index == 14, "app.login",
+                                  choose(index == 15, "",
+                                    choose(index == 16, "app.message",
+                                      choose(index == 17, "app.sessionRef",
+                                        choose(index == 18, "app.sessionRefId",
+                                          choose(index == 19, "app.sessionAgain",
+                                            choose(index == 20, "user",
+                                              choose(index == 21, "payload", "app.payloadViaRef"))))))))))))))))))))))
+
+  reckon build_strings(index : Number, output : Sequence) -> Sequence =
+    choose(index >= 23, output,
+      build_strings(index + 1, sequence_append(output, runtime_string_at(index))))
+
+  reckon runtime_strings() -> Sequence =
+    build_strings(0, empty_sequence())
+
+  reckon instruction_op_at(index : Number) -> Number =
+    choose(index == 0, 3,
+      choose(index == 1, 3,
+        choose(index == 2, 36,
+          choose(index == 3, 3,
+            choose(index == 4, 37,
+              choose(index == 5, 36,
+                choose(index == 6, 5,
+                  choose(index == 7, 3,
+                    choose(index == 8, 37,
+                      choose(index == 9, 5,
+                        choose(index == 10, 4,
+                          choose(index == 11, 39,
+                            choose(index == 12, 21,
+                              choose(index == 13, 4,
+                                choose(index == 14, 40,
+                                  choose(index == 15, 20,
+                                    choose(index == 16, 4,
+                                      choose(index == 17, 39,
+                                        choose(index == 18, 21,
+                                          choose(index == 19, 4,
+                                            choose(index == 20, 40,
+                                              choose(index == 21, 20,
+                                                choose(index == 22, 3,
+                                                  choose(index == 23, 5,
+                                                    choose(index == 24, 4,
+                                                      choose(index == 25, 41,
+                                                        choose(index == 26, 5,
+                                                          choose(index == 27, 4,
+                                                            choose(index == 28, 43,
+                                                              choose(index == 29, 5,
+                                                                choose(index == 30, 4,
+                                                                  choose(index == 31, 42,
+                                                                    choose(index == 32, 5,
+                                                                      choose(index == 33, 4,
+                                                                        choose(index == 34, 38,
+                                                                          choose(index == 35, 38,
+                                                                            choose(index == 36, 5, 31)))))))))))))))))))))))))))))))))))))
+
+  reckon instruction_a_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 3,
+        choose(index == 2, 4,
+          choose(index == 3, 6,
+            choose(index == 4, 7,
+              choose(index == 5, 9,
+                choose(index == 6, 11,
+                  choose(index == 7, 12,
+                    choose(index == 8, 7,
+                      choose(index == 9, 14,
+                        choose(index == 10, 14,
+                          choose(index == 11, 8,
+                            choose(index == 12, 16,
+                              choose(index == 13, 14,
+                                choose(index == 14, 0,
+                                  choose(index == 15, 23,
+                                    choose(index == 16, 14,
+                                      choose(index == 17, 13,
+                                        choose(index == 18, 22,
+                                          choose(index == 19, 14,
+                                            choose(index == 20, 0,
+                                              choose(index == 21, 23,
+                                                choose(index == 22, 15,
+                                                  choose(index == 23, 16,
+                                                    choose(index == 24, 11,
+                                                      choose(index == 25, 0,
+                                                        choose(index == 26, 17,
+                                                          choose(index == 27, 17,
+                                                            choose(index == 28, 0,
+                                                              choose(index == 29, 18,
+                                                                choose(index == 30, 17,
+                                                                  choose(index == 31, 0,
+                                                                    choose(index == 32, 19,
+                                                                      choose(index == 33, 19,
+                                                                        choose(index == 34, 20,
+                                                                          choose(index == 35, 21,
+                                                                            choose(index == 36, 22, 0)))))))))))))))))))))))))))))))))))))
+
+  reckon instruction_b_at(index : Number) -> Number =
+    choose(index == 2, 5,
+      choose(index == 4, 8,
+        choose(index == 5, 10,
+          choose(index == 8, 13, 0))))
+
+  reckon instruction_c_at(index : Number) -> Number =
+    choose(index == 2, 2,
+      choose(index == 4, 1,
+        choose(index == 5, 2,
+          choose(index == 8, 1, 0))))
+
+  reckon build_instruction_values(index : Number, output : Sequence, selector : Number) -> Sequence =
+    choose(index >= 38, output,
+      build_instruction_values(
+        index + 1,
+        sequence_append(
+          output,
+          choose(selector == 0, instruction_op_at(index),
+            choose(selector == 1, instruction_a_at(index),
+              choose(selector == 2, instruction_b_at(index), instruction_c_at(index))))),
+        selector))
+
+  reckon instruction_ops() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 0)
+
+  reckon instruction_a_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 1)
+
+  reckon instruction_b_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 2)
+
+  reckon instruction_c_values() -> Sequence =
+    build_instruction_values(0, empty_sequence(), 3)
+
+  reckon encode_target_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(target.rbc_strings), 0, length(target.rbc_instruction_ops)),
+      sequence_concat(
+        encode_string_pool(target.rbc_strings, 0, empty_sequence()),
+        encode_instruction_plan(target.rbc_instruction_ops, target.rbc_instruction_a_values, target.rbc_instruction_b_values, target.rbc_instruction_c_values, 0, empty_sequence())))
+
+  reckon typed_object(kind : Text, type_name : Text, object_id : Number, shape : Text, values : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), kind),
+            type_name),
+          object_id),
+        shape),
+      values)
+
+  reckon typed_ref_value(type_name : Text, object_id : Number, target_kind : Text) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), "Ref"),
+          type_name),
+        object_id),
+      target_kind)
+
+  reckon object_kind(object : Sequence) -> Text = sequence_get(object, 0)
+  reckon object_type(object : Sequence) -> Text = sequence_get(object, 1)
+  reckon object_id(object : Sequence) -> Number = sequence_get(object, 2)
+  reckon object_shape(object : Sequence) -> Text = sequence_get(object, 3)
+  reckon object_values(object : Sequence) -> Sequence = sequence_get(object, 4)
+  reckon ref_object_id(ref : Sequence) -> Number = sequence_get(ref, 2)
+
+  reckon runtime_frame(
+    pc : Number,
+    stack : Sequence,
+    state_keys : Sequence,
+    state_values : Sequence,
+    next_object_id : Number,
+    typed_objects : Sequence,
+    typed_ref_count : Number
+  ) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), pc),
+                stack),
+              state_keys),
+            state_values),
+          next_object_id),
+        typed_objects),
+      typed_ref_count)
+
+  reckon frame_pc(frame : Sequence) -> Number = sequence_get(frame, 0)
+  reckon frame_stack(frame : Sequence) -> Sequence = sequence_get(frame, 1)
+  reckon frame_state_keys(frame : Sequence) -> Sequence = sequence_get(frame, 2)
+  reckon frame_state_values(frame : Sequence) -> Sequence = sequence_get(frame, 3)
+  reckon frame_next_object_id(frame : Sequence) -> Number = sequence_get(frame, 4)
+  reckon frame_typed_objects(frame : Sequence) -> Sequence = sequence_get(frame, 5)
+  reckon frame_typed_ref_count(frame : Sequence) -> Number = sequence_get(frame, 6)
+
+  reckon current_op(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_ops, frame_pc(frame))
+  reckon current_a(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_a_values, frame_pc(frame))
+  reckon current_b(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_b_values, frame_pc(frame))
+  reckon current_c(frame : Sequence) -> Number = sequence_get(target.rbc_instruction_c_values, frame_pc(frame))
+
+  reckon copy_until(items : Sequence, index : Number, exclusive_end : Number, output : Sequence) -> Sequence =
+    choose(index >= exclusive_end, output,
+      copy_until(items, index + 1, exclusive_end, sequence_append(output, sequence_get(items, index))))
+
+  reckon stack_without_count(items : Sequence, count : Number) -> Sequence =
+    copy_until(items, 0, length(items) - count, empty_sequence())
+
+  reckon stack_without_last(items : Sequence) -> Sequence =
+    stack_without_count(items, 1)
+
+  reckon stack_tail_values(items : Sequence, count : Number) -> Sequence =
+    choose(count == 2,
+      sequence_append(
+        sequence_append(empty_sequence(), sequence_get(items, length(items) - 2)),
+        sequence_get(items, length(items) - 1)),
+      choose(count == 1,
+        sequence_append(empty_sequence(), sequence_get(items, length(items) - 1)),
+        empty_sequence()))
+
+  reckon stack_top_sequence(items : Sequence) -> Sequence =
+    sequence_get(items, length(items) - 1)
+
+  reckon stack_top_truth(items : Sequence) -> Truth =
+    sequence_get(items, length(items) - 1)
+
+  reckon lookup_sequence(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Sequence) -> Sequence =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_sequence(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_text(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Text) -> Text =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_text(keys, values, index - 1, key, fallback)))
+
+  reckon lookup_number(keys : Sequence, values : Sequence, index : Number, key : Text, fallback : Number) -> Number =
+    choose(index < 0, fallback,
+      choose(sequence_get(keys, index) == key,
+        sequence_get(values, index),
+        lookup_number(keys, values, index - 1, key, fallback)))
+
+  reckon find_typed_object(objects : Sequence, index : Number, object_id_value : Number, fallback : Sequence) -> Sequence =
+    choose(index >= length(objects), fallback,
+      choose(object_id(sequence_get(objects, index)) == object_id_value,
+        sequence_get(objects, index),
+        find_typed_object(objects, index + 1, object_id_value, fallback)))
+
+  reckon update_frame(frame : Sequence, pc : Number, stack : Sequence, state_keys : Sequence, state_values : Sequence) -> Sequence =
+    runtime_frame(
+      pc,
+      stack,
+      state_keys,
+      state_values,
+      frame_next_object_id(frame),
+      frame_typed_objects(frame),
+      frame_typed_ref_count(frame))
+
+  reckon push_string_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(frame_stack(frame), sequence_get(target.rbc_strings, current_a(frame))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon load_state_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(
+        frame_stack(frame),
+        lookup_sequence(frame_state_keys(frame), frame_state_values(frame), length(frame_state_keys(frame)) - 1, sequence_get(target.rbc_strings, current_a(frame)), empty_sequence())),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon store_state_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      stack_without_last(frame_stack(frame)),
+      sequence_append(frame_state_keys(frame), sequence_get(target.rbc_strings, current_a(frame))),
+      sequence_append(frame_state_values(frame), sequence_get(frame_stack(frame), length(frame_stack(frame)) - 1)))
+
+  reckon make_record_object(frame : Sequence) -> Sequence =
+    typed_object(
+      "Record",
+      sequence_get(target.rbc_strings, current_a(frame)),
+      frame_next_object_id(frame),
+      sequence_get(target.rbc_strings, current_b(frame)),
+      stack_tail_values(frame_stack(frame), current_c(frame)))
+
+  reckon make_union_object(frame : Sequence) -> Sequence =
+    typed_object(
+      "Union",
+      sequence_get(target.rbc_strings, current_a(frame)),
+      frame_next_object_id(frame),
+      sequence_get(target.rbc_strings, current_b(frame)),
+      stack_tail_values(frame_stack(frame), current_c(frame)))
+
+  reckon make_typed_record_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_count(frame_stack(frame), current_c(frame)), make_record_object(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_next_object_id(frame) + 1,
+      sequence_append(frame_typed_objects(frame), make_record_object(frame)),
+      frame_typed_ref_count(frame))
+
+  reckon make_typed_union_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_count(frame_stack(frame), current_c(frame)), make_union_object(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_next_object_id(frame) + 1,
+      sequence_append(frame_typed_objects(frame), make_union_object(frame)),
+      frame_typed_ref_count(frame))
+
+  reckon typed_field_value_sequence(object : Sequence, field : Text) -> Sequence =
+    choose(field == "user",
+      sequence_get(object_values(object), 0),
+      choose(field == "login",
+        sequence_get(object_values(object), 1),
+        empty_sequence()))
+
+  reckon typed_field_value_text(object : Sequence, field : Text) -> Text =
+    choose(field == "id",
+      sequence_get(object_values(object), 0),
+      choose(field == "payload",
+        sequence_get(object_values(object), 1),
+        ""))
+
+  reckon get_typed_field_frame(frame : Sequence) -> Sequence =
+    choose(sequence_get(target.rbc_strings, current_a(frame)) == "user" or sequence_get(target.rbc_strings, current_a(frame)) == "login",
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(
+          stack_without_last(frame_stack(frame)),
+          typed_field_value_sequence(stack_top_sequence(frame_stack(frame)), sequence_get(target.rbc_strings, current_a(frame)))),
+        frame_state_keys(frame),
+        frame_state_values(frame)),
+      update_frame(
+        frame,
+        frame_pc(frame) + 1,
+        sequence_append(
+          stack_without_last(frame_stack(frame)),
+          typed_field_value_text(stack_top_sequence(frame_stack(frame)), sequence_get(target.rbc_strings, current_a(frame)))),
+        frame_state_keys(frame),
+        frame_state_values(frame)))
+
+  reckon is_union_variant_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(
+        stack_without_last(frame_stack(frame)),
+        object_kind(stack_top_sequence(frame_stack(frame))) == "Union"
+          and object_shape(stack_top_sequence(frame_stack(frame))) == sequence_get(target.rbc_strings, current_a(frame))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon get_union_payload_text(frame : Sequence) -> Text =
+    sequence_get(object_values(stack_top_sequence(frame_stack(frame))), current_a(frame))
+
+  reckon get_union_payload_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_last(frame_stack(frame)), get_union_payload_text(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon make_typed_ref_frame(frame : Sequence) -> Sequence =
+    runtime_frame(
+      frame_pc(frame) + 1,
+      sequence_append(
+        stack_without_last(frame_stack(frame)),
+        typed_ref_value(object_type(stack_top_sequence(frame_stack(frame))), object_id(stack_top_sequence(frame_stack(frame))), object_kind(stack_top_sequence(frame_stack(frame))))),
+      frame_state_keys(frame),
+      frame_state_values(frame),
+      frame_next_object_id(frame),
+      frame_typed_objects(frame),
+      frame_typed_ref_count(frame) + 1)
+
+  reckon deref_typed_ref_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(
+        stack_without_last(frame_stack(frame)),
+        find_typed_object(frame_typed_objects(frame), 0, ref_object_id(stack_top_sequence(frame_stack(frame))), empty_sequence())),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon get_typed_ref_id_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      frame_pc(frame) + 1,
+      sequence_append(stack_without_last(frame_stack(frame)), ref_object_id(stack_top_sequence(frame_stack(frame)))),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon jump_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      current_a(frame),
+      frame_stack(frame),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon jump_if_false_frame(frame : Sequence) -> Sequence =
+    update_frame(
+      frame,
+      choose(stack_top_truth(frame_stack(frame)), frame_pc(frame) + 1, current_a(frame)),
+      stack_without_last(frame_stack(frame)),
+      frame_state_keys(frame),
+      frame_state_values(frame))
+
+  reckon apply_instruction(frame : Sequence) -> Sequence =
+    choose(current_op(frame) == 3, push_string_frame(frame),
+      choose(current_op(frame) == 4, load_state_frame(frame),
+        choose(current_op(frame) == 5, store_state_frame(frame),
+          choose(current_op(frame) == 20, jump_frame(frame),
+            choose(current_op(frame) == 21, jump_if_false_frame(frame),
+              choose(current_op(frame) == 36, make_typed_record_frame(frame),
+                choose(current_op(frame) == 37, make_typed_union_frame(frame),
+                  choose(current_op(frame) == 38, get_typed_field_frame(frame),
+                    choose(current_op(frame) == 39, is_union_variant_frame(frame),
+                      choose(current_op(frame) == 40, get_union_payload_frame(frame),
+                        choose(current_op(frame) == 41, make_typed_ref_frame(frame),
+                          choose(current_op(frame) == 42, deref_typed_ref_frame(frame),
+                            choose(current_op(frame) == 43, get_typed_ref_id_frame(frame),
+                              update_frame(frame, frame_pc(frame) + 1, frame_stack(frame), frame_state_keys(frame), frame_state_values(frame)))))))))))))))
+
+  reckon halt_frame(frame : Sequence) -> Sequence =
+    update_frame(frame, length(target.rbc_instruction_ops), frame_stack(frame), frame_state_keys(frame), frame_state_values(frame))
+
+  reckon execute(frame : Sequence) -> Sequence =
+    choose(frame_pc(frame) >= length(target.rbc_instruction_ops), frame,
+      choose(current_op(frame) == 31,
+        halt_frame(frame),
+        execute(apply_instruction(frame))))
+
+  facet target.rbc_strings : Sequence = runtime_strings()
+  facet target.rbc_instruction_ops : Sequence = instruction_ops()
+  facet target.rbc_instruction_a_values : Sequence = instruction_a_values()
+  facet target.rbc_instruction_b_values : Sequence = instruction_b_values()
+  facet target.rbc_instruction_c_values : Sequence = instruction_c_values()
+  facet target.rbc_bytes : Sequence = encode_target_rbc()
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.string_count : Number = length(target.rbc_strings)
+  facet target.instruction_count : Number = length(target.rbc_instruction_ops)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  facet runtime.initial_frame : Sequence =
+    runtime_frame(0, empty_sequence(), empty_sequence(), empty_sequence(), 1, empty_sequence(), 0)
+  facet runtime.final_frame : Sequence = execute(runtime.initial_frame)
+  facet runtime.final_pc : Number = frame_pc(runtime.final_frame)
+  facet runtime.stack_count : Number = length(frame_stack(runtime.final_frame))
+  facet runtime.state_keys : Sequence = frame_state_keys(runtime.final_frame)
+  facet runtime.state_values : Sequence = frame_state_values(runtime.final_frame)
+  facet runtime.state_count : Number = length(runtime.state_keys)
+  facet runtime.typed_objects : Sequence = frame_typed_objects(runtime.final_frame)
+  facet runtime.typed_object_count : Number = length(runtime.typed_objects)
+  facet runtime.typed_ref_count : Number = frame_typed_ref_count(runtime.final_frame)
+  facet runtime.next_object_id : Number = frame_next_object_id(runtime.final_frame)
+  facet runtime.app_session : Sequence = lookup_sequence(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.session", empty_sequence())
+  facet runtime.app_login : Sequence = lookup_sequence(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.login", empty_sequence())
+  facet runtime.app_session_ref : Sequence = lookup_sequence(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.sessionRef", empty_sequence())
+  facet runtime.app_session_again : Sequence = lookup_sequence(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.sessionAgain", empty_sequence())
+  facet runtime.app_message : Text = lookup_text(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.message", "")
+  facet runtime.app_session_ref_id : Number = lookup_number(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.sessionRefId", 0)
+  facet runtime.app_payload_via_ref : Text = lookup_text(runtime.state_keys, runtime.state_values, runtime.state_count - 1, "app.payloadViaRef", "")
+  facet runtime.session_object_id : Number = object_id(runtime.app_session)
+  facet runtime.session_again_object_id : Number = object_id(runtime.app_session_again)
+  facet runtime.session_ref_object_id : Number = ref_object_id(runtime.app_session_ref)
+  facet runtime.login_variant : Text = object_shape(runtime.app_login)
+  facet runtime.session_user : Sequence = typed_field_value_sequence(runtime.app_session_again, "user")
+  facet runtime.session_payload : Text = typed_field_value_text(runtime.session_user, "payload")
+  facet runtime.interpreter_supported : Truth =
+    semantic_assert(
+      runtime.final_pc == target.instruction_count
+        and runtime.stack_count == 0
+        and runtime.state_count == 7
+        and runtime.typed_object_count == 4
+        and runtime.typed_ref_count == 1
+        and runtime.next_object_id == 5
+        and runtime.app_message == "denied"
+        and runtime.app_payload_via_ref == "referenced"
+        and runtime.session_payload == "referenced"
+        and runtime.app_session_ref_id == 3
+        and runtime.session_object_id == 3
+        and runtime.session_again_object_id == 3
+        and runtime.session_ref_object_id == 3
+        and runtime.login_variant == "Err",
+      "RCL_STAGE17_RUNTIME_TYPED_VALUES_INTERPRETER_MISMATCH",
+      source.program,
+      make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant runtime.audit on runtime
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage17_runtime_typed_values_interpreter_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_runtime_typed_values_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_TYPED_VALUES_SUBSET_VERIFIED"
+
+    preserve runtime.interpreter_supported == true
+      and target.rbc_size == 1038
+      and target.string_count == 23
+      and target.instruction_count == 38
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage17-runtime-typed-values-subset"
+  }
+
+  foresee verify_stage17_runtime_typed_values_interpreter_subset
+  realize verify_stage17_runtime_typed_values_interpreter_subset
+}

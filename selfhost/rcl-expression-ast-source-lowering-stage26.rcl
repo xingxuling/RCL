@@ -1,0 +1,560 @@
+reality RCLSelfHostExpressionAstSourceLoweringStage26 {
+  facet selfhost.stage : Text = "stage26_rcl_owned_expression_ast_source_lowering_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_recursively_parses_literal_path_and_builtin_call_expression_ast_and_lowers_nested_builtin_source_to_bytecode_inside_native_vm"
+  facet selfhost.boundary : Text = "expression_ast_source_lowering_subset_not_complete_parser_compiler_or_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_rule_and_emergence_source_to_bytecode_lowering"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_tokenizer_subset : Truth = true
+  facet gate.rcl_owned_recursive_facet_parser_subset : Truth = true
+  facet gate.rcl_owned_expression_ast_subset : Truth = true
+  facet gate.rcl_owned_nested_call_lowering_subset : Truth = true
+  facet gate.rcl_owned_path_load_lowering_subset : Truth = true
+  facet gate.rcl_owned_target_native_execution_subset : Truth = true
+  facet gate.rcl_owned_parser_complete : Truth = false
+  facet gate.rcl_owned_expression_ast_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.rcl_compiler_self_emits_without_stage0 : Truth = false
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_runtime_root_hashing_complete : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet source.full : Text = "reality RuntimeExpressionAstSourceLoweringTarget { facet seed.raw : Text = \" request \" facet seed.trimmed : Text = trim(seed.raw) facet metrics.request_size : Number = length(trim(seed.raw)) facet metrics.has_request : Truth = contains(seed.trimmed, \"request\") }"
+  facet source.root : Text = "c922c1c276fa78a4138cc59ac7956712497366f3d939974bf93b8013b5187a0f"
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon checked_text(tokens : Sequence, index : Number, kind : Text, expected : Text) -> Text =
+    token_text(expect_token(sequence_get(tokens, index), kind, expected))
+
+  reckon checked_ident(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "IDENT", expected)
+
+  reckon checked_symbol(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "SYMBOL", expected)
+
+  reckon path_end(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index + 1)) == char_at(".", 0),
+      path_end(tokens, index + 2),
+      index + 1)
+
+  reckon path_text(tokens : Sequence, index : Number) -> Text =
+    choose(token_text(sequence_get(tokens, index + 1)) == char_at(".", 0),
+      token_text(expect_token(sequence_get(tokens, index), "IDENT", ""))
+        + char_at(".", 0)
+        + path_text(tokens, index + 2),
+      token_text(expect_token(sequence_get(tokens, index), "IDENT", "")))
+
+  reckon literal_kind_at(tokens : Sequence, index : Number) -> Text =
+    choose(token_kind(sequence_get(tokens, index)) == "NUMBER", "Number",
+      choose(token_kind(sequence_get(tokens, index)) == "STRING", "Text", "Truth"))
+
+  reckon expr_is_literal(tokens : Sequence, index : Number) -> Truth =
+    token_kind(sequence_get(tokens, index)) == "STRING"
+      or token_kind(sequence_get(tokens, index)) == "NUMBER"
+      or token_text(sequence_get(tokens, index)) == "true"
+      or token_text(sequence_get(tokens, index)) == "false"
+
+  reckon expr_is_call(tokens : Sequence, index : Number) -> Truth =
+    token_kind(sequence_get(tokens, index)) == "IDENT"
+      and token_text(sequence_get(tokens, index + 1)) == char_at("()", 0)
+
+  reckon expr_node(kind : Text, name : Text, value_type : Text, text_value : Text, args : Sequence, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(empty_sequence(), kind),
+              name),
+            value_type),
+          text_value),
+        args),
+      span)
+
+  reckon expr_kind_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon expr_name_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon expr_value_type_of(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon expr_text_of(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon expr_args_of(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon expr_span_of(node : Sequence) -> Span = sequence_get(node, 5)
+
+  reckon facet_node(path : Text, value_type : Text, expr : Sequence, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), path),
+          value_type),
+        expr),
+      span)
+
+  reckon facet_path_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon facet_type_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon facet_expr_of(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon facet_span_of_node(node : Sequence) -> Span = sequence_get(node, 3)
+
+  reckon literal_expr_node(tokens : Sequence, index : Number) -> Sequence =
+    expr_node(
+      "LiteralExpr",
+      "",
+      literal_kind_at(tokens, index),
+      token_text(expect_token(sequence_get(tokens, index), token_kind(sequence_get(tokens, index)), "")),
+      empty_sequence(),
+      token_span(sequence_get(tokens, index)))
+
+  reckon path_expr_node(tokens : Sequence, index : Number) -> Sequence =
+    expr_node(
+      "PathExpr",
+      "",
+      "",
+      path_text(tokens, index),
+      empty_sequence(),
+      token_span(sequence_get(tokens, index)))
+
+  reckon parse_expression(tokens : Sequence, index : Number) -> ParseState =
+    choose(expr_is_literal(tokens, index),
+      make_parse_state(index + 1, sequence_append(empty_sequence(), literal_expr_node(tokens, index))),
+      choose(expr_is_call(tokens, index),
+        parse_call_expr(tokens, index),
+        make_parse_state(path_end(tokens, index), sequence_append(empty_sequence(), path_expr_node(tokens, index)))))
+
+  reckon parse_call_args(tokens : Sequence, index : Number, args : Sequence) -> ParseState =
+    choose(token_text(sequence_get(tokens, index)) == char_at("()", 1),
+      make_parse_state(index + 1, args),
+      choose(token_text(sequence_get(tokens, parse_index(parse_expression(tokens, index)))) == char_at(",", 0),
+        parse_call_args(
+          tokens,
+          parse_index(parse_expression(tokens, index)) + 1,
+          sequence_append(args, sequence_get(parse_nodes(parse_expression(tokens, index)), 0))),
+        choose(checked_symbol(tokens, parse_index(parse_expression(tokens, index)), char_at("()", 1)) == char_at("()", 1),
+          make_parse_state(
+            parse_index(parse_expression(tokens, index)) + 1,
+            sequence_append(args, sequence_get(parse_nodes(parse_expression(tokens, index)), 0))),
+          make_parse_state(parse_index(parse_expression(tokens, index)), args))))
+
+  reckon parse_call_args_state(tokens : Sequence, index : Number) -> ParseState =
+    parse_call_args(tokens, index + 2, empty_sequence())
+
+  reckon call_expr_node(tokens : Sequence, index : Number) -> Sequence =
+    expr_node(
+      "CallExpr",
+      token_text(expect_token(sequence_get(tokens, index), "IDENT", "")),
+      "",
+      "",
+      parse_nodes(parse_call_args_state(tokens, index)),
+      token_span(sequence_get(tokens, index)))
+
+  reckon parse_call_expr(tokens : Sequence, index : Number) -> ParseState =
+    make_parse_state(
+      parse_index(parse_call_args_state(tokens, index)),
+      sequence_append(empty_sequence(), call_expr_node(tokens, index)))
+
+  reckon facet_colon_index(tokens : Sequence, start : Number) -> Number =
+    path_end(tokens, start + 1)
+
+  reckon facet_type_start(tokens : Sequence, start : Number) -> Number =
+    facet_colon_index(tokens, start) + 1
+
+  reckon facet_equals_index(tokens : Sequence, start : Number) -> Number =
+    path_end(tokens, facet_type_start(tokens, start))
+
+  reckon facet_expr_start(tokens : Sequence, start : Number) -> Number =
+    facet_equals_index(tokens, start) + 1
+
+  reckon after_facet(tokens : Sequence, start : Number) -> Number =
+    parse_index(parse_expression(tokens, facet_expr_start(tokens, start)))
+
+  reckon facet_path_at(tokens : Sequence, start : Number) -> Text =
+    path_text(tokens, start + 1)
+
+  reckon facet_value_type_at(tokens : Sequence, start : Number) -> Text =
+    token_text(expect_token(sequence_get(tokens, facet_type_start(tokens, start)), "IDENT", ""))
+
+  reckon facet_span(tokens : Sequence, start : Number) -> Span =
+    make_span(
+      span_offset(token_span(expect_token(sequence_get(tokens, start), "IDENT", "facet"))),
+      span_line(token_span(expect_token(sequence_get(tokens, start), "IDENT", "facet"))),
+      span_column(token_span(expect_token(sequence_get(tokens, start), "IDENT", "facet"))),
+      span_offset(token_span(sequence_get(tokens, after_facet(tokens, start) - 1)))
+        + span_length(token_span(sequence_get(tokens, after_facet(tokens, start) - 1)))
+        - span_offset(token_span(sequence_get(tokens, start))))
+
+  reckon parse_facet(tokens : Sequence, start : Number) -> ParseState =
+    make_parse_state(
+      after_facet(tokens, start),
+      sequence_append(
+        empty_sequence(),
+        facet_node(
+          facet_path_at(tokens, start),
+          facet_value_type_at(tokens, start),
+          sequence_get(parse_nodes(parse_expression(tokens, facet_expr_start(tokens, start))), 0),
+          facet_span(tokens, start))))
+
+  reckon parse_facets(tokens : Sequence, index : Number, nodes : Sequence) -> ParseState =
+    choose(token_text(sequence_get(tokens, index)) == char_at("{}", 1),
+      make_parse_state(index, nodes),
+      choose(token_kind(sequence_get(tokens, index)) == "EOF",
+        make_parse_state(index, nodes),
+        choose(checked_ident(tokens, index, "facet") == "facet",
+          parse_facets(
+            tokens,
+            parse_index(parse_facet(tokens, index)),
+            sequence_append(nodes, sequence_get(parse_nodes(parse_facet(tokens, index)), 0))),
+          make_parse_state(index, nodes))))
+
+  reckon find_text(items : Sequence, index : Number, text_value : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(items, index) == text_value,
+        index,
+        find_text(items, index + 1, text_value)))
+
+  reckon append_unique_text(items : Sequence, value : Text) -> Sequence =
+    choose(find_text(items, 0, value) >= 0, items, sequence_append(items, value))
+
+  reckon append_expr_strings(expr : Sequence, output : Sequence) -> Sequence =
+    choose(expr_kind_of(expr) == "LiteralExpr",
+      append_unique_text(output, expr_text_of(expr)),
+      choose(expr_kind_of(expr) == "PathExpr",
+        append_unique_text(output, expr_text_of(expr)),
+        append_expr_arg_strings(expr_args_of(expr), 0, output)))
+
+  reckon append_expr_arg_strings(args : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(args), output,
+      append_expr_arg_strings(args, index + 1, append_expr_strings(sequence_get(args, index), output)))
+
+  reckon collect_target_strings(facets : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(facets), output,
+      collect_target_strings(
+        facets,
+        index + 1,
+        append_unique_text(
+          append_expr_strings(facet_expr_of(sequence_get(facets, index)), output),
+          facet_path_of(sequence_get(facets, index)))))
+
+  reckon append_expr_instruction_values(expr : Sequence, strings : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(expr_kind_of(expr) == "LiteralExpr",
+      choose(selector == 0,
+        sequence_append(output, 3),
+        choose(selector == 1,
+          sequence_append(output, find_text(strings, 0, expr_text_of(expr))),
+          sequence_append(output, 0))),
+      choose(expr_kind_of(expr) == "PathExpr",
+        choose(selector == 0,
+          sequence_append(output, 4),
+          choose(selector == 1,
+            sequence_append(output, find_text(strings, 0, expr_text_of(expr))),
+            sequence_append(output, 0))),
+        append_call_instruction_values(expr, strings, selector, append_call_arg_instruction_values(expr_args_of(expr), 0, strings, selector, output))))
+
+  reckon append_call_arg_instruction_values(args : Sequence, index : Number, strings : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(index >= length(args), output,
+      append_call_arg_instruction_values(
+        args,
+        index + 1,
+        strings,
+        selector,
+        append_expr_instruction_values(sequence_get(args, index), strings, selector, output)))
+
+  reckon builtin_code(name : Text) -> Number =
+    choose(name == "contains", 1,
+      choose(name == "length", 4,
+        choose(name == "trim", 8, 0)))
+
+  reckon append_call_instruction_values(expr : Sequence, strings : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(selector == 0,
+      sequence_append(output, 30),
+      choose(selector == 1,
+        sequence_append(output, builtin_code(expr_name_of(expr))),
+        choose(selector == 2,
+          sequence_append(output, length(expr_args_of(expr))),
+          sequence_append(output, 0))))
+
+  reckon append_facet_instruction_values(facet : Sequence, strings : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(selector == 0,
+      sequence_append(append_expr_instruction_values(facet_expr_of(facet), strings, selector, output), 5),
+      choose(selector == 1,
+        sequence_append(append_expr_instruction_values(facet_expr_of(facet), strings, selector, output), find_text(strings, 0, facet_path_of(facet))),
+        sequence_append(append_expr_instruction_values(facet_expr_of(facet), strings, selector, output), 0)))
+
+  reckon build_instruction_values(facets : Sequence, index : Number, strings : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(index >= length(facets),
+      sequence_append(output, choose(selector == 0, 31, 0)),
+      build_instruction_values(
+        facets,
+        index + 1,
+        strings,
+        selector,
+        append_facet_instruction_values(sequence_get(facets, index), strings, selector, output)))
+
+  reckon expr_node_count(expr : Sequence) -> Number =
+    1 + expr_arg_node_count(expr_args_of(expr), 0)
+
+  reckon expr_arg_node_count(args : Sequence, index : Number) -> Number =
+    choose(index >= length(args), 0,
+      expr_node_count(sequence_get(args, index)) + expr_arg_node_count(args, index + 1))
+
+  reckon facet_expr_node_count(facets : Sequence, index : Number) -> Number =
+    choose(index >= length(facets), 0,
+      expr_node_count(facet_expr_of(sequence_get(facets, index))) + facet_expr_node_count(facets, index + 1))
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon encode_target_rbc(strings : Sequence, ops : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence) -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(strings), 0, length(ops)),
+      sequence_concat(
+        encode_string_pool(strings, 0, empty_sequence()),
+        encode_instruction_plan(ops, a_values, b_values, c_values, 0, empty_sequence())))
+
+  facet parser.tokens : Sequence = tokenize_from(source.full, 0, 1, 1, empty_sequence())
+  facet parser.token_count : Number = length(parser.tokens)
+  facet parser.first_token : Text = token_text(sequence_get(parser.tokens, 0))
+  facet parser.program_token : Text = token_text(sequence_get(parser.tokens, 1))
+  facet parser.body_open : Text = token_text(sequence_get(parser.tokens, 2))
+  facet parser.facet_parse : ParseState = parse_facets(parser.tokens, 3, empty_sequence())
+  facet parser.facet_end_index : Number = parse_index(parser.facet_parse)
+  facet parser.eof_kind : Text = token_kind(sequence_get(parser.tokens, parser.facet_end_index + 1))
+
+  facet compiler.program : Text = checked_ident(parser.tokens, 1, "")
+  facet compiler.facets : Sequence = parse_nodes(parser.facet_parse)
+  facet compiler.facet_count : Number = length(compiler.facets)
+  facet compiler.expression_node_count : Number = facet_expr_node_count(compiler.facets, 0)
+  facet compiler.literal_expr_kind : Text = expr_kind_of(facet_expr_of(sequence_get(compiler.facets, 0)))
+  facet compiler.literal_expr_text : Text = expr_text_of(facet_expr_of(sequence_get(compiler.facets, 0)))
+  facet compiler.trim_expr_kind : Text = expr_kind_of(facet_expr_of(sequence_get(compiler.facets, 1)))
+  facet compiler.trim_expr_name : Text = expr_name_of(facet_expr_of(sequence_get(compiler.facets, 1)))
+  facet compiler.trim_arg0_kind : Text = expr_kind_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 1))), 0))
+  facet compiler.trim_arg0_path : Text = expr_text_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 1))), 0))
+  facet compiler.length_expr_name : Text = expr_name_of(facet_expr_of(sequence_get(compiler.facets, 2)))
+  facet compiler.length_arg0_name : Text = expr_name_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 2))), 0))
+  facet compiler.length_nested_arg0_path : Text = expr_text_of(sequence_get(expr_args_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 2))), 0)), 0))
+  facet compiler.contains_expr_name : Text = expr_name_of(facet_expr_of(sequence_get(compiler.facets, 3)))
+  facet compiler.contains_arg0_path : Text = expr_text_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 3))), 0))
+  facet compiler.contains_arg1_text : Text = expr_text_of(sequence_get(expr_args_of(facet_expr_of(sequence_get(compiler.facets, 3))), 1))
+  facet compiler.source_lowering_supported : Truth =
+    semantic_assert(
+      compiler.facet_count == 4
+        and compiler.expression_node_count == 9
+        and facet_path_of(sequence_get(compiler.facets, 0)) == "seed.raw"
+        and facet_path_of(sequence_get(compiler.facets, 1)) == "seed.trimmed"
+        and facet_path_of(sequence_get(compiler.facets, 2)) == "metrics.request_size"
+        and facet_path_of(sequence_get(compiler.facets, 3)) == "metrics.has_request"
+        and compiler.literal_expr_kind == "LiteralExpr"
+        and compiler.literal_expr_text == " request "
+        and compiler.trim_expr_kind == "CallExpr"
+        and compiler.trim_expr_name == "trim"
+        and compiler.trim_arg0_kind == "PathExpr"
+        and compiler.trim_arg0_path == "seed.raw"
+        and compiler.length_expr_name == "length"
+        and compiler.length_arg0_name == "trim"
+        and compiler.length_nested_arg0_path == "seed.raw"
+        and compiler.contains_expr_name == "contains"
+        and compiler.contains_arg0_path == "seed.trimmed"
+        and compiler.contains_arg1_text == "request"
+        and source.root == "c922c1c276fa78a4138cc59ac7956712497366f3d939974bf93b8013b5187a0f",
+      "RCL_STAGE26_EXPRESSION_AST_SOURCE_LOWERING_MISMATCH",
+      selfhost.stage,
+      token_span(sequence_get(parser.tokens, 0)))
+
+  facet target.rbc_strings : Sequence =
+    collect_target_strings(
+      compiler.facets,
+      0,
+      sequence_append(sequence_append(empty_sequence(), compiler.program), source.root))
+  facet target.rbc_instruction_ops : Sequence = build_instruction_values(compiler.facets, 0, target.rbc_strings, 0, empty_sequence())
+  facet target.rbc_instruction_a_values : Sequence = build_instruction_values(compiler.facets, 0, target.rbc_strings, 1, empty_sequence())
+  facet target.rbc_instruction_b_values : Sequence = build_instruction_values(compiler.facets, 0, target.rbc_strings, 2, empty_sequence())
+  facet target.rbc_instruction_c_values : Sequence = build_instruction_values(compiler.facets, 0, target.rbc_strings, 3, empty_sequence())
+  facet target.rbc_bytes : Sequence = encode_target_rbc(target.rbc_strings, target.rbc_instruction_ops, target.rbc_instruction_a_values, target.rbc_instruction_b_values, target.rbc_instruction_c_values)
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant parser.audit on parser
+    warrant compiler.audit on compiler
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage26_expression_ast_source_lowering_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_expression_ast_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_EXPRESSION_AST_SOURCE_LOWERING_SUBSET_VERIFIED"
+
+    preserve parser.token_count == 57
+      and parser.first_token == "reality"
+      and parser.program_token == compiler.program
+      and parser.body_open == char_at("{}", 0)
+      and parser.facet_end_index == 55
+      and parser.eof_kind == "EOF"
+      and compiler.source_lowering_supported == true
+      and target.rbc_size == 471
+      and length(target.rbc_strings) == 8
+      and length(target.rbc_instruction_ops) == 14
+      and sequence_get(target.rbc_strings, 0) == compiler.program
+      and sequence_get(target.rbc_strings, 1) == source.root
+      and sequence_get(target.rbc_strings, 2) == " request "
+      and sequence_get(target.rbc_strings, 3) == "seed.raw"
+      and sequence_get(target.rbc_strings, 4) == "seed.trimmed"
+      and sequence_get(target.rbc_strings, 5) == "metrics.request_size"
+      and sequence_get(target.rbc_strings, 6) == "request"
+      and sequence_get(target.rbc_strings, 7) == "metrics.has_request"
+      and sequence_get(target.rbc_instruction_ops, 0) == 3
+      and sequence_get(target.rbc_instruction_ops, 1) == 5
+      and sequence_get(target.rbc_instruction_ops, 2) == 4
+      and sequence_get(target.rbc_instruction_ops, 3) == 30
+      and sequence_get(target.rbc_instruction_ops, 4) == 5
+      and sequence_get(target.rbc_instruction_ops, 5) == 4
+      and sequence_get(target.rbc_instruction_ops, 6) == 30
+      and sequence_get(target.rbc_instruction_ops, 7) == 30
+      and sequence_get(target.rbc_instruction_ops, 8) == 5
+      and sequence_get(target.rbc_instruction_ops, 9) == 4
+      and sequence_get(target.rbc_instruction_ops, 10) == 3
+      and sequence_get(target.rbc_instruction_ops, 11) == 30
+      and sequence_get(target.rbc_instruction_ops, 12) == 5
+      and sequence_get(target.rbc_instruction_ops, 13) == 31
+      and sequence_get(target.rbc_instruction_a_values, 3) == 8
+      and sequence_get(target.rbc_instruction_a_values, 7) == 4
+      and sequence_get(target.rbc_instruction_a_values, 11) == 1
+      and sequence_get(target.rbc_instruction_b_values, 11) == 2
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_parser_complete == false
+      and gate.rcl_owned_expression_ast_complete == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.rcl_compiler_self_emits_without_stage0 == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage26-expression-ast-source-lowering-subset"
+  }
+
+  foresee verify_stage26_expression_ast_source_lowering_subset
+  realize verify_stage26_expression_ast_source_lowering_subset
+}

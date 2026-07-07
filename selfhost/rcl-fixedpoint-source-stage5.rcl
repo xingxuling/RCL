@@ -1,0 +1,209 @@
+reality RCLSelfHostFixedPointSourceStage5 {
+  facet source.compiler : Text = "reality RCLCompilerStage9FixedPoint {\n  facet compiler.source_root : Text = \"rcl:selfhost-stage5-normalized-projection\"\n  facet compiler.stage : Text = \"stage9\"\n  facet compiler.artifact : Text = \"fixedpoint\"\n  reckon compile(source : Text) -> Text = \"semantic-fixedpoint\"\n}\n"
+  facet source.generation : Number = 0
+
+  facet selfhost.stage : Text = "stage5_fixedpoint_source_materialization_signature"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_executes_materialized_compiler_source_signature"
+  facet selfhost.boundary : Text = "source_materialization_signature_only_no_native_windows_fixedpoint"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_compiler_source_to_artifact_transformation"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_fixedpoint_signature : Truth = true
+  facet gate.rcl_owned_artifact_fixedpoint : Truth = false
+  facet gate.js_reference_bytecode_fixedpoint : Truth = true
+  facet gate.native_windows_fixedpoint : Truth = false
+  facet gate.js_runtime_still_required : Truth = true
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon full_program_name(tokens : Sequence) -> Text =
+    choose(
+      semantic_assert(token_text(expect_token(sequence_get(tokens, 0), "IDENT", "reality")) == "reality", "RCL_REALITY_HEADER_REQUIRED", "reality", token_span(sequence_get(tokens, 0))),
+      token_text(expect_token(sequence_get(tokens, 1), "IDENT", "")),
+      "")
+
+  reckon is_top_keyword(text_value : Text) -> Truth =
+    text_value == "facet" or text_value == "reckon" or text_value == "subject" or text_value == "emergence" or
+    text_value == "dialect" or text_value == "effect" or text_value == "capability_policy" or text_value == "store" or
+    text_value == "host" or text_value == "foresee" or text_value == "realize" or text_value == "verify" or text_value == "snapshot"
+
+  reckon decl_kind(keyword : Text) -> Text =
+    choose(keyword == "facet", "Facet",
+      choose(keyword == "reckon", "Reckon",
+        choose(keyword == "subject", "Subject",
+          choose(keyword == "emergence", "Emergence",
+            choose(keyword == "dialect", "Dialect",
+              choose(keyword == "effect", "Effect",
+                choose(keyword == "capability_policy", "CapabilityPolicy",
+                  choose(keyword == "store", "Store",
+                    choose(keyword == "host", "Host",
+                      choose(keyword == "foresee", "Foresee",
+                        choose(keyword == "realize", "Realize",
+                          choose(keyword == "verify", "Verify",
+                            choose(keyword == "snapshot", "Snapshot", "Other")))))))))))))
+
+  reckon declaration_name(tokens : Sequence, index : Number) -> Text =
+    token_text(sequence_get(tokens, index + 1))
+
+  reckon make_decl(tokens : Sequence, index : Number) -> Text =
+    decl_kind(token_text(sequence_get(tokens, index))) + ":" + declaration_name(tokens, index)
+
+  reckon find_symbol(tokens : Sequence, index : Number, symbol : Text) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == symbol, index,
+        find_symbol(tokens, index + 1, symbol)))
+
+  reckon skip_block(tokens : Sequence, index : Number, depth : Number) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == "{",
+        skip_block(tokens, index + 1, depth + 1),
+        choose(token_text(sequence_get(tokens, index)) == "}",
+          choose(depth == 1, index + 1, skip_block(tokens, index + 1, depth - 1)),
+          skip_block(tokens, index + 1, depth))))
+
+  reckon find_next_top(tokens : Sequence, index : Number, paren_depth : Number) -> Number =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF", index,
+      choose(token_text(sequence_get(tokens, index)) == "}" and paren_depth == 0, index,
+        choose(token_text(sequence_get(tokens, index)) == "(" , find_next_top(tokens, index + 1, paren_depth + 1),
+          choose(token_text(sequence_get(tokens, index)) == ")" , find_next_top(tokens, index + 1, paren_depth - 1),
+            choose(paren_depth == 0 and is_top_keyword(token_text(sequence_get(tokens, index))), index,
+              find_next_top(tokens, index + 1, paren_depth))))))
+
+  reckon declaration_end(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index)) == "foresee" or token_text(sequence_get(tokens, index)) == "realize" or token_text(sequence_get(tokens, index)) == "verify" or token_text(sequence_get(tokens, index)) == "snapshot",
+      index + 2,
+      choose(token_text(sequence_get(tokens, index)) == "facet",
+        index + 8,
+        choose(token_text(sequence_get(tokens, index)) == "reckon",
+          find_next_top(tokens, index + 1, 0),
+          skip_block(tokens, find_symbol(tokens, index, "{"), 0))))
+
+  reckon parse_top(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF" or token_text(sequence_get(tokens, index)) == "}",
+      output,
+      parse_top(tokens, declaration_end(tokens, index), sequence_append(output, make_decl(tokens, index))))
+
+  reckon count_kind(items : Sequence, index : Number, kind : Text) -> Number =
+    choose(index >= length(items), 0,
+      choose(starts_with(sequence_get(items, index), kind + ":"),
+        1 + count_kind(items, index + 1, kind),
+        count_kind(items, index + 1, kind)))
+
+  facet compiler.tokens : Sequence = tokenize_from(source.compiler, 0, 1, 1, empty_sequence())
+  facet compiler.program : Text = full_program_name(compiler.tokens)
+  facet compiler.body_start : Number = 3
+  facet compiler.declarations : Sequence = parse_top(compiler.tokens, compiler.body_start, empty_sequence())
+  facet compiler.declaration_count : Number = length(compiler.declarations)
+  facet compiler.facet_count : Number = count_kind(compiler.declarations, 0, "Facet")
+  facet compiler.reckon_count : Number = count_kind(compiler.declarations, 0, "Reckon")
+  facet compiler.subject_count : Number = count_kind(compiler.declarations, 0, "Subject")
+  facet compiler.emergence_count : Number = count_kind(compiler.declarations, 0, "Emergence")
+  facet compiler.absorption_count : Number = count_kind(compiler.declarations, 0, "Dialect") + count_kind(compiler.declarations, 0, "Effect") + count_kind(compiler.declarations, 0, "CapabilityPolicy") + count_kind(compiler.declarations, 0, "Store")
+  facet compiler.generation : Number = source.generation
+  facet compiler.fixedpoint_signature_supported : Truth =
+    semantic_assert(compiler.program == "RCLCompilerStage9FixedPoint" and compiler.facet_count >= 1 and compiler.reckon_count >= 1, "RCL_FIXEDPOINT_SIGNATURE_NOT_STABLE", compiler.program, token_span(sequence_get(compiler.tokens, 0)))
+
+  facet stage5.materialized_program : Text = compiler.program
+  facet stage5.materialized_declaration_count : Number = compiler.declaration_count
+  facet stage5.materialized_facet_count : Number = compiler.facet_count
+  facet stage5.materialized_reckon_count : Number = compiler.reckon_count
+  facet stage5.materialized_absorption_count : Number = compiler.absorption_count
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage5.audit on stage5
+    warrant compiler.audit on compiler
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage5_fixedpoint_source {
+    cause selfhost_agent
+    when gate.rcl_owned_fixedpoint_signature == true and gate.native_windows_fixedpoint == false
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_FIXEDPOINT_SOURCE_SIGNATURE_VERIFIED"
+
+    preserve compiler.fixedpoint_signature_supported == true
+      and stage5.materialized_program == "RCLCompilerStage9FixedPoint"
+      and stage5.materialized_declaration_count == 4
+      and stage5.materialized_facet_count == 3
+      and stage5.materialized_reckon_count == 1
+      and stage5.materialized_absorption_count == 0
+      and compiler.generation == 0
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_artifact_fixedpoint == false
+      and gate.js_reference_bytecode_fixedpoint == true
+      and gate.native_windows_fixedpoint == false
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage5-fixedpoint-source-materialization"
+  }
+
+  foresee verify_stage5_fixedpoint_source
+  realize verify_stage5_fixedpoint_source
+}

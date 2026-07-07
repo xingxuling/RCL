@@ -1,0 +1,174 @@
+reality RCLCompilerStage3 {
+  facet source.text : Text = "facet world.value : Number = 7\nfacet world.flag : Truth = true\nfacet world.name : Text = \"Aster\""
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon literal_kind(item : Token) -> Text =
+    choose(token_kind(item) == "NUMBER", "Number",
+      choose(token_kind(item) == "STRING", "Text", "Truth"))
+
+  reckon parse_facet(tokens : Sequence, index : Number) -> AstNode =
+    facet_ast(
+      token_text(expect_token(sequence_get(tokens, index + 1), "IDENT", ""))
+        + token_text(expect_token(sequence_get(tokens, index + 2), "SYMBOL", "."))
+        + token_text(expect_token(sequence_get(tokens, index + 3), "IDENT", "")),
+      token_text(expect_token(sequence_get(tokens, index + 5), "IDENT", "")),
+      literal_kind(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      token_text(expect_token(sequence_get(tokens, index + 7), token_kind(sequence_get(tokens, index + 7)), "")),
+      make_span(
+        span_offset(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_line(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_column(token_span(expect_token(sequence_get(tokens, index), "IDENT", "facet"))),
+        span_offset(token_span(sequence_get(tokens, index + 7)))
+          + span_length(token_span(sequence_get(tokens, index + 7)))
+          - span_offset(token_span(sequence_get(tokens, index)))))
+
+  reckon parse_facets(tokens : Sequence, index : Number, nodes : Sequence) -> ParseState =
+    choose(token_kind(sequence_get(tokens, index)) == "EOF",
+      make_parse_state(index, nodes),
+      parse_facets(tokens, index + 8, sequence_append(nodes, parse_facet(tokens, index))))
+
+  facet compiler.tokens : Sequence = tokenize_from(source.text, 0, 1, 1, empty_sequence())
+  facet compiler.parse : ParseState = parse_facets(compiler.tokens, 0, empty_sequence())
+  facet compiler.ast : Sequence = parse_nodes(compiler.parse)
+  facet compiler.next : Number = parse_index(compiler.parse)
+
+  reckon find_symbol(symbols : Sequence, index : Number, path : Text) -> Number =
+    choose(index >= length(symbols), -1,
+      choose(symbol_path(sequence_get(symbols, index)) == path,
+        index,
+        find_symbol(symbols, index + 1, path)))
+
+  reckon unique_symbol(symbols : Sequence, node : AstNode) -> Truth =
+    semantic_assert(
+      find_symbol(symbols, 0, ast_path(node)) < 0,
+      "RCL_SEMANTIC_DUPLICATE",
+      ast_path(node),
+      ast_span(node))
+
+  reckon resolve_symbol(node : AstNode, slot : Number, symbols : Sequence) -> Symbol =
+    choose(unique_symbol(symbols, node),
+      make_symbol(ast_path(node), ast_value_type(node), slot, ast_span(node)),
+      make_symbol(ast_path(node), ast_value_type(node), slot, ast_span(node)))
+
+  reckon resolve_symbols(nodes : Sequence, index : Number, symbols : Sequence) -> Sequence =
+    choose(index >= length(nodes), symbols,
+      resolve_symbols(
+        nodes,
+        index + 1,
+        sequence_append(symbols, resolve_symbol(sequence_get(nodes, index), index, symbols))))
+
+  reckon type_valid(node : AstNode) -> Truth =
+    semantic_assert(
+      ast_value_type(node) == ast_literal_kind(node),
+      "RCL_SEMANTIC_TYPE_MISMATCH",
+      ast_path(node) + ":" + ast_value_type(node) + "<-" + ast_literal_kind(node),
+      ast_span(node))
+
+  reckon semantic_facet(node : AstNode, symbols : Sequence) -> SemanticNode =
+    choose(type_valid(node),
+      make_semantic_facet(
+        ast_path(node),
+        ast_value_type(node),
+        ast_literal_kind(node),
+        ast_literal_text(node),
+        symbol_slot(sequence_get(symbols, find_symbol(symbols, 0, ast_path(node)))),
+        ast_span(node)),
+      make_semantic_facet(
+        ast_path(node),
+        ast_value_type(node),
+        ast_literal_kind(node),
+        ast_literal_text(node),
+        0,
+        ast_span(node)))
+
+  reckon analyze_semantics(nodes : Sequence, symbols : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(nodes), output,
+      analyze_semantics(
+        nodes,
+        symbols,
+        index + 1,
+        sequence_append(output, semantic_facet(sequence_get(nodes, index), symbols))))
+
+  reckon lower_store(node : SemanticNode) -> IrNode =
+    make_ir_store(
+      "STORE_FACET",
+      semantic_path(node),
+      semantic_type(node),
+      semantic_literal_kind(node),
+      semantic_literal_text(node),
+      semantic_slot(node),
+      semantic_span(node))
+
+  reckon lower_ir(nodes : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(nodes), output,
+      lower_ir(nodes, index + 1, sequence_append(output, lower_store(sequence_get(nodes, index)))))
+
+  facet compiler.symbols : Sequence = resolve_symbols(compiler.ast, 0, empty_sequence())
+  facet compiler.semantic : Sequence = analyze_semantics(compiler.ast, compiler.symbols, 0, empty_sequence())
+  facet compiler.ir : Sequence = lower_ir(compiler.semantic, 0, empty_sequence())
+}

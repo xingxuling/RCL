@@ -1,0 +1,233 @@
+reality RCLSelfHostRuleBytecodeStage7 {
+  facet source.target : Text = "reality RuleBytecodeTarget {\n  facet world.ready : Truth = true\n  facet world.status : Text = \"draft\"\n  subject founder {\n    warrant world.publish on world\n  }\n  emergence publish {\n    cause founder\n    when world.ready\n    needs world.publish on world\n    alter world.status <- \"published\"\n    preserve world.status == \"published\"\n    witness \"rcl:stage7:published\"\n  }\n  realize publish\n}\n"
+  facet source.program : Text = "RuleBytecodeTarget"
+  facet source.root : Text = "fc08e3a0de96fa0620792ea1dde9fa0e9d56dcb2a3ba15db1840c85c1491f772"
+
+  facet selfhost.stage : Text = "stage7_rcl_owned_rule_bytecode_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_encodes_emergence_rule_bytecode_subset"
+  facet selfhost.boundary : Text = "single_emergence_rule_bytecode_subset_not_full_rule_lowering"
+  facet selfhost.next_rewrite_target : Text = "generalized_rule_bytecode_lowering_and_native_windows_packaging"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_rule_bytecode_subset : Truth = true
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.native_windows_fixedpoint : Truth = false
+  facet gate.js_reference_parity_required : Truth = true
+  facet gate.js_runtime_still_required : Truth = true
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon rule_string_prefix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(),
+            source.program),
+          source.root),
+        "world.ready"),
+      "draft")
+
+  reckon rule_string_middle() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(),
+            "world.status"),
+          "founder"),
+        "world.publish"),
+      "world")
+
+  reckon rule_string_suffix() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(),
+          "publish"),
+        "published"),
+      "rcl:stage7:published")
+
+  reckon rule_strings() -> Sequence =
+    sequence_concat(rule_string_prefix(), sequence_concat(rule_string_middle(), rule_string_suffix()))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon facet_and_warrant_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(2, 1, 0, 0),
+      sequence_concat(
+        encode_instruction(5, 2, 0, 0),
+        sequence_concat(
+          encode_instruction(3, 3, 0, 0),
+          sequence_concat(
+            encode_instruction(5, 4, 0, 0),
+            encode_instruction(22, 5, 6, 7)))))
+
+  reckon rule_condition_and_authority_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(4, 2, 0, 0),
+      sequence_concat(
+        encode_instruction(21, 19, 0, 0),
+        sequence_concat(
+          encode_instruction(23, 1, 8, 5),
+          encode_instruction(24, 5, 6, 7))))
+
+  reckon rule_alter_and_preserve_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(3, 9, 0, 0),
+      sequence_concat(
+        encode_instruction(25, 4, 0, 0),
+        sequence_concat(
+          encode_instruction(26, 1, 0, 0),
+          sequence_concat(
+            encode_instruction(4, 4, 0, 0),
+            sequence_concat(
+              encode_instruction(3, 9, 0, 0),
+              sequence_concat(
+                encode_instruction(10, 0, 0, 0),
+                encode_instruction(27, 0, 0, 0)))))))
+
+  reckon rule_commit_instructions() -> Sequence =
+    sequence_concat(
+      encode_instruction(26, 0, 0, 0),
+      sequence_concat(
+        encode_instruction(28, 10, 0, 0),
+        sequence_concat(
+          encode_instruction(29, 0, 0, 0),
+          encode_instruction(31, 0, 0, 0))))
+
+  reckon rule_instructions() -> Sequence =
+    sequence_concat(
+      facet_and_warrant_instructions(),
+      sequence_concat(
+        rule_condition_and_authority_instructions(),
+        sequence_concat(rule_alter_and_preserve_instructions(), rule_commit_instructions())))
+
+  reckon instruction_ops() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(
+                            sequence_append(
+                              sequence_append(
+                                sequence_append(
+                                  sequence_append(
+                                    sequence_append(
+                                      sequence_append(
+                                        sequence_append(
+                                          sequence_append(empty_sequence(), 2), 5), 3), 5), 22), 4), 21), 23), 24), 3), 25), 26), 4), 3), 10), 27), 26), 28), 29), 31)
+
+  reckon count_number(items : Sequence, index : Number, value : Number) -> Number =
+    choose(index >= length(items), 0,
+      choose(sequence_get(items, index) == value,
+        1 + count_number(items, index + 1, value),
+        count_number(items, index + 1, value)))
+
+  reckon encode_rule_rbc() -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(rule_strings()), 0, 20),
+      sequence_concat(
+        encode_string_pool(rule_strings(), 0, empty_sequence()),
+        rule_instructions()))
+
+  facet compiler.rbc_strings : Sequence = rule_strings()
+  facet compiler.rbc_instruction_ops : Sequence = instruction_ops()
+  facet compiler.rbc_bytes : Sequence = encode_rule_rbc()
+  facet compiler.rbc_size : Number = length(compiler.rbc_bytes)
+  facet compiler.string_count : Number = length(compiler.rbc_strings)
+  facet compiler.number_count : Number = 0
+  facet compiler.instruction_count : Number = length(compiler.rbc_instruction_ops)
+  facet compiler.begin_tx_count : Number = count_number(compiler.rbc_instruction_ops, 0, 23)
+  facet compiler.check_warrant_count : Number = count_number(compiler.rbc_instruction_ops, 0, 24)
+  facet compiler.stage_store_count : Number = count_number(compiler.rbc_instruction_ops, 0, 25)
+  facet compiler.check_preserve_count : Number = count_number(compiler.rbc_instruction_ops, 0, 27)
+  facet compiler.record_witness_count : Number = count_number(compiler.rbc_instruction_ops, 0, 28)
+  facet compiler.commit_tx_count : Number = count_number(compiler.rbc_instruction_ops, 0, 29)
+  facet compiler.bytecode_magic_0 : Number = sequence_get(compiler.rbc_bytes, 0)
+  facet compiler.bytecode_magic_1 : Number = sequence_get(compiler.rbc_bytes, 1)
+  facet compiler.bytecode_magic_2 : Number = sequence_get(compiler.rbc_bytes, 2)
+  facet compiler.bytecode_magic_3 : Number = sequence_get(compiler.rbc_bytes, 3)
+  facet compiler.rule_bytecode_subset_supported : Truth =
+    semantic_assert(compiler.rbc_size == 571 and compiler.string_count == 11 and compiler.instruction_count == 20, "RCL_RULE_BYTECODE_SUBSET_SHAPE_MISMATCH", source.program, make_span(0, 1, 1, 0))
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant stage7.audit on stage7
+    warrant compiler.audit on compiler
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage7_rule_bytecode_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_rule_bytecode_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "RCL_OWNED_RULE_BYTECODE_SUBSET_VERIFIED"
+
+    preserve compiler.rule_bytecode_subset_supported == true
+      and compiler.rbc_size == 571
+      and compiler.string_count == 11
+      and compiler.number_count == 0
+      and compiler.instruction_count == 20
+      and compiler.begin_tx_count == 1
+      and compiler.check_warrant_count == 1
+      and compiler.stage_store_count == 1
+      and compiler.check_preserve_count == 1
+      and compiler.record_witness_count == 1
+      and compiler.commit_tx_count == 1
+      and compiler.bytecode_magic_0 == 82
+      and compiler.bytecode_magic_1 == 67
+      and compiler.bytecode_magic_2 == 76
+      and compiler.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.native_windows_fixedpoint == false
+      and gate.js_reference_parity_required == true
+      and gate.js_runtime_still_required == true
+
+    witness "rcl:selfhost-stage7-rule-bytecode-subset"
+  }
+
+  foresee verify_stage7_rule_bytecode_subset
+  realize verify_stage7_rule_bytecode_subset
+}

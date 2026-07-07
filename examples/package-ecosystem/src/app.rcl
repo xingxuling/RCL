@@ -1,0 +1,21 @@
+reality FirstLight {
+  facet world.greeting : Text = "unformed"
+
+  subject founder {
+    facet awareness : Number = 0
+    warrant world.write on world
+  }
+
+  emergence hello {
+    cause founder
+    when world.greeting == "unformed"
+    needs world.write on world
+    alter world.greeting <- "Hello, reality."
+    alter founder.awareness <- founder.awareness + 1
+    preserve founder.awareness >= 0
+    witness "rcl:first-light"
+  }
+
+  foresee hello
+  realize hello
+}

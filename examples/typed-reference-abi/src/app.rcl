@@ -1,0 +1,9 @@
+reality TypedReferenceAbiDemo {
+  facet app.session : core.Session = { user: { id: "u-3", payload: "referenced" }, login: Ok("accepted") }
+  facet app.login : core.LoginResult<Text, Text> = Err("denied")
+  facet app.sessionRef : TypedRef = typed_ref(app.session)
+  facet app.loginRef : TypedRef = typed_ref(app.login)
+  facet app.sessionRefId : Number = typed_ref_id(app.sessionRef)
+  facet app.sessionAgain : core.Session = typed_deref(app.sessionRef)
+  facet app.payloadViaRef : Text = app.sessionAgain.user.payload
+}

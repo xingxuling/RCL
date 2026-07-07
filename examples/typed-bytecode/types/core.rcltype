@@ -1,0 +1,9 @@
+module core
+export record User<T> {
+  id: Text
+  payload: T
+}
+export union LoginResult<T,E> {
+  Ok(T)
+  Err(E)
+}
