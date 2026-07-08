@@ -54,6 +54,7 @@ const modules = coreModules.map(([id, relativePath, stateKey]) => {
 
 const nativeExe = path.join(root, 'native', 'rclvm.exe');
 const nativePosix = path.join(root, 'native', 'rclvm');
+const nativePosixPresent = fs.existsSync(nativePosix);
 const bootstrapStages = Array.from({ length: 9 }, (_, index) => path.join(root, 'bootstrap', index === 0 ? 'compiler-seed.rcl' : `compiler-stage${index + 1}.rcl`));
 const v094Source = readText('src/autonomous-sandbox-file-emission-protocol.mjs');
 
@@ -64,7 +65,7 @@ const checks = {
   bootstrapStagesPresent: bootstrapStages.every(file => fs.existsSync(file)),
   windowsNativeBoundaryRecorded: state['platform.windows_native_status'] === 'NATIVE_WINDOWS_VERIFIED',
   windowsNativeExePresent: fs.existsSync(nativeExe),
-  posixNativeArtifactPresent: fs.existsSync(nativePosix),
+  posixNativeArtifactOptional: process.platform === 'win32' || nativePosixPresent,
   v094FinalGateStillHardcodedFiveDecoded: v094Source.includes('result.decoded.length >= 5'),
   fullSelfHostingClaimBlocked: state['gate.full_self_hosting'] === false,
 };
@@ -81,7 +82,7 @@ const payload = {
     actualRuntime: 'JS reference runtime executes this Stage 0 RCL model.',
     rewriteStatus: 'Core implementation is not rewritten into RCL yet.',
     nativeWindows: fs.existsSync(nativeExe) ? 'NATIVE_WINDOWS_VERIFIED' : 'BLOCKED_MISSING_RCLVM_EXE',
-    nativePosixArtifact: fs.existsSync(nativePosix) ? 'PRESENT' : 'MISSING',
+    nativePosixArtifact: nativePosixPresent ? 'PRESENT' : (process.platform === 'win32' ? 'OPTIONAL_MISSING_ON_WINDOWS' : 'MISSING'),
     nextTarget: run.state['selfhost.next_rewrite_target'],
   },
   stateRoot: run.stateRoot,

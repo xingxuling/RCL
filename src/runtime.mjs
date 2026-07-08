@@ -33,6 +33,12 @@ import { span, token, facetAst, parseState, symbolValue, semanticFacet, irStore,
 
 const MAX_RECKON_DEPTH = 4096;
 
+// Trampoline sentinel: returned from tail-call sites to avoid stack overflow.
+// evaluateExpressionCore returns this instead of recursing; the trampoline loop unwinds it.
+class _TailCall {
+  constructor(expr, context, cacheEntry) { this.expr = expr; this.context = context; this.cacheEntry = cacheEntry; }
+}
+
 function getPath(state, path) {
   if (!Object.prototype.hasOwnProperty.call(state, path)) throw new RCLRuntimeError('RCL_STATE_MISSING', `Facet '${path}' does not exist`, { path });
   return state[path];
@@ -43,7 +49,7 @@ function compareValues(left, right) {
   return left - right;
 }
 
-function evaluateExpression(expr, context) {
+function _evalCore(expr, context) {
   const { state, locals, functions, providers = {}, depth = 0 } = context;
   if (depth > MAX_RECKON_DEPTH) throw new RCLRuntimeError('RCL_RECKON_DEPTH_EXCEEDED', `Reckoning recursion exceeded ${MAX_RECKON_DEPTH} frames`);
   switch (expr.kind) {
@@ -70,7 +76,7 @@ function evaluateExpression(expr, context) {
       if (!selected) throw new RCLRuntimeError('RCL_MATCH_NON_EXHAUSTIVE', `No match case for variant '${value.variant}'`);
       const branchLocals = new Map(locals);
       selected.bindings.forEach((name, index) => branchLocals.set(name, value.payload?.[index]));
-      return evaluateExpression(selected.expression, { ...context, locals: branchLocals, depth: depth + 1 });
+      return new _TailCall(selected.expression, { ...context, locals: branchLocals, depth: depth + 1 }, null);
     }
     case 'RecordLiteralExpr': {
       const fields = {};
@@ -110,7 +116,7 @@ function evaluateExpression(expr, context) {
       }
       if (expr.name === 'choose') {
         const condition = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
-        return evaluateExpression(condition ? expr.args[1] : expr.args[2], { ...context, depth: depth + 1 });
+        return new _TailCall(condition ? expr.args[1] : expr.args[2], { ...context, depth: depth + 1 }, null);
       }
       if (quantityConstructors[expr.name]) {
         const value = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
@@ -532,12 +538,28 @@ function evaluateExpression(expr, context) {
       fn.__rclMetrics.evaluations += 1;
       const childLocals = new Map();
       fn.params.forEach((param, index) => childLocals.set(param.name, values[index]));
-      const result = evaluateExpression(fn.expression, { state, locals: childLocals, functions, depth: depth + 1 });
-      if (cacheKey) acceleration.cache.set(cacheKey, structuredClone(result));
-      return result;
+      const _cacheEntry = cacheKey ? { cacheKey, acceleration } : null;
+      return new _TailCall(fn.expression, { state, locals: childLocals, functions, depth: depth + 1 }, _cacheEntry);
     }
     default: throw new RCLRuntimeError('RCL_EXPRESSION_UNKNOWN', `Unknown expression kind '${expr.kind}'`);
   }
+}
+
+// Trampoline wrapper: converts _TailCall returns from _evalCore into a loop,
+// eliminating deep recursion from RCL tail-call patterns (choose chains, reckon calls).
+function evaluateExpression(expr, context) {
+  let result = _evalCore(expr, context);
+  let pendingCaches = null;
+  while (result instanceof _TailCall) {
+    if (result.cacheEntry) {
+      pendingCaches = (pendingCaches ?? []).concat(result.cacheEntry);
+    }
+    result = _evalCore(result.expr, result.context);
+  }
+  if (pendingCaches) {
+    for (const pc of pendingCaches) pc.acceleration.cache.set(pc.cacheKey, structuredClone(result));
+  }
+  return result;
 }
 
 function evaluateCount(expr, runtime, label) {
