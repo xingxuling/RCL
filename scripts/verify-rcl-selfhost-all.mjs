@@ -45,6 +45,7 @@ const stages = [
   { id: 'stage32', script: 'verify-rcl-selfhost-stage32.mjs', report: 'stage32-verification.json' },
   { id: 'stage33', script: 'verify-rcl-selfhost-stage33.mjs', report: 'stage33-verification.json' },
   { id: 'stage34', script: 'verify-rcl-selfhost-stage34.mjs', report: 'stage34-verification.json' },
+  { id: 'stage35', script: 'verify-rcl-selfhost-stage35.mjs', report: 'stage35-verification.json' },
 ];
 
 function readJson(filePath) {
@@ -92,7 +93,7 @@ const payload = {
   executionMode: 'sequential',
   stages: results,
   currentVerifiedCeiling: results.every(result => result.ok)
-    ? 'stage34_rcl_owned_multisubject_warrant_parser_subset'
+    ? 'stage35_rcl_owned_equality_expression_lowering_subset'
     : 'incomplete',
   boundary: {
     fullSelfHosting: false,
@@ -133,6 +134,7 @@ const payload = {
     rclOwnedFacetWarrantParserSubset: true,
     rclOwnedGeneralRuleDirectiveScalingSubset: true,
     rclOwnedMultisubjectWarrantParserSubset: true,
+    rclOwnedEqualityExpressionLoweringSubset: true,
     rclOwnedRuleTransactionBytecodeSubset: true,
     rclOwnedTargetNativeExecutionSubset: true,
     rclOwnedRuntimeRootHashingComplete: false,

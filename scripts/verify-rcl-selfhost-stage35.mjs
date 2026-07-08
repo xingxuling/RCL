@@ -1,0 +1,278 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { compileReality } from '../src/compiler.mjs';
+import { compileRealityToBytecode, decodeBytecode } from '../src/bytecode.mjs';
+import { runReality } from '../src/runtime.mjs';
+import { DEFAULT_NATIVE_VM_PATH, runNativeBytecode } from '../src/native-vm.mjs';
+
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const rclPath = path.join(root, 'selfhost', 'rcl-equality-expression-stage35.rcl');
+const outputDir = path.join(root, 'output', 'selfhost');
+const outputPath = path.join(outputDir, 'stage35-verification.json');
+const interpreterArtifactPath = path.join(outputDir, 'stage35-equality-expression-interpreter.rbc');
+const targetRbcPath = path.join(outputDir, 'stage35-equality-expression-target.rbc');
+const referenceRbcPath = path.join(outputDir, 'stage35-equality-expression-js-reference.rbc');
+
+function sha256(buffer) {
+  return crypto.createHash('sha256').update(Buffer.from(buffer)).digest('hex');
+}
+
+function sha256File(filePath) {
+  return fs.existsSync(filePath)
+    ? crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')
+    : null;
+}
+
+function nativeExeFormat(filePath) {
+  if (!fs.existsSync(filePath)) return { exists: false, mz: false, pe: false };
+  const buffer = fs.readFileSync(filePath);
+  const peOffset = buffer.length >= 0x40 ? buffer.readUInt32LE(0x3c) : -1;
+  const peSignature = peOffset >= 0 && peOffset + 4 <= buffer.length
+    ? buffer.toString('ascii', peOffset, peOffset + 4)
+    : '';
+  return {
+    exists: true,
+    bytes: buffer.length,
+    mz: buffer.length >= 2 && buffer.toString('ascii', 0, 2) === 'MZ',
+    pe: peSignature === 'PE\u0000\u0000',
+    peOffset,
+    sha256: sha256(buffer),
+  };
+}
+
+function instructionNames(decoded) {
+  return decoded.instructions.map(instruction => instruction.name);
+}
+
+function opcodeCount(decoded, name) {
+  return decoded.instructions.filter(instruction => instruction.name === name).length;
+}
+
+const rclSource = fs.readFileSync(rclPath, 'utf8');
+const interpreterArtifact = Buffer.from(compileRealityToBytecode(rclSource));
+const interpreterRun = runNativeBytecode(interpreterArtifact, { maxBuffer: 128 * 1024 * 1024, timeout: 60_000 });
+const state = interpreterRun.state;
+const sourceText = state['source.full'];
+const compilerProgram = compileReality(sourceText);
+const referenceRbc = Buffer.from(compileRealityToBytecode(sourceText));
+const targetRbc = Buffer.from(state['target.rbc_bytes']);
+const decodedInterpreter = decodeBytecode(interpreterArtifact);
+const decodedTarget = decodeBytecode(targetRbc);
+const decodedReference = decodeBytecode(referenceRbc);
+const targetNativeRun = runNativeBytecode(targetRbc, { maxBuffer: 32 * 1024 * 1024 });
+const targetReferenceRun = await runReality(compilerProgram);
+const targetNames = instructionNames(decodedTarget);
+const nativeFormat = nativeExeFormat(DEFAULT_NATIVE_VM_PATH);
+
+const eqIndexes = decodedTarget.instructions
+  .filter(instruction => instruction.name === 'EQ')
+  .map(instruction => instruction.index);
+const pushStringIndexes = decodedTarget.instructions
+  .filter(instruction => instruction.name === 'PUSH_STRING')
+  .map(instruction => instruction.index);
+const pushBoolIndexes = decodedTarget.instructions
+  .filter(instruction => instruction.name === 'PUSH_BOOL')
+  .map(instruction => instruction.index);
+
+const checks = {
+  nativeVmIsRealWindowsExecutable: process.platform !== 'win32'
+    ? fs.existsSync(DEFAULT_NATIVE_VM_PATH)
+    : nativeFormat.exists === true && nativeFormat.mz === true && nativeFormat.pe === true,
+  interpreterRunsInNativeVm: interpreterRun.status === 'ok'
+    && state['selfhost.stage_status'] === 'STAGE35_RCL_OWNED_EQUALITY_EXPRESSION_LOWERING_SUBSET_VERIFIED',
+  stage35HeaderCorrect: state['selfhost.stage'] === 'stage35_rcl_owned_equality_expression_lowering_subset'
+    && state['selfhost.claim'] === 'rcl_lowers_text_and_truth_equality_expressions_to_eq_bytecode'
+    && state['selfhost.boundary'] === 'equality_expression_lowering_subset_not_complete_parser_compiler_or_runtime'
+    && state['selfhost.next_rewrite_target'] === 'rcl_owned_expression_ast_completion_and_compiler_self_emission',
+  gateFlagsCorrect: state['gate.full_self_hosting'] === false
+    && state['gate.rcl_owned_general_expression_parser_subset'] === true
+    && state['gate.rcl_owned_rule_lowering_loop'] === true
+    && state['gate.rcl_owned_facet_warrant_parser_subset'] === true
+    && state['gate.rcl_owned_general_rule_directive_scaling_subset'] === true
+    && state['gate.rcl_owned_multisubject_warrant_parser_subset'] === true
+    && state['gate.rcl_owned_equality_expression_lowering_subset'] === true
+    && state['gate.rcl_owned_runtime_complete'] === false,
+  sourceTargetCorrect: state['compiler.program'] === 'Stage35Target'
+    && state['source.root'] === compilerProgram.programRoot,
+  sourceHasExpressions: sourceText.includes('world.status : Text = "armed"')
+    && sourceText.includes('world.status == "armed"')
+    && sourceText.includes('world.ready == true')
+    && sourceText.includes('world.score + 2')
+    && sourceText.includes('world.score >= 3')
+    && sourceText.includes('world.level >= 1')
+    && sourceText.includes('world.score >= 4')
+    && sourceText.includes('world.score >= 5')
+    && sourceText.includes('subject auditor')
+    && sourceText.includes('warrant world.audit on world')
+    && sourceText.includes('rcl:stage35:eq-text')
+    && sourceText.includes('rcl:stage35:eq-truth'),
+  tokenizerWorks: state['parser.token_count'] === 298
+    && state['parser.program_token'] === 'Stage35Target',
+  compilerParsesSource: compilerProgram.name === 'Stage35Target'
+    && compilerProgram.facets.length === 5
+    && compilerProgram.warrants.length === 5
+    && compilerProgram.warrants[4].subject === 'auditor'
+    && compilerProgram.warrants[4].capability === 'world.audit'
+    && compilerProgram.rules.length === 5
+    && compilerProgram.rules[0].name === 'publish'
+    && compilerProgram.rules[0].when.operator === '=='
+    && compilerProgram.rules[0].when.right.value === 'armed'
+    && compilerProgram.rules[4].name === 'audit'
+    && compilerProgram.rules[4].when.operator === '=='
+    && compilerProgram.rules[4].when.right.value === true
+    && compilerProgram.directives.length === 10,
+  targetRbcGenerated: targetRbc.length > 0
+    && decodedTarget.program === 'Stage35Target'
+    && decodedTarget.sourceRoot === compilerProgram.programRoot,
+  targetRbcMatchesJsReference: targetRbc.equals(referenceRbc)
+    && sha256(targetRbc) === sha256(referenceRbc),
+  targetRunsInNativeVm: targetNativeRun.status === 'ok'
+    && targetNativeRun.state['world.ready'] === true
+    && targetNativeRun.state['world.status'] === 'armed'
+    && targetNativeRun.state['world.score'] === 6
+    && targetNativeRun.state['world.level'] === 1
+    && targetNativeRun.state['world.certified'] === false,
+  targetHasCorrectInstructionCount: decodedTarget.instructions.length === 196
+    && state['target.rbc_instruction_count'] === 196,
+  targetHasCorrectStringPool: decodedTarget.strings.length === 26
+    && decodedTarget.strings[0] === 'Stage35Target'
+    && decodedTarget.strings[1] === compilerProgram.programRoot
+    && decodedTarget.strings[2] === 'world.ready'
+    && decodedTarget.strings[3] === 'armed'
+    && decodedTarget.strings[4] === 'world.status'
+    && decodedTarget.strings[14] === 'auditor'
+    && decodedTarget.strings[15] === 'world.audit'
+    && decodedTarget.strings[17] === 'rcl:stage35:eq-text'
+    && decodedTarget.strings[25] === 'rcl:stage35:eq-truth',
+  targetHasCorrectNumberPool: JSON.stringify(decodedTarget.numbers) === JSON.stringify([1, 0, 2, 3, 4, 5]),
+  targetHasCorrectOpcodes: targetNames.includes('PUSH_NUMBER')
+    && targetNames.includes('PUSH_BOOL')
+    && targetNames.includes('PUSH_STRING')
+    && targetNames.includes('LOAD_STATE')
+    && targetNames.includes('STORE_STATE')
+    && targetNames.includes('ADD')
+    && targetNames.includes('EQ')
+    && targetNames.includes('GTE')
+    && targetNames.includes('HALT'),
+  equalityExpressionLoweringEvidence: state['compiler.facet_count'] === 5
+    && state['compiler.subject_count'] === 2
+    && state['compiler.warrant_count'] === 5
+    && state['compiler.emergence_count'] === 5
+    && state['compiler.directive_count'] === 10
+    && state['compiler.equality_expression_lowering_supported'] === true
+    && JSON.stringify(eqIndexes) === JSON.stringify([17, 28, 35, 46, 161, 172, 179, 190])
+    && JSON.stringify(pushStringIndexes) === JSON.stringify([2, 16, 27, 34, 45])
+    && JSON.stringify(pushBoolIndexes) === JSON.stringify([0, 8, 160, 171, 178, 189])
+    && decodedTarget.instructions[2]?.name === 'PUSH_STRING'
+    && decodedTarget.strings[decodedTarget.instructions[2]?.a] === 'armed'
+    && decodedTarget.instructions[14]?.name === 'GRANT_WARRANT'
+    && decodedTarget.strings[decodedTarget.instructions[14]?.a] === 'auditor'
+    && decodedTarget.strings[decodedTarget.instructions[14]?.b] === 'world.audit'
+    && opcodeCount(decodedTarget, 'EQ') === 8
+    && opcodeCount(decodedTarget, 'GTE') === 12
+    && opcodeCount(decodedTarget, 'BEGIN_TX') === 10
+    && opcodeCount(decodedTarget, 'RECORD_WITNESS') === 10
+    && opcodeCount(decodedTarget, 'ADD') === 10,
+  boundaryHonest: state['selfhost.boundary'] === 'equality_expression_lowering_subset_not_complete_parser_compiler_or_runtime'
+    && state['gate.rcl_owned_general_expression_parser_subset'] === true
+    && state['gate.rcl_owned_rule_lowering_loop'] === true
+    && state['gate.rcl_owned_facet_warrant_parser_subset'] === true
+    && state['gate.rcl_owned_general_rule_directive_scaling_subset'] === true
+    && state['gate.rcl_owned_multisubject_warrant_parser_subset'] === true
+    && state['gate.rcl_owned_equality_expression_lowering_subset'] === true
+    && state['gate.rcl_owned_expression_ast_complete'] === false
+    && state['gate.rcl_owned_runtime_complete'] === false,
+};
+
+const payload = {
+  ok: Object.values(checks).every(Boolean),
+  format: 'rcl.selfhost.stage35.verification.v1',
+  rclFile: path.relative(root, rclPath).replaceAll(path.sep, '/'),
+  interpreterArtifactFile: path.relative(root, interpreterArtifactPath).replaceAll(path.sep, '/'),
+  targetRbcFile: path.relative(root, targetRbcPath).replaceAll(path.sep, '/'),
+  referenceRbcFile: path.relative(root, referenceRbcPath).replaceAll(path.sep, '/'),
+  stageStatus: state['selfhost.stage_status'],
+  selfHostClaim: state['selfhost.claim'],
+  checks,
+  nativeVm: {
+    path: path.relative(root, DEFAULT_NATIVE_VM_PATH).replaceAll(path.sep, '/'),
+    defaultPath: DEFAULT_NATIVE_VM_PATH,
+    sha256: sha256File(DEFAULT_NATIVE_VM_PATH),
+    executableFormat: nativeFormat,
+  },
+  parser: {
+    tokenCount: state['parser.token_count'],
+    programToken: state['parser.program_token'],
+    eofKind: state['parser.eof_kind'],
+    subjectCount: state['compiler.subject_count'],
+    warrantCount: state['compiler.warrant_count'],
+  },
+  compiler: {
+    program: compilerProgram.name,
+    facetCount: compilerProgram.facets.length,
+    facetPaths: compilerProgram.facets.map(f => f.path),
+    subjectCount: state['compiler.subject_count'],
+    warrantCount: compilerProgram.warrants.length,
+    warrants: compilerProgram.warrants,
+    ruleCount: compilerProgram.rules.length,
+    ruleNames: compilerProgram.rules.map(r => r.name),
+    rules: compilerProgram.rules,
+    directiveCount: compilerProgram.directives.length,
+    directives: compilerProgram.directives,
+  },
+  interpreterArtifact: {
+    program: decodedInterpreter.program,
+    bytes: interpreterArtifact.length,
+    sha256: sha256(interpreterArtifact),
+    instructionCount: decodedInterpreter.instructions.length,
+  },
+  target: {
+    program: decodedTarget.program,
+    sourceRoot: decodedTarget.sourceRoot,
+    bytes: targetRbc.length,
+    sha256: sha256(targetRbc),
+    referenceSha256: sha256(referenceRbc),
+    exactReferenceMatch: targetRbc.equals(referenceRbc),
+    strings: decodedTarget.strings,
+    numbers: decodedTarget.numbers,
+    instructions: decodedTarget.instructions,
+    eqIndexes,
+    pushStringIndexes,
+    pushBoolIndexes,
+    nativeRun: {
+      status: targetNativeRun.status,
+      state: targetNativeRun.state,
+      projections: targetNativeRun.projections,
+      history: targetNativeRun.history,
+      metrics: targetNativeRun.metrics,
+    },
+  },
+  reference: {
+    program: decodedReference.program,
+    sourceRoot: decodedReference.sourceRoot,
+    bytes: referenceRbc.length,
+    strings: decodedReference.strings,
+    numbers: decodedReference.numbers,
+    instructions: decodedReference.instructions,
+    runtimeState: targetReferenceRun.state,
+    projections: targetReferenceRun.projections,
+    history: targetReferenceRun.history,
+  },
+  boundaries: {
+    implementedNow: 'RCL lowers Text and Truth equality expressions to EQ bytecode while preserving the prior multisubject warrant loop. The generated target RBC includes PUSH_STRING, PUSH_BOOL, EQ, GTE and ADD opcodes and matches the JS compiler byte-for-byte.',
+    notYetImplemented: 'This is still a subset. Complete expression AST coverage, parser completion, complete compiler self-emission without stage0, complete runtime, and full native self-hosting remain outside this stage.',
+    nextTarget: state['selfhost.next_rewrite_target'],
+  },
+};
+
+fs.mkdirSync(outputDir, { recursive: true });
+fs.writeFileSync(interpreterArtifactPath, interpreterArtifact);
+fs.writeFileSync(targetRbcPath, targetRbc);
+fs.writeFileSync(referenceRbcPath, referenceRbc);
+fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`);
+console.log(JSON.stringify(payload, null, 2));
+
+if (!payload.ok) process.exitCode = 1;
