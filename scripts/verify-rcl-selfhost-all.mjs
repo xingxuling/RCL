@@ -48,6 +48,7 @@ const stages = [
   { id: 'stage35', script: 'verify-rcl-selfhost-stage35.mjs', report: 'stage35-verification.json' },
   { id: 'stage36', script: 'verify-rcl-selfhost-stage36.mjs', report: 'stage36-verification.json' },
   { id: 'stage37', script: 'verify-rcl-selfhost-stage37.mjs', report: 'stage37-verification.json' },
+  { id: 'stage38', script: 'verify-rcl-selfhost-stage38.mjs', report: 'stage38-verification.json' },
 ];
 
 function readJson(filePath) {
@@ -95,7 +96,7 @@ const payload = {
   executionMode: 'sequential',
   stages: results,
   currentVerifiedCeiling: results.every(result => result.ok)
-    ? 'stage37_rcl_owned_arithmetic_operator_lowering_subset'
+    ? 'stage38_rcl_owned_boolean_connective_lowering_subset'
     : 'incomplete',
   boundary: {
     fullSelfHosting: false,
@@ -139,6 +140,7 @@ const payload = {
     rclOwnedEqualityExpressionLoweringSubset: true,
     rclOwnedComparisonOperatorLoweringSubset: true,
     rclOwnedArithmeticOperatorLoweringSubset: true,
+    rclOwnedBooleanConnectiveLoweringSubset: true,
     rclOwnedRuleTransactionBytecodeSubset: true,
     rclOwnedTargetNativeExecutionSubset: true,
     rclOwnedRuntimeRootHashingComplete: false,
