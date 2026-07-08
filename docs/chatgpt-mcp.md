@@ -22,11 +22,45 @@ Invoke-RestMethod http://127.0.0.1:8765/health
 
 ## Tools Exposed
 
-- `rcl_status`: repo, native VM, and RNCS fusion summary.
-- `rncs_fusion_verify`: runs RCL/RNCS fusion verification and evidence parity checks.
-- `rncs_read_module`: reads vendored RNCS `.rcl` modules.
-- `rcl_compile_source`: compiles RCL source to RBC and can run it in the native VM.
-- `rcl_selfhost_inventory`: lists self-host stage scripts and selfhost `.rcl` files without executing them.
+The server exposes 32 tools: 20 RCL tools and 12 RNCS tools. RCL intentionally has the larger surface.
+
+RCL tools:
+
+- `rcl_status`
+- `rcl_package_metadata`
+- `rcl_native_vm_status`
+- `rcl_list_examples`
+- `rcl_read_example`
+- `rcl_compile_source`
+- `rcl_compile_file`
+- `rcl_run_native_source`
+- `rcl_run_native_file`
+- `rcl_disassemble_source`
+- `rcl_disassemble_file`
+- `rcl_hash_source`
+- `rcl_read_repo_file`
+- `rcl_search_repo`
+- `rcl_list_bootstrap_compilers`
+- `rcl_read_bootstrap_compiler`
+- `rcl_bootstrap_stage5_smoke`
+- `rcl_selfhost_inventory`
+- `rcl_read_selfhost_source`
+- `rcl_rncs_fusion_surface`
+
+RNCS tools:
+
+- `rncs_fusion_verify`
+- `rncs_list_modules`
+- `rncs_read_module`
+- `rncs_control_plane_evidence`
+- `rncs_edge_evidence`
+- `rncs_runtime_bundle_status`
+- `rncs_full_repo_status`
+- `rncs_vsr_status`
+- `rncs_rsr_status`
+- `rncs_vsr_list_examples`
+- `rncs_rsr_list_schemas`
+- `rncs_read_gateway_runtime`
 
 ## Connect To ChatGPT
 

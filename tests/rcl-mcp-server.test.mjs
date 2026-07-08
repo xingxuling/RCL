@@ -15,13 +15,14 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 test('RCL MCP server advertises core RCL and RNCS tools', () => {
   const tools = listRclMcpTools();
   const names = tools.map(tool => tool.name).sort();
-  assert.deepEqual(names, [
-    'rcl_compile_source',
-    'rcl_selfhost_inventory',
-    'rcl_status',
-    'rncs_fusion_verify',
-    'rncs_read_module',
-  ]);
+  const rclTools = names.filter(name => name.startsWith('rcl_'));
+  const rncsTools = names.filter(name => name.startsWith('rncs_'));
+  assert.ok(names.length >= 25, `expected at least 25 MCP tools, got ${names.length}`);
+  assert.ok(rclTools.length > rncsTools.length, `expected RCL to expose the most tools; RCL=${rclTools.length}, RNCS=${rncsTools.length}`);
+  assert.ok(names.includes('rncs_vsr_status'));
+  assert.ok(names.includes('rncs_rsr_status'));
+  assert.ok(names.includes('rcl_bootstrap_stage5_smoke'));
+  assert.ok(names.includes('rcl_disassemble_source'));
   assert.ok(tools.every(tool => tool.inputSchema?.type === 'object'));
 });
 
@@ -52,6 +53,26 @@ test('RCL MCP JSON-RPC initialize, tools/list, and tools/call work', async () =>
   });
   assert.equal(module.result.structuredContent.name, 'aether_earth');
   assert.equal(module.result.structuredContent.source, undefined);
+
+  const vsr = await handleRclMcpRequest({
+    jsonrpc: '2.0',
+    id: 7,
+    method: 'tools/call',
+    params: { name: 'rncs_vsr_status', arguments: {} },
+  });
+  assert.equal(vsr.result.structuredContent.kind, 'vsr');
+  assert.equal(vsr.result.structuredContent.package.name, '@taowind/visual-state-runtime');
+  assert.equal(vsr.result.structuredContent.gatewayRuntime.runtime_id, 'rncs.vsr');
+
+  const rsr = await handleRclMcpRequest({
+    jsonrpc: '2.0',
+    id: 8,
+    method: 'tools/call',
+    params: { name: 'rncs_rsr_status', arguments: {} },
+  });
+  assert.equal(rsr.result.structuredContent.kind, 'rsr');
+  assert.equal(rsr.result.structuredContent.package.name, '@taowind/reality-simulation-runtime');
+  assert.equal(rsr.result.structuredContent.gatewayRuntime.runtime_id, 'rncs.rsr');
 });
 
 test('RCL MCP compile tool compiles and native-runs RCL source', async () => {
@@ -66,6 +87,23 @@ test('RCL MCP compile tool compiles and native-runs RCL source', async () => {
   assert.ok(compiled.result.structuredContent.byteLength > 36);
   assert.equal(compiled.result.structuredContent.nativeRun.status, 'ok');
   assert.equal(compiled.result.structuredContent.nativeRun.state['world.greeting'], 'Hello, reality.');
+
+  const examples = await handleRclMcpRequest({
+    jsonrpc: '2.0',
+    id: 9,
+    method: 'tools/call',
+    params: { name: 'rcl_list_examples', arguments: { limit: 10 } },
+  });
+  assert.ok(examples.result.structuredContent.count >= 1);
+
+  const disassembled = await handleRclMcpRequest({
+    jsonrpc: '2.0',
+    id: 10,
+    method: 'tools/call',
+    params: { name: 'rcl_disassemble_source', arguments: { source, limitInstructions: 4 } },
+  });
+  assert.equal(disassembled.result.structuredContent.ok, true);
+  assert.ok(disassembled.result.structuredContent.instructions.length <= 4);
 });
 
 test('RCL MCP HTTP server accepts JSON-RPC POST requests', async () => {
