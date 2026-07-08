@@ -69,7 +69,7 @@ ChatGPT requires the MCP endpoint to be reachable over HTTPS. For local developm
 For hosted development, deploy this repo to Vercel and use:
 
 ```text
-https://your-vercel-deployment.vercel.app/mcp
+https://rcl-rncs-mcp.vercel.app/mcp
 ```
 
 Vercel note: the hosted endpoint exposes the same MCP tool metadata and can serve read/compile/evidence tools. Live native VM execution depends on a Linux-compatible native VM; the checked Windows `native/rclvm.exe` only runs in local Windows mode.
@@ -79,11 +79,20 @@ In ChatGPT:
 1. Open Settings -> Apps & Connectors -> Advanced settings.
 2. Enable Developer mode if your workspace allows it.
 3. Go to Settings -> Connectors -> Create.
-4. Use a name like `RCL RNCS`.
-5. Set the connector URL to the public HTTPS `/mcp` endpoint, for example:
+4. Use these fields:
 
 ```text
-https://your-tunnel.example/mcp
+Name: RCL RNCS
+Description: RCL/RNCS MCP: 32 tools for RCL compile/read/selfhost inventory plus RNCS fusion, VSR, and RSR evidence.
+Server URL: https://rcl-rncs-mcp.vercel.app/mcp
+Authentication: None
+```
+
+5. Confirm the custom MCP risk checkbox.
+6. Set the connector URL to the public HTTPS `/mcp` endpoint, for example:
+
+```text
+https://rcl-rncs-mcp.vercel.app/mcp
 ```
 
 After creation, ChatGPT should show the advertised tools. Start a new chat, add the connector from the `+` menu, then ask questions such as:

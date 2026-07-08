@@ -1,0 +1,32 @@
+{
+  "format": "reality-one.runtime-manifest.v0.3",
+  "gateway_protocol_versions": [
+    "0.3.0"
+  ],
+  "runtime_id": "rncs.vsr",
+  "runtime_version": "0.8.0-alpha.1",
+  "display_name": "Visual State Runtime",
+  "transport": {
+    "kind": "node-module",
+    "package": "@taowind/visual-state-runtime"
+  },
+  "bridge": "../src/bridges/vsr.bridge.mjs",
+  "actions": [
+    "health",
+    "loadSpatial3d",
+    "loadTemporalPresentation"
+  ],
+  "protocols": [
+    "vsr.spatial-reality-3d.v0.7",
+    "vsr.gltf-import.v0.2",
+    "vsr.temporal-presentation.v0.6"
+  ],
+  "requires": [
+    {
+      "runtime_id": "rncs.rsr",
+      "version_range": ">=0.7.0-alpha.1 <0.10.0",
+      "optional": true
+    }
+  ],
+  "priority": 84
+}

@@ -22,6 +22,7 @@ const DEFAULT_WORKBUDDY_RNCS_ROOT = path.resolve(
   'rncs-aetherworld',
   'RNCS_Aetherworld_Unified_v0.19.7-alpha.1_AetherEarth',
 );
+const BUNDLED_RNCS_WORLD_RUNTIME_SNAPSHOT_DIR = path.join(ROOT, 'examples', 'rncs-world-runtime-snapshots');
 const RCL_TEXT_EXTENSIONS = new Set(['.rcl', '.mjs', '.js', '.json', '.md', '.txt', '.toml', '.rcltype']);
 const SKIPPED_SCAN_DIRS = new Set(['.git', 'node_modules', 'build', 'output', 'dist', '.zig-cache', 'zig-cache']);
 
@@ -613,25 +614,53 @@ function rncsFullRepoStatus(args = {}) {
   const rncsRoot = resolveRncsRoot(args);
   const packagePath = path.join(rncsRoot, 'package.json');
   const changelogPath = path.join(rncsRoot, 'CHANGELOG.md');
+  const runtimeArgs = args.rncsRoot || process.env.RCL_RNCS_ROOT ? { rncsRoot } : {};
   const status = {
     rncsRoot,
     exists: fs.existsSync(rncsRoot),
     package: fs.existsSync(packagePath) ? readJson(packagePath) : null,
     changelog: fs.existsSync(changelogPath) ? fileSummary(rncsRoot, changelogPath) : null,
-    rsr: rncsRuntimeStatus('rsr', { rncsRoot }),
-    vsr: rncsRuntimeStatus('vsr', { rncsRoot }),
+    rsr: rncsRuntimeStatus('rsr', runtimeArgs),
+    vsr: rncsRuntimeStatus('vsr', runtimeArgs),
   };
   return status;
 }
 
+function rncsRuntimeSnapshotPaths(kind, snapshotRoot = BUNDLED_RNCS_WORLD_RUNTIME_SNAPSHOT_DIR) {
+  const rncsRoot = path.resolve(snapshotRoot);
+  const runtimeDir = path.join(rncsRoot, kind);
+  return {
+    source: rncsRoot === BUNDLED_RNCS_WORLD_RUNTIME_SNAPSHOT_DIR ? 'bundled-snapshot' : 'snapshot-root',
+    rncsRoot,
+    runtimeDir,
+    packagePath: path.join(runtimeDir, 'package.json'),
+    gatewayRuntimePath: path.join(runtimeDir, 'runtime.json'),
+    bridgePath: path.join(runtimeDir, 'bridge.mjs'),
+  };
+}
+
 function rncsRuntimePaths(kind, args = {}) {
   const rncsRoot = resolveRncsRoot(args);
+  const snapshotPaths = rncsRuntimeSnapshotPaths(kind, rncsRoot);
+  if (fs.existsSync(snapshotPaths.packagePath) || fs.existsSync(snapshotPaths.gatewayRuntimePath)) return snapshotPaths;
   const runtimeDir = kind === 'vsr'
     ? path.join(rncsRoot, 'packages', 'world', 'visual-state-runtime')
     : path.join(rncsRoot, 'packages', 'world', 'reality-simulation-runtime');
   const gatewayRuntimePath = path.join(rncsRoot, 'packages', 'control', 'reality-one-gateway', 'runtimes', `${kind}.runtime.json`);
   const bridgePath = path.join(rncsRoot, 'packages', 'control', 'reality-one-gateway', 'src', 'bridges', `${kind}.bridge.mjs`);
-  return { rncsRoot, runtimeDir, packagePath: path.join(runtimeDir, 'package.json'), gatewayRuntimePath, bridgePath };
+  const paths = {
+    source: 'rncs-root',
+    rncsRoot,
+    runtimeDir,
+    packagePath: path.join(runtimeDir, 'package.json'),
+    gatewayRuntimePath,
+    bridgePath,
+  };
+  if (fs.existsSync(paths.packagePath) || fs.existsSync(paths.gatewayRuntimePath)) return paths;
+  if (args.rncsRoot || process.env.RCL_RNCS_ROOT) return paths;
+  const bundledPaths = rncsRuntimeSnapshotPaths(kind);
+  if (fs.existsSync(bundledPaths.packagePath) || fs.existsSync(bundledPaths.gatewayRuntimePath)) return bundledPaths;
+  return paths;
 }
 
 function rncsRuntimeStatus(kind, args = {}) {
@@ -643,6 +672,7 @@ function rncsRuntimeStatus(kind, args = {}) {
     : path.join(paths.runtimeDir, 'packages', 'spatial-embodiment', 'src');
   return {
     kind,
+    source: paths.source,
     rncsRoot: paths.rncsRoot,
     runtimeDir: paths.runtimeDir,
     package: pkg ? {
@@ -683,6 +713,7 @@ function rncsVsrListExamples(args = {}) {
   const examplesDir = path.join(paths.runtimeDir, 'examples');
   const outputDir = path.join(paths.runtimeDir, 'outputs');
   return {
+    source: paths.source,
     runtimeDir: paths.runtimeDir,
     examples: fs.existsSync(examplesDir) ? listFiles(examplesDir, { extensions: new Set(['.json']), limit: numberInRange(args.limit, 80, 1, 300), maxDepth: 4 }).map(file => fileSummary(paths.rncsRoot, file)) : [],
     outputs: fs.existsSync(outputDir) ? listFiles(outputDir, { extensions: new Set(['.json']), limit: numberInRange(args.outputLimit, 30, 1, 200), maxDepth: 4 }).map(file => fileSummary(paths.rncsRoot, file)) : [],
@@ -695,6 +726,7 @@ function rncsRsrListSchemas(args = {}) {
   const distSchemasDir = path.join(paths.runtimeDir, 'dist', 'schemas');
   const targetDir = fs.existsSync(schemasDir) ? schemasDir : distSchemasDir;
   return {
+    source: paths.source,
     runtimeDir: paths.runtimeDir,
     schemasDir: targetDir,
     schemas: fs.existsSync(targetDir) ? listFiles(targetDir, { extensions: new Set(['.json']), limit: numberInRange(args.limit, 100, 1, 300), maxDepth: 2 }).map(file => fileSummary(paths.rncsRoot, file)) : [],

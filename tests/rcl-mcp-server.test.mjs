@@ -76,6 +76,16 @@ test('RCL MCP JSON-RPC initialize, tools/list, and tools/call work', async () =>
   assert.equal(rsr.result.structuredContent.kind, 'rsr');
   assert.equal(rsr.result.structuredContent.package.name, '@taowind/reality-simulation-runtime');
   assert.equal(rsr.result.structuredContent.gatewayRuntime.runtime_id, 'rncs.rsr');
+
+  const snapshotRoot = path.join(ROOT, 'examples', 'rncs-world-runtime-snapshots');
+  const snapshotRuntime = await handleRclMcpRequest({
+    jsonrpc: '2.0',
+    id: 12,
+    method: 'tools/call',
+    params: { name: 'rncs_read_gateway_runtime', arguments: { kind: 'vsr', rncsRoot: snapshotRoot } },
+  });
+  assert.equal(snapshotRuntime.result.structuredContent.file, 'vsr/runtime.json');
+  assert.equal(snapshotRuntime.result.structuredContent.manifest.runtime_id, 'rncs.vsr');
 });
 
 test('RCL MCP compile tool compiles and native-runs RCL source', async () => {

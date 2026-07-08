@@ -1,0 +1,51 @@
+{
+  "name": "@taowind/reality-simulation-runtime",
+  "version": "0.9.0-alpha.1",
+  "private": false,
+  "type": "module",
+  "description": "Reality-native authoritative spatial simulation with exact Capsule-OBB collision, friction warm starts, deterministic constraint islands, island sleep, coyote time, jump buffering and v0.7 network state compatibility.",
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "node scripts/lint.mjs",
+    "test": "npm run build && node dist/tests/run.js && node dist/tests/simulation.js && node dist/tests/constraint-physics.js && node dist/tests/embodied-dynamics.js && node dist/tests/experience-fabric.js && node dist/tests/spatial-embodiment.js && node dist/tests/network-reconciliation.js",
+    "test:vsr": "npm run build && node dist/tests/run.js",
+    "test:simulation": "npm run build && node dist/tests/simulation.js",
+    "demo:simulation": "npm run build && node dist/packages/simulation-cli/src/cli.js demo outputs/simulation-demo",
+    "verify:simulation": "npm run build && node dist/packages/simulation-cli/src/cli.js verify outputs/simulation-verify",
+    "benchmark:simulation": "npm run build && node dist/benchmarks/simulation.js",
+    "verify": "npm run verify:release",
+    "audit:release": "node scripts/release-audit.mjs",
+    "verify:release": "npm run typecheck && npm run lint && npm run audit:release",
+    "test:constraint-physics": "npm run build && node dist/tests/constraint-physics.js",
+    "demo:constraint-physics": "npm run build && node dist/packages/constraint-physics-cli/src/cli.js demo outputs/constraint-physics-demo",
+    "verify:constraint-physics": "npm run build && node dist/packages/constraint-physics-cli/src/cli.js verify outputs/constraint-physics-verify",
+    "benchmark:constraint-physics": "npm run build && node dist/benchmarks/constraint-physics.js",
+    "manifest:release": "node scripts/generate-release-manifest.mjs",
+    "test:embodied-dynamics": "npm run build && node dist/tests/embodied-dynamics.js",
+    "demo:embodied-dynamics": "npm run build && node dist/packages/embodied-dynamics-cli/src/cli.js demo outputs/embodied-dynamics-demo",
+    "verify:embodied-dynamics": "npm run build && node dist/packages/embodied-dynamics-cli/src/cli.js verify outputs/embodied-dynamics-verify",
+    "benchmark:embodied-dynamics": "npm run build && node dist/benchmarks/embodied-dynamics.js",
+    "test:experience-fabric": "npm run build && node dist/tests/experience-fabric.js",
+    "demo:experience-fabric": "npm run build && node dist/packages/experience-fabric-cli/src/cli.js demo outputs/experience-fabric-demo",
+    "verify:experience-fabric": "npm run build && node dist/packages/experience-fabric-cli/src/cli.js verify outputs/experience-fabric-verify",
+    "benchmark:experience-fabric": "npm run build && node dist/benchmarks/experience-fabric.js",
+    "test:spatial-embodiment": "npm run build && node dist/tests/spatial-embodiment.js",
+    "demo:spatial-embodiment": "npm run build && node dist/packages/spatial-embodiment-cli/src/cli.js demo outputs/spatial-embodiment-demo",
+    "verify:spatial-embodiment": "npm run build && node dist/packages/spatial-embodiment-cli/src/cli.js verify outputs/spatial-embodiment-verify",
+    "benchmark:spatial-embodiment": "npm run build && node dist/benchmarks/spatial-embodiment.js",
+    "benchmark:all": "npm run benchmark:simulation && npm run benchmark:constraint-physics && npm run benchmark:embodied-dynamics && npm run benchmark:experience-fabric && npm run benchmark:spatial-embodiment",
+    "verify:full": "node scripts/verify-release.mjs",
+    "test:network-reconciliation": "npm run build && node dist/tests/network-reconciliation.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/unified-index.mjs",
+    "./network-reconciliation": "./dist/packages/network-reconciliation/src/index.js",
+    "./spatial-embodiment": "./dist/packages/spatial-embodiment/src/index.js"
+  }
+}
