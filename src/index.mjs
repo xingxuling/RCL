@@ -1540,3 +1540,22 @@ export {
   writeAutonomousSandboxFileEmissionReports,
   autonomousSandboxFileEmissionCanonicalRoot,
 } from './autonomous-sandbox-file-emission-protocol.mjs';
+
+export {
+  RCL_RNCS_FUSION_VERSION,
+  RCL_RNCS_FUSION_RESULT_FORMAT,
+  RCL_RNCS_FUSION_BUNDLE_FORMAT,
+  BUNDLED_RNCS_CONTROL_PLANE_DIR,
+  DEFAULT_WORKBUDDY_RNCS_CONTROL_PLANE_DIR,
+  RNCS_CONTROL_PLANE_EDGES,
+  RNCS_SEMANTIC_MODULES,
+  resolveRclRncsControlPlaneDir,
+  readRncsRclModule,
+  scanRncsRclModules,
+  compileRclRncsFusionEdge,
+  compileRclRncsRuntimeBundle,
+  renderRclRncsFusionRcl,
+  runRclRncsFusion,
+  writeRclRncsFusionReports,
+  runRclRncsFusionDemo,
+} from './rncs-rcl-fusion.mjs';

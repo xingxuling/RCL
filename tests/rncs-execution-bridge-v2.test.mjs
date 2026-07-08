@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   RCL_RNCS_EXECUTION_BRIDGE_V2_RESULT_FORMAT,
   RCL_RNCS_EXECUTION_PLAN_FORMAT,
@@ -14,7 +15,7 @@ import {
   writeRncsExecutionBridgeV2Reports,
 } from '../src/rncs-execution-bridge-v2.mjs';
 
-const cwd = path.resolve(new URL('..', import.meta.url).pathname);
+const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 function tempDir(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `rcl-${name}-`));
 }
@@ -56,7 +57,7 @@ test('v0.63 CLI writes RNCS execution bridge reports', () => {
   assert.equal(fs.existsSync(path.join(dir, 'rncs-execution-plans.json')), true);
   assert.equal(fs.existsSync(path.join(dir, 'provider-contracts.json')), true);
   assert.ok(fs.readdirSync(path.join(dir, 'rncs-execution-docs')).length >= 9);
-  const demoOut = execFileSync('node', ['src/cli.mjs', 'rncs-execution-bridge-v2-demo'], { cwd, encoding: 'utf8' });
+  const demoOut = execFileSync(process.execPath, ['src/cli.mjs', 'rncs-execution-bridge-v2-demo'], { cwd, encoding: 'utf8' });
   const demo = JSON.parse(demoOut);
   assert.equal(demo.ok, true);
   assert.equal(demo.rncsExecutionBridgeV2Established, true);

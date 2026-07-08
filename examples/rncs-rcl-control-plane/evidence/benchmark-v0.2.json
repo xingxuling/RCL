@@ -1,0 +1,28 @@
+{
+  "format": "rncs.rcl-control-plane.benchmark.v0.2",
+  "modules": 11,
+  "legacyManifestScans": {
+    "iterations": 1000,
+    "milliseconds": 645.1225870000001,
+    "perIterationMs": 0.645122587
+  },
+  "childProcessAotReplay": {
+    "iterations": 25,
+    "milliseconds": 562.6431379999999,
+    "perRunMs": 22.505725519999995
+  },
+  "longLivedDaemonReplay": {
+    "iterations": 250,
+    "milliseconds": 125.72449899999992,
+    "perRunMs": 0.5028979959999997,
+    "nativeMedianHintMs": 0.224404
+  },
+  "directEmbeddedLibraryReplay": {
+    "vm": "0.6.0-alpha.1",
+    "iterations": 10000,
+    "totalMs": 37.198256,
+    "perRunMs": 0.003719826,
+    "runsPerSecond": 268829.807
+  },
+  "conclusion": "The performance gain appears only after removing process startup. The direct embedded C library is the authoritative VM-core benchmark; daemon numbers include JSON and IPC overhead."
+}

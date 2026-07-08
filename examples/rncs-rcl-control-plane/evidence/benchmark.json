@@ -1,0 +1,21 @@
+{
+  "format": "rncs.rcl-control-plane.benchmark.v0.1",
+  "legacyManifestScans": {
+    "iterations": 25,
+    "milliseconds": 11.844662
+  },
+  "rclColdCompileAndRun": {
+    "edges": 6,
+    "milliseconds": 969.5912529999999
+  },
+  "rclPrecompiledNativeReplay": {
+    "edges": 6,
+    "milliseconds": 180.86683000000016
+  },
+  "rclAotBundleReplay": {
+    "processes": 1,
+    "milliseconds": 27.513532999999825,
+    "stateKeys": 14
+  },
+  "conclusion": "Current RCL execution remains slower for this tiny workload because native process startup dominates; the AOT bundle substantially reduces overhead, while embedded long-lived VM execution is still required for a fair performance advantage."
+}
