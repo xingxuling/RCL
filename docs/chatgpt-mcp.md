@@ -66,6 +66,14 @@ RNCS tools:
 
 ChatGPT requires the MCP endpoint to be reachable over HTTPS. For local development, expose the local `/mcp` endpoint with Secure MCP Tunnel, ngrok, Cloudflare Tunnel, or an equivalent HTTPS tunnel.
 
+For hosted development, deploy this repo to Vercel and use:
+
+```text
+https://your-vercel-deployment.vercel.app/mcp
+```
+
+Vercel note: the hosted endpoint exposes the same MCP tool metadata and can serve read/compile/evidence tools. Live native VM execution depends on a Linux-compatible native VM; the checked Windows `native/rclvm.exe` only runs in local Windows mode.
+
 In ChatGPT:
 
 1. Open Settings -> Apps & Connectors -> Advanced settings.

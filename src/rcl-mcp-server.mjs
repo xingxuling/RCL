@@ -212,16 +212,66 @@ function compileSourceSummary(source, args = {}) {
   return payload;
 }
 
+function liveFusionOrFallback(options = {}) {
+  try {
+    const fusion = runRclRncsFusion(options);
+    return compactFusionResult(fusion, {
+      includeModules: bool(options.includeModules),
+      includeEdges: bool(options.includeEdges),
+      includeRclSurface: bool(options.includeRclSurface),
+    });
+  } catch (error) {
+    const controlPlaneDir = options.controlPlaneDir ? path.resolve(String(options.controlPlaneDir)) : resolveRclRncsControlPlaneDir();
+    const evidencePath = path.join(controlPlaneDir, 'evidence', 'latest', 'control-plane.json');
+    if (!fs.existsSync(evidencePath)) throw error;
+    const evidence = readJson(evidencePath);
+    return {
+      ok: false,
+      liveNativeVerification: false,
+      fallback: 'evidence-only',
+      reason: error.message ?? String(error),
+      controlPlaneDir,
+      controlPlane: {
+        format: evidence.format,
+        stage: evidence.stage,
+      },
+      rclModuleCount: fs.existsSync(path.join(controlPlaneDir, 'rcl'))
+        ? fs.readdirSync(path.join(controlPlaneDir, 'rcl')).filter(name => name.endsWith('.rcl')).length
+        : null,
+      semanticModuleCount: Object.keys(evidence.modules ?? {}).length,
+      edgeCount: evidence.edges?.length ?? 0,
+      allReady: evidence.allReady,
+      allDeterministic: evidence.allDeterministic,
+      allReferenceParity: evidence.allReferenceParity,
+      evidenceCurrent: 'unknown-without-native-recompile',
+      runtimeBundleReady: evidence.runtimeBundle?.targetState
+        ? Object.entries(evidence.runtimeBundle.targetState).filter(([key]) => key.startsWith('rncs::') && key.endsWith('.ready')).length >= 12
+        : null,
+      runtimeBundleEvidenceParity: 'unknown-without-native-recompile',
+      stateRoot: evidence.stateRoot,
+      modules: bool(options.includeModules) ? evidence.modules : undefined,
+      edges: bool(options.includeEdges) ? evidence.edges?.map(edge => ({
+        from: edge.from,
+        to: edge.to,
+        targetHash: edge.targetHash,
+        byteLength: edge.byteLength,
+        irCount: edge.irCount,
+        deterministic: edge.deterministic,
+        referenceParity: edge.referenceParity,
+      })) : undefined,
+    };
+  }
+}
+
 function rclStatus() {
   const pkg = readPackageJson();
-  const fusion = runRclRncsFusion();
   const nativeVmPath = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
   const tools = listRclMcpTools();
   return {
     package: { name: pkg.name, version: pkg.version, description: pkg.description },
     repo: { root: ROOT, commit: readGitCommit() },
     nativeVm: { path: nativeVmPath, exists: fs.existsSync(nativeVmPath) },
-    rncsFusion: compactFusionResult(fusion),
+    rncsFusion: liveFusionOrFallback(),
     mcp: {
       name: RCL_MCP_SERVER_NAME,
       version: RCL_MCP_SERVER_VERSION,
@@ -264,10 +314,8 @@ function rclNativeVmStatus() {
 }
 
 function rncsFusionVerify(args = {}) {
-  const fusion = runRclRncsFusion({
+  return liveFusionOrFallback({
     controlPlaneDir: args.controlPlaneDir ? path.resolve(String(args.controlPlaneDir)) : undefined,
-  });
-  return compactFusionResult(fusion, {
     includeModules: bool(args.includeModules),
     includeEdges: bool(args.includeEdges),
     includeRclSurface: bool(args.includeRclSurface),

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import {
   RCL_MCP_SERVER_NAME,
@@ -9,6 +10,8 @@ import {
   listRclMcpTools,
   startRclMcpServer,
 } from '../src/rcl-mcp-server.mjs';
+import mcpHandler from '../api/mcp.mjs';
+import healthHandler from '../api/health.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -119,5 +122,31 @@ test('RCL MCP HTTP server accepts JSON-RPC POST requests', async () => {
     assert.ok(payload.result.tools.some(tool => tool.name === 'rcl_status'));
   } finally {
     await new Promise(resolve => started.server.close(resolve));
+  }
+});
+
+test('Vercel API handlers expose health and MCP POST endpoints', async () => {
+  const server = http.createServer((request, response) => {
+    if (request.url?.startsWith('/health')) return healthHandler(request, response);
+    return mcpHandler(request, response);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const { port } = server.address();
+  try {
+    const health = await fetch(`http://127.0.0.1:${port}/health`);
+    assert.equal(health.status, 200);
+    const healthPayload = await health.json();
+    assert.equal(healthPayload.toolCount, 32);
+
+    const response = await fetch(`http://127.0.0.1:${port}/api/mcp`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 11, method: 'tools/list', params: {} }),
+    });
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.result.tools.length, 32);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
   }
 });
