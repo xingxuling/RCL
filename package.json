@@ -9,10 +9,12 @@
   },
   "bin": {
     "rcl": "./src/cli.mjs",
-    "rcl-forge": "./src/forge-cli.mjs"
+    "rcl-forge": "./src/forge-cli.mjs",
+    "rcl-mcp": "./src/rcl-mcp-server.mjs"
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "mcp": "node src/rcl-mcp-server.mjs",
     "test:v0.91": "node --test --test-concurrency=1 tests/blue-sky-cosmogenic-projection-trial.test.mjs",
     "demo": "node src/cli.mjs run examples/hello-reality.rcl",
     "demo:subjects": "node src/cli.mjs run examples/subject-resonance.rcl",
