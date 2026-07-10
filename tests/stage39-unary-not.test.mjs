@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-test('Stage-39 RCL-owned lowering emits unary NOT opcodes', () => {
+test('Stage-39 RCL-owned lowering emits unary NOT with JS-compatible boolean short-circuit bytecode', () => {
   const out = execFileSync('node', ['scripts/verify-rcl-selfhost-stage39.mjs'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
@@ -40,11 +40,11 @@ test('Stage-39 RCL-owned lowering emits unary NOT opcodes', () => {
   assert.equal(report.compiler.rules[4].when.right.expression.operator, '!=');
   assert.deepEqual(report.compiler.rules.map(rule => rule.alters[0].expression.operator), ['+', '*', '-', '/', '+']);
 
-  assert.equal(report.target.bytes, 5624);
+  assert.equal(report.target.bytes, 6904);
   assert.equal(report.target.exactReferenceMatch, true);
   assert.equal(report.target.sha256, report.target.referenceSha256);
-  assert.equal(report.target.sha256, '9fa109da0638ab9946be1ec56e012ab0a3ca05d105a0a6bd1cd884a643483ddc');
-  assert.equal(report.target.instructions.length, 316);
+  assert.equal(report.target.sha256, '32fb9710be02209584c4ecdd3a270c4d13bd9e717633da6b77a5ca886d06a9d4');
+  assert.equal(report.target.instructions.length, 396);
   assert.deepEqual(report.target.numbers, [8, 1, 2, 10, 3, 6, 4]);
   assert.deepEqual(report.target.strings.slice(16, 27), [
     'publish',
@@ -60,15 +60,18 @@ test('Stage-39 RCL-owned lowering emits unary NOT opcodes', () => {
     'rcl:stage39:eq-not-and',
   ]);
   assert.deepEqual(report.target.unaryIndexes, {
-    not: [18, 22, 35, 39, 48, 52, 65, 69, 78, 82, 95, 99, 108, 112, 125, 129, 138, 142, 155, 159, 168, 172, 185, 189, 198, 202, 215, 219, 228, 232, 245, 249, 258, 262, 275, 279, 288, 292, 305, 309],
+    not: [18, 23, 24, 25, 39, 44, 45, 46, 56, 61, 62, 63, 77, 82, 83, 84, 94, 99, 100, 101, 115, 122, 123, 124, 132, 137, 138, 139, 153, 160, 161, 162, 170, 175, 176, 177, 191, 196, 197, 198, 208, 213, 214, 215, 229, 234, 235, 236, 246, 251, 252, 253, 267, 274, 275, 276, 284, 289, 290, 291, 305, 312, 313, 314, 322, 327, 328, 329, 343, 348, 349, 350, 360, 365, 366, 367, 381, 386, 387, 388],
   });
   assert.deepEqual(report.target.booleanIndexes, {
-    and: [23, 40, 53, 70, 83, 113, 143, 160, 173, 190, 203, 233, 263, 280, 293, 310],
-    or: [100, 130, 220, 250],
+    and: [],
+    or: [],
   });
-  assert.equal(report.target.opcodeCounts.NOT, 40);
-  assert.equal(report.target.opcodeCounts.AND, 16);
-  assert.equal(report.target.opcodeCounts.OR, 4);
+  assert.equal(report.target.opcodeCounts.NOT, 80);
+  assert.equal(report.target.opcodeCounts.AND, 0);
+  assert.equal(report.target.opcodeCounts.OR, 0);
+  assert.equal(report.target.opcodeCounts.JUMP, 20);
+  assert.equal(report.target.opcodeCounts.JUMP_IF_FALSE, 30);
+  assert.deepEqual(report.target.controlIndexes.checkWarrant, [30, 68, 106, 144, 182, 220, 258, 296, 334, 372]);
   assert.deepEqual(report.target.nativeRun.state, {
     'world.certified': false,
     'world.level': 2,

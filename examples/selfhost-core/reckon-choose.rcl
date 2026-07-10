@@ -1,0 +1,8 @@
+reality SelfHostReckonFixture {
+  facet input.value : Number = 8
+
+  reckon adjust(value : Number) -> Number =
+    choose(value >= 8, value * 2 + 3, -value)
+
+  facet output.value : Number = adjust(input.value) / 2
+}

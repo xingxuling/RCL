@@ -50,6 +50,7 @@ const stages = [
   { id: 'stage37', script: 'verify-rcl-selfhost-stage37.mjs', report: 'stage37-verification.json' },
   { id: 'stage38', script: 'verify-rcl-selfhost-stage38.mjs', report: 'stage38-verification.json' },
   { id: 'stage39', script: 'verify-rcl-selfhost-stage39.mjs', report: 'stage39-verification.json' },
+  { id: 'stage40', script: 'verify-rcl-selfhost-stage40.mjs', report: 'stage40-verification.json' },
 ];
 
 function readJson(filePath) {
@@ -65,6 +66,18 @@ const nativeBoundaryReport = fs.existsSync(nativeBoundaryReportPath) ? readJson(
 const nativeWindowsVerified = nativeBoundaryRun.status === 0
   && nativeBoundaryReport?.status === 'NATIVE_WINDOWS_VERIFIED'
   && nativeBoundaryReport?.probes?.defaultNativeRun?.ok === true;
+
+const fixedPointRun = spawnSync(process.execPath, [
+  '--test',
+  '--test-concurrency=1',
+  path.join(root, 'tests', 'general-selfhost-fixedpoint.test.mjs'),
+  path.join(root, 'tests', 'selfhost-toolchain.test.mjs'),
+], {
+  cwd: root,
+  encoding: 'utf8',
+  maxBuffer: 64 * 1024 * 1024,
+});
+const generalCompilerFixedPointVerified = fixedPointRun.status === 0;
 
 const results = [];
 
@@ -92,15 +105,17 @@ for (const stage of stages) {
 }
 
 const payload = {
-  ok: results.every(result => result.ok),
+  ok: results.every(result => result.ok) && nativeWindowsVerified && generalCompilerFixedPointVerified,
   format: 'rcl.selfhost.summary.v1',
   executionMode: 'sequential',
   stages: results,
   currentVerifiedCeiling: results.every(result => result.ok)
-    ? 'stage39_rcl_owned_unary_not_lowering_subset'
+    ? 'stage40_rcl_owned_dual_need_warrant_lowering_subset'
     : 'incomplete',
   boundary: {
     fullSelfHosting: false,
+    nativeCoreCompilerSelfHosting: generalCompilerFixedPointVerified,
+    generalCompilerFixedPointArtifact: generalCompilerFixedPointVerified,
     jsRuntimeStillRequired: true,
     nativeWindowsVerified,
     nativeWindowsStillBlocked: !nativeWindowsVerified,
@@ -143,12 +158,13 @@ const payload = {
     rclOwnedArithmeticOperatorLoweringSubset: true,
     rclOwnedBooleanConnectiveLoweringSubset: true,
     rclOwnedUnaryNotLoweringSubset: true,
+    rclOwnedDualNeedWarrantLoweringSubset: true,
     rclOwnedRuleTransactionBytecodeSubset: true,
     rclOwnedTargetNativeExecutionSubset: true,
     rclOwnedRuntimeRootHashingComplete: false,
     rclOwnedExpressionAstComplete: false,
     rclOwnedRuleBytecodeLoweringComplete: false,
-    rclCompilerSelfEmitsWithoutStage0: false,
+    rclCompilerSelfEmitsWithoutStage0: generalCompilerFixedPointVerified,
     rclOwnedRuntimeComplete: false,
   },
   nativeBoundary: {
@@ -160,6 +176,16 @@ const payload = {
     nativeVmPath: nativeBoundaryReport?.artifacts?.nativeExe?.path ?? null,
     nativeVmSha256: nativeBoundaryReport?.artifacts?.nativeExe?.sha256 ?? null,
     stderr: nativeBoundaryRun.stderr.trim(),
+  },
+  generalCompilerFixedPoint: {
+    tests: [
+      'tests/general-selfhost-fixedpoint.test.mjs',
+      'tests/selfhost-toolchain.test.mjs',
+    ],
+    exitCode: fixedPointRun.status,
+    ok: generalCompilerFixedPointVerified,
+    stdout: fixedPointRun.stdout.trim(),
+    stderr: fixedPointRun.stderr.trim(),
   },
 };
 

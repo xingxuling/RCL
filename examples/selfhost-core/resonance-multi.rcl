@@ -1,0 +1,32 @@
+reality SelfHostResonanceFixture {
+  facet signal.count : Number = 2
+  facet signal.ready : Truth = true
+  facet signal.status : Text = "open"
+
+  subject source {
+    warrant signal.read on signal
+    warrant signal.write on signal
+  }
+
+  subject target {
+    facet received : Number = 0
+  }
+
+  resonance transfer {
+    from source
+    into target
+    when signal.ready == true and signal.status == "open"
+    needs signal.read on signal
+    needs signal.write on signal
+    alter signal.count <- signal.count + 1
+    alter target.received <- target.received + signal.count
+    preserve signal.count >= 2
+    preserve target.received >= 0
+    witness "selfhost:resonance:transfer"
+    witness "selfhost:resonance:observed"
+  }
+
+  foresee transfer
+  realize transfer
+  foresee transfer
+}

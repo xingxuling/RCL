@@ -40,6 +40,10 @@ function safeId(value, fallback = 'reality-product-entry') {
     .slice(0, 140) || fallback;
 }
 
+function safeFileId(value, fallback = 'reality-product-entry') {
+  return safeId(value, fallback).replace(/:+/g, '-').replace(/[. ]+$/g, '');
+}
+
 function defaultSourceHumanCapabilitySpec() {
   return normalizeHumanCapabilityFeedbackOsSpec({
     id: 'rcl_reality_product_entry_runtime_source_human_feedback_v0',
@@ -475,7 +479,7 @@ export function writeRealityProductEntryRuntimeReports(outputDir, input = {}) {
   const docDir = path.join(outputDir, 'reality-product-entry-docs');
   fs.mkdirSync(docDir, { recursive: true });
   for (const doc of bundle.documents) {
-    fs.writeFileSync(path.join(docDir, `${safeId(doc.id)}.md`), `${doc.markdown}\n`);
+    fs.writeFileSync(path.join(docDir, `${safeFileId(doc.id)}.md`), `${doc.markdown}\n`);
   }
   return {
     ok: bundle.ok,

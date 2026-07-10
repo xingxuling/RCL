@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   RCL_CIVILIZATION_TECH_TREE_RESULT_FORMAT,
@@ -14,7 +15,7 @@ import {
   writeCivilizationTechnologyTreeReports,
 } from '../src/civilization-technology-tree-compiler.mjs';
 
-const cwd = path.resolve(new URL('..', import.meta.url).pathname);
+const cwd = fileURLToPath(new URL('..', import.meta.url));
 function tempDir(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `rcl-${name}-`));
 }

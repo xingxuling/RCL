@@ -51,7 +51,10 @@ test('package compiler emits all configured terminal packages with hardened mani
 
 test('packaged native-rbc and node-cli entrypoints execute bundled bytecode', async () => {
   const report = await packageRclSource(source, { target: 'all', outputDir: outRoot });
-  const nativeOut = execFileSync('sh', [path.join(outRoot, 'native-rbc', 'run-native.sh')], { encoding: 'utf8' });
+  const nativePackage = path.join(outRoot, 'native-rbc');
+  const nativeOut = process.platform === 'win32'
+    ? execFileSync('cmd.exe', ['/d', '/s', '/c', path.join(nativePackage, 'runners', 'windows', 'run.cmd')], { encoding: 'utf8' })
+    : execFileSync('sh', [path.join(nativePackage, 'run-native.sh')], { encoding: 'utf8' });
   const nativeJson = JSON.parse(nativeOut);
   assert.deepEqual(nativeJson.state, { 'founder.awareness': 1, 'world.greeting': 'Hello, reality.' });
 

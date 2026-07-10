@@ -2,6 +2,7 @@ import { compileReality } from './compiler.mjs';
 import { RCLCompileError } from './errors.mjs';
 
 export const RCL_BYTECODE_VERSION = Object.freeze({ major: 1, minor: 1 });
+export const RCL_BYTECODE_FEATURE_VERSION = Object.freeze({ major: 1, minor: 2 });
 export const RCL_BYTECODE_MAGIC = 'RCLB';
 
 export const OPCODES = Object.freeze({
@@ -49,6 +50,7 @@ export const OPCODES = Object.freeze({
   MAKE_TYPED_REF: 41,
   DEREF_TYPED_REF: 42,
   GET_TYPED_REF_ID: 43,
+  MOD: 44,
 });
 
 export const BUILTINS = Object.freeze({
@@ -161,6 +163,7 @@ class Assembler {
     this.instructions = [];
     this.labels = new Map();
     this.patches = [];
+    this.labelId = 0;
   }
 
   emit(op, a = 0, b = 0, c = 0, flags = 0) {
@@ -172,6 +175,10 @@ class Assembler {
   label(name) {
     if (this.labels.has(name)) throw new Error(`Duplicate bytecode label '${name}'`);
     this.labels.set(name, this.instructions.length);
+  }
+
+  freshLabel(prefix) {
+    return `${prefix}_${this.labelId++}`;
   }
 
   jump(op, label) {
@@ -265,10 +272,14 @@ function compileBuiltin(expr, asm, compileExpr) {
     return true;
   }
   if (expr.name === 'provider_call') {
-    if (expr.args.length !== 3 || expr.args.some(arg => arg?.kind !== 'LiteralExpr' || arg.valueType !== 'Text')) {
-      throw new Error('provider_call() requires provider id, capability and request JSON as Text literals in native v0.6');
+    if (expr.args.length !== 3) throw new Error('provider_call() requires provider id, capability and request JSON');
+    const literalArguments = expr.args.every(arg => arg?.kind === 'LiteralExpr' && arg.valueType === 'Text');
+    if (literalArguments) {
+      asm.emit(OPCODES.CALL_PROVIDER, asm.pool.string(expr.args[0].value), asm.pool.string(expr.args[1].value), asm.pool.string(expr.args[2].value));
+    } else {
+      expr.args.forEach(compileExpr);
+      asm.emit(OPCODES.CALL_PROVIDER, 0, 0, 0, 1);
     }
-    asm.emit(OPCODES.CALL_PROVIDER, asm.pool.string(expr.args[0].value), asm.pool.string(expr.args[1].value), asm.pool.string(expr.args[2].value));
     return true;
   }
   if (expr.name === 'choose') {
@@ -392,13 +403,42 @@ function compileExpression(expr, asm, pool, context = {}) {
       else throw new Error(`Native bytecode cannot lower unary operator '${expr.operator}'`);
       return;
     case 'BinaryExpr': {
+      if (expr.operator === 'and') {
+        const id = asm.freshLabel('and');
+        const falseLabel = `${id}_false`;
+        const endLabel = `${id}_end`;
+        compileExpr(expr.left);
+        asm.jump(OPCODES.JUMP_IF_FALSE, falseLabel);
+        compileExpr(expr.right);
+        asm.emit(OPCODES.NOT);
+        asm.emit(OPCODES.NOT);
+        asm.jump(OPCODES.JUMP, endLabel);
+        asm.label(falseLabel);
+        asm.emit(OPCODES.PUSH_BOOL, 0);
+        asm.label(endLabel);
+        return;
+      }
+      if (expr.operator === 'or') {
+        const id = asm.freshLabel('or');
+        const rightLabel = `${id}_right`;
+        const endLabel = `${id}_end`;
+        compileExpr(expr.left);
+        asm.jump(OPCODES.JUMP_IF_FALSE, rightLabel);
+        asm.emit(OPCODES.PUSH_BOOL, 1);
+        asm.jump(OPCODES.JUMP, endLabel);
+        asm.label(rightLabel);
+        compileExpr(expr.right);
+        asm.emit(OPCODES.NOT);
+        asm.emit(OPCODES.NOT);
+        asm.label(endLabel);
+        return;
+      }
       compileExpr(expr.left);
       compileExpr(expr.right);
       const map = {
-        '+': OPCODES.ADD, '-': OPCODES.SUB, '*': OPCODES.MUL, '/': OPCODES.DIV,
+        '+': OPCODES.ADD, '-': OPCODES.SUB, '*': OPCODES.MUL, '/': OPCODES.DIV, '%': OPCODES.MOD,
         '==': OPCODES.EQ, '!=': OPCODES.NEQ,
         '<': OPCODES.LT, '<=': OPCODES.LTE, '>': OPCODES.GT, '>=': OPCODES.GTE,
-        and: OPCODES.AND, or: OPCODES.OR,
       };
       const op = map[expr.operator];
       if (op === undefined) throw new Error(`Native bytecode cannot lower binary operator '${expr.operator}'`);
@@ -494,11 +534,15 @@ function encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, 
   const stringsSize = stringBytes.reduce((sum, bytes) => sum + 4 + bytes.length, 0);
   const numbersSize = pool.numbers.length * 8;
   const instructionSize = 16;
+  const minorVersion = instructions.some(instruction => (
+    instruction.op === OPCODES.MOD
+    || (instruction.op === OPCODES.CALL_PROVIDER && (instruction.flags & 1) === 1)
+  )) ? RCL_BYTECODE_FEATURE_VERSION.minor : RCL_BYTECODE_VERSION.minor;
   const buffer = Buffer.alloc(headerSize + stringsSize + numbersSize + instructions.length * instructionSize);
   let offset = 0;
   buffer.write(RCL_BYTECODE_MAGIC, offset, 4, 'ascii'); offset += 4;
   buffer.writeUInt16LE(RCL_BYTECODE_VERSION.major, offset); offset += 2;
-  buffer.writeUInt16LE(RCL_BYTECODE_VERSION.minor, offset); offset += 2;
+  buffer.writeUInt16LE(minorVersion, offset); offset += 2;
   buffer.writeUInt32LE(flags >>> 0, offset); offset += 4;
   buffer.writeUInt32LE(programNameIndex >>> 0, offset); offset += 4;
   buffer.writeUInt32LE(sourceRootIndex >>> 0, offset); offset += 4;

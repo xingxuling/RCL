@@ -35,7 +35,14 @@ test('Stage-14 RCL-owned runtime interpreter covers state dependencies and logic
     'world.status': 'ready',
   });
   assert.equal(report.targetBytecode.numbers.length, 3);
+  assert.equal(report.targetBytecode.bytes, 939);
+  assert.equal(report.targetBytecode.sha256, '25af84bf277379e7059812d1378a110c4c095db350a110365a697cd5c1e38059');
+  assert.equal(report.targetBytecode.exactJsReferenceMatch, true);
+  assert.equal(report.targetBytecode.instructions.length, 42);
   assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'LOAD_STATE'), true);
-  assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'OR'), true);
+  assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'JUMP'), true);
+  assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'JUMP_IF_FALSE'), true);
+  assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'AND'), false);
+  assert.equal(report.targetBytecode.instructions.some(instruction => instruction.name === 'OR'), false);
   assert.equal(report.boundaries.notYetImplemented.includes('transactions'), true);
 });

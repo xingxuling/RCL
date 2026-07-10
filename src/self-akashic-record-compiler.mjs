@@ -118,18 +118,32 @@ function parseVersionFromText(text) {
 
 function buildVersionLedger(root) {
   const docs = [
+    path.join(root, 'README.md'),
     ...fs.existsSync(path.join(root, 'docs')) ? fs.readdirSync(path.join(root, 'docs')).map(name => path.join(root, 'docs', name)) : [],
     ...fs.readdirSync(root).filter(name => /^release.*\.json$/.test(name)).map(name => path.join(root, name)),
   ].filter(p => fs.existsSync(p) && fs.statSync(p).isFile());
-  const rows = docs
-    .map(p => {
-      const rel = path.relative(root, p).replaceAll(path.sep, '/');
-      const v = parseVersionFromText(rel) ?? parseVersionFromText(readTextIfExists(p).slice(0, 600));
-      return v ? { path: rel, version: v.raw, minor: v.minor, root: sha256(readTextIfExists(p).slice(0, 4000)) } : null;
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.minor - b.minor || a.path.localeCompare(b.path));
-  return rows;
+  const rows = [];
+  for (const filePath of docs) {
+    const rel = path.relative(root, filePath).replaceAll(path.sep, '/');
+    const text = readTextIfExists(filePath);
+    const headings = [...text.matchAll(/^#{1,6}[^\r\n]*?\bv?\d+\.\d+(?:\.\d+)?(?:-alpha\.?\d*)?[^\r\n]*$/gim)];
+    if (headings.length > 0) {
+      for (const [index, match] of headings.entries()) {
+        const version = parseVersionFromText(match[0]);
+        if (version) rows.push({
+          path: rel,
+          section: index,
+          version: version.raw,
+          minor: version.minor,
+          root: sha256(match[0].trim()),
+        });
+      }
+      continue;
+    }
+    const version = parseVersionFromText(rel) ?? parseVersionFromText(text.slice(0, 600));
+    if (version) rows.push({ path: rel, section: 0, version: version.raw, minor: version.minor, root: sha256(text.slice(0, 4000)) });
+  }
+  return rows.sort((a, b) => a.minor - b.minor || a.path.localeCompare(b.path) || a.section - b.section);
 }
 
 export const DEFAULT_SELF_AKASHIC_RECORD_SPEC = Object.freeze({

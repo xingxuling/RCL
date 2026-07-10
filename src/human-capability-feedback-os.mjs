@@ -38,6 +38,10 @@ function safeId(value, fallback = 'human-capability') {
     .slice(0, 140) || fallback;
 }
 
+function safeFileId(value, fallback = 'human-capability') {
+  return safeId(value, fallback).replace(/:+/g, '-').replace(/[. ]+$/g, '');
+}
+
 function defaultSourceRncsBridgeSpec() {
   return normalizeRncsExecutionBridgeV2Spec({
     id: 'rcl_human_capability_feedback_os_source_bridge_v0',
@@ -452,7 +456,7 @@ export function writeHumanCapabilityFeedbackOsReports(outputDir, input = {}) {
   const docDir = path.join(outputDir, 'human-capability-docs');
   fs.mkdirSync(docDir, { recursive: true });
   for (const doc of bundle.documents) {
-    fs.writeFileSync(path.join(docDir, `${safeId(doc.id)}.md`), `${doc.markdown}\n`);
+    fs.writeFileSync(path.join(docDir, `${safeFileId(doc.id)}.md`), `${doc.markdown}\n`);
   }
   return {
     ok: bundle.ok,

@@ -17,7 +17,7 @@ const targetRbcPath = path.join(outputDir, 'stage38-boolean-connective-target.rb
 const referenceRbcPath = path.join(outputDir, 'stage38-boolean-connective-js-reference.rbc');
 
 const EXPECTED_ROOT = '0000e8518e93fa380b2200a21b3cf37bb51000054fb90c14337b95d4d1c9fa8d';
-const EXPECTED_TARGET_SHA = '272a07ab81b67d69da55703c79c879b9eaa6714a6c935e2cd1cae1ca52c3c822';
+const EXPECTED_TARGET_SHA = '04ae75aa6f73329773483c0022a0895a86870ccc5d2149ba30ae5ea68d5363a4';
 const EXPECTED_STRINGS = [
   'Stage38Target',
   EXPECTED_ROOT,
@@ -133,6 +133,7 @@ const booleanIndexes = {
   or: opcodeIndexes(decodedTarget, 'OR'),
 };
 const controlIndexes = {
+  jump: opcodeIndexes(decodedTarget, 'JUMP'),
   jumpIfFalse: opcodeIndexes(decodedTarget, 'JUMP_IF_FALSE'),
   beginTx: opcodeIndexes(decodedTarget, 'BEGIN_TX'),
   checkWarrant: opcodeIndexes(decodedTarget, 'CHECK_WARRANT'),
@@ -155,6 +156,8 @@ const opcodeCounts = Object.fromEntries([
   'EQ',
   'AND',
   'OR',
+  'NOT',
+  'JUMP',
   'JUMP_IF_FALSE',
   'BEGIN_TX',
   'CHECK_WARRANT',
@@ -236,7 +239,7 @@ const checks = {
     && compilerProgram.rules[3].alters[0].expression.operator === '/'
     && compilerProgram.rules[4].alters[0].expression.operator === '+'
     && compilerProgram.directives.length === 10,
-  targetRbcGenerated: targetRbc.length > 0
+  targetRbcGenerated: targetRbc.length === 6244
     && decodedTarget.program === 'Stage38Target'
     && decodedTarget.sourceRoot === compilerProgram.programRoot,
   targetRbcMatchesJsReference: targetRbc.equals(referenceRbc)
@@ -249,13 +252,11 @@ const checks = {
     && targetNativeRun.state['world.level'] === 2
     && targetNativeRun.state['world.certified'] === false
     && stableRecordJson(targetNativeRun.state) === stableRecordJson(targetReferenceRun.state),
-  targetHasCorrectInstructionCount: decodedTarget.instructions.length === 276
-    && state['target.rbc_instruction_count'] === 276,
+  targetHasCorrectInstructionCount: decodedTarget.instructions.length === 356
+    && state['target.rbc_instruction_count'] === 356,
   targetHasCorrectStringPool: JSON.stringify(decodedTarget.strings) === JSON.stringify(EXPECTED_STRINGS),
   targetHasCorrectNumberPool: JSON.stringify(decodedTarget.numbers) === JSON.stringify(EXPECTED_NUMBERS),
-  targetHasCorrectOpcodes: targetNames.includes('AND')
-    && targetNames.includes('OR')
-    && targetNames.includes('ADD')
+  targetHasCorrectOpcodes: targetNames.includes('ADD')
     && targetNames.includes('SUB')
     && targetNames.includes('MUL')
     && targetNames.includes('DIV')
@@ -267,31 +268,40 @@ const checks = {
     && targetNames.includes('GTE')
     && targetNames.includes('PUSH_STRING')
     && targetNames.includes('PUSH_BOOL')
+    && targetNames.includes('NOT')
+    && targetNames.includes('JUMP')
+    && targetNames.includes('JUMP_IF_FALSE')
+    && !targetNames.includes('AND')
+    && !targetNames.includes('OR')
     && targetNames.includes('HALT'),
   booleanConnectiveLoweringEvidence: state['compiler.boolean_connective_lowering_supported'] === true
-    && JSON.stringify(booleanIndexes.and) === JSON.stringify([21, 36, 47, 62, 73, 99, 125, 140, 151, 166, 177, 203, 229, 244, 255, 270])
-    && JSON.stringify(booleanIndexes.or) === JSON.stringify([88, 114, 192, 218])
-    && opcodeCounts.AND === 16
-    && opcodeCounts.OR === 4
-    && JSON.stringify(arithmeticIndexes.add) === JSON.stringify([27, 53, 235, 261])
-    && JSON.stringify(arithmeticIndexes.sub) === JSON.stringify([131, 157])
-    && JSON.stringify(arithmeticIndexes.mul) === JSON.stringify([79, 105])
-    && JSON.stringify(arithmeticIndexes.div) === JSON.stringify([183, 209])
+    && JSON.stringify(booleanIndexes.and) === JSON.stringify([])
+    && JSON.stringify(booleanIndexes.or) === JSON.stringify([])
+    && opcodeCounts.AND === 0
+    && opcodeCounts.OR === 0
+    && opcodeCounts.NOT === 40
+    && opcodeCounts.JUMP === 20
+    && opcodeCounts.JUMP_IF_FALSE === 30
+    && JSON.stringify(controlIndexes.checkWarrant) === JSON.stringify([28, 62, 96, 130, 164, 198, 232, 266, 300, 334])
+    && JSON.stringify(arithmeticIndexes.add) === JSON.stringify([31, 65, 303, 337])
+    && JSON.stringify(arithmeticIndexes.sub) === JSON.stringify([167, 201])
+    && JSON.stringify(arithmeticIndexes.mul) === JSON.stringify([99, 133])
+    && JSON.stringify(arithmeticIndexes.div) === JSON.stringify([235, 269])
     && opcodeCounts.ADD === 4
     && opcodeCounts.SUB === 2
     && opcodeCounts.MUL === 2
     && opcodeCounts.DIV === 2
-    && JSON.stringify(comparisonIndexes.eq) === JSON.stringify([17, 20, 35, 43, 46, 61, 72, 87, 98, 113, 124, 139, 150, 165, 176, 191, 202, 217, 225, 228, 240, 243, 251, 254, 266, 269])
-    && JSON.stringify(comparisonIndexes.neq) === JSON.stringify([32, 58])
-    && JSON.stringify(comparisonIndexes.lt) === JSON.stringify([173, 199])
-    && JSON.stringify(comparisonIndexes.lte) === JSON.stringify([121, 147, 188, 214])
-    && JSON.stringify(comparisonIndexes.gt) === JSON.stringify([136, 162])
-    && JSON.stringify(comparisonIndexes.gte) === JSON.stringify([69, 84, 95, 110])
-    && JSON.stringify(pushStringIndexes) === JSON.stringify([2, 16, 31, 42, 57, 138, 164, 227, 242, 253, 268])
-    && JSON.stringify(pushBoolIndexes) === JSON.stringify([0, 8, 19, 34, 45, 60, 71, 86, 97, 112, 123, 149, 175, 190, 201, 216, 224, 239, 250, 265])
-    && decodedTarget.instructions[21]?.name === 'AND'
-    && decodedTarget.instructions[88]?.name === 'OR'
-    && decodedTarget.instructions[270]?.name === 'AND',
+    && JSON.stringify(comparisonIndexes.eq) === JSON.stringify([17, 21, 40, 51, 55, 74, 89, 110, 123, 144, 157, 176, 191, 210, 225, 246, 259, 280, 289, 293, 308, 312, 323, 327, 342, 346])
+    && JSON.stringify(comparisonIndexes.neq) === JSON.stringify([36, 70])
+    && JSON.stringify(comparisonIndexes.lt) === JSON.stringify([221, 255])
+    && JSON.stringify(comparisonIndexes.lte) === JSON.stringify([153, 187, 240, 274])
+    && JSON.stringify(comparisonIndexes.gt) === JSON.stringify([172, 206])
+    && JSON.stringify(comparisonIndexes.gte) === JSON.stringify([85, 104, 119, 138])
+    && JSON.stringify(pushStringIndexes) === JSON.stringify([2, 16, 35, 50, 69, 175, 209, 292, 311, 326, 345])
+    && JSON.stringify(pushBoolIndexes) === JSON.stringify([0, 8, 20, 25, 39, 44, 54, 59, 73, 78, 88, 93, 106, 109, 122, 127, 140, 143, 156, 161, 180, 190, 195, 214, 224, 229, 242, 245, 258, 263, 276, 279, 288, 297, 307, 316, 322, 331, 341, 350])
+    && decodedTarget.instructions[18]?.name === 'JUMP_IF_FALSE'
+    && decodedTarget.instructions[24]?.name === 'JUMP'
+    && decodedTarget.instructions[355]?.name === 'HALT',
   boundaryHonest: state['selfhost.boundary'] === 'boolean_connective_lowering_subset_not_complete_expression_ast_parser_compiler_or_runtime'
     && state['gate.rcl_owned_comparison_operator_lowering_subset'] === true
     && state['gate.rcl_owned_arithmetic_operator_lowering_subset'] === true
@@ -380,7 +390,7 @@ const payload = {
     history: targetReferenceRun.history,
   },
   boundaries: {
-    implementedNow: 'RCL maps two-clause boolean connective guard and preserve expressions with and/or to AND and OR bytecode for this self-host compiler subset, while preserving Stage37 arithmetic and Stage36 comparison lowering.',
+    implementedNow: 'RCL maps two-clause and/or guard and preserve expressions to the current JS-compatible short-circuit JUMP/JUMP_IF_FALSE layout, while preserving Stage37 arithmetic and Stage36 comparison lowering.',
     notYetImplemented: 'This is still a subset. Complete expression AST coverage, parser completion, complete compiler self-emission without stage0, complete runtime, and full native self-hosting remain outside this stage.',
     nextTarget: state['selfhost.next_rewrite_target'],
   },

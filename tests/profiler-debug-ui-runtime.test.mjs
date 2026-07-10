@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import {
 import { fileURLToPath } from 'node:url';
+import {
   DEFAULT_DEBUG_REPLAY_SOURCE,
   DEFAULT_DEBUG_REPLAY_TYPE_MODULES,
   RCL_PROFILER_DEBUG_UI_VERSION,

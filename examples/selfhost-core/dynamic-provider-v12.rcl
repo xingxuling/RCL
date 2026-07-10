@@ -1,0 +1,6 @@
+reality SelfHostDynamicProviderFixture {
+  facet provider.capability : Text = "echo.text"
+  facet provider.id : Text = "echo"
+  facet provider.request : Text = "request"
+  facet provider.reply : Text = provider_call(provider.id, provider.capability, provider.request)
+}

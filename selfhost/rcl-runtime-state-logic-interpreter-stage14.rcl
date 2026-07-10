@@ -103,7 +103,7 @@ reality RCLSelfHostRuntimeStateLogicInterpreterStage14 {
   reckon runtime_numbers() -> Sequence =
     build_numbers(0, empty_sequence())
 
-  reckon instruction_op_at(index : Number) -> Number =
+  reckon instruction_prefix_op_at(index : Number) -> Number =
     choose(index == 0, 1,
       choose(index == 1, 5,
         choose(index == 2, 4,
@@ -112,65 +112,90 @@ reality RCLSelfHostRuntimeStateLogicInterpreterStage14 {
               choose(index == 5, 5,
                 choose(index == 6, 4,
                   choose(index == 7, 1,
-                    choose(index == 8, 10,
-                      choose(index == 9, 5,
-                        choose(index == 10, 4,
-                          choose(index == 11, 4,
-                            choose(index == 12, 1,
-                              choose(index == 13, 15,
-                                choose(index == 14, 16,
-                                  choose(index == 15, 2,
-                                    choose(index == 16, 18,
-                                      choose(index == 17, 16,
-                                        choose(index == 18, 5,
-                                          choose(index == 19, 2,
-                                            choose(index == 20, 4,
-                                              choose(index == 21, 17,
-                                                choose(index == 22, 5,
-                                                  choose(index == 23, 4,
-                                                    choose(index == 24, 21,
-                                                      choose(index == 25, 3,
-                                                        choose(index == 26, 20,
-                                                          choose(index == 27, 3,
-                                                            choose(index == 28, 5, 31)))))))))))))))))))))))))))))
+                    choose(index == 8, 10, 5)))))))))
+
+  reckon instruction_ready_op_at(index : Number) -> Number =
+    choose(index == 0, 4,
+      choose(index == 1, 21,
+        choose(index == 2, 4,
+          choose(index == 3, 1,
+            choose(index == 4, 15,
+              choose(index == 5 or index == 6, 18,
+                choose(index == 7, 20,
+                  choose(index == 8, 2,
+                    choose(index == 9, 21,
+                      choose(index == 10, 2,
+                        choose(index == 11 or index == 12 or index == 13, 18,
+                          choose(index == 14, 20,
+                            choose(index == 15, 2, 5)))))))))))))
+
+  reckon instruction_alternate_op_at(index : Number) -> Number =
+    choose(index == 0, 2,
+      choose(index == 1, 21,
+        choose(index == 2, 2,
+          choose(index == 3, 20,
+            choose(index == 4, 4,
+              choose(index == 5 or index == 6, 18, 5))))))
+
+  reckon instruction_status_op_at(index : Number) -> Number =
+    choose(index == 0, 4,
+      choose(index == 1, 21,
+        choose(index == 2, 3,
+          choose(index == 3, 20,
+            choose(index == 4, 3,
+              choose(index == 5, 5, 31))))))
+
+  reckon instruction_op_at(index : Number) -> Number =
+    choose(index < 10, instruction_prefix_op_at(index),
+      choose(index < 27, instruction_ready_op_at(index - 10),
+        choose(index < 35, instruction_alternate_op_at(index - 27),
+          instruction_status_op_at(index - 35))))
+
+  reckon instruction_prefix_a_at(index : Number) -> Number =
+    choose(index == 0, 0,
+      choose(index == 1 or index == 2, 2,
+        choose(index == 3, 1,
+          choose(index == 5 or index == 6, 3,
+            choose(index == 7, 2,
+              choose(index == 9, 4, 0))))))
+
+  reckon instruction_ready_a_at(index : Number) -> Number =
+    choose(index == 0, 4,
+      choose(index == 1, 18,
+        choose(index == 2, 3,
+          choose(index == 3, 2,
+            choose(index == 7, 19,
+              choose(index == 9, 25,
+                choose(index == 14, 26,
+                  choose(index == 16, 5, 0))))))))
+
+  reckon instruction_alternate_a_at(index : Number) -> Number =
+    choose(index == 1, 31,
+      choose(index == 2, 1,
+        choose(index == 3, 34,
+          choose(index == 4, 5,
+            choose(index == 7, 6, 0)))))
+
+  reckon instruction_status_a_at(index : Number) -> Number =
+    choose(index == 0, 6,
+      choose(index == 1, 39,
+        choose(index == 2, 7,
+          choose(index == 3, 40,
+            choose(index == 4, 8,
+              choose(index == 5, 9, 0))))))
 
   reckon instruction_a_at(index : Number) -> Number =
-    choose(index == 0, 0,
-      choose(index == 1, 2,
-        choose(index == 2, 2,
-          choose(index == 3, 1,
-            choose(index == 4, 0,
-              choose(index == 5, 3,
-                choose(index == 6, 3,
-                  choose(index == 7, 2,
-                    choose(index == 8, 0,
-                      choose(index == 9, 4,
-                        choose(index == 10, 4,
-                          choose(index == 11, 3,
-                            choose(index == 12, 2,
-                              choose(index == 13, 0,
-                                choose(index == 14, 0,
-                                  choose(index == 15, 0,
-                                    choose(index == 16, 0,
-                                      choose(index == 17, 0,
-                                        choose(index == 18, 5,
-                                          choose(index == 19, 0,
-                                            choose(index == 20, 5,
-                                              choose(index == 21, 0,
-                                                choose(index == 22, 6,
-                                                  choose(index == 23, 6,
-                                                    choose(index == 24, 27,
-                                                      choose(index == 25, 7,
-                                                        choose(index == 26, 28,
-                                                          choose(index == 27, 8,
-                                                            choose(index == 28, 9, 0)))))))))))))))))))))))))))))
+    choose(index < 10, instruction_prefix_a_at(index),
+      choose(index < 27, instruction_ready_a_at(index - 10),
+        choose(index < 35, instruction_alternate_a_at(index - 27),
+          instruction_status_a_at(index - 35))))
 
   reckon build_instruction_ops(index : Number, output : Sequence) -> Sequence =
-    choose(index >= 30, output,
+    choose(index >= 42, output,
       build_instruction_ops(index + 1, sequence_append(output, instruction_op_at(index))))
 
   reckon build_instruction_a_values(index : Number, output : Sequence) -> Sequence =
-    choose(index >= 30, output,
+    choose(index >= 42, output,
       build_instruction_a_values(index + 1, sequence_append(output, instruction_a_at(index))))
 
   reckon instruction_ops() -> Sequence =
@@ -438,10 +463,10 @@ reality RCLSelfHostRuntimeStateLogicInterpreterStage14 {
     alter selfhost.stage_status <- "RCL_OWNED_RUNTIME_STATE_LOGIC_SUBSET_VERIFIED"
 
     preserve runtime.interpreter_supported == true
-      and target.rbc_size == 747
+      and target.rbc_size == 939
       and target.string_count == 10
       and target.number_count == 3
-      and target.instruction_count == 30
+      and target.instruction_count == 42
       and target.bytecode_magic_0 == 82
       and target.bytecode_magic_1 == 67
       and target.bytecode_magic_2 == 76

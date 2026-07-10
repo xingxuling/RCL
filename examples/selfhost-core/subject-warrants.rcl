@@ -1,0 +1,13 @@
+reality SelfHostSubjectFixture {
+  facet world.ready : Truth = true
+
+  subject founder {
+    facet score : Number = 2
+    warrant world.publish on world
+    warrant world.audit on world
+  }
+
+  subject auditor {
+    warrant world.audit on world
+  }
+}

@@ -1,0 +1,1365 @@
+reality RCLSelfHostDualNeedStage40 {
+  facet selfhost.stage : Text = "stage40_rcl_owned_dual_need_warrant_lowering_subset"
+  facet selfhost.stage_status : Text = "UNVERIFIED"
+  facet selfhost.claim : Text = "rcl_lowers_dual_needs_clauses_to_warrant_bytecode"
+  facet selfhost.boundary : Text = "dual_need_warrant_lowering_subset_not_complete_rule_parser_compiler_or_runtime"
+  facet selfhost.next_rewrite_target : Text = "rcl_owned_rule_parser_completion_and_compiler_self_emission"
+
+  facet gate.full_self_hosting : Truth = false
+  facet gate.rcl_owned_general_expression_parser_subset : Truth = true
+  facet gate.rcl_owned_rule_lowering_loop : Truth = true
+  facet gate.rcl_owned_facet_warrant_parser_subset : Truth = true
+  facet gate.rcl_owned_general_rule_directive_scaling_subset : Truth = true
+  facet gate.rcl_owned_multisubject_warrant_parser_subset : Truth = true
+  facet gate.rcl_owned_equality_expression_lowering_subset : Truth = true
+  facet gate.rcl_owned_comparison_operator_lowering_subset : Truth = true
+  facet gate.rcl_owned_arithmetic_operator_lowering_subset : Truth = true
+  facet gate.rcl_owned_boolean_connective_lowering_subset : Truth = true
+  facet gate.rcl_owned_unary_not_lowering_subset : Truth = true
+  facet gate.rcl_owned_dual_need_warrant_lowering_subset : Truth = true
+  facet gate.rcl_owned_runtime_complete : Truth = false
+  facet gate.rcl_owned_multirule_expression_source_lowering_subset : Truth = true
+  facet gate.rcl_owned_rule_expression_source_lowering_subset : Truth = true
+  facet gate.rcl_owned_parser_complete : Truth = false
+  facet gate.rcl_owned_expression_ast_complete : Truth = false
+  facet gate.rcl_owned_rule_bytecode_lowering_complete : Truth = false
+  facet gate.rcl_compiler_self_emits_without_stage0 : Truth = false
+  facet gate.native_vm_host_still_required : Truth = true
+
+  facet source.full : Text = "reality Stage40Target { facet world.ready : Truth = true facet world.status : Text = \"armed\" facet world.score : Number = 8 facet world.level : Number = 1 facet world.certified : Truth = false subject founder { warrant world.publish on world warrant world.promote on world warrant world.certify on world warrant world.seal on world } subject auditor { warrant world.audit on world warrant world.inspect on world } emergence publish { cause founder when not (world.status != \"armed\") and not (world.certified == true) needs world.publish on world needs world.promote on world alter world.score <- world.score + 2 preserve not (world.status == \"sleep\") and not (world.certified == true) witness \"rcl:stage40:add-not-and-dual-need\" } emergence promote { cause founder when not (world.score < 10) and not (world.ready == false) needs world.promote on world needs world.certify on world alter world.level <- world.level * 2 preserve not (world.level < 2) or not (world.certified == true) witness \"rcl:stage40:mul-not-or-dual-need\" } emergence certify { cause founder when not (world.level > 2) and not (world.ready == false) needs world.certify on world needs world.seal on world alter world.score <- world.score - 3 preserve not (world.score <= 6) and not (world.status != \"armed\") witness \"rcl:stage40:sub-not-and-dual-need\" } emergence seal { cause founder when not (world.score >= 8) and not (world.ready == false) needs world.seal on world needs world.publish on world alter world.score <- world.score / 2 preserve not (world.score > 4) or not (world.certified == true) witness \"rcl:stage40:div-not-or-dual-need\" } emergence audit { cause auditor when not (world.certified == true) and not (world.status != \"armed\") needs world.audit on world needs world.inspect on world alter world.score <- world.score + 1 preserve not (world.ready == false) and not (world.status != \"armed\") witness \"rcl:stage40:eq-not-and-dual-need\" } foresee publish realize publish foresee promote realize promote foresee certify realize certify foresee seal realize seal foresee audit realize audit }"
+  facet source.root : Text = "71e899db3794f862101f898dbf0549a534db488f4320f30d07585d523a25ce14"
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)),
+        scan_identifier_end(source, index + 1),
+        index))
+
+  reckon scan_number_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_digit(char_at(source, index)),
+        scan_number_end(source, index + 1),
+        index))
+
+  reckon scan_string_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\"",
+        index,
+        scan_string_end(source, index + 1)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_token("EOF", "<eof>", make_span(index, line, column, 0))),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(is_identifier_start(char_at(source, index)),
+          tokenize_from(
+            source,
+            scan_identifier_end(source, index + 1),
+            line,
+            column + scan_identifier_end(source, index + 1) - index,
+            sequence_append(output,
+              make_token(
+                "IDENT",
+                slice_text(source, index, scan_identifier_end(source, index + 1) - index),
+                make_span(index, line, column, scan_identifier_end(source, index + 1) - index)))),
+          choose(is_digit(char_at(source, index)),
+            tokenize_from(
+              source,
+              scan_number_end(source, index + 1),
+              line,
+              column + scan_number_end(source, index + 1) - index,
+              sequence_append(output,
+                make_token(
+                  "NUMBER",
+                  slice_text(source, index, scan_number_end(source, index + 1) - index),
+                  make_span(index, line, column, scan_number_end(source, index + 1) - index)))),
+            choose(char_at(source, index) == "\"",
+              tokenize_from(
+                source,
+                scan_string_end(source, index + 1) + 1,
+                line,
+                column + scan_string_end(source, index + 1) - index + 1,
+                sequence_append(output,
+                  make_token(
+                    "STRING",
+                    slice_text(source, index + 1, scan_string_end(source, index + 1) - index - 1),
+                    make_span(index, line, column, scan_string_end(source, index + 1) - index + 1)))),
+              tokenize_from(
+                source,
+                index + 1,
+                line,
+                column + 1,
+                sequence_append(output,
+                  make_token("SYMBOL", char_at(source, index), make_span(index, line, column, 1)))))))))
+
+  reckon checked_text(tokens : Sequence, index : Number, kind : Text, expected : Text) -> Text =
+    token_text(expect_token(sequence_get(tokens, index), kind, expected))
+
+  reckon checked_ident(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "IDENT", expected)
+
+  reckon checked_symbol(tokens : Sequence, index : Number, expected : Text) -> Text =
+    checked_text(tokens, index, "SYMBOL", expected)
+
+  reckon path_end(tokens : Sequence, index : Number) -> Number =
+    choose(token_text(sequence_get(tokens, index + 1)) == char_at(".", 0),
+      path_end(tokens, index + 2),
+      index + 1)
+
+  reckon path_text(tokens : Sequence, index : Number) -> Text =
+    choose(token_text(sequence_get(tokens, index + 1)) == char_at(".", 0),
+      token_text(expect_token(sequence_get(tokens, index), "IDENT", ""))
+        + char_at(".", 0)
+        + path_text(tokens, index + 2),
+      token_text(expect_token(sequence_get(tokens, index), "IDENT", "")))
+
+  reckon literal_kind_at(tokens : Sequence, index : Number) -> Text =
+    choose(token_kind(sequence_get(tokens, index)) == "NUMBER", "Number",
+      choose(token_kind(sequence_get(tokens, index)) == "STRING", "Text", "Truth"))
+
+  reckon expr_node(kind : Text, name : Text, value_type : Text, text_value : Text, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), kind),
+            name),
+          value_type),
+        text_value),
+      span)
+
+  reckon expr_kind_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon expr_name_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon expr_value_type_of(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon expr_text_of(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon expr_span_of(node : Sequence) -> Span = sequence_get(node, 4)
+
+  reckon literal_expr_node(tokens : Sequence, index : Number) -> Sequence =
+    expr_node(
+      "LiteralExpr",
+      "",
+      literal_kind_at(tokens, index),
+      token_text(expect_token(sequence_get(tokens, index), token_kind(sequence_get(tokens, index)), "")),
+      token_span(sequence_get(tokens, index)))
+
+  reckon path_expr_node(tokens : Sequence, index : Number) -> Sequence =
+    expr_node(
+      "PathExpr",
+      "",
+      "",
+      path_text(tokens, index),
+      token_span(sequence_get(tokens, index)))
+
+  reckon binary_expr_node(operator : Text, left : Sequence, right : Sequence, span : Span) -> Sequence =
+    expr_node("BinaryExpr", operator, "", "", span)
+
+  reckon facet_node(path : Text, value_type : Text, expr : Sequence, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), path),
+          value_type),
+        expr),
+      span)
+
+  reckon facet_path_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon facet_type_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon facet_expr_of(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon facet_span_of_node(node : Sequence) -> Span = sequence_get(node, 3)
+
+  reckon facet_colon_index(tokens : Sequence, start : Number) -> Number =
+    path_end(tokens, start + 1)
+
+  reckon facet_type_start(tokens : Sequence, start : Number) -> Number =
+    facet_colon_index(tokens, start) + 1
+
+  reckon facet_equals_index(tokens : Sequence, start : Number) -> Number =
+    path_end(tokens, facet_type_start(tokens, start))
+
+  reckon facet_expr_start(tokens : Sequence, start : Number) -> Number =
+    facet_equals_index(tokens, start) + 1
+
+  reckon after_literal_facet(tokens : Sequence, start : Number) -> Number =
+    facet_expr_start(tokens, start) + 1
+
+  reckon parse_literal_facet(tokens : Sequence, start : Number) -> Sequence =
+    facet_node(
+      path_text(tokens, start + 1),
+      token_text(expect_token(sequence_get(tokens, facet_type_start(tokens, start)), "IDENT", "")),
+      literal_expr_node(tokens, facet_expr_start(tokens, start)),
+      token_span(sequence_get(tokens, start)))
+
+  reckon warrant_node(subject : Text, capability : Text, target : Text, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), subject),
+          capability),
+        target),
+      span)
+
+  reckon warrant_subject_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon warrant_capability_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon warrant_target_of(node : Sequence) -> Text = sequence_get(node, 2)
+
+  reckon subject_node(name : Text, warrants : Sequence, span : Span) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), name),
+        warrants),
+      span)
+
+  reckon subject_name_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon subject_warrants_of(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon subject_capability_one_of(node : Sequence) -> Text = warrant_capability_of(sequence_get(subject_warrants_of(node), 0))
+  reckon subject_target_one_of(node : Sequence) -> Text = warrant_target_of(sequence_get(subject_warrants_of(node), 0))
+  reckon subject_capability_two_of(node : Sequence) -> Text = warrant_capability_of(sequence_get(subject_warrants_of(node), 1))
+  reckon subject_target_two_of(node : Sequence) -> Text = warrant_target_of(sequence_get(subject_warrants_of(node), 1))
+  reckon subject_capability_three_of(node : Sequence) -> Text = warrant_capability_of(sequence_get(subject_warrants_of(node), 2))
+  reckon subject_target_three_of(node : Sequence) -> Text = warrant_target_of(sequence_get(subject_warrants_of(node), 2))
+
+  reckon emergence_node(
+    name : Text,
+    cause : Text,
+    when_left : Text,
+    when_operator : Text,
+    when_right : Text,
+    need_capability : Text,
+    need_target : Text,
+    alter_target : Text,
+    alter_left : Text,
+    alter_operator : Text,
+    alter_right : Text,
+    preserve_left : Text,
+    preserve_operator : Text,
+    preserve_right : Text,
+    witness : Text,
+    span : Span,
+    when_connective : Text,
+    when_second_left : Text,
+    when_second_operator : Text,
+    when_second_right : Text,
+    preserve_connective : Text,
+    preserve_second_left : Text,
+    preserve_second_operator : Text,
+    preserve_second_right : Text,
+    second_need_capability : Text,
+    second_need_target : Text
+  ) -> Sequence =
+    sequence_concat(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(
+                            sequence_append(
+                              sequence_append(empty_sequence(), name),
+                              cause),
+                            when_left),
+                          when_operator),
+                        when_right),
+                      need_capability),
+                    need_target),
+                  alter_target),
+                alter_left),
+              alter_operator),
+            alter_right),
+          preserve_left),
+        preserve_operator),
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(
+                            sequence_append(
+                              sequence_append(empty_sequence(), preserve_right),
+                              witness),
+                            span),
+                          when_connective),
+                        when_second_left),
+                      when_second_operator),
+                    when_second_right),
+                  preserve_connective),
+                preserve_second_left),
+              preserve_second_operator),
+            preserve_second_right),
+          second_need_capability),
+        second_need_target))
+
+  reckon rule_name_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon rule_cause_of(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon rule_when_left_of(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon rule_when_operator_of(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon rule_when_right_of(node : Sequence) -> Text = sequence_get(node, 4)
+  reckon rule_need_capability_of(node : Sequence) -> Text = sequence_get(node, 5)
+  reckon rule_need_target_of(node : Sequence) -> Text = sequence_get(node, 6)
+  reckon rule_alter_target_of(node : Sequence) -> Text = sequence_get(node, 7)
+  reckon rule_alter_left_of(node : Sequence) -> Text = sequence_get(node, 8)
+  reckon rule_alter_operator_of(node : Sequence) -> Text = sequence_get(node, 9)
+  reckon rule_alter_right_of(node : Sequence) -> Text = sequence_get(node, 10)
+  reckon rule_preserve_left_of(node : Sequence) -> Text = sequence_get(node, 11)
+  reckon rule_preserve_operator_of(node : Sequence) -> Text = sequence_get(node, 12)
+  reckon rule_preserve_right_of(node : Sequence) -> Text = sequence_get(node, 13)
+  reckon rule_witness_of(node : Sequence) -> Text = sequence_get(node, 14)
+  reckon rule_when_connective_of(node : Sequence) -> Text = sequence_get(node, 16)
+  reckon rule_when_second_left_of(node : Sequence) -> Text = sequence_get(node, 17)
+  reckon rule_when_second_operator_of(node : Sequence) -> Text = sequence_get(node, 18)
+  reckon rule_when_second_right_of(node : Sequence) -> Text = sequence_get(node, 19)
+  reckon rule_preserve_connective_of(node : Sequence) -> Text = sequence_get(node, 20)
+  reckon rule_preserve_second_left_of(node : Sequence) -> Text = sequence_get(node, 21)
+  reckon rule_preserve_second_operator_of(node : Sequence) -> Text = sequence_get(node, 22)
+  reckon rule_preserve_second_right_of(node : Sequence) -> Text = sequence_get(node, 23)
+  reckon rule_second_need_capability_of(node : Sequence) -> Text = sequence_get(node, 24)
+  reckon rule_second_need_target_of(node : Sequence) -> Text = sequence_get(node, 25)
+
+  reckon find_token_text(tokens : Sequence, index : Number, text_value : Text) -> Number =
+    choose(index >= length(tokens), -1,
+      choose(token_text(sequence_get(tokens, index)) == text_value,
+        index,
+        find_token_text(tokens, index + 1, text_value)))
+
+  reckon find_token_text_after(tokens : Sequence, index : Number, text_value : Text) -> Number =
+    find_token_text(tokens, index + 1, text_value)
+
+  reckon collect_token_starts(tokens : Sequence, index : Number, text_value : Text, output : Sequence) -> Sequence =
+    choose(index >= length(tokens), output,
+      collect_token_starts(
+        tokens,
+        index + 1,
+        text_value,
+        choose(token_text(sequence_get(tokens, index)) == text_value,
+          sequence_append(output, index),
+          output)))
+
+  reckon collect_token_starts_until(tokens : Sequence, index : Number, end : Number, text_value : Text, output : Sequence) -> Sequence =
+    choose(index >= end, output,
+      collect_token_starts_until(
+        tokens,
+        index + 1,
+        end,
+        text_value,
+        choose(token_text(sequence_get(tokens, index)) == text_value,
+          sequence_append(output, index),
+          output)))
+
+  reckon directive_node(kind : Text, rule_name : Text) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), kind), rule_name)
+
+  reckon directive_kind_of(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon directive_rule_name_of(node : Sequence) -> Text = sequence_get(node, 1)
+
+  reckon collect_directives(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(tokens), output,
+      choose(token_text(sequence_get(tokens, index)) == "foresee",
+        collect_directives(
+          tokens,
+          index + 2,
+          sequence_append(output, directive_node("foresee", checked_ident(tokens, index + 1, "")))),
+        choose(token_text(sequence_get(tokens, index)) == "realize",
+          collect_directives(
+            tokens,
+            index + 2,
+            sequence_append(output, directive_node("realize", checked_ident(tokens, index + 1, "")))),
+          collect_directives(tokens, index + 1, output))))
+
+  reckon parse_rules_from_starts(tokens : Sequence, starts : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(starts), output,
+      parse_rules_from_starts(
+        tokens,
+        starts,
+        index + 1,
+        sequence_append(output, parse_emergence(tokens, sequence_get(starts, index)))))
+
+  reckon parse_facets_from_starts(tokens : Sequence, starts : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(starts), output,
+      parse_facets_from_starts(
+        tokens,
+        starts,
+        index + 1,
+        sequence_append(output, parse_literal_facet(tokens, sequence_get(starts, index)))))
+
+  reckon parse_warrant(tokens : Sequence, start : Number, subject_name : Text) -> Sequence =
+    warrant_node(
+      subject_name,
+      path_text(tokens, start + 1),
+      token_text(expect_token(sequence_get(tokens, path_end(tokens, start + 1) + 1), "IDENT", "")),
+      token_span(sequence_get(tokens, start)))
+
+  reckon parse_warrants_from_starts(tokens : Sequence, starts : Sequence, subject_name : Text, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(starts), output,
+      parse_warrants_from_starts(
+        tokens,
+        starts,
+        subject_name,
+        index + 1,
+        sequence_append(output, parse_warrant(tokens, sequence_get(starts, index), subject_name))))
+
+  reckon subject_end(tokens : Sequence, start : Number) -> Number =
+    find_token_text(tokens, start + 1, "}")
+
+  reckon subject_warrant_starts(tokens : Sequence, start : Number) -> Sequence =
+    collect_token_starts_until(tokens, start + 1, subject_end(tokens, start), "warrant", empty_sequence())
+
+  reckon parse_subject(tokens : Sequence, start : Number) -> Sequence =
+    subject_node(
+      token_text(expect_token(sequence_get(tokens, start + 1), "IDENT", "")),
+      parse_warrants_from_starts(
+        tokens,
+        subject_warrant_starts(tokens, start),
+        token_text(expect_token(sequence_get(tokens, start + 1), "IDENT", "")),
+        0,
+        empty_sequence()),
+      token_span(sequence_get(tokens, start)))
+
+  reckon parse_subjects_from_starts(tokens : Sequence, starts : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(starts), output,
+      parse_subjects_from_starts(
+        tokens,
+        starts,
+        index + 1,
+        sequence_append(output, parse_subject(tokens, sequence_get(starts, index)))))
+
+  reckon append_subject_warrants(subjects : Sequence, subject_index : Number, warrant_index : Number, output : Sequence) -> Sequence =
+    choose(subject_index >= length(subjects), output,
+      choose(warrant_index >= length(subject_warrants_of(sequence_get(subjects, subject_index))),
+        append_subject_warrants(subjects, subject_index + 1, 0, output),
+        append_subject_warrants(
+          subjects,
+          subject_index,
+          warrant_index + 1,
+          sequence_append(output, sequence_get(subject_warrants_of(sequence_get(subjects, subject_index)), warrant_index)))))
+
+  reckon comparison_op_index(tokens : Sequence, path_start : Number) -> Number =
+    path_end(tokens, path_start)
+
+  reckon comparison_has_equals_tail(tokens : Sequence, path_start : Number) -> Truth =
+    choose(token_kind(sequence_get(tokens, comparison_op_index(tokens, path_start) + 1)) == "SYMBOL",
+      token_text(sequence_get(tokens, comparison_op_index(tokens, path_start) + 1)) == char_at("=", 0),
+      false)
+
+  reckon comparison_operator_at(tokens : Sequence, path_start : Number) -> Text =
+    choose(comparison_has_equals_tail(tokens, path_start),
+      token_text(expect_token(sequence_get(tokens, comparison_op_index(tokens, path_start)), "SYMBOL", ""))
+        + token_text(expect_token(sequence_get(tokens, comparison_op_index(tokens, path_start) + 1), "SYMBOL", "")),
+      token_text(expect_token(sequence_get(tokens, comparison_op_index(tokens, path_start)), "SYMBOL", "")))
+
+  reckon comparison_right_index(tokens : Sequence, path_start : Number) -> Number =
+    choose(comparison_has_equals_tail(tokens, path_start),
+      comparison_op_index(tokens, path_start) + 2,
+      comparison_op_index(tokens, path_start) + 1)
+
+  reckon unary_comparison_path_start(tokens : Sequence, expression_start : Number) -> Number =
+    expression_start + 2
+
+  reckon comparison_connective_index(tokens : Sequence, path_start : Number) -> Number =
+    comparison_right_index(tokens, path_start) + 2
+
+  reckon second_comparison_start(tokens : Sequence, path_start : Number) -> Number =
+    comparison_right_index(tokens, path_start) + 3
+
+  reckon when_path_start(tokens : Sequence, start : Number) -> Number =
+    unary_comparison_path_start(tokens, find_token_text(tokens, start, "when") + 1)
+
+  reckon when_second_path_start(tokens : Sequence, start : Number) -> Number =
+    unary_comparison_path_start(tokens, second_comparison_start(tokens, when_path_start(tokens, start)))
+
+  reckon preserve_path_start(tokens : Sequence, start : Number) -> Number =
+    unary_comparison_path_start(tokens, find_token_text(tokens, start, "preserve") + 1)
+
+  reckon preserve_second_path_start(tokens : Sequence, start : Number) -> Number =
+    unary_comparison_path_start(tokens, second_comparison_start(tokens, preserve_path_start(tokens, start)))
+
+  reckon first_need_start(tokens : Sequence, start : Number) -> Number =
+    find_token_text(tokens, start, "needs")
+
+  reckon second_need_start(tokens : Sequence, start : Number) -> Number =
+    find_token_text_after(tokens, first_need_start(tokens, start), "needs")
+
+  reckon need_capability_at(tokens : Sequence, need_start : Number) -> Text =
+    path_text(tokens, need_start + 1)
+
+  reckon need_target_at(tokens : Sequence, need_start : Number) -> Text =
+    token_text(expect_token(sequence_get(tokens, path_end(tokens, need_start + 1) + 1), "IDENT", ""))
+
+  reckon parse_emergence(tokens : Sequence, start : Number) -> Sequence =
+    emergence_node(
+      token_text(expect_token(sequence_get(tokens, start + 1), "IDENT", "")),
+      token_text(expect_token(sequence_get(tokens, find_token_text(tokens, start, "cause") + 1), "IDENT", "")),
+      path_text(tokens, when_path_start(tokens, start)),
+      comparison_operator_at(tokens, when_path_start(tokens, start)),
+      token_text(sequence_get(tokens, comparison_right_index(tokens, when_path_start(tokens, start)))),
+      need_capability_at(tokens, first_need_start(tokens, start)),
+      need_target_at(tokens, first_need_start(tokens, start)),
+      path_text(tokens, find_token_text(tokens, start, "alter") + 1),
+      path_text(tokens, path_end(tokens, find_token_text(tokens, start, "alter") + 1) + 2),
+      token_text(expect_token(sequence_get(tokens, path_end(tokens, path_end(tokens, find_token_text(tokens, start, "alter") + 1) + 2)), "SYMBOL", "")),
+      token_text(expect_token(sequence_get(tokens, path_end(tokens, path_end(tokens, find_token_text(tokens, start, "alter") + 1) + 2) + 1), "NUMBER", "")),
+      path_text(tokens, preserve_path_start(tokens, start)),
+      comparison_operator_at(tokens, preserve_path_start(tokens, start)),
+      token_text(sequence_get(tokens, comparison_right_index(tokens, preserve_path_start(tokens, start)))),
+      token_text(expect_token(sequence_get(tokens, find_token_text(tokens, start, "witness") + 1), "STRING", "")),
+      token_span(sequence_get(tokens, start)),
+      token_text(sequence_get(tokens, comparison_connective_index(tokens, when_path_start(tokens, start)))),
+      path_text(tokens, when_second_path_start(tokens, start)),
+      comparison_operator_at(tokens, when_second_path_start(tokens, start)),
+      token_text(sequence_get(tokens, comparison_right_index(tokens, when_second_path_start(tokens, start)))),
+      token_text(sequence_get(tokens, comparison_connective_index(tokens, preserve_path_start(tokens, start)))),
+      path_text(tokens, preserve_second_path_start(tokens, start)),
+      comparison_operator_at(tokens, preserve_second_path_start(tokens, start)),
+      token_text(sequence_get(tokens, comparison_right_index(tokens, preserve_second_path_start(tokens, start)))),
+      need_capability_at(tokens, second_need_start(tokens, start)),
+      need_target_at(tokens, second_need_start(tokens, start)))
+
+  reckon find_text(items : Sequence, index : Number, text_value : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(items, index) == text_value,
+        index,
+        find_text(items, index + 1, text_value)))
+
+  reckon append_unique_text(items : Sequence, value : Text) -> Sequence =
+    choose(find_text(items, 0, value) >= 0, items, sequence_append(items, value))
+
+  reckon find_number(items : Sequence, index : Number, number_value : Number) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(items, index) == number_value,
+        index,
+        find_number(items, index + 1, number_value)))
+
+  reckon append_unique_number(items : Sequence, value : Number) -> Sequence =
+    choose(find_number(items, 0, value) >= 0, items, sequence_append(items, value))
+
+  reckon text_all_digits(value : Text, index : Number) -> Truth =
+    choose(index >= length(value), true,
+      is_digit(char_at(value, index)) and text_all_digits(value, index + 1))
+
+  reckon literal_is_number_text(value : Text) -> Truth =
+    length(value) > 0 and text_all_digits(value, 0)
+
+  reckon literal_is_truth_text(value : Text) -> Truth =
+    value == "true" or value == "false"
+
+  reckon literal_is_text_value(value : Text) -> Truth =
+    not literal_is_number_text(value) and not literal_is_truth_text(value)
+
+  reckon append_literal_number(numbers : Sequence, value : Text) -> Sequence =
+    choose(literal_is_number_text(value),
+      append_unique_number(numbers, number_from_text(value)),
+      numbers)
+
+  reckon append_literal_string(strings : Sequence, value : Text) -> Sequence =
+    choose(literal_is_text_value(value),
+      append_unique_text(strings, value),
+      strings)
+
+  reckon literal_push_opcode(value : Text) -> Number =
+    choose(literal_is_number_text(value), 1,
+      choose(literal_is_truth_text(value), 2, 3))
+
+  reckon literal_bool_a_value(value : Text) -> Number =
+    choose(value == "true", 1, 0)
+
+  reckon literal_push_a_value(value : Text, strings : Sequence, numbers : Sequence) -> Number =
+    choose(literal_is_number_text(value),
+      number_index(numbers, number_from_text(value)),
+      choose(literal_is_truth_text(value),
+        literal_bool_a_value(value),
+        string_index(strings, value)))
+
+  reckon binary_opcode(operator : Text) -> Number =
+    choose(operator == "==", 10,
+      choose(operator == "!=", 11,
+        choose(operator == "<", 12,
+          choose(operator == "<=", 13,
+            choose(operator == ">", 14, 15)))))
+
+  reckon arithmetic_opcode(operator : Text) -> Number =
+    choose(operator == char_at("+-*/", 0), 6,
+      choose(operator == char_at("+-*/", 1), 7,
+        choose(operator == char_at("+-*/", 2), 8, 9)))
+
+  reckon boolean_connective_opcode(operator : Text) -> Number =
+    choose(operator == "and", 16, 17)
+
+  reckon rule_by_name(rules : Sequence, index : Number, name : Text) -> Sequence =
+    choose(index >= length(rules), sequence_get(rules, 0),
+      choose(rule_name_of(sequence_get(rules, index)) == name,
+        sequence_get(rules, index),
+        rule_by_name(rules, index + 1, name)))
+
+  reckon facet_matches(facets : Sequence, index : Number, path : Text, value_type : Text, text_value : Text) -> Truth =
+    facet_path_of(sequence_get(facets, index)) == path
+      and facet_type_of(sequence_get(facets, index)) == value_type
+      and expr_text_of(facet_expr_of(sequence_get(facets, index))) == text_value
+
+  reckon warrant_matches(warrants : Sequence, index : Number, subject : Text, capability : Text, target : Text) -> Truth =
+    warrant_subject_of(sequence_get(warrants, index)) == subject
+      and warrant_capability_of(sequence_get(warrants, index)) == capability
+      and warrant_target_of(sequence_get(warrants, index)) == target
+
+  reckon rule_matches(
+    rule : Sequence,
+    name : Text,
+    cause : Text,
+    when_left : Text,
+    when_operator : Text,
+    when_right : Text,
+    need_capability : Text,
+    need_target : Text,
+    second_need_capability : Text,
+    second_need_target : Text,
+    alter_target : Text,
+    alter_left : Text,
+    alter_operator : Text,
+    alter_right : Text,
+    preserve_left : Text,
+    preserve_operator : Text,
+    preserve_right : Text,
+    witness : Text
+  ) -> Truth =
+    rule_name_of(rule) == name
+      and rule_cause_of(rule) == cause
+      and rule_when_left_of(rule) == when_left
+      and rule_when_operator_of(rule) == when_operator
+      and rule_when_right_of(rule) == when_right
+      and rule_need_capability_of(rule) == need_capability
+      and rule_need_target_of(rule) == need_target
+      and rule_second_need_capability_of(rule) == second_need_capability
+      and rule_second_need_target_of(rule) == second_need_target
+      and rule_alter_target_of(rule) == alter_target
+      and rule_alter_left_of(rule) == alter_left
+      and rule_alter_operator_of(rule) == alter_operator
+      and rule_alter_right_of(rule) == alter_right
+      and rule_preserve_left_of(rule) == preserve_left
+      and rule_preserve_operator_of(rule) == preserve_operator
+      and rule_preserve_right_of(rule) == preserve_right
+      and rule_witness_of(rule) == witness
+
+  reckon directive_matches(directives : Sequence, index : Number, kind : Text, rule_name : Text) -> Truth =
+    directive_kind_of(sequence_get(directives, index)) == kind
+      and directive_rule_name_of(sequence_get(directives, index)) == rule_name
+
+  reckon append_facet_strings(strings : Sequence, facets : Sequence, index : Number) -> Sequence =
+    choose(index >= length(facets), strings,
+      append_facet_strings(
+        append_unique_text(
+          choose(facet_type_of(sequence_get(facets, index)) == "Text",
+            append_unique_text(strings, expr_text_of(facet_expr_of(sequence_get(facets, index)))),
+            strings),
+          facet_path_of(sequence_get(facets, index))),
+        facets,
+        index + 1))
+
+  reckon append_warrant_strings(strings : Sequence, warrants : Sequence, index : Number) -> Sequence =
+    choose(index >= length(warrants), strings,
+      append_warrant_strings(
+        append_unique_text(
+          append_unique_text(
+            append_unique_text(strings, warrant_subject_of(sequence_get(warrants, index))),
+            warrant_capability_of(sequence_get(warrants, index))),
+          warrant_target_of(sequence_get(warrants, index))),
+        warrants,
+        index + 1))
+
+  reckon build_target_string_base() -> Sequence =
+    append_warrant_strings(
+      append_facet_strings(
+        append_unique_text(
+          append_unique_text(empty_sequence(), compiler.program),
+          source.root),
+        compiler.facets,
+        0),
+      compiler.warrants,
+      0)
+
+  reckon build_rule_strings(strings : Sequence, rules : Sequence, index : Number) -> Sequence =
+    choose(index >= length(rules), strings,
+      build_rule_strings(
+        append_unique_text(
+          append_literal_string(
+            append_literal_string(
+              append_literal_string(
+                append_unique_text(
+                  append_literal_string(strings, rule_when_right_of(sequence_get(rules, index))),
+                  rule_name_of(sequence_get(rules, index))),
+                rule_when_second_right_of(sequence_get(rules, index))),
+              rule_preserve_right_of(sequence_get(rules, index))),
+            rule_preserve_second_right_of(sequence_get(rules, index))),
+          rule_witness_of(sequence_get(rules, index))),
+        rules,
+        index + 1))
+
+  reckon build_target_strings() -> Sequence =
+    build_rule_strings(build_target_string_base(), compiler.rules, 0)
+
+  reckon append_facet_number(numbers : Sequence, facet : Sequence) -> Sequence =
+    choose(facet_type_of(facet) == "Number",
+      append_unique_number(numbers, number_from_text(expr_text_of(facet_expr_of(facet)))),
+      numbers)
+
+  reckon build_facet_numbers(numbers : Sequence, facets : Sequence, index : Number) -> Sequence =
+    choose(index >= length(facets), numbers,
+      build_facet_numbers(
+        append_facet_number(numbers, sequence_get(facets, index)),
+        facets,
+        index + 1))
+
+  reckon append_rule_numbers(numbers : Sequence, rule : Sequence) -> Sequence =
+    append_literal_number(
+      append_literal_number(
+        append_literal_number(
+          append_literal_number(
+            append_literal_number(numbers, rule_when_right_of(rule)),
+            rule_when_second_right_of(rule)),
+          rule_alter_right_of(rule)),
+        rule_preserve_right_of(rule)),
+      rule_preserve_second_right_of(rule))
+
+  reckon build_directive_numbers(numbers : Sequence, index : Number) -> Sequence =
+    choose(index >= length(compiler.directives), numbers,
+      build_directive_numbers(
+        append_rule_numbers(
+          numbers,
+          rule_by_name(compiler.rules, 0, directive_rule_name_of(sequence_get(compiler.directives, index)))),
+        index + 1))
+
+  reckon build_target_numbers() -> Sequence =
+    build_directive_numbers(
+      build_facet_numbers(empty_sequence(), compiler.facets, 0),
+      0)
+
+  reckon string_index(strings : Sequence, value : Text) -> Number =
+    find_text(strings, 0, value)
+
+  reckon number_index(numbers : Sequence, value : Number) -> Number =
+    find_number(numbers, 0, value)
+
+  reckon facet_instruction_count() -> Number =
+    length(compiler.facets) * 2
+
+  reckon instruction_base_count() -> Number =
+    facet_instruction_count() + length(compiler.warrants)
+
+  reckon instruction_count() -> Number =
+    instruction_base_count() + length(compiler.directives) * 39 + 1
+
+  reckon instruction_group_at_from(index : Number, group : Number, start : Number) -> Number =
+    choose(index < start + 39,
+      group,
+      instruction_group_at_from(index, group + 1, start + 39))
+
+  reckon instruction_group_at(index : Number) -> Number =
+    instruction_group_at_from(index, 0, instruction_base_count())
+
+  reckon instruction_local_at(index : Number) -> Number =
+    index - (instruction_base_count() + instruction_group_at(index) * 39)
+
+  reckon instruction_group_start_at(index : Number) -> Number =
+    instruction_base_count() + instruction_group_at(index) * 39
+
+  reckon instruction_rule_at(index : Number) -> Sequence =
+    rule_by_name(
+      compiler.rules,
+      0,
+      directive_rule_name_of(sequence_get(compiler.directives, instruction_group_at(index))))
+
+  reckon instruction_mode_at(index : Number) -> Number =
+    choose(directive_kind_of(sequence_get(compiler.directives, instruction_group_at(index))) == "realize", 1, 0)
+
+  reckon instruction_jump_target_at(index : Number) -> Number =
+    choose(instruction_group_at(index) + 1 >= length(compiler.directives),
+      instruction_count() - 1,
+      instruction_base_count() + (instruction_group_at(index) + 1) * 39)
+
+  reckon instruction_when_left_at(index : Number) -> Text =
+    rule_when_left_of(instruction_rule_at(index))
+
+  reckon instruction_when_right_at(index : Number) -> Text =
+    rule_when_right_of(instruction_rule_at(index))
+
+  reckon instruction_when_operator_at(index : Number) -> Text =
+    rule_when_operator_of(instruction_rule_at(index))
+
+  reckon instruction_when_connective_at(index : Number) -> Text =
+    rule_when_connective_of(instruction_rule_at(index))
+
+  reckon instruction_when_second_left_at(index : Number) -> Text =
+    rule_when_second_left_of(instruction_rule_at(index))
+
+  reckon instruction_when_second_right_at(index : Number) -> Text =
+    rule_when_second_right_of(instruction_rule_at(index))
+
+  reckon instruction_when_second_operator_at(index : Number) -> Text =
+    rule_when_second_operator_of(instruction_rule_at(index))
+
+  reckon instruction_rule_name_at(index : Number) -> Text =
+    rule_name_of(instruction_rule_at(index))
+
+  reckon instruction_rule_cause_at(index : Number) -> Text =
+    rule_cause_of(instruction_rule_at(index))
+
+  reckon instruction_need_capability_at(index : Number) -> Text =
+    rule_need_capability_of(instruction_rule_at(index))
+
+  reckon instruction_need_target_at(index : Number) -> Text =
+    rule_need_target_of(instruction_rule_at(index))
+
+  reckon instruction_second_need_capability_at(index : Number) -> Text =
+    rule_second_need_capability_of(instruction_rule_at(index))
+
+  reckon instruction_second_need_target_at(index : Number) -> Text =
+    rule_second_need_target_of(instruction_rule_at(index))
+
+  reckon instruction_alter_target_at(index : Number) -> Text =
+    rule_alter_target_of(instruction_rule_at(index))
+
+  reckon instruction_alter_left_at(index : Number) -> Text =
+    rule_alter_left_of(instruction_rule_at(index))
+
+  reckon instruction_alter_operator_at(index : Number) -> Text =
+    rule_alter_operator_of(instruction_rule_at(index))
+
+  reckon instruction_alter_right_at(index : Number) -> Text =
+    rule_alter_right_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_left_at(index : Number) -> Text =
+    rule_preserve_left_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_right_at(index : Number) -> Text =
+    rule_preserve_right_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_operator_at(index : Number) -> Text =
+    rule_preserve_operator_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_connective_at(index : Number) -> Text =
+    rule_preserve_connective_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_second_left_at(index : Number) -> Text =
+    rule_preserve_second_left_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_second_right_at(index : Number) -> Text =
+    rule_preserve_second_right_of(instruction_rule_at(index))
+
+  reckon instruction_preserve_second_operator_at(index : Number) -> Text =
+    rule_preserve_second_operator_of(instruction_rule_at(index))
+
+  reckon instruction_witness_at(index : Number) -> Text =
+    rule_witness_of(instruction_rule_at(index))
+
+  reckon facet_index_at_from(index : Number, facet_index : Number, start : Number) -> Number =
+    choose(index < start + 2,
+      facet_index,
+      facet_index_at_from(index, facet_index + 1, start + 2))
+
+  reckon facet_index_at_instruction(index : Number) -> Number =
+    facet_index_at_from(index, 0, 0)
+
+  reckon facet_local_at(index : Number) -> Number =
+    index - facet_index_at_instruction(index) * 2
+
+  reckon instruction_facet_at(index : Number) -> Sequence =
+    sequence_get(compiler.facets, facet_index_at_instruction(index))
+
+  reckon warrant_index_at(index : Number) -> Number =
+    index - facet_instruction_count()
+
+  reckon instruction_warrant_at(index : Number) -> Sequence =
+    sequence_get(compiler.warrants, warrant_index_at(index))
+
+  reckon facet_push_opcode(facet : Sequence) -> Number =
+    choose(facet_type_of(facet) == "Number", 1,
+      choose(facet_type_of(facet) == "Truth", 2, 3))
+
+  reckon literal_truth_value(expr : Sequence) -> Number =
+    choose(expr_text_of(expr) == "true", 1, 0)
+
+  reckon facet_push_a_value(facet : Sequence, strings : Sequence, numbers : Sequence) -> Number =
+    choose(facet_type_of(facet) == "Number",
+      number_index(numbers, number_from_text(expr_text_of(facet_expr_of(facet)))),
+      choose(facet_type_of(facet) == "Truth",
+        literal_truth_value(facet_expr_of(facet)),
+        string_index(strings, expr_text_of(facet_expr_of(facet)))))
+
+  reckon short_circuit_instruction_op_at(
+    local : Number,
+    connective : Text,
+    left_right : Text,
+    left_operator : Text,
+    right_right : Text,
+    right_operator : Text
+  ) -> Number =
+    choose(local == 0, 4,
+      choose(local == 1, literal_push_opcode(left_right),
+        choose(local == 2, binary_opcode(left_operator),
+          choose(local == 3, 18,
+            choose(local == 4, 21,
+              choose(connective == "and",
+                choose(local == 5, 4,
+                  choose(local == 6, literal_push_opcode(right_right),
+                    choose(local == 7, binary_opcode(right_operator),
+                      choose(local == 8 or local == 9 or local == 10, 18,
+                        choose(local == 11, 20, 2))))),
+                choose(local == 5, 2,
+                  choose(local == 6, 20,
+                    choose(local == 7, 4,
+                      choose(local == 8, literal_push_opcode(right_right),
+                        choose(local == 9, binary_opcode(right_operator), 18)))))))))))
+
+  reckon short_circuit_instruction_a_at(
+    local : Number,
+    connective : Text,
+    left_path : Text,
+    left_right : Text,
+    right_path : Text,
+    right_right : Text,
+    expression_start : Number,
+    strings : Sequence,
+    numbers : Sequence
+  ) -> Number =
+    choose(local == 0, string_index(strings, left_path),
+      choose(local == 1, literal_push_a_value(left_right, strings, numbers),
+        choose(local == 4, expression_start + choose(connective == "and", 12, 7),
+          choose(connective == "and",
+            choose(local == 5, string_index(strings, right_path),
+              choose(local == 6, literal_push_a_value(right_right, strings, numbers),
+                choose(local == 11, expression_start + 13, 0))),
+            choose(local == 5, 1,
+              choose(local == 6, expression_start + 13,
+                choose(local == 7, string_index(strings, right_path),
+                  choose(local == 8, literal_push_a_value(right_right, strings, numbers), 0))))))))
+
+  reckon rule_instruction_op_at(local : Number, index : Number) -> Number =
+    choose(local < 13,
+      short_circuit_instruction_op_at(
+        local,
+        instruction_when_connective_at(index),
+        instruction_when_right_at(index),
+        instruction_when_operator_at(index),
+        instruction_when_second_right_at(index),
+        instruction_when_second_operator_at(index)),
+      choose(local == 13, 21,
+        choose(local == 14, 23,
+          choose(local == 15 or local == 16, 24,
+            choose(local == 17, 4,
+              choose(local == 18, 1,
+                choose(local == 19, arithmetic_opcode(instruction_alter_operator_at(index)),
+                  choose(local == 20, 25,
+                    choose(local == 21, 26,
+                      choose(local < 35,
+                        short_circuit_instruction_op_at(
+                          local - 22,
+                          instruction_preserve_connective_at(index),
+                          instruction_preserve_right_at(index),
+                          instruction_preserve_operator_at(index),
+                          instruction_preserve_second_right_at(index),
+                          instruction_preserve_second_operator_at(index)),
+                        choose(local == 35, 27,
+                          choose(local == 36, 26,
+                            choose(local == 37, 28, 29)))))))))))))
+
+  reckon instruction_op_at(index : Number) -> Number =
+    choose(index < facet_instruction_count(),
+      choose(facet_local_at(index) == 0, facet_push_opcode(instruction_facet_at(index)), 5),
+      choose(index < instruction_base_count(), 22,
+        choose(index == instruction_count() - 1, 31,
+          rule_instruction_op_at(instruction_local_at(index), index))))
+
+  reckon rule_instruction_a_at(local : Number, index : Number, strings : Sequence, numbers : Sequence) -> Number =
+    choose(local < 13,
+      short_circuit_instruction_a_at(
+        local,
+        instruction_when_connective_at(index),
+        instruction_when_left_at(index),
+        instruction_when_right_at(index),
+        instruction_when_second_left_at(index),
+        instruction_when_second_right_at(index),
+        instruction_group_start_at(index),
+        strings,
+        numbers),
+      choose(local == 13, instruction_jump_target_at(index),
+        choose(local == 14, instruction_mode_at(index),
+          choose(local == 15 or local == 16, string_index(strings, instruction_rule_cause_at(index)),
+            choose(local == 17, string_index(strings, instruction_alter_left_at(index)),
+              choose(local == 18, number_index(numbers, number_from_text(instruction_alter_right_at(index))),
+                choose(local == 20, string_index(strings, instruction_alter_target_at(index)),
+                  choose(local == 21, 1,
+                    choose(local < 35,
+                      short_circuit_instruction_a_at(
+                        local - 22,
+                        instruction_preserve_connective_at(index),
+                        instruction_preserve_left_at(index),
+                        instruction_preserve_right_at(index),
+                        instruction_preserve_second_left_at(index),
+                        instruction_preserve_second_right_at(index),
+                        instruction_group_start_at(index) + 22,
+                        strings,
+                        numbers),
+                      choose(local == 37, string_index(strings, instruction_witness_at(index)), 0))))))))))
+
+  reckon instruction_a_at(index : Number, strings : Sequence, numbers : Sequence) -> Number =
+    choose(index < facet_instruction_count(),
+      choose(facet_local_at(index) == 0,
+        facet_push_a_value(instruction_facet_at(index), strings, numbers),
+        string_index(strings, facet_path_of(instruction_facet_at(index)))),
+      choose(index < instruction_base_count(),
+        string_index(strings, warrant_subject_of(instruction_warrant_at(index))),
+        choose(index == instruction_count() - 1, 0,
+          rule_instruction_a_at(instruction_local_at(index), index, strings, numbers))))
+
+  reckon instruction_b_at(index : Number, strings : Sequence) -> Number =
+    choose(index < facet_instruction_count(), 0,
+      choose(index < instruction_base_count(),
+        string_index(strings, warrant_capability_of(instruction_warrant_at(index))),
+        choose(index == instruction_count() - 1, 0,
+          choose(instruction_local_at(index) == 14, string_index(strings, instruction_rule_name_at(index)),
+            choose(instruction_local_at(index) == 15, string_index(strings, instruction_need_capability_at(index)),
+              choose(instruction_local_at(index) == 16, string_index(strings, instruction_second_need_capability_at(index)), 0))))))
+
+  reckon instruction_c_at(index : Number, strings : Sequence) -> Number =
+    choose(index < facet_instruction_count(), 0,
+      choose(index < instruction_base_count(),
+        string_index(strings, warrant_target_of(instruction_warrant_at(index))),
+        choose(index == instruction_count() - 1, 0,
+          choose(instruction_local_at(index) == 14, string_index(strings, instruction_rule_cause_at(index)),
+            choose(instruction_local_at(index) == 15, string_index(strings, instruction_need_target_at(index)),
+              choose(instruction_local_at(index) == 16, string_index(strings, instruction_second_need_target_at(index)), 0))))))
+
+  reckon build_instruction_values(index : Number, strings : Sequence, numbers : Sequence, selector : Number, output : Sequence) -> Sequence =
+    choose(index >= instruction_count(), output,
+      build_instruction_values(
+        index + 1,
+        strings,
+        numbers,
+        selector,
+        sequence_append(
+          output,
+          choose(selector == 0, instruction_op_at(index),
+            choose(selector == 1, instruction_a_at(index, strings, numbers),
+              choose(selector == 2, instruction_b_at(index, strings), instruction_c_at(index, strings)))))))
+
+  reckon encode_string_record(value : Text) -> Sequence =
+    sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
+
+  reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+
+  reckon encode_instruction(op : Number, a : Number, b : Number, c : Number) -> Sequence =
+    sequence_concat(
+      bytes_u8(op),
+      sequence_concat(
+        bytes_u8(0),
+        sequence_concat(
+          bytes_u16le(0),
+          sequence_concat(
+            bytes_i32le(a),
+            sequence_concat(bytes_i32le(b), bytes_i32le(c))))))
+
+  reckon encode_instruction_plan(op_values : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(op_values), output,
+      encode_instruction_plan(
+        op_values,
+        a_values,
+        b_values,
+        c_values,
+        index + 1,
+        sequence_concat(
+          output,
+          encode_instruction(
+            sequence_get(op_values, index),
+            sequence_get(a_values, index),
+            sequence_get(b_values, index),
+            sequence_get(c_values, index)))))
+
+  reckon encode_number_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      encode_number_pool(items, index + 1, sequence_concat(output, bytes_f64le(sequence_get(items, index)))))
+
+  reckon encode_rbc_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number) -> Sequence =
+    sequence_concat(
+      utf8_bytes("RCLB"),
+      sequence_concat(
+        bytes_u16le(1),
+        sequence_concat(
+          bytes_u16le(1),
+          sequence_concat(
+            bytes_u32le(0),
+            sequence_concat(
+              bytes_u32le(program_index),
+              sequence_concat(
+                bytes_u32le(root_index),
+                sequence_concat(
+                  bytes_u32le(string_count),
+                  sequence_concat(
+                    bytes_u32le(number_count),
+                    sequence_concat(bytes_u32le(instruction_count), bytes_u32le(0))))))))))
+
+  reckon encode_target_rbc(strings : Sequence, numbers : Sequence, ops : Sequence, a_values : Sequence, b_values : Sequence, c_values : Sequence) -> Sequence =
+    sequence_concat(
+      encode_rbc_header(0, 1, length(strings), length(numbers), length(ops)),
+      sequence_concat(
+        encode_string_pool(strings, 0, empty_sequence()),
+        sequence_concat(
+          encode_number_pool(numbers, 0, empty_sequence()),
+          encode_instruction_plan(ops, a_values, b_values, c_values, 0, empty_sequence()))))
+
+  facet parser.tokens : Sequence = tokenize_from(source.full, 0, 1, 1, empty_sequence())
+  facet parser.token_count : Number = length(parser.tokens)
+  facet parser.first_token : Text = token_text(sequence_get(parser.tokens, 0))
+  facet parser.program_token : Text = token_text(sequence_get(parser.tokens, 1))
+  facet parser.body_open : Text = token_text(sequence_get(parser.tokens, 2))
+  facet parser.subject_start : Number = find_token_text(parser.tokens, 3, "subject")
+  facet parser.subject_starts : Sequence = collect_token_starts(parser.tokens, 3, "subject", empty_sequence())
+  facet parser.facet_starts : Sequence = collect_token_starts(parser.tokens, 3, "facet", empty_sequence())
+  facet parser.warrant_starts : Sequence = collect_token_starts(parser.tokens, 3, "warrant", empty_sequence())
+  facet parser.emergence_starts : Sequence = collect_token_starts(parser.tokens, 3, "emergence", empty_sequence())
+  facet parser.directive_nodes : Sequence = collect_directives(parser.tokens, 3, empty_sequence())
+  facet parser.body_close : Text = token_text(sequence_get(parser.tokens, parser.token_count - 2))
+  facet parser.eof_kind : Text = token_kind(sequence_get(parser.tokens, parser.token_count - 1))
+
+  facet compiler.program : Text = checked_ident(parser.tokens, 1, "")
+  facet compiler.facets : Sequence = parse_facets_from_starts(parser.tokens, parser.facet_starts, 0, empty_sequence())
+  facet compiler.ready_facet : Sequence = sequence_get(compiler.facets, 0)
+  facet compiler.status_facet : Sequence = sequence_get(compiler.facets, 1)
+  facet compiler.score_facet : Sequence = sequence_get(compiler.facets, 2)
+  facet compiler.level_facet : Sequence = sequence_get(compiler.facets, 3)
+  facet compiler.certified_facet : Sequence = sequence_get(compiler.facets, 4)
+  facet compiler.subjects : Sequence = parse_subjects_from_starts(parser.tokens, parser.subject_starts, 0, empty_sequence())
+  facet compiler.subject : Sequence = sequence_get(compiler.subjects, 0)
+  facet compiler.auditor_subject : Sequence = sequence_get(compiler.subjects, 1)
+  facet compiler.warrants : Sequence = append_subject_warrants(compiler.subjects, 0, 0, empty_sequence())
+  facet compiler.rules : Sequence = parse_rules_from_starts(parser.tokens, parser.emergence_starts, 0, empty_sequence())
+  facet compiler.directives : Sequence = parser.directive_nodes
+  facet compiler.publish_rule : Sequence = rule_by_name(compiler.rules, 0, "publish")
+  facet compiler.promote_rule : Sequence = rule_by_name(compiler.rules, 0, "promote")
+  facet compiler.certify_rule : Sequence = rule_by_name(compiler.rules, 0, "certify")
+  facet compiler.seal_rule : Sequence = rule_by_name(compiler.rules, 0, "seal")
+  facet compiler.audit_rule : Sequence = rule_by_name(compiler.rules, 0, "audit")
+  facet compiler.facet_count : Number = length(compiler.facets)
+  facet compiler.subject_count : Number = length(compiler.subjects)
+  facet compiler.warrant_count : Number = length(compiler.warrants)
+  facet compiler.emergence_count : Number = length(compiler.rules)
+  facet compiler.directive_count : Number = length(compiler.directives)
+  facet compiler.dual_need_warrant_lowering_supported : Truth =
+    semantic_assert(
+      compiler.program == "Stage40Target"
+        and compiler.facet_count == 5
+        and compiler.subject_count == 2
+        and compiler.warrant_count == 6
+        and compiler.emergence_count == 5
+        and compiler.directive_count == 10
+        and facet_matches(compiler.facets, 0, "world.ready", "Truth", "true")
+        and facet_matches(compiler.facets, 1, "world.status", "Text", "armed")
+        and facet_matches(compiler.facets, 2, "world.score", "Number", "8")
+        and facet_matches(compiler.facets, 3, "world.level", "Number", "1")
+        and facet_matches(compiler.facets, 4, "world.certified", "Truth", "false")
+        and subject_name_of(compiler.subject) == "founder"
+        and subject_name_of(compiler.auditor_subject) == "auditor"
+        and warrant_matches(compiler.warrants, 0, "founder", "world.publish", "world")
+        and warrant_matches(compiler.warrants, 1, "founder", "world.promote", "world")
+        and warrant_matches(compiler.warrants, 2, "founder", "world.certify", "world")
+        and warrant_matches(compiler.warrants, 3, "founder", "world.seal", "world")
+        and warrant_matches(compiler.warrants, 4, "auditor", "world.audit", "world")
+        and warrant_matches(compiler.warrants, 5, "auditor", "world.inspect", "world")
+        and rule_matches(compiler.publish_rule, "publish", "founder", "world.status", "!=", "armed", "world.publish", "world", "world.promote", "world", "world.score", "world.score", char_at("+-*/", 0), "2", "world.status", "==", "sleep", "rcl:stage40:add-not-and-dual-need")
+        and rule_when_connective_of(compiler.publish_rule) == "and"
+        and rule_when_second_left_of(compiler.publish_rule) == "world.certified"
+        and rule_when_second_operator_of(compiler.publish_rule) == "=="
+        and rule_when_second_right_of(compiler.publish_rule) == "true"
+        and rule_preserve_connective_of(compiler.publish_rule) == "and"
+        and rule_preserve_second_left_of(compiler.publish_rule) == "world.certified"
+        and rule_preserve_second_operator_of(compiler.publish_rule) == "=="
+        and rule_preserve_second_right_of(compiler.publish_rule) == "true"
+        and rule_matches(compiler.promote_rule, "promote", "founder", "world.score", "<", "10", "world.promote", "world", "world.certify", "world", "world.level", "world.level", char_at("+-*/", 2), "2", "world.level", "<", "2", "rcl:stage40:mul-not-or-dual-need")
+        and rule_when_connective_of(compiler.promote_rule) == "and"
+        and rule_when_second_left_of(compiler.promote_rule) == "world.ready"
+        and rule_when_second_operator_of(compiler.promote_rule) == "=="
+        and rule_when_second_right_of(compiler.promote_rule) == "false"
+        and rule_preserve_connective_of(compiler.promote_rule) == "or"
+        and rule_preserve_second_left_of(compiler.promote_rule) == "world.certified"
+        and rule_preserve_second_operator_of(compiler.promote_rule) == "=="
+        and rule_preserve_second_right_of(compiler.promote_rule) == "true"
+        and rule_matches(compiler.certify_rule, "certify", "founder", "world.level", ">", "2", "world.certify", "world", "world.seal", "world", "world.score", "world.score", char_at("+-*/", 1), "3", "world.score", "<=", "6", "rcl:stage40:sub-not-and-dual-need")
+        and rule_when_connective_of(compiler.certify_rule) == "and"
+        and rule_when_second_left_of(compiler.certify_rule) == "world.ready"
+        and rule_when_second_operator_of(compiler.certify_rule) == "=="
+        and rule_when_second_right_of(compiler.certify_rule) == "false"
+        and rule_preserve_connective_of(compiler.certify_rule) == "and"
+        and rule_preserve_second_left_of(compiler.certify_rule) == "world.status"
+        and rule_preserve_second_operator_of(compiler.certify_rule) == "!="
+        and rule_preserve_second_right_of(compiler.certify_rule) == "armed"
+        and rule_matches(compiler.seal_rule, "seal", "founder", "world.score", ">=", "8", "world.seal", "world", "world.publish", "world", "world.score", "world.score", char_at("+-*/", 3), "2", "world.score", ">", "4", "rcl:stage40:div-not-or-dual-need")
+        and rule_when_connective_of(compiler.seal_rule) == "and"
+        and rule_when_second_left_of(compiler.seal_rule) == "world.ready"
+        and rule_when_second_operator_of(compiler.seal_rule) == "=="
+        and rule_when_second_right_of(compiler.seal_rule) == "false"
+        and rule_preserve_connective_of(compiler.seal_rule) == "or"
+        and rule_preserve_second_left_of(compiler.seal_rule) == "world.certified"
+        and rule_preserve_second_operator_of(compiler.seal_rule) == "=="
+        and rule_preserve_second_right_of(compiler.seal_rule) == "true"
+        and rule_matches(compiler.audit_rule, "audit", "auditor", "world.certified", "==", "true", "world.audit", "world", "world.inspect", "world", "world.score", "world.score", char_at("+-*/", 0), "1", "world.ready", "==", "false", "rcl:stage40:eq-not-and-dual-need")
+        and rule_when_connective_of(compiler.audit_rule) == "and"
+        and rule_when_second_left_of(compiler.audit_rule) == "world.status"
+        and rule_when_second_operator_of(compiler.audit_rule) == "!="
+        and rule_when_second_right_of(compiler.audit_rule) == "armed"
+        and rule_preserve_connective_of(compiler.audit_rule) == "and"
+        and rule_preserve_second_left_of(compiler.audit_rule) == "world.status"
+        and rule_preserve_second_operator_of(compiler.audit_rule) == "!="
+        and rule_preserve_second_right_of(compiler.audit_rule) == "armed"
+        and directive_matches(compiler.directives, 0, "foresee", "publish")
+        and directive_matches(compiler.directives, 1, "realize", "publish")
+        and directive_matches(compiler.directives, 2, "foresee", "promote")
+        and directive_matches(compiler.directives, 3, "realize", "promote")
+        and directive_matches(compiler.directives, 4, "foresee", "certify")
+        and directive_matches(compiler.directives, 5, "realize", "certify")
+        and directive_matches(compiler.directives, 6, "foresee", "seal")
+        and directive_matches(compiler.directives, 7, "realize", "seal")
+        and directive_matches(compiler.directives, 8, "foresee", "audit")
+        and directive_matches(compiler.directives, 9, "realize", "audit")
+        and source.root == "71e899db3794f862101f898dbf0549a534db488f4320f30d07585d523a25ce14",
+      "RCL_STAGE40_DUAL_NEED_WARRANT_LOWERING_MISMATCH",
+      selfhost.stage,
+      token_span(sequence_get(parser.tokens, 0)))
+
+  reckon target_check_warrant_matches(index : Number, actor : Text, capability : Text, target_path : Text) -> Truth =
+    sequence_get(target.rbc_instruction_ops, index) == 24
+      and sequence_get(target.rbc_instruction_a_values, index) == string_index(target.rbc_strings, actor)
+      and sequence_get(target.rbc_instruction_b_values, index) == string_index(target.rbc_strings, capability)
+      and sequence_get(target.rbc_instruction_c_values, index) == string_index(target.rbc_strings, target_path)
+
+  facet target.rbc_strings : Sequence = build_target_strings()
+  facet target.rbc_numbers : Sequence = build_target_numbers()
+  facet target.rbc_instruction_ops : Sequence = build_instruction_values(0, target.rbc_strings, target.rbc_numbers, 0, empty_sequence())
+  facet target.rbc_instruction_a_values : Sequence = build_instruction_values(0, target.rbc_strings, target.rbc_numbers, 1, empty_sequence())
+  facet target.rbc_instruction_b_values : Sequence = build_instruction_values(0, target.rbc_strings, target.rbc_numbers, 2, empty_sequence())
+  facet target.rbc_instruction_c_values : Sequence = build_instruction_values(0, target.rbc_strings, target.rbc_numbers, 3, empty_sequence())
+  facet target.rbc_instruction_count : Number = length(target.rbc_instruction_ops)
+  facet target.rbc_bytes : Sequence = encode_target_rbc(target.rbc_strings, target.rbc_numbers, target.rbc_instruction_ops, target.rbc_instruction_a_values, target.rbc_instruction_b_values, target.rbc_instruction_c_values)
+  facet target.rbc_size : Number = length(target.rbc_bytes)
+  facet target.bytecode_magic_0 : Number = sequence_get(target.rbc_bytes, 0)
+  facet target.bytecode_magic_1 : Number = sequence_get(target.rbc_bytes, 1)
+  facet target.bytecode_magic_2 : Number = sequence_get(target.rbc_bytes, 2)
+  facet target.bytecode_magic_3 : Number = sequence_get(target.rbc_bytes, 3)
+
+  subject selfhost_agent {
+    warrant selfhost.write on selfhost
+    warrant parser.audit on parser
+    warrant compiler.audit on compiler
+    warrant target.audit on target
+    warrant gate.audit on gate
+  }
+
+  emergence verify_stage40_dual_need_warrant_lowering_subset {
+    cause selfhost_agent
+    when gate.rcl_owned_dual_need_warrant_lowering_subset == true
+    needs selfhost.write on selfhost
+
+    alter selfhost.stage_status <- "STAGE40_RCL_OWNED_DUAL_NEED_WARRANT_LOWERING_SUBSET_VERIFIED"
+
+    preserve parser.token_count == 460
+      and parser.first_token == "reality"
+      and parser.program_token == compiler.program
+      and parser.eof_kind == "EOF"
+      and length(parser.subject_starts) == 2
+      and length(parser.warrant_starts) == 6
+      and compiler.dual_need_warrant_lowering_supported == true
+      and compiler.facet_count == 5
+      and compiler.subject_count == 2
+      and compiler.warrant_count == 6
+      and compiler.emergence_count == 5
+      and compiler.directive_count == 10
+      and facet_instruction_count() == 10
+      and instruction_base_count() == 16
+      and target.rbc_instruction_count == instruction_count()
+      and target.rbc_instruction_count == 407
+      and target.rbc_size == 7147
+      and length(target.rbc_strings) == 28
+      and length(target.rbc_numbers) == 7
+      and sequence_get(target.rbc_numbers, 0) == 8
+      and sequence_get(target.rbc_numbers, 1) == 1
+      and sequence_get(target.rbc_numbers, 2) == 2
+      and sequence_get(target.rbc_numbers, 3) == 10
+      and sequence_get(target.rbc_numbers, 4) == 3
+      and sequence_get(target.rbc_numbers, 5) == 6
+      and sequence_get(target.rbc_numbers, 6) == 4
+      and sequence_get(target.rbc_instruction_ops, 0) == 2
+      and sequence_get(target.rbc_instruction_ops, 2) == 3
+      and sequence_get(target.rbc_instruction_ops, 8) == 2
+      and sequence_get(target.rbc_instruction_ops, 10) == 22
+      and sequence_get(target.rbc_instruction_ops, 11) == 22
+      and sequence_get(target.rbc_instruction_ops, 12) == 22
+      and sequence_get(target.rbc_instruction_ops, 13) == 22
+      and sequence_get(target.rbc_instruction_ops, 14) == 22
+      and sequence_get(target.rbc_instruction_ops, 15) == 22
+      and target_check_warrant_matches(31, "founder", "world.publish", "world")
+      and target_check_warrant_matches(32, "founder", "world.promote", "world")
+      and target_check_warrant_matches(70, "founder", "world.publish", "world")
+      and target_check_warrant_matches(71, "founder", "world.promote", "world")
+      and target_check_warrant_matches(109, "founder", "world.promote", "world")
+      and target_check_warrant_matches(110, "founder", "world.certify", "world")
+      and target_check_warrant_matches(148, "founder", "world.promote", "world")
+      and target_check_warrant_matches(149, "founder", "world.certify", "world")
+      and target_check_warrant_matches(187, "founder", "world.certify", "world")
+      and target_check_warrant_matches(188, "founder", "world.seal", "world")
+      and target_check_warrant_matches(226, "founder", "world.certify", "world")
+      and target_check_warrant_matches(227, "founder", "world.seal", "world")
+      and target_check_warrant_matches(265, "founder", "world.seal", "world")
+      and target_check_warrant_matches(266, "founder", "world.publish", "world")
+      and target_check_warrant_matches(304, "founder", "world.seal", "world")
+      and target_check_warrant_matches(305, "founder", "world.publish", "world")
+      and target_check_warrant_matches(343, "auditor", "world.audit", "world")
+      and target_check_warrant_matches(344, "auditor", "world.inspect", "world")
+      and target_check_warrant_matches(382, "auditor", "world.audit", "world")
+      and target_check_warrant_matches(383, "auditor", "world.inspect", "world")
+      and sequence_get(target.rbc_instruction_ops, 406) == 31
+      and string_index(target.rbc_strings, "sleep") == 18
+      and string_index(target.rbc_strings, "rcl:stage40:add-not-and-dual-need") == 19
+      and string_index(target.rbc_strings, "rcl:stage40:mul-not-or-dual-need") == 21
+      and string_index(target.rbc_strings, "rcl:stage40:sub-not-and-dual-need") == 23
+      and string_index(target.rbc_strings, "rcl:stage40:div-not-or-dual-need") == 25
+      and string_index(target.rbc_strings, "rcl:stage40:eq-not-and-dual-need") == 27
+      and target.bytecode_magic_0 == 82
+      and target.bytecode_magic_1 == 67
+      and target.bytecode_magic_2 == 76
+      and target.bytecode_magic_3 == 66
+      and gate.full_self_hosting == false
+      and gate.rcl_owned_general_expression_parser_subset == true
+      and gate.rcl_owned_rule_lowering_loop == true
+      and gate.rcl_owned_facet_warrant_parser_subset == true
+      and gate.rcl_owned_general_rule_directive_scaling_subset == true
+      and gate.rcl_owned_multisubject_warrant_parser_subset == true
+      and gate.rcl_owned_equality_expression_lowering_subset == true
+      and gate.rcl_owned_comparison_operator_lowering_subset == true
+      and gate.rcl_owned_arithmetic_operator_lowering_subset == true
+      and gate.rcl_owned_boolean_connective_lowering_subset == true
+      and gate.rcl_owned_unary_not_lowering_subset == true
+      and gate.rcl_owned_dual_need_warrant_lowering_subset == true
+      and gate.rcl_owned_rule_expression_source_lowering_subset == true
+      and gate.rcl_owned_multirule_expression_source_lowering_subset == true
+      and gate.rcl_owned_parser_complete == false
+      and gate.rcl_owned_expression_ast_complete == false
+      and gate.rcl_owned_rule_bytecode_lowering_complete == false
+      and gate.rcl_compiler_self_emits_without_stage0 == false
+      and gate.rcl_owned_runtime_complete == false
+      and gate.native_vm_host_still_required == true
+
+    witness "rcl:selfhost-stage40-dual-need-warrant-lowering-subset"
+  }
+
+  foresee verify_stage40_dual_need_warrant_lowering_subset
+  realize verify_stage40_dual_need_warrant_lowering_subset
+}

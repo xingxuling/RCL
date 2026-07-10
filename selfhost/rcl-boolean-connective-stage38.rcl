@@ -712,18 +712,21 @@ reality RCLSelfHostBooleanConnectiveStage38 {
     facet_instruction_count() + length(compiler.warrants)
 
   reckon instruction_count() -> Number =
-    instruction_base_count() + length(compiler.directives) * 26 + 1
+    instruction_base_count() + length(compiler.directives) * 34 + 1
 
   reckon instruction_group_at_from(index : Number, group : Number, start : Number) -> Number =
-    choose(index < start + 26,
+    choose(index < start + 34,
       group,
-      instruction_group_at_from(index, group + 1, start + 26))
+      instruction_group_at_from(index, group + 1, start + 34))
 
   reckon instruction_group_at(index : Number) -> Number =
     instruction_group_at_from(index, 0, instruction_base_count())
 
   reckon instruction_local_at(index : Number) -> Number =
-    index - (instruction_base_count() + instruction_group_at(index) * 26)
+    index - (instruction_base_count() + instruction_group_at(index) * 34)
+
+  reckon instruction_group_start_at(index : Number) -> Number =
+    instruction_base_count() + instruction_group_at(index) * 34
 
   reckon instruction_rule_at(index : Number) -> Sequence =
     rule_by_name(
@@ -737,7 +740,7 @@ reality RCLSelfHostBooleanConnectiveStage38 {
   reckon instruction_jump_target_at(index : Number) -> Number =
     choose(instruction_group_at(index) + 1 >= length(compiler.directives),
       instruction_count() - 1,
-      instruction_base_count() + (instruction_group_at(index) + 1) * 26)
+      instruction_base_count() + (instruction_group_at(index) + 1) * 34)
 
   reckon instruction_when_left_at(index : Number) -> Text =
     rule_when_left_of(instruction_rule_at(index))
@@ -842,32 +845,81 @@ reality RCLSelfHostBooleanConnectiveStage38 {
         literal_truth_value(facet_expr_of(facet)),
         string_index(strings, expr_text_of(facet_expr_of(facet)))))
 
-  reckon rule_instruction_op_at(local : Number, index : Number) -> Number =
+  reckon short_circuit_instruction_op_at(
+    local : Number,
+    connective : Text,
+    left_right : Text,
+    left_operator : Text,
+    right_right : Text,
+    right_operator : Text
+  ) -> Number =
     choose(local == 0, 4,
-      choose(local == 1, literal_push_opcode(instruction_when_right_at(index)),
-        choose(local == 2, binary_opcode(instruction_when_operator_at(index)),
-          choose(local == 3, 4,
-            choose(local == 4, literal_push_opcode(instruction_when_second_right_at(index)),
-              choose(local == 5, binary_opcode(instruction_when_second_operator_at(index)),
-                choose(local == 6, boolean_connective_opcode(instruction_when_connective_at(index)),
-                  choose(local == 7, 21,
-                    choose(local == 8, 23,
-                      choose(local == 9, 24,
-                        choose(local == 10, 4,
-                          choose(local == 11, 1,
-                            choose(local == 12, arithmetic_opcode(instruction_alter_operator_at(index)),
-                              choose(local == 13, 25,
-                                choose(local == 14, 26,
-                                  choose(local == 15, 4,
-                                    choose(local == 16, literal_push_opcode(instruction_preserve_right_at(index)),
-                                      choose(local == 17, binary_opcode(instruction_preserve_operator_at(index)),
-                                        choose(local == 18, 4,
-                                          choose(local == 19, literal_push_opcode(instruction_preserve_second_right_at(index)),
-                                            choose(local == 20, binary_opcode(instruction_preserve_second_operator_at(index)),
-                                              choose(local == 21, boolean_connective_opcode(instruction_preserve_connective_at(index)),
-                                                choose(local == 22, 27,
-                                                  choose(local == 23, 26,
-                                                    choose(local == 24, 28, 29)))))))))))))))))))))))))
+      choose(local == 1, literal_push_opcode(left_right),
+        choose(local == 2, binary_opcode(left_operator),
+          choose(local == 3, 21,
+            choose(connective == "and",
+              choose(local == 4, 4,
+                choose(local == 5, literal_push_opcode(right_right),
+                  choose(local == 6, binary_opcode(right_operator),
+                    choose(local == 7 or local == 8, 18,
+                      choose(local == 9, 20, 2))))),
+              choose(local == 4, 2,
+                choose(local == 5, 20,
+                  choose(local == 6, 4,
+                    choose(local == 7, literal_push_opcode(right_right),
+                      choose(local == 8, binary_opcode(right_operator), 18))))))))))
+
+  reckon short_circuit_instruction_a_at(
+    local : Number,
+    connective : Text,
+    left_path : Text,
+    left_right : Text,
+    right_path : Text,
+    right_right : Text,
+    expression_start : Number,
+    strings : Sequence,
+    numbers : Sequence
+  ) -> Number =
+    choose(local == 0, string_index(strings, left_path),
+      choose(local == 1, literal_push_a_value(left_right, strings, numbers),
+        choose(local == 3, expression_start + choose(connective == "and", 10, 6),
+          choose(connective == "and",
+            choose(local == 4, string_index(strings, right_path),
+              choose(local == 5, literal_push_a_value(right_right, strings, numbers),
+                choose(local == 9, expression_start + 11, 0))),
+            choose(local == 4, 1,
+              choose(local == 5, expression_start + 11,
+                choose(local == 6, string_index(strings, right_path),
+                  choose(local == 7, literal_push_a_value(right_right, strings, numbers), 0))))))))
+
+  reckon rule_instruction_op_at(local : Number, index : Number) -> Number =
+    choose(local < 11,
+      short_circuit_instruction_op_at(
+        local,
+        instruction_when_connective_at(index),
+        instruction_when_right_at(index),
+        instruction_when_operator_at(index),
+        instruction_when_second_right_at(index),
+        instruction_when_second_operator_at(index)),
+      choose(local == 11, 21,
+        choose(local == 12, 23,
+          choose(local == 13, 24,
+            choose(local == 14, 4,
+              choose(local == 15, 1,
+                choose(local == 16, arithmetic_opcode(instruction_alter_operator_at(index)),
+                  choose(local == 17, 25,
+                    choose(local == 18, 26,
+                      choose(local < 30,
+                        short_circuit_instruction_op_at(
+                          local - 19,
+                          instruction_preserve_connective_at(index),
+                          instruction_preserve_right_at(index),
+                          instruction_preserve_operator_at(index),
+                          instruction_preserve_second_right_at(index),
+                          instruction_preserve_second_operator_at(index)),
+                        choose(local == 30, 27,
+                          choose(local == 31, 26,
+                            choose(local == 32, 28, 29)))))))))))))
 
   reckon instruction_op_at(index : Number) -> Number =
     choose(index < facet_instruction_count(),
@@ -877,31 +929,36 @@ reality RCLSelfHostBooleanConnectiveStage38 {
           rule_instruction_op_at(instruction_local_at(index), index))))
 
   reckon rule_instruction_a_at(local : Number, index : Number, strings : Sequence, numbers : Sequence) -> Number =
-    choose(local == 0, string_index(strings, instruction_when_left_at(index)),
-      choose(local == 1, literal_push_a_value(instruction_when_right_at(index), strings, numbers),
-        choose(local == 2, 0,
-          choose(local == 3, string_index(strings, instruction_when_second_left_at(index)),
-            choose(local == 4, literal_push_a_value(instruction_when_second_right_at(index), strings, numbers),
-              choose(local == 5, 0,
-                choose(local == 6, 0,
-                  choose(local == 7, instruction_jump_target_at(index),
-                    choose(local == 8, instruction_mode_at(index),
-                      choose(local == 9, string_index(strings, instruction_rule_cause_at(index)),
-                        choose(local == 10, string_index(strings, instruction_alter_left_at(index)),
-                          choose(local == 11, number_index(numbers, number_from_text(instruction_alter_right_at(index))),
-                            choose(local == 12, 0,
-                              choose(local == 13, string_index(strings, instruction_alter_target_at(index)),
-                                choose(local == 14, 1,
-                                  choose(local == 15, string_index(strings, instruction_preserve_left_at(index)),
-                                    choose(local == 16, literal_push_a_value(instruction_preserve_right_at(index), strings, numbers),
-                                      choose(local == 17, 0,
-                                        choose(local == 18, string_index(strings, instruction_preserve_second_left_at(index)),
-                                          choose(local == 19, literal_push_a_value(instruction_preserve_second_right_at(index), strings, numbers),
-                                            choose(local == 20, 0,
-                                              choose(local == 21, 0,
-                                                choose(local == 22, 0,
-                                                  choose(local == 23, 0,
-                                                    choose(local == 24, string_index(strings, instruction_witness_at(index)), 0)))))))))))))))))))))))))
+    choose(local < 11,
+      short_circuit_instruction_a_at(
+        local,
+        instruction_when_connective_at(index),
+        instruction_when_left_at(index),
+        instruction_when_right_at(index),
+        instruction_when_second_left_at(index),
+        instruction_when_second_right_at(index),
+        instruction_group_start_at(index),
+        strings,
+        numbers),
+      choose(local == 11, instruction_jump_target_at(index),
+        choose(local == 12, instruction_mode_at(index),
+          choose(local == 13, string_index(strings, instruction_rule_cause_at(index)),
+            choose(local == 14, string_index(strings, instruction_alter_left_at(index)),
+              choose(local == 15, number_index(numbers, number_from_text(instruction_alter_right_at(index))),
+                choose(local == 17, string_index(strings, instruction_alter_target_at(index)),
+                  choose(local == 18, 1,
+                    choose(local < 30,
+                      short_circuit_instruction_a_at(
+                        local - 19,
+                        instruction_preserve_connective_at(index),
+                        instruction_preserve_left_at(index),
+                        instruction_preserve_right_at(index),
+                        instruction_preserve_second_left_at(index),
+                        instruction_preserve_second_right_at(index),
+                        instruction_group_start_at(index) + 19,
+                        strings,
+                        numbers),
+                      choose(local == 32, string_index(strings, instruction_witness_at(index)), 0))))))))))
 
   reckon instruction_a_at(index : Number, strings : Sequence, numbers : Sequence) -> Number =
     choose(index < facet_instruction_count(),
@@ -918,16 +975,16 @@ reality RCLSelfHostBooleanConnectiveStage38 {
       choose(index < instruction_base_count(),
         string_index(strings, warrant_capability_of(instruction_warrant_at(index))),
         choose(index == instruction_count() - 1, 0,
-          choose(instruction_local_at(index) == 8, string_index(strings, instruction_rule_name_at(index)),
-            choose(instruction_local_at(index) == 9, string_index(strings, instruction_need_capability_at(index)), 0)))))
+          choose(instruction_local_at(index) == 12, string_index(strings, instruction_rule_name_at(index)),
+            choose(instruction_local_at(index) == 13, string_index(strings, instruction_need_capability_at(index)), 0)))))
 
   reckon instruction_c_at(index : Number, strings : Sequence) -> Number =
     choose(index < facet_instruction_count(), 0,
       choose(index < instruction_base_count(),
         string_index(strings, warrant_target_of(instruction_warrant_at(index))),
         choose(index == instruction_count() - 1, 0,
-          choose(instruction_local_at(index) == 8, string_index(strings, instruction_rule_cause_at(index)),
-            choose(instruction_local_at(index) == 9, string_index(strings, instruction_need_target_at(index)), 0)))))
+          choose(instruction_local_at(index) == 12, string_index(strings, instruction_rule_cause_at(index)),
+            choose(instruction_local_at(index) == 13, string_index(strings, instruction_need_target_at(index)), 0)))))
 
   reckon build_instruction_values(index : Number, strings : Sequence, numbers : Sequence, selector : Number, output : Sequence) -> Sequence =
     choose(index >= instruction_count(), output,
@@ -1169,8 +1226,8 @@ reality RCLSelfHostBooleanConnectiveStage38 {
       and facet_instruction_count() == 10
       and instruction_base_count() == 15
       and target.rbc_instruction_count == instruction_count()
-      and target.rbc_instruction_count == 276
-      and target.rbc_size == 4964
+      and target.rbc_instruction_count == 356
+      and target.rbc_size == 6244
       and length(target.rbc_strings) == 27
       and length(target.rbc_numbers) == 7
       and sequence_get(target.rbc_numbers, 0) == 8
@@ -1188,61 +1245,19 @@ reality RCLSelfHostBooleanConnectiveStage38 {
       and sequence_get(target.rbc_instruction_ops, 12) == 22
       and sequence_get(target.rbc_instruction_ops, 13) == 22
       and sequence_get(target.rbc_instruction_ops, 14) == 22
-      and sequence_get(target.rbc_instruction_ops, 17) == 10
-      and sequence_get(target.rbc_instruction_ops, 20) == 10
-      and sequence_get(target.rbc_instruction_ops, 21) == 16
-      and sequence_get(target.rbc_instruction_ops, 22) == 21
-      and sequence_get(target.rbc_instruction_ops, 27) == 6
-      and sequence_get(target.rbc_instruction_ops, 32) == 11
-      and sequence_get(target.rbc_instruction_ops, 36) == 16
-      and sequence_get(target.rbc_instruction_ops, 47) == 16
-      and sequence_get(target.rbc_instruction_ops, 53) == 6
-      and sequence_get(target.rbc_instruction_ops, 62) == 16
-      and sequence_get(target.rbc_instruction_ops, 73) == 16
-      and sequence_get(target.rbc_instruction_ops, 79) == 8
-      and sequence_get(target.rbc_instruction_ops, 88) == 17
-      and sequence_get(target.rbc_instruction_ops, 99) == 16
-      and sequence_get(target.rbc_instruction_ops, 105) == 8
-      and sequence_get(target.rbc_instruction_ops, 114) == 17
-      and sequence_get(target.rbc_instruction_ops, 125) == 16
-      and sequence_get(target.rbc_instruction_ops, 131) == 7
-      and sequence_get(target.rbc_instruction_ops, 140) == 16
-      and sequence_get(target.rbc_instruction_ops, 151) == 16
-      and sequence_get(target.rbc_instruction_ops, 157) == 7
-      and sequence_get(target.rbc_instruction_ops, 166) == 16
-      and sequence_get(target.rbc_instruction_ops, 177) == 16
-      and sequence_get(target.rbc_instruction_ops, 183) == 9
-      and sequence_get(target.rbc_instruction_ops, 192) == 17
-      and sequence_get(target.rbc_instruction_ops, 203) == 16
-      and sequence_get(target.rbc_instruction_ops, 209) == 9
-      and sequence_get(target.rbc_instruction_ops, 218) == 17
-      and sequence_get(target.rbc_instruction_ops, 229) == 16
-      and sequence_get(target.rbc_instruction_ops, 235) == 6
-      and sequence_get(target.rbc_instruction_ops, 244) == 16
-      and sequence_get(target.rbc_instruction_ops, 255) == 16
-      and sequence_get(target.rbc_instruction_ops, 261) == 6
-      and sequence_get(target.rbc_instruction_ops, 270) == 16
-      and sequence_get(target.rbc_instruction_ops, 275) == 31
-      and sequence_get(target.rbc_instruction_a_values, 22) == 41
-      and sequence_get(target.rbc_instruction_a_values, 48) == 67
-      and sequence_get(target.rbc_instruction_a_values, 74) == 93
-      and sequence_get(target.rbc_instruction_a_values, 100) == 119
-      and sequence_get(target.rbc_instruction_a_values, 126) == 145
-      and sequence_get(target.rbc_instruction_a_values, 152) == 171
-      and sequence_get(target.rbc_instruction_a_values, 178) == 197
-      and sequence_get(target.rbc_instruction_a_values, 204) == 223
-      and sequence_get(target.rbc_instruction_a_values, 230) == 249
-      and sequence_get(target.rbc_instruction_a_values, 256) == 275
-      and sequence_get(target.rbc_instruction_a_values, 39) == 18
-      and sequence_get(target.rbc_instruction_a_values, 65) == 18
-      and sequence_get(target.rbc_instruction_a_values, 91) == 20
-      and sequence_get(target.rbc_instruction_a_values, 117) == 20
-      and sequence_get(target.rbc_instruction_a_values, 143) == 22
-      and sequence_get(target.rbc_instruction_a_values, 169) == 22
-      and sequence_get(target.rbc_instruction_a_values, 195) == 24
-      and sequence_get(target.rbc_instruction_a_values, 221) == 24
-      and sequence_get(target.rbc_instruction_a_values, 247) == 26
-      and sequence_get(target.rbc_instruction_a_values, 273) == 26
+      and sequence_get(target.rbc_instruction_ops, 18) == 21
+      and sequence_get(target.rbc_instruction_ops, 24) == 20
+      and sequence_get(target.rbc_instruction_ops, 28) == 24
+      and sequence_get(target.rbc_instruction_ops, 62) == 24
+      and sequence_get(target.rbc_instruction_ops, 96) == 24
+      and sequence_get(target.rbc_instruction_ops, 130) == 24
+      and sequence_get(target.rbc_instruction_ops, 164) == 24
+      and sequence_get(target.rbc_instruction_ops, 198) == 24
+      and sequence_get(target.rbc_instruction_ops, 232) == 24
+      and sequence_get(target.rbc_instruction_ops, 266) == 24
+      and sequence_get(target.rbc_instruction_ops, 300) == 24
+      and sequence_get(target.rbc_instruction_ops, 334) == 24
+      and sequence_get(target.rbc_instruction_ops, 355) == 31
       and string_index(target.rbc_strings, "sleep") == 17
       and string_index(target.rbc_strings, "rcl:stage38:add-and") == 18
       and string_index(target.rbc_strings, "rcl:stage38:mul-or") == 20

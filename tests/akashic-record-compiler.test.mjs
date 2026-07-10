@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   DEFAULT_AKASHIC_RECORD_SPEC,
@@ -16,7 +17,7 @@ import {
   RCL_AKASHIC_RECORD_RESULT_FORMAT,
 } from '../src/akashic-record-compiler.mjs';
 
-const cwd = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const bundle = runAkashicRecordCompiler();
 
 function tempDir(name) {
