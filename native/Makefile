@@ -4,6 +4,7 @@ PICFLAGS ?= -fPIC
 LDFLAGS ?= -lcrypto -lm
 TARGET := rclvm
 SERVER := rclvmd
+COMPILER := rclc
 PROVIDER_DEMO := provider_demo
 EMBEDDED_BENCHMARK := embedded_benchmark
 STATIC_LIB := librclvm.a
@@ -11,7 +12,7 @@ SHARED_LIB := librclvm.so
 SOURCE := rclvm.c
 OBJECT := rclvm.o
 
-all: $(TARGET) $(STATIC_LIB) $(SHARED_LIB) $(SERVER) $(PROVIDER_DEMO) $(EMBEDDED_BENCHMARK)
+all: $(TARGET) $(STATIC_LIB) $(SHARED_LIB) $(SERVER) $(COMPILER) $(PROVIDER_DEMO) $(EMBEDDED_BENCHMARK)
 
 $(OBJECT): $(SOURCE) rclvm.h
 	$(CC) $(CFLAGS) $(PICFLAGS) -DRCLVM_EMBEDDED_ONLY -c -o $@ $(SOURCE)
@@ -28,6 +29,9 @@ $(SHARED_LIB): $(OBJECT)
 $(SERVER): rclvmd.c $(STATIC_LIB) rclvm.h
 	$(CC) $(CFLAGS) -o $@ rclvmd.c $(STATIC_LIB) $(LDFLAGS)
 
+$(COMPILER): rclc.c $(STATIC_LIB) rclvm.h
+	$(CC) $(CFLAGS) -o $@ rclc.c $(STATIC_LIB) $(LDFLAGS)
+
 $(PROVIDER_DEMO): provider_demo.c $(STATIC_LIB) rclvm.h
 	$(CC) $(CFLAGS) -o $@ provider_demo.c $(STATIC_LIB) $(LDFLAGS)
 
@@ -35,4 +39,4 @@ $(EMBEDDED_BENCHMARK): embedded_benchmark.c $(STATIC_LIB) rclvm.h
 	$(CC) $(CFLAGS) -o $@ embedded_benchmark.c $(STATIC_LIB) $(LDFLAGS)
 
 clean:
-	rm -f $(TARGET) $(SERVER) $(PROVIDER_DEMO) $(EMBEDDED_BENCHMARK) $(OBJECT) $(STATIC_LIB) $(SHARED_LIB)
+	rm -f $(TARGET) $(SERVER) $(COMPILER) $(PROVIDER_DEMO) $(EMBEDDED_BENCHMARK) $(OBJECT) $(STATIC_LIB) $(SHARED_LIB)

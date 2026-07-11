@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   DEFAULT_ESOTERIC_MECHANISM_SPEC,
@@ -16,7 +17,7 @@ import {
   RCL_ESOTERIC_MECHANISM_RESULT_FORMAT,
 } from '../src/esoteric-mechanism-compiler.mjs';
 
-const cwd = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const bundle = runEsotericMechanismCompiler();
 
 function tempDir(name) {

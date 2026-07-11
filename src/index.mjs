@@ -50,7 +50,16 @@ export {
   RCL_BYTECODE_VERSION, RCL_BYTECODE_MAGIC, OPCODES, BUILTINS,
   compileRealityToBytecode, tryCompileRealityToBytecode, decodeBytecode, assembleLiteralProgram, assembleAstProgram, assembleIrProgram,
 } from './bytecode.mjs';
-export { DEFAULT_NATIVE_VM_PATH, RCLNativeVMError, runNativeBytecode, runRealityNative, verifyNativeParity } from './native-vm.mjs';
+export { DEFAULT_NATIVE_VM_PATH, DEFAULT_NATIVE_COMPILER_PATH, RCLNativeVMError, runNativeBytecode, runNativeCompiler, runRealityNative, verifyNativeParity } from './native-vm.mjs';
+export {
+  SELFHOST_COMPILER_CORE_PATH,
+  SELFHOST_COMPILER_MAIN_PATH,
+  DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
+  readSelfHostedCompilerSource,
+  bootstrapSelfHostedCompiler,
+  compileSourceFileSelfHosted,
+  compileSourceSelfHosted,
+} from './selfhost-compiler.mjs';
 export { DEFAULT_COMPILER_SEED_PATH, DEFAULT_COMPILER_STAGE2_PATH, DEFAULT_COMPILER_STAGE3_PATH, DEFAULT_COMPILER_STAGE4_PATH, DEFAULT_COMPILER_STAGE5_PATH, DEFAULT_COMPILER_STAGE6_PATH, DEFAULT_COMPILER_STAGE7_PATH, DEFAULT_COMPILER_STAGE8_PATH, DEFAULT_COMPILER_STAGE9_PATH, DEFAULT_WHOLE_LANGUAGE_PARSER_TARGET_PATH, DEFAULT_WHOLE_LANGUAGE_SEMANTIC_TARGET_PATH, DEFAULT_ABSORPTION_LOWERING_TARGET_PATH, DEFAULT_SELFHOST_CORE_PATH, DEFAULT_SELFHOST_APP_PATH, DEFAULT_SELFHOST_OUTPUT_PATH, DEFAULT_SELFHOST_COMPILER_ARTIFACT_PATH, DEFAULT_FIXEDPOINT_COMPILER_ARTIFACT_N_PATH, DEFAULT_FIXEDPOINT_COMPILER_ARTIFACT_N1_PATH, DEFAULT_STAGE10_EMITTER_ARTIFACT_PATH, DEFAULT_STAGE10_EMITTED_COMPILER_ARTIFACT_PATH, DEFAULT_STAGE11_STRUCTURED_EMITTER_ARTIFACT_PATH, DEFAULT_STAGE11_STRUCTURED_EMITTED_COMPILER_ARTIFACT_PATH, bootstrapCompilerSeed, bootstrapCompilerStage2, bootstrapCompilerStage3, bootstrapCompilerStage4, bootstrapCompilerStage5, bootstrapCompilerStage6, bootstrapCompilerStage7, bootstrapCompilerStage8, bootstrapCompilerStage9, bootstrapCompilerStage10, bootstrapCompilerStage11, bootstrapCompilerComplete } from './bootstrap.mjs';
 export { span, token, facetAst, parseState, symbolValue, semanticFacet, irStore, isSpan, isToken, isAstNode, isParseState, isSymbolValue, isSemanticNode, isIrNode } from './compiler-primitives.mjs';
 

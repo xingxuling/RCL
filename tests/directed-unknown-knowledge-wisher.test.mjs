@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   DEFAULT_DIRECTED_WISHER_SPEC,
@@ -19,7 +20,7 @@ import {
 import { runUnknownKnowledgeCompiler } from '../src/unknown-knowledge-compiler.mjs';
 import { compileReality } from '../src/index.mjs';
 
-const cwd = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function tempDir(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `rcl-${name}-`));

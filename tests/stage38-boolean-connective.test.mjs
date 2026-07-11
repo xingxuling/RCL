@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-test('Stage-38 RCL-owned lowering emits boolean connective opcodes', () => {
+test('Stage-38 RCL-owned lowering emits JS-compatible boolean short-circuit bytecode', () => {
   const out = execFileSync('node', ['scripts/verify-rcl-selfhost-stage38.mjs'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
@@ -45,10 +45,10 @@ test('Stage-38 RCL-owned lowering emits boolean connective opcodes', () => {
   assert.equal(report.compiler.rules[3].preserves[0].left.operator, '<=');
   assert.equal(report.compiler.rules[4].when.right.left.path, 'world.status');
 
-  assert.equal(report.target.bytes, 4964);
+  assert.equal(report.target.bytes, 6244);
   assert.equal(report.target.exactReferenceMatch, true);
   assert.equal(report.target.sha256, report.target.referenceSha256);
-  assert.equal(report.target.sha256, '272a07ab81b67d69da55703c79c879b9eaa6714a6c935e2cd1cae1ca52c3c822');
+  assert.equal(report.target.sha256, '04ae75aa6f73329773483c0022a0895a86870ccc5d2149ba30ae5ea68d5363a4');
   assert.deepEqual(report.target.numbers, [8, 1, 2, 10, 3, 6, 4]);
   assert.deepEqual(report.target.strings.slice(16, 27), [
     'publish',
@@ -63,29 +63,33 @@ test('Stage-38 RCL-owned lowering emits boolean connective opcodes', () => {
     'audit',
     'rcl:stage38:eq-and',
   ]);
-  assert.equal(report.target.instructions.length, 276);
+  assert.equal(report.target.instructions.length, 356);
   assert.deepEqual(report.target.booleanIndexes, {
-    and: [21, 36, 47, 62, 73, 99, 125, 140, 151, 166, 177, 203, 229, 244, 255, 270],
-    or: [88, 114, 192, 218],
+    and: [],
+    or: [],
   });
   assert.deepEqual(report.target.arithmeticIndexes, {
-    add: [27, 53, 235, 261],
-    sub: [131, 157],
-    mul: [79, 105],
-    div: [183, 209],
+    add: [31, 65, 303, 337],
+    sub: [167, 201],
+    mul: [99, 133],
+    div: [235, 269],
   });
   assert.deepEqual(report.target.comparisonIndexes, {
-    eq: [17, 20, 35, 43, 46, 61, 72, 87, 98, 113, 124, 139, 150, 165, 176, 191, 202, 217, 225, 228, 240, 243, 251, 254, 266, 269],
-    neq: [32, 58],
-    lt: [173, 199],
-    lte: [121, 147, 188, 214],
-    gt: [136, 162],
-    gte: [69, 84, 95, 110],
+    eq: [17, 21, 40, 51, 55, 74, 89, 110, 123, 144, 157, 176, 191, 210, 225, 246, 259, 280, 289, 293, 308, 312, 323, 327, 342, 346],
+    neq: [36, 70],
+    lt: [221, 255],
+    lte: [153, 187, 240, 274],
+    gt: [172, 206],
+    gte: [85, 104, 119, 138],
   });
-  assert.deepEqual(report.target.pushStringIndexes, [2, 16, 31, 42, 57, 138, 164, 227, 242, 253, 268]);
-  assert.deepEqual(report.target.pushBoolIndexes, [0, 8, 19, 34, 45, 60, 71, 86, 97, 112, 123, 149, 175, 190, 201, 216, 224, 239, 250, 265]);
-  assert.equal(report.target.opcodeCounts.AND, 16);
-  assert.equal(report.target.opcodeCounts.OR, 4);
+  assert.deepEqual(report.target.pushStringIndexes, [2, 16, 35, 50, 69, 175, 209, 292, 311, 326, 345]);
+  assert.deepEqual(report.target.pushBoolIndexes, [0, 8, 20, 25, 39, 44, 54, 59, 73, 78, 88, 93, 106, 109, 122, 127, 140, 143, 156, 161, 180, 190, 195, 214, 224, 229, 242, 245, 258, 263, 276, 279, 288, 297, 307, 316, 322, 331, 341, 350]);
+  assert.equal(report.target.opcodeCounts.AND, 0);
+  assert.equal(report.target.opcodeCounts.OR, 0);
+  assert.equal(report.target.opcodeCounts.NOT, 40);
+  assert.equal(report.target.opcodeCounts.JUMP, 20);
+  assert.equal(report.target.opcodeCounts.JUMP_IF_FALSE, 30);
+  assert.deepEqual(report.target.controlIndexes.checkWarrant, [28, 62, 96, 130, 164, 198, 232, 266, 300, 334]);
   assert.deepEqual(report.target.nativeRun.state, {
     'world.certified': false,
     'world.level': 2,

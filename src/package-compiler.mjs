@@ -209,9 +209,10 @@ async function writeNativeRbc(ctx, outputDir) {
   ensureDir(outputDir);
   writeText(path.join(outputDir, 'program.rcl'), ctx.source);
   fs.writeFileSync(path.join(outputDir, 'program.rbc'), ctx.bytecode);
-  const nativeCopied = copyIfExists(path.join(PROJECT_ROOT, 'native', 'rclvm'), path.join(outputDir, 'rclvm'), 0o755);
+  const nativeName = process.platform === 'win32' ? 'rclvm.exe' : 'rclvm';
+  const nativeCopied = copyIfExists(path.join(PROJECT_ROOT, 'native', nativeName), path.join(outputDir, nativeName), 0o755);
   writeText(path.join(outputDir, 'run-native.sh'), `#!/usr/bin/env sh\nset -eu\nDIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"\nif [ -x "$DIR/rclvm" ]; then exec "$DIR/rclvm" "$DIR/program.rbc"; fi\nif command -v rcl >/dev/null 2>&1; then exec rcl native-run "$DIR/program.rbc"; fi\necho "No bundled rclvm and no rcl command found." >&2\nexit 127\n`, 0o755);
-  const manifest = { ...baseManifest(ctx, 'native-rbc', outputDir), entrypoints: ['program.rbc', 'run-native.sh'], bundledNativeVm: nativeCopied, boundary: 'Native-RBC package contains deterministic RBC bytecode and an optional host-native VM binary.' };
+  const manifest = { ...baseManifest(ctx, 'native-rbc', outputDir), entrypoints: ['program.rbc', 'run-native.sh', 'runners/windows/run.cmd'], bundledNativeVm: nativeCopied, boundary: 'Native-RBC package contains deterministic RBC bytecode and an optional host-native VM binary.' };
   const hardened = writeCommonHardening(ctx, outputDir, 'native-rbc', manifest);
   writeText(path.join(outputDir, 'README.md'), renderReadme({ target: 'native-rbc', programName: ctx.programName, entrypoints: hardened.entrypoints, boundary: hardened.boundary }));
   return hardened;
@@ -221,7 +222,8 @@ async function writeNodeCli(ctx, outputDir) {
   ensureDir(path.join(outputDir, 'bin'));
   writeText(path.join(outputDir, 'program.rcl'), ctx.source);
   fs.writeFileSync(path.join(outputDir, 'program.rbc'), ctx.bytecode);
-  copyIfExists(path.join(PROJECT_ROOT, 'native', 'rclvm'), path.join(outputDir, 'native', 'rclvm'), 0o755);
+  const nativeName = process.platform === 'win32' ? 'rclvm.exe' : 'rclvm';
+  copyIfExists(path.join(PROJECT_ROOT, 'native', nativeName), path.join(outputDir, 'native', nativeName), 0o755);
   writeJson(path.join(outputDir, 'package.json'), {
     name: `rcl-${ctx.slug}`,
     version: '0.24.0-alpha.1',

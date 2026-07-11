@@ -8,8 +8,13 @@ import { runBlueSkyCosmogenicProjectionDemo, writeBlueSkyCosmogenicProjectionRep
 import { runSuperconductorCandidateInversionDemo, writeSuperconductorCandidateInversionReports, buildSuperconductorCandidateInversionSpec, renderSuperconductorCandidateInversionRcl, readSuperconductorCandidateInversionInput } from './superconductor-candidate-inversion-compiler.mjs';
 import { runSandboxComputerFileTransmissionDemo, writeSandboxComputerFileTransmissionReports, buildSandboxComputerTransmissionSpec, renderSandboxComputerTransmissionRcl, readSandboxTransmissionInput } from './sandbox-computer-file-transmission-protocol.mjs';
 import { runAutonomousSandboxFileEmissionDemo, writeAutonomousSandboxFileEmissionReports, buildAutonomousSandboxFileEmissionSpec, renderAutonomousSandboxFileEmissionRcl, readAutonomousSandboxFileEmissionInput } from './autonomous-sandbox-file-emission-protocol.mjs';
-import { compileRealityToBytecode, decodeBytecode } from './bytecode.mjs';
-import { runNativeBytecode, runRealityNative } from './native-vm.mjs';
+import { decodeBytecode } from './bytecode.mjs';
+import { runNativeBytecode } from './native-vm.mjs';
+import {
+  DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
+  compileSourceFileSelfHosted,
+  compileSourceSelfHosted,
+} from './selfhost-compiler.mjs';
 import { bootstrapCompilerSeed, bootstrapCompilerStage2, bootstrapCompilerStage3, bootstrapCompilerStage4, bootstrapCompilerStage5, bootstrapCompilerStage6, bootstrapCompilerStage7, bootstrapCompilerStage8, bootstrapCompilerStage9, bootstrapCompilerComplete } from './bootstrap.mjs';
 import { runProviderV2Demo } from './provider-runtime-v2.mjs';
 import { runResourceIsolationDemo, runResourceLifecycleDemo } from './resource-isolation-kernel.mjs';
@@ -1941,12 +1946,17 @@ try {
     if (command === 'compile') console.log(JSON.stringify(compileReality(source), null, 2));
     else if (command === 'run') console.log(JSON.stringify(await runReality(source), null, 2));
     else if (command === 'absorb') console.log(JSON.stringify(materializeRclAbsorptionKernel(source), null, 2));
-    else if (command === 'native') console.log(JSON.stringify(runRealityNative(source), null, 2));
+    else if (command === 'native') console.log(JSON.stringify(runNativeBytecode(compileSourceSelfHosted(source)), null, 2));
     else if (command === 'bytecode') {
-      const bytecode = compileRealityToBytecode(source);
       const target = output ?? path.join(path.dirname(file), `${path.basename(file, path.extname(file))}.rbc`);
-      fs.writeFileSync(target, bytecode);
-      console.log(JSON.stringify({ status: 'ok', output: target, bytes: bytecode.length }, null, 2));
+      const result = compileSourceFileSelfHosted(file, target);
+      console.log(JSON.stringify({
+        status: 'ok',
+        compiler: 'rcl-selfhost-native',
+        compilerArtifact: DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
+        output: target,
+        bytes: result.bytecode.length,
+      }, null, 2));
     }
   }
 } catch (error) {

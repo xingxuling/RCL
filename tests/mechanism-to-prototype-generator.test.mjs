@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   RCL_MECHANISM_TO_PROTOTYPE_RESULT_FORMAT,
@@ -15,7 +16,7 @@ import {
   renderPrototypeTechnicalDocument,
 } from '../src/mechanism-to-prototype-generator.mjs';
 
-const cwd = path.resolve(new URL('..', import.meta.url).pathname);
+const cwd = fileURLToPath(new URL('..', import.meta.url));
 function tempDir(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `rcl-${name}-`));
 }

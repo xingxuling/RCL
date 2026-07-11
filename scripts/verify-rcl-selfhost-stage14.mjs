@@ -15,6 +15,7 @@ const outputPath = path.join(outputDir, 'stage14-verification.json');
 const interpreterArtifactPath = path.join(outputDir, 'stage14-runtime-state-logic-interpreter.rbc');
 const targetRbcPath = path.join(outputDir, 'stage14-runtime-state-logic-target.rbc');
 const jsReferenceTargetRbcPath = path.join(outputDir, 'stage14-runtime-state-logic-target-js-reference.rbc');
+const EXPECTED_TARGET_SHA = '25af84bf277379e7059812d1378a110c4c095db350a110365a697cd5c1e38059';
 
 const targetSource = `reality RuntimeStateLogicTarget {
   facet world.base : Number = 4
@@ -53,20 +54,22 @@ const checks = {
   interpreterRunsInNativeVm: interpreterRun.status === 'ok'
     && state['selfhost.stage_status'] === 'RCL_OWNED_RUNTIME_STATE_LOGIC_SUBSET_VERIFIED',
   rclGeneratedTargetRbcMatchesJsCompiler: targetRbc.equals(jsReferenceTargetRbc)
-    && sha256(targetRbc) === sha256(jsReferenceTargetRbc),
+    && sha256(targetRbc) === sha256(jsReferenceTargetRbc)
+    && sha256(targetRbc) === EXPECTED_TARGET_SHA,
   decodedTargetShapeMatches: decodedTarget.format === 'rcl.bytecode.v1'
     && decodedTarget.program === 'RuntimeStateLogicTarget'
     && decodedTarget.sourceRoot === targetCompiled.programRoot
-    && decodedTarget.instructions.length === 30
+    && decodedTarget.instructions.length === 42
     && JSON.stringify(decodedTarget.instructions) === JSON.stringify(decodedJsReferenceTarget.instructions)
     && JSON.stringify(decodedTarget.numbers) === JSON.stringify([4, 2, 6]),
   targetActuallyUsesStateDependenciesAndLogic: targetInstructionNames.includes('LOAD_STATE')
     && targetInstructionNames.includes('EQ')
     && targetInstructionNames.includes('GTE')
-    && targetInstructionNames.includes('AND')
-    && targetInstructionNames.includes('OR')
     && targetInstructionNames.includes('NOT')
+    && targetInstructionNames.includes('JUMP')
     && targetInstructionNames.includes('JUMP_IF_FALSE')
+    && !targetInstructionNames.includes('AND')
+    && !targetInstructionNames.includes('OR')
     && targetInstructionNames.at(-1) === 'HALT',
   rclInterpreterStateMatchesNativeRuntime: state['runtime.world_base'] === 4
     && state['runtime.world_next'] === 6
@@ -93,9 +96,11 @@ const checks = {
     && interpreterInstructionNames.includes('LOAD_STATE')
     && interpreterInstructionNames.includes('EQ')
     && interpreterInstructionNames.includes('GTE')
-    && interpreterInstructionNames.includes('AND')
-    && interpreterInstructionNames.includes('OR')
     && interpreterInstructionNames.includes('NOT')
+    && interpreterInstructionNames.includes('JUMP')
+    && interpreterInstructionNames.includes('JUMP_IF_FALSE')
+    && !interpreterInstructionNames.includes('AND')
+    && !interpreterInstructionNames.includes('OR')
     && decodedInterpreter.instructions.some(instruction => instruction.builtin === 'SEQUENCE_GET')
     && decodedInterpreter.instructions.some(instruction => instruction.builtin === 'SEQUENCE_APPEND'),
   boundaryHonest: state['selfhost.boundary'] === 'load_state_comparison_boolean_logic_subset_not_complete_rcl_runtime'
@@ -167,7 +172,7 @@ const payload = {
     },
   },
   boundaries: {
-    implementedNow: 'A native-running RCL artifact interprets bytecode for LOAD_STATE, numeric comparison, boolean logic, stack-popping state stores, jumps, and literals. It executes dependent facets and matches direct native and JS runtime state for the same target program.',
+    implementedNow: 'A native-running RCL artifact emits and interprets the current JS-compatible short-circuit jump layout for state-dependent boolean logic, with exact target byte parity and matching native and JS runtime state.',
     notYetImplemented: 'The RCL runtime interpreter does not yet cover authorization, transactions, projections, typed values, providers, history, calls/returns for target programs, builtins beyond sequence/byte encoders, or the full current RCL runtime surface.',
     nextTarget: state['selfhost.next_rewrite_target'],
   },

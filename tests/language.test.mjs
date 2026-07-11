@@ -1192,7 +1192,10 @@ test('reference runtime accepts the same provider_call contract through explicit
 });
 
 test('native build exports embeddable static/shared libraries and public header', () => {
-  for (const file of ['librclvm.a', 'librclvm.so', 'rclvm.h', 'rclvmd']) {
+  const files = process.platform === 'win32'
+    ? ['librclvm.a', 'rclvm.dll', 'rclvm.lib', 'rclvm.h', 'rclvmd.exe', 'rclc.exe']
+    : ['librclvm.a', 'librclvm.so', 'rclvm.h', 'rclvmd', 'rclc'];
+  for (const file of files) {
     assert.equal(fs.existsSync(path.join(PACKAGE_ROOT, 'native', file)), true, file);
   }
 });

@@ -18,7 +18,7 @@
 #include "rclvm.h"
 
 #define RCL_VM_VERSION "0.6.0-alpha.1"
-#define MAX_STACK 4096
+#define INITIAL_STACK_CAPACITY 4096
 #define MAX_STATE 2048
 #define MAX_WARRANTS 1024
 #define MAX_TX_CHANGES 512
@@ -26,9 +26,10 @@
 #define MAX_WITNESSES 128
 #define MAX_NEEDS 128
 #define MAX_INSTRUCTIONS 1000000
-#define MAX_CALL_FRAMES 2048
+#define MAX_BYTECODE_BYTES (256u * 1024u * 1024u)
+#define INITIAL_CALL_FRAME_CAPACITY 2048
 #define MAX_PROVIDERS 64
-#define MAX_PROVIDER_RESPONSE 65536
+#define MAX_PROVIDER_RESPONSE (16 * 1024 * 1024)
 #define MAX_TYPED_HEAP_OBJECTS 4096
 
 /* Must remain aligned with src/bytecode.mjs. */
@@ -77,6 +78,7 @@ enum {
   OP_MAKE_TYPED_REF = 41,
   OP_DEREF_TYPED_REF = 42,
   OP_GET_TYPED_REF_ID = 43,
+  OP_MOD = 44,
 };
 
 enum {
@@ -172,7 +174,13 @@ typedef struct TypedUnion TypedUnion;
 typedef struct TypedRef TypedRef;
 
 struct Span { int64_t offset, line, column, length; };
-struct Sequence { Value *items; size_t count; };
+struct Sequence {
+  size_t ref_count;
+  size_t count;
+  Value *items;
+  Sequence *prefix;
+  Value *tail;
+};
 struct Token { char *token_type; char *text; Span span; };
 struct AstNode { char *path; char *value_type; char *literal_kind; char *literal_text; Span span; };
 struct ParseState { int64_t index; Sequence *nodes; };
@@ -310,16 +318,20 @@ typedef struct {
   State state;
   Warrant warrants[MAX_WARRANTS];
   size_t warrant_count;
-  Value stack[MAX_STACK];
+  Value *stack;
   size_t stack_count;
+  size_t stack_capacity;
+  size_t peak_stack_count;
   Transaction tx;
   Record projections[MAX_RECORDS];
   size_t projection_count;
   Record history[MAX_RECORDS];
   size_t history_count;
   uint64_t executed_instructions;
-  CallFrame frames[MAX_CALL_FRAMES];
+  CallFrame *frames;
   size_t frame_count;
+  size_t frame_capacity;
+  size_t peak_frame_count;
   VmError error;
   ProviderRegistration providers[MAX_PROVIDERS];
   size_t provider_count;
@@ -336,6 +348,16 @@ typedef struct {
   size_t length;
   size_t capacity;
 } StringBuilder;
+
+typedef struct {
+  size_t ref_count;
+  size_t byte_length;
+  size_t character_count;
+  size_t *character_offsets;
+  char data[];
+} SharedString;
+
+static size_t utf8_decode_at(const char *text, size_t byte_length, size_t offset, uint32_t *codepoint, int *valid);
 
 static void sb_init(StringBuilder *sb) {
   sb->capacity = 256;
@@ -370,10 +392,65 @@ static char *xstrdup(const char *s) {
   return copy;
 }
 
+static SharedString *shared_string_header(const char *value) {
+  return (SharedString *)((char *)value - offsetof(SharedString, data));
+}
+
+static char *shared_string_allocate(size_t length) {
+  if (length > SIZE_MAX - sizeof(SharedString) - 1) { fprintf(stderr, "out of memory\n"); exit(2); }
+  SharedString *shared = (SharedString *)malloc(sizeof(SharedString) + length + 1);
+  if (!shared) { fprintf(stderr, "out of memory\n"); exit(2); }
+  shared->ref_count = 1;
+  shared->byte_length = length;
+  shared->character_count = SIZE_MAX;
+  shared->character_offsets = NULL;
+  shared->data[length] = '\0';
+  return shared->data;
+}
+
+static char *shared_string_create_n(const char *source, size_t length) {
+  char *data = shared_string_allocate(length);
+  if (length) memcpy(data, source, length);
+  return data;
+}
+
+static char *shared_string_create(const char *source) {
+  const char *text = source ? source : "";
+  return shared_string_create_n(text, strlen(text));
+}
+
+static char *shared_string_join(const char *left, size_t left_length, const char *right, size_t right_length) {
+  if (left_length > SIZE_MAX - right_length) { fprintf(stderr, "out of memory\n"); exit(2); }
+  size_t length = left_length + right_length;
+  char *joined = shared_string_allocate(length);
+  if (left_length) memcpy(joined, left, left_length);
+  if (right_length) memcpy(joined + left_length, right, right_length);
+  joined[length] = '\0';
+  return joined;
+}
+
+static char *shared_string_retain(char *value) {
+  if (!value) return NULL;
+  SharedString *shared = shared_string_header(value);
+  if (shared->ref_count == SIZE_MAX) { fprintf(stderr, "string reference overflow\n"); exit(2); }
+  shared->ref_count++;
+  return value;
+}
+
+static void shared_string_release(char *value) {
+  if (!value) return;
+  SharedString *shared = shared_string_header(value);
+  if (shared->ref_count == 0) { fprintf(stderr, "invalid string reference\n"); abort(); }
+  if (--shared->ref_count == 0) { free(shared->character_offsets); free(shared); }
+}
+
 static Value value_null(void) { Value v; memset(&v, 0, sizeof(v)); v.type = VALUE_NULL; return v; }
 static Value value_number(double n) { Value v = value_null(); v.type = VALUE_NUMBER; v.number = n; return v; }
 static Value value_bool(int b) { Value v = value_null(); v.type = VALUE_BOOL; v.boolean = !!b; return v; }
-static Value value_string(const char *s) { Value v = value_null(); v.type = VALUE_STRING; v.string = xstrdup(s ? s : ""); return v; }
+static Value value_string(const char *s) { Value v = value_null(); v.type = VALUE_STRING; v.string = shared_string_create(s); return v; }
+static Value value_string_n(const char *s, size_t length) { Value v = value_null(); v.type = VALUE_STRING; v.string = shared_string_create_n(s, length); return v; }
+static Value value_string_retain(const char *s) { Value v = value_null(); v.type = VALUE_STRING; v.string = shared_string_retain((char *)s); return v; }
+static Value value_string_join(const char *left, size_t left_length, const char *right, size_t right_length) { Value v = value_null(); v.type = VALUE_STRING; v.string = shared_string_join(left, left_length, right, right_length); return v; }
 static Value value_span(int64_t offset, int64_t line, int64_t column, int64_t length) {
   Value v = value_null(); v.type = VALUE_SPAN; v.span = (Span *)malloc(sizeof(Span));
   if (!v.span) { fprintf(stderr, "out of memory\n"); exit(2); }
@@ -392,33 +469,77 @@ static Value value_ast(const char *path, const char *value_type, const char *lit
 
 static void value_free(Value *value);
 static Value value_clone(const Value *value);
+static void sequence_free(Sequence *sequence);
 
-static Sequence *sequence_clone(const Sequence *source) {
+static Sequence *sequence_create(void) {
   Sequence *sequence = (Sequence *)calloc(1, sizeof(Sequence));
   if (!sequence) { fprintf(stderr, "out of memory\n"); exit(2); }
-  sequence->count = source ? source->count : 0;
-  if (sequence->count) {
-    sequence->items = (Value *)calloc(sequence->count, sizeof(Value));
-    if (!sequence->items) { fprintf(stderr, "out of memory\n"); exit(2); }
-    for (size_t i = 0; i < sequence->count; i++) sequence->items[i] = value_clone(&source->items[i]);
-  }
+  sequence->ref_count = 1;
   return sequence;
 }
 
+static Sequence *sequence_clone(const Sequence *source) {
+  if (!source) return sequence_create();
+  Sequence *sequence = (Sequence *)source;
+  if (sequence->ref_count == SIZE_MAX) { fprintf(stderr, "sequence reference overflow\n"); exit(2); }
+  sequence->ref_count++;
+  return sequence;
+}
+
+static void sequence_materialize(Sequence *sequence) {
+  if (!sequence || !sequence->tail) return;
+
+  size_t tail_count = 0;
+  Sequence *base = sequence;
+  while (base->tail) {
+    if (tail_count == SIZE_MAX) { fprintf(stderr, "sequence is too large\n"); exit(2); }
+    tail_count++;
+    base = base->prefix;
+  }
+  if (tail_count > SIZE_MAX / sizeof(Sequence *)) { fprintf(stderr, "out of memory\n"); exit(2); }
+  Sequence **tails = (Sequence **)malloc(tail_count * sizeof(Sequence *));
+  Value *items = (Value *)calloc(sequence->count ? sequence->count : 1, sizeof(Value));
+  if (!tails || !items) { free(tails); free(items); fprintf(stderr, "out of memory\n"); exit(2); }
+
+  Sequence *cursor = sequence;
+  for (size_t i = 0; i < tail_count; i++) {
+    tails[i] = cursor;
+    cursor = cursor->prefix;
+  }
+  size_t output = 0;
+  for (size_t i = 0; i < base->count; i++) items[output++] = value_clone(&base->items[i]);
+  for (size_t i = tail_count; i > 0; i--) items[output++] = value_clone(tails[i - 1]->tail);
+  free(tails);
+  if (output != sequence->count) { fprintf(stderr, "invalid persistent sequence\n"); abort(); }
+
+  Sequence *prefix = sequence->prefix;
+  Value *tail = sequence->tail;
+  sequence->items = items;
+  sequence->prefix = NULL;
+  sequence->tail = NULL;
+  value_free(tail);
+  free(tail);
+  sequence_free(prefix);
+}
+
+static const Value *sequence_item(const Sequence *sequence, size_t index) {
+  Sequence *materialized = (Sequence *)sequence;
+  sequence_materialize(materialized);
+  return &materialized->items[index];
+}
+
 static Value value_sequence_empty(void) {
-  Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = (Sequence *)calloc(1, sizeof(Sequence));
-  if (!v.sequence) { fprintf(stderr, "out of memory\n"); exit(2); }
+  Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = sequence_create();
   return v;
 }
 
 static Value value_sequence_append(const Sequence *source, const Value *item) {
-  Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = (Sequence *)calloc(1, sizeof(Sequence));
-  if (!v.sequence) { fprintf(stderr, "out of memory\n"); exit(2); }
+  Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = sequence_create();
   v.sequence->count = (source ? source->count : 0) + 1;
-  v.sequence->items = (Value *)calloc(v.sequence->count, sizeof(Value));
-  if (!v.sequence->items) { fprintf(stderr, "out of memory\n"); exit(2); }
-  for (size_t i = 0; source && i < source->count; i++) v.sequence->items[i] = value_clone(&source->items[i]);
-  v.sequence->items[v.sequence->count - 1] = value_clone(item);
+  v.sequence->prefix = sequence_clone(source);
+  v.sequence->tail = (Value *)malloc(sizeof(Value));
+  if (!v.sequence->tail) { fprintf(stderr, "out of memory\n"); exit(2); }
+  *v.sequence->tail = value_clone(item);
   return v;
 }
 
@@ -518,15 +639,24 @@ static int typed_record_field_index(const TypedRecord *record, const char *field
 }
 
 static void sequence_free(Sequence *sequence) {
-  if (!sequence) return;
-  for (size_t i = 0; i < sequence->count; i++) value_free(&sequence->items[i]);
-  free(sequence->items); free(sequence);
+  while (sequence) {
+    if (sequence->ref_count == 0) { fprintf(stderr, "invalid sequence reference\n"); abort(); }
+    if (--sequence->ref_count > 0) return;
+    Sequence *prefix = sequence->prefix;
+    if (sequence->items) {
+      for (size_t i = 0; i < sequence->count; i++) value_free(&sequence->items[i]);
+      free(sequence->items);
+    }
+    if (sequence->tail) { value_free(sequence->tail); free(sequence->tail); }
+    free(sequence);
+    sequence = prefix;
+  }
 }
 
 static void value_free(Value *value) {
   if (!value) return;
   switch (value->type) {
-    case VALUE_STRING: free(value->string); break;
+    case VALUE_STRING: shared_string_release(value->string); break;
     case VALUE_SEQUENCE: sequence_free(value->sequence); break;
     case VALUE_SPAN: free(value->span); break;
     case VALUE_TOKEN:
@@ -574,7 +704,7 @@ static Value value_clone(const Value *value) {
   switch (value->type) {
     case VALUE_NUMBER: return value_number(value->number);
     case VALUE_BOOL: return value_bool(value->boolean);
-    case VALUE_STRING: return value_string(value->string);
+    case VALUE_STRING: { Value v = value_null(); v.type = VALUE_STRING; v.string = shared_string_retain(value->string); return v; }
     case VALUE_SEQUENCE: { Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = sequence_clone(value->sequence); return v; }
     case VALUE_SPAN: return value_span(value->span->offset, value->span->line, value->span->column, value->span->length);
     case VALUE_TOKEN: return value_token(value->token->token_type, value->token->text, &value->token->span);
@@ -670,7 +800,10 @@ static void typed_heap_mark_value(VM *vm, const Value *value) {
   if (!value) return;
   switch (value->type) {
     case VALUE_SEQUENCE:
-      if (value->sequence) for (size_t i = 0; i < value->sequence->count; i++) typed_heap_mark_value(vm, &value->sequence->items[i]);
+      if (value->sequence) {
+        sequence_materialize(value->sequence);
+        for (size_t i = 0; i < value->sequence->count; i++) typed_heap_mark_value(vm, &value->sequence->items[i]);
+      }
       break;
     case VALUE_TYPED_RECORD:
       typed_heap_mark_object_id(vm, value->typed_record->object_id);
@@ -746,12 +879,68 @@ static Value vm_load_state(VM *vm, const char *path) {
     Change *change = tx_find_change(&vm->tx, path);
     if (change) return value_clone(&change->after);
   }
-  return state_get(&vm->state, path);
+  const StateEntry *entry = state_find_const(&vm->state, path);
+  if (!entry) {
+    char message[512];
+    snprintf(message, sizeof(message), "Facet '%s' does not exist", path);
+    vm_fail(vm, "RCL_STATE_MISSING", message);
+    return value_null();
+  }
+  return value_clone(&entry->value);
+}
+
+static int stack_reserve(VM *vm, size_t required) {
+  if (required <= vm->stack_capacity) return 1;
+  if (required > RCLVM_MAX_VALUE_STACK) {
+    vm_fail(vm, "RCL_NATIVE_STACK_LIMIT", "Native VM Value stack hard limit exceeded (131072)");
+    return 0;
+  }
+  size_t capacity = vm->stack_capacity ? vm->stack_capacity : INITIAL_STACK_CAPACITY;
+  while (capacity < required) {
+    capacity = capacity > RCLVM_MAX_VALUE_STACK / 2 ? RCLVM_MAX_VALUE_STACK : capacity * 2;
+  }
+  if (capacity > SIZE_MAX / sizeof(Value)) {
+    vm_fail(vm, "RCL_NATIVE_OOM", "Native VM Value stack allocation is too large");
+    return 0;
+  }
+  Value *stack = (Value *)realloc(vm->stack, capacity * sizeof(Value));
+  if (!stack) {
+    vm_fail(vm, "RCL_NATIVE_OOM", "Unable to grow native VM Value stack");
+    return 0;
+  }
+  vm->stack = stack;
+  vm->stack_capacity = capacity;
+  return 1;
+}
+
+static int frame_reserve(VM *vm, size_t required) {
+  if (required <= vm->frame_capacity) return 1;
+  if (required > RCLVM_MAX_CALL_FRAMES) {
+    vm_fail(vm, "RCL_NATIVE_CALL_DEPTH", "Native VM CallFrame hard limit exceeded (32768)");
+    return 0;
+  }
+  size_t capacity = vm->frame_capacity ? vm->frame_capacity : INITIAL_CALL_FRAME_CAPACITY;
+  while (capacity < required) {
+    capacity = capacity > RCLVM_MAX_CALL_FRAMES / 2 ? RCLVM_MAX_CALL_FRAMES : capacity * 2;
+  }
+  if (capacity > SIZE_MAX / sizeof(CallFrame)) {
+    vm_fail(vm, "RCL_NATIVE_OOM", "Native VM CallFrame allocation is too large");
+    return 0;
+  }
+  CallFrame *frames = (CallFrame *)realloc(vm->frames, capacity * sizeof(CallFrame));
+  if (!frames) {
+    vm_fail(vm, "RCL_NATIVE_OOM", "Unable to grow native VM CallFrame stack");
+    return 0;
+  }
+  vm->frames = frames;
+  vm->frame_capacity = capacity;
+  return 1;
 }
 
 static int stack_push(VM *vm, Value value) {
-  if (vm->stack_count >= MAX_STACK) { value_free(&value); vm_fail(vm, "RCL_NATIVE_STACK_OVERFLOW", "Native VM stack overflow"); return 0; }
+  if (!stack_reserve(vm, vm->stack_count + 1)) { value_free(&value); return 0; }
   vm->stack[vm->stack_count++] = value;
+  if (vm->stack_count > vm->peak_stack_count) vm->peak_stack_count = vm->stack_count;
   return 1;
 }
 
@@ -809,6 +998,7 @@ static void span_json_sb(StringBuilder *sb, const Span *span) {
 
 static void sequence_json_sb(StringBuilder *sb, const Sequence *sequence) {
   sb_append_char(sb, '[');
+  sequence_materialize((Sequence *)sequence);
   for (size_t i = 0; sequence && i < sequence->count; i++) { if (i) sb_append_char(sb, ','); value_json_sb(sb, &sequence->items[i]); }
   sb_append_char(sb, ']');
 }
@@ -993,8 +1183,156 @@ static double read_f64_le(FILE *file, int *ok) {
   return value;
 }
 
+static uint16_t memory_u16_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
+  if (offset > length || length - offset < 2) { *ok = 0; return 0; }
+  return (uint16_t)(bytes[offset] | ((uint16_t)bytes[offset + 1] << 8));
+}
+
+static uint32_t memory_u32_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
+  if (offset > length || length - offset < 4) { *ok = 0; return 0; }
+  return (uint32_t)bytes[offset]
+    | ((uint32_t)bytes[offset + 1] << 8)
+    | ((uint32_t)bytes[offset + 2] << 16)
+    | ((uint32_t)bytes[offset + 3] << 24);
+}
+
+static int32_t memory_i32_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
+  return (int32_t)memory_u32_le(bytes, length, offset, ok);
+}
+
+static int validation_fail(VmError *error, const char *code, const char *message) {
+  error->code = code;
+  snprintf(error->message, sizeof(error->message), "%s", message);
+  return 0;
+}
+
+static int pool_index_valid(int32_t index, uint32_t count) {
+  return index >= 0 && (uint32_t)index < count;
+}
+
+static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError *error) {
+  memset(error, 0, sizeof(*error));
+  if (!bytes || length < 36) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC is shorter than its 36-byte header");
+  if (length > MAX_BYTECODE_BYTES) return validation_fail(error, "RCL_NATIVE_BYTECODE_LIMIT", "RBC exceeds the 256 MiB byte limit");
+  if (memcmp(bytes, "RCLB", 4) != 0) return validation_fail(error, "RCL_NATIVE_BAD_MAGIC", "Invalid RCL bytecode magic");
+
+  int ok = 1;
+  uint16_t major = memory_u16_le(bytes, length, 4, &ok);
+  uint16_t minor = memory_u16_le(bytes, length, 6, &ok);
+  uint32_t program_name_index = memory_u32_le(bytes, length, 12, &ok);
+  uint32_t source_root_index = memory_u32_le(bytes, length, 16, &ok);
+  uint32_t string_count = memory_u32_le(bytes, length, 20, &ok);
+  uint32_t number_count = memory_u32_le(bytes, length, 24, &ok);
+  uint32_t instruction_count = memory_u32_le(bytes, length, 28, &ok);
+  uint32_t reserved = memory_u32_le(bytes, length, 32, &ok);
+  if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC header is truncated");
+  if (major != 1 || minor < 1 || minor > 2) {
+    char message[128];
+    snprintf(message, sizeof(message), "Unsupported RBC version %u.%u; native VM supports 1.1 and 1.2", major, minor);
+    return validation_fail(error, "RCL_NATIVE_BYTECODE_VERSION", message);
+  }
+  if (reserved != 0) return validation_fail(error, "RCL_NATIVE_BAD_HEADER", "RBC reserved header field must be zero");
+  if (string_count > 100000 || number_count > 100000 || instruction_count > MAX_INSTRUCTIONS) {
+    return validation_fail(error, "RCL_NATIVE_BAD_HEADER", "RBC pool or instruction count exceeds native limits");
+  }
+  if (program_name_index >= string_count || source_root_index >= string_count) {
+    return validation_fail(error, "RCL_NATIVE_POOL_RANGE", "RBC program or source-root string index is out of range");
+  }
+
+  size_t offset = 36;
+  for (uint32_t i = 0; i < string_count; i++) {
+    uint32_t string_length = memory_u32_le(bytes, length, offset, &ok);
+    if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC string length is truncated");
+    offset += 4;
+    if (string_length > 16u * 1024u * 1024u) return validation_fail(error, "RCL_NATIVE_STRING_LIMIT", "RBC string exceeds the 16 MiB limit");
+    if (offset > length || length - offset < string_length) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC string data is truncated");
+    offset += string_length;
+  }
+  if (number_count > (length - offset) / 8) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC number pool is truncated");
+  offset += (size_t)number_count * 8;
+  if (instruction_count > (length - offset) / 16) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC instruction stream is truncated");
+  size_t instruction_offset = offset;
+  offset += (size_t)instruction_count * 16;
+  if (offset != length) return validation_fail(error, "RCL_NATIVE_LENGTH_MISMATCH", "RBC declared sections do not consume the complete file");
+
+  for (uint32_t i = 0; i < instruction_count; i++) {
+    size_t at = instruction_offset + (size_t)i * 16;
+    uint8_t op = bytes[at];
+    uint8_t instruction_flags = bytes[at + 1];
+    int32_t a = memory_i32_le(bytes, length, at + 4, &ok);
+    int32_t b = memory_i32_le(bytes, length, at + 8, &ok);
+    int32_t c = memory_i32_le(bytes, length, at + 12, &ok);
+    if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC instruction operand is truncated");
+    if (op > OP_MOD) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
+    if (minor == 1 && (op == OP_MOD || (op == OP_CALL_PROVIDER && (instruction_flags & 1)))) {
+      return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.2 feature is encoded under a 1.1 header");
+    }
+    if (op == OP_CALL_PROVIDER && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "CALL_PROVIDER contains unknown flags");
+
+    int valid = 1;
+    switch (op) {
+      case OP_PUSH_NUMBER: valid = pool_index_valid(a, number_count); break;
+      case OP_PUSH_STRING: case OP_LOAD_STATE: case OP_STORE_STATE: case OP_STAGE_STORE:
+      case OP_RECORD_WITNESS: case OP_GET_TYPED_FIELD: case OP_IS_UNION_VARIANT:
+        valid = pool_index_valid(a, string_count); break;
+      case OP_GRANT_WARRANT: case OP_CHECK_WARRANT:
+        valid = pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && pool_index_valid(c, string_count); break;
+      case OP_BEGIN_TX:
+        valid = pool_index_valid(b, string_count) && pool_index_valid(c, string_count); break;
+      case OP_CALL_PROVIDER:
+        valid = (instruction_flags & 1) || (pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && pool_index_valid(c, string_count)); break;
+      case OP_MAKE_TYPED_RECORD: case OP_MAKE_TYPED_UNION:
+        valid = pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && c >= 0; break;
+      case OP_JUMP: case OP_JUMP_IF_FALSE:
+        valid = a >= 0 && (uint32_t)a < instruction_count; break;
+      case OP_CALL:
+        valid = a >= 0 && (uint32_t)a < instruction_count && b >= 0; break;
+      case OP_CALL_BUILTIN:
+        valid = a >= BUILTIN_CONTAINS && a <= BUILTIN_SHA256_TEXT && b >= 0 && b <= 16; break;
+      case OP_PUSH_BOOL:
+        valid = a == 0 || a == 1; break;
+      default: break;
+    }
+    if (!valid) {
+      char message[160];
+      snprintf(message, sizeof(message), "RBC instruction %u has an invalid operand", i);
+      return validation_fail(error, "RCL_NATIVE_INSTRUCTION_INVALID", message);
+    }
+  }
+  return 1;
+}
+
+int rclvm_validate_bytecode(const uint8_t *bytes, size_t length, char *error, size_t error_capacity) {
+  VmError validation_error;
+  int valid = validate_bytecode_bytes(bytes, length, &validation_error);
+  if (!valid && error && error_capacity) snprintf(error, error_capacity, "%s: %s", validation_error.code, validation_error.message);
+  return valid;
+}
+
+static int validate_bytecode_file(const char *path, VmError *error) {
+  FILE *file = fopen(path, "rb");
+  if (!file) { error->code = "RCL_NATIVE_OPEN_FAILED"; snprintf(error->message, sizeof(error->message), "Cannot open bytecode '%s': %s", path, strerror(errno)); return 0; }
+  if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return validation_fail(error, "RCL_NATIVE_OPEN_FAILED", "Cannot seek RBC file"); }
+  long file_length = ftell(file);
+  if (file_length < 0 || (unsigned long)file_length > MAX_BYTECODE_BYTES || fseek(file, 0, SEEK_SET) != 0) {
+    fclose(file);
+    return validation_fail(error, "RCL_NATIVE_BYTECODE_LIMIT", "RBC file size is invalid or exceeds 256 MiB");
+  }
+  size_t length = (size_t)file_length;
+  uint8_t *bytes = (uint8_t *)malloc(length ? length : 1);
+  if (!bytes) { fclose(file); return validation_fail(error, "RCL_NATIVE_OOM", "Unable to allocate RBC validation buffer"); }
+  size_t read = fread(bytes, 1, length, file);
+  int read_ok = read == length && !ferror(file);
+  fclose(file);
+  if (!read_ok) { free(bytes); return validation_fail(error, "RCL_NATIVE_TRUNCATED", "Cannot read complete RBC file"); }
+  int valid = validate_bytecode_bytes(bytes, length, error);
+  free(bytes);
+  return valid;
+}
+
 static int load_program(const char *path, Program *program, VmError *error) {
   memset(program, 0, sizeof(*program));
+  if (!validate_bytecode_file(path, error)) return 0;
   FILE *file = fopen(path, "rb");
   if (!file) { error->code = "RCL_NATIVE_OPEN_FAILED"; snprintf(error->message, sizeof(error->message), "Cannot open bytecode '%s': %s", path, strerror(errno)); return 0; }
   char magic[4];
@@ -1009,7 +1347,7 @@ static int load_program(const char *path, Program *program, VmError *error) {
   program->number_count = read_u32_le(file, &ok);
   program->instruction_count = read_u32_le(file, &ok);
   (void)read_u32_le(file, &ok);
-  if (!ok || program->major != 1 || program->string_count > 100000 || program->number_count > 100000 || program->instruction_count > MAX_INSTRUCTIONS) {
+  if (!ok || program->major != 1 || program->minor < 1 || program->minor > 2 || program->string_count > 100000 || program->number_count > 100000 || program->instruction_count > MAX_INSTRUCTIONS) {
     error->code = "RCL_NATIVE_BAD_HEADER"; snprintf(error->message, sizeof(error->message), "Unsupported or corrupt RCL bytecode header"); fclose(file); return 0;
   }
   program->strings = (char **)calloc(program->string_count ? program->string_count : 1, sizeof(char *));
@@ -1019,9 +1357,11 @@ static int load_program(const char *path, Program *program, VmError *error) {
   for (uint32_t i = 0; i < program->string_count; i++) {
     uint32_t length = read_u32_le(file, &ok);
     if (!ok || length > 16 * 1024 * 1024) { ok = 0; break; }
-    program->strings[i] = (char *)malloc((size_t)length + 1);
-    if (!program->strings[i] || !read_exact(file, program->strings[i], length)) { ok = 0; break; }
-    program->strings[i][length] = '\0';
+    char *text = (char *)malloc((size_t)length + 1);
+    if (!text || !read_exact(file, text, length)) { free(text); ok = 0; break; }
+    text[length] = '\0';
+    program->strings[i] = shared_string_create(text);
+    free(text);
   }
   for (uint32_t i = 0; ok && i < program->number_count; i++) program->numbers[i] = read_f64_le(file, &ok);
   for (uint32_t i = 0; ok && i < program->instruction_count; i++) {
@@ -1041,7 +1381,7 @@ static int load_program(const char *path, Program *program, VmError *error) {
 }
 
 static void free_program(Program *program) {
-  for (uint32_t i = 0; i < program->string_count; i++) free(program->strings[i]);
+  for (uint32_t i = 0; i < program->string_count; i++) shared_string_release(program->strings[i]);
   free(program->strings);
   free(program->numbers);
   free(program->instructions);
@@ -1116,6 +1456,8 @@ static int values_equal(const Value *left, const Value *right) {
     case VALUE_AST: return strcmp(left->ast->path, right->ast->path) == 0 && strcmp(left->ast->value_type, right->ast->value_type) == 0 && strcmp(left->ast->literal_kind, right->ast->literal_kind) == 0 && strcmp(left->ast->literal_text, right->ast->literal_text) == 0 && span_equal(&left->ast->span, &right->ast->span);
     case VALUE_SEQUENCE:
       if (left->sequence->count != right->sequence->count) return 0;
+      sequence_materialize(left->sequence);
+      sequence_materialize(right->sequence);
       for (size_t i = 0; i < left->sequence->count; i++) if (!values_equal(&left->sequence->items[i], &right->sequence->items[i])) return 0;
       return 1;
     case VALUE_PARSE_STATE: {
@@ -1170,11 +1512,87 @@ static char *trim_copy(const char *source) {
   return result;
 }
 
+static size_t utf8_decode_at(const char *text, size_t byte_length, size_t offset, uint32_t *codepoint, int *valid) {
+  const unsigned char *bytes = (const unsigned char *)text;
+  *valid = 1;
+  if (offset >= byte_length) { *codepoint = 0; return 0; }
+  unsigned char first = bytes[offset];
+  if (first < 0x80) { *codepoint = first; return 1; }
+  size_t width;
+  uint32_t value;
+  uint32_t minimum;
+  if (first >= 0xC2 && first <= 0xDF) { width = 2; value = first & 0x1F; minimum = 0x80; }
+  else if (first >= 0xE0 && first <= 0xEF) { width = 3; value = first & 0x0F; minimum = 0x800; }
+  else if (first >= 0xF0 && first <= 0xF4) { width = 4; value = first & 0x07; minimum = 0x10000; }
+  else { *codepoint = first; *valid = 0; return 1; }
+  if (width > byte_length - offset) { *codepoint = first; *valid = 0; return 1; }
+  for (size_t i = 1; i < width; i++) {
+    unsigned char continuation = bytes[offset + i];
+    if ((continuation & 0xC0) != 0x80) { *codepoint = first; *valid = 0; return 1; }
+    value = (value << 6) | (continuation & 0x3F);
+  }
+  if (value < minimum || value > 0x10FFFF || (value >= 0xD800 && value <= 0xDFFF)) {
+    *codepoint = first; *valid = 0; return 1;
+  }
+  *codepoint = value;
+  return width;
+}
+
+static void shared_string_ensure_character_index(SharedString *shared) {
+  if (shared->character_count != SIZE_MAX) return;
+  size_t length = shared->byte_length;
+  size_t offset = 0;
+  while (offset < length && (unsigned char)shared->data[offset] < 0x80) offset++;
+  if (offset == length) {
+    shared->character_count = length;
+    return;
+  }
+
+  size_t count = offset;
+  while (offset < length) {
+    uint32_t codepoint;
+    int valid;
+    size_t width = (unsigned char)shared->data[offset] < 0x80
+      ? 1
+      : utf8_decode_at(shared->data, length, offset, &codepoint, &valid);
+    offset += width ? width : 1;
+    count++;
+  }
+  shared->character_count = count;
+  if (count == length) return;
+
+  shared->character_offsets = (size_t *)malloc((count + 1) * sizeof(size_t));
+  if (!shared->character_offsets) { fprintf(stderr, "out of memory\n"); exit(2); }
+  offset = 0;
+  for (size_t index = 0; index < count; index++) {
+    shared->character_offsets[index] = offset;
+    uint32_t codepoint;
+    int valid;
+    size_t width = (unsigned char)shared->data[offset] < 0x80
+      ? 1
+      : utf8_decode_at(shared->data, length, offset, &codepoint, &valid);
+    offset += width ? width : 1;
+  }
+  shared->character_offsets[count] = length;
+}
+
+static size_t utf8_length(const char *text) {
+  SharedString *shared = shared_string_header(text);
+  shared_string_ensure_character_index(shared);
+  return shared->character_count;
+}
+
+static size_t utf8_byte_offset(const char *text, size_t character_index) {
+  SharedString *shared = shared_string_header(text);
+  shared_string_ensure_character_index(shared);
+  if (character_index > shared->character_count) character_index = shared->character_count;
+  return shared->character_offsets ? shared->character_offsets[character_index] : character_index;
+}
+
 static Value value_byte_sequence(const unsigned char *bytes, size_t length) {
   Value result = value_null();
   result.type = VALUE_SEQUENCE;
-  result.sequence = (Sequence *)calloc(1, sizeof(Sequence));
-  if (!result.sequence) return value_null();
+  result.sequence = sequence_create();
   if (length == 0) return result;
   result.sequence->items = (Value *)calloc(length, sizeof(Value));
   if (!result.sequence->items) { free(result.sequence); return value_null(); }
@@ -1207,16 +1625,18 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     case BUILTIN_ENDS_WITH: {
       if (argc != 2 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "Text predicate expects two Text values"); break; }
       const char *left = args[0].string, *right = args[1].string;
+      size_t left_length = shared_string_header(left)->byte_length;
+      size_t right_length = shared_string_header(right)->byte_length;
       int matched = 0;
       if (builtin == BUILTIN_CONTAINS) matched = strstr(left, right) != NULL;
-      else if (builtin == BUILTIN_STARTS_WITH) matched = strncmp(left, right, strlen(right)) == 0;
-      else { size_t ll = strlen(left), rl = strlen(right); matched = ll >= rl && strcmp(left + ll - rl, right) == 0; }
+      else if (builtin == BUILTIN_STARTS_WITH) matched = left_length >= right_length && memcmp(left, right, right_length) == 0;
+      else matched = left_length >= right_length && memcmp(left + left_length - right_length, right, right_length) == 0;
       result = value_bool(matched);
       break;
     }
     case BUILTIN_LENGTH:
       if (argc != 1 || (args[0].type != VALUE_STRING && args[0].type != VALUE_SEQUENCE)) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "length expects Text or Sequence");
-      else result = value_number(args[0].type == VALUE_STRING ? (double)strlen(args[0].string) : (double)args[0].sequence->count);
+      else result = value_number(args[0].type == VALUE_STRING ? (double)utf8_length(args[0].string) : (double)args[0].sequence->count);
       break;
     case BUILTIN_LOWER_TEXT:
     case BUILTIN_UPPER_TEXT:
@@ -1235,12 +1655,16 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     case BUILTIN_SPLIT_AFTER: {
       if (argc != 2 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "split operation expects two Text values"); break; }
       char *position = strstr(args[0].string, args[1].string);
-      if (!position) result = value_string(builtin == BUILTIN_SPLIT_BEFORE ? args[0].string : "");
+      if (!position) result = builtin == BUILTIN_SPLIT_BEFORE ? value_clone(&args[0]) : value_string("");
       else if (builtin == BUILTIN_SPLIT_BEFORE) {
         size_t length = (size_t)(position - args[0].string);
-        char *text = (char *)malloc(length + 1); memcpy(text, args[0].string, length); text[length] = '\0';
-        result = value_string(text); free(text);
-      } else result = value_string(position + strlen(args[1].string));
+        result = value_string_n(args[0].string, length);
+      } else {
+        size_t marker_length = shared_string_header(args[1].string)->byte_length;
+        size_t source_length = shared_string_header(args[0].string)->byte_length;
+        size_t start = (size_t)(position - args[0].string) + marker_length;
+        result = value_string_n(args[0].string + start, source_length - start);
+      }
       break;
     }
     case BUILTIN_NUMBER_FROM_TEXT: {
@@ -1266,35 +1690,51 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_NUMBER || floor(args[1].number) != args[1].number) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_get expects Sequence and integer index"); break; }
       int64_t index = (int64_t)args[1].number;
       if (index < 0 || (size_t)index >= args[0].sequence->count) vm_fail(vm, "RCL_SEQUENCE_RANGE", "sequence_get index out of range");
-      else result = value_clone(&args[0].sequence->items[index]);
+      else result = value_clone(sequence_item(args[0].sequence, (size_t)index));
       break;
     }
     case BUILTIN_CHAR_AT: {
       if (argc != 2 || args[0].type != VALUE_STRING || args[1].type != VALUE_NUMBER || floor(args[1].number) != args[1].number) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "char_at expects Text and integer index"); break; }
-      int64_t index = (int64_t)args[1].number; size_t length = strlen(args[0].string);
-      if (index < 0 || (size_t)index >= length) result = value_string("");
-      else { char text[2] = { args[0].string[index], '\0' }; result = value_string(text); }
+      int64_t index = (int64_t)args[1].number; size_t character_count = utf8_length(args[0].string);
+      if (index < 0 || (size_t)index >= character_count) result = value_string("");
+      else {
+        size_t byte_length = shared_string_header(args[0].string)->byte_length;
+        size_t start = utf8_byte_offset(args[0].string, (size_t)index);
+        uint32_t codepoint;
+        int valid;
+        size_t width = utf8_decode_at(args[0].string, byte_length, start, &codepoint, &valid);
+        (void)codepoint;
+        (void)valid;
+        result = value_string_n(args[0].string + start, width);
+      }
       break;
     }
     case BUILTIN_SLICE_TEXT: {
       if (argc != 3 || args[0].type != VALUE_STRING || args[1].type != VALUE_NUMBER || args[2].type != VALUE_NUMBER || floor(args[1].number) != args[1].number || floor(args[2].number) != args[2].number) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "slice_text expects Text and integer start/length"); break; }
-      int64_t start = (int64_t)args[1].number, count = (int64_t)args[2].number; size_t total = strlen(args[0].string);
+      int64_t start = (int64_t)args[1].number, count = (int64_t)args[2].number; size_t total = utf8_length(args[0].string);
       if (start < 0 || count < 0) { vm_fail(vm, "RCL_TEXT_SLICE", "slice_text expects non-negative start/length"); break; }
       if ((size_t)start > total) start = (int64_t)total;
       size_t available = total - (size_t)start; size_t take = (size_t)count < available ? (size_t)count : available;
-      char *text = (char *)malloc(take + 1); if (!text) { fprintf(stderr, "out of memory\n"); exit(2); }
-      memcpy(text, args[0].string + start, take); text[take] = '\0'; result = value_string(text); free(text); break;
+      size_t byte_start = utf8_byte_offset(args[0].string, (size_t)start);
+      size_t byte_end = utf8_byte_offset(args[0].string, (size_t)start + take);
+      size_t byte_take = byte_end - byte_start;
+      result = value_string_n(args[0].string + byte_start, byte_take); break;
     }
     case BUILTIN_IS_WHITESPACE:
     case BUILTIN_IS_DIGIT:
     case BUILTIN_IS_IDENTIFIER_START:
     case BUILTIN_IS_IDENTIFIER_PART: {
       if (argc != 1 || args[0].type != VALUE_STRING) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "character predicate expects Text"); break; }
-      unsigned char ch = (unsigned char)(args[0].string[0] ? args[0].string[0] : 0); int matched = 0;
+      size_t byte_length = shared_string_header(args[0].string)->byte_length;
+      uint32_t codepoint = 0;
+      int utf8_valid = 0;
+      size_t width = utf8_decode_at(args[0].string, byte_length, 0, &codepoint, &utf8_valid);
+      unsigned char ch = codepoint < 0x80 ? (unsigned char)codepoint : 0;
+      int matched = 0;
       if (builtin == BUILTIN_IS_WHITESPACE) matched = ch && isspace(ch);
       else if (builtin == BUILTIN_IS_DIGIT) matched = ch && isdigit(ch);
-      else if (builtin == BUILTIN_IS_IDENTIFIER_START) matched = ch && (isalpha(ch) || ch == '_');
-      else matched = ch && (isalnum(ch) || ch == '_');
+      else if (builtin == BUILTIN_IS_IDENTIFIER_START) matched = width && ((ch && (isalpha(ch) || ch == '_')) || (utf8_valid && codepoint >= 0x80));
+      else matched = width && ((ch && (isalnum(ch) || ch == '_')) || (utf8_valid && codepoint >= 0x80));
       result = value_bool(matched); break;
     }
     case BUILTIN_MAKE_SPAN:
@@ -1428,12 +1868,14 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_SEQUENCE) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_concat expects two Sequences");
       else {
         result.type = VALUE_SEQUENCE;
-        result.sequence = (Sequence *)calloc(1, sizeof(Sequence));
-        if (!result.sequence) { vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate concatenated Sequence"); break; }
+        result.sequence = sequence_create();
+        sequence_materialize(args[0].sequence);
+        sequence_materialize(args[1].sequence);
+        if (args[0].sequence->count > SIZE_MAX - args[1].sequence->count) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Concatenated Sequence is too large"); break; }
         size_t count = args[0].sequence->count + args[1].sequence->count;
         if (count > 0) {
           result.sequence->items = (Value *)calloc(count, sizeof(Value));
-          if (!result.sequence->items) { free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate concatenated Sequence items"); break; }
+          if (!result.sequence->items) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate concatenated Sequence items"); break; }
         }
         result.sequence->count = count;
         size_t out = 0;
@@ -1574,10 +2016,21 @@ static ProviderRegistration *find_provider(VM *vm, const char *provider_id) {
   return NULL;
 }
 
+static int call_continuation_returns(const VM *vm, uint32_t pc) {
+  for (uint32_t hops = 0; hops < vm->program.instruction_count && pc < vm->program.instruction_count; hops++) {
+    const Instruction *instruction = &vm->program.instructions[pc];
+    if (instruction->op == OP_RETURN) return 1;
+    if (instruction->op == OP_NOP) { pc++; continue; }
+    if (instruction->op != OP_JUMP || instruction->a < 0 || (uint32_t)instruction->a >= vm->program.instruction_count) return 0;
+    pc = (uint32_t)instruction->a;
+  }
+  return 0;
+}
+
 static int execute_program(VM *vm) {
   uint32_t pc = 0;
   while (pc < vm->program.instruction_count && !vm->error.code) {
-    if (++vm->executed_instructions > MAX_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded"); break; }
+    if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded (300000000)"); break; }
     Instruction instruction = vm->program.instructions[pc++];
     Value left, right, value, result;
     int comparison;
@@ -1585,7 +2038,7 @@ static int execute_program(VM *vm) {
       case OP_NOP: break;
       case OP_PUSH_NUMBER: stack_push(vm, value_number(pool_number(vm, instruction.a))); break;
       case OP_PUSH_BOOL: stack_push(vm, value_bool(instruction.a)); break;
-      case OP_PUSH_STRING: stack_push(vm, value_string(pool_string(vm, instruction.a))); break;
+      case OP_PUSH_STRING: stack_push(vm, value_string_retain(pool_string(vm, instruction.a))); break;
       case OP_LOAD_STATE: stack_push(vm, vm_load_state(vm, pool_string(vm, instruction.a))); break;
       case OP_STORE_STATE:
         value = stack_pop(vm);
@@ -1596,16 +2049,30 @@ static int execute_program(VM *vm) {
         right = stack_pop(vm); left = stack_pop(vm);
         if (left.type == VALUE_NUMBER && right.type == VALUE_NUMBER) result = value_number(left.number + right.number);
         else if (left.type == VALUE_STRING || right.type == VALUE_STRING) {
-          char *a = value_to_text(&left), *b = value_to_text(&right);
-          size_t length = strlen(a) + strlen(b); char *joined = (char *)malloc(length + 1); strcpy(joined, a); strcat(joined, b);
-          result = value_string(joined); free(joined); free(a); free(b);
+          char *left_owned = NULL, *right_owned = NULL;
+          const char *left_text = left.type == VALUE_STRING ? left.string : (left_owned = value_to_text(&left));
+          const char *right_text = right.type == VALUE_STRING ? right.string : (right_owned = value_to_text(&right));
+          size_t left_length = left.type == VALUE_STRING ? shared_string_header(left.string)->byte_length : strlen(left_text);
+          size_t right_length = right.type == VALUE_STRING ? shared_string_header(right.string)->byte_length : strlen(right_text);
+          result = value_string_join(left_text, left_length, right_text, right_length);
+          free(left_owned);
+          free(right_owned);
         } else { vm_fail(vm, "RCL_NATIVE_ADD_TYPE", "ADD expects Number or Text values"); result = value_null(); }
         value_free(&left); value_free(&right); if (!vm->error.code) stack_push(vm, result); else value_free(&result); break;
-      case OP_SUB: case OP_MUL: case OP_DIV:
+      case OP_SUB: case OP_MUL: case OP_DIV: case OP_MOD:
         right = stack_pop(vm); left = stack_pop(vm);
         if (left.type != VALUE_NUMBER || right.type != VALUE_NUMBER) { vm_fail(vm, "RCL_NATIVE_ARITHMETIC_TYPE", "Arithmetic expects Number values"); result = value_null(); }
-        else if (instruction.op == OP_DIV && right.number == 0) { vm_fail(vm, "RCL_NATIVE_DIVIDE_ZERO", "Division by zero"); result = value_null(); }
-        else result = value_number(instruction.op == OP_SUB ? left.number - right.number : instruction.op == OP_MUL ? left.number * right.number : left.number / right.number);
+        else if ((instruction.op == OP_DIV || instruction.op == OP_MOD) && right.number == 0) {
+          vm_fail(vm, instruction.op == OP_DIV ? "RCL_NATIVE_DIVIDE_ZERO" : "RCL_NATIVE_MODULO_ZERO", instruction.op == OP_DIV ? "Division by zero" : "Modulo by zero");
+          result = value_null();
+        } else {
+          result = value_number(
+            instruction.op == OP_SUB ? left.number - right.number
+              : instruction.op == OP_MUL ? left.number * right.number
+                : instruction.op == OP_DIV ? left.number / right.number
+                  : fmod(left.number, right.number)
+          );
+        }
         value_free(&left); value_free(&right); if (!vm->error.code) stack_push(vm, result); else value_free(&result); break;
       case OP_EQ: case OP_NEQ:
         right = stack_pop(vm); left = stack_pop(vm); comparison = values_equal(&left, &right); if (instruction.op == OP_NEQ) comparison = !comparison;
@@ -1685,24 +2152,58 @@ static int execute_program(VM *vm) {
       }
       case OP_CALL_BUILTIN: execute_builtin(vm, instruction.a, instruction.b); break;
       case OP_CALL_PROVIDER: {
-        const char *provider_id = pool_string(vm, instruction.a);
-        const char *capability = pool_string(vm, instruction.b);
-        const char *request_json = pool_string(vm, instruction.c);
+        Value provider_id_value = value_null();
+        Value capability_value = value_null();
+        Value request_value = value_null();
+        const char *provider_id;
+        const char *capability;
+        const char *request_json;
+        if (instruction.flags & 1) {
+          request_value = stack_pop(vm);
+          capability_value = stack_pop(vm);
+          provider_id_value = stack_pop(vm);
+          if (vm->error.code) {
+            value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
+            break;
+          }
+          if (provider_id_value.type != VALUE_STRING || capability_value.type != VALUE_STRING || request_value.type != VALUE_STRING) {
+            value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
+            vm_fail(vm, "RCL_NATIVE_PROVIDER_ARGUMENT_TYPE", "provider_call expects Text provider id, capability and request JSON");
+            break;
+          }
+          provider_id = provider_id_value.string;
+          capability = capability_value.string;
+          request_json = request_value.string;
+        } else {
+          provider_id = pool_string(vm, instruction.a);
+          capability = pool_string(vm, instruction.b);
+          request_json = pool_string(vm, instruction.c);
+        }
         ProviderRegistration *provider = find_provider(vm, provider_id);
         if (!provider || !provider->invoke) {
           char message[384];
           snprintf(message, sizeof(message), "Provider '%s' is not registered for capability '%s'", provider_id, capability);
+          value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
           vm_fail(vm, "RCL_NATIVE_PROVIDER_MISSING", message);
           break;
         }
-        char response[MAX_PROVIDER_RESPONSE]; response[0] = '\0';
+        char *response = (char *)calloc(MAX_PROVIDER_RESPONSE, 1);
+        if (!response) {
+          value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
+          vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate native provider response buffer");
+          break;
+        }
         char provider_error[512]; provider_error[0] = '\0';
-        int provider_ok = provider->invoke(provider->userdata, capability, request_json, response, sizeof(response), provider_error, sizeof(provider_error));
+        int provider_ok = provider->invoke(provider->userdata, capability, request_json, response, MAX_PROVIDER_RESPONSE, provider_error, sizeof(provider_error));
+        response[MAX_PROVIDER_RESPONSE - 1] = '\0';
+        value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
         if (!provider_ok) {
           vm_fail(vm, "RCL_NATIVE_PROVIDER_FAILURE", provider_error[0] ? provider_error : "Native provider invocation failed");
+          free(response);
           break;
         }
         stack_push(vm, value_string(response));
+        free(response);
         break;
       }
       case OP_MAKE_TYPED_RECORD: {
@@ -1808,9 +2309,22 @@ static int execute_program(VM *vm) {
       case OP_CALL: {
         if (instruction.a < 0 || (uint32_t)instruction.a >= vm->program.instruction_count) { vm_fail(vm, "RCL_NATIVE_CALL_RANGE", "Call target out of range"); break; }
         if (instruction.b < 0 || vm->stack_count < (size_t)instruction.b) { vm_fail(vm, "RCL_NATIVE_CALL_ARITY", "Call argument stack underflow"); break; }
-        if (vm->frame_count >= MAX_CALL_FRAMES) { vm_fail(vm, "RCL_NATIVE_CALL_DEPTH", "Native reckoning call depth exceeded"); break; }
+        if (vm->frame_count > 0 && call_continuation_returns(vm, pc)) {
+          CallFrame *frame = &vm->frames[vm->frame_count - 1];
+          size_t argc = (size_t)instruction.b;
+          size_t argument_start = vm->stack_count - argc;
+          if (argument_start < frame->base) { vm_fail(vm, "RCL_NATIVE_CALL_ARITY", "Tail call arguments overlap the caller frame"); break; }
+          for (size_t i = frame->base; i < argument_start; i++) value_free(&vm->stack[i]);
+          memmove(&vm->stack[frame->base], &vm->stack[argument_start], argc * sizeof(Value));
+          vm->stack_count = frame->base + argc;
+          frame->argc = instruction.b;
+          pc = (uint32_t)instruction.a;
+          break;
+        }
+        if (!frame_reserve(vm, vm->frame_count + 1)) break;
         CallFrame *frame = &vm->frames[vm->frame_count++];
         frame->return_pc = pc; frame->argc = instruction.b; frame->base = vm->stack_count - (size_t)instruction.b;
+        if (vm->frame_count > vm->peak_frame_count) vm->peak_frame_count = vm->frame_count;
         pc = (uint32_t)instruction.a;
         break;
       }
@@ -1915,7 +2429,17 @@ static void print_success(VM *vm, FILE *out) {
   for (size_t i = 0; i < vm->projection_count; i++) { if (i) fputc(',', out); print_record(out, vm, &vm->projections[i]); }
   fputs("],\"history\":[", out);
   for (size_t i = 0; i < vm->history_count; i++) { if (i) fputc(',', out); print_record(out, vm, &vm->history[i]); }
-  fprintf(out, "],\"metrics\":{\"instructions\":%" PRIu64 ",\"stateEntries\":%zu,\"warrants\":%zu}}\n", vm->executed_instructions, vm->state.count, vm->warrant_count);
+  fprintf(
+    out,
+    "],\"metrics\":{\"instructions\":%" PRIu64 ",\"stateEntries\":%zu,\"warrants\":%zu,\"peakStackDepth\":%zu,\"peakCallFrames\":%zu,\"stackCapacity\":%zu,\"callFrameCapacity\":%zu}}\n",
+    vm->executed_instructions,
+    vm->state.count,
+    vm->warrant_count,
+    vm->peak_stack_count,
+    vm->peak_frame_count,
+    vm->stack_capacity,
+    vm->frame_capacity
+  );
 }
 
 static void print_error(VmError *error, FILE *out) {
@@ -1925,6 +2449,14 @@ static void print_error(VmError *error, FILE *out) {
 
 static void vm_free(VM *vm) {
   for (size_t i = 0; i < vm->stack_count; i++) value_free(&vm->stack[i]);
+  free(vm->stack);
+  vm->stack = NULL;
+  vm->stack_count = 0;
+  vm->stack_capacity = 0;
+  free(vm->frames);
+  vm->frames = NULL;
+  vm->frame_count = 0;
+  vm->frame_capacity = 0;
   state_free(&vm->state);
   for (size_t i = 0; i < vm->warrant_count; i++) { free(vm->warrants[i].subject); free(vm->warrants[i].capability); free(vm->warrants[i].target); }
   transaction_reset(&vm->tx);
@@ -1948,6 +2480,8 @@ static void vm_clear_transient(VM *vm, int clear_state) {
   vm->history_count = 0;
   vm->frame_count = 0;
   vm->executed_instructions = 0;
+  vm->peak_stack_count = 0;
+  vm->peak_frame_count = 0;
   memset(&vm->error, 0, sizeof(vm->error));
   if (clear_state) {
     state_free(&vm->state);
@@ -2044,7 +2578,95 @@ int rclvm_instance_reset(RclVmInstance *instance, int clear_state) {
   return 1;
 }
 
+int rclvm_instance_get_state_text(
+  RclVmInstance *instance,
+  const char *path,
+  char **text,
+  size_t *text_length,
+  char *error,
+  size_t error_capacity
+) {
+  if (text) *text = NULL;
+  if (text_length) *text_length = 0;
+  if (!instance || !path || !text) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_ABI_ARGUMENT: instance, path and text output are required");
+    return 0;
+  }
+  const StateEntry *entry = state_find_const(&instance->vm.state, path);
+  if (!entry) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_MISSING: Facet '%s' does not exist", path);
+    return 0;
+  }
+  if (entry->value.type != VALUE_STRING) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_TYPE_MISMATCH: Facet '%s' is not Text", path);
+    return 0;
+  }
+  size_t length = strlen(entry->value.string);
+  char *copy = (char *)malloc(length + 1);
+  if (!copy) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_NATIVE_OOM: Unable to copy Text state '%s'", path);
+    return 0;
+  }
+  memcpy(copy, entry->value.string, length + 1);
+  *text = copy;
+  if (text_length) *text_length = length;
+  return 1;
+}
+
+int rclvm_instance_get_state_bytes(
+  RclVmInstance *instance,
+  const char *path,
+  uint8_t **bytes,
+  size_t *byte_length,
+  char *error,
+  size_t error_capacity
+) {
+  if (bytes) *bytes = NULL;
+  if (byte_length) *byte_length = 0;
+  if (!instance || !path || !bytes) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_ABI_ARGUMENT: instance, path and bytes output are required");
+    return 0;
+  }
+  const StateEntry *entry = state_find_const(&instance->vm.state, path);
+  if (!entry) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_MISSING: Facet '%s' does not exist", path);
+    return 0;
+  }
+  if (entry->value.type != VALUE_SEQUENCE || !entry->value.sequence) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_TYPE_MISMATCH: Facet '%s' is not Sequence", path);
+    return 0;
+  }
+  sequence_materialize(entry->value.sequence);
+  size_t length = entry->value.sequence->count;
+  uint8_t *copy = (uint8_t *)malloc(length ? length : 1);
+  if (!copy) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_NATIVE_OOM: Unable to copy byte Sequence state '%s'", path);
+    return 0;
+  }
+  for (size_t i = 0; i < length; i++) {
+    const Value *item = &entry->value.sequence->items[i];
+    if (item->type != VALUE_NUMBER || !isfinite(item->number) || floor(item->number) != item->number || item->number < 0 || item->number > 255) {
+      free(copy);
+      if (error && error_capacity) snprintf(error, error_capacity, "RCL_STATE_BYTES_INVALID: Facet '%s' item %zu is not an integer byte", path, i);
+      return 0;
+    }
+    copy[i] = (uint8_t)item->number;
+  }
+  *bytes = copy;
+  if (byte_length) *byte_length = length;
+  return 1;
+}
+
+size_t rclvm_instance_get_peak_stack_depth(const RclVmInstance *instance) {
+  return instance ? instance->vm.peak_stack_count : 0;
+}
+
+size_t rclvm_instance_get_peak_call_frame_depth(const RclVmInstance *instance) {
+  return instance ? instance->vm.peak_frame_count : 0;
+}
+
 void rclvm_free_string(char *value) { free(value); }
+void rclvm_free_bytes(uint8_t *value) { free(value); }
 
 #ifndef RCLVM_EMBEDDED_ONLY
 int main(int argc, char **argv) {

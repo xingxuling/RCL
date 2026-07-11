@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import {
@@ -12,7 +13,7 @@ import {
   writeRealityProductEntryRuntimeReports,
 } from '../src/reality-product-entry-runtime.mjs';
 
-const cwd = path.resolve(new URL('..', import.meta.url).pathname);
+const cwd = fileURLToPath(new URL('..', import.meta.url));
 
 function tempDir(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `${name}-`));

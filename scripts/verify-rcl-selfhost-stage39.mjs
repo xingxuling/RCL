@@ -17,7 +17,7 @@ const targetRbcPath = path.join(outputDir, 'stage39-unary-not-target.rbc');
 const referenceRbcPath = path.join(outputDir, 'stage39-unary-not-js-reference.rbc');
 
 const EXPECTED_ROOT = '6961b0ffd5019d30b8aa4d22368200a5bdb1f17e7cb5ffd40a31dcf1947d436b';
-const EXPECTED_TARGET_SHA = '9fa109da0638ab9946be1ec56e012ab0a3ca05d105a0a6bd1cd884a643483ddc';
+const EXPECTED_TARGET_SHA = '32fb9710be02209584c4ecdd3a270c4d13bd9e717633da6b77a5ca886d06a9d4';
 const EXPECTED_NUMBERS = [8, 1, 2, 10, 3, 6, 4];
 const EXPECTED_STRINGS = [
   'Stage39Target',
@@ -50,21 +50,24 @@ const EXPECTED_STRINGS = [
 ];
 
 const EXPECTED_INDEXES = {
-  not: [18, 22, 35, 39, 48, 52, 65, 69, 78, 82, 95, 99, 108, 112, 125, 129, 138, 142, 155, 159, 168, 172, 185, 189, 198, 202, 215, 219, 228, 232, 245, 249, 258, 262, 275, 279, 288, 292, 305, 309],
-  and: [23, 40, 53, 70, 83, 113, 143, 160, 173, 190, 203, 233, 263, 280, 293, 310],
-  or: [100, 130, 220, 250],
-  add: [29, 59, 269, 299],
-  sub: [149, 179],
-  mul: [89, 119],
-  div: [209, 239],
-  eq: [21, 34, 38, 51, 64, 68, 81, 98, 111, 128, 141, 171, 201, 218, 231, 248, 257, 274, 287, 304],
-  neq: [17, 47, 158, 188, 261, 278, 291, 308],
-  lt: [77, 94, 107, 124],
-  lte: [154, 184],
-  gt: [137, 167, 214, 244],
-  gte: [197, 227],
-  pushString: [2, 16, 33, 46, 63, 157, 187, 260, 277, 290, 307],
-  pushBool: [0, 8, 20, 37, 50, 67, 80, 97, 110, 127, 140, 170, 200, 217, 230, 247, 256, 273, 286, 303],
+  not: [18, 23, 24, 25, 39, 44, 45, 46, 56, 61, 62, 63, 77, 82, 83, 84, 94, 99, 100, 101, 115, 122, 123, 124, 132, 137, 138, 139, 153, 160, 161, 162, 170, 175, 176, 177, 191, 196, 197, 198, 208, 213, 214, 215, 229, 234, 235, 236, 246, 251, 252, 253, 267, 274, 275, 276, 284, 289, 290, 291, 305, 312, 313, 314, 322, 327, 328, 329, 343, 348, 349, 350, 360, 365, 366, 367, 381, 386, 387, 388],
+  and: [],
+  or: [],
+  jump: [26, 47, 64, 85, 102, 118, 140, 156, 178, 199, 216, 237, 254, 270, 292, 308, 330, 351, 368, 389],
+  jumpIfFalse: [19, 28, 40, 57, 66, 78, 95, 104, 116, 133, 142, 154, 171, 180, 192, 209, 218, 230, 247, 256, 268, 285, 294, 306, 323, 332, 344, 361, 370, 382],
+  checkWarrant: [30, 68, 106, 144, 182, 220, 258, 296, 334, 372],
+  add: [33, 71, 337, 375],
+  sub: [185, 223],
+  mul: [109, 147],
+  div: [261, 299],
+  eq: [22, 38, 43, 60, 76, 81, 98, 121, 136, 159, 174, 212, 250, 273, 288, 311, 321, 342, 359, 380],
+  neq: [17, 55, 195, 233, 326, 347, 364, 385],
+  lt: [93, 114, 131, 152],
+  lte: [190, 228],
+  gt: [169, 207, 266, 304],
+  gte: [245, 283],
+  pushString: [2, 16, 37, 54, 75, 194, 232, 325, 346, 363, 384],
+  pushBool: [0, 8, 21, 27, 42, 48, 59, 65, 80, 86, 97, 103, 117, 120, 135, 141, 155, 158, 173, 179, 200, 211, 217, 238, 249, 255, 269, 272, 287, 293, 307, 310, 320, 331, 341, 352, 358, 369, 379, 390],
 };
 
 function sha256(buffer) {
@@ -135,6 +138,11 @@ const booleanIndexes = {
   and: opcodeIndexes(decodedTarget, 'AND'),
   or: opcodeIndexes(decodedTarget, 'OR'),
 };
+const controlIndexes = {
+  jump: opcodeIndexes(decodedTarget, 'JUMP'),
+  jumpIfFalse: opcodeIndexes(decodedTarget, 'JUMP_IF_FALSE'),
+  checkWarrant: opcodeIndexes(decodedTarget, 'CHECK_WARRANT'),
+};
 const arithmeticIndexes = {
   add: opcodeIndexes(decodedTarget, 'ADD'),
   sub: opcodeIndexes(decodedTarget, 'SUB'),
@@ -154,7 +162,7 @@ const pushBoolIndexes = opcodeIndexes(decodedTarget, 'PUSH_BOOL');
 const opcodeCounts = Object.fromEntries([
   'PUSH_BOOL', 'STORE_STATE', 'PUSH_STRING', 'PUSH_NUMBER', 'GRANT_WARRANT', 'LOAD_STATE',
   'EQ', 'NEQ', 'LT', 'LTE', 'GT', 'GTE', 'AND', 'OR', 'NOT',
-  'JUMP_IF_FALSE', 'BEGIN_TX', 'CHECK_WARRANT', 'ADD', 'SUB', 'MUL', 'DIV',
+  'JUMP', 'JUMP_IF_FALSE', 'BEGIN_TX', 'CHECK_WARRANT', 'ADD', 'SUB', 'MUL', 'DIV',
   'STAGE_STORE', 'SET_PROJECTED_VIEW', 'CHECK_PRESERVE', 'RECORD_WITNESS', 'COMMIT_TX', 'HALT',
 ].map(name => [name, opcodeCount(decodedTarget, name)]));
 
@@ -213,7 +221,7 @@ const checks = {
     && compilerProgram.rules[3].alters[0].expression.operator === '/'
     && compilerProgram.rules[4].alters[0].expression.operator === '+'
     && compilerProgram.directives.length === 10,
-  targetRbcGenerated: targetRbc.length > 0
+  targetRbcGenerated: targetRbc.length === 6904
     && decodedTarget.program === 'Stage39Target'
     && decodedTarget.sourceRoot === compilerProgram.programRoot,
   targetRbcMatchesJsReference: targetRbc.equals(referenceRbc)
@@ -224,14 +232,17 @@ const checks = {
     && targetNativeRun.state['world.score'] === 4.5
     && targetNativeRun.state['world.level'] === 2
     && targetNativeRun.state['world.certified'] === false,
-  targetHasCorrectInstructionCount: decodedTarget.instructions.length === 316
-    && state['target.rbc_instruction_count'] === 316,
+  targetHasCorrectInstructionCount: decodedTarget.instructions.length === 396
+    && state['target.rbc_instruction_count'] === 396,
   targetHasCorrectStringPool: JSON.stringify(decodedTarget.strings) === JSON.stringify(EXPECTED_STRINGS),
   targetHasCorrectNumberPool: JSON.stringify(decodedTarget.numbers) === JSON.stringify(EXPECTED_NUMBERS),
   unaryNotLoweringEvidence: state['compiler.unary_not_lowering_supported'] === true
     && JSON.stringify(unaryIndexes.not) === JSON.stringify(EXPECTED_INDEXES.not)
     && JSON.stringify(booleanIndexes.and) === JSON.stringify(EXPECTED_INDEXES.and)
     && JSON.stringify(booleanIndexes.or) === JSON.stringify(EXPECTED_INDEXES.or)
+    && JSON.stringify(controlIndexes.jump) === JSON.stringify(EXPECTED_INDEXES.jump)
+    && JSON.stringify(controlIndexes.jumpIfFalse) === JSON.stringify(EXPECTED_INDEXES.jumpIfFalse)
+    && JSON.stringify(controlIndexes.checkWarrant) === JSON.stringify(EXPECTED_INDEXES.checkWarrant)
     && JSON.stringify(arithmeticIndexes.add) === JSON.stringify(EXPECTED_INDEXES.add)
     && JSON.stringify(arithmeticIndexes.sub) === JSON.stringify(EXPECTED_INDEXES.sub)
     && JSON.stringify(arithmeticIndexes.mul) === JSON.stringify(EXPECTED_INDEXES.mul)
@@ -244,9 +255,13 @@ const checks = {
     && JSON.stringify(comparisonIndexes.gte) === JSON.stringify(EXPECTED_INDEXES.gte)
     && JSON.stringify(pushStringIndexes) === JSON.stringify(EXPECTED_INDEXES.pushString)
     && JSON.stringify(pushBoolIndexes) === JSON.stringify(EXPECTED_INDEXES.pushBool)
-    && opcodeCounts.NOT === 40
+    && opcodeCounts.NOT === 80
+    && opcodeCounts.AND === 0
+    && opcodeCounts.OR === 0
+    && opcodeCounts.JUMP === 20
+    && opcodeCounts.JUMP_IF_FALSE === 30
     && decodedTarget.instructions[18]?.name === 'NOT'
-    && decodedTarget.instructions[315]?.name === 'HALT',
+    && decodedTarget.instructions[395]?.name === 'HALT',
   boundaryHonest: state['selfhost.boundary'] === 'unary_not_lowering_subset_not_complete_expression_ast_parser_compiler_or_runtime'
     && state['gate.rcl_owned_boolean_connective_lowering_subset'] === true
     && state['gate.rcl_owned_unary_not_lowering_subset'] === true
@@ -310,6 +325,7 @@ const payload = {
     opcodeCounts,
     unaryIndexes,
     booleanIndexes,
+    controlIndexes,
     arithmeticIndexes,
     comparisonIndexes,
     pushStringIndexes,
@@ -334,7 +350,7 @@ const payload = {
     history: targetReferenceRun.history,
   },
   boundaries: {
-    implementedNow: 'RCL maps parenthesized primitive comparison expressions wrapped in unary not to comparison bytecode followed by NOT for this self-host compiler subset, while preserving Stage38 boolean connective and Stage37 arithmetic lowering.',
+    implementedNow: 'RCL maps unary-not comparison expressions and their and/or composition to the current JS-compatible short-circuit jump layout, while preserving Stage38 boolean and Stage37 arithmetic lowering.',
     notYetImplemented: 'This is still a subset. Complete expression AST coverage, parser completion, complete compiler self-emission without stage0, complete runtime, and full native self-hosting remain outside this stage.',
     nextTarget: state['selfhost.next_rewrite_target'],
   },

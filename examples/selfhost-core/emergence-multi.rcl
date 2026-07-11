@@ -1,0 +1,27 @@
+reality SelfHostEmergenceFixture {
+  facet world.level : Number = 1
+  facet world.ready : Truth = true
+  facet world.score : Number = 4
+  facet world.status : Text = "armed"
+
+  subject founder {
+    warrant world.audit on world
+    warrant world.raise on world
+  }
+
+  emergence promote {
+    cause founder
+    when world.ready == true and world.score >= 4
+    needs world.raise on world
+    needs world.audit on world
+    alter world.score <- world.score + 2
+    alter world.level <- world.level * 3
+    preserve world.score >= 4
+    preserve world.level >= 1
+    witness "selfhost:emergence:promote"
+    witness "selfhost:emergence:verified"
+  }
+
+  foresee promote
+  realize promote
+}
