@@ -31,6 +31,7 @@
 #define MAX_PROVIDERS 64
 #define MAX_PROVIDER_RESPONSE (16 * 1024 * 1024)
 #define MAX_TYPED_HEAP_OBJECTS 4096
+#define MAX_DOMAIN_OPERATIONS 18
 
 /* Must remain aligned with src/bytecode.mjs. */
 enum {
@@ -79,6 +80,7 @@ enum {
   OP_DEREF_TYPED_REF = 42,
   OP_GET_TYPED_REF_ID = 43,
   OP_MOD = 44,
+  OP_DOMAIN_CALL = 45,
 };
 
 enum {
@@ -313,6 +315,33 @@ typedef struct {
   void *userdata;
 } ProviderRegistration;
 
+typedef enum {
+  DOMAIN_BUILTIN_CORE_ECHO,
+  DOMAIN_BUILTIN_QUANTITY_MAKE,
+  DOMAIN_BUILTIN_QUANTITATIVE_MEASURE,
+  DOMAIN_BUILTIN_KNOWLEDGE_CLAIM,
+  DOMAIN_BUILTIN_LANGUAGE_UTTERANCE,
+  DOMAIN_BUILTIN_LANGUAGE_INTENT,
+  DOMAIN_BUILTIN_UNDERSTANDING_MODEL,
+  DOMAIN_BUILTIN_CREATION_CANDIDATE,
+  DOMAIN_BUILTIN_CREATION_SELECT,
+  DOMAIN_BUILTIN_ENERGY_SCALE,
+  DOMAIN_BUILTIN_ELEMENT_SPECIES,
+  DOMAIN_BUILTIN_ELEMENT_COMPOUND,
+  DOMAIN_BUILTIN_SCIENCE_CLAIM,
+  DOMAIN_BUILTIN_SCIENCE_EXPERIMENT,
+  DOMAIN_BUILTIN_BODY_STATE,
+  DOMAIN_BUILTIN_SPIRIT_STATE,
+  DOMAIN_BUILTIN_SPACETIME_POINT,
+  DOMAIN_BUILTIN_SPACETIME_RETIME,
+} DomainBuiltin;
+
+typedef struct {
+  const char *domain;
+  const char *operation;
+  DomainBuiltin builtin;
+} DomainOperationRegistration;
+
 typedef struct {
   Program program;
   State state;
@@ -335,6 +364,8 @@ typedef struct {
   VmError error;
   ProviderRegistration providers[MAX_PROVIDERS];
   size_t provider_count;
+  DomainOperationRegistration domain_operations[MAX_DOMAIN_OPERATIONS];
+  size_t domain_operation_count;
   uint64_t next_typed_object_id;
   uint64_t typed_heap_allocated;
   uint64_t typed_ref_allocated;
@@ -567,7 +598,7 @@ static Value value_ir(const char *op, const char *path, const char *value_type, 
   v.ir->op = xstrdup(op); v.ir->path = xstrdup(path); v.ir->value_type = xstrdup(value_type); v.ir->literal_kind = xstrdup(literal_kind); v.ir->literal_text = xstrdup(literal_text); v.ir->slot = slot; v.ir->span = *span; return v;
 }
 
-static Value value_typed_record_with_id(uint64_t object_id, const char *type_name, char **field_names, const Value *field_values, size_t field_count) {
+static Value value_typed_record_with_id(uint64_t object_id, const char *type_name, const char *const *field_names, const Value *field_values, size_t field_count) {
   Value v = value_null(); v.type = VALUE_TYPED_RECORD; v.typed_record = (TypedRecord *)calloc(1, sizeof(TypedRecord));
   if (!v.typed_record) { fprintf(stderr, "out of memory\n"); exit(2); }
   v.typed_record->object_id = object_id;
@@ -713,7 +744,7 @@ static Value value_clone(const Value *value) {
     case VALUE_SYMBOL: return value_symbol(value->symbol->path, value->symbol->value_type, value->symbol->slot, &value->symbol->span);
     case VALUE_SEMANTIC: return value_semantic(value->semantic->path, value->semantic->value_type, value->semantic->literal_kind, value->semantic->literal_text, value->semantic->slot, &value->semantic->span);
     case VALUE_IR: return value_ir(value->ir->op, value->ir->path, value->ir->value_type, value->ir->literal_kind, value->ir->literal_text, value->ir->slot, &value->ir->span);
-    case VALUE_TYPED_RECORD: return value_typed_record_with_id(value->typed_record->object_id, value->typed_record->type_name, value->typed_record->field_names, value->typed_record->field_values, value->typed_record->field_count);
+    case VALUE_TYPED_RECORD: return value_typed_record_with_id(value->typed_record->object_id, value->typed_record->type_name, (const char *const *)value->typed_record->field_names, value->typed_record->field_values, value->typed_record->field_count);
     case VALUE_TYPED_UNION: return value_typed_union_with_id(value->typed_union->object_id, value->typed_union->type_name, value->typed_union->variant, value->typed_union->payload, value->typed_union->payload_count);
     case VALUE_TYPED_REF: return value_typed_ref(value->typed_ref->object_id, value->typed_ref->type_name, value->typed_ref->target_kind);
     default: return value_null();
@@ -759,6 +790,612 @@ static int typed_heap_register(VM *vm, const Value *value) {
   entry->value = value_clone(value);
   entry->marked = 0;
   return 1;
+}
+
+static Value domain_make_typed_record(VM *vm, const char *type_name, const char *const *field_names, const Value *field_values, size_t field_count) {
+  uint64_t object_id = vm->next_typed_object_id++;
+  vm->typed_heap_allocated++;
+  Value result = value_typed_record_with_id(object_id, type_name, field_names, field_values, field_count);
+  if (!typed_heap_register(vm, &result)) {
+    value_free(&result);
+    return value_null();
+  }
+  return result;
+}
+
+static int is_quantity_type(const char *type_name) {
+  static const char *const types[] = {
+    "Length", "Time", "Mass", "Velocity", "Acceleration", "Force", "Energy",
+    "Temperature", "Frequency", "Area", "Volume", "Pressure", "Power", "Information",
+  };
+  for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); i++) if (strcmp(type_name, types[i]) == 0) return 1;
+  return 0;
+}
+
+static const char *quantity_default_unit(const char *type_name) {
+  static const struct { const char *type_name; const char *unit; } units[] = {
+    { "Length", "m" }, { "Time", "s" }, { "Mass", "kg" }, { "Velocity", "m/s" },
+    { "Acceleration", "m/s²" }, { "Force", "N" }, { "Energy", "J" },
+    { "Temperature", "°C" }, { "Frequency", "Hz" }, { "Area", "m²" },
+    { "Volume", "m³" }, { "Pressure", "Pa" }, { "Power", "W" }, { "Information", "bit" },
+  };
+  for (size_t i = 0; i < sizeof(units) / sizeof(units[0]); i++) if (strcmp(type_name, units[i].type_name) == 0) return units[i].unit;
+  return NULL;
+}
+
+static const Value *typed_record_field(const Value *value, const char *field_name) {
+  if (!value || value->type != VALUE_TYPED_RECORD || !value->typed_record) return NULL;
+  int index = typed_record_field_index(value->typed_record, field_name);
+  return index < 0 ? NULL : &value->typed_record->field_values[index];
+}
+
+static const char *native_runtime_type(const Value *value) {
+  if (!value) return NULL;
+  switch (value->type) {
+    case VALUE_NUMBER: return "Number";
+    case VALUE_STRING: return "Text";
+    case VALUE_BOOL: return "Truth";
+    case VALUE_SEQUENCE: return "Sequence";
+    case VALUE_SPAN: return "Span";
+    case VALUE_TOKEN: return "Token";
+    case VALUE_AST: return "AstNode";
+    case VALUE_PARSE_STATE: return "ParseState";
+    case VALUE_TYPED_RECORD: {
+      if (!value->typed_record) return NULL;
+      if (strcmp(value->typed_record->type_name, "Quantity") == 0) {
+        const Value *type = typed_record_field(value, "type");
+        return type && type->type == VALUE_STRING ? type->string : NULL;
+      }
+      return value->typed_record->type_name;
+    }
+    case VALUE_TYPED_UNION: return value->typed_union ? value->typed_union->type_name : NULL;
+    default: return NULL;
+  }
+}
+
+static void domain_argument_error(VM *vm, const char *operation, const char *message) {
+  char detail[384];
+  snprintf(detail, sizeof(detail), "%s: %s", operation, message);
+  vm_fail(vm, "RCL_NATIVE_DOMAIN_ARGUMENT", detail);
+}
+
+static int value_matches_base_type(const Value *value, const char *base_type);
+
+static int domain_is_bounded_number(const Value *value) {
+  return value->type == VALUE_NUMBER && isfinite(value->number) && value->number >= 0 && value->number <= 1;
+}
+
+static int domain_is_root(const Value *value) {
+  return value->type == VALUE_NULL || value->type == VALUE_STRING;
+}
+
+static Value domain_language_utterance(VM *vm, const Value *args, size_t argc) {
+  if (argc != 6 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING
+      || args[2].type != VALUE_STRING || args[3].type != VALUE_STRING
+      || args[4].type != VALUE_SEQUENCE || !domain_is_root(&args[5])) {
+    domain_argument_error(vm, "language.utterance", "expects text, speaker, locale and channel Text, evidence Sequence, and formedAtRoot Text or Null");
+    return value_null();
+  }
+  static const char *const names[] = { "kind", "text", "speaker", "locale", "channel", "evidence", "formedAtRoot" };
+  Value fields[] = {
+    value_string("Utterance"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_clone(&args[4]), value_clone(&args[5]),
+  };
+  Value result = domain_make_typed_record(vm, "Utterance", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static int domain_slots_are_pairs(const Value *slots) {
+  if (slots->type != VALUE_SEQUENCE || !slots->sequence || slots->sequence->count % 2 != 0) return 0;
+  /* slots is the compact lowering: alternating Text name and arbitrary value. */
+  for (size_t i = 0; i < slots->sequence->count; i += 2) {
+    if (sequence_item(slots->sequence, i)->type != VALUE_STRING) return 0;
+  }
+  return 1;
+}
+
+static Value domain_compact_map(VM *vm, const Value *pairs, const char *operation, const char *label) {
+  if (!domain_slots_are_pairs(pairs)) {
+    char message[192];
+    snprintf(message, sizeof(message), "%s must be an alternating Text key/value Sequence", label);
+    domain_argument_error(vm, operation, message);
+    return value_null();
+  }
+  size_t field_count = pairs->sequence->count / 2;
+  const char **names = (const char **)calloc(field_count ? field_count : 1, sizeof(const char *));
+  Value *fields = (Value *)calloc(field_count ? field_count : 1, sizeof(Value));
+  if (!names || !fields) { free(names); free(fields); fprintf(stderr, "out of memory\n"); exit(2); }
+  for (size_t i = 0; i < field_count; i++) {
+    const Value *key = sequence_item(pairs->sequence, i * 2);
+    for (size_t prior = 0; prior < i; prior++) {
+      if (strcmp(names[prior], key->string) == 0) {
+        for (size_t j = 0; j < i; j++) value_free(&fields[j]);
+        free(fields); free(names);
+        domain_argument_error(vm, operation, "compact map keys must be unique");
+        return value_null();
+      }
+    }
+    names[i] = key->string;
+    fields[i] = value_clone(sequence_item(pairs->sequence, i * 2 + 1));
+  }
+  Value result = domain_make_typed_record(vm, "CompactMap", names, fields, field_count);
+  for (size_t i = 0; i < field_count; i++) value_free(&fields[i]);
+  free(fields); free(names);
+  return result;
+}
+
+static Value domain_nullable_text(const Value *value) {
+  return value->string[0] ? value_clone(value) : value_null();
+}
+
+static Value domain_language_intent(VM *vm, const Value *args, size_t argc) {
+  if (argc != 9 || args[0].type != VALUE_STRING || args[1].type != VALUE_BOOL
+      || args[2].type != VALUE_STRING || args[3].type != VALUE_STRING || !domain_is_bounded_number(&args[4])
+      || args[5].type != VALUE_SEQUENCE || args[6].type != VALUE_SEQUENCE || !domain_slots_are_pairs(&args[7])
+      || !domain_is_root(&args[8])) {
+    domain_argument_error(vm, "language.intent", "expects name Text, active Truth, action and target Text, confidence Number, evidence and utterances Sequence, alternating name/value slots Sequence, and formedAtRoot Text or Null");
+    return value_null();
+  }
+  static const char *const names[] = {
+    "kind", "name", "active", "action", "target", "confidence", "evidence", "utterances", "slots", "formedAtRoot",
+  };
+  Value fields[] = {
+    value_string("Intent"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]), value_clone(&args[3]),
+    value_number(args[1].boolean ? args[4].number : 0), value_clone(&args[5]), value_clone(&args[6]),
+    value_clone(&args[7]), value_clone(&args[8]),
+  };
+  Value result = domain_make_typed_record(vm, "Intent", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_understanding_model(VM *vm, const Value *args, size_t argc) {
+  if (argc != 10 || args[0].type != VALUE_STRING || !value_matches_base_type(&args[1], args[0].string)
+      || !domain_is_bounded_number(&args[2]) || args[3].type != VALUE_STRING
+      || args[4].type != VALUE_SEQUENCE || args[5].type != VALUE_SEQUENCE
+      || !domain_is_bounded_number(&args[6]) || !domain_is_bounded_number(&args[7])
+      || args[8].type != VALUE_STRING || !domain_is_root(&args[9])) {
+    domain_argument_error(vm, "understanding.model", "expects baseType Text, matching value, confidence Number, explanation Text, evidence and dependencies Sequence, coverage and coherence Number, status Text, and formedAtRoot Text or Null");
+    return value_null();
+  }
+  static const char *const names[] = {
+    "kind", "baseType", "value", "confidence", "explanation", "evidence", "dependencies",
+    "coverage", "coherence", "status", "formedAtRoot",
+  };
+  Value fields[] = {
+    value_string("Understanding"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_clone(&args[4]), value_clone(&args[5]), value_clone(&args[6]),
+    value_clone(&args[7]), value_clone(&args[8]), value_clone(&args[9]),
+  };
+  char type_name[256];
+  snprintf(type_name, sizeof(type_name), "Understand<%s>", args[0].string);
+  Value result = domain_make_typed_record(vm, type_name, names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_creation_candidate(VM *vm, const Value *args, size_t argc) {
+  if (argc != 11 || args[0].type != VALUE_STRING || !value_matches_base_type(&args[1], args[0].string)
+      || args[2].type != VALUE_BOOL || args[3].type != VALUE_STRING
+      || !domain_is_bounded_number(&args[4]) || !domain_is_bounded_number(&args[5])
+      || !domain_is_bounded_number(&args[6]) || !domain_is_bounded_number(&args[7])
+      || args[8].type != VALUE_SEQUENCE || args[9].type != VALUE_SEQUENCE || !domain_is_root(&args[10])) {
+    domain_argument_error(vm, "creation.candidate", "expects baseType Text, matching value, active Truth, target Text, four bounded metrics, evidence and basedOn Sequence, and formedAtRoot Text or Null");
+    return value_null();
+  }
+  double score = args[2].boolean
+    ? fmax(0, fmin(1, (args[5].number * 0.45) + (args[6].number * 0.30)
+      + (args[4].number * 0.15) + ((1 - args[7].number) * 0.10)))
+    : 0;
+  static const char *const names[] = {
+    "kind", "baseType", "value", "active", "target", "novelty", "utility", "feasibility",
+    "risk", "score", "status", "evidence", "basedOn", "formedAtRoot",
+  };
+  Value fields[] = {
+    value_string("Creation"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_clone(&args[4]), value_clone(&args[5]), value_clone(&args[6]),
+    value_clone(&args[7]), value_number(score), value_string(args[2].boolean ? "candidate" : "inactive"),
+    value_clone(&args[8]), value_clone(&args[9]), value_clone(&args[10]),
+  };
+  char type_name[256];
+  snprintf(type_name, sizeof(type_name), "Create<%s>", args[0].string);
+  Value result = domain_make_typed_record(vm, type_name, names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static int domain_is_creation(const Value *value) {
+  const Value *kind = typed_record_field(value, "kind");
+  const Value *base_type = typed_record_field(value, "baseType");
+  const Value *score = typed_record_field(value, "score");
+  return kind && kind->type == VALUE_STRING && strcmp(kind->string, "Creation") == 0
+    && base_type && base_type->type == VALUE_STRING && score && score->type == VALUE_NUMBER;
+}
+
+static Value domain_creation_select(VM *vm, const Value *args, size_t argc) {
+  if (argc != 2 || !domain_is_creation(&args[0]) || args[1].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "creation.select", "expects a Creation candidate and selectedFrom Sequence");
+    return value_null();
+  }
+  const TypedRecord *candidate = args[0].typed_record;
+  int status_index = typed_record_field_index(candidate, "status");
+  int selected_from_index = typed_record_field_index(candidate, "selectedFrom");
+  size_t field_count = candidate->field_count + (status_index < 0 ? 1 : 0) + (selected_from_index < 0 ? 1 : 0);
+  const char **names = (const char **)calloc(field_count ? field_count : 1, sizeof(const char *));
+  Value *fields = (Value *)calloc(field_count ? field_count : 1, sizeof(Value));
+  if (!names || !fields) { free(names); free(fields); fprintf(stderr, "out of memory\n"); exit(2); }
+  size_t output = 0;
+  for (size_t i = 0; i < candidate->field_count; i++) {
+    names[output] = candidate->field_names[i];
+    if ((int)i == status_index) fields[output] = value_string("selected");
+    else if ((int)i == selected_from_index) fields[output] = value_clone(&args[1]);
+    else fields[output] = value_clone(&candidate->field_values[i]);
+    output++;
+  }
+  if (status_index < 0) { names[output] = "status"; fields[output++] = value_string("selected"); }
+  if (selected_from_index < 0) { names[output] = "selectedFrom"; fields[output++] = value_clone(&args[1]); }
+  Value result = domain_make_typed_record(vm, candidate->type_name, names, fields, field_count);
+  for (size_t i = 0; i < field_count; i++) value_free(&fields[i]);
+  free(fields);
+  free(names);
+  return result;
+}
+
+static Value domain_quantity_make(VM *vm, const Value *args, size_t argc) {
+  if (argc != 3) {
+    domain_argument_error(vm, "quantity.make", "expects baseType Text, value Number and unit Text");
+    return value_null();
+  }
+  if (args[0].type != VALUE_STRING || args[1].type != VALUE_NUMBER || !isfinite(args[1].number)
+      || args[2].type != VALUE_STRING) {
+    domain_argument_error(vm, "quantity.make", "received invalid argument types or a non-finite value");
+    return value_null();
+  }
+  if (!is_quantity_type(args[0].string)) {
+    domain_argument_error(vm, "quantity.make", "received an unknown quantity type");
+    return value_null();
+  }
+  const char *unit = args[2].string[0] ? args[2].string : quantity_default_unit(args[0].string);
+  static const char *const names[] = { "kind", "type", "value", "unit" };
+  Value fields[] = { value_string("Quantity"), value_clone(&args[0]), value_clone(&args[1]), value_string(unit) };
+  Value result = domain_make_typed_record(vm, "Quantity", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static int domain_is_quantity_of_type(const Value *value, const char *type_name) {
+  const Value *kind = typed_record_field(value, "kind");
+  const Value *type = typed_record_field(value, "type");
+  return value && value->type == VALUE_TYPED_RECORD && value->typed_record
+    && strcmp(value->typed_record->type_name, "Quantity") == 0
+    && kind && kind->type == VALUE_STRING && strcmp(kind->string, "Quantity") == 0
+    && type && type->type == VALUE_STRING && strcmp(type->string, type_name) == 0;
+}
+
+static Value domain_spacetime_point(VM *vm, const Value *args, size_t argc) {
+  if (argc != 6 || args[0].type != VALUE_STRING || !args[0].string[0]
+      || !domain_is_quantity_of_type(&args[1], "Length")
+      || !domain_is_quantity_of_type(&args[2], "Length")
+      || !domain_is_quantity_of_type(&args[3], "Length")
+      || !domain_is_quantity_of_type(&args[4], "Time")
+      || args[5].type != VALUE_STRING) {
+    domain_argument_error(vm, "spacetime.point", "expects non-empty frame Text, x/y/z Length, t Time and target Text");
+    return value_null();
+  }
+  static const char *const names[] = { "kind", "frame", "x", "y", "z", "t", "target" };
+  Value fields[] = {
+    value_string("SpacetimePoint"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_clone(&args[4]), value_clone(&args[5]),
+  };
+  Value result = domain_make_typed_record(vm, "SpacetimePoint", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_spacetime_retime(VM *vm, const Value *args, size_t argc) {
+  if (argc != 3 || args[0].type != VALUE_TYPED_RECORD || !args[0].typed_record
+      || strcmp(args[0].typed_record->type_name, "SpacetimePoint") != 0
+      || !domain_is_quantity_of_type(&args[1], "Time") || args[2].type != VALUE_STRING) {
+    domain_argument_error(vm, "spacetime.retime", "expects SpacetimePoint, newTime Time and target Text");
+    return value_null();
+  }
+  const Value *frame = typed_record_field(&args[0], "frame");
+  const Value *x = typed_record_field(&args[0], "x");
+  const Value *y = typed_record_field(&args[0], "y");
+  const Value *z = typed_record_field(&args[0], "z");
+  Value point_args[] = {
+    frame ? value_clone(frame) : value_null(), x ? value_clone(x) : value_null(),
+    y ? value_clone(y) : value_null(), z ? value_clone(z) : value_null(),
+    value_clone(&args[1]), value_clone(&args[2]),
+  };
+  Value result = domain_spacetime_point(vm, point_args, sizeof(point_args) / sizeof(point_args[0]));
+  for (size_t i = 0; i < sizeof(point_args) / sizeof(point_args[0]); i++) value_free(&point_args[i]);
+  return result;
+}
+
+static Value domain_energy_scale(VM *vm, const Value *args, size_t argc) {
+  const Value *type = argc > 0 ? typed_record_field(&args[0], "type") : NULL;
+  const Value *amount = argc > 0 ? typed_record_field(&args[0], "value") : NULL;
+  const Value *unit = argc > 0 ? typed_record_field(&args[0], "unit") : NULL;
+  if (argc != 2 || !type || type->type != VALUE_STRING || strcmp(type->string, "Energy") != 0
+      || !amount || amount->type != VALUE_NUMBER || !isfinite(amount->number)
+      || !unit || unit->type != VALUE_STRING || args[1].type != VALUE_NUMBER || !isfinite(args[1].number)) {
+    domain_argument_error(vm, "energy.scale", "expects an Energy Quantity and finite factor Number");
+    return value_null();
+  }
+  Value quantity_args[] = { value_string("Energy"), value_number(amount->number * args[1].number), value_clone(unit) };
+  Value result = domain_quantity_make(vm, quantity_args, sizeof(quantity_args) / sizeof(quantity_args[0]));
+  for (size_t i = 0; i < sizeof(quantity_args) / sizeof(quantity_args[0]); i++) value_free(&quantity_args[i]);
+  return result;
+}
+
+static Value domain_element_species(VM *vm, const Value *args, size_t argc) {
+  if (argc != 7 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING
+      || args[2].type != VALUE_NUMBER || !isfinite(args[2].number)
+      || args[3].type != VALUE_NUMBER || !isfinite(args[3].number)
+      || args[4].type != VALUE_NUMBER || !isfinite(args[4].number)
+      || args[5].type != VALUE_STRING || args[6].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "element.species", "expects name and symbol Text, finite atomicNumber, atomicMass and charge Number, phase Text and evidence Sequence");
+    return value_null();
+  }
+  static const char *const names[] = {
+    "kind", "name", "category", "symbol", "atomicNumber", "atomicMass", "charge", "phase", "components", "bond", "evidence",
+  };
+  Value empty_pairs = value_sequence_empty();
+  Value components = domain_compact_map(vm, &empty_pairs, "element.species", "componentsPairsSeq");
+  value_free(&empty_pairs);
+  if (vm->error.code) return value_null();
+  Value fields[] = {
+    value_string("ElementEntity"), value_clone(&args[0]), value_string("species"), domain_nullable_text(&args[1]),
+    value_clone(&args[2]), value_clone(&args[3]), value_clone(&args[4]),
+    value_string(args[5].string[0] ? args[5].string : "unspecified"), components, value_null(), value_clone(&args[6]),
+  };
+  Value result = domain_make_typed_record(vm, "Element", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_element_compound(VM *vm, const Value *args, size_t argc) {
+  if (argc != 4 || args[0].type != VALUE_STRING || !domain_slots_are_pairs(&args[1])
+      || args[2].type != VALUE_STRING || args[3].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "element.compound", "expects name Text, alternating component/count Sequence, bond Text and evidence Sequence");
+    return value_null();
+  }
+  Value components = domain_compact_map(vm, &args[1], "element.compound", "componentsPairsSeq");
+  if (vm->error.code) return value_null();
+  static const char *const names[] = {
+    "kind", "name", "category", "symbol", "atomicNumber", "atomicMass", "charge", "phase", "components", "bond", "evidence",
+  };
+  Value fields[] = {
+    value_string("ElementEntity"), value_clone(&args[0]), value_string("compound"), value_null(), value_null(), value_null(),
+    value_number(0), value_string("unspecified"), components, domain_nullable_text(&args[2]), value_clone(&args[3]),
+  };
+  Value result = domain_make_typed_record(vm, "Element", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_science_claim(VM *vm, const Value *args, size_t argc) {
+  if (argc != 10 || args[0].type != VALUE_STRING || !value_matches_base_type(&args[1], args[0].string)
+      || !domain_is_bounded_number(&args[2]) || args[3].type != VALUE_STRING || args[4].type != VALUE_SEQUENCE
+      || args[5].type != VALUE_STRING || args[6].type != VALUE_NUMBER || !isfinite(args[6].number)
+      || args[7].type != VALUE_NUMBER || !isfinite(args[7].number) || args[8].type != VALUE_BOOL
+      || args[9].type != VALUE_STRING) {
+    domain_argument_error(vm, "science.claim", "expects baseType Text, matching value, bounded confidence Number, status Text, evidence Sequence, method Text, finite replications and reproducibility Number, falsified Truth and source Text");
+    return value_null();
+  }
+  static const char *const names[] = {
+    "kind", "baseType", "value", "confidence", "status", "evidence", "method", "replications", "reproducibility", "falsified", "source",
+  };
+  Value fields[] = {
+    value_string("ScientificClaim"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_clone(&args[4]), domain_nullable_text(&args[5]), value_clone(&args[6]),
+    value_clone(&args[7]), value_clone(&args[8]), domain_nullable_text(&args[9]),
+  };
+  char type_name[256];
+  snprintf(type_name, sizeof(type_name), "Science<%s>", args[0].string);
+  Value result = domain_make_typed_record(vm, type_name, names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_science_experiment(VM *vm, const Value *args, size_t argc) {
+  if (argc != 8 || args[0].type != VALUE_STRING || args[2].type != VALUE_STRING
+      || args[3].type != VALUE_NUMBER || !isfinite(args[3].number) || args[4].type != VALUE_BOOL
+      || args[5].type != VALUE_NUMBER || !isfinite(args[5].number)
+      || args[6].type != VALUE_SEQUENCE || args[7].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "science.experiment", "expects name Text, hypothesis value, method Text, finite repeats Number, consistent Truth, finite reproducibility Number, observed and evidence Sequence");
+    return value_null();
+  }
+  static const char *const names[] = {
+    "kind", "name", "hypothesis", "method", "repeats", "consistent", "reproducibility", "observed", "evidence",
+  };
+  Value fields[] = {
+    value_string("ExperimentResult"), value_clone(&args[0]), value_clone(&args[1]),
+    value_string(args[2].string[0] ? args[2].string : "deterministic"), value_clone(&args[3]),
+    value_clone(&args[4]), value_clone(&args[5]), value_clone(&args[6]), value_clone(&args[7]),
+  };
+  Value result = domain_make_typed_record(vm, "Experiment", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_body_state(VM *vm, const Value *args, size_t argc) {
+  if (argc != 7 || args[0].type != VALUE_STRING || args[1].type != VALUE_SEQUENCE || args[2].type != VALUE_SEQUENCE
+      || !domain_slots_are_pairs(&args[3]) || args[4].type != VALUE_BOOL
+      || args[5].type != VALUE_NUMBER || !isfinite(args[5].number) || args[6].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "body.state", "expects name Text, systems and organs Sequence, alternating bindings Sequence, maintained Truth, finite coherence Number and evidence Sequence");
+    return value_null();
+  }
+  Value bindings = domain_compact_map(vm, &args[3], "body.state", "bindingsPairsSeq");
+  if (vm->error.code) return value_null();
+  static const char *const names[] = { "kind", "name", "systems", "organs", "bindings", "maintained", "coherence", "evidence" };
+  Value fields[] = {
+    value_string("BodyState"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]), bindings,
+    value_clone(&args[4]), value_clone(&args[5]), value_clone(&args[6]),
+  };
+  Value result = domain_make_typed_record(vm, "BodyState", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_spirit_state(VM *vm, const Value *args, size_t argc) {
+  if (argc != 8 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING
+      || !domain_slots_are_pairs(&args[2]) || !domain_slots_are_pairs(&args[3]) || !domain_slots_are_pairs(&args[4])
+      || args[5].type != VALUE_NUMBER || !isfinite(args[5].number) || args[6].type != VALUE_BOOL
+      || args[7].type != VALUE_SEQUENCE) {
+    domain_argument_error(vm, "spirit.state", "expects name and identity Text, alternating values, purposes and affects Sequence, finite coherence Number, integrated Truth and evidence Sequence");
+    return value_null();
+  }
+  Value values = domain_compact_map(vm, &args[2], "spirit.state", "valuesPairsSeq");
+  Value purposes = vm->error.code ? value_null() : domain_compact_map(vm, &args[3], "spirit.state", "purposesPairsSeq");
+  Value affects = vm->error.code ? value_null() : domain_compact_map(vm, &args[4], "spirit.state", "affectsPairsSeq");
+  if (vm->error.code) { value_free(&values); value_free(&purposes); value_free(&affects); return value_null(); }
+  static const char *const names[] = { "kind", "name", "identity", "values", "purposes", "affects", "coherence", "integrated", "evidence" };
+  Value fields[] = {
+    value_string("SpiritState"), value_clone(&args[0]), domain_nullable_text(&args[1]), values, purposes, affects,
+    value_clone(&args[5]), value_clone(&args[6]), value_clone(&args[7]),
+  };
+  Value result = domain_make_typed_record(vm, "SpiritState", names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static int value_matches_base_type(const Value *value, const char *base_type) {
+  const char *actual = native_runtime_type(value);
+  return actual && strcmp(actual, base_type) == 0;
+}
+
+static Value domain_quantitative_measure(VM *vm, const Value *args, size_t argc) {
+  if (argc != 8 || args[0].type != VALUE_STRING || !value_matches_base_type(&args[1], args[0].string)) {
+    domain_argument_error(vm, "quantitative.measure", "expects baseType Text, value, uncertainty, confidence Number, unit Text, scale Text, evidence Sequence and calibratedBy Text");
+    return value_null();
+  }
+  if (!value_matches_base_type(&args[2], args[0].string) && strcmp(args[0].string, "Text") != 0 && strcmp(args[0].string, "Truth") != 0) {
+    domain_argument_error(vm, "quantitative.measure", "uncertainty must match the base type");
+    return value_null();
+  }
+  if (args[3].type != VALUE_NUMBER || !isfinite(args[3].number) || args[3].number < 0 || args[3].number > 1) {
+    domain_argument_error(vm, "quantitative.measure", "confidence must be a finite Number between 0 and 1");
+    return value_null();
+  }
+  if (args[4].type != VALUE_STRING || args[5].type != VALUE_STRING || args[6].type != VALUE_SEQUENCE || args[7].type != VALUE_STRING) {
+    domain_argument_error(vm, "quantitative.measure", "unit, scale, evidence or calibratedBy has an invalid type");
+    return value_null();
+  }
+  const Value *quantity_unit = typed_record_field(&args[1], "unit");
+  const char *unit = args[4].string[0] ? args[4].string
+    : quantity_unit && quantity_unit->type == VALUE_STRING ? quantity_unit->string : "";
+  Value fields[] = {
+    value_string("Measurement"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]),
+    value_clone(&args[3]), value_string(unit), value_clone(&args[5]), value_clone(&args[6]), value_clone(&args[7]),
+  };
+  static const char *const names[] = {
+    "kind", "baseType", "value", "uncertainty", "confidence", "unit", "scale", "evidence", "calibratedBy",
+  };
+  char type_name[256];
+  snprintf(type_name, sizeof(type_name), "Measure<%s>", args[0].string);
+  Value result = domain_make_typed_record(vm, type_name, names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static Value domain_knowledge_claim(VM *vm, const Value *args, size_t argc) {
+  if (argc != 10 || args[0].type != VALUE_STRING || !value_matches_base_type(&args[1], args[0].string)) {
+    domain_argument_error(vm, "knowledge.claim", "expects baseType Text, value, confidence Number, evidence Sequence, source Text, scope Text, status Text, dependencies Sequence, revision Number and formedAtRoot Text");
+    return value_null();
+  }
+  if (args[2].type != VALUE_NUMBER || !isfinite(args[2].number) || args[2].number < 0 || args[2].number > 1) {
+    domain_argument_error(vm, "knowledge.claim", "confidence must be a finite Number between 0 and 1");
+    return value_null();
+  }
+  if (args[3].type != VALUE_SEQUENCE || args[4].type != VALUE_STRING || args[5].type != VALUE_STRING
+      || args[6].type != VALUE_STRING || args[7].type != VALUE_SEQUENCE
+      || args[8].type != VALUE_NUMBER || !isfinite(args[8].number) || args[9].type != VALUE_STRING) {
+    domain_argument_error(vm, "knowledge.claim", "received an option with an invalid type");
+    return value_null();
+  }
+  Value fields[] = {
+    value_string("Knowledge"), value_clone(&args[0]), value_clone(&args[1]),
+    value_clone(&args[2]), value_clone(&args[3]), value_clone(&args[4]), value_clone(&args[5]),
+    value_clone(&args[6]), value_clone(&args[7]), value_clone(&args[8]), value_sequence_empty(), value_clone(&args[9]),
+  };
+  static const char *const names[] = {
+    "kind", "baseType", "value", "confidence", "evidence", "source", "scope", "status",
+    "dependencies", "revision", "alternatives", "formedAtRoot",
+  };
+  char type_name[256];
+  snprintf(type_name, sizeof(type_name), "Know<%s>", args[0].string);
+  Value result = domain_make_typed_record(vm, type_name, names, fields, sizeof(fields) / sizeof(fields[0]));
+  for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+  return result;
+}
+
+static void initialize_domain_registry(VM *vm) {
+  static const DomainOperationRegistration builtins[] = {
+    { "core", "echo", DOMAIN_BUILTIN_CORE_ECHO },
+    { "quantity", "make", DOMAIN_BUILTIN_QUANTITY_MAKE },
+    { "quantitative", "measure", DOMAIN_BUILTIN_QUANTITATIVE_MEASURE },
+    { "knowledge", "claim", DOMAIN_BUILTIN_KNOWLEDGE_CLAIM },
+    { "language", "utterance", DOMAIN_BUILTIN_LANGUAGE_UTTERANCE },
+    { "language", "intent", DOMAIN_BUILTIN_LANGUAGE_INTENT },
+    { "understanding", "model", DOMAIN_BUILTIN_UNDERSTANDING_MODEL },
+    { "creation", "candidate", DOMAIN_BUILTIN_CREATION_CANDIDATE },
+    { "creation", "select", DOMAIN_BUILTIN_CREATION_SELECT },
+    { "energy", "scale", DOMAIN_BUILTIN_ENERGY_SCALE },
+    { "element", "species", DOMAIN_BUILTIN_ELEMENT_SPECIES },
+    { "element", "compound", DOMAIN_BUILTIN_ELEMENT_COMPOUND },
+    { "science", "claim", DOMAIN_BUILTIN_SCIENCE_CLAIM },
+    { "science", "experiment", DOMAIN_BUILTIN_SCIENCE_EXPERIMENT },
+    { "body", "state", DOMAIN_BUILTIN_BODY_STATE },
+    { "spirit", "state", DOMAIN_BUILTIN_SPIRIT_STATE },
+    { "spacetime", "point", DOMAIN_BUILTIN_SPACETIME_POINT },
+    { "spacetime", "retime", DOMAIN_BUILTIN_SPACETIME_RETIME },
+  };
+  vm->domain_operation_count = sizeof(builtins) / sizeof(builtins[0]);
+  memcpy(vm->domain_operations, builtins, sizeof(builtins));
+}
+
+static Value dispatch_domain_operation(VM *vm, const char *domain, const char *operation, const Value *args, size_t argc) {
+  int domain_found = 0;
+  for (size_t i = 0; i < vm->domain_operation_count; i++) {
+    const DomainOperationRegistration *entry = &vm->domain_operations[i];
+    if (strcmp(entry->domain, domain) != 0) continue;
+    domain_found = 1;
+    if (strcmp(entry->operation, operation) != 0) continue;
+    switch (entry->builtin) {
+      case DOMAIN_BUILTIN_CORE_ECHO:
+        if (argc != 1) { domain_argument_error(vm, "core.echo", "expects exactly one argument"); return value_null(); }
+        return value_clone(&args[0]);
+      case DOMAIN_BUILTIN_QUANTITY_MAKE: return domain_quantity_make(vm, args, argc);
+      case DOMAIN_BUILTIN_QUANTITATIVE_MEASURE: return domain_quantitative_measure(vm, args, argc);
+      case DOMAIN_BUILTIN_KNOWLEDGE_CLAIM: return domain_knowledge_claim(vm, args, argc);
+      case DOMAIN_BUILTIN_LANGUAGE_UTTERANCE: return domain_language_utterance(vm, args, argc);
+      case DOMAIN_BUILTIN_LANGUAGE_INTENT: return domain_language_intent(vm, args, argc);
+      case DOMAIN_BUILTIN_UNDERSTANDING_MODEL: return domain_understanding_model(vm, args, argc);
+      case DOMAIN_BUILTIN_CREATION_CANDIDATE: return domain_creation_candidate(vm, args, argc);
+      case DOMAIN_BUILTIN_CREATION_SELECT: return domain_creation_select(vm, args, argc);
+      case DOMAIN_BUILTIN_ENERGY_SCALE: return domain_energy_scale(vm, args, argc);
+      case DOMAIN_BUILTIN_ELEMENT_SPECIES: return domain_element_species(vm, args, argc);
+      case DOMAIN_BUILTIN_ELEMENT_COMPOUND: return domain_element_compound(vm, args, argc);
+      case DOMAIN_BUILTIN_SCIENCE_CLAIM: return domain_science_claim(vm, args, argc);
+      case DOMAIN_BUILTIN_SCIENCE_EXPERIMENT: return domain_science_experiment(vm, args, argc);
+      case DOMAIN_BUILTIN_BODY_STATE: return domain_body_state(vm, args, argc);
+      case DOMAIN_BUILTIN_SPIRIT_STATE: return domain_spirit_state(vm, args, argc);
+      case DOMAIN_BUILTIN_SPACETIME_POINT: return domain_spacetime_point(vm, args, argc);
+      case DOMAIN_BUILTIN_SPACETIME_RETIME: return domain_spacetime_retime(vm, args, argc);
+    }
+  }
+  char message[384];
+  if (domain_found) {
+    snprintf(message, sizeof(message), "Domain '%s' has no operation '%s'", domain, operation);
+    vm_fail(vm, "RCL_NATIVE_DOMAIN_OPERATION_MISSING", message);
+  } else {
+    snprintf(message, sizeof(message), "Domain '%s' is not registered", domain);
+    vm_fail(vm, "RCL_NATIVE_DOMAIN_MISSING", message);
+  }
+  return value_null();
 }
 
 static Value typed_heap_make_ref(VM *vm, const Value *target) {
@@ -1050,6 +1687,16 @@ static void value_json_sb(StringBuilder *sb, const Value *value) {
       sb_append(sb, ",\"slot\":"); snprintf(number, sizeof(number), "%" PRId64, value->ir->slot); sb_append(sb, number);
       sb_append(sb, ",\"span\":"); span_json_sb(sb, &value->ir->span); sb_append_char(sb, '}'); break;
     case VALUE_TYPED_RECORD:
+      if (strcmp(value->typed_record->type_name, "CompactMap") == 0) {
+        sb_append_char(sb, '{');
+        for (size_t i = 0; i < value->typed_record->field_count; i++) {
+          if (i) sb_append_char(sb, ',');
+          json_escape_sb(sb, value->typed_record->field_names[i]); sb_append_char(sb, ':');
+          value_json_sb(sb, &value->typed_record->field_values[i]);
+        }
+        sb_append_char(sb, '}');
+        break;
+      }
       sb_append(sb, "{\"__rclKind\":\"Record\",\"__rclType\":"); json_escape_sb(sb, value->typed_record->type_name);
       sb_append(sb, ",\"__rclObjectId\":"); snprintf(number, sizeof(number), "%" PRIu64 "", value->typed_record->object_id); sb_append(sb, number);
       sb_append(sb, ",\"__rclFieldOffsets\":{");
@@ -1226,9 +1873,9 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
   uint32_t instruction_count = memory_u32_le(bytes, length, 28, &ok);
   uint32_t reserved = memory_u32_le(bytes, length, 32, &ok);
   if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC header is truncated");
-  if (major != 1 || minor < 1 || minor > 2) {
+  if (major != 1 || minor < 1 || minor > 3) {
     char message[128];
-    snprintf(message, sizeof(message), "Unsupported RBC version %u.%u; native VM supports 1.1 and 1.2", major, minor);
+    snprintf(message, sizeof(message), "Unsupported RBC version %u.%u; native VM supports 1.1, 1.2 and 1.3", major, minor);
     return validation_fail(error, "RCL_NATIVE_BYTECODE_VERSION", message);
   }
   if (reserved != 0) return validation_fail(error, "RCL_NATIVE_BAD_HEADER", "RBC reserved header field must be zero");
@@ -1263,11 +1910,15 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
     int32_t b = memory_i32_le(bytes, length, at + 8, &ok);
     int32_t c = memory_i32_le(bytes, length, at + 12, &ok);
     if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC instruction operand is truncated");
-    if (op > OP_MOD) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
+    if (op > OP_DOMAIN_CALL) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
     if (minor == 1 && (op == OP_MOD || (op == OP_CALL_PROVIDER && (instruction_flags & 1)))) {
       return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.2 feature is encoded under a 1.1 header");
     }
+    if (minor < 3 && op == OP_DOMAIN_CALL) {
+      return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.3 feature is encoded under an older header");
+    }
     if (op == OP_CALL_PROVIDER && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "CALL_PROVIDER contains unknown flags");
+    if (op == OP_DOMAIN_CALL && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "DOMAIN_CALL contains unknown flags");
 
     int valid = 1;
     switch (op) {
@@ -1281,6 +1932,8 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
         valid = pool_index_valid(b, string_count) && pool_index_valid(c, string_count); break;
       case OP_CALL_PROVIDER:
         valid = (instruction_flags & 1) || (pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && pool_index_valid(c, string_count)); break;
+      case OP_DOMAIN_CALL:
+        valid = c >= 0 && ((instruction_flags & 1) || (pool_index_valid(a, string_count) && pool_index_valid(b, string_count))); break;
       case OP_MAKE_TYPED_RECORD: case OP_MAKE_TYPED_UNION:
         valid = pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && c >= 0; break;
       case OP_JUMP: case OP_JUMP_IF_FALSE:
@@ -1347,7 +2000,7 @@ static int load_program(const char *path, Program *program, VmError *error) {
   program->number_count = read_u32_le(file, &ok);
   program->instruction_count = read_u32_le(file, &ok);
   (void)read_u32_le(file, &ok);
-  if (!ok || program->major != 1 || program->minor < 1 || program->minor > 2 || program->string_count > 100000 || program->number_count > 100000 || program->instruction_count > MAX_INSTRUCTIONS) {
+  if (!ok || program->major != 1 || program->minor < 1 || program->minor > 3 || program->string_count > 100000 || program->number_count > 100000 || program->instruction_count > MAX_INSTRUCTIONS) {
     error->code = "RCL_NATIVE_BAD_HEADER"; snprintf(error->message, sizeof(error->message), "Unsupported or corrupt RCL bytecode header"); fclose(file); return 0;
   }
   program->strings = (char **)calloc(program->string_count ? program->string_count : 1, sizeof(char *));
@@ -1484,13 +2137,106 @@ static int values_equal(const Value *left, const Value *right) {
   }
 }
 
+static int compatible_quantity_numbers(const Value *left, const Value *right, double *left_number, double *right_number) {
+  if (!left || !right || left->type != VALUE_TYPED_RECORD || right->type != VALUE_TYPED_RECORD
+      || !left->typed_record || !right->typed_record
+      || strcmp(left->typed_record->type_name, "Quantity") != 0
+      || strcmp(right->typed_record->type_name, "Quantity") != 0) return 0;
+  const Value *left_type = typed_record_field(left, "type");
+  const Value *right_type = typed_record_field(right, "type");
+  const Value *left_value = typed_record_field(left, "value");
+  const Value *right_value = typed_record_field(right, "value");
+  const Value *left_unit = typed_record_field(left, "unit");
+  const Value *right_unit = typed_record_field(right, "unit");
+  if (!left_type || !right_type || left_type->type != VALUE_STRING || right_type->type != VALUE_STRING
+      || strcmp(left_type->string, right_type->string) != 0
+      || !left_value || !right_value || left_value->type != VALUE_NUMBER || right_value->type != VALUE_NUMBER
+      || !isfinite(left_value->number) || !isfinite(right_value->number)
+      || !left_unit || !right_unit || left_unit->type != VALUE_STRING || right_unit->type != VALUE_STRING
+      || strcmp(left_unit->string, right_unit->string) != 0) return 0;
+  *left_number = left_value->number;
+  *right_number = right_value->number;
+  return 1;
+}
+
+static int is_quantity_record(const Value *value) {
+  return value && value->type == VALUE_TYPED_RECORD && value->typed_record
+    && strcmp(value->typed_record->type_name, "Quantity") == 0;
+}
+
+static Value quantity_arithmetic_result(VM *vm, const Value *quantity, double number) {
+  const Value *type = typed_record_field(quantity, "type");
+  const Value *unit = typed_record_field(quantity, "unit");
+  Value args[] = { value_clone(type), value_number(number), value_clone(unit) };
+  Value result = domain_quantity_make(vm, args, sizeof(args) / sizeof(args[0]));
+  for (size_t i = 0; i < sizeof(args) / sizeof(args[0]); i++) value_free(&args[i]);
+  return result;
+}
+
+static Value quantity_product_result(VM *vm, const Value *left, const Value *right) {
+  static const struct {
+    const char *left_type;
+    const char *left_unit;
+    const char *right_type;
+    const char *right_unit;
+    const char *result_type;
+    const char *result_unit;
+  } rules[] = {
+    { "Acceleration", "m/s²", "Time", "s", "Velocity", "m/s" },
+    { "Velocity", "m/s", "Time", "s", "Length", "m" },
+  };
+  const Value *left_type = typed_record_field(left, "type");
+  const Value *left_value = typed_record_field(left, "value");
+  const Value *left_unit = typed_record_field(left, "unit");
+  const Value *right_type = typed_record_field(right, "type");
+  const Value *right_value = typed_record_field(right, "value");
+  const Value *right_unit = typed_record_field(right, "unit");
+  if (!left_type || left_type->type != VALUE_STRING || !left_value || left_value->type != VALUE_NUMBER
+      || !left_unit || left_unit->type != VALUE_STRING || !right_type || right_type->type != VALUE_STRING
+      || !right_value || right_value->type != VALUE_NUMBER || !right_unit || right_unit->type != VALUE_STRING) {
+    vm_fail(vm, "RCL_NATIVE_QUANTITY_TYPE", "Quantity multiplication requires well-formed Quantity values");
+    return value_null();
+  }
+  for (size_t i = 0; i < sizeof(rules) / sizeof(rules[0]); i++) {
+    int direct = strcmp(left_type->string, rules[i].left_type) == 0
+      && strcmp(left_unit->string, rules[i].left_unit) == 0
+      && strcmp(right_type->string, rules[i].right_type) == 0
+      && strcmp(right_unit->string, rules[i].right_unit) == 0;
+    int reversed = strcmp(right_type->string, rules[i].left_type) == 0
+      && strcmp(right_unit->string, rules[i].left_unit) == 0
+      && strcmp(left_type->string, rules[i].right_type) == 0
+      && strcmp(left_unit->string, rules[i].right_unit) == 0;
+    if (!direct && !reversed) continue;
+    double product = left_value->number * right_value->number;
+    if (!isfinite(product)) {
+      vm_fail(vm, "RCL_NATIVE_QUANTITY_RANGE", "Quantity multiplication produced a non-finite value");
+      return value_null();
+    }
+    Value args[] = { value_string(rules[i].result_type), value_number(product), value_string(rules[i].result_unit) };
+    Value result = domain_quantity_make(vm, args, sizeof(args) / sizeof(args[0]));
+    for (size_t j = 0; j < sizeof(args) / sizeof(args[0]); j++) value_free(&args[j]);
+    return result;
+  }
+  vm_fail(vm, "RCL_NATIVE_QUANTITY_DIMENSION", "Quantity multiplication has no dimension-safe result for these types and units");
+  return value_null();
+}
+
 static int compare_values(VM *vm, const Value *left, const Value *right, int *comparison) {
+  double left_number, right_number;
   if (left->type == VALUE_NUMBER && right->type == VALUE_NUMBER) {
     *comparison = left->number < right->number ? -1 : left->number > right->number ? 1 : 0;
     return 1;
   }
+  if (compatible_quantity_numbers(left, right, &left_number, &right_number)) {
+    *comparison = left_number < right_number ? -1 : left_number > right_number ? 1 : 0;
+    return 1;
+  }
+  if (is_quantity_record(left) || is_quantity_record(right)) {
+    vm_fail(vm, "RCL_NATIVE_QUANTITY_TYPE", "Quantity comparison requires matching base types and units");
+    return 0;
+  }
   if (left->type == VALUE_STRING && right->type == VALUE_STRING) { *comparison = strcmp(left->string, right->string); return 1; }
-  vm_fail(vm, "RCL_NATIVE_COMPARE_TYPE", "Comparison requires matching Number or Text values");
+  vm_fail(vm, "RCL_NATIVE_COMPARE_TYPE", "Comparison requires matching Number, Text or Quantity values");
   return 0;
 }
 
@@ -1635,8 +2381,10 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       break;
     }
     case BUILTIN_LENGTH:
-      if (argc != 1 || (args[0].type != VALUE_STRING && args[0].type != VALUE_SEQUENCE)) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "length expects Text or Sequence");
-      else result = value_number(args[0].type == VALUE_STRING ? (double)utf8_length(args[0].string) : (double)args[0].sequence->count);
+      if (argc != 1 || (args[0].type != VALUE_STRING && args[0].type != VALUE_SEQUENCE && args[0].type != VALUE_TYPED_RECORD)) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "length expects Text, Sequence or typed record");
+      else if (args[0].type == VALUE_STRING) result = value_number((double)utf8_length(args[0].string));
+      else if (args[0].type == VALUE_SEQUENCE) result = value_number((double)args[0].sequence->count);
+      else result = value_number((double)args[0].typed_record->field_count);
       break;
     case BUILTIN_LOWER_TEXT:
     case BUILTIN_UPPER_TEXT:
@@ -2030,7 +2778,7 @@ static int call_continuation_returns(const VM *vm, uint32_t pc) {
 static int execute_program(VM *vm) {
   uint32_t pc = 0;
   while (pc < vm->program.instruction_count && !vm->error.code) {
-    if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded (300000000)"); break; }
+    if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded (500000000)"); break; }
     Instruction instruction = vm->program.instructions[pc++];
     Value left, right, value, result;
     int comparison;
@@ -2048,30 +2796,57 @@ static int execute_program(VM *vm) {
       case OP_ADD:
         right = stack_pop(vm); left = stack_pop(vm);
         if (left.type == VALUE_NUMBER && right.type == VALUE_NUMBER) result = value_number(left.number + right.number);
-        else if (left.type == VALUE_STRING || right.type == VALUE_STRING) {
-          char *left_owned = NULL, *right_owned = NULL;
-          const char *left_text = left.type == VALUE_STRING ? left.string : (left_owned = value_to_text(&left));
-          const char *right_text = right.type == VALUE_STRING ? right.string : (right_owned = value_to_text(&right));
-          size_t left_length = left.type == VALUE_STRING ? shared_string_header(left.string)->byte_length : strlen(left_text);
-          size_t right_length = right.type == VALUE_STRING ? shared_string_header(right.string)->byte_length : strlen(right_text);
-          result = value_string_join(left_text, left_length, right_text, right_length);
-          free(left_owned);
-          free(right_owned);
-        } else { vm_fail(vm, "RCL_NATIVE_ADD_TYPE", "ADD expects Number or Text values"); result = value_null(); }
+        else {
+          double left_number, right_number;
+          if (compatible_quantity_numbers(&left, &right, &left_number, &right_number)) result = quantity_arithmetic_result(vm, &left, left_number + right_number);
+          else if (is_quantity_record(&left) || is_quantity_record(&right)) {
+            vm_fail(vm, "RCL_NATIVE_QUANTITY_TYPE", "Quantity arithmetic requires matching base types and units");
+            result = value_null();
+          }
+          else if (left.type == VALUE_STRING || right.type == VALUE_STRING) {
+            char *left_owned = NULL, *right_owned = NULL;
+            const char *left_text = left.type == VALUE_STRING ? left.string : (left_owned = value_to_text(&left));
+            const char *right_text = right.type == VALUE_STRING ? right.string : (right_owned = value_to_text(&right));
+            size_t left_length = left.type == VALUE_STRING ? shared_string_header(left.string)->byte_length : strlen(left_text);
+            size_t right_length = right.type == VALUE_STRING ? shared_string_header(right.string)->byte_length : strlen(right_text);
+            result = value_string_join(left_text, left_length, right_text, right_length);
+            free(left_owned);
+            free(right_owned);
+          } else { vm_fail(vm, "RCL_NATIVE_ADD_TYPE", "ADD expects Number, Text or compatible Quantity values"); result = value_null(); }
+        }
         value_free(&left); value_free(&right); if (!vm->error.code) stack_push(vm, result); else value_free(&result); break;
       case OP_SUB: case OP_MUL: case OP_DIV: case OP_MOD:
         right = stack_pop(vm); left = stack_pop(vm);
-        if (left.type != VALUE_NUMBER || right.type != VALUE_NUMBER) { vm_fail(vm, "RCL_NATIVE_ARITHMETIC_TYPE", "Arithmetic expects Number values"); result = value_null(); }
-        else if ((instruction.op == OP_DIV || instruction.op == OP_MOD) && right.number == 0) {
+        {
+          double left_number, right_number;
+          int numeric = left.type == VALUE_NUMBER && right.type == VALUE_NUMBER;
+          if (numeric) { left_number = left.number; right_number = right.number; }
+          else if (instruction.op == OP_SUB && compatible_quantity_numbers(&left, &right, &left_number, &right_number)) {
+            result = quantity_arithmetic_result(vm, &left, left_number - right_number);
+            numeric = 2;
+          }
+          else if (instruction.op == OP_MUL && is_quantity_record(&left) && is_quantity_record(&right)) {
+            result = quantity_product_result(vm, &left, &right);
+            numeric = 2;
+          }
+          if (!numeric) {
+            vm_fail(vm, is_quantity_record(&left) || is_quantity_record(&right) ? "RCL_NATIVE_QUANTITY_TYPE" : "RCL_NATIVE_ARITHMETIC_TYPE",
+              is_quantity_record(&left) || is_quantity_record(&right) ? "Quantity multiplication, division and modulo require dimensional lowering" : "Arithmetic expects Number values");
+            result = value_null();
+          }
+          else if (numeric == 2) {
+            /* SUB result was constructed above. */
+          } else if ((instruction.op == OP_DIV || instruction.op == OP_MOD) && right_number == 0) {
           vm_fail(vm, instruction.op == OP_DIV ? "RCL_NATIVE_DIVIDE_ZERO" : "RCL_NATIVE_MODULO_ZERO", instruction.op == OP_DIV ? "Division by zero" : "Modulo by zero");
           result = value_null();
-        } else {
-          result = value_number(
-            instruction.op == OP_SUB ? left.number - right.number
-              : instruction.op == OP_MUL ? left.number * right.number
-                : instruction.op == OP_DIV ? left.number / right.number
-                  : fmod(left.number, right.number)
-          );
+          } else {
+            result = value_number(
+              instruction.op == OP_SUB ? left_number - right_number
+                : instruction.op == OP_MUL ? left_number * right_number
+                  : instruction.op == OP_DIV ? left_number / right_number
+                    : fmod(left_number, right_number)
+            );
+          }
         }
         value_free(&left); value_free(&right); if (!vm->error.code) stack_push(vm, result); else value_free(&result); break;
       case OP_EQ: case OP_NEQ:
@@ -2206,6 +2981,35 @@ static int execute_program(VM *vm) {
         free(response);
         break;
       }
+      case OP_DOMAIN_CALL: {
+        size_t argc = (size_t)instruction.c;
+        size_t prefix_count = (instruction.flags & 1) ? 2 : 0;
+        if (vm->stack_count < argc + prefix_count) {
+          vm_fail(vm, "RCL_NATIVE_DOMAIN_STACK", "DOMAIN_CALL argument stack underflow");
+          break;
+        }
+        size_t consumed_start = vm->stack_count - argc - prefix_count;
+        size_t argument_start = consumed_start + prefix_count;
+        const char *domain = instruction.flags & 1 ? NULL : pool_string(vm, instruction.a);
+        const char *operation = instruction.flags & 1 ? NULL : pool_string(vm, instruction.b);
+        if (instruction.flags & 1) {
+          Value *domain_value = &vm->stack[consumed_start];
+          Value *operation_value = &vm->stack[consumed_start + 1];
+          if (domain_value->type != VALUE_STRING || operation_value->type != VALUE_STRING) {
+            vm_fail(vm, "RCL_NATIVE_DOMAIN_ARGUMENT_TYPE", "Dynamic DOMAIN_CALL expects domain Text and operation Text before its arguments");
+          } else {
+            domain = domain_value->string;
+            operation = operation_value->string;
+          }
+        }
+        Value domain_result = vm->error.code
+          ? value_null()
+          : dispatch_domain_operation(vm, domain, operation, &vm->stack[argument_start], argc);
+        for (size_t i = consumed_start; i < vm->stack_count; i++) value_free(&vm->stack[i]);
+        vm->stack_count = consumed_start;
+        if (!vm->error.code) stack_push(vm, domain_result); else value_free(&domain_result);
+        break;
+      }
       case OP_MAKE_TYPED_RECORD: {
         if (instruction.c < 0 || vm->stack_count < (size_t)instruction.c) { vm_fail(vm, "RCL_NATIVE_TYPED_RECORD_STACK", "Typed record constructor stack underflow"); break; }
         size_t field_count = (size_t)instruction.c;
@@ -2220,7 +3024,7 @@ static int execute_program(VM *vm) {
         }
         uint64_t object_id = vm->next_typed_object_id++;
         vm->typed_heap_allocated++;
-        Value record_value = value_typed_record_with_id(object_id, pool_string(vm, instruction.a), field_names, field_values, field_count);
+        Value record_value = value_typed_record_with_id(object_id, pool_string(vm, instruction.a), (const char *const *)field_names, field_values, field_count);
         typed_heap_register(vm, &record_value);
         for (size_t i = 0; i < field_count; i++) value_free(&field_values[i]);
         free(field_values); free_string_array(field_names, field_count);
@@ -2514,7 +3318,10 @@ const char *rclvm_version(void) { return RCL_VM_VERSION; }
 
 RclVmInstance *rclvm_instance_create(void) {
   RclVmInstance *instance = (RclVmInstance *)calloc(1, sizeof(RclVmInstance));
-  if (instance) instance->vm.next_typed_object_id = 1;
+  if (instance) {
+    instance->vm.next_typed_object_id = 1;
+    initialize_domain_registry(&instance->vm);
+  }
   return instance;
 }
 
@@ -2533,6 +3340,7 @@ int rclvm_instance_load_file(RclVmInstance *instance, const char *path, char *er
     memcpy(saved, instance->vm.providers, sizeof(saved));
     memset(&instance->vm, 0, sizeof(instance->vm));
     instance->vm.next_typed_object_id = 1;
+    initialize_domain_registry(&instance->vm);
     memcpy(instance->vm.providers, saved, sizeof(saved)); instance->vm.provider_count = saved_count;
   }
   if (!load_program(path, &instance->vm.program, &instance->vm.error)) {

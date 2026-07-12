@@ -154,6 +154,19 @@ reality RCLGeneralSelfHostCompiler {
   reckon call_node(name : Text, args : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), "CallExpr"), name), args)
 
+  reckon cognition_accessor_field(name : Text) -> Text =
+    choose(name == "utterance_text", "text", choose(name == "utterance_speaker", "speaker", choose(name == "utterance_locale", "locale",
+      choose(name == "intent_name", "name", choose(name == "intent_action", "action", choose(name == "intent_target", "target", choose(name == "intent_confidence", "confidence", choose(name == "intent_active", "active",
+        choose(name == "understanding_value", "value", choose(name == "understanding_confidence", "confidence", choose(name == "understanding_coverage", "coverage", choose(name == "understanding_coherence", "coherence", choose(name == "understanding_explanation", "explanation", choose(name == "understanding_status", "status",
+          choose(name == "creation_value", "value", choose(name == "creation_score", "score", choose(name == "creation_novelty", "novelty", choose(name == "creation_utility", "utility", choose(name == "creation_feasibility", "feasibility", choose(name == "creation_risk", "risk", choose(name == "creation_target", "target", choose(name == "creation_status", "status", ""))))))))))))))))))))))
+  reckon is_cognition_accessor(name : Text) -> Truth = cognition_accessor_field(name) != ""
+  reckon accessor_node(name : Text, expression : Sequence) -> Sequence = call_node(name, sequence_append(empty_sequence(), expression))
+  reckon intent_matches_expression(node : Sequence) -> Sequence =
+    binary_node("__and", binary_node("__and", accessor_node("intent_active", sequence_get(expr_args(node), 0)), binary_node("==", accessor_node("intent_action", sequence_get(expr_args(node), 0)), sequence_get(expr_args(node), 1))), binary_node("==", accessor_node("intent_target", sequence_get(expr_args(node), 0)), sequence_get(expr_args(node), 2)))
+  reckon understood_expression(node : Sequence) -> Sequence =
+    binary_node("__and", binary_node("__and", binary_node("!=", accessor_node("understanding_status", sequence_get(expr_args(node), 0)), literal_node("Text", "rejected")), binary_node(">=", accessor_node("understanding_confidence", sequence_get(expr_args(node), 0)), choose(length(expr_args(node)) > 1, sequence_get(expr_args(node), 1), literal_node("Number", "0.5")))), binary_node(">=", accessor_node("understanding_coherence", sequence_get(expr_args(node), 0)), choose(length(expr_args(node)) > 1, sequence_get(expr_args(node), 1), literal_node("Number", "0.5"))))
+  reckon selected_expression(node : Sequence) -> Sequence = binary_node("==", accessor_node("creation_status", sequence_get(expr_args(node), 0)), literal_node("Text", "selected"))
+
   reckon expr_kind(node : Sequence) -> Text = sequence_get(node, 0)
   reckon expr_text(node : Sequence) -> Text = sequence_get(node, 1)
   reckon expr_literal_text(node : Sequence) -> Text = sequence_get(node, 2)
@@ -245,6 +258,14 @@ reality RCLGeneralSelfHostCompiler {
   reckon facet_owner(node : Sequence) -> Text = sequence_get(node, 3)
   reckon facet_line(node : Sequence) -> Number = sequence_get(node, 4)
   reckon facet_column(node : Sequence) -> Number = sequence_get(node, 5)
+  reckon facet_domain_kind(node : Sequence) -> Text = choose(length(node) > 6, sequence_get(node, 6), "")
+  reckon facet_domain_data(node : Sequence) -> Sequence = choose(length(node) > 7, sequence_get(node, 7), empty_sequence())
+  reckon facet_deferred(node : Sequence) -> Truth = choose(length(node) > 8, sequence_get(node, 8), false)
+
+  reckon make_domain_facet(path : Text, value_type : Text, expression : Sequence, owner : Text, kind : Text, data : Sequence, deferred : Truth) -> Sequence =
+    sequence_append(sequence_append(sequence_append(
+      sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), value_type), expression), owner), 0), 0),
+      kind), data), deferred)
 
   reckon make_reckon(name : Text, params : Sequence, return_type : Text, expression : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), params), return_type), expression)
@@ -673,8 +694,366 @@ reality RCLGeneralSelfHostCompiler {
     parse_policy_body(tokens, index + 3,
       make_policy(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), "false"))
 
+  reckon make_measure(path : Text, base_type : Text, value : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), base_type), value), empty_sequence()), empty_sequence()), ""), "ratio"), empty_sequence()), "")
+  reckon measure_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon measure_base_type(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon measure_initializer(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon measure_uncertainty_expr(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon measure_confidence_expr(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon measure_unit(node : Sequence) -> Text = sequence_get(node, 5)
+  reckon measure_scale(node : Sequence) -> Text = sequence_get(node, 6)
+  reckon measure_evidence(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon measure_calibrated_by(node : Sequence) -> Text = sequence_get(node, 8)
+
+  reckon measure_with(node : Sequence, target : Number, value : Sequence) -> Sequence =
+    replace_extra(node, target, value, 0, empty_sequence())
+  reckon replace_text_slot(items : Sequence, target : Number, value : Text, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      replace_text_slot(items, target, value, index + 1,
+        sequence_append(output, choose(index == target, value, sequence_get(items, index)))))
+  reckon measure_with_text(node : Sequence, target : Number, value : Text) -> Sequence =
+    replace_text_slot(node, target, value, 0, empty_sequence())
+
+  reckon parse_measure_clauses(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "uncertainty",
+      parse_measure_expression_clause(tokens, parse_expression(tokens, index + 1, 0), node, 3),
+      choose(token_text_at(tokens, index) == "confidence",
+        parse_measure_expression_clause(tokens, parse_expression(tokens, index + 1, 0), node, 4),
+        choose(token_text_at(tokens, index) == "unit",
+          parse_measure_clauses(tokens, index + 2, measure_with_text(node, 5, token_text_at(tokens, index + 1))),
+          choose(token_text_at(tokens, index) == "scale",
+            parse_measure_clauses(tokens, index + 2, measure_with_text(node, 6, token_text_at(tokens, index + 1))),
+            choose(token_text_at(tokens, index) == "evidence",
+              parse_measure_clauses(tokens, index + 2, measure_with(node, 7, sequence_append(measure_evidence(node), token_text_at(tokens, index + 1)))),
+              choose(token_text_at(tokens, index) == "calibrated",
+                parse_measure_clauses(tokens, index + 3, measure_with_text(node, 8, token_text_at(tokens, index + 2))),
+                make_node_state(index, node)))))))
+
+  reckon parse_measure_expression_clause(tokens : Sequence, expression_state : Sequence, node : Sequence, target : Number) -> Sequence =
+    parse_measure_clauses(tokens, state_index(expression_state), measure_with(node, target, state_node(expression_state)))
+
+  reckon parse_measure_after_value(tokens : Sequence, name : Text, local : Text, base_type : Text, value_state : Sequence) -> Sequence =
+    parse_measure_clauses(tokens, state_index(value_state), make_measure(name + "." + local, base_type, state_node(value_state)))
+
+  reckon parse_measure_after_type(tokens : Sequence, name : Text, local : Text, type_state : Sequence) -> Sequence =
+    parse_measure_after_value(tokens, name, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+
+  reckon make_quant_derive(path : Text, value_type : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), path), value_type), expression)
+  reckon quant_derive_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon quant_derive_type(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon quant_derive_expression(node : Sequence) -> Sequence = sequence_get(node, 2)
+
+  reckon make_quantitative(name : Text, measures : Sequence, derives : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), measures), derives), preserves)
+  reckon quantitative_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon quantitative_measures(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon quantitative_derives(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon quantitative_preserves(node : Sequence) -> Sequence = sequence_get(node, 3)
+
+  reckon parse_quantitative_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "measure",
+        parse_quantitative_after_measure(tokens, node, parse_measure_after_type(tokens, quantitative_name(node), token_text_at(tokens, index + 1), parse_path(tokens, index + 3))),
+        choose(token_text_at(tokens, index) == "derive",
+          parse_quantitative_after_derive(tokens, node, token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+          choose(token_text_at(tokens, index) == "preserve",
+            parse_quantitative_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)),
+            syntax_failure(tokens, index, "RCL_QUANTITATIVE_CLAUSE")))))
+
+  reckon parse_quantitative_after_measure(tokens : Sequence, node : Sequence, item_state : Sequence) -> Sequence =
+    parse_quantitative_body(tokens, state_index(item_state), make_quantitative(quantitative_name(node), sequence_append(quantitative_measures(node), state_node(item_state)), quantitative_derives(node), quantitative_preserves(node)))
+  reckon parse_quantitative_after_derive(tokens : Sequence, node : Sequence, local : Text, type_state : Sequence) -> Sequence =
+    parse_quantitative_after_derive_expression(tokens, node, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+  reckon parse_quantitative_after_derive_expression(tokens : Sequence, node : Sequence, local : Text, value_type : Text, expression_state : Sequence) -> Sequence =
+    parse_quantitative_body(tokens, state_index(expression_state), make_quantitative(quantitative_name(node), quantitative_measures(node), sequence_append(quantitative_derives(node), make_quant_derive(quantitative_name(node) + "." + local, value_type, state_node(expression_state))), quantitative_preserves(node)))
+  reckon parse_quantitative_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_quantitative_body(tokens, state_index(expression_state), make_quantitative(quantitative_name(node), quantitative_measures(node), quantitative_derives(node), sequence_append(quantitative_preserves(node), state_node(expression_state))))
+  reckon parse_quantitative(tokens : Sequence, index : Number) -> Sequence =
+    parse_quantitative_body(tokens, index + 3, make_quantitative(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence()))
+
+  reckon make_channel(path : Text, value_type : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), path), value_type), expression)
+  reckon channel_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon channel_type(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon channel_expression(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon make_perception(name : Text, observer : Text, source : Text, channels : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), observer), source), channels), preserves)
+  reckon perception_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon perception_observer(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon perception_source(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon perception_channels(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon perception_preserves(node : Sequence) -> Sequence = sequence_get(node, 4)
+
+  reckon parse_perception_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "observer",
+        parse_perception_after_path(tokens, node, parse_path(tokens, index + 1), 1),
+        choose(token_text_at(tokens, index) == "source",
+          parse_perception_after_path(tokens, node, parse_path(tokens, index + 1), 2),
+          choose(token_text_at(tokens, index) == "channel",
+            parse_perception_after_channel_type(tokens, node, token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+            choose(token_text_at(tokens, index) == "preserve",
+              parse_perception_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)),
+              syntax_failure(tokens, index, "RCL_PERCEPTION_CLAUSE"))))))
+  reckon parse_perception_after_path(tokens : Sequence, node : Sequence, path_state : Sequence, target : Number) -> Sequence =
+    parse_perception_body(tokens, state_index(path_state), make_perception(perception_name(node), choose(target == 1, state_text(path_state), perception_observer(node)), choose(target == 2, state_text(path_state), perception_source(node)), perception_channels(node), perception_preserves(node)))
+  reckon parse_perception_after_channel_type(tokens : Sequence, node : Sequence, local : Text, type_state : Sequence) -> Sequence =
+    parse_perception_after_channel_expression(tokens, node, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+  reckon parse_perception_after_channel_expression(tokens : Sequence, node : Sequence, local : Text, value_type : Text, expression_state : Sequence) -> Sequence =
+    parse_perception_body(tokens, state_index(expression_state), make_perception(perception_name(node), perception_observer(node), perception_source(node), sequence_append(perception_channels(node), make_channel(perception_name(node) + "." + local, value_type, state_node(expression_state))), perception_preserves(node)))
+  reckon parse_perception_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_perception_body(tokens, state_index(expression_state), make_perception(perception_name(node), perception_observer(node), perception_source(node), perception_channels(node), sequence_append(perception_preserves(node), state_node(expression_state))))
+  reckon parse_perception(tokens : Sequence, index : Number) -> Sequence =
+    parse_perception_body(tokens, index + 3, make_perception(token_text_at(tokens, index + 1), "", "", empty_sequence(), empty_sequence()))
+
+  reckon make_knowledge_item(kind : Text, path : Text, base_type : Text, expression : Sequence, confidence : Sequence, evidence : Sequence, source : Text, scope : Text, status : Text, dependencies : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), kind), path), base_type), expression), confidence), evidence), source), scope), status), dependencies)
+  reckon knowledge_item_kind(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon knowledge_item_path(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon knowledge_item_base_type(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon knowledge_item_expression(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon knowledge_item_confidence(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon knowledge_item_evidence(node : Sequence) -> Sequence = sequence_get(node, 5)
+  reckon knowledge_item_source(node : Sequence) -> Text = sequence_get(node, 6)
+  reckon knowledge_item_scope(node : Sequence) -> Text = sequence_get(node, 7)
+  reckon knowledge_item_status(node : Sequence) -> Text = sequence_get(node, 8)
+  reckon knowledge_item_dependencies(node : Sequence) -> Sequence = sequence_get(node, 9)
+
+  reckon knowledge_item_replace(node : Sequence, target : Number, value : Sequence) -> Sequence = replace_extra(node, target, value, 0, empty_sequence())
+  reckon knowledge_item_replace_text(node : Sequence, target : Number, value : Text) -> Sequence = replace_text_slot(node, target, value, 0, empty_sequence())
+  reckon parse_dependency_list(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == ",", parse_dependency_after_path(tokens, parse_path(tokens, index + 1), output), make_node_state(index, output))
+  reckon parse_dependency_after_path(tokens : Sequence, path_state : Sequence, output : Sequence) -> Sequence =
+    parse_dependency_list(tokens, state_index(path_state), sequence_append(output, state_text(path_state)))
+  reckon parse_knowledge_metadata(tokens : Sequence, index : Number, node : Sequence, allow_dependencies : Truth) -> Sequence =
+    choose(token_text_at(tokens, index) == "confidence",
+      parse_knowledge_confidence(tokens, node, allow_dependencies, parse_expression(tokens, index + 1, 0)),
+      choose(token_text_at(tokens, index) == "evidence",
+        parse_knowledge_metadata(tokens, index + 2, knowledge_item_replace(node, 5, sequence_append(knowledge_item_evidence(node), token_text_at(tokens, index + 1))), allow_dependencies),
+        choose(token_text_at(tokens, index) == "source",
+          parse_knowledge_metadata(tokens, index + 2, knowledge_item_replace_text(node, 6, token_text_at(tokens, index + 1)), allow_dependencies),
+          choose(token_text_at(tokens, index) == "scope",
+            parse_knowledge_metadata(tokens, index + 2, knowledge_item_replace_text(node, 7, token_text_at(tokens, index + 1)), allow_dependencies),
+            choose(token_text_at(tokens, index) == "status",
+              parse_knowledge_metadata(tokens, index + 2, knowledge_item_replace_text(node, 8, token_text_at(tokens, index + 1)), allow_dependencies),
+              choose(token_text_at(tokens, index) == "from" and allow_dependencies,
+                parse_knowledge_dependencies(tokens, node, allow_dependencies, parse_path(tokens, index + 1)),
+                make_node_state(index, node)))))))
+  reckon parse_knowledge_confidence(tokens : Sequence, node : Sequence, allow_dependencies : Truth, expression_state : Sequence) -> Sequence =
+    parse_knowledge_metadata(tokens, state_index(expression_state), knowledge_item_replace(node, 4, state_node(expression_state)), allow_dependencies)
+  reckon parse_knowledge_dependencies(tokens : Sequence, node : Sequence, allow_dependencies : Truth, path_state : Sequence) -> Sequence =
+    parse_knowledge_dependencies_done(tokens, node, allow_dependencies, parse_dependency_list(tokens, state_index(path_state), sequence_append(empty_sequence(), state_text(path_state))))
+  reckon parse_knowledge_dependencies_done(tokens : Sequence, node : Sequence, allow_dependencies : Truth, list_state : Sequence) -> Sequence =
+    parse_knowledge_metadata(tokens, state_index(list_state), knowledge_item_replace(node, 9, state_node(list_state)), allow_dependencies)
+
+  reckon make_knowledge(name : Text, claims : Sequence, derives : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), claims), derives), preserves)
+  reckon knowledge_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon knowledge_claims(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon knowledge_derives(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon knowledge_preserves(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon parse_knowledge_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "claim" or token_text_at(tokens, index) == "derive",
+        parse_knowledge_after_type(tokens, node, token_text_at(tokens, index), token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+        choose(token_text_at(tokens, index) == "preserve",
+          parse_knowledge_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)),
+          syntax_failure(tokens, index, "RCL_KNOWLEDGE_CLAUSE"))))
+  reckon parse_knowledge_after_type(tokens : Sequence, node : Sequence, kind : Text, local : Text, type_state : Sequence) -> Sequence =
+    parse_knowledge_after_expression(tokens, node, kind, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+  reckon parse_knowledge_after_expression(tokens : Sequence, node : Sequence, kind : Text, local : Text, base_type : Text, expression_state : Sequence) -> Sequence =
+    parse_knowledge_after_metadata(tokens, node, kind, parse_knowledge_metadata(tokens, state_index(expression_state),
+      make_knowledge_item(choose(kind == "claim", "KnowledgeClaimDecl", "DerivedKnowledgeDecl"), knowledge_name(node) + "." + local, base_type, state_node(expression_state), empty_sequence(), empty_sequence(), choose(kind == "claim", "", "rcl:inference"), "local", choose(kind == "claim", "provisional", "derived"), empty_sequence()), kind == "derive"))
+  reckon parse_knowledge_after_metadata(tokens : Sequence, node : Sequence, kind : Text, item_state : Sequence) -> Sequence =
+    parse_knowledge_body(tokens, state_index(item_state), make_knowledge(knowledge_name(node), choose(kind == "claim", sequence_append(knowledge_claims(node), state_node(item_state)), knowledge_claims(node)), choose(kind == "derive", sequence_append(knowledge_derives(node), state_node(item_state)), knowledge_derives(node)), knowledge_preserves(node)))
+  reckon parse_knowledge_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_knowledge_body(tokens, state_index(expression_state), make_knowledge(knowledge_name(node), knowledge_claims(node), knowledge_derives(node), sequence_append(knowledge_preserves(node), state_node(expression_state))))
+  reckon parse_knowledge(tokens : Sequence, index : Number) -> Sequence =
+    parse_knowledge_body(tokens, index + 3, make_knowledge(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence()))
+
+  reckon make_utterance(path : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), expression), "unknown"), "und"), "text"), empty_sequence())
+  reckon utterance_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon utterance_expression(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon ast_utterance_speaker(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon ast_utterance_locale(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon utterance_channel(node : Sequence) -> Text = sequence_get(node, 4)
+  reckon utterance_evidence(node : Sequence) -> Sequence = sequence_get(node, 5)
+  reckon utterance_with_text(node : Sequence, target : Number, value : Text) -> Sequence = replace_text_slot(node, target, value, 0, empty_sequence())
+  reckon utterance_with(node : Sequence, target : Number, value : Sequence) -> Sequence = replace_extra(node, target, value, 0, empty_sequence())
+  reckon parse_utterance_metadata(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "speaker", parse_utterance_metadata(tokens, index + 2, utterance_with_text(node, 2, token_text_at(tokens, index + 1))),
+      choose(token_text_at(tokens, index) == "locale", parse_utterance_metadata(tokens, index + 2, utterance_with_text(node, 3, token_text_at(tokens, index + 1))),
+        choose(token_text_at(tokens, index) == "channel", parse_utterance_metadata(tokens, index + 2, utterance_with_text(node, 4, token_text_at(tokens, index + 1))),
+          choose(token_text_at(tokens, index) == "evidence", parse_utterance_metadata(tokens, index + 2, utterance_with(node, 5, sequence_append(utterance_evidence(node), token_text_at(tokens, index + 1)))),
+            make_node_state(index, node)))))
+
+  reckon make_slot(name : Text, expression : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), name), expression)
+  reckon slot_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon slot_expression(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon make_intent(path : Text, name : Text, when_expr : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), name), when_expr), ""), ""), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
+  reckon intent_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon ast_intent_name(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon intent_when(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon ast_intent_action(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon ast_intent_target(node : Sequence) -> Text = sequence_get(node, 4)
+  reckon intent_confidence_expr(node : Sequence) -> Sequence = sequence_get(node, 5)
+  reckon intent_evidence(node : Sequence) -> Sequence = sequence_get(node, 6)
+  reckon intent_utterances(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon intent_slots(node : Sequence) -> Sequence = sequence_get(node, 8)
+  reckon intent_with(node : Sequence, target : Number, value : Sequence) -> Sequence = replace_extra(node, target, value, 0, empty_sequence())
+  reckon intent_with_text(node : Sequence, target : Number, value : Text) -> Sequence = replace_text_slot(node, target, value, 0, empty_sequence())
+  reckon parse_intent_metadata(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "action", parse_intent_metadata(tokens, index + 2, intent_with_text(node, 3, token_text_at(tokens, index + 1))),
+      choose(token_text_at(tokens, index) == "target", parse_intent_metadata(tokens, index + 2, intent_with_text(node, 4, token_text_at(tokens, index + 1))),
+        choose(token_text_at(tokens, index) == "confidence", parse_intent_after_expression(tokens, node, 5, parse_expression(tokens, index + 1, 0)),
+          choose(token_text_at(tokens, index) == "evidence", parse_intent_metadata(tokens, index + 2, intent_with(node, 6, sequence_append(intent_evidence(node), token_text_at(tokens, index + 1)))),
+            choose(token_text_at(tokens, index) == "from", parse_intent_after_names(tokens, node, 7, parse_name_list(tokens, index + 1, empty_sequence())),
+              choose(token_text_at(tokens, index) == "slot", parse_intent_after_slot(tokens, node, token_text_at(tokens, index + 1), parse_expression(tokens, index + 3, 0)),
+                make_node_state(index, node)))))))
+  reckon parse_intent_after_expression(tokens : Sequence, node : Sequence, target : Number, expression_state : Sequence) -> Sequence =
+    parse_intent_metadata(tokens, state_index(expression_state), intent_with(node, target, state_node(expression_state)))
+  reckon parse_intent_after_names(tokens : Sequence, node : Sequence, target : Number, list_state : Sequence) -> Sequence =
+    parse_intent_metadata(tokens, state_index(list_state), intent_with(node, target, state_node(list_state)))
+  reckon parse_intent_after_slot(tokens : Sequence, node : Sequence, name : Text, expression_state : Sequence) -> Sequence =
+    parse_intent_metadata(tokens, state_index(expression_state), intent_with(node, 8, sequence_append(intent_slots(node), make_slot(name, state_node(expression_state)))))
+
+  reckon make_language(name : Text, utterances : Sequence, intents : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), utterances), intents), preserves)
+  reckon language_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon language_utterances(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon language_intents(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon language_preserves(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon parse_language_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "utterance", parse_language_after_utterance(tokens, node, token_text_at(tokens, index + 1), parse_expression(tokens, index + 3, 0)),
+        choose(token_text_at(tokens, index) == "intent", parse_language_after_intent(tokens, node, token_text_at(tokens, index + 1), parse_expression(tokens, index + 3, 0)),
+          choose(token_text_at(tokens, index) == "preserve", parse_language_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)), syntax_failure(tokens, index, "RCL_LANGUAGE_CLAUSE")))))
+  reckon parse_language_after_utterance(tokens : Sequence, node : Sequence, local : Text, expression_state : Sequence) -> Sequence =
+    parse_language_after_utterance_metadata(tokens, node, parse_utterance_metadata(tokens, state_index(expression_state), make_utterance(language_name(node) + "." + local, state_node(expression_state))))
+  reckon parse_language_after_utterance_metadata(tokens : Sequence, node : Sequence, item_state : Sequence) -> Sequence =
+    parse_language_body(tokens, state_index(item_state), make_language(language_name(node), sequence_append(language_utterances(node), state_node(item_state)), language_intents(node), language_preserves(node)))
+  reckon parse_language_after_intent(tokens : Sequence, node : Sequence, local : Text, expression_state : Sequence) -> Sequence =
+    parse_language_after_intent_metadata(tokens, node, parse_intent_metadata(tokens, state_index(expression_state), make_intent(language_name(node) + "." + local, local, state_node(expression_state))))
+  reckon parse_language_after_intent_metadata(tokens : Sequence, node : Sequence, item_state : Sequence) -> Sequence =
+    parse_language_body(tokens, state_index(item_state), make_language(language_name(node), language_utterances(node), sequence_append(language_intents(node), state_node(item_state)), language_preserves(node)))
+  reckon parse_language_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_language_body(tokens, state_index(expression_state), make_language(language_name(node), language_utterances(node), language_intents(node), sequence_append(language_preserves(node), state_node(expression_state))))
+  reckon parse_language(tokens : Sequence, index : Number) -> Sequence =
+    parse_language_body(tokens, index + 3, make_language(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence()))
+
+  reckon make_understanding_item(kind : Text, path : Text, base_type : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), kind), path), base_type), expression), empty_sequence()), ""), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), choose(kind == "HypothesisDecl", "hypothesis", "derived"))
+  reckon understanding_item_kind(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon understanding_item_path(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon understanding_item_base_type(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon understanding_item_expression(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon understanding_item_confidence(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon understanding_item_explanation(node : Sequence) -> Text = sequence_get(node, 5)
+  reckon understanding_item_evidence(node : Sequence) -> Sequence = sequence_get(node, 6)
+  reckon understanding_item_dependencies(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon understanding_item_coverage(node : Sequence) -> Sequence = sequence_get(node, 8)
+  reckon understanding_item_coherence(node : Sequence) -> Sequence = sequence_get(node, 9)
+  reckon understanding_item_status(node : Sequence) -> Text = sequence_get(node, 10)
+  reckon understanding_item_with(node : Sequence, target : Number, value : Sequence) -> Sequence = replace_extra(node, target, value, 0, empty_sequence())
+  reckon understanding_item_with_text(node : Sequence, target : Number, value : Text) -> Sequence = replace_text_slot(node, target, value, 0, empty_sequence())
+  reckon parse_understanding_metadata(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "confidence", parse_understanding_after_metadata_expression(tokens, node, 4, parse_expression(tokens, index + 1, 0)),
+      choose(token_text_at(tokens, index) == "explanation", parse_understanding_metadata(tokens, index + 2, understanding_item_with_text(node, 5, token_text_at(tokens, index + 1))),
+        choose(token_text_at(tokens, index) == "evidence", parse_understanding_metadata(tokens, index + 2, understanding_item_with(node, 6, sequence_append(understanding_item_evidence(node), token_text_at(tokens, index + 1)))),
+          choose(token_text_at(tokens, index) == "from", parse_understanding_after_names(tokens, node, parse_name_list(tokens, index + 1, empty_sequence())),
+            choose(token_text_at(tokens, index) == "coverage", parse_understanding_after_metadata_expression(tokens, node, 8, parse_expression(tokens, index + 1, 0)),
+              choose(token_text_at(tokens, index) == "coherence", parse_understanding_after_metadata_expression(tokens, node, 9, parse_expression(tokens, index + 1, 0)),
+                choose(token_text_at(tokens, index) == "status", parse_understanding_metadata(tokens, index + 2, understanding_item_with_text(node, 10, token_text_at(tokens, index + 1))), make_node_state(index, node))))))))
+  reckon parse_understanding_after_metadata_expression(tokens : Sequence, node : Sequence, target : Number, expression_state : Sequence) -> Sequence =
+    parse_understanding_metadata(tokens, state_index(expression_state), understanding_item_with(node, target, state_node(expression_state)))
+  reckon parse_understanding_after_names(tokens : Sequence, node : Sequence, list_state : Sequence) -> Sequence =
+    parse_understanding_metadata(tokens, state_index(list_state), understanding_item_with(node, 7, state_node(list_state)))
+  reckon make_understanding(name : Text, hypotheses : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), name), hypotheses), preserves)
+  reckon understanding_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon understanding_hypotheses(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon understanding_preserves(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon parse_understanding_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "hypothesis" or token_text_at(tokens, index) == "derive", parse_understanding_after_type(tokens, node, token_text_at(tokens, index), token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+        choose(token_text_at(tokens, index) == "preserve", parse_understanding_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)), syntax_failure(tokens, index, "RCL_UNDERSTANDING_CLAUSE"))))
+  reckon parse_understanding_after_type(tokens : Sequence, node : Sequence, kind : Text, local : Text, type_state : Sequence) -> Sequence =
+    parse_understanding_after_expression(tokens, node, kind, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+  reckon parse_understanding_after_expression(tokens : Sequence, node : Sequence, kind : Text, local : Text, base_type : Text, expression_state : Sequence) -> Sequence =
+    parse_understanding_after_metadata(tokens, node, parse_understanding_metadata(tokens, state_index(expression_state), make_understanding_item(choose(kind == "hypothesis", "HypothesisDecl", "DerivedUnderstandingDecl"), understanding_name(node) + "." + local, base_type, state_node(expression_state))))
+  reckon parse_understanding_after_metadata(tokens : Sequence, node : Sequence, item_state : Sequence) -> Sequence =
+    parse_understanding_body(tokens, state_index(item_state), make_understanding(understanding_name(node), sequence_append(understanding_hypotheses(node), state_node(item_state)), understanding_preserves(node)))
+  reckon parse_understanding_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_understanding_body(tokens, state_index(expression_state), make_understanding(understanding_name(node), understanding_hypotheses(node), sequence_append(understanding_preserves(node), state_node(expression_state))))
+  reckon parse_understanding(tokens : Sequence, index : Number) -> Sequence =
+    parse_understanding_body(tokens, index + 3, make_understanding(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence()))
+
+  reckon make_creation_candidate(path : Text, local : Text, base_type : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), local), base_type), expression), literal_node("Truth", "true")), ""), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
+  reckon creation_candidate_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon creation_candidate_local(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon creation_candidate_base_type(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon creation_candidate_expression(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon creation_candidate_when(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon creation_candidate_target(node : Sequence) -> Text = sequence_get(node, 5)
+  reckon creation_candidate_novelty(node : Sequence) -> Sequence = sequence_get(node, 6)
+  reckon creation_candidate_utility(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon creation_candidate_feasibility(node : Sequence) -> Sequence = sequence_get(node, 8)
+  reckon creation_candidate_risk(node : Sequence) -> Sequence = sequence_get(node, 9)
+  reckon creation_candidate_evidence(node : Sequence) -> Sequence = sequence_get(node, 10)
+  reckon creation_candidate_based_on(node : Sequence) -> Sequence = sequence_get(node, 11)
+  reckon creation_candidate_with(node : Sequence, target : Number, value : Sequence) -> Sequence = replace_extra(node, target, value, 0, empty_sequence())
+  reckon creation_candidate_with_text(node : Sequence, target : Number, value : Text) -> Sequence = replace_text_slot(node, target, value, 0, empty_sequence())
+  reckon parse_creation_candidate_metadata(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "when", parse_creation_candidate_after_expression(tokens, node, 4, parse_expression(tokens, index + 1, 0)),
+      choose(token_text_at(tokens, index) == "target", parse_creation_candidate_metadata(tokens, index + 2, creation_candidate_with_text(node, 5, token_text_at(tokens, index + 1))),
+        choose(token_text_at(tokens, index) == "novelty", parse_creation_candidate_after_expression(tokens, node, 6, parse_expression(tokens, index + 1, 0)),
+          choose(token_text_at(tokens, index) == "utility", parse_creation_candidate_after_expression(tokens, node, 7, parse_expression(tokens, index + 1, 0)),
+            choose(token_text_at(tokens, index) == "feasibility", parse_creation_candidate_after_expression(tokens, node, 8, parse_expression(tokens, index + 1, 0)),
+              choose(token_text_at(tokens, index) == "risk", parse_creation_candidate_after_expression(tokens, node, 9, parse_expression(tokens, index + 1, 0)),
+                choose(token_text_at(tokens, index) == "evidence", parse_creation_candidate_metadata(tokens, index + 2, creation_candidate_with(node, 10, sequence_append(creation_candidate_evidence(node), token_text_at(tokens, index + 1)))),
+                  choose(token_text_at(tokens, index) == "based_on", parse_creation_candidate_after_names(tokens, node, parse_name_list(tokens, index + 1, empty_sequence())), make_node_state(index, node)))))))))
+  reckon parse_creation_candidate_after_expression(tokens : Sequence, node : Sequence, target : Number, expression_state : Sequence) -> Sequence =
+    parse_creation_candidate_metadata(tokens, state_index(expression_state), creation_candidate_with(node, target, state_node(expression_state)))
+  reckon parse_creation_candidate_after_names(tokens : Sequence, node : Sequence, list_state : Sequence) -> Sequence =
+    parse_creation_candidate_metadata(tokens, state_index(list_state), creation_candidate_with(node, 11, state_node(list_state)))
+  reckon qualify_creation_names(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, qualify_creation_names(items, index + 1, owner, sequence_append(output, choose(contains(sequence_get(items, index), "."), sequence_get(items, index), owner + "." + sequence_get(items, index)))))
+  reckon make_selection(path : Text, candidates : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), path), candidates)
+  reckon selection_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon selection_candidates(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon make_creation(name : Text, candidates : Sequence, selection : Sequence, preserves : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), candidates), selection), preserves)
+  reckon creation_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon creation_candidates(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon creation_selection(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon creation_preserves(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon parse_creation_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "candidate", parse_creation_after_type(tokens, node, token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+        choose(token_text_at(tokens, index) == "select", parse_creation_after_selection(tokens, node, token_text_at(tokens, index + 1), parse_name_list(tokens, index + 3, empty_sequence())),
+          choose(token_text_at(tokens, index) == "preserve", parse_creation_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)), syntax_failure(tokens, index, "RCL_CREATION_CLAUSE")))))
+  reckon parse_creation_after_type(tokens : Sequence, node : Sequence, local : Text, type_state : Sequence) -> Sequence =
+    parse_creation_after_expression(tokens, node, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+  reckon parse_creation_after_expression(tokens : Sequence, node : Sequence, local : Text, base_type : Text, expression_state : Sequence) -> Sequence =
+    parse_creation_after_metadata(tokens, node, parse_creation_candidate_metadata(tokens, state_index(expression_state), make_creation_candidate(creation_name(node) + "." + local, local, base_type, state_node(expression_state))))
+  reckon parse_creation_after_metadata(tokens : Sequence, node : Sequence, item_state : Sequence) -> Sequence =
+    parse_creation_body(tokens, state_index(item_state), make_creation(creation_name(node), sequence_append(creation_candidates(node), state_node(item_state)), creation_selection(node), creation_preserves(node)))
+  reckon parse_creation_after_selection(tokens : Sequence, node : Sequence, local : Text, list_state : Sequence) -> Sequence =
+    parse_creation_body(tokens, state_index(list_state), make_creation(creation_name(node), creation_candidates(node), make_selection(creation_name(node) + "." + local, qualify_creation_names(state_node(list_state), 0, creation_name(node), empty_sequence())), creation_preserves(node)))
+  reckon parse_creation_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_creation_body(tokens, state_index(expression_state), make_creation(creation_name(node), creation_candidates(node), creation_selection(node), sequence_append(creation_preserves(node), state_node(expression_state))))
+  reckon parse_creation(tokens : Sequence, index : Number) -> Sequence =
+    parse_creation_body(tokens, index + 3, make_creation(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence()))
+
   reckon make_extras() -> Sequence =
-    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
+      sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()),
+      empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
 
   reckon replace_extra(items : Sequence, target : Number, value : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -704,6 +1083,66 @@ reality RCLGeneralSelfHostCompiler {
   reckon program_policies(program : Sequence) -> Sequence = sequence_get(program_extras(program), 3)
   reckon program_stores(program : Sequence) -> Sequence = sequence_get(program_extras(program), 4)
   reckon program_absorption(program : Sequence) -> Sequence = sequence_get(program_extras(program), 5)
+  reckon program_quantitatives(program : Sequence) -> Sequence = sequence_get(program_extras(program), 6)
+  reckon program_perceptions(program : Sequence) -> Sequence = sequence_get(program_extras(program), 7)
+  reckon program_knowledges(program : Sequence) -> Sequence = sequence_get(program_extras(program), 8)
+  reckon program_languages(program : Sequence) -> Sequence = sequence_get(program_extras(program), 9)
+  reckon program_understandings(program : Sequence) -> Sequence = sequence_get(program_extras(program), 10)
+  reckon program_creations(program : Sequence) -> Sequence = sequence_get(program_extras(program), 11)
+
+  reckon append_measure_facets(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_measure_facets(items, index + 1, sequence_append(output,
+        make_domain_facet(measure_path(sequence_get(items, index)), "Measure<" + measure_base_type(sequence_get(items, index)) + ">", measure_initializer(sequence_get(items, index)), quantitative_name(make_quantitative("", empty_sequence(), empty_sequence(), empty_sequence())), "measure", sequence_get(items, index), false))))
+
+  reckon append_measure_facets_owned(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_measure_facets_owned(items, index + 1, owner, sequence_append(output,
+        make_domain_facet(measure_path(sequence_get(items, index)), "Measure<" + measure_base_type(sequence_get(items, index)) + ">", measure_initializer(sequence_get(items, index)), owner, "measure", sequence_get(items, index), false))))
+
+  reckon append_quant_derive_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_quant_derive_facets(items, index + 1, owner, sequence_append(output,
+        make_domain_facet(quant_derive_path(sequence_get(items, index)), quant_derive_type(sequence_get(items, index)), quant_derive_expression(sequence_get(items, index)), owner, "quantitative", sequence_get(items, index), false))))
+
+  reckon quantitative_facets(node : Sequence, output : Sequence) -> Sequence =
+    append_quant_derive_facets(quantitative_derives(node), 0, quantitative_name(node),
+      append_measure_facets_owned(quantitative_measures(node), 0, quantitative_name(node), output))
+
+  reckon append_channel_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_channel_facets(items, index + 1, owner, sequence_append(output,
+        make_domain_facet(channel_path(sequence_get(items, index)), channel_type(sequence_get(items, index)), channel_expression(sequence_get(items, index)), owner, "perception", sequence_get(items, index), false))))
+
+  reckon append_knowledge_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_knowledge_facets(items, index + 1, owner, sequence_append(output,
+        make_domain_facet(knowledge_item_path(sequence_get(items, index)), "Know<" + knowledge_item_base_type(sequence_get(items, index)) + ">", empty_sequence(), owner, "knowledge", sequence_get(items, index), true))))
+
+  reckon knowledge_facets(node : Sequence, output : Sequence) -> Sequence =
+    append_knowledge_facets(knowledge_derives(node), 0, knowledge_name(node),
+      append_knowledge_facets(knowledge_claims(node), 0, knowledge_name(node), output))
+
+  reckon append_utterance_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, append_utterance_facets(items, index + 1, owner, sequence_append(output,
+      make_domain_facet(utterance_path(sequence_get(items, index)), "Utterance", empty_sequence(), owner, "language", sequence_get(items, index), true))))
+  reckon append_intent_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, append_intent_facets(items, index + 1, owner, sequence_append(output,
+      make_domain_facet(intent_path(sequence_get(items, index)), "Intent", empty_sequence(), owner, "language", sequence_get(items, index), true))))
+  reckon language_facets(node : Sequence, output : Sequence) -> Sequence =
+    append_intent_facets(language_intents(node), 0, language_name(node), append_utterance_facets(language_utterances(node), 0, language_name(node), output))
+  reckon append_understanding_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, append_understanding_facets(items, index + 1, owner, sequence_append(output,
+      make_domain_facet(understanding_item_path(sequence_get(items, index)), "Understand<" + understanding_item_base_type(sequence_get(items, index)) + ">", empty_sequence(), owner, "understanding", sequence_get(items, index), true))))
+  reckon find_creation_candidate(items : Sequence, index : Number, path : Text) -> Sequence =
+    choose(creation_candidate_path(sequence_get(items, index)) == path, sequence_get(items, index), find_creation_candidate(items, index + 1, path))
+  reckon append_creation_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, append_creation_facets(items, index + 1, owner, sequence_append(output,
+      make_domain_facet(creation_candidate_path(sequence_get(items, index)), "Create<" + creation_candidate_base_type(sequence_get(items, index)) + ">", empty_sequence(), owner, "creation", sequence_get(items, index), true))))
+  reckon creation_facets(node : Sequence, output : Sequence) -> Sequence =
+    choose(length(creation_selection(node)) == 0, append_creation_facets(creation_candidates(node), 0, creation_name(node), output),
+      sequence_append(append_creation_facets(creation_candidates(node), 0, creation_name(node), output),
+        make_domain_facet(selection_path(creation_selection(node)), "Create<" + creation_candidate_base_type(find_creation_candidate(creation_candidates(node), 0, sequence_get(selection_candidates(creation_selection(node)), 0))) + ">", empty_sequence(), creation_name(node), "selection", creation_selection(node), true)))
 
   reckon parse_top(tokens : Sequence, index : Number, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     choose(token_kind_at(tokens, index) == "EOF", syntax_failure(tokens, index, "RCL_REALITY_UNCLOSED"),
@@ -717,11 +1156,23 @@ reality RCLGeneralSelfHostCompiler {
             parse_top_after_subject(tokens, parse_subject(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
             choose(either(token_text_at(tokens, index) == "emergence", token_text_at(tokens, index) == "resonance"),
               parse_top_after_rule(tokens, parse_rule(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-              choose(either(token_text_at(tokens, index) == "foresee", token_text_at(tokens, index) == "realize"),
+              choose(token_text_at(tokens, index) == "quantitative",
+                parse_top_after_quantitative(tokens, parse_quantitative(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                choose(token_text_at(tokens, index) == "perception",
+                  parse_top_after_perception(tokens, parse_perception(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+              choose(token_text_at(tokens, index) == "knowledge",
+                parse_top_after_knowledge(tokens, parse_knowledge(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                choose(token_text_at(tokens, index) == "language",
+                  parse_top_after_language(tokens, parse_language(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                  choose(token_text_at(tokens, index) == "understanding",
+                    parse_top_after_understanding(tokens, parse_understanding(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                    choose(token_text_at(tokens, index) == "creation",
+                      parse_top_after_creation(tokens, parse_creation(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                    choose(either(either(token_text_at(tokens, index) == "foresee", token_text_at(tokens, index) == "realize"), either(either(token_text_at(tokens, index) == "quantify", token_text_at(tokens, index) == "observe"), either(either(token_text_at(tokens, index) == "learn", token_text_at(tokens, index) == "interpret"), either(token_text_at(tokens, index) == "understand", token_text_at(tokens, index) == "create")))),
                 parse_top(tokens, index + 2, facets, reckons, subjects, warrants, rules,
                   sequence_append(directives,
-                    make_directive(choose(token_text_at(tokens, index) == "foresee", "Foresee", "Realize"), token_text_at(tokens, index + 1))), extras),
-                parse_metadata_top(tokens, index, facets, reckons, subjects, warrants, rules, directives, extras))))))))
+                    make_directive(choose(token_text_at(tokens, index) == "foresee", "Foresee", choose(token_text_at(tokens, index) == "realize", "Realize", choose(token_text_at(tokens, index) == "quantify", "Quantify", choose(token_text_at(tokens, index) == "observe", "Observe", choose(token_text_at(tokens, index) == "learn", "Learn", choose(token_text_at(tokens, index) == "interpret", "Interpret", choose(token_text_at(tokens, index) == "understand", "Understand", "Create"))))))), token_text_at(tokens, index + 1))), extras),
+                parse_metadata_top(tokens, index, facets, reckons, subjects, warrants, rules, directives, extras))))))))))))))
 
   reckon parse_top_after_facet(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), sequence_append(facets, state_node(item_state)), reckons, subjects, warrants, rules, directives, extras)
@@ -736,6 +1187,22 @@ reality RCLGeneralSelfHostCompiler {
   reckon parse_top_after_rule(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), facets, reckons, subjects, warrants,
       sequence_append(rules, state_node(item_state)), directives, extras)
+
+  reckon parse_top_after_quantitative(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), quantitative_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 6, state_node(item_state)))
+
+  reckon parse_top_after_perception(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), append_channel_facets(perception_channels(state_node(item_state)), 0, perception_name(state_node(item_state)), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 7, state_node(item_state)))
+
+  reckon parse_top_after_knowledge(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), knowledge_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 8, state_node(item_state)))
+
+  reckon parse_top_after_language(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), language_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 9, state_node(item_state)))
+  reckon parse_top_after_understanding(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), append_understanding_facets(understanding_hypotheses(state_node(item_state)), 0, understanding_name(state_node(item_state)), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 10, state_node(item_state)))
+  reckon parse_top_after_creation(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), creation_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 11, state_node(item_state)))
 
   reckon parse_top_after_extra(tokens : Sequence, item_state : Sequence, target : Number, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), facets, reckons, subjects, warrants, rules, directives,
@@ -808,6 +1275,32 @@ reality RCLGeneralSelfHostCompiler {
       canonical_expression_array(items, index + 1,
         output + choose(index == 0, "", ",") + canonical_expression(sequence_get(items, index))))
 
+  reckon canonical_optional_expression(node : Sequence) -> Text =
+    choose(length(node) == 0, "null", canonical_expression(node))
+
+  reckon canonical_measure(node : Sequence) -> Text =
+    "{\"baseType\":" + json_quote(measure_base_type(node))
+      + ",\"calibratedBy\":" + choose(measure_calibrated_by(node) == "", "null", json_quote(measure_calibrated_by(node)))
+      + ",\"confidence\":" + canonical_optional_expression(measure_confidence_expr(node))
+      + ",\"evidence\":" + canonical_text_array(measure_evidence(node), 0, "[")
+      + ",\"kind\":\"MeasureDecl\",\"path\":" + json_quote(measure_path(node))
+      + ",\"scale\":" + json_quote(measure_scale(node))
+      + ",\"uncertainty\":" + canonical_optional_expression(measure_uncertainty_expr(node))
+      + ",\"unit\":" + choose(measure_unit(node) == "", "null", json_quote(measure_unit(node)))
+      + ",\"value\":" + canonical_expression(measure_initializer(node)) + "}"
+
+  reckon canonical_knowledge_item(node : Sequence) -> Text =
+    "{\"baseType\":" + json_quote(knowledge_item_base_type(node))
+      + ",\"confidence\":" + canonical_optional_expression(knowledge_item_confidence(node))
+      + ",\"dependencies\":" + canonical_text_array(knowledge_item_dependencies(node), 0, "[")
+      + ",\"evidence\":" + canonical_text_array(knowledge_item_evidence(node), 0, "[")
+      + ",\"expression\":" + canonical_expression(knowledge_item_expression(node))
+      + ",\"kind\":" + json_quote(knowledge_item_kind(node))
+      + ",\"path\":" + json_quote(knowledge_item_path(node))
+      + ",\"scope\":" + json_quote(knowledge_item_scope(node))
+      + ",\"source\":" + choose(knowledge_item_source(node) == "", "null", json_quote(knowledge_item_source(node)))
+      + ",\"status\":" + json_quote(knowledge_item_status(node)) + "}"
+
   reckon canonical_params(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
       canonical_params(items, index + 1,
@@ -816,11 +1309,35 @@ reality RCLGeneralSelfHostCompiler {
           + ",\"valueType\":" + json_quote(sequence_get(sequence_get(items, index), 1)) + "}"))
 
   reckon canonical_facet(node : Sequence) -> Text =
-    "{\"kind\":\"FacetDecl\",\"location\":{\"column\":" + text(facet_column(node))
-      + ",\"line\":" + text(facet_line(node)) + "},\"owner\":"
-      + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node)))
-      + ",\"path\":" + json_quote(facet_path(node)) + ",\"value\":" + canonical_expression(facet_expression(node))
-      + ",\"valueType\":" + json_quote(facet_type(node)) + "}"
+    choose(facet_domain_kind(node) == "",
+      "{\"kind\":\"FacetDecl\",\"location\":{\"column\":" + text(facet_column(node))
+        + ",\"line\":" + text(facet_line(node)) + "},\"owner\":"
+        + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node)))
+        + ",\"path\":" + json_quote(facet_path(node)) + ",\"value\":" + canonical_expression(facet_expression(node))
+        + ",\"valueType\":" + json_quote(facet_type(node)) + "}",
+      choose(facet_domain_kind(node) == "measure",
+        "{\"kind\":\"FacetDecl\",\"measure\":" + canonical_measure(facet_domain_data(node))
+          + ",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+          + ",\"value\":" + canonical_expression(facet_expression(node)) + ",\"valueType\":" + json_quote(facet_type(node)) + "}",
+        choose(facet_domain_kind(node) == "knowledge",
+          "{\"deferred\":true,\"kind\":\"FacetDecl\",\"knowledge\":" + canonical_knowledge_item(facet_domain_data(node))
+            + ",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+            + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
+          choose(facet_domain_kind(node) == "language",
+            "{\"deferred\":true,\"kind\":\"FacetDecl\",\"naturalLanguage\":" + choose(facet_type(node) == "Utterance", canonical_utterance(facet_domain_data(node)), canonical_intent(facet_domain_data(node)))
+              + ",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node)) + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
+            choose(facet_domain_kind(node) == "understanding",
+              "{\"deferred\":true,\"kind\":\"FacetDecl\",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+                + ",\"understanding\":" + canonical_understanding_item(facet_domain_data(node)) + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
+              choose(facet_domain_kind(node) == "creation",
+                "{\"creation\":" + canonical_creation_candidate(facet_domain_data(node)) + ",\"deferred\":true,\"kind\":\"FacetDecl\",\"owner\":" + json_quote(facet_owner(node))
+                  + ",\"path\":" + json_quote(facet_path(node)) + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
+                choose(facet_domain_kind(node) == "selection",
+                  "{\"deferred\":true,\"kind\":\"FacetDecl\",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+                    + ",\"selection\":" + canonical_selection(facet_domain_data(node)) + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
+                  "{\"derivedBy\":" + json_quote(facet_domain_kind(node)) + ",\"kind\":\"FacetDecl\",\"owner\":"
+                    + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+                    + ",\"value\":" + canonical_expression(facet_expression(node)) + ",\"valueType\":" + json_quote(facet_type(node)) + "}")))))))
 
   reckon canonical_facets(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -885,7 +1402,9 @@ reality RCLGeneralSelfHostCompiler {
         output + choose(index == 0, "", ",") + canonical_rule(sequence_get(items, index))))
 
   reckon canonical_directive(node : Sequence) -> Text =
-    "{\"kind\":" + json_quote(directive_kind(node)) + ",\"rule\":" + json_quote(directive_name(node)) + "}"
+    "{\"kind\":" + json_quote(directive_kind(node))
+      + choose(directive_kind(node) == "Foresee" or directive_kind(node) == "Realize", ",\"rule\":", ",\"name\":")
+      + json_quote(directive_name(node)) + "}"
 
   reckon canonical_directives(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1046,14 +1565,16 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon canonical_source_map_facets(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "}",
-      canonical_source_map_facets(items, index + 1,
-        output + choose(index == 0, "", ",") + json_quote(facet_path(sequence_get(items, index)))
-          + ":" + canonical_source_map_facet(sequence_get(items, index))))
+      choose(facet_line(sequence_get(items, index)) == 0,
+        canonical_source_map_facets(items, index + 1, output),
+        canonical_source_map_facets(items, index + 1,
+          output + choose(output == "{", "", ",") + json_quote(facet_path(sequence_get(items, index)))
+            + ":" + canonical_source_map_facet(sequence_get(items, index)))))
 
   reckon canonical_type_binding(node : Sequence) -> Text =
     "{\"canonicalType\":" + json_quote(facet_type(node)) + ",\"declaredType\":" + json_quote(facet_type(node))
-      + ",\"external\":false,\"location\":{\"column\":" + text(facet_column(node)) + ",\"line\":" + text(facet_line(node))
-      + "},\"owner\":" + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node)))
+      + ",\"external\":false,\"location\":" + choose(facet_line(node) == 0, "null", "{\"column\":" + text(facet_column(node)) + ",\"line\":" + text(facet_line(node)) + "}")
+      + ",\"owner\":" + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node)))
       + ",\"path\":" + json_quote(facet_path(node)) + "}"
 
   reckon canonical_type_bindings_facets(items : Sequence, index : Number, output : Text) -> Text =
@@ -1064,8 +1585,8 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon canonical_semantic_facet(node : Sequence) -> Text =
     "{\"canonicalType\":" + json_quote(facet_type(node)) + ",\"constructor\":null,\"declaredType\":"
-      + json_quote(facet_type(node)) + ",\"deferred\":false,\"externalType\":false,\"fieldAccesses\":[],\"location\":{\"column\":"
-      + text(facet_column(node)) + ",\"line\":" + text(facet_line(node)) + "},\"matches\":[],\"owner\":"
+      + json_quote(facet_type(node)) + ",\"deferred\":" + choose(facet_deferred(node), "true", "false") + ",\"externalType\":false,\"fieldAccesses\":[],\"location\":"
+      + choose(facet_line(node) == 0, "null", "{\"column\":" + text(facet_column(node)) + ",\"line\":" + text(facet_line(node)) + "}") + ",\"matches\":[],\"owner\":"
       + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node))) + ",\"path\":" + json_quote(facet_path(node)) + "}"
 
   reckon canonical_semantic_facets(items : Sequence, index : Number, output : Text) -> Text =
@@ -1088,10 +1609,99 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon foundation_canonical() -> Text = "{\"compositePlanes\":[{\"composedFrom\":[\"perceptual\",\"knowledge\",\"authority\"],\"id\":\"natural-language-reality\",\"primitives\":[\"language\",\"utterance\",\"intent\",\"interpret\"],\"role\":\"turns human symbols into explicit utterances, candidate meanings and bounded intents without making a language model the whole intelligence\"},{\"composedFrom\":[\"knowledge\",\"quantitative\",\"perceptual\",\"natural-language-reality\"],\"id\":\"understanding-reality\",\"primitives\":[\"understanding\",\"hypothesis\",\"explanation\",\"understand\"],\"role\":\"constructs testable world models that explain evidence, expose confidence and can be rejected by contradiction\"},{\"composedFrom\":[\"understanding-reality\",\"knowledge\",\"meta-computational\",\"authority\"],\"id\":\"creative-reality\",\"primitives\":[\"creation\",\"candidate\",\"select\",\"create\"],\"role\":\"generates bounded novelty, evaluates candidates by utility, feasibility, novelty and risk, then selects without automatically executing\"},{\"composedFrom\":[\"perceptual\",\"neural\",\"living\",\"knowledge\",\"natural-language-reality\",\"understanding-reality\",\"creative-reality\"],\"id\":\"inner-reality\",\"role\":\"the subject-relative model that contains percepts, needs, memories, claims, interpretations, explanations and candidate creations\"},{\"composedFrom\":[\"computational\",\"physical\",\"authority\",\"causality-evidence\"],\"id\":\"execution-reality\",\"role\":\"the bounded transition plane that turns a justified and selected intention into an observed, authorized and evidenced change\"}],\"crossDomainAxes\":[{\"id\":\"authority\",\"primitives\":[\"warrant\",\"needs\",\"preserve\"],\"role\":\"opens bounded powers while constraining which changes can become authoritative reality\"},{\"id\":\"causality-evidence\",\"primitives\":[\"cause\",\"when\",\"witness\",\"evidence\"],\"role\":\"connects change and knowledge to causes, conditions, provenance and reproducible evidence\"}],\"domains\":[{\"id\":\"meta-computational\",\"keyword\":\"meta\",\"question\":\"How can computation inspect, validate and transform computation itself?\"},{\"id\":\"computational\",\"keyword\":\"reckon/host\",\"question\":\"How are symbolic and machine states computed and executed?\"},{\"id\":\"physical\",\"keyword\":\"physical\",\"question\":\"How do matter, energy, fields, space and time evolve?\"},{\"id\":\"energy\",\"keyword\":\"energy\",\"question\":\"How is capacity to cause change stored, transferred, transformed, dissipated and bounded?\"},{\"id\":\"elemental\",\"keyword\":\"element\",\"question\":\"What primitive constituents, properties, bonds and compositions make a reality object what it is?\"},{\"id\":\"perceptual\",\"keyword\":\"perception\",\"question\":\"How does a world become observable and experienced by an observer?\"},{\"id\":\"neural\",\"keyword\":\"neural\",\"question\":\"How do signals become memory, attention, learning, decisions and control?\"},{\"id\":\"embodied\",\"keyword\":\"embodiment\",\"question\":\"How are systems, organs, boundaries and sensorimotor channels integrated into one body?\"},{\"id\":\"living\",\"keyword\":\"living\",\"question\":\"How does a living system maintain continuity, needs and autonomous action?\"},{\"id\":\"genetic\",\"keyword\":\"genetic\",\"question\":\"How are structures encoded, expressed, inherited and changed across generations?\"},{\"id\":\"quantitative\",\"keyword\":\"quantitative\",\"question\":\"What can be measured, on what scale, with what uncertainty, confidence and evidence?\"},{\"id\":\"knowledge\",\"keyword\":\"knowledge\",\"question\":\"How do observations and prior structures become justified, revisable and actionable knowledge?\"},{\"id\":\"science\",\"keyword\":\"science\",\"question\":\"How are hypotheses made falsifiable, tested, replicated, revised and accepted with explicit method and evidence?\"},{\"id\":\"spirit\",\"keyword\":\"spirit\",\"question\":\"How are identity, meaning, values, purposes, affect and will integrated as a subject-relative mental reality?\"}],\"format\":\"rcl.reality-foundation.v0.6\",\"metaRealityPlanes\":[{\"id\":\"meta-spacetime-reality\",\"operatesOn\":[\"all reality domains\",\"all transitions\",\"all observations\"],\"primitives\":[\"spacetime\",\"frame\",\"clock\",\"coordinate\",\"relation\",\"synchronize\"],\"role\":\"locates every state, event and observer in a reference frame and logical/physical time while preserving causal order and synchronization boundaries\"},{\"id\":\"meta-acceleration-reality\",\"operatesOn\":[\"computation\",\"simulation\",\"learning\",\"execution\"],\"primitives\":[\"acceleration\",\"target\",\"strategy\",\"factor\",\"budget\",\"fidelity\",\"accelerate\"],\"role\":\"changes the speed, scheduling and reuse strategy of reality computation while preserving declared fidelity, authority and causal invariants\"},{\"id\":\"meta-compression-reality\",\"operatesOn\":[\"state\",\"history\",\"knowledge\",\"world models\",\"evidence\"],\"primitives\":[\"compression\",\"target\",\"mode\",\"codec\",\"reversible\",\"fidelity\",\"compress\",\"restore\"],\"role\":\"reduces representational cost while preserving a declared reconstruction contract, provenance and reality root\"}]}"
 
+  reckon canonical_quant_derive(node : Sequence) -> Text =
+    "{\"expression\":" + canonical_expression(quant_derive_expression(node)) + ",\"kind\":\"DerivedMeasureDecl\",\"path\":"
+      + json_quote(quant_derive_path(node)) + ",\"valueType\":" + json_quote(quant_derive_type(node)) + "}"
+  reckon canonical_quant_derives(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_quant_derives(items, index + 1, output + choose(index == 0, "", ",") + canonical_quant_derive(sequence_get(items, index))))
+  reckon canonical_measures(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_measures(items, index + 1, output + choose(index == 0, "", ",") + canonical_measure(sequence_get(items, index))))
+  reckon canonical_quantitative(node : Sequence) -> Text =
+    "{\"derives\":" + canonical_quant_derives(quantitative_derives(node), 0, "[") + ",\"kind\":\"QuantitativeDecl\",\"measures\":"
+      + canonical_measures(quantitative_measures(node), 0, "[") + ",\"name\":" + json_quote(quantitative_name(node))
+      + ",\"preserves\":" + canonical_expression_array(quantitative_preserves(node), 0, "[") + "}"
+  reckon canonical_quantitatives(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_quantitatives(items, index + 1, output + choose(index == 0, "", ",") + canonical_quantitative(sequence_get(items, index))))
+
+  reckon canonical_channel(node : Sequence) -> Text =
+    "{\"expression\":" + canonical_expression(channel_expression(node)) + ",\"kind\":\"PerceptionChannelDecl\",\"path\":"
+      + json_quote(channel_path(node)) + ",\"valueType\":" + json_quote(channel_type(node)) + "}"
+  reckon canonical_channels(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_channels(items, index + 1, output + choose(index == 0, "", ",") + canonical_channel(sequence_get(items, index))))
+  reckon canonical_perception(node : Sequence) -> Text =
+    "{\"channels\":" + canonical_channels(perception_channels(node), 0, "[") + ",\"kind\":\"PerceptionDecl\",\"name\":" + json_quote(perception_name(node))
+      + ",\"observer\":" + choose(perception_observer(node) == "", "null", json_quote(perception_observer(node)))
+      + ",\"preserves\":" + canonical_expression_array(perception_preserves(node), 0, "[")
+      + ",\"source\":" + choose(perception_source(node) == "", "null", json_quote(perception_source(node))) + "}"
+  reckon canonical_perceptions(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_perceptions(items, index + 1, output + choose(index == 0, "", ",") + canonical_perception(sequence_get(items, index))))
+
+  reckon canonical_knowledge_items(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_knowledge_items(items, index + 1, output + choose(index == 0, "", ",") + canonical_knowledge_item(sequence_get(items, index))))
+  reckon canonical_knowledge(node : Sequence) -> Text =
+    "{\"claims\":" + canonical_knowledge_items(knowledge_claims(node), 0, "[") + ",\"decays\":[],\"derives\":"
+      + canonical_knowledge_items(knowledge_derives(node), 0, "[") + ",\"kind\":\"KnowledgeDecl\",\"name\":" + json_quote(knowledge_name(node))
+      + ",\"preserves\":" + canonical_expression_array(knowledge_preserves(node), 0, "[") + ",\"revisions\":[]}"
+  reckon canonical_knowledges(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_knowledges(items, index + 1, output + choose(index == 0, "", ",") + canonical_knowledge(sequence_get(items, index))))
+
+  reckon canonical_utterance(node : Sequence) -> Text =
+    "{\"channel\":" + json_quote(utterance_channel(node)) + ",\"evidence\":" + canonical_text_array(utterance_evidence(node), 0, "[")
+      + ",\"expression\":" + canonical_expression(utterance_expression(node)) + ",\"kind\":\"UtteranceDecl\",\"locale\":" + json_quote(ast_utterance_locale(node))
+      + ",\"path\":" + json_quote(utterance_path(node)) + ",\"speaker\":" + json_quote(ast_utterance_speaker(node)) + "}"
+  reckon canonical_slot(node : Sequence) -> Text = "{\"expression\":" + canonical_expression(slot_expression(node)) + ",\"name\":" + json_quote(slot_name(node)) + "}"
+  reckon canonical_slots(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_slots(items, index + 1, output + choose(index == 0, "", ",") + canonical_slot(sequence_get(items, index))))
+  reckon canonical_intent(node : Sequence) -> Text =
+    "{\"action\":" + json_quote(ast_intent_action(node)) + ",\"confidence\":" + canonical_optional_expression(intent_confidence_expr(node))
+      + ",\"evidence\":" + canonical_text_array(intent_evidence(node), 0, "[") + ",\"kind\":\"IntentDecl\",\"name\":" + json_quote(ast_intent_name(node))
+      + ",\"path\":" + json_quote(intent_path(node)) + ",\"slots\":" + canonical_slots(intent_slots(node), 0, "[") + ",\"target\":" + json_quote(ast_intent_target(node))
+      + ",\"utterances\":" + canonical_text_array(intent_utterances(node), 0, "[") + ",\"when\":" + canonical_expression(intent_when(node)) + "}"
+  reckon canonical_utterances(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_utterances(items, index + 1, output + choose(index == 0, "", ",") + canonical_utterance(sequence_get(items, index))))
+  reckon canonical_intents(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_intents(items, index + 1, output + choose(index == 0, "", ",") + canonical_intent(sequence_get(items, index))))
+  reckon canonical_language(node : Sequence) -> Text =
+    "{\"intents\":" + canonical_intents(language_intents(node), 0, "[") + ",\"kind\":\"NaturalLanguageDecl\",\"name\":" + json_quote(language_name(node))
+      + ",\"preserves\":" + canonical_expression_array(language_preserves(node), 0, "[") + ",\"utterances\":" + canonical_utterances(language_utterances(node), 0, "[") + "}"
+  reckon canonical_languages(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_languages(items, index + 1, output + choose(index == 0, "", ",") + canonical_language(sequence_get(items, index))))
+
+  reckon canonical_understanding_item(node : Sequence) -> Text =
+    "{\"baseType\":" + json_quote(understanding_item_base_type(node)) + ",\"coherence\":" + canonical_optional_expression(understanding_item_coherence(node))
+      + ",\"confidence\":" + canonical_optional_expression(understanding_item_confidence(node)) + ",\"coverage\":" + canonical_optional_expression(understanding_item_coverage(node))
+      + ",\"dependencies\":" + canonical_text_array(understanding_item_dependencies(node), 0, "[") + ",\"evidence\":" + canonical_text_array(understanding_item_evidence(node), 0, "[")
+      + ",\"explanation\":" + json_quote(understanding_item_explanation(node)) + ",\"expression\":" + canonical_expression(understanding_item_expression(node))
+      + ",\"kind\":" + json_quote(understanding_item_kind(node)) + ",\"path\":" + json_quote(understanding_item_path(node)) + ",\"status\":" + json_quote(understanding_item_status(node)) + "}"
+  reckon canonical_understanding_items(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_understanding_items(items, index + 1, output + choose(index == 0, "", ",") + canonical_understanding_item(sequence_get(items, index))))
+  reckon canonical_understanding(node : Sequence) -> Text =
+    "{\"hypotheses\":" + canonical_understanding_items(understanding_hypotheses(node), 0, "[") + ",\"kind\":\"UnderstandingDecl\",\"name\":" + json_quote(understanding_name(node))
+      + ",\"preserves\":" + canonical_expression_array(understanding_preserves(node), 0, "[") + "}"
+  reckon canonical_understandings(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_understandings(items, index + 1, output + choose(index == 0, "", ",") + canonical_understanding(sequence_get(items, index))))
+
+  reckon canonical_creation_candidate(node : Sequence) -> Text =
+    "{\"baseType\":" + json_quote(creation_candidate_base_type(node)) + ",\"basedOn\":" + canonical_text_array(creation_candidate_based_on(node), 0, "[")
+      + ",\"evidence\":" + canonical_text_array(creation_candidate_evidence(node), 0, "[") + ",\"expression\":" + canonical_expression(creation_candidate_expression(node))
+      + ",\"feasibility\":" + canonical_optional_expression(creation_candidate_feasibility(node)) + ",\"kind\":\"CreationCandidateDecl\",\"localName\":" + json_quote(creation_candidate_local(node))
+      + ",\"novelty\":" + canonical_optional_expression(creation_candidate_novelty(node)) + ",\"path\":" + json_quote(creation_candidate_path(node))
+      + ",\"risk\":" + canonical_optional_expression(creation_candidate_risk(node)) + ",\"target\":" + json_quote(creation_candidate_target(node))
+      + ",\"utility\":" + canonical_optional_expression(creation_candidate_utility(node)) + ",\"when\":" + canonical_expression(creation_candidate_when(node)) + "}"
+  reckon canonical_creation_candidates(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_creation_candidates(items, index + 1, output + choose(index == 0, "", ",") + canonical_creation_candidate(sequence_get(items, index))))
+  reckon canonical_selection(node : Sequence) -> Text =
+    "{\"candidates\":" + canonical_text_array(selection_candidates(node), 0, "[") + ",\"kind\":\"CreationSelectionDecl\",\"path\":" + json_quote(selection_path(node)) + "}"
+  reckon canonical_creation(node : Sequence) -> Text =
+    "{\"candidates\":" + canonical_creation_candidates(creation_candidates(node), 0, "[") + ",\"kind\":\"CreationDecl\",\"name\":" + json_quote(creation_name(node))
+      + ",\"preserves\":" + canonical_expression_array(creation_preserves(node), 0, "[") + ",\"selection\":" + choose(length(creation_selection(node)) == 0, "null", canonical_selection(creation_selection(node))) + "}"
+  reckon canonical_creations(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_creations(items, index + 1, output + choose(index == 0, "", ",") + canonical_creation(sequence_get(items, index))))
+
   reckon canonical_program_with(program : Sequence, sorted_facets : Sequence) -> Text =
     "{\"absorptionDirectives\":" + canonical_absorptions(program_absorption(program), 0, "[")
       + ",\"accelerations\":[],\"capabilityPolicies\":" + canonical_policies(program_policies(program), 0, "[")
-      + ",\"compressions\":[],\"creations\":[],\"dialects\":" + canonical_dialects(program_dialects(program), 0, "[")
+      + ",\"compressions\":[],\"creations\":" + canonical_creations(program_creations(program), 0, "[") + ",\"dialects\":" + canonical_dialects(program_dialects(program), 0, "[")
       + ",\"directives\":"
       + canonical_directives(program_directives(program), 0, "[")
       + ",\"effectDeclarations\":" + canonical_effects(program_effects(program), 0, "[")
@@ -1099,9 +1709,9 @@ reality RCLGeneralSelfHostCompiler {
       + canonical_facet_types(sorted_facets, 0, "{") + ",\"facets\":" + canonical_facets(program_facets(program), 0, "[")
       + ",\"format\":\"rcl.reality-program.v0.10\",\"foundation\":" + foundation_canonical()
       + ",\"genetics\":[],\"hosts\":" + canonical_hosts(program_hosts(program), 0, "[")
-      + ",\"knowledges\":[],\"languageVersion\":\"0.14.0-alpha.1\",\"livings\":[],\"metaDomains\":[],\"name\":"
+      + ",\"knowledges\":" + canonical_knowledges(program_knowledges(program), 0, "[") + ",\"languageVersion\":\"0.14.0-alpha.1\",\"livings\":[],\"metaDomains\":[],\"name\":"
       + json_quote(program_name(program))
-      + ",\"naturalLanguages\":[],\"neurals\":[],\"perceptions\":[],\"physicals\":[],\"quantitatives\":[],\"reckons\":"
+      + ",\"naturalLanguages\":" + canonical_languages(program_languages(program), 0, "[") + ",\"neurals\":[],\"perceptions\":" + canonical_perceptions(program_perceptions(program), 0, "[") + ",\"physicals\":[],\"quantitatives\":" + canonical_quantitatives(program_quantitatives(program), 0, "[") + ",\"reckons\":"
       + canonical_reckons(program_reckons(program), 0, "[")
       + ",\"rules\":" + canonical_rules(program_rules(program), 0, "[")
       + ",\"sciences\":[],\"semanticMap\":" + canonical_semantic_map(program, sorted_facets)
@@ -1109,7 +1719,7 @@ reality RCLGeneralSelfHostCompiler {
       + ",\"spacetimes\":[],\"spirits\":[],\"stores\":" + canonical_stores(program_stores(program), 0, "[")
       + ",\"subjects\":" + canonical_text_array(program_subjects(program), 0, "[")
       + ",\"typeBindings\":" + canonical_type_bindings(sorted_facets)
-      + ",\"typeModules\":null,\"understandings\":[],\"warrants\":" + canonical_warrants(program_warrants(program), 0, "[") + "}"
+      + ",\"typeModules\":null,\"understandings\":" + canonical_understandings(program_understandings(program), 0, "[") + ",\"warrants\":" + canonical_warrants(program_warrants(program), 0, "[") + "}"
 
   reckon canonical_program(program : Sequence) -> Text =
     canonical_program_with(program, sort_facets(program_facets(program), 0, empty_sequence()))
@@ -1133,16 +1743,27 @@ reality RCLGeneralSelfHostCompiler {
         validate_expression_array(items, index + 1, locals, facets, reckons), false))
 
   reckon call_is_known(name : Text, reckons : Sequence) -> Truth =
-    builtin_id(name) > 0 or name == "provider_call" or name == "choose"
+    builtin_id(name) > 0 or name == "provider_call" or name == "domain_call" or name == "choose"
       or name == "typed_ref" or name == "typed_deref" or name == "typed_ref_id"
+      or name == "celsius" or name == "measure_value" or name == "uncertainty"
+      or name == "confidence" or name == "certainty" or name == "knowledge_value"
+      or name == "knowledge_status" or name == "known" or name == "supported"
+      or is_cognition_accessor(name) or name == "intent_matches" or name == "understood" or name == "selected"
       or find_reckon_index(reckons, 0, name) >= 0
 
   reckon call_arity_valid(node : Sequence, reckons : Sequence) -> Truth =
-    choose(expr_text(node) == "provider_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
-      choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id",
+    choose(expr_text(node) == "provider_call" or expr_text(node) == "domain_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
+      choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id"
+          or expr_text(node) == "celsius" or expr_text(node) == "measure_value" or expr_text(node) == "uncertainty"
+          or expr_text(node) == "confidence" or expr_text(node) == "certainty" or expr_text(node) == "knowledge_value"
+          or expr_text(node) == "knowledge_status",
         length(expr_args(node)) == 1,
-        choose(find_reckon_index(reckons, 0, expr_text(node)) >= 0,
-          length(expr_args(node)) == length(reckon_params(sequence_get(reckons, find_reckon_index(reckons, 0, expr_text(node))))), true)))
+        choose(is_cognition_accessor(expr_text(node)) or expr_text(node) == "selected", length(expr_args(node)) == 1,
+        choose(expr_text(node) == "intent_matches", length(expr_args(node)) == 3,
+        choose(expr_text(node) == "known" or expr_text(node) == "supported" or expr_text(node) == "understood",
+          length(expr_args(node)) >= 1 and length(expr_args(node)) <= 2,
+          choose(find_reckon_index(reckons, 0, expr_text(node)) >= 0,
+          length(expr_args(node)) == length(reckon_params(sequence_get(reckons, find_reckon_index(reckons, 0, expr_text(node))))), true))))))
 
   reckon validate_expression(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(expr_kind(node) == "LiteralExpr", true,
@@ -1159,11 +1780,12 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon validate_facets(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check(expr_kind(facet_expression(sequence_get(items, index))) != "LiteralExpr"
+      choose(facet_deferred(sequence_get(items, index)), validate_facets(items, index + 1, facets, reckons),
+      choose(semantic_check(facet_domain_kind(sequence_get(items, index)) == "measure" or expr_kind(facet_expression(sequence_get(items, index))) != "LiteralExpr"
             or facet_type(sequence_get(items, index)) == expr_text(facet_expression(sequence_get(items, index))),
           "RCL_SEMANTIC_TYPE_MISMATCH", facet_path(sequence_get(items, index))),
         choose(validate_expression(facet_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
-          validate_facets(items, index + 1, facets, reckons), false), false))
+          validate_facets(items, index + 1, facets, reckons), false), false)))
 
   reckon validate_reckons(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -1185,10 +1807,76 @@ reality RCLGeneralSelfHostCompiler {
           choose(validate_expression_array(rule_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
             validate_rules(items, index + 1, facets, reckons), false), false), false))
 
+  reckon validate_measure_items(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(length(measure_uncertainty_expr(sequence_get(items, index))) == 0 or validate_expression(measure_uncertainty_expr(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(length(measure_confidence_expr(sequence_get(items, index))) == 0 or validate_expression(measure_confidence_expr(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          validate_measure_items(items, index + 1, facets, reckons), false), false))
+  reckon validate_quantitatives(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_measure_items(quantitative_measures(sequence_get(items, index)), 0, facets, reckons),
+        choose(validate_expression_array(quantitative_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
+          validate_quantitatives(items, index + 1, facets, reckons), false), false))
+  reckon validate_perceptions(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression_array(perception_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
+        validate_perceptions(items, index + 1, facets, reckons), false))
+  reckon validate_knowledge_items(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression(knowledge_item_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(length(knowledge_item_confidence(sequence_get(items, index))) == 0 or validate_expression(knowledge_item_confidence(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          validate_knowledge_items(items, index + 1, facets, reckons), false), false))
+  reckon validate_knowledges(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_knowledge_items(knowledge_claims(sequence_get(items, index)), 0, facets, reckons),
+        choose(validate_knowledge_items(knowledge_derives(sequence_get(items, index)), 0, facets, reckons),
+          choose(validate_expression_array(knowledge_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
+            validate_knowledges(items, index + 1, facets, reckons), false), false), false))
+  reckon validate_utterances(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true, choose(validate_expression(utterance_expression(sequence_get(items, index)), empty_sequence(), facets, reckons), validate_utterances(items, index + 1, facets, reckons), false))
+  reckon validate_slots(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true, choose(validate_expression(slot_expression(sequence_get(items, index)), empty_sequence(), facets, reckons), validate_slots(items, index + 1, facets, reckons), false))
+  reckon validate_intents(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression(intent_when(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(length(intent_confidence_expr(sequence_get(items, index))) == 0 or validate_expression(intent_confidence_expr(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          choose(validate_slots(intent_slots(sequence_get(items, index)), 0, facets, reckons), validate_intents(items, index + 1, facets, reckons), false), false), false))
+  reckon validate_languages(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_utterances(language_utterances(sequence_get(items, index)), 0, facets, reckons),
+        choose(validate_intents(language_intents(sequence_get(items, index)), 0, facets, reckons),
+          choose(validate_expression_array(language_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons), validate_languages(items, index + 1, facets, reckons), false), false), false))
+  reckon validate_understanding_items(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression(understanding_item_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(length(understanding_item_confidence(sequence_get(items, index))) == 0 or validate_expression(understanding_item_confidence(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          choose(length(understanding_item_coverage(sequence_get(items, index))) == 0 or validate_expression(understanding_item_coverage(sequence_get(items, index)), empty_sequence(), facets, reckons),
+            choose(length(understanding_item_coherence(sequence_get(items, index))) == 0 or validate_expression(understanding_item_coherence(sequence_get(items, index)), empty_sequence(), facets, reckons), validate_understanding_items(items, index + 1, facets, reckons), false), false), false), false))
+  reckon validate_understandings(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true, choose(validate_understanding_items(understanding_hypotheses(sequence_get(items, index)), 0, facets, reckons),
+      choose(validate_expression_array(understanding_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons), validate_understandings(items, index + 1, facets, reckons), false), false))
+  reckon validate_creation_candidates(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression(creation_candidate_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(validate_expression(creation_candidate_when(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          choose(length(creation_candidate_novelty(sequence_get(items, index))) == 0 or validate_expression(creation_candidate_novelty(sequence_get(items, index)), empty_sequence(), facets, reckons),
+            choose(length(creation_candidate_utility(sequence_get(items, index))) == 0 or validate_expression(creation_candidate_utility(sequence_get(items, index)), empty_sequence(), facets, reckons),
+              choose(length(creation_candidate_feasibility(sequence_get(items, index))) == 0 or validate_expression(creation_candidate_feasibility(sequence_get(items, index)), empty_sequence(), facets, reckons),
+                choose(length(creation_candidate_risk(sequence_get(items, index))) == 0 or validate_expression(creation_candidate_risk(sequence_get(items, index)), empty_sequence(), facets, reckons), validate_creation_candidates(items, index + 1, facets, reckons), false), false), false), false), false), false))
+  reckon validate_creations(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true, choose(validate_creation_candidates(creation_candidates(sequence_get(items, index)), 0, facets, reckons),
+      choose(validate_expression_array(creation_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons), validate_creations(items, index + 1, facets, reckons), false), false))
+
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
       choose(validate_reckons(program_reckons(program), 0, program_facets(program), program_reckons(program)),
-        validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)), false), false)
+        choose(validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)),
+          choose(validate_quantitatives(program_quantitatives(program), 0, program_facets(program), program_reckons(program)),
+            choose(validate_perceptions(program_perceptions(program), 0, program_facets(program), program_reckons(program)),
+              choose(validate_knowledges(program_knowledges(program), 0, program_facets(program), program_reckons(program)),
+                choose(validate_languages(program_languages(program), 0, program_facets(program), program_reckons(program)),
+                  choose(validate_understandings(program_understandings(program), 0, program_facets(program), program_reckons(program)),
+                    validate_creations(program_creations(program), 0, program_facets(program), program_reckons(program)), false), false), false), false), false), false), false), false)
 
   reckon validated_program(program : Sequence) -> Sequence =
     choose(validate_program(program), program, program)
@@ -1207,7 +1895,23 @@ reality RCLGeneralSelfHostCompiler {
           choose(expr_kind(node) == "BinaryExpr",
             collect_expression_strings(expr_right(node), locals,
               collect_expression_strings(expr_left(node), locals, output)),
-            collect_expression_strings_array(expr_args(node), 0, locals, output)))))
+            collect_call_strings(node, locals, output)))))
+
+  reckon collect_call_strings(node : Sequence, locals : Sequence, output : Sequence) -> Sequence =
+    choose(expr_text(node) == "celsius",
+      append_unique_text(append_unique_text(append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, append_unique_text(output, "Temperature")), ""), "quantity"), "make"),
+      choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence" or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status",
+        append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, output), choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value", "value", choose(expr_text(node) == "knowledge_status", "status", expr_text(node)))),
+        choose(is_cognition_accessor(expr_text(node)), append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, output), cognition_accessor_field(expr_text(node))),
+          choose(expr_text(node) == "known" or expr_text(node) == "supported", collect_supported_strings(node, locals, output),
+            choose(expr_text(node) == "intent_matches", collect_expression_strings(intent_matches_expression(node), locals, output),
+              choose(expr_text(node) == "understood", collect_expression_strings(understood_expression(node), locals, output),
+                choose(expr_text(node) == "selected", collect_expression_strings(selected_expression(node), locals, output), collect_expression_strings_array(expr_args(node), 0, locals, output))))))))
+
+  reckon collect_supported_strings(node : Sequence, locals : Sequence, output : Sequence) -> Sequence =
+    collect_expression_strings_array(expr_args(node), 1, locals,
+      append_unique_text(collect_expression_strings(sequence_get(expr_args(node), 0), locals,
+        append_unique_text(append_unique_text(collect_expression_strings(sequence_get(expr_args(node), 0), locals, output), "status"), "forgotten")), "confidence"))
 
   reckon collect_expression_strings_array(items : Sequence, index : Number, locals : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1222,7 +1926,10 @@ reality RCLGeneralSelfHostCompiler {
           choose(expr_kind(node) == "BinaryExpr",
             collect_expression_numbers(expr_right(node), locals,
               collect_expression_numbers(expr_left(node), locals, output)),
-            collect_expression_numbers_array(expr_args(node), 0, locals, output)))))
+            choose(expr_text(node) == "intent_matches", collect_expression_numbers(intent_matches_expression(node), locals, output),
+              choose(expr_text(node) == "understood", collect_expression_numbers(understood_expression(node), locals, output),
+                choose(expr_text(node) == "selected", collect_expression_numbers(selected_expression(node), locals, output),
+                  collect_expression_numbers_array(expr_args(node), 0, locals, output))))))))
 
   reckon collect_expression_numbers_array(items : Sequence, index : Number, locals : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1232,13 +1939,53 @@ reality RCLGeneralSelfHostCompiler {
   reckon collect_facet_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       collect_facet_strings(items, index + 1,
-        append_unique_text(collect_expression_strings(facet_expression(sequence_get(items, index)), empty_sequence(), output),
-          facet_path(sequence_get(items, index)))))
+        choose(facet_deferred(sequence_get(items, index)), output,
+          append_unique_text(
+            choose(facet_domain_kind(sequence_get(items, index)) == "measure",
+              collect_measure_strings_complete(facet_domain_data(sequence_get(items, index)), output),
+              collect_expression_strings(facet_expression(sequence_get(items, index)), empty_sequence(), output)),
+            facet_path(sequence_get(items, index))))))
 
   reckon collect_facet_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       collect_facet_numbers(items, index + 1,
-        collect_expression_numbers(facet_expression(sequence_get(items, index)), empty_sequence(), output)))
+        choose(facet_deferred(sequence_get(items, index)), output,
+          choose(facet_domain_kind(sequence_get(items, index)) == "measure",
+            collect_measure_numbers(facet_domain_data(sequence_get(items, index)), output),
+            collect_expression_numbers(facet_expression(sequence_get(items, index)), empty_sequence(), output)))))
+
+  reckon collect_text_values(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_text_values(items, index + 1, append_unique_text(output, sequence_get(items, index))))
+
+  reckon collect_measure_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_text_values(measure_evidence(node), 0,
+      append_unique_text(append_unique_text(collect_measure_confidence_strings(node,
+        collect_measure_uncertainty_strings(node,
+          collect_expression_strings(measure_initializer(node), empty_sequence(), append_unique_text(output, measure_base_type(node))))),
+        measure_unit(node)), measure_scale(node))), measure_calibrated_by(node))
+
+  reckon collect_measure_uncertainty_strings(node : Sequence, output : Sequence) -> Sequence =
+    choose(length(measure_uncertainty_expr(node)) == 0, output,
+      collect_expression_strings(measure_uncertainty_expr(node), empty_sequence(), output))
+
+  reckon collect_measure_confidence_strings(node : Sequence, output : Sequence) -> Sequence =
+    choose(length(measure_confidence_expr(node)) == 0, output,
+      collect_expression_strings(measure_confidence_expr(node), empty_sequence(), output))
+
+  reckon collect_measure_strings_complete(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_measure_strings(node, output), "quantitative"), "measure")
+
+  reckon collect_measure_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_measure_confidence_numbers(node,
+      collect_measure_uncertainty_numbers(node, collect_expression_numbers(measure_initializer(node), empty_sequence(), output)))
+
+  reckon collect_measure_uncertainty_numbers(node : Sequence, output : Sequence) -> Sequence =
+    choose(length(measure_uncertainty_expr(node)) == 0, append_unique_number(output, 0),
+      collect_expression_numbers(measure_uncertainty_expr(node), empty_sequence(), output))
+
+  reckon collect_measure_confidence_numbers(node : Sequence, output : Sequence) -> Sequence =
+    choose(length(measure_confidence_expr(node)) == 0, append_unique_number(output, 1),
+      collect_expression_numbers(measure_confidence_expr(node), empty_sequence(), output))
 
   reckon collect_warrant_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1250,6 +1997,19 @@ reality RCLGeneralSelfHostCompiler {
   reckon find_rule(items : Sequence, index : Number, name : Text) -> Sequence =
     choose(rule_name(sequence_get(items, index)) == name, sequence_get(items, index),
       find_rule(items, index + 1, name))
+
+  reckon find_quantitative(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(quantitative_name(sequence_get(items, index)) == name, sequence_get(items, index), find_quantitative(items, index + 1, name))
+  reckon find_perception(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(perception_name(sequence_get(items, index)) == name, sequence_get(items, index), find_perception(items, index + 1, name))
+  reckon find_knowledge(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(knowledge_name(sequence_get(items, index)) == name, sequence_get(items, index), find_knowledge(items, index + 1, name))
+  reckon find_language(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(language_name(sequence_get(items, index)) == name, sequence_get(items, index), find_language(items, index + 1, name))
+  reckon find_understanding(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(understanding_name(sequence_get(items, index)) == name, sequence_get(items, index), find_understanding(items, index + 1, name))
+  reckon find_creation(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(creation_name(sequence_get(items, index)) == name, sequence_get(items, index), find_creation(items, index + 1, name))
 
   reckon rule_actor(node : Sequence) -> Text =
     choose(rule_kind(node) == "Emergence", rule_cause(node), rule_from(node))
@@ -1282,10 +2042,131 @@ reality RCLGeneralSelfHostCompiler {
   reckon collect_rule_strings_complete(node : Sequence, reckons : Sequence, output : Sequence) -> Sequence =
     collect_witness_strings(rule_witnesses(node), 0, collect_rule_strings(node, reckons, output))
 
-  reckon collect_directive_strings(items : Sequence, index : Number, rules : Sequence, reckons : Sequence, output : Sequence) -> Sequence =
+  reckon collect_knowledge_item_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(
+      append_unique_text(
+        append_unique_text(
+          append_unique_text(
+            append_unique_text(
+              append_unique_text(
+                collect_text_values(knowledge_item_dependencies(node), 0,
+                  collect_dependency_evidence_strings(knowledge_item_dependencies(node), 0,
+                    collect_text_values(knowledge_item_evidence(node), 0,
+                      collect_expression_strings(knowledge_item_confidence(node), empty_sequence(),
+                        collect_expression_strings(knowledge_item_expression(node), empty_sequence(),
+                          append_unique_text(output, knowledge_item_base_type(node))))))),
+                knowledge_item_source(node)),
+              knowledge_item_scope(node)),
+            knowledge_item_status(node)),
+          ""),
+        "knowledge"),
+      "claim")
+
+  reckon collect_dependency_evidence_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      collect_directive_strings(items, index + 1, rules, reckons,
-        collect_rule_strings_complete(find_rule(rules, 0, directive_name(sequence_get(items, index))), reckons, output)))
+      collect_dependency_evidence_strings(items, index + 1, append_unique_text(append_unique_text(output, sequence_get(items, index)), "evidence")))
+
+  reckon collect_knowledge_items_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_knowledge_items_strings(items, index + 1, collect_knowledge_item_strings(sequence_get(items, index), output)))
+
+  reckon effective_confidence_expression(explicit : Sequence, dependencies : Sequence, index : Number, current : Sequence) -> Sequence =
+    choose(index >= length(dependencies), current,
+      effective_confidence_expression(explicit, dependencies, index + 1,
+        call_node("choose", sequence_append(sequence_append(sequence_append(empty_sequence(),
+          binary_node("<", accessor_node("understanding_confidence", path_node(sequence_get(dependencies, index))), current)),
+          accessor_node("understanding_confidence", path_node(sequence_get(dependencies, index)))), current))))
+  reckon collect_slot_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_slot_strings(items, index + 1, collect_expression_strings(slot_expression(sequence_get(items, index)), empty_sequence(), append_unique_text(output, slot_name(sequence_get(items, index))))))
+  reckon collect_utterance_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_text_values(utterance_evidence(node), 0,
+      append_unique_text(append_unique_text(append_unique_text(collect_expression_strings(utterance_expression(node), empty_sequence(), output), ast_utterance_speaker(node)), ast_utterance_locale(node)), utterance_channel(node))), ""), "language")
+  reckon collect_utterance_strings_complete(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_utterance_strings(node, output), "utterance"), utterance_path(node))
+  reckon collect_intent_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(append_unique_text(collect_slot_strings(intent_slots(node), 0,
+      collect_text_values(intent_utterances(node), 0, collect_dependency_evidence_strings(intent_utterances(node), 0,
+        collect_text_values(intent_evidence(node), 0, collect_expression_strings(intent_confidence_expr(node), empty_sequence(),
+          append_unique_text(append_unique_text(collect_expression_strings(intent_when(node), empty_sequence(), append_unique_text(output, ast_intent_name(node))), ast_intent_action(node)), ast_intent_target(node))))))), ""), "language"), "intent")
+  reckon collect_intent_strings_complete(node : Sequence, output : Sequence) -> Sequence = append_unique_text(collect_intent_strings(node, output), intent_path(node))
+  reckon collect_language_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(language_preserves(node), 0, empty_sequence(),
+      collect_intent_list_strings(language_intents(node), 0, collect_utterance_list_strings(language_utterances(node), 0, append_unique_text(output, language_name(node))))), "domain:interpret:" + language_name(node))
+  reckon collect_utterance_list_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_utterance_list_strings(items, index + 1, collect_utterance_strings_complete(sequence_get(items, index), output)))
+  reckon collect_intent_list_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_intent_list_strings(items, index + 1, collect_intent_strings_complete(sequence_get(items, index), output)))
+  reckon collect_understanding_item_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(append_unique_text(collect_understanding_optional_strings(node,
+      collect_understanding_evidence_strings(node, collect_understanding_expression_strings(node, output))), understanding_item_status(node)), ""), "understanding")
+  reckon collect_understanding_expression_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings(effective_confidence_expression(understanding_item_confidence(node), understanding_item_dependencies(node), 0,
+      choose(length(understanding_item_confidence(node)) == 0, literal_node("Number", "1"), understanding_item_confidence(node))), empty_sequence(),
+      collect_expression_strings(understanding_item_expression(node), empty_sequence(), append_unique_text(output, understanding_item_base_type(node)))), understanding_item_explanation(node))
+  reckon collect_understanding_evidence_strings(node : Sequence, output : Sequence) -> Sequence =
+    collect_text_values(understanding_item_dependencies(node), 0, collect_dependency_evidence_strings(understanding_item_dependencies(node), 0,
+      collect_text_values(understanding_item_evidence(node), 0, output)))
+  reckon collect_understanding_optional_strings(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_strings(understanding_item_coherence(node), empty_sequence(), collect_expression_strings(understanding_item_coverage(node), empty_sequence(), output))
+  reckon collect_understanding_item_strings_complete(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_understanding_item_strings(node, output), "model"), understanding_item_path(node))
+  reckon collect_understanding_items_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_understanding_items_strings(items, index + 1, collect_understanding_item_strings_complete(sequence_get(items, index), output)))
+  reckon collect_understanding_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(understanding_preserves(node), 0, empty_sequence(), collect_understanding_items_strings(understanding_hypotheses(node), 0, append_unique_text(output, understanding_name(node)))), "domain:understand:" + understanding_name(node))
+  reckon collect_optional_expression_strings(node : Sequence, fallback : Text, output : Sequence) -> Sequence =
+    choose(length(node) == 0, output, collect_expression_strings(node, empty_sequence(), output))
+  reckon collect_creation_candidate_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_creation_dependency_strings(node,
+      collect_creation_score_strings(node, collect_creation_expression_strings(node, output))), ""), "creation")
+  reckon collect_creation_expression_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings(creation_candidate_when(node), empty_sequence(),
+      collect_expression_strings(creation_candidate_expression(node), empty_sequence(), append_unique_text(output, creation_candidate_base_type(node)))), creation_candidate_target(node))
+  reckon collect_creation_score_strings(node : Sequence, output : Sequence) -> Sequence =
+    collect_optional_expression_strings(creation_candidate_risk(node), "0.5", collect_optional_expression_strings(creation_candidate_feasibility(node), "0.5",
+      collect_optional_expression_strings(creation_candidate_utility(node), "0.5", collect_optional_expression_strings(creation_candidate_novelty(node), "0.5", output))))
+  reckon collect_creation_dependency_strings(node : Sequence, output : Sequence) -> Sequence =
+    collect_text_values(creation_candidate_based_on(node), 0, collect_dependency_evidence_strings(creation_candidate_based_on(node), 0,
+      collect_text_values(creation_candidate_evidence(node), 0, output)))
+  reckon collect_creation_candidate_strings_complete(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(append_unique_text(collect_creation_candidate_strings(node, output), "candidate"), creation_candidate_path(node))
+  reckon collect_creation_candidates_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_creation_candidates_strings(items, index + 1, collect_creation_candidate_strings_complete(sequence_get(items, index), output)))
+  reckon best_creation_expression(items : Sequence, index : Number, current : Sequence) -> Sequence =
+    choose(index >= length(items), current, best_creation_expression(items, index + 1,
+      call_node("choose", sequence_append(sequence_append(sequence_append(empty_sequence(), binary_node(">", accessor_node("creation_score", path_node(sequence_get(items, index))), accessor_node("creation_score", current))), path_node(sequence_get(items, index))), current))))
+  reckon collect_creation_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(creation_preserves(node), 0, empty_sequence(),
+      append_unique_text(append_unique_text(append_unique_text(collect_text_values(selection_candidates(creation_selection(node)), 0,
+        collect_expression_strings(best_creation_expression(selection_candidates(creation_selection(node)), 1, path_node(sequence_get(selection_candidates(creation_selection(node)), 0))), empty_sequence(),
+          collect_creation_candidates_strings(creation_candidates(node), 0, append_unique_text(output, creation_name(node))))), "creation"), "select"), selection_path(creation_selection(node)))), "domain:create:" + creation_name(node))
+
+  reckon collect_domain_strings(program : Sequence, kind : Text, name : Text, output : Sequence) -> Sequence =
+    choose(kind == "Quantify", collect_quantitative_strings(find_quantitative(program_quantitatives(program), 0, name), output),
+      choose(kind == "Observe", collect_perception_strings(find_perception(program_perceptions(program), 0, name), output),
+        choose(kind == "Learn", collect_knowledge_strings(find_knowledge(program_knowledges(program), 0, name), output),
+          choose(kind == "Interpret", collect_language_strings(find_language(program_languages(program), 0, name), output),
+            choose(kind == "Understand", collect_understanding_strings(find_understanding(program_understandings(program), 0, name), output),
+              collect_creation_strings(find_creation(program_creations(program), 0, name), output))))))
+
+  reckon collect_measure_list_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_measure_list_strings(items, index + 1, append_unique_text(collect_measure_strings_complete(sequence_get(items, index), output), measure_path(sequence_get(items, index)))))
+  reckon collect_quant_derive_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_quant_derive_strings(items, index + 1, append_unique_text(collect_expression_strings(quant_derive_expression(sequence_get(items, index)), empty_sequence(), output), quant_derive_path(sequence_get(items, index)))))
+  reckon collect_quantitative_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(quantitative_preserves(node), 0, empty_sequence(), collect_quant_derive_strings(quantitative_derives(node), 0, collect_measure_list_strings(quantitative_measures(node), 0, append_unique_text(output, quantitative_name(node))))), "domain:quantify:" + quantitative_name(node))
+  reckon collect_channel_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_channel_strings(items, index + 1, append_unique_text(collect_expression_strings(channel_expression(sequence_get(items, index)), empty_sequence(), output), channel_path(sequence_get(items, index)))))
+  reckon collect_perception_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(perception_preserves(node), 0, empty_sequence(), collect_channel_strings(perception_channels(node), 0, append_unique_text(output, perception_name(node)))), "domain:observe:" + perception_name(node))
+  reckon collect_knowledge_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(collect_expression_strings_array(knowledge_preserves(node), 0, empty_sequence(), collect_knowledge_items_strings(knowledge_derives(node), 0, collect_knowledge_items_strings(knowledge_claims(node), 0, append_unique_text(output, knowledge_name(node))))), "domain:learn:" + knowledge_name(node))
+
+  reckon collect_directive_strings(items : Sequence, index : Number, program : Sequence, reckons : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_directive_strings(items, index + 1, program, reckons,
+        choose(directive_kind(sequence_get(items, index)) == "Foresee" or directive_kind(sequence_get(items, index)) == "Realize",
+          collect_rule_strings_complete(find_rule(program_rules(program), 0, directive_name(sequence_get(items, index))), reckons, output),
+          collect_domain_strings(program, directive_kind(sequence_get(items, index)), directive_name(sequence_get(items, index)), output))))
 
   reckon collect_alter_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1297,10 +2178,63 @@ reality RCLGeneralSelfHostCompiler {
       collect_alter_numbers(rule_alters(node), 0,
         collect_expression_numbers(rule_when(node), empty_sequence(), output)))
 
-  reckon collect_directive_numbers(items : Sequence, index : Number, rules : Sequence, output : Sequence) -> Sequence =
+  reckon collect_measure_list_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_measure_list_numbers(items, index + 1, collect_measure_numbers(sequence_get(items, index), output)))
+  reckon collect_quant_derive_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_quant_derive_numbers(items, index + 1, collect_expression_numbers(quant_derive_expression(sequence_get(items, index)), empty_sequence(), output)))
+  reckon collect_channel_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_channel_numbers(items, index + 1, collect_expression_numbers(channel_expression(sequence_get(items, index)), empty_sequence(), output)))
+  reckon collect_knowledge_item_numbers(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_number(collect_expression_numbers(knowledge_item_confidence(node), empty_sequence(), collect_expression_numbers(knowledge_item_expression(node), empty_sequence(), output)), 1)
+  reckon collect_knowledge_items_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_knowledge_items_numbers(items, index + 1, collect_knowledge_item_numbers(sequence_get(items, index), output)))
+  reckon collect_slot_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_slot_numbers(items, index + 1, collect_expression_numbers(slot_expression(sequence_get(items, index)), empty_sequence(), output)))
+  reckon collect_utterance_numbers(node : Sequence, output : Sequence) -> Sequence = collect_expression_numbers(utterance_expression(node), empty_sequence(), output)
+  reckon collect_intent_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_slot_numbers(intent_slots(node), 0, choose(length(intent_confidence_expr(node)) == 0, append_unique_number(collect_expression_numbers(intent_when(node), empty_sequence(), output), 1), collect_expression_numbers(intent_confidence_expr(node), empty_sequence(), collect_expression_numbers(intent_when(node), empty_sequence(), output))))
+  reckon collect_utterance_list_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_utterance_list_numbers(items, index + 1, collect_utterance_numbers(sequence_get(items, index), output)))
+  reckon collect_intent_list_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_intent_list_numbers(items, index + 1, collect_intent_numbers(sequence_get(items, index), output)))
+  reckon collect_language_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers_array(language_preserves(node), 0, empty_sequence(), collect_intent_list_numbers(language_intents(node), 0, collect_utterance_list_numbers(language_utterances(node), 0, output)))
+  reckon collect_understanding_item_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers(understanding_item_coherence(node), empty_sequence(),
+      choose(length(understanding_item_coverage(node)) == 0, append_unique_number(
+        collect_expression_numbers(effective_confidence_expression(understanding_item_confidence(node), understanding_item_dependencies(node), 0, choose(length(understanding_item_confidence(node)) == 0, literal_node("Number", "1"), understanding_item_confidence(node))), empty_sequence(), collect_expression_numbers(understanding_item_expression(node), empty_sequence(), output)),
+        choose(length(understanding_item_dependencies(node)) > 0, 1, 0.75)),
+        collect_expression_numbers(understanding_item_coverage(node), empty_sequence(), collect_expression_numbers(effective_confidence_expression(understanding_item_confidence(node), understanding_item_dependencies(node), 0, choose(length(understanding_item_confidence(node)) == 0, literal_node("Number", "1"), understanding_item_confidence(node))), empty_sequence(), collect_expression_numbers(understanding_item_expression(node), empty_sequence(), output)))))
+  reckon collect_understanding_items_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_understanding_items_numbers(items, index + 1, collect_understanding_item_numbers(sequence_get(items, index), output)))
+  reckon collect_understanding_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers_array(understanding_preserves(node), 0, empty_sequence(), collect_understanding_items_numbers(understanding_hypotheses(node), 0, output))
+  reckon collect_optional_expression_numbers(node : Sequence, fallback : Number, output : Sequence) -> Sequence =
+    choose(length(node) == 0, append_unique_number(output, fallback), collect_expression_numbers(node, empty_sequence(), output))
+  reckon collect_creation_candidate_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_optional_expression_numbers(creation_candidate_risk(node), 0.5, collect_optional_expression_numbers(creation_candidate_feasibility(node), 0.5,
+      collect_optional_expression_numbers(creation_candidate_utility(node), 0.5, collect_optional_expression_numbers(creation_candidate_novelty(node), 0.5,
+        collect_expression_numbers(creation_candidate_when(node), empty_sequence(), collect_expression_numbers(creation_candidate_expression(node), empty_sequence(), output))))))
+  reckon collect_creation_candidates_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_creation_candidates_numbers(items, index + 1, collect_creation_candidate_numbers(sequence_get(items, index), output)))
+  reckon collect_creation_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers_array(creation_preserves(node), 0, empty_sequence(), collect_expression_numbers(best_creation_expression(selection_candidates(creation_selection(node)), 1, path_node(sequence_get(selection_candidates(creation_selection(node)), 0))), empty_sequence(), collect_creation_candidates_numbers(creation_candidates(node), 0, output)))
+  reckon collect_domain_numbers(program : Sequence, kind : Text, name : Text, output : Sequence) -> Sequence =
+    choose(kind == "Quantify",
+      collect_expression_numbers_array(quantitative_preserves(find_quantitative(program_quantitatives(program), 0, name)), 0, empty_sequence(), collect_quant_derive_numbers(quantitative_derives(find_quantitative(program_quantitatives(program), 0, name)), 0, collect_measure_list_numbers(quantitative_measures(find_quantitative(program_quantitatives(program), 0, name)), 0, output))),
+      choose(kind == "Observe",
+        collect_expression_numbers_array(perception_preserves(find_perception(program_perceptions(program), 0, name)), 0, empty_sequence(), collect_channel_numbers(perception_channels(find_perception(program_perceptions(program), 0, name)), 0, output)),
+        choose(kind == "Learn", collect_expression_numbers_array(knowledge_preserves(find_knowledge(program_knowledges(program), 0, name)), 0, empty_sequence(), collect_knowledge_items_numbers(knowledge_derives(find_knowledge(program_knowledges(program), 0, name)), 0, collect_knowledge_items_numbers(knowledge_claims(find_knowledge(program_knowledges(program), 0, name)), 0, output))),
+          choose(kind == "Interpret", collect_language_numbers(find_language(program_languages(program), 0, name), output),
+            choose(kind == "Understand", collect_understanding_numbers(find_understanding(program_understandings(program), 0, name), output),
+              collect_creation_numbers(find_creation(program_creations(program), 0, name), output))))))
+
+  reckon collect_directive_numbers(items : Sequence, index : Number, program : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      collect_directive_numbers(items, index + 1, rules,
-        collect_rule_numbers(find_rule(rules, 0, directive_name(sequence_get(items, index))), output)))
+      collect_directive_numbers(items, index + 1, program,
+        choose(directive_kind(sequence_get(items, index)) == "Foresee" or directive_kind(sequence_get(items, index)) == "Realize",
+          collect_rule_numbers(find_rule(program_rules(program), 0, directive_name(sequence_get(items, index))), output),
+          collect_domain_numbers(program, directive_kind(sequence_get(items, index)), directive_name(sequence_get(items, index)), output))))
 
   reckon collect_reckon_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1316,14 +2250,14 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon build_string_pool(program : Sequence, root : Text) -> Sequence =
     collect_reckon_strings(program_reckons(program), 0,
-      collect_directive_strings(program_directives(program), 0, program_rules(program), program_reckons(program),
+      collect_directive_strings(program_directives(program), 0, program, program_reckons(program),
         collect_warrant_strings(program_warrants(program), 0,
           collect_facet_strings(program_facets(program), 0,
             append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root)))))
 
   reckon build_number_pool(program : Sequence) -> Sequence =
     collect_reckon_numbers(program_reckons(program), 0,
-      collect_directive_numbers(program_directives(program), 0, program_rules(program),
+      collect_directive_numbers(program_directives(program), 0, program,
         collect_facet_numbers(program_facets(program), 0, empty_sequence())))
 
   reckon builtin_id(name : Text) -> Number =
@@ -1409,12 +2343,18 @@ reality RCLGeneralSelfHostCompiler {
           choose(expr_text(node) == "and" or expr_text(node) == "or",
             expression_count(expr_left(node)) + expression_count(expr_right(node)) + 5,
             expression_count(expr_left(node)) + expression_count(expr_right(node)) + 1),
-          choose(expr_text(node) == "choose",
-            expression_count(sequence_get(expr_args(node), 0)) + expression_count(sequence_get(expr_args(node), 1))
-              + expression_count(sequence_get(expr_args(node), 2)) + 2,
-            choose(expr_text(node) == "provider_call",
-              choose(provider_literal_arguments(node), 1, expression_count_array(expr_args(node), 0, 0) + 1),
-              expression_count_array(expr_args(node), 0, 0) + 1)))))
+          expression_call_count(node))))
+
+  reckon expression_call_count(node : Sequence) -> Number =
+    choose(expr_text(node) == "celsius", expression_count_array(expr_args(node), 0, 0) + 3,
+      choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence" or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status" or is_cognition_accessor(expr_text(node)), expression_count_array(expr_args(node), 0, 0) + 1,
+        choose(expr_text(node) == "intent_matches", expression_count(intent_matches_expression(node)),
+          choose(expr_text(node) == "understood", expression_count(understood_expression(node)),
+            choose(expr_text(node) == "selected", expression_count(selected_expression(node)),
+              choose(expr_text(node) == "known" or expr_text(node) == "supported", expression_count(sequence_get(expr_args(node), 0)) * 2 + choose(length(expr_args(node)) > 1, expression_count(sequence_get(expr_args(node), 1)), 1) + 6,
+                choose(expr_text(node) == "choose", expression_count(sequence_get(expr_args(node), 0)) + expression_count(sequence_get(expr_args(node), 1)) + expression_count(sequence_get(expr_args(node), 2)) + 2,
+                  choose(expr_text(node) == "provider_call", choose(provider_literal_arguments(node), 1, expression_count_array(expr_args(node), 0, 0) + 1),
+                    choose(expr_text(node) == "domain_call" and domain_literal_target(node), expression_count(sequence_get(expr_args(node), 2)) + 1, expression_count_array(expr_args(node), 0, 0) + 1)))))))))
 
   reckon provider_literal_arguments(node : Sequence) -> Truth =
     choose(length(expr_args(node)) != 3, false,
@@ -1425,10 +2365,88 @@ reality RCLGeneralSelfHostCompiler {
         and expr_kind(sequence_get(expr_args(node), 2)) == "LiteralExpr"
         and expr_text(sequence_get(expr_args(node), 2)) == "Text")
 
+  reckon domain_literal_target(node : Sequence) -> Truth =
+    choose(length(expr_args(node)) != 3, false,
+      expr_kind(sequence_get(expr_args(node), 0)) == "LiteralExpr"
+        and expr_text(sequence_get(expr_args(node), 0)) == "Text"
+        and expr_kind(sequence_get(expr_args(node), 1)) == "LiteralExpr"
+        and expr_text(sequence_get(expr_args(node), 1)) == "Text")
+
   reckon facet_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,
       facet_instruction_count(items, index + 1,
-        output + expression_count(facet_expression(sequence_get(items, index))) + 1))
+        output + choose(facet_deferred(sequence_get(items, index)), 0,
+          choose(facet_domain_kind(sequence_get(items, index)) == "measure", measure_instruction_count(facet_domain_data(sequence_get(items, index))) + 1,
+            expression_count(facet_expression(sequence_get(items, index))) + 1))))
+
+  reckon measure_instruction_count(node : Sequence) -> Number =
+    6 + expression_count(measure_initializer(node))
+      + choose(length(measure_uncertainty_expr(node)) == 0, 1, expression_count(measure_uncertainty_expr(node)))
+      + choose(length(measure_confidence_expr(node)) == 0, 1, expression_count(measure_confidence_expr(node)))
+      + length(measure_evidence(node)) * 2
+
+  reckon knowledge_confidence_count(node : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(knowledge_item_dependencies(node)), output,
+      knowledge_confidence_count(node, index + 1, output * 2 + 7))
+
+  reckon knowledge_instruction_count(node : Sequence) -> Number =
+    9 + expression_count(knowledge_item_expression(node))
+      + knowledge_confidence_count(node, 0, choose(length(knowledge_item_confidence(node)) == 0, 1, expression_count(knowledge_item_confidence(node))))
+      + length(knowledge_item_evidence(node)) * 2 + length(knowledge_item_dependencies(node)) * 5
+
+  reckon measure_list_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, measure_list_instruction_count(items, index + 1, output + measure_instruction_count(sequence_get(items, index)) + 1))
+  reckon quant_derive_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, quant_derive_instruction_count(items, index + 1, output + expression_count(quant_derive_expression(sequence_get(items, index))) + 1))
+  reckon channel_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, channel_instruction_count(items, index + 1, output + expression_count(channel_expression(sequence_get(items, index))) + 1))
+  reckon knowledge_items_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, knowledge_items_instruction_count(items, index + 1, output + knowledge_instruction_count(sequence_get(items, index)) + 1))
+  reckon utterance_instruction_count(node : Sequence) -> Number = expression_count(utterance_expression(node)) + 7 + length(utterance_evidence(node)) * 2
+  reckon utterance_items_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, utterance_items_instruction_count(items, index + 1, output + utterance_instruction_count(sequence_get(items, index))))
+  reckon slot_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, slot_instruction_count(items, index + 1, output + expression_count(slot_expression(sequence_get(items, index))) + 3))
+  reckon intent_instruction_count(node : Sequence) -> Number =
+    9 + expression_count(intent_when(node)) + choose(length(intent_confidence_expr(node)) == 0, 1, expression_count(intent_confidence_expr(node)))
+      + length(intent_evidence(node)) * 2 + length(intent_utterances(node)) * 5 + slot_instruction_count(intent_slots(node), 0, 0)
+  reckon intent_items_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, intent_items_instruction_count(items, index + 1, output + intent_instruction_count(sequence_get(items, index))))
+  reckon understanding_effective_confidence_count(node : Sequence) -> Number = expression_count(effective_confidence_expression(understanding_item_confidence(node), understanding_item_dependencies(node), 0, choose(length(understanding_item_confidence(node)) == 0, literal_node("Number", "1"), understanding_item_confidence(node))))
+  reckon understanding_instruction_count(node : Sequence) -> Number =
+    8 + expression_count(understanding_item_expression(node)) + understanding_effective_confidence_count(node)
+      + choose(length(understanding_item_coverage(node)) == 0, 1, expression_count(understanding_item_coverage(node)))
+      + choose(length(understanding_item_coherence(node)) == 0, understanding_effective_confidence_count(node), expression_count(understanding_item_coherence(node)))
+      + length(understanding_item_evidence(node)) * 2 + length(understanding_item_dependencies(node)) * 5
+  reckon understanding_items_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, understanding_items_instruction_count(items, index + 1, output + understanding_instruction_count(sequence_get(items, index))))
+  reckon optional_expression_count(node : Sequence) -> Number = choose(length(node) == 0, 1, expression_count(node))
+  reckon creation_candidate_instruction_count(node : Sequence) -> Number =
+    7 + expression_count(creation_candidate_expression(node)) + expression_count(creation_candidate_when(node))
+      + optional_expression_count(creation_candidate_novelty(node)) + optional_expression_count(creation_candidate_utility(node))
+      + optional_expression_count(creation_candidate_feasibility(node)) + optional_expression_count(creation_candidate_risk(node))
+      + length(creation_candidate_evidence(node)) * 2 + length(creation_candidate_based_on(node)) * 5
+  reckon creation_candidate_items_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, creation_candidate_items_instruction_count(items, index + 1, output + creation_candidate_instruction_count(sequence_get(items, index))))
+  reckon selection_instruction_count(node : Sequence) -> Number =
+    expression_count(best_creation_expression(selection_candidates(node), 1, path_node(sequence_get(selection_candidates(node), 0)))) + 3 + length(selection_candidates(node)) * 2
+  reckon domain_instruction_count(program : Sequence, kind : Text, name : Text) -> Number =
+    choose(kind == "Quantify", 5 + measure_list_instruction_count(quantitative_measures(find_quantitative(program_quantitatives(program), 0, name)), 0, 0)
+        + quant_derive_instruction_count(quantitative_derives(find_quantitative(program_quantitatives(program), 0, name)), 0, 0)
+        + preserve_instruction_count(quantitative_preserves(find_quantitative(program_quantitatives(program), 0, name)), 0, 0),
+      choose(kind == "Observe", 5 + channel_instruction_count(perception_channels(find_perception(program_perceptions(program), 0, name)), 0, 0)
+          + preserve_instruction_count(perception_preserves(find_perception(program_perceptions(program), 0, name)), 0, 0),
+        choose(kind == "Learn", 5 + knowledge_items_instruction_count(knowledge_claims(find_knowledge(program_knowledges(program), 0, name)), 0, 0)
+          + knowledge_items_instruction_count(knowledge_derives(find_knowledge(program_knowledges(program), 0, name)), 0, 0)
+          + preserve_instruction_count(knowledge_preserves(find_knowledge(program_knowledges(program), 0, name)), 0, 0),
+        choose(kind == "Interpret", 5 + utterance_items_instruction_count(language_utterances(find_language(program_languages(program), 0, name)), 0, 0)
+          + intent_items_instruction_count(language_intents(find_language(program_languages(program), 0, name)), 0, 0)
+          + preserve_instruction_count(language_preserves(find_language(program_languages(program), 0, name)), 0, 0),
+        choose(kind == "Understand", 5 + understanding_items_instruction_count(understanding_hypotheses(find_understanding(program_understandings(program), 0, name)), 0, 0)
+          + preserve_instruction_count(understanding_preserves(find_understanding(program_understandings(program), 0, name)), 0, 0),
+          5 + creation_candidate_items_instruction_count(creation_candidates(find_creation(program_creations(program), 0, name)), 0, 0)
+            + selection_instruction_count(creation_selection(find_creation(program_creations(program), 0, name)))
+            + preserve_instruction_count(creation_preserves(find_creation(program_creations(program), 0, name)), 0, 0))))))
 
   reckon alter_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,
@@ -1447,15 +2465,17 @@ reality RCLGeneralSelfHostCompiler {
           preserve_instruction_count(rule_preserves(node), 0, 2), 0)
       + length(rule_witnesses(node))
 
-  reckon directive_instruction_count(items : Sequence, index : Number, rules : Sequence, output : Number) -> Number =
+  reckon directive_instruction_count(items : Sequence, index : Number, program : Sequence, output : Number) -> Number =
     choose(index >= length(items), output,
-      directive_instruction_count(items, index + 1, rules,
-        output + rule_instruction_count(find_rule(rules, 0, directive_name(sequence_get(items, index))))))
+      directive_instruction_count(items, index + 1, program,
+        output + choose(directive_kind(sequence_get(items, index)) == "Foresee" or directive_kind(sequence_get(items, index)) == "Realize",
+          rule_instruction_count(find_rule(program_rules(program), 0, directive_name(sequence_get(items, index)))),
+          domain_instruction_count(program, directive_kind(sequence_get(items, index)), directive_name(sequence_get(items, index))))))
 
   reckon main_instruction_count(program : Sequence) -> Number =
     facet_instruction_count(program_facets(program), 0,
       length(program_warrants(program))
-        + directive_instruction_count(program_directives(program), 0, program_rules(program), 0) + 1)
+        + directive_instruction_count(program_directives(program), 0, program, 0) + 1)
 
   reckon function_address(items : Sequence, name : Text, index : Number, address : Number) -> Number =
     choose(reckon_name(sequence_get(items, index)) == name, address,
@@ -1484,7 +2504,7 @@ reality RCLGeneralSelfHostCompiler {
                 choose(operator == "<", 12,
                   choose(operator == "<=", 13,
                     choose(operator == ">", 14,
-                      choose(operator == ">=", 15, 44))))))))))
+                      choose(operator == ">=", 15, choose(operator == "__and", 16, 44)))))))))))
 
   reckon emit_expression_array(items : Sequence, index : Number, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1529,6 +2549,26 @@ reality RCLGeneralSelfHostCompiler {
             emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start)))))
 
   reckon emit_call(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(expr_text(node) == "celsius",
+      append_all(one_instruction(45, find_text(strings, 0, "quantity"), find_text(strings, 0, "make"), 3),
+        append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+          append_all(emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start + 1),
+            one_instruction(3, find_text(strings, 0, "Temperature"), 0, 0)))),
+      choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence"
+          or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status",
+        append_all(one_instruction(38, find_text(strings, 0,
+            choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value", "value", choose(expr_text(node) == "knowledge_status", "status", expr_text(node)))), 0, 0),
+          emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start)),
+        choose(is_cognition_accessor(expr_text(node)),
+          append_all(one_instruction(38, find_text(strings, 0, cognition_accessor_field(expr_text(node))), 0, 0),
+            emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start)),
+        choose(expr_text(node) == "intent_matches", emit_expression(intent_matches_expression(node), locals, reckons, strings, numbers, main_count, start),
+        choose(expr_text(node) == "understood", emit_expression(understood_expression(node), locals, reckons, strings, numbers, main_count, start),
+        choose(expr_text(node) == "selected", emit_expression(selected_expression(node), locals, reckons, strings, numbers, main_count, start),
+          emit_call_tail(node, locals, reckons, strings, numbers, main_count, start)))))))
+
+  reckon emit_call_tail(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(expr_text(node) == "known" or expr_text(node) == "supported", emit_supported(node, locals, reckons, strings, numbers, main_count, start),
     choose(expr_text(node) == "provider_call",
       choose(provider_literal_arguments(node),
         one_instruction(35,
@@ -1537,13 +2577,40 @@ reality RCLGeneralSelfHostCompiler {
           find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 2)))),
         append_all(one_flagged_instruction(35, 0, 0, 0, 1),
           emit_expression_array(expr_args(node), 0, locals, reckons, strings, numbers, main_count, start, empty_sequence()))),
-      choose(expr_text(node) == "choose", emit_choose(node, locals, reckons, strings, numbers, main_count, start),
-        append_all(one_instruction(
-            choose(builtin_id(expr_text(node)) > 0, 30, 33),
-            choose(builtin_id(expr_text(node)) > 0, builtin_id(expr_text(node)),
-              function_address(reckons, expr_text(node), 0, main_count)),
-            length(expr_args(node)), 0),
-          emit_expression_array(expr_args(node), 0, locals, reckons, strings, numbers, main_count, start, empty_sequence()))))
+      choose(expr_text(node) == "domain_call",
+        choose(domain_literal_target(node),
+          append_all(one_instruction(45,
+              find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 0))),
+              find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 1))), 1),
+            emit_expression(sequence_get(expr_args(node), 2), locals, reckons, strings, numbers, main_count, start)),
+          append_all(one_flagged_instruction(45, 0, 0, 1, 1),
+            emit_expression_array(expr_args(node), 0, locals, reckons, strings, numbers, main_count, start, empty_sequence()))),
+        choose(expr_text(node) == "choose", emit_choose(node, locals, reckons, strings, numbers, main_count, start),
+          append_all(one_instruction(
+              choose(builtin_id(expr_text(node)) > 0, 30, 33),
+              choose(builtin_id(expr_text(node)) > 0, builtin_id(expr_text(node)),
+                function_address(reckons, expr_text(node), 0, main_count)),
+              length(expr_args(node)), 0),
+            emit_expression_array(expr_args(node), 0, locals, reckons, strings, numbers, main_count, start, empty_sequence()))))))
+
+  reckon emit_supported(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(16, 0, 0, 0),
+      append_all(one_instruction(15, 0, 0, 0),
+        append_all(emit_supported_threshold(node, locals, reckons, strings, numbers, main_count, start),
+          emit_supported_head(node, locals, reckons, strings, numbers, main_count, start))))
+
+  reckon emit_supported_threshold(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(expr_args(node)) > 1,
+      emit_expression(sequence_get(expr_args(node), 1), locals, reckons, strings, numbers, main_count, start + expression_count(sequence_get(expr_args(node), 0)) * 2 + 4),
+      one_instruction(1, find_number(numbers, 0, 0.5), 0, 0))
+
+  reckon emit_supported_head(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(38, find_text(strings, 0, "confidence"), 0, 0),
+      append_all(emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start + expression_count(sequence_get(expr_args(node), 0)) + 3),
+        append_all(one_instruction(11, 0, 0, 0),
+          append_all(one_instruction(3, find_text(strings, 0, "forgotten"), 0, 0),
+            append_all(one_instruction(38, find_text(strings, 0, "status"), 0, 0),
+              emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start))))))
 
   reckon emit_expression(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
     choose(expr_kind(node) == "LiteralExpr",
@@ -1564,9 +2631,37 @@ reality RCLGeneralSelfHostCompiler {
   reckon emit_facets(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       emit_facets(items, index + 1, reckons, strings, numbers, main_count, start,
-        append_all(one_instruction(5, find_text(strings, 0, facet_path(sequence_get(items, index))), 0, 0),
-          append_all(emit_expression(facet_expression(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers,
-              main_count, start + length(output)), output))))
+        choose(facet_deferred(sequence_get(items, index)), output,
+          append_all(one_instruction(5, find_text(strings, 0, facet_path(sequence_get(items, index))), 0, 0),
+            append_all(choose(facet_domain_kind(sequence_get(items, index)) == "measure",
+                emit_measurement(facet_domain_data(sequence_get(items, index)), reckons, strings, numbers, main_count, start + length(output)),
+                emit_expression(facet_expression(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers, main_count, start + length(output))), output)))))
+
+  reckon emit_text_sequence(items : Sequence, index : Number, strings : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_text_sequence(items, index + 1, strings,
+        append_all(one_instruction(30, 13, 2, 0), append_all(one_instruction(3, find_text(strings, 0, sequence_get(items, index)), 0, 0), output))))
+
+  reckon emit_measurement(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "quantitative"), find_text(strings, 0, "measure"), 8),
+      append_all(one_instruction(3, find_text(strings, 0, measure_calibrated_by(node)), 0, 0),
+        emit_text_sequence(measure_evidence(node), 0, strings,
+          append_all(one_instruction(30, 12, 0, 0),
+            append_all(one_instruction(3, find_text(strings, 0, measure_scale(node)), 0, 0),
+              append_all(one_instruction(3, find_text(strings, 0, measure_unit(node)), 0, 0),
+                append_all(emit_measure_confidence(node, reckons, strings, numbers, main_count, start),
+                  append_all(emit_measure_uncertainty(node, reckons, strings, numbers, main_count, start),
+                    append_all(emit_expression(measure_initializer(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1),
+                      one_instruction(3, find_text(strings, 0, measure_base_type(node)), 0, 0))))))))))
+
+  reckon emit_measure_uncertainty(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(measure_uncertainty_expr(node)) == 0, one_instruction(1, find_number(numbers, 0, 0), 0, 0),
+      emit_expression(measure_uncertainty_expr(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1 + expression_count(measure_initializer(node))))
+
+  reckon emit_measure_confidence(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(measure_confidence_expr(node)) == 0, one_instruction(1, find_number(numbers, 0, 1), 0, 0),
+      emit_expression(measure_confidence_expr(node), empty_sequence(), reckons, strings, numbers, main_count,
+        start + 1 + expression_count(measure_initializer(node)) + choose(length(measure_uncertainty_expr(node)) == 0, 1, expression_count(measure_uncertainty_expr(node)))))
 
   reckon emit_warrants(items : Sequence, index : Number, strings : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1624,12 +2719,208 @@ reality RCLGeneralSelfHostCompiler {
                 append_all(one_instruction(21, start + rule_instruction_count(node), 0, 0),
                   emit_expression(rule_when(node), empty_sequence(), reckons, strings, numbers, main_count, start))))))))
 
-  reckon emit_directives(items : Sequence, index : Number, rules : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+  reckon knowledge_effective_confidence(node : Sequence, index : Number, current : Sequence) -> Sequence =
+    choose(index >= length(knowledge_item_dependencies(node)), current,
+      knowledge_effective_confidence(node, index + 1,
+        call_node("choose", sequence_append(sequence_append(sequence_append(empty_sequence(),
+          binary_node("<", call_node("confidence", sequence_append(empty_sequence(), path_node(sequence_get(knowledge_item_dependencies(node), index)))), current)),
+          call_node("confidence", sequence_append(empty_sequence(), path_node(sequence_get(knowledge_item_dependencies(node), index))))), current))))
+
+  reckon emit_dependency_evidence(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      emit_directives(items, index + 1, rules, reckons, strings, numbers, main_count, start,
-        append_all(emit_rule_invocation(find_rule(rules, 0, directive_name(sequence_get(items, index))),
-            choose(directive_kind(sequence_get(items, index)) == "Realize", 1, 0),
-            reckons, strings, numbers, main_count, start + length(output)), output)))
+      emit_dependency_evidence(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(one_instruction(30, 62, 2, 0),
+          append_all(one_instruction(38, find_text(strings, 0, "evidence"), 0, 0),
+            append_all(one_instruction(4, find_text(strings, 0, sequence_get(items, index)), 0, 0), output)))))
+
+  reckon emit_knowledge(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, forced_status : Text) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "knowledge"), find_text(strings, 0, "claim"), 10),
+      append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+        append_all(one_instruction(1, find_number(numbers, 0, 1), 0, 0),
+          emit_text_sequence(knowledge_item_dependencies(node), 0, strings,
+            append_all(one_instruction(30, 12, 0, 0),
+              append_all(one_instruction(3, find_text(strings, 0, choose(forced_status == "", knowledge_item_status(node), forced_status)), 0, 0),
+                append_all(one_instruction(3, find_text(strings, 0, knowledge_item_scope(node)), 0, 0),
+                  append_all(one_instruction(3, find_text(strings, 0, knowledge_item_source(node)), 0, 0),
+                    emit_dependency_evidence(knowledge_item_dependencies(node), 0, reckons, strings, numbers, main_count, start,
+                      emit_text_sequence(knowledge_item_evidence(node), 0, strings,
+                        append_all(one_instruction(30, 12, 0, 0),
+                          append_all(emit_expression(knowledge_effective_confidence(node, 0,
+                              choose(length(knowledge_item_confidence(node)) == 0, literal_node("Number", "1"), knowledge_item_confidence(node))), empty_sequence(), reckons, strings, numbers, main_count,
+                              start + 1 + expression_count(knowledge_item_expression(node))),
+                            append_all(emit_expression(knowledge_item_expression(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1),
+                              one_instruction(3, find_text(strings, 0, knowledge_item_base_type(node)), 0, 0))))))))))))))
+
+  reckon emit_utterance(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "language"), find_text(strings, 0, "utterance"), 6),
+      append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+        emit_text_sequence(utterance_evidence(node), 0, strings,
+          append_all(one_instruction(30, 12, 0, 0),
+            append_all(one_instruction(3, find_text(strings, 0, utterance_channel(node)), 0, 0),
+              append_all(one_instruction(3, find_text(strings, 0, ast_utterance_locale(node)), 0, 0),
+                append_all(one_instruction(3, find_text(strings, 0, ast_utterance_speaker(node)), 0, 0),
+                  emit_expression(utterance_expression(node), empty_sequence(), reckons, strings, numbers, main_count, start))))))))
+  reckon emit_intent_slots(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, emit_intent_slots(items, index + 1, reckons, strings, numbers, main_count, start,
+      append_all(one_instruction(30, 13, 2, 0), append_all(emit_expression(slot_expression(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers, main_count, start + length(output) + 2),
+        append_all(one_instruction(30, 13, 2, 0), append_all(one_instruction(3, find_text(strings, 0, slot_name(sequence_get(items, index))), 0, 0), output))))))
+  reckon emit_intent_confidence(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(intent_confidence_expr(node)) == 0, one_instruction(1, find_number(numbers, 0, 1), 0, 0), emit_expression(intent_confidence_expr(node), empty_sequence(), reckons, strings, numbers, main_count, start))
+  reckon emit_intent_prefix(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(emit_intent_confidence(node, reckons, strings, numbers, main_count, start + 3 + expression_count(intent_when(node))),
+      append_all(one_instruction(3, find_text(strings, 0, ast_intent_target(node)), 0, 0),
+        append_all(one_instruction(3, find_text(strings, 0, ast_intent_action(node)), 0, 0),
+          append_all(emit_expression(intent_when(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1),
+            one_instruction(3, find_text(strings, 0, ast_intent_name(node)), 0, 0)))))
+  reckon emit_intent_evidence(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    emit_dependency_evidence(intent_utterances(node), 0, reckons, strings, numbers, main_count, start,
+      emit_text_sequence(intent_evidence(node), 0, strings,
+        append_all(one_instruction(30, 12, 0, 0), emit_intent_prefix(node, reckons, strings, numbers, main_count, start))))
+  reckon emit_intent_utterances(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    emit_text_sequence(intent_utterances(node), 0, strings,
+      append_all(one_instruction(30, 12, 0, 0), emit_intent_evidence(node, reckons, strings, numbers, main_count, start)))
+  reckon emit_intent(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "language"), find_text(strings, 0, "intent"), 9),
+      append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+        emit_intent_slots(intent_slots(node), 0, reckons, strings, numbers, main_count,
+          start + 5 + expression_count(intent_when(node)) + choose(length(intent_confidence_expr(node)) == 0, 1, expression_count(intent_confidence_expr(node))) + length(intent_evidence(node)) * 2 + length(intent_utterances(node)) * 5,
+          append_all(one_instruction(30, 12, 0, 0), emit_intent_utterances(node, reckons, strings, numbers, main_count, start)))))
+  reckon emit_effective_confidence(explicit : Sequence, dependencies : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    emit_expression(effective_confidence_expression(explicit, dependencies, 0, choose(length(explicit) == 0, literal_node("Number", "1"), explicit)), empty_sequence(), reckons, strings, numbers, main_count, start)
+  reckon emit_understanding_coverage(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(understanding_item_coverage(node)) == 0, one_instruction(1, find_number(numbers, 0, choose(length(understanding_item_dependencies(node)) > 0, 1, 0.75)), 0, 0), emit_expression(understanding_item_coverage(node), empty_sequence(), reckons, strings, numbers, main_count, start))
+  reckon emit_understanding_coherence(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(understanding_item_coherence(node)) == 0, emit_effective_confidence(understanding_item_confidence(node), understanding_item_dependencies(node), reckons, strings, numbers, main_count, start), emit_expression(understanding_item_coherence(node), empty_sequence(), reckons, strings, numbers, main_count, start))
+  reckon emit_understanding(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "understanding"), find_text(strings, 0, "model"), 10),
+      append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+        append_all(one_instruction(3, find_text(strings, 0, understanding_item_status(node)), 0, 0),
+          append_all(emit_understanding_coherence(node, reckons, strings, numbers, main_count, start + understanding_instruction_count(node) - 4 - choose(length(understanding_item_coherence(node)) == 0, understanding_effective_confidence_count(node), expression_count(understanding_item_coherence(node)))),
+            append_all(emit_understanding_coverage(node, reckons, strings, numbers, main_count, start + 4 + expression_count(understanding_item_expression(node)) + understanding_effective_confidence_count(node) + length(understanding_item_evidence(node)) * 2 + length(understanding_item_dependencies(node)) * 5),
+              emit_text_sequence(understanding_item_dependencies(node), 0, strings,
+                append_all(one_instruction(30, 12, 0, 0),
+                  emit_dependency_evidence(understanding_item_dependencies(node), 0, reckons, strings, numbers, main_count, start,
+                    emit_text_sequence(understanding_item_evidence(node), 0, strings,
+                      append_all(one_instruction(30, 12, 0, 0),
+                        append_all(one_instruction(3, find_text(strings, 0, understanding_item_explanation(node)), 0, 0),
+                          append_all(emit_effective_confidence(understanding_item_confidence(node), understanding_item_dependencies(node), reckons, strings, numbers, main_count, start + 1 + expression_count(understanding_item_expression(node))),
+                            append_all(emit_expression(understanding_item_expression(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1),
+                              one_instruction(3, find_text(strings, 0, understanding_item_base_type(node)), 0, 0))))))))))))))
+  reckon emit_optional_expression(node : Sequence, fallback : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(length(node) == 0, one_instruction(1, find_number(numbers, 0, fallback), 0, 0), emit_expression(node, empty_sequence(), reckons, strings, numbers, main_count, start))
+  reckon emit_creation_candidate(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(45, find_text(strings, 0, "creation"), find_text(strings, 0, "candidate"), 11),
+      append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
+        emit_text_sequence(creation_candidate_based_on(node), 0, strings,
+          append_all(one_instruction(30, 12, 0, 0),
+            emit_dependency_evidence(creation_candidate_based_on(node), 0, reckons, strings, numbers, main_count, start,
+              emit_text_sequence(creation_candidate_evidence(node), 0, strings,
+                append_all(one_instruction(30, 12, 0, 0),
+                  append_all(emit_optional_expression(creation_candidate_risk(node), 0.5, reckons, strings, numbers, main_count, start + 4 + expression_count(creation_candidate_expression(node)) + expression_count(creation_candidate_when(node)) + optional_expression_count(creation_candidate_novelty(node)) + optional_expression_count(creation_candidate_utility(node)) + optional_expression_count(creation_candidate_feasibility(node))),
+                    append_all(emit_optional_expression(creation_candidate_feasibility(node), 0.5, reckons, strings, numbers, main_count, start + 4 + expression_count(creation_candidate_expression(node)) + expression_count(creation_candidate_when(node)) + optional_expression_count(creation_candidate_novelty(node)) + optional_expression_count(creation_candidate_utility(node))),
+                      append_all(emit_optional_expression(creation_candidate_utility(node), 0.5, reckons, strings, numbers, main_count, start + 4 + expression_count(creation_candidate_expression(node)) + expression_count(creation_candidate_when(node)) + optional_expression_count(creation_candidate_novelty(node))),
+                        append_all(emit_optional_expression(creation_candidate_novelty(node), 0.5, reckons, strings, numbers, main_count, start + 4 + expression_count(creation_candidate_expression(node)) + expression_count(creation_candidate_when(node))),
+                          append_all(one_instruction(3, find_text(strings, 0, creation_candidate_target(node)), 0, 0),
+                            append_all(emit_expression(creation_candidate_when(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1 + expression_count(creation_candidate_expression(node))),
+                              append_all(emit_expression(creation_candidate_expression(node), empty_sequence(), reckons, strings, numbers, main_count, start + 1),
+                                one_instruction(3, find_text(strings, 0, creation_candidate_base_type(node)), 0, 0)))))))))))))))
+
+  reckon emit_measure_transition_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_measure_transition_items(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(one_instruction(25, find_text(strings, 0, measure_path(sequence_get(items, index))), 0, 0),
+          append_all(emit_measurement(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_quant_derive_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_quant_derive_items(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(one_instruction(25, find_text(strings, 0, quant_derive_path(sequence_get(items, index))), 0, 0),
+          append_all(emit_expression(quant_derive_expression(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_channel_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_channel_items(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(one_instruction(25, find_text(strings, 0, channel_path(sequence_get(items, index))), 0, 0),
+          append_all(emit_expression(channel_expression(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_knowledge_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, forced_status : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_knowledge_items(items, index + 1, reckons, strings, numbers, main_count, start, forced_status,
+        append_all(one_instruction(25, find_text(strings, 0, knowledge_item_path(sequence_get(items, index))), 0, 0),
+          append_all(emit_knowledge(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output), forced_status), output))))
+  reckon emit_utterance_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, emit_utterance_items(items, index + 1, reckons, strings, numbers, main_count, start,
+      append_all(one_instruction(25, find_text(strings, 0, utterance_path(sequence_get(items, index))), 0, 0),
+        append_all(emit_utterance(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_intent_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, emit_intent_items(items, index + 1, reckons, strings, numbers, main_count, start,
+      append_all(one_instruction(25, find_text(strings, 0, intent_path(sequence_get(items, index))), 0, 0),
+        append_all(emit_intent(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_understanding_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, emit_understanding_items(items, index + 1, reckons, strings, numbers, main_count, start,
+      append_all(one_instruction(25, find_text(strings, 0, understanding_item_path(sequence_get(items, index))), 0, 0),
+        append_all(emit_understanding(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_creation_candidate_items(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, emit_creation_candidate_items(items, index + 1, reckons, strings, numbers, main_count, start,
+      append_all(one_instruction(25, find_text(strings, 0, creation_candidate_path(sequence_get(items, index))), 0, 0),
+        append_all(emit_creation_candidate(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output))))
+  reckon emit_creation_selection(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    append_all(one_instruction(25, find_text(strings, 0, selection_path(node)), 0, 0),
+      append_all(one_instruction(45, find_text(strings, 0, "creation"), find_text(strings, 0, "select"), 2),
+        emit_text_sequence(selection_candidates(node), 0, strings,
+          append_all(one_instruction(30, 12, 0, 0),
+            append_all(emit_expression(best_creation_expression(selection_candidates(node), 1, path_node(sequence_get(selection_candidates(node), 0))), empty_sequence(), reckons, strings, numbers, main_count, start + length(output)), output)))))
+
+  reckon emit_domain_preserves(items : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    append_all(one_instruction(26, 0, 0, 0), emit_preserve_items(items, 0, reckons, strings, numbers, main_count, start, output))
+
+  reckon emit_domain_transition(program : Sequence, kind : Text, name : Text, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    choose(kind == "Quantify", emit_quantitative_transition(find_quantitative(program_quantitatives(program), 0, name), reckons, strings, numbers, main_count, start),
+      choose(kind == "Observe", emit_perception_transition(find_perception(program_perceptions(program), 0, name), reckons, strings, numbers, main_count, start),
+        choose(kind == "Learn", emit_knowledge_transition(find_knowledge(program_knowledges(program), 0, name), reckons, strings, numbers, main_count, start),
+          choose(kind == "Interpret", emit_language_transition(find_language(program_languages(program), 0, name), reckons, strings, numbers, main_count, start),
+            choose(kind == "Understand", emit_understanding_transition(find_understanding(program_understandings(program), 0, name), reckons, strings, numbers, main_count, start),
+              emit_creation_transition(find_creation(program_creations(program), 0, name), reckons, strings, numbers, main_count, start))))))
+
+  reckon emit_quantitative_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:quantify:" + quantitative_name(node)), 0, 0),
+      emit_domain_preserves(quantitative_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_quant_derive_items(quantitative_derives(node), 0, reckons, strings, numbers, main_count, start,
+          append_all(one_instruction(26, 1, 0, 0),
+            emit_measure_transition_items(quantitative_measures(node), 0, reckons, strings, numbers, main_count, start,
+              one_instruction(23, 1, find_text(strings, 0, quantitative_name(node)), find_text(strings, 0, quantitative_name(node)))))))))
+  reckon emit_perception_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:observe:" + perception_name(node)), 0, 0),
+      emit_domain_preserves(perception_preserves(node), reckons, strings, numbers, main_count, start,
+        append_all(one_instruction(26, 1, 0, 0), emit_channel_items(perception_channels(node), 0, reckons, strings, numbers, main_count, start,
+          one_instruction(23, 1, find_text(strings, 0, perception_name(node)), find_text(strings, 0, perception_name(node))))))))
+  reckon emit_knowledge_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:learn:" + knowledge_name(node)), 0, 0),
+      emit_domain_preserves(knowledge_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_knowledge_items(knowledge_derives(node), 0, reckons, strings, numbers, main_count, start, "derived",
+          emit_knowledge_items(knowledge_claims(node), 0, reckons, strings, numbers, main_count, start, "",
+            append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, knowledge_name(node)), find_text(strings, 0, knowledge_name(node)))))))))
+  reckon emit_language_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:interpret:" + language_name(node)), 0, 0),
+      emit_domain_preserves(language_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_intent_items(language_intents(node), 0, reckons, strings, numbers, main_count, start,
+          emit_utterance_items(language_utterances(node), 0, reckons, strings, numbers, main_count, start,
+            append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, language_name(node)), find_text(strings, 0, language_name(node)))))))))
+  reckon emit_understanding_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:understand:" + understanding_name(node)), 0, 0),
+      emit_domain_preserves(understanding_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_understanding_items(understanding_hypotheses(node), 0, reckons, strings, numbers, main_count, start,
+          append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, understanding_name(node)), find_text(strings, 0, understanding_name(node))))))))
+  reckon emit_creation_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:create:" + creation_name(node)), 0, 0),
+      emit_domain_preserves(creation_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_creation_selection(creation_selection(node), reckons, strings, numbers, main_count, start,
+          emit_creation_candidate_items(creation_candidates(node), 0, reckons, strings, numbers, main_count, start,
+            append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, creation_name(node)), find_text(strings, 0, creation_name(node)))))))))
+
+  reckon emit_directives(items : Sequence, index : Number, program : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_directives(items, index + 1, program, reckons, strings, numbers, main_count, start,
+        append_all(choose(directive_kind(sequence_get(items, index)) == "Foresee" or directive_kind(sequence_get(items, index)) == "Realize",
+            emit_rule_invocation(find_rule(program_rules(program), 0, directive_name(sequence_get(items, index))), choose(directive_kind(sequence_get(items, index)) == "Realize", 1, 0), reckons, strings, numbers, main_count, start + length(output)),
+            emit_domain_transition(program, directive_kind(sequence_get(items, index)), directive_name(sequence_get(items, index)), reckons, strings, numbers, main_count, start + length(output))), output)))
 
   reckon emit_reckons(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1644,7 +2935,7 @@ reality RCLGeneralSelfHostCompiler {
       emit_reckons(program_reckons(program), 0, program_reckons(program), strings, numbers,
         main_instruction_count(program), main_instruction_count(program), empty_sequence()),
       append_all(one_instruction(31, 0, 0, 0),
-        emit_directives(program_directives(program), 0, program_rules(program), program_reckons(program), strings, numbers,
+        emit_directives(program_directives(program), 0, program, program_reckons(program), strings, numbers,
           main_instruction_count(program), 0,
           emit_warrants(program_warrants(program), 0, strings,
             emit_facets(program_facets(program), 0, program_reckons(program), strings, numbers,
@@ -1674,11 +2965,13 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon instruction_flags(node : Sequence) -> Number = choose(length(node) > 4, sequence_get(node, 4), 0)
 
-  reckon instructions_require_v12(items : Sequence, index : Number) -> Truth =
-    choose(index >= length(items), false,
-      choose(sequence_get(sequence_get(items, index), 0) == 44
-          or (sequence_get(sequence_get(items, index), 0) == 35 and instruction_flags(sequence_get(items, index)) == 1),
-        true, instructions_require_v12(items, index + 1)))
+  reckon instructions_required_minor(items : Sequence, index : Number, required : Number) -> Number =
+    choose(index >= length(items), required,
+      choose(sequence_get(sequence_get(items, index), 0) == 45, 3,
+        instructions_required_minor(items, index + 1,
+          choose(sequence_get(sequence_get(items, index), 0) == 44
+              or (sequence_get(sequence_get(items, index), 0) == 35
+                and instruction_flags(sequence_get(items, index)) == 1), 2, required))))
 
   reckon encode_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number, minor : Number) -> Sequence =
     sequence_concat(utf8_bytes("RCLB"),
@@ -1694,7 +2987,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon encode_rbc(program : Sequence, root : Text, strings : Sequence, numbers : Sequence, instructions : Sequence) -> Sequence =
     sequence_concat(
       encode_header(find_text(strings, 0, program_name(program)), find_text(strings, 0, root),
-        length(strings), length(numbers), length(instructions), choose(instructions_require_v12(instructions, 0), 2, 1)),
+        length(strings), length(numbers), length(instructions), instructions_required_minor(instructions, 0, 1)),
       sequence_concat(encode_string_pool(strings, 0, empty_sequence()),
         sequence_concat(encode_number_pool(numbers, 0, empty_sequence()),
           encode_instructions(instructions, 0, empty_sequence()))))

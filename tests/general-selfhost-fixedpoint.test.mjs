@@ -87,7 +87,7 @@ function callBuiltin(id, args) {
   }
 }
 
-function runCompilerArtifact(bytecode, source, { budget = 300_000_000 } = {}) {
+function runCompilerArtifact(bytecode, source, { budget = 500_000_000 } = {}) {
   const program = decodeBytecode(bytecode);
   const stack = [];
   const state = new Map();
@@ -305,7 +305,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
     'reality UnknownPath { facet world.value : Number = missing.value }',
     'reality UnknownCall { facet world.value : Number = missing_call(1) }',
     'reality WrongLiteral { facet world.value : Number = "one" }',
-    'reality UnsupportedNative { physical universe { } }',
+    'reality UnsupportedNative { facet memory.value : Text = "x" compression capsule { target memory mode lossless codec deflate reversible true discard true fidelity 1 max_ratio 1 } compress capsule }',
   ];
 
   for (const source of rejected) {

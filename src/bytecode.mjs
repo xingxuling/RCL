@@ -3,6 +3,7 @@ import { RCLCompileError } from './errors.mjs';
 
 export const RCL_BYTECODE_VERSION = Object.freeze({ major: 1, minor: 1 });
 export const RCL_BYTECODE_FEATURE_VERSION = Object.freeze({ major: 1, minor: 2 });
+export const RCL_BYTECODE_DOMAIN_VERSION = Object.freeze({ major: 1, minor: 3 });
 export const RCL_BYTECODE_MAGIC = 'RCLB';
 
 export const OPCODES = Object.freeze({
@@ -51,6 +52,7 @@ export const OPCODES = Object.freeze({
   DEREF_TYPED_REF: 42,
   GET_TYPED_REF_ID: 43,
   MOD: 44,
+  DOMAIN_CALL: 45,
 });
 
 export const BUILTINS = Object.freeze({
@@ -215,12 +217,6 @@ function validateNativeSubset(program) {
   const diagnostics = [];
 
   const unsupportedDomains = [
-    ['metaDomains', 'meta-computational'], ['physicals', 'physical'], ['perceptions', 'perception'],
-    ['neurals', 'neural'], ['livings', 'living'], ['genetics', 'genetic'],
-    ['quantitatives', 'quantitative'], ['knowledges', 'knowledge'], ['naturalLanguages', 'natural-language'],
-    ['understandings', 'understanding'], ['creations', 'creation'], ['spacetimes', 'spacetime'],
-    ['accelerations', 'acceleration'], ['compressions', 'compression'], ['energies', 'energy'],
-    ['elements', 'element'], ['sciences', 'science'], ['embodiments', 'embodiment'], ['spirits', 'spirit'],
   ];
   for (const [field, name] of unsupportedDomains) {
     if ((program[field]?.length ?? 0) > 0) diagnostics.push(diagnostic(
@@ -229,9 +225,16 @@ function validateNativeSubset(program) {
       { field, count: program[field].length },
     ));
   }
+  for (const domain of program.knowledges) {
+    if (domain.revisions.length || domain.decays.length) diagnostics.push(diagnostic(
+      'RCL_NATIVE_KNOWLEDGE_MUTATION_UNSUPPORTED',
+      `Native knowledge domain '${domain.name}' does not yet lower revise/forget operations`,
+      { revisions: domain.revisions.length, decays: domain.decays.length },
+    ));
+  }
 
   for (const facet of program.facets) {
-    if (facet.deferred || !facet.value) {
+    if ((facet.deferred || !facet.value) && !facet.knowledge && !facet.naturalLanguage && !facet.understanding && !facet.creation && !facet.selection && !facet.elementEntity && !facet.science && !facet.experiment && !facet.scienceConclusion && facet.valueType !== 'BodyState' && facet.valueType !== 'SpiritState') {
       diagnostics.push(diagnostic('RCL_NATIVE_FACET_UNSUPPORTED', `Native VM v0.2 requires an executable facet initializer`, { path: facet.path, valueType: facet.valueType }));
     }
   }
@@ -244,7 +247,7 @@ function validateNativeSubset(program) {
     if (rule.calls?.length) diagnostics.push(diagnostic('RCL_NATIVE_HOST_CALL', 'Native VM v0.1 does not yet execute host calls', { rule: rule.name }));
   }
 
-  const allowedDirectives = new Set(['Foresee', 'Realize']);
+  const allowedDirectives = new Set(['Foresee', 'Realize', 'Reflect', 'Advance', 'Observe', 'Propagate', 'Live', 'Inherit', 'Quantify', 'Learn', 'Interpret', 'Understand', 'Create', 'Synchronize', 'Energize', 'Constitute', 'Investigate', 'Embody', 'Integrate']);
   for (const directive of program.directives) {
     if (!allowedDirectives.has(directive.kind)) diagnostics.push(diagnostic('RCL_NATIVE_DIRECTIVE_UNSUPPORTED', `Native VM v0.1 cannot execute '${directive.kind}'`, { directive }));
   }
@@ -282,10 +285,145 @@ function compileBuiltin(expr, asm, compileExpr) {
     }
     return true;
   }
+  if (expr.name === 'domain_call') {
+    if (expr.args.length !== 3) throw new Error('domain_call() requires domain, operation and request');
+    const literalTarget = expr.args.slice(0, 2).every(arg => arg?.kind === 'LiteralExpr' && arg.valueType === 'Text');
+    if (literalTarget) {
+      const domainIndex = asm.pool.string(expr.args[0].value);
+      const operationIndex = asm.pool.string(expr.args[1].value);
+      compileExpr(expr.args[2]);
+      asm.emit(OPCODES.DOMAIN_CALL, domainIndex, operationIndex, 1);
+    } else {
+      expr.args.forEach(compileExpr);
+      asm.emit(OPCODES.DOMAIN_CALL, 0, 0, 1, 1);
+    }
+    return true;
+  }
+  const quantityTypes = {
+    meters: 'Length', seconds: 'Time', kilograms: 'Mass',
+    meters_per_second: 'Velocity', meters_per_second2: 'Acceleration',
+    newtons: 'Force', joules: 'Energy', celsius: 'Temperature',
+    hertz: 'Frequency', square_meters: 'Area', cubic_meters: 'Volume',
+    pascals: 'Pressure', watts: 'Power', bits: 'Information',
+  };
+  if (quantityTypes[expr.name]) {
+    if (expr.args.length !== 1) throw new Error(`${expr.name}() requires one numeric argument`);
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string(quantityTypes[expr.name]));
+    compileExpr(expr.args[0]);
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string(''));
+    asm.emit(OPCODES.DOMAIN_CALL, asm.pool.string('quantity'), asm.pool.string('make'), 3);
+    return true;
+  }
+  const fieldAccessors = {
+    measure_value: 'value', uncertainty: 'uncertainty', confidence: 'confidence', certainty: 'confidence',
+    knowledge_value: 'value', belief: 'value', knowledge_status: 'status',
+    utterance_text: 'text', utterance_speaker: 'speaker', utterance_locale: 'locale',
+    intent_name: 'name', intent_action: 'action', intent_target: 'target', intent_confidence: 'confidence',
+    understanding_value: 'value', understanding_confidence: 'confidence', understanding_coverage: 'coverage',
+    understanding_coherence: 'coherence', understanding_explanation: 'explanation',
+    creation_value: 'value', creation_score: 'score', creation_novelty: 'novelty', creation_utility: 'utility',
+    creation_feasibility: 'feasibility', creation_risk: 'risk', creation_target: 'target',
+    scientific_value: 'value', falsified: 'falsified', body_coherence: 'coherence', body_maintained: 'maintained',
+    spirit_coherence: 'coherence', spirit_integrated: 'integrated', element_symbol: 'symbol', atomic_number: 'atomicNumber',
+  };
+  if (fieldAccessors[expr.name]) {
+    if (expr.args.length !== 1) throw new Error(`${expr.name}() requires one argument`);
+    compileExpr(expr.args[0]);
+    asm.emit(OPCODES.GET_TYPED_FIELD, asm.pool.string(fieldAccessors[expr.name]));
+    return true;
+  }
+  if (expr.name === 'known' || expr.name === 'supported') {
+    if (expr.args.length < 1 || expr.args.length > 2) throw new Error(`${expr.name}() requires knowledge and an optional threshold`);
+    compileExpr(expr.args[0]);
+    asm.emit(OPCODES.GET_TYPED_FIELD, asm.pool.string('status'));
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string('forgotten'));
+    asm.emit(OPCODES.NEQ);
+    compileExpr(expr.args[0]);
+    asm.emit(OPCODES.GET_TYPED_FIELD, asm.pool.string('confidence'));
+    if (expr.args[1]) compileExpr(expr.args[1]);
+    else asm.emit(OPCODES.PUSH_NUMBER, asm.pool.number(0.5));
+    asm.emit(OPCODES.GTE);
+    asm.emit(OPCODES.AND);
+    return true;
+  }
+  if (expr.name === 'intent_matches') {
+    if (expr.args.length !== 3) throw new Error('intent_matches() requires intent, action and target');
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'active' });
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'action' });
+    compileExpr(expr.args[1]);
+    asm.emit(OPCODES.EQ);
+    asm.emit(OPCODES.AND);
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'target' });
+    compileExpr(expr.args[2]);
+    asm.emit(OPCODES.EQ);
+    asm.emit(OPCODES.AND);
+    return true;
+  }
+  if (expr.name === 'understood') {
+    if (expr.args.length < 1 || expr.args.length > 2) throw new Error('understood() requires understanding and optional threshold');
+    const threshold = expr.args[1] ?? { kind: 'LiteralExpr', valueType: 'Number', value: 0.5 };
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'status' });
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string('rejected'));
+    asm.emit(OPCODES.NEQ);
+    for (const field of ['confidence', 'coherence']) {
+      compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field });
+      compileExpr(threshold);
+      asm.emit(OPCODES.GTE);
+      asm.emit(OPCODES.AND);
+    }
+    return true;
+  }
+  if (expr.name === 'selected') {
+    if (expr.args.length !== 1) throw new Error('selected() requires one creation candidate');
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'status' });
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string('selected'));
+    asm.emit(OPCODES.EQ);
+    return true;
+  }
+  if (expr.name === 'reproducible') {
+    if (expr.args.length !== 1) throw new Error('reproducible() requires one science value');
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'consistent' });
+    return true;
+  }
+  if (expr.name === 'component_count') {
+    if (expr.args.length !== 1) throw new Error('component_count() requires one element');
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'components' });
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.LENGTH, 1);
+    return true;
+  }
+  if (expr.name === 'lower' || expr.name === 'upper') {
+    if (expr.args.length !== 1) throw new Error(`${expr.name}() requires one measurement`);
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'value' });
+    compileExpr({ kind: 'FieldAccessExpr', object: expr.args[0], field: 'uncertainty' });
+    asm.emit(expr.name === 'lower' ? OPCODES.SUB : OPCODES.ADD);
+    return true;
+  }
+  if (expr.name === 'min' || expr.name === 'max') {
+    if (expr.args.length < 1) throw new Error(`${expr.name}() requires at least one argument`);
+    const selected = expr.args.slice(1).reduce((best, candidate) => ({
+      kind: 'CallExpr',
+      name: 'choose',
+      args: [
+        { kind: 'BinaryExpr', operator: expr.name === 'min' ? '<' : '>', left: candidate, right: best },
+        candidate,
+        best,
+      ],
+    }), expr.args[0]);
+    compileExpr(selected);
+    return true;
+  }
+  if (expr.name === 'point') {
+    if (expr.args.length !== 5) throw new Error('point() requires frame, x, y, z and t');
+    expr.args.forEach(compileExpr);
+    asm.emit(OPCODES.PUSH_STRING, asm.pool.string(''));
+    asm.emit(OPCODES.DOMAIN_CALL, asm.pool.string('spacetime'), asm.pool.string('point'), 6);
+    return true;
+  }
   if (expr.name === 'choose') {
     if (expr.args.length !== 3) throw new Error('choose() requires three arguments');
-    const elseLabel = `choose_else_${asm.instructions.length}`;
-    const endLabel = `choose_end_${asm.instructions.length}`;
+    const id = asm.freshLabel('choose');
+    const elseLabel = `${id}_else`;
+    const endLabel = `${id}_end`;
     compileExpr(expr.args[0]);
     asm.jump(OPCODES.JUMP_IF_FALSE, elseLabel);
     compileExpr(expr.args[1]);
@@ -385,6 +523,11 @@ function compileExpression(expr, asm, pool, context = {}) {
       else throw new Error(`Native bytecode cannot lower literal type '${expr.valueType}'`);
       return;
     case 'PathExpr': {
+      const binding = context.bindings?.get(expr.path);
+      if (binding) {
+        compileExpression(binding, asm, pool, context);
+        return;
+      }
       const patternLocal = context.patternLocals?.get(expr.path);
       if (patternLocal) {
         compileExpression(patternLocal.target, asm, pool, context);
@@ -528,16 +671,593 @@ function compileRuleInvocation(rule, mode, asm, pool, invocationIndex, context =
   asm.label(endLabel);
 }
 
+function emitTextSequence(values, asm, pool) {
+  asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.EMPTY_SEQUENCE, 0);
+  for (const value of values ?? []) {
+    asm.emit(OPCODES.PUSH_STRING, pool.string(value));
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+  }
+}
+
+function emitQuantity(type, expression, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(type));
+  compileExpression(expression, asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('quantity'), pool.string('make'), 3);
+}
+
+function emitSpacetimePoint(expression, target, asm, pool, context) {
+  if (expression?.kind !== 'CallExpr' || expression.name !== 'point' || expression.args.length !== 5) {
+    throw new Error('Spacetime coordinate requires point(frame, x, y, z, t)');
+  }
+  expression.args.forEach(arg => compileExpression(arg, asm, pool, context));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(target ?? ''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('spacetime'), pool.string('point'), 6);
+}
+
+function emitMeasurement(decl, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(decl.baseType));
+  compileExpression(decl.value, asm, pool, context);
+  if (decl.uncertainty) compileExpression(decl.uncertainty, asm, pool, context);
+  else if (['Length', 'Time', 'Mass', 'Velocity', 'Acceleration', 'Force', 'Energy', 'Temperature', 'Frequency', 'Area', 'Volume', 'Pressure', 'Power', 'Information'].includes(decl.baseType)) {
+    emitQuantity(decl.baseType, { kind: 'LiteralExpr', valueType: 'Number', value: 0 }, asm, pool, context);
+  } else asm.emit(OPCODES.PUSH_NUMBER, pool.number(0));
+  if (decl.confidence) compileExpression(decl.confidence, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(1));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(decl.unit ?? ''));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(decl.scale ?? 'ratio'));
+  emitTextSequence(decl.evidence, asm, pool);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(decl.calibratedBy ?? ''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('quantitative'), pool.string('measure'), 8);
+}
+
+function emitKnowledge(spec, asm, pool, context, status = null) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.baseType));
+  compileExpression(spec.expression, asm, pool, context);
+  const explicitConfidence = spec.confidence ?? { kind: 'LiteralExpr', valueType: 'Number', value: 1 };
+  const confidence = (spec.dependencies ?? []).reduce((current, path) => {
+    const dependencyConfidence = {
+      kind: 'FieldAccessExpr',
+      object: { kind: 'PathExpr', path },
+      field: 'confidence',
+    };
+    return {
+      kind: 'CallExpr',
+      name: 'choose',
+      args: [
+        { kind: 'BinaryExpr', operator: '<', left: dependencyConfidence, right: current },
+        dependencyConfidence,
+        current,
+      ],
+    };
+  }, explicitConfidence);
+  compileExpression(confidence, asm, pool, context);
+  emitTextSequence(spec.evidence, asm, pool);
+  for (const path of spec.dependencies ?? []) {
+    compileExpression({ kind: 'FieldAccessExpr', object: { kind: 'PathExpr', path }, field: 'evidence' }, asm, pool, context);
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_CONCAT, 2);
+  }
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.source ?? ''));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.scope ?? 'local'));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(status ?? spec.status ?? 'provisional'));
+  emitTextSequence(spec.dependencies, asm, pool);
+  asm.emit(OPCODES.PUSH_NUMBER, pool.number(1));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('knowledge'), pool.string('claim'), 10);
+}
+
+function emitEvidenceWithDependencies(evidence, dependencies, asm, pool, context) {
+  emitTextSequence(evidence, asm, pool);
+  for (const path of dependencies ?? []) {
+    compileExpression({ kind: 'FieldAccessExpr', object: { kind: 'PathExpr', path }, field: 'evidence' }, asm, pool, context);
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_CONCAT, 2);
+  }
+}
+
+function minimumConfidenceExpression(explicit, dependencies) {
+  return (dependencies ?? []).reduce((current, path) => {
+    const dependencyConfidence = {
+      kind: 'FieldAccessExpr',
+      object: { kind: 'PathExpr', path },
+      field: 'confidence',
+    };
+    return {
+      kind: 'CallExpr', name: 'choose',
+      args: [{ kind: 'BinaryExpr', operator: '<', left: dependencyConfidence, right: current }, dependencyConfidence, current],
+    };
+  }, explicit ?? { kind: 'LiteralExpr', valueType: 'Number', value: 1 });
+}
+
+function emitUtterance(spec, asm, pool, context) {
+  compileExpression(spec.expression, asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.speaker ?? 'unknown'));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.locale ?? 'und'));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.channel ?? 'text'));
+  emitTextSequence(spec.evidence, asm, pool);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('language'), pool.string('utterance'), 6);
+}
+
+function emitIntent(spec, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.name));
+  compileExpression(spec.when, asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.action ?? ''));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.target ?? ''));
+  if (spec.confidence) compileExpression(spec.confidence, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(1));
+  emitEvidenceWithDependencies(spec.evidence, spec.utterances, asm, pool, context);
+  emitTextSequence(spec.utterances, asm, pool);
+  asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.EMPTY_SEQUENCE, 0);
+  for (const slot of spec.slots ?? []) {
+    asm.emit(OPCODES.PUSH_STRING, pool.string(slot.name));
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+    compileExpression(slot.expression, asm, pool, context);
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+  }
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('language'), pool.string('intent'), 9);
+}
+
+function emitUnderstanding(spec, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.baseType));
+  compileExpression(spec.expression, asm, pool, context);
+  compileExpression(minimumConfidenceExpression(spec.confidence, spec.dependencies), asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.explanation ?? ''));
+  emitEvidenceWithDependencies(spec.evidence, spec.dependencies, asm, pool, context);
+  emitTextSequence(spec.dependencies, asm, pool);
+  if (spec.coverage) compileExpression(spec.coverage, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(spec.dependencies?.length ? 1 : 0.75));
+  if (spec.coherence) compileExpression(spec.coherence, asm, pool, context);
+  else compileExpression(minimumConfidenceExpression(spec.confidence, spec.dependencies), asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.status ?? 'hypothesis'));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('understanding'), pool.string('model'), 10);
+}
+
+function emitCreationCandidate(spec, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.baseType));
+  compileExpression(spec.expression, asm, pool, context);
+  compileExpression(spec.when, asm, pool, context);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(spec.target ?? ''));
+  for (const [field, fallback] of [['novelty', 0.5], ['utility', 0.5], ['feasibility', 0.5], ['risk', 0.5]]) {
+    if (spec[field]) compileExpression(spec[field], asm, pool, context);
+    else asm.emit(OPCODES.PUSH_NUMBER, pool.number(fallback));
+  }
+  emitEvidenceWithDependencies(spec.evidence, spec.basedOn, asm, pool, context);
+  emitTextSequence(spec.basedOn, asm, pool);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('creation'), pool.string('candidate'), 11);
+}
+
+function bestCreationExpression(paths) {
+  if (!paths?.length) throw new Error('Creation selection requires at least one candidate');
+  return paths.slice(1).reduce((winner, path) => {
+    const candidate = { kind: 'PathExpr', path };
+    return {
+      kind: 'CallExpr', name: 'choose',
+      args: [
+        {
+          kind: 'BinaryExpr', operator: '>',
+          left: { kind: 'FieldAccessExpr', object: candidate, field: 'score' },
+          right: { kind: 'FieldAccessExpr', object: winner, field: 'score' },
+        },
+        candidate,
+        winner,
+      ],
+    };
+  }, { kind: 'PathExpr', path: paths[0] });
+}
+
+function emitPairs(items, asm, pool, context, emitValue) {
+  asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.EMPTY_SEQUENCE, 0);
+  for (const item of items) {
+    asm.emit(OPCODES.PUSH_STRING, pool.string(item.key));
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+    emitValue(item, asm, pool, context);
+    asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+  }
+}
+
+function emitScienceClaim({ baseType, value, confidence, status, evidence, method = '', replications = null, reproducibility = null, falsified = null, source = '' }, asm, pool, context) {
+  asm.emit(OPCODES.PUSH_STRING, pool.string(baseType));
+  compileExpression(value, asm, pool, context);
+  if (confidence) compileExpression(confidence, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(1));
+  asm.emit(OPCODES.PUSH_STRING, pool.string(status));
+  if (evidence?.expression) compileExpression(evidence.expression, asm, pool, context);
+  else emitTextSequence(evidence, asm, pool);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(method));
+  if (replications) compileExpression(replications, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(0));
+  if (reproducibility) compileExpression(reproducibility, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_NUMBER, pool.number(0));
+  if (falsified) compileExpression(falsified, asm, pool, context);
+  else asm.emit(OPCODES.PUSH_BOOL, 0);
+  asm.emit(OPCODES.PUSH_STRING, pool.string(source));
+  asm.emit(OPCODES.DOMAIN_CALL, pool.string('science'), pool.string('claim'), 10);
+}
+
+function booleanAllExpression(expressions) {
+  return expressions.reduce((left, right) => ({ kind: 'BinaryExpr', operator: 'and', left, right }), { kind: 'LiteralExpr', valueType: 'Truth', value: true });
+}
+
+function booleanRatioExpression(expressions) {
+  if (!expressions.length) return { kind: 'LiteralExpr', valueType: 'Number', value: 1 };
+  const count = expressions
+    .map(expression => ({ kind: 'CallExpr', name: 'choose', args: [expression, { kind: 'LiteralExpr', valueType: 'Number', value: 1 }, { kind: 'LiteralExpr', valueType: 'Number', value: 0 }] }))
+    .reduce((left, right) => ({ kind: 'BinaryExpr', operator: '+', left, right }));
+  return { kind: 'BinaryExpr', operator: '/', left: count, right: { kind: 'LiteralExpr', valueType: 'Number', value: expressions.length } };
+}
+
+function averageExpression(expressions) {
+  if (!expressions.length) return { kind: 'LiteralExpr', valueType: 'Number', value: 1 };
+  const sum = expressions.reduce((left, right) => ({ kind: 'BinaryExpr', operator: '+', left, right }));
+  return { kind: 'BinaryExpr', operator: '/', left: sum, right: { kind: 'LiteralExpr', valueType: 'Number', value: expressions.length } };
+}
+
+function directiveCount(directive) {
+  if (!directive?.count || directive.count.kind !== 'LiteralExpr' || directive.count.valueType !== 'Number') {
+    throw new Error(`${directive?.kind ?? 'Domain'} currently requires a literal step count for native lowering`);
+  }
+  const count = Number(directive.count.value);
+  if (!Number.isInteger(count) || count < 0) throw new Error(`${directive.kind} step count must be a non-negative integer`);
+  return count;
+}
+
+function compileGuardedTransition({ name, when, changes, preserves = [], witnesses = [], context }, asm, pool) {
+  const end = asm.freshLabel(`domain_${name.replaceAll('.', '_')}`);
+  if (when) {
+    compileExpression(when, asm, pool, context);
+    asm.jump(OPCODES.JUMP_IF_FALSE, end);
+  }
+  asm.emit(OPCODES.BEGIN_TX, 1, pool.string(name), pool.string(name));
+  for (const change of changes) {
+    compileExpression(change.expression, asm, pool, context);
+    asm.emit(OPCODES.STAGE_STORE, pool.string(change.target));
+  }
+  asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+  for (const preserve of preserves) {
+    compileExpression(preserve, asm, pool, context);
+    asm.emit(OPCODES.CHECK_PRESERVE);
+  }
+  asm.emit(OPCODES.SET_PROJECTED_VIEW, 0);
+  for (const witness of witnesses) asm.emit(OPCODES.RECORD_WITNESS, pool.string(witness));
+  asm.emit(OPCODES.COMMIT_TX);
+  asm.label(end);
+}
+
+function compileDomainTransition(domain, kind, asm, pool, context, directive = null) {
+  if (kind === 'Reflect') {
+    compileGuardedTransition({ name: domain.name, changes: domain.revisions, preserves: domain.preserves, witnesses: [`domain:reflect:${domain.name}`], context }, asm, pool);
+    return;
+  }
+  if (kind === 'Advance') {
+    const bindings = new Map(context.bindings ?? []);
+    bindings.set(domain.step.name, directive.dt);
+    for (let step = 0; step < directiveCount(directive); step += 1) {
+      compileGuardedTransition({
+        name: domain.name, when: domain.when, changes: domain.evolves, preserves: domain.conserves,
+        witnesses: domain.witnesses, context: { ...context, bindings },
+      }, asm, pool);
+    }
+    return;
+  }
+  if (kind === 'Propagate') {
+    for (let step = 0; step < directiveCount(directive); step += 1) {
+      for (const pathway of domain.pathways) compileGuardedTransition({
+        name: pathway.name, when: pathway.when, changes: pathway.changes,
+        preserves: pathway.preserves, witnesses: pathway.witnesses, context,
+      }, asm, pool);
+    }
+    return;
+  }
+  if (kind === 'Live') {
+    for (let step = 0; step < directiveCount(directive); step += 1) {
+      compileGuardedTransition({
+        name: `${domain.name}.sense`,
+        changes: domain.senses.map(sense => ({ target: sense.path, expression: { kind: 'PathExpr', path: sense.source } })),
+        context,
+      }, asm, pool);
+      for (const cycle of domain.cycles) compileGuardedTransition({
+        name: cycle.name, when: cycle.when, changes: cycle.changes,
+        preserves: domain.maintains, witnesses: cycle.witnesses, context,
+      }, asm, pool);
+    }
+    return;
+  }
+  if (kind === 'Inherit') {
+    for (let generation = 0; generation < directiveCount(directive); generation += 1) {
+      asm.emit(OPCODES.BEGIN_TX, 1, pool.string(domain.name), pool.string(domain.name));
+      for (const mutation of domain.mutations) {
+        compileExpression({
+          kind: 'BinaryExpr', operator: '+',
+          left: { kind: 'PathExpr', path: mutation.target }, right: mutation.expression,
+        }, asm, pool, context);
+        asm.emit(OPCODES.STAGE_STORE, pool.string(mutation.target));
+      }
+      asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+      for (const expression of domain.expressions) {
+        compileExpression(expression.expression, asm, pool, context);
+        asm.emit(OPCODES.STAGE_STORE, pool.string(expression.target));
+      }
+      for (const preserve of domain.preserves) {
+        compileExpression(preserve, asm, pool, context);
+        asm.emit(OPCODES.CHECK_PRESERVE);
+      }
+      asm.emit(OPCODES.SET_PROJECTED_VIEW, 0);
+      for (const witness of domain.witnesses) asm.emit(OPCODES.RECORD_WITNESS, pool.string(witness));
+      asm.emit(OPCODES.COMMIT_TX);
+    }
+    return;
+  }
+  if (kind === 'Synchronize') {
+    const count = directiveCount(directive);
+    for (let step = 0; step < count; step += 1) {
+      asm.emit(OPCODES.BEGIN_TX, 1, pool.string(domain.name), pool.string(domain.name));
+      for (const clock of domain.clocks) {
+        compileExpression({ kind: 'PathExpr', path: clock.path }, asm, pool, context);
+        asm.emit(OPCODES.PUSH_STRING, pool.string('Time'));
+        compileExpression(clock.tick, asm, pool, context);
+        asm.emit(OPCODES.GET_TYPED_FIELD, pool.string('value'));
+        compileExpression(clock.rate, asm, pool, context);
+        asm.emit(OPCODES.MUL);
+        asm.emit(OPCODES.PUSH_STRING, pool.string(''));
+        asm.emit(OPCODES.DOMAIN_CALL, pool.string('quantity'), pool.string('make'), 3);
+        asm.emit(OPCODES.ADD);
+        asm.emit(OPCODES.STAGE_STORE, pool.string(clock.path));
+      }
+      asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+      const defaultClock = domain.clocks[0]?.path;
+      for (const coordinate of domain.coordinates) {
+        compileExpression({ kind: 'PathExpr', path: coordinate.path }, asm, pool, context);
+        compileExpression({ kind: 'PathExpr', path: coordinate.clock ?? defaultClock }, asm, pool, context);
+        asm.emit(OPCODES.PUSH_STRING, pool.string(coordinate.target ?? ''));
+        asm.emit(OPCODES.DOMAIN_CALL, pool.string('spacetime'), pool.string('retime'), 3);
+        asm.emit(OPCODES.STAGE_STORE, pool.string(coordinate.path));
+      }
+      for (const preserve of domain.preserves) {
+        compileExpression(preserve, asm, pool, context);
+        asm.emit(OPCODES.CHECK_PRESERVE);
+      }
+      asm.emit(OPCODES.SET_PROJECTED_VIEW, 0);
+      asm.emit(OPCODES.RECORD_WITNESS, pool.string(`domain:synchronize:${domain.name}`));
+      asm.emit(OPCODES.COMMIT_TX);
+    }
+    return;
+  }
+  if (kind === 'Accelerate' || kind === 'Compress' || kind === 'Restore') {
+    compileGuardedTransition({
+      name: domain.name, changes: [], preserves: domain.preserves ?? [],
+      witnesses: [`domain:${kind.toLowerCase()}:${domain.name}`], context,
+    }, asm, pool);
+    return;
+  }
+  asm.emit(OPCODES.BEGIN_TX, 1, pool.string(domain.name), pool.string(domain.name));
+  if (kind === 'Quantify') {
+    for (const measure of domain.measures) {
+      emitMeasurement(measure, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(measure.path));
+    }
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const derive of domain.derives) {
+      compileExpression(derive.expression, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(derive.path));
+    }
+  } else if (kind === 'Observe') {
+    for (const channel of domain.channels) {
+      compileExpression(channel.expression, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(channel.path));
+    }
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+  } else if (kind === 'Learn') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const claim of domain.claims) {
+      emitKnowledge(claim, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(claim.path));
+    }
+    for (const derive of domain.derives) {
+      emitKnowledge(derive, asm, pool, context, 'derived');
+      asm.emit(OPCODES.STAGE_STORE, pool.string(derive.path));
+    }
+  } else if (kind === 'Interpret') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const utterance of domain.utterances) {
+      emitUtterance(utterance, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(utterance.path));
+    }
+    for (const intent of domain.intents) {
+      emitIntent(intent, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(intent.path));
+    }
+  } else if (kind === 'Understand') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const hypothesis of domain.hypotheses) {
+      emitUnderstanding(hypothesis, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(hypothesis.path));
+    }
+  } else if (kind === 'Create') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const candidate of domain.candidates) {
+      emitCreationCandidate(candidate, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(candidate.path));
+    }
+    compileExpression(bestCreationExpression(domain.selection.candidates), asm, pool, context);
+    emitTextSequence(domain.selection.candidates, asm, pool);
+    asm.emit(OPCODES.DOMAIN_CALL, pool.string('creation'), pool.string('select'), 2);
+    asm.emit(OPCODES.STAGE_STORE, pool.string(domain.selection.path));
+  } else if (kind === 'Energize') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const flow of domain.flows) {
+      compileExpression({ kind: 'PathExpr', path: flow.from }, asm, pool, context);
+      compileExpression(flow.amount, asm, pool, context);
+      asm.emit(OPCODES.SUB);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(flow.from));
+      compileExpression({ kind: 'PathExpr', path: flow.to }, asm, pool, context);
+      compileExpression(flow.amount, asm, pool, context);
+      compileExpression(flow.efficiency, asm, pool, context);
+      asm.emit(OPCODES.DOMAIN_CALL, pool.string('energy'), pool.string('scale'), 2);
+      asm.emit(OPCODES.ADD);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(flow.to));
+    }
+  } else if (kind === 'Constitute') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const spec of domain.species) {
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.localName));
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.symbol ?? ''));
+      compileExpression(spec.atomicNumber ?? { kind: 'LiteralExpr', valueType: 'Number', value: 0 }, asm, pool, context);
+      compileExpression(spec.atomicMass ?? { kind: 'LiteralExpr', valueType: 'Number', value: 0 }, asm, pool, context);
+      compileExpression(spec.charge ?? { kind: 'LiteralExpr', valueType: 'Number', value: 0 }, asm, pool, context);
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.phase ?? 'unspecified'));
+      emitTextSequence(spec.evidence, asm, pool);
+      asm.emit(OPCODES.DOMAIN_CALL, pool.string('element'), pool.string('species'), 7);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.path));
+    }
+    for (const spec of domain.compounds) {
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.localName));
+      emitPairs(spec.components.map(item => ({ key: item.component, expression: item.coefficient })), asm, pool, context,
+        item => compileExpression(item.expression, asm, pool, context));
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.bond ?? ''));
+      emitTextSequence(spec.evidence, asm, pool);
+      asm.emit(OPCODES.DOMAIN_CALL, pool.string('element'), pool.string('compound'), 4);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.path));
+    }
+  } else if (kind === 'Investigate') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    for (const spec of domain.hypotheses) {
+      emitScienceClaim({
+        baseType: spec.baseType, value: spec.expression, confidence: spec.confidence,
+        status: 'hypothesis', evidence: spec.evidence, source: spec.path,
+      }, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.path));
+    }
+    for (const spec of domain.experiments) {
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.localName));
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.hypothesis));
+      asm.emit(OPCODES.PUSH_STRING, pool.string(spec.method ?? 'deterministic'));
+      compileExpression(spec.repeats, asm, pool, context);
+      asm.emit(OPCODES.PUSH_BOOL, 1);
+      asm.emit(OPCODES.PUSH_NUMBER, pool.number(1));
+      asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.EMPTY_SEQUENCE, 0);
+      const hypothesis = domain.hypotheses.find(item => item.path === spec.hypothesis);
+      const repeats = spec.repeats?.kind === 'LiteralExpr' ? Math.max(1, Math.floor(spec.repeats.value)) : 1;
+      for (let index = 0; index < repeats; index += 1) {
+        compileExpression(hypothesis.expression, asm, pool, context);
+        asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+      }
+      emitTextSequence(spec.evidence, asm, pool);
+      asm.emit(OPCODES.DOMAIN_CALL, pool.string('science'), pool.string('experiment'), 8);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.path));
+
+      const old = { kind: 'PathExpr', path: spec.hypothesis };
+      emitScienceClaim({
+        baseType: hypothesis.baseType,
+        value: { kind: 'FieldAccessExpr', object: old, field: 'value' },
+        confidence: { kind: 'FieldAccessExpr', object: old, field: 'confidence' },
+        status: 'supported',
+        evidence: {
+          expression: {
+            kind: 'CallExpr', name: 'sequence_concat',
+            args: [
+              { kind: 'FieldAccessExpr', object: old, field: 'evidence' },
+              { kind: 'FieldAccessExpr', object: { kind: 'PathExpr', path: spec.path }, field: 'evidence' },
+            ],
+          },
+        },
+        method: spec.method ?? '', replications: spec.repeats,
+        reproducibility: { kind: 'LiteralExpr', valueType: 'Number', value: 1 },
+        source: hypothesis.path,
+      }, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.hypothesis));
+    }
+    for (const spec of domain.conclusions) {
+      const source = { kind: 'PathExpr', path: spec.source };
+      emitScienceClaim({
+        baseType: 'Truth',
+        value: {
+          kind: 'BinaryExpr', operator: 'and',
+          left: {
+            kind: 'BinaryExpr', operator: '==',
+            left: { kind: 'FieldAccessExpr', object: source, field: 'status' },
+            right: { kind: 'LiteralExpr', valueType: 'Text', value: 'supported' },
+          },
+          right: { kind: 'UnaryExpr', operator: 'not', expression: { kind: 'FieldAccessExpr', object: source, field: 'falsified' } },
+        },
+        confidence: spec.confidence, status: 'conclusion',
+        evidence: {
+          expression: {
+            kind: 'CallExpr', name: 'sequence_concat',
+            args: [{ kind: 'FieldAccessExpr', object: source, field: 'evidence' }, { kind: 'CallExpr', name: 'empty_sequence', args: [] }],
+          },
+        },
+        method: '', replications: { kind: 'FieldAccessExpr', object: source, field: 'replications' },
+        reproducibility: { kind: 'FieldAccessExpr', object: source, field: 'reproducibility' },
+        falsified: { kind: 'FieldAccessExpr', object: source, field: 'falsified' }, source: spec.source,
+      }, asm, pool, context);
+      asm.emit(OPCODES.STAGE_STORE, pool.string(spec.path));
+    }
+  } else if (kind === 'Embody') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    asm.emit(OPCODES.PUSH_STRING, pool.string(domain.name));
+    emitTextSequence(domain.systems.map(item => item.path), asm, pool);
+    emitTextSequence(domain.organs.map(item => item.path), asm, pool);
+    emitPairs(Object.entries(domain.bindings).map(([key, value]) => ({ key, value })), asm, pool, context,
+      item => asm.emit(OPCODES.PUSH_STRING, pool.string(item.value)));
+    compileExpression(booleanAllExpression(domain.maintains), asm, pool, context);
+    compileExpression(booleanRatioExpression(domain.maintains), asm, pool, context);
+    emitTextSequence(domain.evidence, asm, pool);
+    asm.emit(OPCODES.DOMAIN_CALL, pool.string('body'), pool.string('state'), 7);
+    asm.emit(OPCODES.STAGE_STORE, pool.string(`${domain.name}.state`));
+  } else if (kind === 'Integrate') {
+    asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
+    asm.emit(OPCODES.PUSH_STRING, pool.string(domain.name));
+    const identity = domain.facets.find(item => item.path.endsWith('.identity'));
+    compileExpression(identity?.value ?? { kind: 'LiteralExpr', valueType: 'Text', value: domain.name }, asm, pool, context);
+    for (const items of [domain.values, domain.purposes, domain.affects]) {
+      emitPairs(items.map(item => ({ key: item.localName, item })), asm, pool, context, entry => {
+        asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.EMPTY_SEQUENCE, 0);
+        compileExpression({ kind: 'PathExpr', path: entry.item.path }, asm, pool, context);
+        asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+        compileExpression(entry.item.weight, asm, pool, context);
+        asm.emit(OPCODES.CALL_BUILTIN, BUILTINS.SEQUENCE_APPEND, 2);
+      });
+    }
+    const normalizedWeight = averageExpression([...domain.values, ...domain.purposes, ...domain.affects].map(item => item.weight));
+    compileExpression({
+      kind: 'BinaryExpr', operator: '*',
+      left: booleanRatioExpression(domain.preserves),
+      right: { kind: 'CallExpr', name: 'choose', args: [
+        { kind: 'BinaryExpr', operator: '<', left: normalizedWeight, right: { kind: 'LiteralExpr', valueType: 'Number', value: 1 } },
+        normalizedWeight,
+        { kind: 'LiteralExpr', valueType: 'Number', value: 1 },
+      ] },
+    }, asm, pool, context);
+    compileExpression(booleanAllExpression(domain.preserves), asm, pool, context);
+    emitTextSequence(domain.evidence, asm, pool);
+    asm.emit(OPCODES.DOMAIN_CALL, pool.string('spirit'), pool.string('state'), 8);
+    asm.emit(OPCODES.STAGE_STORE, pool.string(`${domain.name}.state`));
+  }
+  for (const preserve of domain.preserves ?? []) {
+    compileExpression(preserve, asm, pool, context);
+    asm.emit(OPCODES.CHECK_PRESERVE);
+  }
+  asm.emit(OPCODES.SET_PROJECTED_VIEW, 0);
+  asm.emit(OPCODES.RECORD_WITNESS, pool.string(`domain:${kind.toLowerCase()}:${domain.name}`));
+  asm.emit(OPCODES.COMMIT_TX);
+}
+
 function encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, flags = 0 }) {
   const headerSize = 36;
   const stringBytes = pool.strings.map(text => Buffer.from(text, 'utf8'));
   const stringsSize = stringBytes.reduce((sum, bytes) => sum + 4 + bytes.length, 0);
   const numbersSize = pool.numbers.length * 8;
   const instructionSize = 16;
-  const minorVersion = instructions.some(instruction => (
-    instruction.op === OPCODES.MOD
-    || (instruction.op === OPCODES.CALL_PROVIDER && (instruction.flags & 1) === 1)
-  )) ? RCL_BYTECODE_FEATURE_VERSION.minor : RCL_BYTECODE_VERSION.minor;
+  const minorVersion = instructions.reduce((requiredMinor, instruction) => {
+    if (instruction.op === OPCODES.DOMAIN_CALL) return Math.max(requiredMinor, RCL_BYTECODE_DOMAIN_VERSION.minor);
+    if (instruction.op === OPCODES.MOD || (instruction.op === OPCODES.CALL_PROVIDER && (instruction.flags & 1) === 1)) {
+      return Math.max(requiredMinor, RCL_BYTECODE_FEATURE_VERSION.minor);
+    }
+    return requiredMinor;
+  }, RCL_BYTECODE_VERSION.minor);
   const buffer = Buffer.alloc(headerSize + stringsSize + numbersSize + instructions.length * instructionSize);
   let offset = 0;
   buffer.write(RCL_BYTECODE_MAGIC, offset, 4, 'ascii'); offset += 4;
@@ -580,7 +1300,10 @@ function lowerToBytecode(program) {
   const mainContext = { locals: new Map(), functions };
 
   for (const facet of program.facets) {
-    compileExpression(facet.value, asm, pool, mainContext);
+    if (facet.deferred) continue;
+    if (facet.measure) emitMeasurement(facet.measure, asm, pool, mainContext);
+    else if (facet.spacetimeCoordinate) emitSpacetimePoint(facet.value, facet.spacetimeCoordinate.target, asm, pool, mainContext);
+    else compileExpression(facet.value, asm, pool, mainContext);
     asm.emit(OPCODES.STORE_STATE, pool.string(facet.path));
   }
   for (const warrant of program.warrants) {
@@ -588,7 +1311,35 @@ function lowerToBytecode(program) {
   }
 
   const rules = new Map(program.rules.map(rule => [rule.name, rule]));
+  const domains = {
+    Reflect: new Map(program.metaDomains.map(domain => [domain.name, domain])),
+    Advance: new Map(program.physicals.flatMap(domain => domain.laws).map(law => [law.name, law])),
+    Observe: new Map(program.perceptions.map(domain => [domain.name, domain])),
+    Propagate: new Map(program.neurals.map(domain => [domain.name, domain])),
+    Live: new Map(program.livings.map(domain => [domain.name, domain])),
+    Inherit: new Map(program.genetics.map(domain => [domain.name, domain])),
+    Quantify: new Map(program.quantitatives.map(domain => [domain.name, domain])),
+    Learn: new Map(program.knowledges.map(domain => [domain.name, domain])),
+    Interpret: new Map(program.naturalLanguages.map(domain => [domain.name, domain])),
+    Understand: new Map(program.understandings.map(domain => [domain.name, domain])),
+    Create: new Map(program.creations.map(domain => [domain.name, domain])),
+    Synchronize: new Map(program.spacetimes.map(domain => [domain.name, domain])),
+    Accelerate: new Map(program.accelerations.map(domain => [domain.name, domain])),
+    Compress: new Map(program.compressions.map(domain => [domain.name, domain])),
+    Restore: new Map(program.compressions.map(domain => [domain.name, domain])),
+    Energize: new Map(program.energies.map(domain => [domain.name, domain])),
+    Constitute: new Map(program.elements.map(domain => [domain.name, domain])),
+    Investigate: new Map(program.sciences.map(domain => [domain.name, domain])),
+    Embody: new Map(program.embodiments.map(domain => [domain.name, domain])),
+    Integrate: new Map(program.spirits.map(domain => [domain.name, domain])),
+  };
   program.directives.forEach((directive, index) => {
+    if (domains[directive.kind]) {
+      const domain = domains[directive.kind].get(directive.name);
+      if (!domain) throw new Error(`Unknown ${directive.kind} domain '${directive.name}' during bytecode lowering`);
+      compileDomainTransition(domain, directive.kind, asm, pool, mainContext, directive);
+      return;
+    }
     const rule = rules.get(directive.rule);
     if (!rule) throw new Error(`Unknown rule '${directive.rule}' during bytecode lowering`);
     compileRuleInvocation(rule, directive.kind === 'Realize' ? 'realize' : 'foresee', asm, pool, index, mainContext);

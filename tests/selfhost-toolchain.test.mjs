@@ -42,7 +42,7 @@ test('production self-hosted compiler rejects invalid native-core sources', { ti
     'reality UnknownPath { facet world.value : Number = missing.value }',
     'reality UnknownCall { facet world.value : Number = missing_call(1) }',
     'reality WrongLiteral { facet world.value : Number = "one" }',
-    'reality UnsupportedNative { physical universe { } }',
+    'reality UnsupportedNative { facet memory.value : Text = "x" compression capsule { target memory mode lossless codec deflate reversible true discard true fidelity 1 max_ratio 1 } compress capsule }',
   ]) {
     assert.throws(() => compileRealityToBytecode(source));
     assert.throws(() => compileSourceSelfHosted(source));

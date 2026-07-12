@@ -113,7 +113,7 @@ test('native LOAD_STATE reports the reference runtime missing-state code and mes
 test('native loader enforces RBC feature versions and rejects unknown future versions', () => {
   const base = compileRealityToBytecode('reality VersionBase { facet world.ready : Truth = true }');
   const future = Buffer.from(base);
-  future.writeUInt16LE(3, 6);
+  future.writeUInt16LE(4, 6);
   assert.throws(
     () => runNativeBytecode(future),
     error => error instanceof RCLNativeVMError && error.message.includes('RCL_NATIVE_BYTECODE_VERSION'),

@@ -33,6 +33,26 @@ import { span, token, facetAst, parseState, symbolValue, semanticFacet, irStore,
 
 const MAX_RECKON_DEPTH = 4096;
 
+function invokeInternalDomain(domain, operation, args) {
+  const key = `${domain}.${operation}`;
+  if (key === 'core.echo') return args[0];
+  if (key === 'quantity.make') return quantity(args[0], args[1], args[2] || undefined);
+  if (key === 'quantitative.measure') {
+    return measurement(args[0], args[1], {
+      uncertainty: args[2], confidence: args[3], unit: args[4] || undefined,
+      scale: args[5], evidence: args[6], calibratedBy: args[7] || null,
+    });
+  }
+  if (key === 'knowledge.claim') {
+    return knowledgeClaim(args[0], args[1], {
+      confidence: args[2], evidence: args[3], source: args[4] || null,
+      scope: args[5], status: args[6], dependencies: args[7],
+      revision: args[8], formedAtRoot: args[9] || null,
+    });
+  }
+  throw new RCLRuntimeError('RCL_DOMAIN_OPERATION_MISSING', `Internal domain operation '${key}' is not registered`);
+}
+
 // Trampoline sentinel: returned from tail-call sites to avoid stack overflow.
 // evaluateExpressionCore returns this instead of recursing; the trampoline loop unwinds it.
 class _TailCall {
@@ -106,6 +126,13 @@ function _evalCore(expr, context) {
       return applyBinary(expr.operator, left, right);
     }
     case 'CallExpr': {
+      if (expr.name === 'domain_call') {
+        if (expr.args.length !== 3) throw new RCLRuntimeError('RCL_CALL_ARITY', 'domain_call expects domain, operation and request');
+        const domain = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
+        const operation = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
+        const request = evaluateExpression(expr.args[2], { ...context, depth: depth + 1 });
+        return invokeInternalDomain(domain, operation, [request]);
+      }
       if (expr.name === 'provider_call') {
         const providerId = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
         const capability = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });

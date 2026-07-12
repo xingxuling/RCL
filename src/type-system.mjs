@@ -562,6 +562,14 @@ export function checkReality(program, options = {}) {
           expr.args.forEach(arg => { const type = infer(arg, locals); if (type !== 'Text' && type !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'provider_call arguments must be Text', expr)); });
           return 'Text';
         }
+        if (expr.name === 'domain_call') {
+          if (expr.args.length !== 3) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'domain_call expects domain, operation and request', expr));
+          expr.args.forEach((arg, index) => {
+            const type = infer(arg, locals);
+            if (index < 2 && type !== 'Text' && type !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'domain_call domain and operation must be Text', expr));
+          });
+          return 'Unknown';
+        }
         if (expr.name === 'empty_sequence') {
           if (expr.args.length !== 0) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'empty_sequence expects no arguments', expr));
           return 'Sequence';
