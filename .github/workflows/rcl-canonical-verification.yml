@@ -21,10 +21,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install package metadata without mutating the tree
+      - name: Install from lockfile
         run: npm ci --ignore-scripts
       - name: Verify canonical-source contract
         run: npm run verify:version-contract
+      - name: Verify Stage40 boundary
+        run: npm run verify:selfhost-stage40
+      - name: Verify native platform boundary
+        run: npm run verify:native-boundary
       - name: Run RCL test suite
         run: npm test
       - name: Verify self-hosted examples
