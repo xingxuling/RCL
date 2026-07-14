@@ -1757,6 +1757,77 @@ static int compare_semantic_field_refs(const void *left, const void *right) {
 
 static void semantic_value_json_sb(StringBuilder *sb, const Value *value);
 
+static void semantic_span_json_sb(StringBuilder *sb, const Span *span) {
+  char number[64];
+  sb_append(sb, "{\"column\":"); snprintf(number, sizeof(number), "%" PRId64, span->column); sb_append(sb, number);
+  sb_append(sb, ",\"kind\":\"Span\",\"length\":"); snprintf(number, sizeof(number), "%" PRId64, span->length); sb_append(sb, number);
+  sb_append(sb, ",\"line\":"); snprintf(number, sizeof(number), "%" PRId64, span->line); sb_append(sb, number);
+  sb_append(sb, ",\"offset\":"); snprintf(number, sizeof(number), "%" PRId64, span->offset); sb_append(sb, number); sb_append_char(sb, '}');
+}
+
+static void semantic_sequence_json_sb(StringBuilder *sb, const Sequence *sequence) {
+  sb_append_char(sb, '[');
+  sequence_materialize((Sequence *)sequence);
+  for (size_t i = 0; sequence && i < sequence->count; i++) { if (i) sb_append_char(sb, ','); semantic_value_json_sb(sb, &sequence->items[i]); }
+  sb_append_char(sb, ']');
+}
+
+static void semantic_literal_expr_json_sb(StringBuilder *sb, const AstNode *ast) {
+  char number[64];
+  sb_append(sb, "{\"kind\":\"LiteralExpr\",\"value\":");
+  if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); snprintf(number, sizeof(number), "%.15g", n); sb_append(sb, number); }
+  else if (strcmp(ast->literal_kind, "Truth") == 0) sb_append(sb, strcmp(ast->literal_text, "true") == 0 ? "true" : "false");
+  else json_escape_sb(sb, ast->literal_text);
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->literal_kind); sb_append_char(sb, '}');
+}
+
+static void semantic_token_json_sb(StringBuilder *sb, const Token *token) {
+  sb_append(sb, "{\"kind\":\"Token\",\"span\":"); semantic_span_json_sb(sb, &token->span);
+  sb_append(sb, ",\"text\":"); json_escape_sb(sb, token->text); sb_append(sb, ",\"tokenType\":"); json_escape_sb(sb, token->token_type); sb_append_char(sb, '}');
+}
+
+static void semantic_ast_json_sb(StringBuilder *sb, const AstNode *ast) {
+  sb_append(sb, "{\"kind\":\"FacetDecl\",\"path\":"); json_escape_sb(sb, ast->path);
+  sb_append(sb, ",\"span\":"); semantic_span_json_sb(sb, &ast->span);
+  sb_append(sb, ",\"value\":"); semantic_literal_expr_json_sb(sb, ast);
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->value_type); sb_append_char(sb, '}');
+}
+
+static void semantic_parse_state_json_sb(StringBuilder *sb, const ParseState *parse_state) {
+  char number[64];
+  sb_append(sb, "{\"index\":"); snprintf(number, sizeof(number), "%" PRId64, parse_state->index); sb_append(sb, number);
+  sb_append(sb, ",\"kind\":\"ParseState\",\"nodes\":"); semantic_sequence_json_sb(sb, parse_state->nodes); sb_append_char(sb, '}');
+}
+
+static void semantic_symbol_json_sb(StringBuilder *sb, const SymbolValue *symbol) {
+  char number[64];
+  sb_append(sb, "{\"kind\":\"Symbol\",\"path\":"); json_escape_sb(sb, symbol->path);
+  sb_append(sb, ",\"slot\":"); snprintf(number, sizeof(number), "%" PRId64, symbol->slot); sb_append(sb, number);
+  sb_append(sb, ",\"span\":"); semantic_span_json_sb(sb, &symbol->span);
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, symbol->value_type); sb_append_char(sb, '}');
+}
+
+static void semantic_facet_json_sb(StringBuilder *sb, const SemanticNode *semantic) {
+  char number[64];
+  sb_append(sb, "{\"kind\":\"SemanticFacet\",\"literalKind\":"); json_escape_sb(sb, semantic->literal_kind);
+  sb_append(sb, ",\"literalText\":"); json_escape_sb(sb, semantic->literal_text);
+  sb_append(sb, ",\"path\":"); json_escape_sb(sb, semantic->path);
+  sb_append(sb, ",\"slot\":"); snprintf(number, sizeof(number), "%" PRId64, semantic->slot); sb_append(sb, number);
+  sb_append(sb, ",\"span\":"); semantic_span_json_sb(sb, &semantic->span);
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, semantic->value_type); sb_append_char(sb, '}');
+}
+
+static void semantic_ir_json_sb(StringBuilder *sb, const IrNode *ir) {
+  char number[64];
+  sb_append(sb, "{\"kind\":\"IRStore\",\"literalKind\":"); json_escape_sb(sb, ir->literal_kind);
+  sb_append(sb, ",\"literalText\":"); json_escape_sb(sb, ir->literal_text);
+  sb_append(sb, ",\"op\":"); json_escape_sb(sb, ir->op);
+  sb_append(sb, ",\"path\":"); json_escape_sb(sb, ir->path);
+  sb_append(sb, ",\"slot\":"); snprintf(number, sizeof(number), "%" PRId64, ir->slot); sb_append(sb, number);
+  sb_append(sb, ",\"span\":"); semantic_span_json_sb(sb, &ir->span);
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ir->value_type); sb_append_char(sb, '}');
+}
+
 static void semantic_typed_record_json_sb(StringBuilder *sb, const TypedRecord *record) {
   SemanticFieldRef *fields = (SemanticFieldRef *)malloc(sizeof(SemanticFieldRef) * (record->field_count ? record->field_count : 1));
   if (!fields) { fprintf(stderr, "out of memory\n"); exit(2); }
@@ -1775,14 +1846,29 @@ static void semantic_typed_record_json_sb(StringBuilder *sb, const TypedRecord *
 
 static void semantic_value_json_sb(StringBuilder *sb, const Value *value) {
   switch (value->type) {
+    case VALUE_SPAN:
+      semantic_span_json_sb(sb, value->span);
+      break;
+    case VALUE_TOKEN:
+      semantic_token_json_sb(sb, value->token);
+      break;
+    case VALUE_AST:
+      semantic_ast_json_sb(sb, value->ast);
+      break;
+    case VALUE_PARSE_STATE:
+      semantic_parse_state_json_sb(sb, value->parse_state);
+      break;
+    case VALUE_SYMBOL:
+      semantic_symbol_json_sb(sb, value->symbol);
+      break;
+    case VALUE_SEMANTIC:
+      semantic_facet_json_sb(sb, value->semantic);
+      break;
+    case VALUE_IR:
+      semantic_ir_json_sb(sb, value->ir);
+      break;
     case VALUE_SEQUENCE:
-      sb_append_char(sb, '[');
-      sequence_materialize(value->sequence);
-      for (size_t i = 0; value->sequence && i < value->sequence->count; i++) {
-        if (i) sb_append_char(sb, ',');
-        semantic_value_json_sb(sb, &value->sequence->items[i]);
-      }
-      sb_append_char(sb, ']');
+      semantic_sequence_json_sb(sb, value->sequence);
       break;
     case VALUE_TYPED_RECORD:
       semantic_typed_record_json_sb(sb, value->typed_record);
@@ -3582,9 +3668,13 @@ static void print_record(FILE *out, VM *vm, const Record *record) {
 static void print_success(VM *vm, FILE *out) {
   const char *program = vm->program.strings[vm->program.program_name_index];
   const char *source_root = vm->program.strings[vm->program.source_root_index];
+  char semantic_state_root[65];
+  state_root(&vm->state, semantic_state_root);
   fprintf(out, "{\"vm\":\"rcl-native-vm/%s\",\"bytecodeVersion\":\"%u.%u\",\"program\":", RCL_VM_VERSION, vm->program.major, vm->program.minor);
   print_json_string(out, program);
   fputs(",\"sourceRoot\":", out); print_json_string(out, source_root);
+  fputs(",\"stateRootAlgorithm\":\"rcl.semantic-state-root.v1\"", out);
+  fputs(",\"stateRoot\":", out); print_json_string(out, semantic_state_root);
   typed_heap_mark_from_roots(vm);
   fputs(",\"status\":\"ok\",\"typedHeap\":{\"allocated\":", out); fprintf(out, "%" PRIu64, vm->typed_heap_allocated);
   fputs(",\"registered\":", out); fprintf(out, "%zu", vm->typed_heap_count);

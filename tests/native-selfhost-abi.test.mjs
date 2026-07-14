@@ -97,6 +97,17 @@ test('native core bytecode implements MOD and JS-compatible and/or short circuit
   });
 });
 
+test('native VM exports and verifies the canonical semantic authority state root', () => {
+  const source = `reality NativeAuthorityStateRoot {
+    facet world.ready : Truth = true
+    facet world.value : Number = 7
+  }`;
+  const result = runRealityNative(source);
+  assert.match(result.nativeStateRoot, /^[0-9a-f]{64}$/);
+  assert.equal(result.stateRoot, result.nativeStateRoot);
+  assert.equal(result.stateRootVerified, true);
+});
+
 test('native LOAD_STATE reports the reference runtime missing-state code and message', () => {
   const source = `reality NativeMissingState {
     facet early.value : Truth = late.value

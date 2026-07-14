@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+export const RCL_NATIVE_STATE_ROOT_ALGORITHM = 'rcl.semantic-state-root.v1';
 export const DEFAULT_NATIVE_VM_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
 export const DEFAULT_NATIVE_COMPILER_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclc.exe' : 'rclc');
 
@@ -160,6 +161,8 @@ function normalizeNativeValue(value) {
 
 function normalizeNativeEvidence(result) {
   if (!result) return result;
+  const nativeStateRoot = typeof result.stateRoot === 'string' ? result.stateRoot : null;
+  const nativeStateRootAlgorithm = result.stateRootAlgorithm ?? null;
   result.state = normalizeNativeValue(result.state ?? {});
   result.history = (result.history ?? []).map(record => ({
     ...record,
@@ -177,7 +180,22 @@ function normalizeNativeEvidence(result) {
       after: normalizeNativeValue(change.after),
     })),
   }));
-  if (result.history.length === 0) return result;
+  if (result.history.length === 0) {
+    const computedStateRoot = semanticRoot(result.state);
+    if (nativeStateRoot && nativeStateRootAlgorithm !== RCL_NATIVE_STATE_ROOT_ALGORITHM) {
+      throw new RCLNativeVMError({ code: 'RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', message: `Unsupported native state root algorithm: ${nativeStateRootAlgorithm}` }, { nativeStateRootAlgorithm });
+    }
+    if (nativeStateRoot && nativeStateRoot !== computedStateRoot) {
+      throw new RCLNativeVMError({ code: 'RCL_NATIVE_STATE_ROOT_MISMATCH', message: `Native state root ${nativeStateRoot} does not match semantic state root ${computedStateRoot}` }, { nativeStateRoot, computedStateRoot });
+    }
+    result.nativeStateRoot = nativeStateRoot;
+    result.stateRoot = computedStateRoot;
+    result.stateRootVerified = nativeStateRoot !== null && nativeStateRootAlgorithm === RCL_NATIVE_STATE_ROOT_ALGORITHM;
+    result.stateRootParity = nativeStateRoot !== null && nativeStateRoot === computedStateRoot;
+    result.stateRootAlgorithm = nativeStateRootAlgorithm ?? RCL_NATIVE_STATE_ROOT_ALGORITHM;
+    result.semanticStateRoot = computedStateRoot;
+    return result;
+  }
   const state = structuredClone(result.state);
 
   // Reconstruct the initial flat state from native before-values, then replay
@@ -204,6 +222,19 @@ function normalizeNativeEvidence(result) {
     record.afterRoot = semanticRoot(state);
   }
   result.state = state;
+  const computedStateRoot = semanticRoot(result.state);
+  if (nativeStateRoot && nativeStateRootAlgorithm !== RCL_NATIVE_STATE_ROOT_ALGORITHM) {
+    throw new RCLNativeVMError({ code: 'RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', message: `Unsupported native state root algorithm: ${nativeStateRootAlgorithm}` }, { nativeStateRootAlgorithm });
+  }
+  if (nativeStateRoot && nativeStateRoot !== computedStateRoot) {
+    throw new RCLNativeVMError({ code: 'RCL_NATIVE_STATE_ROOT_MISMATCH', message: `Native state root ${nativeStateRoot} does not match semantic state root ${computedStateRoot}` }, { nativeStateRoot, computedStateRoot });
+  }
+  result.nativeStateRoot = nativeStateRoot;
+  result.stateRoot = computedStateRoot;
+  result.stateRootVerified = nativeStateRoot !== null && nativeStateRootAlgorithm === RCL_NATIVE_STATE_ROOT_ALGORITHM;
+  result.stateRootParity = nativeStateRoot !== null && nativeStateRoot === computedStateRoot;
+  result.stateRootAlgorithm = nativeStateRootAlgorithm ?? RCL_NATIVE_STATE_ROOT_ALGORITHM;
+  result.semanticStateRoot = computedStateRoot;
   return result;
 }
 
