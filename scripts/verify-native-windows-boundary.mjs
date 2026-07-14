@@ -97,17 +97,27 @@ const compilerAvailable = compilerCommands.some(item => item.exists) || commonCo
 const wslUsable = Boolean(wslList?.usable && wslUname?.usable);
 const nativeExeExists = fs.existsSync(nativeExePath);
 const nativeExeFormat = executableFormat(nativeExePath);
-const nativeExeLooksReal = process.platform !== 'win32' || (nativeExeFormat.mz === true && nativeExeFormat.pe === true);
+const nativeExeIsPe = nativeExeFormat.mz === true && nativeExeFormat.pe === true;
+const nativeExeLooksReal = nativeExeIsPe;
 const nativeExeRuns = defaultNativeRun?.ok === true;
-const nativeWindowsBlocked = process.platform === 'win32' && !nativeExeRuns && !nativeExeExists && !compilerAvailable && !wslUsable;
-const status = nativeExeRuns && nativeExeLooksReal
+const nativeArtifactVerified = nativeExeExists && nativeExeIsPe;
+const windowsExecutionVerified = process.platform === 'win32' && nativeExeRuns && nativeArtifactVerified;
+const hostNativeExecutionVerified = process.platform !== 'win32' && nativeExeRuns;
+const nativeWindowsBlocked = process.platform === 'win32' && !windowsExecutionVerified && !nativeExeExists && !compilerAvailable && !wslUsable;
+const status = windowsExecutionVerified
   ? 'NATIVE_WINDOWS_VERIFIED'
-  : (nativeWindowsBlocked ? 'NATIVE_WINDOWS_BLOCKED' : 'NATIVE_WINDOWS_RECHECK_REQUIRED');
-const reason = nativeExeRuns && nativeExeLooksReal
-  ? 'src/native-vm.mjs selects native/rclvm.exe on win32, native/rclvm.exe has a valid PE executable header, and the default native VM smoke run completed successfully.'
   : (nativeWindowsBlocked
-    ? 'src/native-vm.mjs selects native/rclvm.exe on win32, but this source package currently has no runnable native/rclvm.exe; no C compiler was found locally, and WSL is not usable as an execution bridge in this environment.'
-    : 'The Windows native boundary should be rechecked because at least one native execution or build precondition is present but the smoke run did not prove success.');
+    ? 'NATIVE_WINDOWS_BLOCKED'
+    : (hostNativeExecutionVerified ? 'HOST_NATIVE_VERIFIED' : (nativeArtifactVerified ? 'NATIVE_WINDOWS_ARTIFACT_ONLY' : 'NATIVE_WINDOWS_RECHECK_REQUIRED')));
+const reason = windowsExecutionVerified
+  ? 'The current Windows host selected native/rclvm.exe, confirmed its PE header, and completed the default native VM smoke run.'
+  : (hostNativeExecutionVerified
+    ? 'The current host completed the native VM smoke run, but this is POSIX host-native execution; it is not Windows execution evidence.'
+    : (nativeArtifactVerified
+      ? 'The Windows PE artifact is present and structurally valid, but Windows execution was not observed in this run.'
+      : (nativeWindowsBlocked
+        ? 'No runnable native/rclvm.exe, C compiler, or usable WSL execution bridge was available on this Windows host.'
+        : 'The Windows native boundary should be rechecked because at least one build or execution precondition is present but the smoke run did not prove success.')));
 
 const payload = {
   ok: true,
@@ -140,12 +150,15 @@ const payload = {
     },
   },
   boundary: {
-    nativeWindowsStillBlocked: !(nativeExeRuns && nativeExeLooksReal),
+    nativeArtifactVerified,
+    windowsPeHeaderVerified: nativeExeIsPe,
+    windowsExecutionVerified,
+    hostNativeExecutionVerified,
+    nativeWindowsStillBlocked: !windowsExecutionVerified,
     nativeExeLooksReal,
     reason,
     notAClaim: 'This verifier records the current Windows native execution boundary; it does not prove the C VM source is invalid.',
-  },
-};
+  },};
 
 fs.mkdirSync(outputDir, { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`);
