@@ -563,7 +563,7 @@ export function checkReality(program, options = {}) {
           return 'Text';
         }
         if (expr.name === 'domain_call') {
-          if (expr.args.length !== 3) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'domain_call expects domain, operation and request', expr));
+          if (expr.args.length < 2) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'domain_call expects domain, operation and optional arguments', expr));
           expr.args.forEach((arg, index) => {
             const type = infer(arg, locals);
             if (index < 2 && type !== 'Text' && type !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'domain_call domain and operation must be Text', expr));
@@ -579,6 +579,46 @@ export function checkReality(program, options = {}) {
           const sequenceType = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
           if (sequenceType !== 'Sequence' && sequenceType !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `sequence_append expects Sequence, received ${sequenceType}`, expr));
           if (expr.args[1]) infer(expr.args[1], locals);
+          return 'Sequence';
+        }
+        if (expr.name === 'sequence_append_unique') {
+          if (expr.args.length !== 2) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'sequence_append_unique expects Sequence and value', expr));
+          const sequenceType = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
+          if (sequenceType !== 'Sequence' && sequenceType !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `sequence_append_unique expects Sequence, received ${sequenceType}`, expr));
+          if (expr.args[1]) infer(expr.args[1], locals);
+          return 'Sequence';
+        }
+        if (expr.name === 'sequence_unique') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'sequence_unique expects one Sequence', expr));
+          const sequenceType = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
+          if (sequenceType !== 'Sequence' && sequenceType !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `sequence_unique expects Sequence, received ${sequenceType}`, expr));
+          return 'Sequence';
+        }
+        if (expr.name === 'sequence_index_of') {
+          if (expr.args.length !== 3) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'sequence_index_of expects Sequence, value and start', expr));
+          const types = expr.args.map(arg => infer(arg, locals));
+          if (types[0] !== 'Sequence' && types[0] !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'sequence_index_of first argument must be Sequence', expr));
+          if (types[2] !== 'Number' && types[2] !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'sequence_index_of start must be Number', expr));
+          return 'Number';
+        }
+        if (expr.name === 'sequence_find_field') {
+          if (expr.args.length !== 4) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'sequence_find_field expects Sequence, field, value and start', expr));
+          const types = expr.args.map(arg => infer(arg, locals));
+          if (types[0] !== 'Sequence' && types[0] !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'sequence_find_field first argument must be Sequence', expr));
+          for (const type of [types[1], types[3]]) if (type !== 'Number' && type !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'sequence_find_field field and start must be Number', expr));
+          return 'Number';
+        }
+        if (expr.name === 'decode_string_slice') {
+          if (expr.args.length !== 3) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'decode_string_slice expects Text, start and end', expr));
+          const types = expr.args.map(arg => infer(arg, locals));
+          if (types[0] !== 'Text' && types[0] !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'decode_string_slice source must be Text', expr));
+          for (const type of types.slice(1)) if (type !== 'Number' && type !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'decode_string_slice indexes must be Number', expr));
+          return 'Text';
+        }
+        if (expr.name === 'compiler_tokenize') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'compiler_tokenize expects source Text', expr));
+          const sourceType = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
+          if (sourceType !== 'Text' && sourceType !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', 'compiler_tokenize source must be Text', expr));
           return 'Sequence';
         }
         if (expr.name === 'sequence_get') {

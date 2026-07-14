@@ -32,25 +32,19 @@ reality RCLGeneralSelfHostCompiler {
   reckon state_text(state : Sequence) -> Text = sequence_get(state, 1)
   reckon state_node(state : Sequence) -> Sequence = sequence_get(state, 1)
 
-  reckon append_all_from(items : Sequence, index : Number, output : Sequence) -> Sequence =
-    choose(index >= length(items), output,
-      append_all_from(items, index + 1, sequence_append(output, sequence_get(items, index))))
-
-  reckon append_all(items : Sequence, output : Sequence) -> Sequence = append_all_from(items, 0, output)
+  reckon append_all(items : Sequence, output : Sequence) -> Sequence = sequence_concat(output, items)
 
   reckon find_text(items : Sequence, index : Number, value : Text) -> Number =
-    choose(index >= length(items), -1,
-      choose(sequence_get(items, index) == value, index, find_text(items, index + 1, value)))
+    sequence_index_of(items, value, index)
 
   reckon find_number(items : Sequence, index : Number, value : Number) -> Number =
-    choose(index >= length(items), -1,
-      choose(sequence_get(items, index) == value, index, find_number(items, index + 1, value)))
+    sequence_index_of(items, value, index)
 
   reckon append_unique_text(items : Sequence, value : Text) -> Sequence =
-    choose(find_text(items, 0, value) >= 0, items, sequence_append(items, value))
+    sequence_append(items, value)
 
   reckon append_unique_number(items : Sequence, value : Number) -> Sequence =
-    choose(find_number(items, 0, value) >= 0, items, sequence_append(items, value))
+    sequence_append(items, value)
 
   reckon either(left : Truth, right : Truth) -> Truth = choose(left, true, right)
   reckon both(left : Truth, right : Truth) -> Truth = choose(left, right, false)
@@ -122,14 +116,14 @@ reality RCLGeneralSelfHostCompiler {
                   sequence_get(position_after(source, index, scan_string_end(source, index + 1, false) + 1, line, column), 0),
                   sequence_get(position_after(source, index, scan_string_end(source, index + 1, false) + 1, line, column), 1),
                   sequence_append(output,
-                    make_token_node("STRING", decode_string_from(source, index + 1, scan_string_end(source, index + 1, false), ""), line, column))),
+                    make_token_node("STRING", decode_string_slice(source, index + 1, scan_string_end(source, index + 1, false)), line, column))),
                 choose(is_two_symbol(slice_text(source, index, 2)),
                   tokenize_from(source, index + 2, line, column + 2,
                     sequence_append(output, make_token_node("SYMBOL", slice_text(source, index, 2), line, column))),
                   tokenize_from(source, index + 1, line, column + 1,
                     sequence_append(output, make_token_node("SYMBOL", char_at(source, index), line, column))))))))))
 
-  reckon tokenize(source : Text) -> Sequence = tokenize_from(source, 0, 1, 1, empty_sequence())
+  reckon tokenize(source : Text) -> Sequence = compiler_tokenize(source)
 
   reckon parse_path_tail(tokens : Sequence, index : Number, value : Text) -> Sequence =
     choose(token_text_at(tokens, index) == ".",
@@ -140,19 +134,20 @@ reality RCLGeneralSelfHostCompiler {
     parse_path_tail(tokens, index + 1, token_text_at(tokens, index))
 
   reckon literal_node(value_type : Text, value : Text) -> Sequence =
-    sequence_append(sequence_append(sequence_append(empty_sequence(), "LiteralExpr"), value_type), value)
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "LiteralExpr"), value_type), value), 1)
 
   reckon path_node(path : Text) -> Sequence =
-    sequence_append(sequence_append(empty_sequence(), "PathExpr"), path)
+    sequence_append(sequence_append(sequence_append(empty_sequence(), "PathExpr"), path), 1)
 
   reckon unary_node(operator : Text, expression : Sequence) -> Sequence =
-    sequence_append(sequence_append(sequence_append(empty_sequence(), "UnaryExpr"), operator), expression)
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "UnaryExpr"), operator), expression), expression_count(expression) + 1)
 
   reckon binary_node(operator : Text, left : Sequence, right : Sequence) -> Sequence =
-    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "BinaryExpr"), operator), left), right)
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "BinaryExpr"), operator), left), right),
+      expression_count(left) + expression_count(right) + choose(operator == "and" or operator == "or", 5, 1))
 
   reckon call_node(name : Text, args : Sequence) -> Sequence =
-    sequence_append(sequence_append(sequence_append(empty_sequence(), "CallExpr"), name), args)
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "CallExpr"), name), args), call_instruction_count(name, args))
 
   reckon cognition_accessor_field(name : Text) -> Text =
     choose(name == "utterance_text", "text", choose(name == "utterance_speaker", "speaker", choose(name == "utterance_locale", "locale",
@@ -161,11 +156,14 @@ reality RCLGeneralSelfHostCompiler {
           choose(name == "creation_value", "value", choose(name == "creation_score", "score", choose(name == "creation_novelty", "novelty", choose(name == "creation_utility", "utility", choose(name == "creation_feasibility", "feasibility", choose(name == "creation_risk", "risk", choose(name == "creation_target", "target", choose(name == "creation_status", "status", ""))))))))))))))))))))))
   reckon is_cognition_accessor(name : Text) -> Truth = cognition_accessor_field(name) != ""
   reckon accessor_node(name : Text, expression : Sequence) -> Sequence = call_node(name, sequence_append(empty_sequence(), expression))
-  reckon intent_matches_expression(node : Sequence) -> Sequence =
-    binary_node("__and", binary_node("__and", accessor_node("intent_active", sequence_get(expr_args(node), 0)), binary_node("==", accessor_node("intent_action", sequence_get(expr_args(node), 0)), sequence_get(expr_args(node), 1))), binary_node("==", accessor_node("intent_target", sequence_get(expr_args(node), 0)), sequence_get(expr_args(node), 2)))
-  reckon understood_expression(node : Sequence) -> Sequence =
-    binary_node("__and", binary_node("__and", binary_node("!=", accessor_node("understanding_status", sequence_get(expr_args(node), 0)), literal_node("Text", "rejected")), binary_node(">=", accessor_node("understanding_confidence", sequence_get(expr_args(node), 0)), choose(length(expr_args(node)) > 1, sequence_get(expr_args(node), 1), literal_node("Number", "0.5")))), binary_node(">=", accessor_node("understanding_coherence", sequence_get(expr_args(node), 0)), choose(length(expr_args(node)) > 1, sequence_get(expr_args(node), 1), literal_node("Number", "0.5"))))
-  reckon selected_expression(node : Sequence) -> Sequence = binary_node("==", accessor_node("creation_status", sequence_get(expr_args(node), 0)), literal_node("Text", "selected"))
+  reckon intent_matches_expression_from(args : Sequence) -> Sequence =
+    binary_node("__and", binary_node("__and", accessor_node("intent_active", sequence_get(args, 0)), binary_node("==", accessor_node("intent_action", sequence_get(args, 0)), sequence_get(args, 1))), binary_node("==", accessor_node("intent_target", sequence_get(args, 0)), sequence_get(args, 2)))
+  reckon intent_matches_expression(node : Sequence) -> Sequence = intent_matches_expression_from(expr_args(node))
+  reckon understood_expression_from(args : Sequence) -> Sequence =
+    binary_node("__and", binary_node("__and", binary_node("!=", accessor_node("understanding_status", sequence_get(args, 0)), literal_node("Text", "rejected")), binary_node(">=", accessor_node("understanding_confidence", sequence_get(args, 0)), choose(length(args) > 1, sequence_get(args, 1), literal_node("Number", "0.5")))), binary_node(">=", accessor_node("understanding_coherence", sequence_get(args, 0)), choose(length(args) > 1, sequence_get(args, 1), literal_node("Number", "0.5"))))
+  reckon understood_expression(node : Sequence) -> Sequence = understood_expression_from(expr_args(node))
+  reckon selected_expression_from(args : Sequence) -> Sequence = binary_node("==", accessor_node("creation_status", sequence_get(args, 0)), literal_node("Text", "selected"))
+  reckon selected_expression(node : Sequence) -> Sequence = selected_expression_from(expr_args(node))
 
   reckon expr_kind(node : Sequence) -> Text = sequence_get(node, 0)
   reckon expr_text(node : Sequence) -> Text = sequence_get(node, 1)
@@ -1730,12 +1728,10 @@ reality RCLGeneralSelfHostCompiler {
     semantic_assert(condition, code, detail, make_span(0, 1, 1, 0))
 
   reckon find_facet_index(items : Sequence, index : Number, path : Text) -> Number =
-    choose(index >= length(items), -1,
-      choose(facet_path(sequence_get(items, index)) == path, index, find_facet_index(items, index + 1, path)))
+    sequence_find_field(items, 0, path, index)
 
   reckon find_reckon_index(items : Sequence, index : Number, name : Text) -> Number =
-    choose(index >= length(items), -1,
-      choose(reckon_name(sequence_get(items, index)) == name, index, find_reckon_index(items, index + 1, name)))
+    sequence_find_field(items, 0, name, index)
 
   reckon validate_expression_array(items : Sequence, index : Number, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -1752,7 +1748,8 @@ reality RCLGeneralSelfHostCompiler {
       or find_reckon_index(reckons, 0, name) >= 0
 
   reckon call_arity_valid(node : Sequence, reckons : Sequence) -> Truth =
-    choose(expr_text(node) == "provider_call" or expr_text(node) == "domain_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
+    choose(expr_text(node) == "provider_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
+      choose(expr_text(node) == "domain_call", length(expr_args(node)) >= 2,
       choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id"
           or expr_text(node) == "celsius" or expr_text(node) == "measure_value" or expr_text(node) == "uncertainty"
           or expr_text(node) == "confidence" or expr_text(node) == "certainty" or expr_text(node) == "knowledge_value"
@@ -1763,7 +1760,7 @@ reality RCLGeneralSelfHostCompiler {
         choose(expr_text(node) == "known" or expr_text(node) == "supported" or expr_text(node) == "understood",
           length(expr_args(node)) >= 1 and length(expr_args(node)) <= 2,
           choose(find_reckon_index(reckons, 0, expr_text(node)) >= 0,
-          length(expr_args(node)) == length(reckon_params(sequence_get(reckons, find_reckon_index(reckons, 0, expr_text(node))))), true))))))
+          length(expr_args(node)) == length(reckon_params(sequence_get(reckons, find_reckon_index(reckons, 0, expr_text(node))))), true)))))))
 
   reckon validate_expression(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(expr_kind(node) == "LiteralExpr", true,
@@ -2249,16 +2246,16 @@ reality RCLGeneralSelfHostCompiler {
           param_names(reckon_params(sequence_get(items, index)), 0, empty_sequence()), output)))
 
   reckon build_string_pool(program : Sequence, root : Text) -> Sequence =
-    collect_reckon_strings(program_reckons(program), 0,
+    sequence_unique(collect_reckon_strings(program_reckons(program), 0,
       collect_directive_strings(program_directives(program), 0, program, program_reckons(program),
         collect_warrant_strings(program_warrants(program), 0,
           collect_facet_strings(program_facets(program), 0,
-            append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root)))))
+            append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root))))))
 
   reckon build_number_pool(program : Sequence) -> Sequence =
-    collect_reckon_numbers(program_reckons(program), 0,
+    sequence_unique(collect_reckon_numbers(program_reckons(program), 0,
       collect_directive_numbers(program_directives(program), 0, program,
-        collect_facet_numbers(program_facets(program), 0, empty_sequence())))
+        collect_facet_numbers(program_facets(program), 0, empty_sequence()))))
 
   reckon builtin_id(name : Text) -> Number =
     choose(name == "contains", 1,
@@ -2330,47 +2327,45 @@ reality RCLGeneralSelfHostCompiler {
                                                                                                                                         choose(name == "bytes_f64le", 67,
                                                                                                                                           choose(name == "utf8_bytes", 68,
                                                                                                                                             choose(name == "hex_bytes", 69,
-                                                                                                                                              choose(name == "sha256_text", 70, 0))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                              choose(name == "sha256_text", 70, choose(name == "sequence_append_unique", 71, choose(name == "sequence_unique", 72, choose(name == "decode_string_slice", 73, choose(name == "compiler_tokenize", 74, choose(name == "sequence_index_of", 75, choose(name == "sequence_find_field", 76, 0))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
   reckon expression_count_array(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,
       expression_count_array(items, index + 1, output + expression_count(sequence_get(items, index))))
 
   reckon expression_count(node : Sequence) -> Number =
-    choose(expr_kind(node) == "LiteralExpr" or expr_kind(node) == "PathExpr", 1,
-      choose(expr_kind(node) == "UnaryExpr", expression_count(expr_left(node)) + 1,
-        choose(expr_kind(node) == "BinaryExpr",
-          choose(expr_text(node) == "and" or expr_text(node) == "or",
-            expression_count(expr_left(node)) + expression_count(expr_right(node)) + 5,
-            expression_count(expr_left(node)) + expression_count(expr_right(node)) + 1),
-          expression_call_count(node))))
+    sequence_get(node, choose(expr_kind(node) == "BinaryExpr", 4, choose(expr_kind(node) == "PathExpr", 2, 3)))
 
-  reckon expression_call_count(node : Sequence) -> Number =
-    choose(expr_text(node) == "celsius", expression_count_array(expr_args(node), 0, 0) + 3,
-      choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence" or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status" or is_cognition_accessor(expr_text(node)), expression_count_array(expr_args(node), 0, 0) + 1,
-        choose(expr_text(node) == "intent_matches", expression_count(intent_matches_expression(node)),
-          choose(expr_text(node) == "understood", expression_count(understood_expression(node)),
-            choose(expr_text(node) == "selected", expression_count(selected_expression(node)),
-              choose(expr_text(node) == "known" or expr_text(node) == "supported", expression_count(sequence_get(expr_args(node), 0)) * 2 + choose(length(expr_args(node)) > 1, expression_count(sequence_get(expr_args(node), 1)), 1) + 6,
-                choose(expr_text(node) == "choose", expression_count(sequence_get(expr_args(node), 0)) + expression_count(sequence_get(expr_args(node), 1)) + expression_count(sequence_get(expr_args(node), 2)) + 2,
-                  choose(expr_text(node) == "provider_call", choose(provider_literal_arguments(node), 1, expression_count_array(expr_args(node), 0, 0) + 1),
-                    choose(expr_text(node) == "domain_call" and domain_literal_target(node), expression_count(sequence_get(expr_args(node), 2)) + 1, expression_count_array(expr_args(node), 0, 0) + 1)))))))))
+  reckon expression_call_count(node : Sequence) -> Number = sequence_get(node, 3)
 
-  reckon provider_literal_arguments(node : Sequence) -> Truth =
-    choose(length(expr_args(node)) != 3, false,
-      expr_kind(sequence_get(expr_args(node), 0)) == "LiteralExpr"
-        and expr_text(sequence_get(expr_args(node), 0)) == "Text"
-        and expr_kind(sequence_get(expr_args(node), 1)) == "LiteralExpr"
-        and expr_text(sequence_get(expr_args(node), 1)) == "Text"
-        and expr_kind(sequence_get(expr_args(node), 2)) == "LiteralExpr"
-        and expr_text(sequence_get(expr_args(node), 2)) == "Text")
+  reckon call_instruction_count(name : Text, args : Sequence) -> Number =
+    choose(name == "celsius", expression_count_array(args, 0, 0) + 3,
+      choose(name == "measure_value" or name == "knowledge_value" or name == "confidence" or name == "uncertainty" or name == "knowledge_status" or is_cognition_accessor(name), expression_count_array(args, 0, 0) + 1,
+        choose(name == "intent_matches", expression_count(intent_matches_expression_from(args)),
+          choose(name == "understood", expression_count(understood_expression_from(args)),
+            choose(name == "selected", expression_count(selected_expression_from(args)),
+              choose(name == "known" or name == "supported", expression_count(sequence_get(args, 0)) * 2 + choose(length(args) > 1, expression_count(sequence_get(args, 1)), 1) + 6,
+                choose(name == "choose", expression_count(sequence_get(args, 0)) + expression_count(sequence_get(args, 1)) + expression_count(sequence_get(args, 2)) + 2,
+                  choose(name == "provider_call", choose(provider_literal_arguments_from(args), 1, expression_count_array(args, 0, 0) + 1),
+                    choose(name == "domain_call" and domain_literal_target_from(args), expression_count_array(args, 2, 0) + 1, expression_count_array(args, 0, 0) + 1)))))))))
 
-  reckon domain_literal_target(node : Sequence) -> Truth =
-    choose(length(expr_args(node)) != 3, false,
-      expr_kind(sequence_get(expr_args(node), 0)) == "LiteralExpr"
-        and expr_text(sequence_get(expr_args(node), 0)) == "Text"
-        and expr_kind(sequence_get(expr_args(node), 1)) == "LiteralExpr"
-        and expr_text(sequence_get(expr_args(node), 1)) == "Text")
+  reckon provider_literal_arguments_from(args : Sequence) -> Truth =
+    choose(length(args) != 3, false,
+      expr_kind(sequence_get(args, 0)) == "LiteralExpr"
+        and expr_text(sequence_get(args, 0)) == "Text"
+        and expr_kind(sequence_get(args, 1)) == "LiteralExpr"
+        and expr_text(sequence_get(args, 1)) == "Text"
+        and expr_kind(sequence_get(args, 2)) == "LiteralExpr"
+        and expr_text(sequence_get(args, 2)) == "Text")
+  reckon provider_literal_arguments(node : Sequence) -> Truth = provider_literal_arguments_from(expr_args(node))
+
+  reckon domain_literal_target_from(args : Sequence) -> Truth =
+    choose(length(args) < 2, false,
+      expr_kind(sequence_get(args, 0)) == "LiteralExpr"
+        and expr_text(sequence_get(args, 0)) == "Text"
+        and expr_kind(sequence_get(args, 1)) == "LiteralExpr"
+        and expr_text(sequence_get(args, 1)) == "Text")
+  reckon domain_literal_target(node : Sequence) -> Truth = domain_literal_target_from(expr_args(node))
 
   reckon facet_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,
@@ -2581,9 +2576,9 @@ reality RCLGeneralSelfHostCompiler {
         choose(domain_literal_target(node),
           append_all(one_instruction(45,
               find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 0))),
-              find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 1))), 1),
-            emit_expression(sequence_get(expr_args(node), 2), locals, reckons, strings, numbers, main_count, start)),
-          append_all(one_flagged_instruction(45, 0, 0, 1, 1),
+              find_text(strings, 0, expr_literal_text(sequence_get(expr_args(node), 1))), length(expr_args(node)) - 2),
+            emit_expression_array(expr_args(node), 2, locals, reckons, strings, numbers, main_count, start, empty_sequence())),
+          append_all(one_flagged_instruction(45, 0, 0, length(expr_args(node)) - 2, 1),
             emit_expression_array(expr_args(node), 0, locals, reckons, strings, numbers, main_count, start, empty_sequence()))),
         choose(expr_text(node) == "choose", emit_choose(node, locals, reckons, strings, numbers, main_count, start),
           append_all(one_instruction(

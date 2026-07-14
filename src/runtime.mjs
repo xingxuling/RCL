@@ -127,11 +127,11 @@ function _evalCore(expr, context) {
     }
     case 'CallExpr': {
       if (expr.name === 'domain_call') {
-        if (expr.args.length !== 3) throw new RCLRuntimeError('RCL_CALL_ARITY', 'domain_call expects domain, operation and request');
+        if (expr.args.length < 2) throw new RCLRuntimeError('RCL_CALL_ARITY', 'domain_call expects domain, operation and optional arguments');
         const domain = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
         const operation = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
-        const request = evaluateExpression(expr.args[2], { ...context, depth: depth + 1 });
-        return invokeInternalDomain(domain, operation, [request]);
+        const args = expr.args.slice(2).map(arg => evaluateExpression(arg, { ...context, depth: depth + 1 }));
+        return invokeInternalDomain(domain, operation, args);
       }
       if (expr.name === 'provider_call') {
         const providerId = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
@@ -349,6 +349,79 @@ function _evalCore(expr, context) {
         const value = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
         if (!Array.isArray(sequence)) throw new RCLRuntimeError('RCL_EXPECTED_SEQUENCE', 'sequence_append() expects Sequence');
         return Object.freeze([...sequence, structuredClone(value)]);
+      }
+      if (expr.name === 'sequence_append_unique') {
+        const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
+        const value = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
+        if (!Array.isArray(sequence)) throw new RCLRuntimeError('RCL_EXPECTED_SEQUENCE', 'sequence_append_unique() expects Sequence');
+        const encoded = JSON.stringify(value);
+        return Object.freeze(sequence.some(item => JSON.stringify(item) === encoded)
+          ? sequence.map(item => structuredClone(item))
+          : [...sequence.map(item => structuredClone(item)), structuredClone(value)]);
+      }
+      if (expr.name === 'sequence_unique') {
+        const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
+        if (!Array.isArray(sequence)) throw new RCLRuntimeError('RCL_EXPECTED_SEQUENCE', 'sequence_unique() expects Sequence');
+        const seen = new Set();
+        return Object.freeze(sequence.filter(item => {
+          const encoded = JSON.stringify(item);
+          if (seen.has(encoded)) return false;
+          seen.add(encoded);
+          return true;
+        }).map(item => structuredClone(item)));
+      }
+      if (expr.name === 'sequence_index_of') {
+        const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
+        const value = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
+        const start = evaluateExpression(expr.args[2], { ...context, depth: depth + 1 });
+        if (!Array.isArray(sequence) || !Number.isInteger(start) || start < 0) throw new RCLRuntimeError('RCL_SEQUENCE_SEARCH', 'sequence_index_of() expects Sequence, value and non-negative start');
+        const encoded = JSON.stringify(value);
+        return sequence.findIndex((item, index) => index >= start && JSON.stringify(item) === encoded);
+      }
+      if (expr.name === 'sequence_find_field') {
+        const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
+        const field = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
+        const value = evaluateExpression(expr.args[2], { ...context, depth: depth + 1 });
+        const start = evaluateExpression(expr.args[3], { ...context, depth: depth + 1 });
+        if (!Array.isArray(sequence) || !Number.isInteger(field) || field < 0 || !Number.isInteger(start) || start < 0) throw new RCLRuntimeError('RCL_SEQUENCE_SEARCH', 'sequence_find_field() expects Sequence, non-negative field, value and non-negative start');
+        const encoded = JSON.stringify(value);
+        return sequence.findIndex((item, index) => index >= start && Array.isArray(item) && field < item.length && JSON.stringify(item[field]) === encoded);
+      }
+      if (expr.name === 'decode_string_slice') {
+        const source = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
+        const start = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
+        const end = evaluateExpression(expr.args[2], { ...context, depth: depth + 1 });
+        if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start) throw new RCLRuntimeError('RCL_TEXT_SLICE', 'decode_string_slice() expects valid character indexes');
+        return [...source].slice(start, end).join('').replace(/\\(.)/gs, (_match, value) => ({ n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\' })[value] ?? value);
+      }
+      if (expr.name === 'compiler_tokenize') {
+        const source = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
+        const chars = [...source];
+        const tokens = [];
+        let index = 0; let line = 1; let column = 1;
+        const code = value => value?.codePointAt(0) ?? 0;
+        const identifierStart = value => /[A-Za-z_]/.test(value ?? '') || code(value) >= 0x80;
+        const identifierPart = value => /[A-Za-z0-9_]/.test(value ?? '') || code(value) >= 0x80;
+        while (index < chars.length) {
+          const ch = chars[index];
+          if (/\s/.test(ch)) { if (ch === '\n') { line += 1; column = 1; } else column += 1; index += 1; continue; }
+          if (ch === '#' || (ch === '/' && chars[index + 1] === '/')) { while (index < chars.length && chars[index] !== '\n') { index += 1; column += 1; } continue; }
+          const start = index; const tokenLine = line; const tokenColumn = column;
+          let kind = 'SYMBOL'; let textValue = null;
+          if (identifierStart(ch)) { index += 1; while (identifierPart(chars[index])) index += 1; kind = 'IDENT'; }
+          else if (/[0-9]/.test(ch)) { let dot = false; index += 1; while (/[0-9]/.test(chars[index] ?? '') || (chars[index] === '.' && !dot && (dot = true))) index += 1; kind = 'NUMBER'; }
+          else if (ch === '"') {
+            index += 1; const contentStart = index; let escaped = false;
+            while (index < chars.length) { const value = chars[index]; if (escaped) escaped = false; else if (value === '\\') escaped = true; else if (value === '"') break; index += 1; }
+            textValue = chars.slice(contentStart, index).join('').replace(/\\(.)/gs, (_match, value) => ({ n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\' })[value] ?? value);
+            if (index < chars.length) index += 1; kind = 'STRING';
+          } else { const pair = chars.slice(index, index + 2).join(''); index += ['<-', '->', '==', '!=', '<=', '>='].includes(pair) ? 2 : 1; }
+          textValue ??= chars.slice(start, index).join('');
+          for (let cursor = start; cursor < index; cursor += 1) { if (chars[cursor] === '\n') { line += 1; column = 1; } else column += 1; }
+          tokens.push(Object.freeze([kind, textValue, tokenLine, tokenColumn]));
+        }
+        tokens.push(Object.freeze(['EOF', '<eof>', line, column]));
+        return Object.freeze(tokens);
       }
       if (expr.name === 'sequence_get') {
         const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });

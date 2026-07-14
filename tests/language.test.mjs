@@ -873,15 +873,21 @@ test('native VM rejects preserve-bound violations instead of committing unsafe s
   });
 });
 
-test('native subset refuses provider domains rather than pretending full-domain execution', () => {
+test('native VM executes registered energy domains with state and transition evidence', () => {
   const source = `
   reality NativeBoundary {
     energy grid { reservoir source : Energy = joules(10) }
     energize grid
   }`;
-  const result = tryCompileRealityToBytecode(source);
-  assert.equal(result.ok, false);
-  assert.ok(result.diagnostics.some(item => item.code === 'RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED'));
+  const compiled = tryCompileRealityToBytecode(source);
+  assert.equal(compiled.ok, true);
+  const result = runRealityNative(source);
+  assert.equal(result.bytecodeVersion, '1.3');
+  assert.equal(result.state['grid.source'].__rclType, 'Quantity');
+  assert.equal(result.state['grid.source'].type, 'Energy');
+  assert.equal(result.state['grid.source'].value, 10);
+  assert.equal(result.state['grid.source'].unit, 'J');
+  assert.deepEqual(result.history[0].witnesses, ['domain:energize:grid']);
 });
 
 test('Stage-1 RCL compiler seed lowers a literal assignment and produces runnable target bytecode', () => {

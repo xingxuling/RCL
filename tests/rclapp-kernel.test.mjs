@@ -15,8 +15,9 @@ import {
 } from '../src/index.mjs';
 
 const source = fileURLToPath(new URL('../examples/hello-reality.rcl', import.meta.url));
-const packageDir = fileURLToPath(new URL('../output/test-rclapps/hello-rclapp-package', import.meta.url));
-const storeDir = fileURLToPath(new URL('../output/test-rclapps/store', import.meta.url));
+const testRoot = fileURLToPath(new URL(`../output/test-rclapps-${process.pid}`, import.meta.url));
+const packageDir = path.join(testRoot, 'hello-rclapp-package');
+const storeDir = path.join(testRoot, 'store');
 
 async function createVerifiedPackage() {
   fs.rmSync(packageDir, { recursive: true, force: true });
@@ -27,7 +28,7 @@ async function createVerifiedPackage() {
 }
 
 test('RCLApp kernel installs verifies runs lists and uninstalls a verified RCL package', async () => {
-  fs.rmSync(new URL('../output/test-rclapps', import.meta.url), { recursive: true, force: true });
+  fs.rmSync(testRoot, { recursive: true, force: true });
   await createVerifiedPackage();
 
   const directVerification = verifyRclApp(packageDir, { storeDir });
@@ -64,7 +65,7 @@ test('RCLApp kernel installs verifies runs lists and uninstalls a verified RCL p
 });
 
 test('RCLApp CLI exposes install verify run list uninstall commands', async () => {
-  const cliRoot = fileURLToPath(new URL('../output/test-rclapps/cli', import.meta.url));
+  const cliRoot = path.join(testRoot, 'cli');
   const cliPackageDir = path.join(cliRoot, 'package');
   const cliStoreDir = path.join(cliRoot, 'store');
   fs.rmSync(cliRoot, { recursive: true, force: true });
@@ -99,8 +100,8 @@ test('RCLApp CLI exposes install verify run list uninstall commands', async () =
 });
 
 test('RCLApp install rejects tampered packages before they enter the store', async () => {
-  const tamperedPackageDir = fileURLToPath(new URL('../output/test-rclapps/tampered-package', import.meta.url));
-  const tamperedStoreDir = fileURLToPath(new URL('../output/test-rclapps/tampered-store', import.meta.url));
+  const tamperedPackageDir = path.join(testRoot, 'tampered-package');
+  const tamperedStoreDir = path.join(testRoot, 'tampered-store');
   fs.rmSync(tamperedPackageDir, { recursive: true, force: true });
   fs.rmSync(tamperedStoreDir, { recursive: true, force: true });
   await packageRclSource(source, { target: 'rclapp', outputDir: tamperedPackageDir });

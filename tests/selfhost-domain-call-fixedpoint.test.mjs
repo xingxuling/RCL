@@ -43,6 +43,22 @@ test('self-hosted domain_call preserves the dynamic target ABI', { timeout: 120_
   );
 });
 
+test('self-hosted domain_call emits variadic literal and dynamic target ABI', { timeout: 120_000 }, () => {
+  const literal = compileWithParity(`reality SelfHostDomainVariadic {
+    facet result.length : Length = domain_call("quantity", "make", "Length", 2, "m")
+  }`);
+  const dynamic = compileWithParity(`reality SelfHostDomainDynamicVariadic {
+    facet target.domain : Text = "quantity"
+    facet target.operation : Text = "make"
+    facet result.length : Length = domain_call(target.domain, target.operation, "Length", 3, "m")
+  }`);
+
+  const literalInstruction = literal.instructions.find(item => item.op === OPCODES.DOMAIN_CALL);
+  const dynamicInstruction = dynamic.instructions.find(item => item.op === OPCODES.DOMAIN_CALL);
+  assert.deepEqual({ flags: literalInstruction.flags, argc: literalInstruction.c }, { flags: 0, argc: 3 });
+  assert.deepEqual({ flags: dynamicInstruction.flags, argc: dynamicInstruction.c }, { flags: 1, argc: 3 });
+});
+
 test('self-hosted required-minor selection preserves RBC 1.1 and 1.2 bytes', { timeout: 120_000 }, () => {
   const base = compileWithParity('reality SelfHostBase { facet value : Number = 1 }');
   const mod = compileWithParity('reality SelfHostMod { facet value : Number = 7 % 3 }');

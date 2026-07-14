@@ -154,6 +154,12 @@ enum {
   BUILTIN_UTF8_BYTES = 68,
   BUILTIN_HEX_BYTES = 69,
   BUILTIN_SHA256_TEXT = 70,
+  BUILTIN_SEQUENCE_APPEND_UNIQUE = 71,
+  BUILTIN_SEQUENCE_UNIQUE = 72,
+  BUILTIN_DECODE_STRING_SLICE = 73,
+  BUILTIN_COMPILER_TOKENIZE = 74,
+  BUILTIN_SEQUENCE_INDEX_OF = 75,
+  BUILTIN_SEQUENCE_FIND_FIELD = 76,
 };
 
 typedef enum {
@@ -357,6 +363,8 @@ typedef struct {
   Record history[MAX_RECORDS];
   size_t history_count;
   uint64_t executed_instructions;
+  uint8_t *tail_return_cache;
+  size_t tail_return_cache_count;
   CallFrame *frames;
   size_t frame_count;
   size_t frame_capacity;
@@ -1941,7 +1949,7 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
       case OP_CALL:
         valid = a >= 0 && (uint32_t)a < instruction_count && b >= 0; break;
       case OP_CALL_BUILTIN:
-        valid = a >= BUILTIN_CONTAINS && a <= BUILTIN_SHA256_TEXT && b >= 0 && b <= 16; break;
+        valid = a >= BUILTIN_CONTAINS && a <= BUILTIN_SEQUENCE_FIND_FIELD && b >= 0 && b <= 16; break;
       case OP_PUSH_BOOL:
         valid = a == 0 || a == 1; break;
       default: break;
@@ -2358,6 +2366,123 @@ static int hex_nibble(char ch) {
   return -1;
 }
 
+static uint32_t text_codepoint_at(const char *text, size_t byte_length, size_t character_index) {
+  size_t offset = utf8_byte_offset(text, character_index);
+  uint32_t codepoint = 0; int valid = 0;
+  utf8_decode_at(text, byte_length, offset, &codepoint, &valid);
+  return valid ? codepoint : (unsigned char)text[offset];
+}
+
+static Value decoded_string_slice(const char *text, size_t start, size_t end) {
+  size_t byte_start = utf8_byte_offset(text, start), byte_end = utf8_byte_offset(text, end);
+  char *decoded = (char *)malloc(byte_end - byte_start + 1);
+  if (!decoded) { fprintf(stderr, "out of memory\n"); exit(2); }
+  size_t input = byte_start, output = 0;
+  while (input < byte_end) {
+    if (text[input] == '\\' && input + 1 < byte_end) {
+      unsigned char escaped = (unsigned char)text[++input];
+      if (escaped == 'n') decoded[output++] = '\n';
+      else if (escaped == 'r') decoded[output++] = '\r';
+      else if (escaped == 't') decoded[output++] = '\t';
+      else decoded[output++] = (char)escaped;
+      input++;
+    } else {
+      unsigned char lead = (unsigned char)text[input];
+      uint32_t codepoint = 0; int valid = 0;
+      size_t width = lead < 0x80 ? 1 : utf8_decode_at(text, byte_end, input, &codepoint, &valid);
+      if (width == 0 || input + width > byte_end) width = 1;
+      memcpy(decoded + output, text + input, width);
+      output += width; input += width;
+    }
+  }
+  Value result = value_string_n(decoded, output);
+  free(decoded);
+  return result;
+}
+
+static Value compiler_token_node(const char *kind, Value text, size_t line, size_t column) {
+  Value node = value_sequence_empty();
+  node.sequence->items = (Value *)calloc(4, sizeof(Value));
+  if (!node.sequence->items) { value_free(&text); fprintf(stderr, "out of memory\n"); exit(2); }
+  node.sequence->count = 4;
+  node.sequence->items[0] = value_string(kind);
+  node.sequence->items[1] = text;
+  node.sequence->items[2] = value_number((double)line);
+  node.sequence->items[3] = value_number((double)column);
+  return node;
+}
+
+static Value compiler_tokenize_source(const char *source) {
+  size_t byte_length = shared_string_header(source)->byte_length;
+  size_t character_count = utf8_length(source);
+  Value result = value_sequence_empty();
+  result.sequence->items = (Value *)calloc(character_count + 1, sizeof(Value));
+  if (!result.sequence->items) { fprintf(stderr, "out of memory\n"); exit(2); }
+  size_t index = 0, line = 1, column = 1;
+  while (index < character_count) {
+    uint32_t ch = text_codepoint_at(source, byte_length, index);
+    if (ch < 0x80 && isspace((unsigned char)ch)) {
+      if (ch == '\n') { line++; column = 1; } else column++;
+      index++; continue;
+    }
+    uint32_t next = index + 1 < character_count ? text_codepoint_at(source, byte_length, index + 1) : 0;
+    if (ch == '#' || (ch == '/' && next == '/')) {
+      while (index < character_count && text_codepoint_at(source, byte_length, index) != '\n') { index++; column++; }
+      continue;
+    }
+    size_t start = index, token_line = line, token_column = column;
+    const char *kind = "SYMBOL";
+    Value text = value_null();
+    if ((ch < 0x80 && (isalpha((unsigned char)ch) || ch == '_')) || ch >= 0x80) {
+      index++;
+      while (index < character_count) {
+        uint32_t value = text_codepoint_at(source, byte_length, index);
+        if (!((value < 0x80 && (isalnum((unsigned char)value) || value == '_')) || value >= 0x80)) break;
+        index++;
+      }
+      kind = "IDENT";
+    } else if (ch < 0x80 && isdigit((unsigned char)ch)) {
+      int seen_dot = 0; index++;
+      while (index < character_count) {
+        uint32_t value = text_codepoint_at(source, byte_length, index);
+        if (value < 0x80 && isdigit((unsigned char)value)) { index++; continue; }
+        if (value == '.' && !seen_dot) { seen_dot = 1; index++; continue; }
+        break;
+      }
+      kind = "NUMBER";
+    } else if (ch == '"') {
+      int escaped = 0; index++;
+      size_t content_start = index;
+      while (index < character_count) {
+        uint32_t value = text_codepoint_at(source, byte_length, index);
+        if (escaped) { escaped = 0; index++; continue; }
+        if (value == '\\') { escaped = 1; index++; continue; }
+        if (value == '"') break;
+        index++;
+      }
+      text = decoded_string_slice(source, content_start, index);
+      if (index < character_count) index++;
+      kind = "STRING";
+    } else {
+      int two = (ch == '<' && (next == '-' || next == '='))
+        || (ch == '-' && next == '>') || (ch == '=' && next == '=')
+        || (ch == '!' && next == '=') || (ch == '>' && next == '=');
+      index += two ? 2 : 1;
+    }
+    if (text.type == VALUE_NULL) {
+      size_t byte_start = utf8_byte_offset(source, start), byte_end = utf8_byte_offset(source, index);
+      text = value_string_n(source + byte_start, byte_end - byte_start);
+    }
+    for (size_t cursor = start; cursor < index; cursor++) {
+      if (text_codepoint_at(source, byte_length, cursor) == '\n') { line++; column = 1; }
+      else column++;
+    }
+    result.sequence->items[result.sequence->count++] = compiler_token_node(kind, text, token_line, token_column);
+  }
+  result.sequence->items[result.sequence->count++] = compiler_token_node("EOF", value_string("<eof>"), line, column);
+  return result;
+}
+
 static int execute_builtin(VM *vm, int builtin, int argc) {
   if (argc < 0 || argc > 16 || vm->stack_count < (size_t)argc) { vm_fail(vm, "RCL_NATIVE_BUILTIN_ARITY", "Invalid builtin arity"); return 0; }
   Value args[16];
@@ -2434,6 +2559,104 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       if (argc != 2 || args[0].type != VALUE_SEQUENCE) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_append expects Sequence and value");
       else result = value_sequence_append(args[0].sequence, &args[1]);
       break;
+    case BUILTIN_SEQUENCE_APPEND_UNIQUE: {
+      if (argc != 2 || args[0].type != VALUE_SEQUENCE) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_append_unique expects Sequence and value"); break; }
+      sequence_materialize(args[0].sequence);
+      int found = 0;
+      for (size_t i = 0; i < args[0].sequence->count; i++) {
+        if (values_equal(&args[0].sequence->items[i], &args[1])) { found = 1; break; }
+      }
+      if (found) { result.type = VALUE_SEQUENCE; result.sequence = sequence_clone(args[0].sequence); }
+      else result = value_sequence_append(args[0].sequence, &args[1]);
+      break;
+    }
+    case BUILTIN_SEQUENCE_UNIQUE: {
+      if (argc != 1 || args[0].type != VALUE_SEQUENCE) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_unique expects one Sequence"); break; }
+      sequence_materialize(args[0].sequence);
+      result.type = VALUE_SEQUENCE;
+      result.sequence = sequence_create();
+      size_t capacity = args[0].sequence->count;
+      if (capacity > 0) {
+        result.sequence->items = (Value *)calloc(capacity, sizeof(Value));
+        if (!result.sequence->items) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate unique Sequence"); break; }
+      }
+      for (size_t i = 0; i < args[0].sequence->count; i++) {
+        int found = 0;
+        for (size_t j = 0; j < result.sequence->count; j++) {
+          if (values_equal(&result.sequence->items[j], &args[0].sequence->items[i])) { found = 1; break; }
+        }
+        if (!found) result.sequence->items[result.sequence->count++] = value_clone(&args[0].sequence->items[i]);
+      }
+      break;
+    }
+    case BUILTIN_DECODE_STRING_SLICE: {
+      if (argc != 3 || args[0].type != VALUE_STRING || args[1].type != VALUE_NUMBER || args[2].type != VALUE_NUMBER
+          || floor(args[1].number) != args[1].number || floor(args[2].number) != args[2].number) {
+        vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "decode_string_slice expects Text and integer start/end"); break;
+      }
+      int64_t start = (int64_t)args[1].number, end = (int64_t)args[2].number;
+      size_t characters = utf8_length(args[0].string);
+      if (start < 0 || end < start || (size_t)end > characters) { vm_fail(vm, "RCL_TEXT_SLICE", "decode_string_slice indexes are out of range"); break; }
+      size_t byte_start = utf8_byte_offset(args[0].string, (size_t)start);
+      size_t byte_end = utf8_byte_offset(args[0].string, (size_t)end);
+      char *decoded = (char *)malloc(byte_end - byte_start + 1);
+      if (!decoded) { vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate decoded string"); break; }
+      size_t input = byte_start, output = 0;
+      while (input < byte_end) {
+        if (args[0].string[input] == '\\' && input + 1 < byte_end) {
+          unsigned char escaped = (unsigned char)args[0].string[++input];
+          if (escaped == 'n') decoded[output++] = '\n';
+          else if (escaped == 'r') decoded[output++] = '\r';
+          else if (escaped == 't') decoded[output++] = '\t';
+          else decoded[output++] = (char)escaped;
+          input++;
+        } else {
+          unsigned char lead = (unsigned char)args[0].string[input];
+          uint32_t codepoint = 0; int valid = 0;
+          size_t width = lead < 0x80 ? 1 : utf8_decode_at(args[0].string, byte_end, input, &codepoint, &valid);
+          if (width == 0 || input + width > byte_end) width = 1;
+          memcpy(decoded + output, args[0].string + input, width);
+          output += width; input += width;
+        }
+      }
+      decoded[output] = '\0';
+      result = value_string_n(decoded, output);
+      free(decoded);
+      break;
+    }
+    case BUILTIN_COMPILER_TOKENIZE:
+      if (argc != 1 || args[0].type != VALUE_STRING) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "compiler_tokenize expects source Text");
+      else result = compiler_tokenize_source(args[0].string);
+      break;
+    case BUILTIN_SEQUENCE_INDEX_OF: {
+      if (argc != 3 || args[0].type != VALUE_SEQUENCE || args[2].type != VALUE_NUMBER || floor(args[2].number) != args[2].number || args[2].number < 0) {
+        vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_index_of expects Sequence, value and non-negative integer start"); break;
+      }
+      sequence_materialize(args[0].sequence);
+      int64_t found = -1;
+      for (size_t i = (size_t)args[2].number; i < args[0].sequence->count; i++) {
+        if (values_equal(&args[0].sequence->items[i], &args[1])) { found = (int64_t)i; break; }
+      }
+      result = value_number((double)found);
+      break;
+    }
+    case BUILTIN_SEQUENCE_FIND_FIELD: {
+      if (argc != 4 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_NUMBER || args[3].type != VALUE_NUMBER
+          || floor(args[1].number) != args[1].number || floor(args[3].number) != args[3].number || args[1].number < 0 || args[3].number < 0) {
+        vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_find_field expects Sequence, non-negative integer field, value and non-negative integer start"); break;
+      }
+      sequence_materialize(args[0].sequence);
+      size_t field = (size_t)args[1].number;
+      int64_t found = -1;
+      for (size_t i = (size_t)args[3].number; i < args[0].sequence->count; i++) {
+        const Value *item = &args[0].sequence->items[i];
+        if (item->type != VALUE_SEQUENCE) continue;
+        sequence_materialize(item->sequence);
+        if (field < item->sequence->count && values_equal(&item->sequence->items[field], &args[2])) { found = (int64_t)i; break; }
+      }
+      result = value_number((double)found);
+      break;
+    }
     case BUILTIN_SEQUENCE_GET: {
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_NUMBER || floor(args[1].number) != args[1].number) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_get expects Sequence and integer index"); break; }
       int64_t index = (int64_t)args[1].number;
@@ -2615,20 +2838,15 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     case BUILTIN_SEQUENCE_CONCAT:
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_SEQUENCE) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_concat expects two Sequences");
       else {
-        result.type = VALUE_SEQUENCE;
-        result.sequence = sequence_create();
-        sequence_materialize(args[0].sequence);
         sequence_materialize(args[1].sequence);
         if (args[0].sequence->count > SIZE_MAX - args[1].sequence->count) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Concatenated Sequence is too large"); break; }
-        size_t count = args[0].sequence->count + args[1].sequence->count;
-        if (count > 0) {
-          result.sequence->items = (Value *)calloc(count, sizeof(Value));
-          if (!result.sequence->items) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate concatenated Sequence items"); break; }
+        result.type = VALUE_SEQUENCE;
+        result.sequence = sequence_clone(args[0].sequence);
+        for (size_t i = 0; i < args[1].sequence->count; i++) {
+          Value appended = value_sequence_append(result.sequence, &args[1].sequence->items[i]);
+          sequence_free(result.sequence);
+          result.sequence = appended.sequence;
         }
-        result.sequence->count = count;
-        size_t out = 0;
-        for (size_t i = 0; i < args[0].sequence->count; i++) result.sequence->items[out++] = value_clone(&args[0].sequence->items[i]);
-        for (size_t i = 0; i < args[1].sequence->count; i++) result.sequence->items[out++] = value_clone(&args[1].sequence->items[i]);
       }
       break;
     case BUILTIN_BYTES_U8:
@@ -2764,21 +2982,36 @@ static ProviderRegistration *find_provider(VM *vm, const char *provider_id) {
   return NULL;
 }
 
-static int call_continuation_returns(const VM *vm, uint32_t pc) {
+static int call_continuation_returns(VM *vm, uint32_t pc) {
+  uint32_t origin = pc;
+  if (pc < vm->tail_return_cache_count && vm->tail_return_cache[pc] != 0) return vm->tail_return_cache[pc] == 2;
+  int returns = 0;
   for (uint32_t hops = 0; hops < vm->program.instruction_count && pc < vm->program.instruction_count; hops++) {
     const Instruction *instruction = &vm->program.instructions[pc];
-    if (instruction->op == OP_RETURN) return 1;
+    if (instruction->op == OP_RETURN) { returns = 1; break; }
     if (instruction->op == OP_NOP) { pc++; continue; }
-    if (instruction->op != OP_JUMP || instruction->a < 0 || (uint32_t)instruction->a >= vm->program.instruction_count) return 0;
+    if (instruction->op != OP_JUMP || instruction->a < 0 || (uint32_t)instruction->a >= vm->program.instruction_count) break;
     pc = (uint32_t)instruction->a;
   }
-  return 0;
+  if (origin < vm->tail_return_cache_count) vm->tail_return_cache[origin] = returns ? 2 : 1;
+  return returns;
 }
 
 static int execute_program(VM *vm) {
   uint32_t pc = 0;
+  if (vm->tail_return_cache_count != vm->program.instruction_count) {
+    free(vm->tail_return_cache);
+    vm->tail_return_cache = (uint8_t *)calloc(vm->program.instruction_count ? vm->program.instruction_count : 1, sizeof(uint8_t));
+    if (!vm->tail_return_cache) { vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate tail-call cache"); return 0; }
+    vm->tail_return_cache_count = vm->program.instruction_count;
+  }
   while (pc < vm->program.instruction_count && !vm->error.code) {
-    if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded (500000000)"); break; }
+    if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) {
+      char budget_message[192];
+      snprintf(budget_message, sizeof(budget_message), "Native VM instruction budget exceeded at pc=%u stack=%zu frames=%zu", pc, vm->stack_count, vm->frame_count);
+      vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", budget_message);
+      break;
+    }
     Instruction instruction = vm->program.instructions[pc++];
     Value left, right, value, result;
     int comparison;
@@ -3261,6 +3494,9 @@ static void vm_free(VM *vm) {
   vm->frames = NULL;
   vm->frame_count = 0;
   vm->frame_capacity = 0;
+  free(vm->tail_return_cache);
+  vm->tail_return_cache = NULL;
+  vm->tail_return_cache_count = 0;
   state_free(&vm->state);
   for (size_t i = 0; i < vm->warrant_count; i++) { free(vm->warrants[i].subject); free(vm->warrants[i].capability); free(vm->warrants[i].target); }
   transaction_reset(&vm->tx);
@@ -3471,6 +3707,10 @@ size_t rclvm_instance_get_peak_stack_depth(const RclVmInstance *instance) {
 
 size_t rclvm_instance_get_peak_call_frame_depth(const RclVmInstance *instance) {
   return instance ? instance->vm.peak_frame_count : 0;
+}
+
+uint64_t rclvm_instance_get_executed_instruction_count(const RclVmInstance *instance) {
+  return instance ? instance->vm.executed_instructions : 0;
 }
 
 void rclvm_free_string(char *value) { free(value); }

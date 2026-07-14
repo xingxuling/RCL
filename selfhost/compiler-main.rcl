@@ -1,7 +1,6 @@
   facet compiler.source : Text = provider_call("compiler_input", "source", "{}")
   facet compiler.tokens : Sequence = tokenize(compiler.source)
   facet compiler.program : Sequence = parse_program(compiler.tokens)
-  facet compiler.canonical : Text = canonical_program(compiler.program)
   facet compiler.root : Text = program_root(compiler.program)
   facet compiler.strings : Sequence = build_string_pool(compiler.program, compiler.root)
   facet compiler.numbers : Sequence = build_number_pool(compiler.program)

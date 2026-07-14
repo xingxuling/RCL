@@ -56,6 +56,36 @@ test('native VM dispatches literal and dynamic internal domain calls', () => {
   assert.equal(dynamic.state['result.value'], 'hello');
 });
 
+test('domain_call forwards variadic arguments through reference and native runtimes', async () => {
+  const source = `reality DomainVariadic {
+    facet result.length : Length = domain_call("quantity", "make", "Length", 2, "m")
+  }`;
+  const decoded = decodeBytecode(compileRealityToBytecode(source));
+  const instruction = decoded.instructions.find(item => item.op === OPCODES.DOMAIN_CALL);
+  const reference = await runReality(source);
+  const native = runNativeBytecode(compileRealityToBytecode(source));
+
+  assert.equal(instruction.c, 3);
+  assert.equal(reference.state['result.length'].value, 2);
+  assert.equal(reference.state['result.length'].unit, 'm');
+  assert.equal(native.state['result.length'].value, 2);
+  assert.equal(native.state['result.length'].unit, 'm');
+});
+
+test('domain_call supports a dynamic target with variadic arguments', () => {
+  const source = `reality DomainDynamicVariadic {
+    facet target.domain : Text = "quantity"
+    facet target.operation : Text = "make"
+    facet result.length : Length = domain_call(target.domain, target.operation, "Length", 3, "m")
+  }`;
+  const decoded = decodeBytecode(compileRealityToBytecode(source));
+  const instruction = decoded.instructions.find(item => item.op === OPCODES.DOMAIN_CALL);
+  const native = runNativeBytecode(compileRealityToBytecode(source));
+
+  assert.deepEqual({ flags: instruction.flags, argc: instruction.c }, { flags: 1, argc: 3 });
+  assert.equal(native.state['result.length'].value, 3);
+});
+
 test('Quantify, Observe and Learn lower the small-data agent into RBC 1.3', () => {
   const source = fs.readFileSync(path.join(ROOT, 'examples', 'small-data-agent.rcl'), 'utf8');
   const decoded = decodeBytecode(compileRealityToBytecode(source));

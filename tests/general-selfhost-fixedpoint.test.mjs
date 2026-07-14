@@ -36,6 +36,37 @@ function bytesF64(value) {
   return [...buffer];
 }
 
+const encodedEqual = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+
+function compilerTokenize(sourceValue) {
+  const chars = [...String(sourceValue)];
+  const tokens = [];
+  let index = 0; let line = 1; let column = 1;
+  const code = value => value?.codePointAt(0) ?? 0;
+  const identifierStart = value => /[A-Za-z_]/.test(value ?? '') || code(value) >= 0x80;
+  const identifierPart = value => /[A-Za-z0-9_]/.test(value ?? '') || code(value) >= 0x80;
+  while (index < chars.length) {
+    const ch = chars[index];
+    if (/\s/.test(ch)) { if (ch === '\n') { line += 1; column = 1; } else column += 1; index += 1; continue; }
+    if (ch === '#' || (ch === '/' && chars[index + 1] === '/')) { while (index < chars.length && chars[index] !== '\n') { index += 1; column += 1; } continue; }
+    const start = index; const tokenLine = line; const tokenColumn = column;
+    let kind = 'SYMBOL'; let textValue = null;
+    if (identifierStart(ch)) { index += 1; while (identifierPart(chars[index])) index += 1; kind = 'IDENT'; }
+    else if (/[0-9]/.test(ch)) { let dot = false; index += 1; while (/[0-9]/.test(chars[index] ?? '') || (chars[index] === '.' && !dot && (dot = true))) index += 1; kind = 'NUMBER'; }
+    else if (ch === '"') {
+      index += 1; const contentStart = index; let escaped = false;
+      while (index < chars.length) { const value = chars[index]; if (escaped) escaped = false; else if (value === '\\') escaped = true; else if (value === '"') break; index += 1; }
+      textValue = chars.slice(contentStart, index).join('').replace(/\\(.)/gs, (_match, value) => ({ n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\' })[value] ?? value);
+      if (index < chars.length) index += 1; kind = 'STRING';
+    } else { const pair = chars.slice(index, index + 2).join(''); index += ['<-', '->', '==', '!=', '<=', '>='].includes(pair) ? 2 : 1; }
+    textValue ??= chars.slice(start, index).join('');
+    for (let cursor = start; cursor < index; cursor += 1) { if (chars[cursor] === '\n') { line += 1; column = 1; } else column += 1; }
+    tokens.push([kind, textValue, tokenLine, tokenColumn]);
+  }
+  tokens.push(['EOF', '<eof>', line, column]);
+  return tokens;
+}
+
 function callBuiltin(id, args) {
   switch (id) {
     case 1: return String(args[0]).includes(String(args[1]));
@@ -83,6 +114,12 @@ function callBuiltin(id, args) {
     case 68: return [...Buffer.from(String(args[0]), 'utf8')];
     case 69: return [...Buffer.from(String(args[0]), 'hex')];
     case 70: return crypto.createHash('sha256').update(String(args[0])).digest('hex');
+    case 71: return args[0].some(item => encodedEqual(item, args[1])) ? [...args[0]] : [...args[0], args[1]];
+    case 72: return args[0].filter((item, index, items) => items.findIndex(candidate => encodedEqual(candidate, item)) === index);
+    case 73: return [...String(args[0])].slice(args[1], args[2]).join('').replace(/\\(.)/gs, (_match, value) => ({ n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\' })[value] ?? value);
+    case 74: return compilerTokenize(args[0]);
+    case 75: return args[0].findIndex((item, index) => index >= args[2] && encodedEqual(item, args[1]));
+    case 76: return args[0].findIndex((item, index) => index >= args[3] && Array.isArray(item) && args[1] < item.length && encodedEqual(item[args[1]], args[2]));
     default: throw new Error(`Test RBC host does not implement builtin ${id}`);
   }
 }

@@ -270,8 +270,9 @@ int main(int argc, char **argv) {
     print_json_string(stdout, output_state);
     fprintf(
       stdout,
-      ",\"bytes\":%zu,\"peakStackDepth\":%zu,\"peakCallFrames\":%zu,\"output\":",
+      ",\"bytes\":%zu,\"instructions\":%llu,\"peakStackDepth\":%zu,\"peakCallFrames\":%zu,\"output\":",
       output_length,
+      (unsigned long long)rclvm_instance_get_executed_instruction_count(instance),
       rclvm_instance_get_peak_stack_depth(instance),
       rclvm_instance_get_peak_call_frame_depth(instance)
     );
