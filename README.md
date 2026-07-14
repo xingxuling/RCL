@@ -5,6 +5,8 @@
 
 > Canonical source: `xingxuling/RCL@main`. The verified ceiling is Stage40 native-core RCL self-hosting. Whole-language runtime self-hosting and byte identity with downstream copies are not claimed; see `VERSION-CONTRACT.json`.
 
+> Release-history sections below are historical records and do not represent the current `main` state. Current release facts are defined by `package.json`, `CURRENT-STATUS.md`, and `VERSION-CONTRACT.json`.
+
 
 RCL stopped borrowing its compiler.
 
