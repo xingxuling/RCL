@@ -1,0 +1,33 @@
+{
+  "format": "taowind.canonical-language-source-contract.v1",
+  "repository": "xingxuling/RCL",
+  "canonicalBranch": "main",
+  "canonical": true,
+  "package": "@taowind/rcl-reality-forge",
+  "packageVersion": "0.94.0-alpha.1",
+  "verifiedCeiling": "Stage40 native-core RCL self-hosting",
+  "claims": {
+    "nativeCoreSelfHosting": true,
+    "wholeLanguageRuntimeSelfHosting": false,
+    "advancedDomainRuntime": "JavaScript",
+    "downstreamByteIdentity": false
+  },
+  "downstreamCopies": [
+    {
+      "repository": "xingxuling/RNCS-Unified-Platform-",
+      "path": "packages/languages/reality-computation-language",
+      "relation": "embedded extension delta; synchronize before byte-identity claims"
+    },
+    {
+      "repository": "xingxuling/zhinao",
+      "path": "vendor/rcl",
+      "relation": "vendored snapshot; current audit observed Stage39 pending sync"
+    }
+  ],
+  "verificationCommands": [
+    "npm run verify:version-contract",
+    "npm test",
+    "npm run verify:selfhost-fixedpoint",
+    "npm run verify:selfhost-examples"
+  ]
+}
