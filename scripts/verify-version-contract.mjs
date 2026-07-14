@@ -32,7 +32,7 @@ for (const command of contractJson.verificationCommands ?? []) {
     if (!packageJson.scripts?.[scriptName]) errors.push(`missing npm script: ${scriptName}`);
   }
 }
-await access(path.join(root, "native", "Makefile")).catch(() => errors.push("native/Makefile is missing"));
+await access(path.join(root, "native", "Makefile")).catch(() => errors.push("native/Makefile is missing"));\nawait access(path.join(root, "native", "native-windows-manifest.json")).catch(() => errors.push("native/native-windows-manifest.json is missing"));\nawait access(path.join(root, "selfhost", "rcl-dual-need-stage40.rcl")).catch(() => errors.push("Stage40 fixture is missing"));\nawait access(path.join(root, "tests", "stage40-dual-need.test.mjs")).catch(() => errors.push("Stage40 test is missing"));
 await access(path.join(root, "selfhost")).catch(() => errors.push("selfhost directory is missing"));
 
 const report = {
@@ -40,7 +40,7 @@ const report = {
   repository: contractJson.repository,
   canonicalBranch: contractJson.canonicalBranch,
   packageVersion: packageJson.version,
-  verifiedCeiling: contractJson.verifiedCeiling,
+  verifiedCeiling: contractJson.verifiedCeiling,\n  windowsExecutionVerified: contractJson.boundary?.windowsExecutionVerified ?? false,
   errors
 };
 console.log(JSON.stringify(report, null, 2));
