@@ -36,5 +36,5 @@ test('Energy native parity compares semantic state rather than heap metadata', {
   assert.equal(parity.ok, true);
   assert.equal(parity.parity.state, true);
   assert.equal(parity.parity.historySemantics, true);
-  assert.equal(parity.parity.rawRoots, false);
+  assert.equal(parity.parity.rawRoots, true);
 });

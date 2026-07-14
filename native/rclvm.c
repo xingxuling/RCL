@@ -951,8 +951,13 @@ static Value domain_language_intent(VM *vm, const Value *args, size_t argc) {
   Value fields[] = {
     value_string("Intent"), value_clone(&args[0]), value_clone(&args[1]), value_clone(&args[2]), value_clone(&args[3]),
     value_number(args[1].boolean ? args[4].number : 0), value_clone(&args[5]), value_clone(&args[6]),
-    value_clone(&args[7]), value_clone(&args[8]),
+    value_null(), value_clone(&args[8]),
   };
+  fields[8] = domain_compact_map(vm, &args[7], "language.intent", "slots");
+  if (vm->error.code) {
+    for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
+    return value_null();
+  }
   Value result = domain_make_typed_record(vm, "Intent", names, fields, sizeof(fields) / sizeof(fields[0]));
   for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); i++) value_free(&fields[i]);
   return result;
@@ -1739,6 +1744,76 @@ static void value_json_sb(StringBuilder *sb, const Value *value) {
   }
 }
 
+typedef struct {
+  const char *name;
+  size_t index;
+} SemanticFieldRef;
+
+static int compare_semantic_field_refs(const void *left, const void *right) {
+  const SemanticFieldRef *a = (const SemanticFieldRef *)left;
+  const SemanticFieldRef *b = (const SemanticFieldRef *)right;
+  return strcmp(a->name, b->name);
+}
+
+static void semantic_value_json_sb(StringBuilder *sb, const Value *value);
+
+static void semantic_typed_record_json_sb(StringBuilder *sb, const TypedRecord *record) {
+  SemanticFieldRef *fields = (SemanticFieldRef *)malloc(sizeof(SemanticFieldRef) * (record->field_count ? record->field_count : 1));
+  if (!fields) { fprintf(stderr, "out of memory\n"); exit(2); }
+  for (size_t i = 0; i < record->field_count; i++) fields[i] = (SemanticFieldRef){ record->field_names[i], i };
+  qsort(fields, record->field_count, sizeof(SemanticFieldRef), compare_semantic_field_refs);
+  sb_append_char(sb, '{');
+  for (size_t i = 0; i < record->field_count; i++) {
+    if (i) sb_append_char(sb, ',');
+    json_escape_sb(sb, fields[i].name);
+    sb_append_char(sb, ':');
+    semantic_value_json_sb(sb, &record->field_values[fields[i].index]);
+  }
+  sb_append_char(sb, '}');
+  free(fields);
+}
+
+static void semantic_value_json_sb(StringBuilder *sb, const Value *value) {
+  switch (value->type) {
+    case VALUE_SEQUENCE:
+      sb_append_char(sb, '[');
+      sequence_materialize(value->sequence);
+      for (size_t i = 0; value->sequence && i < value->sequence->count; i++) {
+        if (i) sb_append_char(sb, ',');
+        semantic_value_json_sb(sb, &value->sequence->items[i]);
+      }
+      sb_append_char(sb, ']');
+      break;
+    case VALUE_TYPED_RECORD:
+      semantic_typed_record_json_sb(sb, value->typed_record);
+      break;
+    case VALUE_TYPED_UNION:
+      sb_append(sb, "{\"payload\":[");
+      for (size_t i = 0; i < value->typed_union->payload_count; i++) {
+        if (i) sb_append_char(sb, ',');
+        semantic_value_json_sb(sb, &value->typed_union->payload[i]);
+      }
+      sb_append(sb, "],\"variant\":");
+      json_escape_sb(sb, value->typed_union->variant);
+      sb_append_char(sb, '}');
+      break;
+    case VALUE_TYPED_REF:
+      sb_append(sb, "{\"__rclRefKind\":");
+      json_escape_sb(sb, value->typed_ref->target_kind);
+      sb_append(sb, ",\"__rclRefObjectId\":");
+      char number[64];
+      snprintf(number, sizeof(number), "%" PRIu64, value->typed_ref->object_id);
+      sb_append(sb, number);
+      sb_append(sb, ",\"__rclRefType\":");
+      json_escape_sb(sb, value->typed_ref->type_name);
+      sb_append_char(sb, '}');
+      break;
+    default:
+      value_json_sb(sb, value);
+      break;
+  }
+}
+
 static int compare_entry_ptrs(const void *left, const void *right) {
   const StateEntry *const *a = (const StateEntry *const *)left;
   const StateEntry *const *b = (const StateEntry *const *)right;
@@ -1759,6 +1834,25 @@ static void state_json_sb(StringBuilder *sb, const State *state) {
     json_escape_sb(sb, sorted[i]->key);
     sb_append_char(sb, ':');
     value_json_sb(sb, &sorted[i]->value);
+  }
+  sb_append_char(sb, '}');
+  free(sorted);
+}
+
+static void semantic_state_json_sb(StringBuilder *sb, const State *state) {
+  StateEntry **sorted = NULL;
+  if (state->count) {
+    sorted = (StateEntry **)malloc(sizeof(StateEntry *) * state->count);
+    if (!sorted) { fprintf(stderr, "out of memory\n"); exit(2); }
+    for (size_t i = 0; i < state->count; i++) sorted[i] = (StateEntry *)&state->entries[i];
+    qsort(sorted, state->count, sizeof(StateEntry *), compare_entry_ptrs);
+  }
+  sb_append_char(sb, '{');
+  for (size_t i = 0; i < state->count; i++) {
+    if (i) sb_append_char(sb, ',');
+    json_escape_sb(sb, sorted[i]->key);
+    sb_append_char(sb, ':');
+    semantic_value_json_sb(sb, &sorted[i]->value);
   }
   sb_append_char(sb, '}');
   free(sorted);
@@ -1801,7 +1895,7 @@ cleanup:
 static void state_root(const State *state, char output[65]) {
   StringBuilder sb;
   sb_init(&sb);
-  state_json_sb(&sb, state);
+  semantic_state_json_sb(&sb, state);
   unsigned char digest[RCL_SHA256_DIGEST_LENGTH];
   if (!rcl_sha256((const unsigned char *)sb.data, sb.length, digest)) {
     fprintf(stderr, "{\"status\":\"error\",\"code\":\"RCL_NATIVE_SHA256\",\"message\":\"SHA256 calculation failed\"}\n");
@@ -1810,6 +1904,40 @@ static void state_root(const State *state, char output[65]) {
   for (int i = 0; i < RCL_SHA256_DIGEST_LENGTH; i++) snprintf(output + i * 2, 3, "%02x", digest[i]);
   output[64] = '\0';
   free(sb.data);
+}
+
+static int domain_root_argument_index(const char *domain, const char *operation, size_t argc) {
+  if (!domain || !operation) return -1;
+  if (strcmp(domain, "knowledge") == 0 && strcmp(operation, "claim") == 0 && argc == 10) return 9;
+  if (strcmp(domain, "language") == 0 && strcmp(operation, "utterance") == 0 && argc == 6) return 5;
+  if (strcmp(domain, "language") == 0 && strcmp(operation, "intent") == 0 && argc == 9) return 8;
+  if (strcmp(domain, "understanding") == 0 && strcmp(operation, "model") == 0 && argc == 10) return 9;
+  if (strcmp(domain, "creation") == 0 && strcmp(operation, "candidate") == 0 && argc == 11) return 10;
+  return -1;
+}
+
+static void materialize_domain_root(VM *vm, const char *domain, const char *operation, size_t argc, Value *args) {
+  const int index = domain_root_argument_index(domain, operation, argc);
+  if (index < 0 || args[index].type != VALUE_STRING || args[index].string[0] != '\0') return;
+  State projected;
+  if (!state_clone_into(&projected, &vm->state)) {
+    vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot clone projected state for domain root");
+    return;
+  }
+  if (vm->tx.active) {
+    for (size_t i = 0; i < vm->tx.change_count; i++) {
+      if (!state_set(&projected, vm->tx.changes[i].target, &vm->tx.changes[i].after)) {
+        state_free(&projected);
+        vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot apply transaction changes for domain root");
+        return;
+      }
+    }
+  }
+  char root[65];
+  state_root(&projected, root);
+  state_free(&projected);
+  value_free(&args[index]);
+  args[index] = value_string(root);
 }
 
 static int read_exact(FILE *file, void *target, size_t length) { return fread(target, 1, length, file) == length; }
@@ -3235,6 +3363,7 @@ static int execute_program(VM *vm) {
             operation = operation_value->string;
           }
         }
+        if (!vm->error.code) materialize_domain_root(vm, domain, operation, argc, &vm->stack[argument_start]);
         Value domain_result = vm->error.code
           ? value_null()
           : dispatch_domain_operation(vm, domain, operation, &vm->stack[argument_start], argc);

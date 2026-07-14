@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
@@ -50,7 +51,7 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
       const payload = parsePayload(result.stderr.trim(), { code: 'RCL_NATIVE_PROCESS', message: result.stderr.trim() || `Native VM exited with ${result.status}` });
       throw new RCLNativeVMError(payload, { status: result.status, stdout: result.stdout, stderr: result.stderr });
     }
-    return parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout });
+    return normalizeNativeEvidence(parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout }));
   } finally {
     if (temporaryDir) fs.rmSync(temporaryDir, { recursive: true, force: true });
   }
@@ -128,6 +129,82 @@ function semanticChanges(record) {
 
 function historySemanticallyMatches(nativeRecord, referenceRecord) {
   return equalJson(semanticChanges(nativeRecord), semanticChanges(referenceRecord));
+}
+
+function semanticRoot(value) {
+  return createHash('sha256').update(JSON.stringify(canonicalJson(semanticValue(value)))).digest('hex');
+}
+
+function hydrateFormedAtRoots(value, root) {
+  if (Array.isArray(value)) return value.map(item => hydrateFormedAtRoots(item, root));
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.entries(value).map(([key, nested]) => [
+    key,
+    key === 'formedAtRoot' && nested === '' ? root : hydrateFormedAtRoots(nested, root),
+  ]));
+}
+
+function normalizeNativeValue(value) {
+  if (Array.isArray(value)) return value.map(normalizeNativeValue);
+  if (!value || typeof value !== 'object') return value;
+  const normalized = Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, normalizeNativeValue(nested)]));
+  if (normalized.kind === 'Intent' && Array.isArray(normalized.slots) && normalized.slots.length % 2 === 0
+      && normalized.slots.every((item, index) => index % 2 === 0 ? typeof item === 'string' : true)) {
+    normalized.slots = Object.fromEntries(normalized.slots.reduce((pairs, item, index, slots) => {
+      if (index % 2 === 0) pairs.push([item, slots[index + 1]]);
+      return pairs;
+    }, []));
+  }
+  return normalized;
+}
+
+function normalizeNativeEvidence(result) {
+  if (!result) return result;
+  result.state = normalizeNativeValue(result.state ?? {});
+  result.history = (result.history ?? []).map(record => ({
+    ...record,
+    changes: (record.changes ?? []).map(change => ({
+      ...change,
+      before: normalizeNativeValue(change.before),
+      after: normalizeNativeValue(change.after),
+    })),
+  }));
+  result.projections = (result.projections ?? []).map(record => ({
+    ...record,
+    changes: (record.changes ?? []).map(change => ({
+      ...change,
+      before: normalizeNativeValue(change.before),
+      after: normalizeNativeValue(change.after),
+    })),
+  }));
+  if (result.history.length === 0) return result;
+  const state = structuredClone(result.state);
+
+  // Reconstruct the initial flat state from native before-values, then replay
+  // forward so evidence roots are based on semantic state rather than VM heap ids.
+  for (let index = result.history.length - 1; index >= 0; index -= 1) {
+    for (const change of [...(result.history[index].changes ?? [])].reverse()) {
+      if (change.before === null) delete state[change.target];
+      else state[change.target] = structuredClone(change.before);
+    }
+  }
+
+  for (const record of result.history) {
+    const before = structuredClone(state);
+    const beforeRoot = semanticRoot(before);
+    for (const change of record.changes ?? []) {
+      change.before = Object.prototype.hasOwnProperty.call(state, change.target)
+        ? structuredClone(state[change.target])
+        : null;
+      change.after = hydrateFormedAtRoots(change.after, semanticRoot(state));
+      if (change.after === null) delete state[change.target];
+      else state[change.target] = structuredClone(change.after);
+    }
+    record.beforeRoot = beforeRoot;
+    record.afterRoot = semanticRoot(state);
+  }
+  result.state = state;
+  return result;
 }
 
 export async function verifyNativeParity(source, options = {}) {

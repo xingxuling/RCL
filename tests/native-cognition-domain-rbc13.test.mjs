@@ -95,7 +95,7 @@ test('native RBC 1.3 cognition domains construct JS-parity typed records', () =>
   assert.deepEqual(result.state['utterance.result'].evidence, ['evidence-a']);
   assert.equal(result.state['utterance.result'].__rclType, 'Utterance');
   assert.equal(result.state['intent.result'].confidence, 0);
-  assert.deepEqual(result.state['intent.result'].slots, ['topic', 'runtime']);
+  assert.deepEqual(result.state['intent.result'].slots, { topic: 'runtime' });
   assert.equal(result.state['understanding.result'].__rclType, 'Understand<Text>');
   assert.deepEqual(result.state['understanding.result'].dependencies, ['dependency-a']);
   assert.equal(result.state['candidate.result'].__rclType, 'Create<Text>');
