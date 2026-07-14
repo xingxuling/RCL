@@ -25,6 +25,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Verify canonical-source contract
         run: npm run verify:version-contract
+      - name: Build native host
+        run: npm run build:native
       - name: Verify Stage40 boundary
         run: npm run verify:selfhost-stage40
       - name: Verify native platform boundary
