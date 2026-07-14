@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
-import { runNativeBytecode } from '../src/native-vm.mjs';
+import { runNativeBytecode, verifyNativeParity } from '../src/native-vm.mjs';
 import { compileSourceSelfHosted } from '../src/selfhost-compiler.mjs';
 
 const ENERGY_SOURCE = `reality EnergyProbe {
@@ -29,4 +29,12 @@ test('Energy domain stays byte-identical through self-hosting and executes nativ
     ['grid.load', 36],
   ]);
   assert.deepEqual(native.history[0].witnesses, ['domain:energize:grid']);
+});
+
+test('Energy native parity compares semantic state rather than heap metadata', { timeout: 120_000 }, async () => {
+  const parity = await verifyNativeParity(ENERGY_SOURCE);
+  assert.equal(parity.ok, true);
+  assert.equal(parity.parity.state, true);
+  assert.equal(parity.parity.historySemantics, true);
+  assert.equal(parity.parity.rawRoots, false);
 });

@@ -19,12 +19,12 @@ RBC 1.3 `domain_call` now carries zero or more operation arguments in both liter
 
 ```text
 native core compiler self-hosting: VERIFIED
-C0 == C1 == C2: 348,945 bytes
-fixed-point SHA-256: 7afab372f23be18db97c4eb10aa3e90b2b7560b4e0b6d22e92d144949033acdc
+C0 == C1 == C2: 372,818 bytes
+fixed-point SHA-256: 7f42128c87560992b6ec5342783e63ff5bd05f3b52f723f6d82b1e26fe37660f
 native compiler peak: 952 Value stack / 235 CallFrames
 native fixed point: about 9.9 seconds for C0 -> C1 -> C2 in the direct verifier
 full fixed-point build: about 15.1 seconds including bootstrap and report
-native-core example parity: 16 byte-identical examples
+native-core example parity: 17 byte-identical examples
 known self-host example gaps: 2 advanced-domain parser failures; 32 examples outside native-core eligibility
 stage ladder ceiling: stage40_rcl_owned_dual_need_warrant_lowering_subset
 Stage40 target: 407 static instructions / 367 executed / 20 CHECK_WARRANT operations

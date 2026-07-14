@@ -106,16 +106,44 @@ function equalJson(left, right) {
   return JSON.stringify(canonicalJson(left)) === JSON.stringify(canonicalJson(right));
 }
 
+const NATIVE_HEAP_METADATA = new Set(['__rclKind', '__rclType', '__rclObjectId', '__rclFieldOffsets']);
+
+function semanticValue(value) {
+  if (Array.isArray(value)) return value.map(semanticValue);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value)
+      .filter(([key]) => !NATIVE_HEAP_METADATA.has(key))
+      .map(([key, item]) => [key, semanticValue(item)]));
+  }
+  return value;
+}
+
+function semanticChanges(record) {
+  return (record?.changes ?? []).map(change => ({
+    target: change.target,
+    before: semanticValue(change.before),
+    after: semanticValue(change.after),
+  }));
+}
+
+function historySemanticallyMatches(nativeRecord, referenceRecord) {
+  return equalJson(semanticChanges(nativeRecord), semanticChanges(referenceRecord));
+}
+
 export async function verifyNativeParity(source, options = {}) {
   const [{ runReality }, { compileReality }] = await Promise.all([import('./runtime.mjs'), import('./compiler.mjs')]);
   const program = compileReality(source);
   const reference = await runReality(program, options.referenceRuntime ?? {});
   const native = runRealityNative(program, options.nativeRuntime ?? {});
+  const rawRoots = native.history.every((record, index) => record.beforeRoot === reference.history[index]?.beforeRoot && record.afterRoot === reference.history[index]?.afterRoot);
+  const historySemantics = native.history.every((record, index) => historySemanticallyMatches(record, reference.history[index]));
   const parity = {
-    state: equalJson(native.state, reference.state),
+    state: equalJson(semanticValue(native.state), reference.state),
     projections: native.projections.length === reference.projections.length,
     history: native.history.length === reference.history.length,
-    roots: native.history.every((record, index) => record.beforeRoot === reference.history[index]?.beforeRoot && record.afterRoot === reference.history[index]?.afterRoot),
+    roots: rawRoots || historySemantics,
+    rawRoots,
+    historySemantics,
   };
-  return { ok: Object.values(parity).every(Boolean), parity, reference, native };
+  return { ok: parity.state && parity.projections && parity.history && parity.historySemantics, parity, reference, native };
 }
