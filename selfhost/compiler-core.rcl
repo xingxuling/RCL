@@ -1048,6 +1048,92 @@ reality RCLGeneralSelfHostCompiler {
   reckon parse_creation(tokens : Sequence, index : Number) -> Sequence =
     parse_creation_body(tokens, index + 3, make_creation(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence()))
 
+  reckon make_energy_reservoir(path : Text, local : Text, value_type : Text, value : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), path), local), value_type), value)
+  reckon energy_reservoir_path(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon energy_reservoir_local(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon energy_reservoir_type(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon energy_reservoir_value(node : Sequence) -> Sequence = sequence_get(node, 3)
+
+  reckon make_energy_flow(name : Text, local : Text, from_path : Text, to_path : Text, amount : Sequence, efficiency : Sequence, evidence : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), local), from_path), to_path), amount), efficiency), evidence)
+  reckon energy_flow_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon energy_flow_local(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon energy_flow_from(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon energy_flow_to(node : Sequence) -> Text = sequence_get(node, 3)
+  reckon energy_flow_amount(node : Sequence) -> Sequence = sequence_get(node, 4)
+  reckon energy_flow_efficiency(node : Sequence) -> Sequence = sequence_get(node, 5)
+  reckon energy_flow_evidence(node : Sequence) -> Sequence = sequence_get(node, 6)
+
+  reckon make_energy(name : Text, reservoirs : Sequence, flows : Sequence, preserves : Sequence, witnesses : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), reservoirs), flows), preserves), witnesses)
+  reckon energy_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon energy_reservoirs(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon energy_flows(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon energy_preserves(node : Sequence) -> Sequence = sequence_get(node, 3)
+  reckon energy_witnesses(node : Sequence) -> Sequence = sequence_get(node, 4)
+
+  reckon energy_with_reservoir(node : Sequence, value : Sequence) -> Sequence =
+    make_energy(energy_name(node), sequence_append(energy_reservoirs(node), value), energy_flows(node), energy_preserves(node), energy_witnesses(node))
+  reckon energy_with_flow(node : Sequence, value : Sequence) -> Sequence =
+    make_energy(energy_name(node), energy_reservoirs(node), sequence_append(energy_flows(node), value), energy_preserves(node), energy_witnesses(node))
+  reckon energy_with_preserve(node : Sequence, value : Sequence) -> Sequence =
+    make_energy(energy_name(node), energy_reservoirs(node), energy_flows(node), sequence_append(energy_preserves(node), value), energy_witnesses(node))
+  reckon energy_with_witness(node : Sequence, value : Text) -> Sequence =
+    make_energy(energy_name(node), energy_reservoirs(node), energy_flows(node), energy_preserves(node), sequence_append(energy_witnesses(node), value))
+
+  reckon qualify_energy_path(owner : Text, value : Text) -> Text = choose(contains(value, "."), value, owner + "." + value)
+
+  reckon parse_energy_after_reservoir_value(tokens : Sequence, node : Sequence, local : Text, value_type : Text, value_state : Sequence) -> Sequence =
+    parse_energy_body(tokens, state_index(value_state), energy_with_reservoir(node,
+      make_energy_reservoir(energy_name(node) + "." + local, local, value_type, state_node(value_state))))
+
+  reckon parse_energy_after_reservoir_type(tokens : Sequence, node : Sequence, local : Text, type_state : Sequence) -> Sequence =
+    parse_energy_after_reservoir_value(tokens, node, local, state_text(type_state), parse_expression(tokens, state_index(type_state) + 1, 0))
+
+  reckon parse_energy_after_reservoir(tokens : Sequence, node : Sequence, local : Text, path_state : Sequence) -> Sequence =
+    parse_energy_after_reservoir_type(tokens, node, local, path_state)
+
+  reckon parse_energy_flow_clauses(tokens : Sequence, index : Number, node : Sequence, local : Text, from_path : Text, to_path : Text, amount : Sequence, efficiency : Sequence, evidence : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "efficiency",
+      parse_energy_flow_after_efficiency(tokens, index, node, local, from_path, to_path, amount, parse_expression(tokens, index + 1, 0), evidence),
+      choose(token_text_at(tokens, index) == "evidence",
+        parse_energy_flow_clauses(tokens, index + 2, node, local, from_path, to_path, amount, efficiency, sequence_append(evidence, token_text_at(tokens, index + 1))),
+        parse_energy_body(tokens, index, energy_with_flow(node, make_energy_flow(energy_name(node) + "." + local, local, from_path, to_path, amount, efficiency, evidence)))))
+
+  reckon parse_energy_flow_after_efficiency(tokens : Sequence, index : Number, node : Sequence, local : Text, from_path : Text, to_path : Text, amount : Sequence, efficiency_state : Sequence, evidence : Sequence) -> Sequence =
+    parse_energy_flow_clauses(tokens, state_index(efficiency_state), node, local, from_path, to_path, amount, state_node(efficiency_state), evidence)
+
+  reckon parse_energy_flow_after_amount(tokens : Sequence, node : Sequence, local : Text, from_path : Text, to_path : Text, amount_state : Sequence) -> Sequence =
+    parse_energy_flow_clauses(tokens, state_index(amount_state), node, local, from_path, to_path, state_node(amount_state), literal_node("Number", "1"), empty_sequence())
+
+  reckon parse_energy_flow_after_to(tokens : Sequence, node : Sequence, local : Text, from_path : Text, to_state : Sequence) -> Sequence =
+    parse_energy_flow_after_amount(tokens, node, local, from_path, qualify_energy_path(energy_name(node), state_text(to_state)), parse_expression(tokens, state_index(to_state) + 1, 0))
+
+  reckon parse_energy_flow_after_from(tokens : Sequence, node : Sequence, local : Text, from_state : Sequence) -> Sequence =
+    parse_energy_flow_after_to(tokens, node, local, qualify_energy_path(energy_name(node), state_text(from_state)), parse_path(tokens, state_index(from_state) + 1))
+
+  reckon parse_energy_flow(tokens : Sequence, node : Sequence, index : Number) -> Sequence =
+    parse_energy_flow_after_from(tokens, node, token_text_at(tokens, index + 1), parse_path(tokens, index + 3))
+
+  reckon parse_energy_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
+      choose(token_text_at(tokens, index) == "reservoir",
+        parse_energy_after_reservoir(tokens, node, token_text_at(tokens, index + 1), parse_path(tokens, index + 3)),
+        choose(token_text_at(tokens, index) == "flow",
+          parse_energy_flow(tokens, node, index),
+          choose(token_text_at(tokens, index) == "preserve",
+            parse_energy_after_preserve(tokens, node, parse_expression(tokens, index + 1, 0)),
+            choose(token_text_at(tokens, index) == "witness",
+              parse_energy_body(tokens, index + 2, energy_with_witness(node, token_text_at(tokens, index + 1))),
+              syntax_failure(tokens, index, "RCL_ENERGY_CLAUSE"))))))
+
+  reckon parse_energy_after_preserve(tokens : Sequence, node : Sequence, expression_state : Sequence) -> Sequence =
+    parse_energy_body(tokens, state_index(expression_state), energy_with_preserve(node, state_node(expression_state)))
+
+  reckon parse_energy(tokens : Sequence, index : Number) -> Sequence =
+    parse_energy_body(tokens, index + 3, make_energy(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence()))
+
   reckon make_extras() -> Sequence =
     sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
       sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()),
@@ -1059,7 +1145,8 @@ reality RCLGeneralSelfHostCompiler {
         sequence_append(output, choose(index == target, value, sequence_get(items, index)))))
 
   reckon append_extra(items : Sequence, target : Number, value : Sequence) -> Sequence =
-    replace_extra(items, target, sequence_append(sequence_get(items, target), value), 0, empty_sequence())
+    choose(target >= length(items), append_extra(sequence_append(items, empty_sequence()), target, value),
+      replace_extra(items, target, sequence_append(sequence_get(items, target), value), 0, empty_sequence()))
 
   reckon make_absorption(kind : Text, target : Text) -> Sequence =
     sequence_append(sequence_append(empty_sequence(), kind), target)
@@ -1087,6 +1174,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon program_languages(program : Sequence) -> Sequence = sequence_get(program_extras(program), 9)
   reckon program_understandings(program : Sequence) -> Sequence = sequence_get(program_extras(program), 10)
   reckon program_creations(program : Sequence) -> Sequence = sequence_get(program_extras(program), 11)
+  reckon program_energies(program : Sequence) -> Sequence = choose(length(program_extras(program)) > 12, sequence_get(program_extras(program), 12), empty_sequence())
 
   reckon append_measure_facets(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -1142,6 +1230,20 @@ reality RCLGeneralSelfHostCompiler {
       sequence_append(append_creation_facets(creation_candidates(node), 0, creation_name(node), output),
         make_domain_facet(selection_path(creation_selection(node)), "Create<" + creation_candidate_base_type(find_creation_candidate(creation_candidates(node), 0, sequence_get(selection_candidates(creation_selection(node)), 0))) + ">", empty_sequence(), creation_name(node), "selection", creation_selection(node), true)))
 
+  reckon append_energy_facets(items : Sequence, index : Number, owner : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      append_energy_facets(items, index + 1, owner, sequence_append(output,
+        make_domain_facet(energy_reservoir_path(sequence_get(items, index)), energy_reservoir_type(sequence_get(items, index)), energy_reservoir_value(sequence_get(items, index)), owner, "energy", sequence_get(items, index), false))))
+
+  reckon energy_facets(node : Sequence, output : Sequence) -> Sequence =
+    append_energy_facets(energy_reservoirs(node), 0, energy_name(node), output)
+
+  reckon is_runtime_directive(value : Text) -> Truth =
+    value == "foresee" or value == "realize" or value == "quantify" or value == "observe" or value == "learn" or value == "interpret" or value == "understand" or value == "create" or value == "energize"
+
+  reckon runtime_directive_kind(value : Text) -> Text =
+    choose(value == "foresee", "Foresee", choose(value == "realize", "Realize", choose(value == "quantify", "Quantify", choose(value == "observe", "Observe", choose(value == "learn", "Learn", choose(value == "interpret", "Interpret", choose(value == "understand", "Understand", choose(value == "create", "Create", "Energize"))))))))
+
   reckon parse_top(tokens : Sequence, index : Number, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     choose(token_kind_at(tokens, index) == "EOF", syntax_failure(tokens, index, "RCL_REALITY_UNCLOSED"),
       choose(token_text_at(tokens, index) == "}",
@@ -1154,23 +1256,24 @@ reality RCLGeneralSelfHostCompiler {
             parse_top_after_subject(tokens, parse_subject(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
             choose(either(token_text_at(tokens, index) == "emergence", token_text_at(tokens, index) == "resonance"),
               parse_top_after_rule(tokens, parse_rule(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-              choose(token_text_at(tokens, index) == "quantitative",
-                parse_top_after_quantitative(tokens, parse_quantitative(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-                choose(token_text_at(tokens, index) == "perception",
-                  parse_top_after_perception(tokens, parse_perception(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-              choose(token_text_at(tokens, index) == "knowledge",
-                parse_top_after_knowledge(tokens, parse_knowledge(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-                choose(token_text_at(tokens, index) == "language",
-                  parse_top_after_language(tokens, parse_language(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-                  choose(token_text_at(tokens, index) == "understanding",
-                    parse_top_after_understanding(tokens, parse_understanding(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-                    choose(token_text_at(tokens, index) == "creation",
-                      parse_top_after_creation(tokens, parse_creation(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
-                    choose(either(either(token_text_at(tokens, index) == "foresee", token_text_at(tokens, index) == "realize"), either(either(token_text_at(tokens, index) == "quantify", token_text_at(tokens, index) == "observe"), either(either(token_text_at(tokens, index) == "learn", token_text_at(tokens, index) == "interpret"), either(token_text_at(tokens, index) == "understand", token_text_at(tokens, index) == "create")))),
-                parse_top(tokens, index + 2, facets, reckons, subjects, warrants, rules,
-                  sequence_append(directives,
-                    make_directive(choose(token_text_at(tokens, index) == "foresee", "Foresee", choose(token_text_at(tokens, index) == "realize", "Realize", choose(token_text_at(tokens, index) == "quantify", "Quantify", choose(token_text_at(tokens, index) == "observe", "Observe", choose(token_text_at(tokens, index) == "learn", "Learn", choose(token_text_at(tokens, index) == "interpret", "Interpret", choose(token_text_at(tokens, index) == "understand", "Understand", "Create"))))))), token_text_at(tokens, index + 1))), extras),
-                parse_metadata_top(tokens, index, facets, reckons, subjects, warrants, rules, directives, extras))))))))))))))
+              choose(token_text_at(tokens, index) == "energy",
+                parse_top_after_energy(tokens, parse_energy(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                choose(token_text_at(tokens, index) == "quantitative",
+                  parse_top_after_quantitative(tokens, parse_quantitative(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                  choose(token_text_at(tokens, index) == "perception",
+                    parse_top_after_perception(tokens, parse_perception(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                    choose(token_text_at(tokens, index) == "knowledge",
+                      parse_top_after_knowledge(tokens, parse_knowledge(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                      choose(token_text_at(tokens, index) == "language",
+                        parse_top_after_language(tokens, parse_language(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                        choose(token_text_at(tokens, index) == "understanding",
+                          parse_top_after_understanding(tokens, parse_understanding(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                          choose(token_text_at(tokens, index) == "creation",
+                            parse_top_after_creation(tokens, parse_creation(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
+                            choose(is_runtime_directive(token_text_at(tokens, index)),
+                              parse_top(tokens, index + 2, facets, reckons, subjects, warrants, rules,
+                                sequence_append(directives, make_directive(runtime_directive_kind(token_text_at(tokens, index)), token_text_at(tokens, index + 1))), extras),
+                              parse_metadata_top(tokens, index, facets, reckons, subjects, warrants, rules, directives, extras)))))))))))))))
 
   reckon parse_top_after_facet(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), sequence_append(facets, state_node(item_state)), reckons, subjects, warrants, rules, directives, extras)
@@ -1201,6 +1304,9 @@ reality RCLGeneralSelfHostCompiler {
     parse_top(tokens, state_index(item_state), append_understanding_facets(understanding_hypotheses(state_node(item_state)), 0, understanding_name(state_node(item_state)), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 10, state_node(item_state)))
   reckon parse_top_after_creation(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), creation_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 11, state_node(item_state)))
+
+  reckon parse_top_after_energy(tokens : Sequence, item_state : Sequence, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
+    parse_top(tokens, state_index(item_state), energy_facets(state_node(item_state), facets), reckons, subjects, warrants, rules, directives, append_extra(extras, 12, state_node(item_state)))
 
   reckon parse_top_after_extra(tokens : Sequence, item_state : Sequence, target : Number, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     parse_top(tokens, state_index(item_state), facets, reckons, subjects, warrants, rules, directives,
@@ -1333,9 +1439,15 @@ reality RCLGeneralSelfHostCompiler {
                 choose(facet_domain_kind(node) == "selection",
                   "{\"deferred\":true,\"kind\":\"FacetDecl\",\"owner\":" + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
                     + ",\"selection\":" + canonical_selection(facet_domain_data(node)) + ",\"value\":null,\"valueType\":" + json_quote(facet_type(node)) + "}",
-                  "{\"derivedBy\":" + json_quote(facet_domain_kind(node)) + ",\"kind\":\"FacetDecl\",\"owner\":"
-                    + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
-                    + ",\"value\":" + canonical_expression(facet_expression(node)) + ",\"valueType\":" + json_quote(facet_type(node)) + "}")))))))
+                  choose(facet_domain_kind(node) == "energy",
+                    "{\"energyReservoir\":{\"kind\":\"EnergyReservoirDecl\",\"localName\":" + json_quote(energy_reservoir_local(facet_domain_data(node)))
+                      + ",\"path\":" + json_quote(energy_reservoir_path(facet_domain_data(node))) + ",\"value\":" + canonical_expression(energy_reservoir_value(facet_domain_data(node)))
+                      + ",\"valueType\":" + json_quote(energy_reservoir_type(facet_domain_data(node))) + "},\"kind\":\"FacetDecl\",\"owner\":"
+                      + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+                      + ",\"value\":" + canonical_expression(facet_expression(node)) + ",\"valueType\":" + json_quote(facet_type(node)) + "}",
+                    "{\"derivedBy\":" + json_quote(facet_domain_kind(node)) + ",\"kind\":\"FacetDecl\",\"owner\":"
+                      + json_quote(facet_owner(node)) + ",\"path\":" + json_quote(facet_path(node))
+                      + ",\"value\":" + canonical_expression(facet_expression(node)) + ",\"valueType\":" + json_quote(facet_type(node)) + "}"))))))))
 
   reckon canonical_facets(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1696,6 +1808,31 @@ reality RCLGeneralSelfHostCompiler {
   reckon canonical_creations(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]", canonical_creations(items, index + 1, output + choose(index == 0, "", ",") + canonical_creation(sequence_get(items, index))))
 
+  reckon canonical_energy_reservoir(node : Sequence) -> Text =
+    "{\"kind\":\"EnergyReservoirDecl\",\"localName\":" + json_quote(energy_reservoir_local(node))
+      + ",\"path\":" + json_quote(energy_reservoir_path(node)) + ",\"value\":" + canonical_expression(energy_reservoir_value(node))
+      + ",\"valueType\":" + json_quote(energy_reservoir_type(node)) + "}"
+
+  reckon canonical_energy_reservoirs(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_energy_reservoirs(items, index + 1, output + choose(index == 0, "", ",") + canonical_energy_reservoir(sequence_get(items, index))))
+
+  reckon canonical_energy_flow(node : Sequence) -> Text =
+    "{\"amount\":" + canonical_expression(energy_flow_amount(node)) + ",\"efficiency\":" + canonical_expression(energy_flow_efficiency(node))
+      + ",\"evidence\":" + canonical_text_array(energy_flow_evidence(node), 0, "[") + ",\"from\":" + json_quote(energy_flow_from(node))
+      + ",\"kind\":\"EnergyFlowDecl\",\"localName\":" + json_quote(energy_flow_local(node)) + ",\"name\":" + json_quote(energy_flow_name(node))
+      + ",\"to\":" + json_quote(energy_flow_to(node)) + "}"
+
+  reckon canonical_energy_flows(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_energy_flows(items, index + 1, output + choose(index == 0, "", ",") + canonical_energy_flow(sequence_get(items, index))))
+
+  reckon canonical_energy(node : Sequence) -> Text =
+    "{\"flows\":" + canonical_energy_flows(energy_flows(node), 0, "[") + ",\"kind\":\"EnergyDecl\",\"name\":" + json_quote(energy_name(node))
+      + ",\"preserves\":" + canonical_expression_array(energy_preserves(node), 0, "[") + ",\"reservoirs\":" + canonical_energy_reservoirs(energy_reservoirs(node), 0, "[")
+      + ",\"witnesses\":" + canonical_text_array(energy_witnesses(node), 0, "[") + "}"
+
+  reckon canonical_energies(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]", canonical_energies(items, index + 1, output + choose(index == 0, "", ",") + canonical_energy(sequence_get(items, index))))
+
   reckon canonical_program_with(program : Sequence, sorted_facets : Sequence) -> Text =
     "{\"absorptionDirectives\":" + canonical_absorptions(program_absorption(program), 0, "[")
       + ",\"accelerations\":[],\"capabilityPolicies\":" + canonical_policies(program_policies(program), 0, "[")
@@ -1703,7 +1840,7 @@ reality RCLGeneralSelfHostCompiler {
       + ",\"directives\":"
       + canonical_directives(program_directives(program), 0, "[")
       + ",\"effectDeclarations\":" + canonical_effects(program_effects(program), 0, "[")
-      + ",\"elements\":[],\"embodiments\":[],\"energies\":[],\"facetTypes\":"
+      + ",\"elements\":[],\"embodiments\":[],\"energies\":" + canonical_energies(program_energies(program), 0, "[") + ",\"facetTypes\":"
       + canonical_facet_types(sorted_facets, 0, "{") + ",\"facets\":" + canonical_facets(program_facets(program), 0, "[")
       + ",\"format\":\"rcl.reality-program.v0.10\",\"foundation\":" + foundation_canonical()
       + ",\"genetics\":[],\"hosts\":" + canonical_hosts(program_hosts(program), 0, "[")
@@ -1727,6 +1864,13 @@ reality RCLGeneralSelfHostCompiler {
   reckon semantic_check(condition : Truth, code : Text, detail : Text) -> Truth =
     semantic_assert(condition, code, detail, make_span(0, 1, 1, 0))
 
+  reckon quantity_constructor_type(name : Text) -> Text =
+    choose(name == "meters", "Length", choose(name == "seconds", "Time", choose(name == "kilograms", "Mass", choose(name == "meters_per_second", "Velocity",
+      choose(name == "meters_per_second2", "Acceleration", choose(name == "newtons", "Force", choose(name == "joules", "Energy", choose(name == "celsius", "Temperature",
+        choose(name == "hertz", "Frequency", choose(name == "square_meters", "Area", choose(name == "cubic_meters", "Volume", choose(name == "pascals", "Pressure",
+          choose(name == "watts", "Power", choose(name == "bits", "Information", ""))))))))))))))
+  reckon is_quantity_constructor(name : Text) -> Truth = quantity_constructor_type(name) != ""
+
   reckon find_facet_index(items : Sequence, index : Number, path : Text) -> Number =
     sequence_find_field(items, 0, path, index)
 
@@ -1741,7 +1885,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon call_is_known(name : Text, reckons : Sequence) -> Truth =
     builtin_id(name) > 0 or name == "provider_call" or name == "domain_call" or name == "choose"
       or name == "typed_ref" or name == "typed_deref" or name == "typed_ref_id"
-      or name == "celsius" or name == "measure_value" or name == "uncertainty"
+      or is_quantity_constructor(name) or name == "measure_value" or name == "uncertainty"
       or name == "confidence" or name == "certainty" or name == "knowledge_value"
       or name == "knowledge_status" or name == "known" or name == "supported"
       or is_cognition_accessor(name) or name == "intent_matches" or name == "understood" or name == "selected"
@@ -1751,7 +1895,7 @@ reality RCLGeneralSelfHostCompiler {
     choose(expr_text(node) == "provider_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
       choose(expr_text(node) == "domain_call", length(expr_args(node)) >= 2,
       choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id"
-          or expr_text(node) == "celsius" or expr_text(node) == "measure_value" or expr_text(node) == "uncertainty"
+          or is_quantity_constructor(expr_text(node)) or expr_text(node) == "measure_value" or expr_text(node) == "uncertainty"
           or expr_text(node) == "confidence" or expr_text(node) == "certainty" or expr_text(node) == "knowledge_value"
           or expr_text(node) == "knowledge_status",
         length(expr_args(node)) == 1,
@@ -1864,6 +2008,18 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= length(items), true, choose(validate_creation_candidates(creation_candidates(sequence_get(items, index)), 0, facets, reckons),
       choose(validate_expression_array(creation_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons), validate_creations(items, index + 1, facets, reckons), false), false))
 
+  reckon validate_energy_flows(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_expression(energy_flow_amount(sequence_get(items, index)), empty_sequence(), facets, reckons),
+        choose(validate_expression(energy_flow_efficiency(sequence_get(items, index)), empty_sequence(), facets, reckons),
+          validate_energy_flows(items, index + 1, facets, reckons), false), false))
+
+  reckon validate_energies(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_energy_flows(energy_flows(sequence_get(items, index)), 0, facets, reckons),
+        choose(validate_expression_array(energy_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
+          validate_energies(items, index + 1, facets, reckons), false), false))
+
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
       choose(validate_reckons(program_reckons(program), 0, program_facets(program), program_reckons(program)),
@@ -1875,8 +2031,11 @@ reality RCLGeneralSelfHostCompiler {
                   choose(validate_understandings(program_understandings(program), 0, program_facets(program), program_reckons(program)),
                     validate_creations(program_creations(program), 0, program_facets(program), program_reckons(program)), false), false), false), false), false), false), false), false)
 
+  reckon validate_program_with_energies(program : Sequence) -> Truth =
+    choose(validate_program(program), validate_energies(program_energies(program), 0, program_facets(program), program_reckons(program)), false)
+
   reckon validated_program(program : Sequence) -> Sequence =
-    choose(validate_program(program), program, program)
+    choose(validate_program_with_energies(program), program, program)
 
   reckon param_names(params : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(params), output,
@@ -1895,8 +2054,8 @@ reality RCLGeneralSelfHostCompiler {
             collect_call_strings(node, locals, output)))))
 
   reckon collect_call_strings(node : Sequence, locals : Sequence, output : Sequence) -> Sequence =
-    choose(expr_text(node) == "celsius",
-      append_unique_text(append_unique_text(append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, append_unique_text(output, "Temperature")), ""), "quantity"), "make"),
+    choose(is_quantity_constructor(expr_text(node)),
+      append_unique_text(append_unique_text(append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, append_unique_text(output, quantity_constructor_type(expr_text(node)))), ""), "quantity"), "make"),
       choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence" or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status",
         append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, output), choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value", "value", choose(expr_text(node) == "knowledge_status", "status", expr_text(node)))),
         choose(is_cognition_accessor(expr_text(node)), append_unique_text(collect_expression_strings_array(expr_args(node), 0, locals, output), cognition_accessor_field(expr_text(node))),
@@ -2137,13 +2296,28 @@ reality RCLGeneralSelfHostCompiler {
         collect_expression_strings(best_creation_expression(selection_candidates(creation_selection(node)), 1, path_node(sequence_get(selection_candidates(creation_selection(node)), 0))), empty_sequence(),
           collect_creation_candidates_strings(creation_candidates(node), 0, append_unique_text(output, creation_name(node))))), "creation"), "select"), selection_path(creation_selection(node)))), "domain:create:" + creation_name(node))
 
+  reckon find_energy(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(energy_name(sequence_get(items, index)) == name, sequence_get(items, index), find_energy(items, index + 1, name))
+  reckon collect_energy_flow_strings(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_strings(energy_flow_efficiency(node), empty_sequence(),
+      collect_expression_strings(energy_flow_amount(node), empty_sequence(),
+        append_unique_text(append_unique_text(append_unique_text(append_unique_text(output, energy_flow_from(node)), energy_flow_to(node)), "energy"), "scale")))
+  reckon collect_energy_flows_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_energy_flows_strings(items, index + 1, collect_energy_flow_strings(sequence_get(items, index), output)))
+  reckon collect_energy_strings(node : Sequence, output : Sequence) -> Sequence =
+    append_unique_text(
+      collect_expression_strings_array(energy_preserves(node), 0, empty_sequence(),
+        collect_energy_flows_strings(energy_flows(node), 0, append_unique_text(output, energy_name(node)))),
+      "domain:energize:" + energy_name(node))
+
   reckon collect_domain_strings(program : Sequence, kind : Text, name : Text, output : Sequence) -> Sequence =
     choose(kind == "Quantify", collect_quantitative_strings(find_quantitative(program_quantitatives(program), 0, name), output),
       choose(kind == "Observe", collect_perception_strings(find_perception(program_perceptions(program), 0, name), output),
         choose(kind == "Learn", collect_knowledge_strings(find_knowledge(program_knowledges(program), 0, name), output),
           choose(kind == "Interpret", collect_language_strings(find_language(program_languages(program), 0, name), output),
             choose(kind == "Understand", collect_understanding_strings(find_understanding(program_understandings(program), 0, name), output),
-              collect_creation_strings(find_creation(program_creations(program), 0, name), output))))))
+              choose(kind == "Energize", collect_energy_strings(find_energy(program_energies(program), 0, name), output),
+                collect_creation_strings(find_creation(program_creations(program), 0, name), output)))))))
 
   reckon collect_measure_list_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output, collect_measure_list_strings(items, index + 1, append_unique_text(collect_measure_strings_complete(sequence_get(items, index), output), measure_path(sequence_get(items, index)))))
@@ -2216,6 +2390,12 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= length(items), output, collect_creation_candidates_numbers(items, index + 1, collect_creation_candidate_numbers(sequence_get(items, index), output)))
   reckon collect_creation_numbers(node : Sequence, output : Sequence) -> Sequence =
     collect_expression_numbers_array(creation_preserves(node), 0, empty_sequence(), collect_expression_numbers(best_creation_expression(selection_candidates(creation_selection(node)), 1, path_node(sequence_get(selection_candidates(creation_selection(node)), 0))), empty_sequence(), collect_creation_candidates_numbers(creation_candidates(node), 0, output)))
+  reckon collect_energy_flow_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers(energy_flow_efficiency(node), empty_sequence(), collect_expression_numbers(energy_flow_amount(node), empty_sequence(), output))
+  reckon collect_energy_flows_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output, collect_energy_flows_numbers(items, index + 1, collect_energy_flow_numbers(sequence_get(items, index), output)))
+  reckon collect_energy_numbers(node : Sequence, output : Sequence) -> Sequence =
+    collect_expression_numbers_array(energy_preserves(node), 0, empty_sequence(), collect_energy_flows_numbers(energy_flows(node), 0, output))
   reckon collect_domain_numbers(program : Sequence, kind : Text, name : Text, output : Sequence) -> Sequence =
     choose(kind == "Quantify",
       collect_expression_numbers_array(quantitative_preserves(find_quantitative(program_quantitatives(program), 0, name)), 0, empty_sequence(), collect_quant_derive_numbers(quantitative_derives(find_quantitative(program_quantitatives(program), 0, name)), 0, collect_measure_list_numbers(quantitative_measures(find_quantitative(program_quantitatives(program), 0, name)), 0, output))),
@@ -2224,7 +2404,8 @@ reality RCLGeneralSelfHostCompiler {
         choose(kind == "Learn", collect_expression_numbers_array(knowledge_preserves(find_knowledge(program_knowledges(program), 0, name)), 0, empty_sequence(), collect_knowledge_items_numbers(knowledge_derives(find_knowledge(program_knowledges(program), 0, name)), 0, collect_knowledge_items_numbers(knowledge_claims(find_knowledge(program_knowledges(program), 0, name)), 0, output))),
           choose(kind == "Interpret", collect_language_numbers(find_language(program_languages(program), 0, name), output),
             choose(kind == "Understand", collect_understanding_numbers(find_understanding(program_understandings(program), 0, name), output),
-              collect_creation_numbers(find_creation(program_creations(program), 0, name), output))))))
+              choose(kind == "Energize", collect_energy_numbers(find_energy(program_energies(program), 0, name), output),
+                collect_creation_numbers(find_creation(program_creations(program), 0, name), output)))))))
 
   reckon collect_directive_numbers(items : Sequence, index : Number, program : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -2339,7 +2520,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon expression_call_count(node : Sequence) -> Number = sequence_get(node, 3)
 
   reckon call_instruction_count(name : Text, args : Sequence) -> Number =
-    choose(name == "celsius", expression_count_array(args, 0, 0) + 3,
+    choose(is_quantity_constructor(name), expression_count_array(args, 0, 0) + 3,
       choose(name == "measure_value" or name == "knowledge_value" or name == "confidence" or name == "uncertainty" or name == "knowledge_status" or is_cognition_accessor(name), expression_count_array(args, 0, 0) + 1,
         choose(name == "intent_matches", expression_count(intent_matches_expression_from(args)),
           choose(name == "understood", expression_count(understood_expression_from(args)),
@@ -2425,6 +2606,10 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= length(items), output, creation_candidate_items_instruction_count(items, index + 1, output + creation_candidate_instruction_count(sequence_get(items, index))))
   reckon selection_instruction_count(node : Sequence) -> Number =
     expression_count(best_creation_expression(selection_candidates(node), 1, path_node(sequence_get(selection_candidates(node), 0)))) + 3 + length(selection_candidates(node)) * 2
+  reckon energy_flow_instruction_count(node : Sequence) -> Number =
+    7 + expression_count(energy_flow_amount(node)) * 2 + expression_count(energy_flow_efficiency(node))
+  reckon energy_flows_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output, energy_flows_instruction_count(items, index + 1, output + energy_flow_instruction_count(sequence_get(items, index))))
   reckon domain_instruction_count(program : Sequence, kind : Text, name : Text) -> Number =
     choose(kind == "Quantify", 5 + measure_list_instruction_count(quantitative_measures(find_quantitative(program_quantitatives(program), 0, name)), 0, 0)
         + quant_derive_instruction_count(quantitative_derives(find_quantitative(program_quantitatives(program), 0, name)), 0, 0)
@@ -2439,9 +2624,11 @@ reality RCLGeneralSelfHostCompiler {
           + preserve_instruction_count(language_preserves(find_language(program_languages(program), 0, name)), 0, 0),
         choose(kind == "Understand", 5 + understanding_items_instruction_count(understanding_hypotheses(find_understanding(program_understandings(program), 0, name)), 0, 0)
           + preserve_instruction_count(understanding_preserves(find_understanding(program_understandings(program), 0, name)), 0, 0),
-          5 + creation_candidate_items_instruction_count(creation_candidates(find_creation(program_creations(program), 0, name)), 0, 0)
-            + selection_instruction_count(creation_selection(find_creation(program_creations(program), 0, name)))
-            + preserve_instruction_count(creation_preserves(find_creation(program_creations(program), 0, name)), 0, 0))))))
+          choose(kind == "Energize", 5 + energy_flows_instruction_count(energy_flows(find_energy(program_energies(program), 0, name)), 0, 0)
+              + preserve_instruction_count(energy_preserves(find_energy(program_energies(program), 0, name)), 0, 0),
+            5 + creation_candidate_items_instruction_count(creation_candidates(find_creation(program_creations(program), 0, name)), 0, 0)
+              + selection_instruction_count(creation_selection(find_creation(program_creations(program), 0, name)))
+              + preserve_instruction_count(creation_preserves(find_creation(program_creations(program), 0, name)), 0, 0)))))))
 
   reckon alter_instruction_count(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,
@@ -2544,11 +2731,11 @@ reality RCLGeneralSelfHostCompiler {
             emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start)))))
 
   reckon emit_call(node : Sequence, locals : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
-    choose(expr_text(node) == "celsius",
+    choose(is_quantity_constructor(expr_text(node)),
       append_all(one_instruction(45, find_text(strings, 0, "quantity"), find_text(strings, 0, "make"), 3),
         append_all(one_instruction(3, find_text(strings, 0, ""), 0, 0),
           append_all(emit_expression(sequence_get(expr_args(node), 0), locals, reckons, strings, numbers, main_count, start + 1),
-            one_instruction(3, find_text(strings, 0, "Temperature"), 0, 0)))),
+            one_instruction(3, find_text(strings, 0, quantity_constructor_type(expr_text(node))), 0, 0)))),
       choose(expr_text(node) == "measure_value" or expr_text(node) == "knowledge_value" or expr_text(node) == "confidence"
           or expr_text(node) == "uncertainty" or expr_text(node) == "knowledge_status",
         append_all(one_instruction(38, find_text(strings, 0,
@@ -2872,7 +3059,8 @@ reality RCLGeneralSelfHostCompiler {
         choose(kind == "Learn", emit_knowledge_transition(find_knowledge(program_knowledges(program), 0, name), reckons, strings, numbers, main_count, start),
           choose(kind == "Interpret", emit_language_transition(find_language(program_languages(program), 0, name), reckons, strings, numbers, main_count, start),
             choose(kind == "Understand", emit_understanding_transition(find_understanding(program_understandings(program), 0, name), reckons, strings, numbers, main_count, start),
-              emit_creation_transition(find_creation(program_creations(program), 0, name), reckons, strings, numbers, main_count, start))))))
+              choose(kind == "Energize", emit_energy_transition(find_energy(program_energies(program), 0, name), reckons, strings, numbers, main_count, start),
+                emit_creation_transition(find_creation(program_creations(program), 0, name), reckons, strings, numbers, main_count, start)))))))
 
   reckon emit_quantitative_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
     append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:quantify:" + quantitative_name(node)), 0, 0),
@@ -2909,6 +3097,33 @@ reality RCLGeneralSelfHostCompiler {
         emit_creation_selection(creation_selection(node), reckons, strings, numbers, main_count, start,
           emit_creation_candidate_items(creation_candidates(node), 0, reckons, strings, numbers, main_count, start,
             append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, creation_name(node)), find_text(strings, 0, creation_name(node)))))))))
+
+  reckon emit_energy_flow(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(25, find_text(strings, 0, energy_flow_to(node)), 0, 0),
+      append_all(one_instruction(6, 0, 0, 0),
+        append_all(one_instruction(45, find_text(strings, 0, "energy"), find_text(strings, 0, "scale"), 2),
+          append_all(emit_expression(energy_flow_efficiency(node), empty_sequence(), reckons, strings, numbers, main_count,
+              start + 4 + expression_count(energy_flow_amount(node)) * 2),
+            append_all(emit_expression(energy_flow_amount(node), empty_sequence(), reckons, strings, numbers, main_count,
+                start + 4 + expression_count(energy_flow_amount(node))),
+              append_all(emit_expression(path_node(energy_flow_to(node)), empty_sequence(), reckons, strings, numbers, main_count,
+                  start + 3 + expression_count(energy_flow_amount(node))),
+                append_all(one_instruction(25, find_text(strings, 0, energy_flow_from(node)), 0, 0),
+                  append_all(one_instruction(7, 0, 0, 0),
+                    append_all(emit_expression(energy_flow_amount(node), empty_sequence(), reckons, strings, numbers, main_count,
+                        start + 1),
+                      emit_expression(path_node(energy_flow_from(node)), empty_sequence(), reckons, strings, numbers, main_count, start))))))))))
+
+  reckon emit_energy_flows(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_energy_flows(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(emit_energy_flow(sequence_get(items, index), reckons, strings, numbers, main_count, start + length(output)), output)))
+
+  reckon emit_energy_transition(node : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    append_all(one_instruction(29, 0, 0, 0), append_all(one_instruction(28, find_text(strings, 0, "domain:energize:" + energy_name(node)), 0, 0),
+      emit_domain_preserves(energy_preserves(node), reckons, strings, numbers, main_count, start,
+        emit_energy_flows(energy_flows(node), 0, reckons, strings, numbers, main_count, start,
+          append_all(one_instruction(26, 1, 0, 0), one_instruction(23, 1, find_text(strings, 0, energy_name(node)), find_text(strings, 0, energy_name(node))))))))
 
   reckon emit_directives(items : Sequence, index : Number, program : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,

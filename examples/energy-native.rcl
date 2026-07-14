@@ -1,0 +1,10 @@
+reality EnergyProbe {
+  energy grid {
+    reservoir source : Energy = joules(100)
+    reservoir load : Energy = joules(0)
+    flow charge from source to load amount joules(40) efficiency 0.9 evidence "meter"
+    preserve grid.source >= joules(0)
+    witness "rcl:energy"
+  }
+  energize grid
+}
