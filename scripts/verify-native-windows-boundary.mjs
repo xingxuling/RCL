@@ -158,7 +158,8 @@ const payload = {
     nativeExeLooksReal,
     reason,
     notAClaim: 'This verifier records the current Windows native execution boundary; it does not prove the C VM source is invalid.',
-  },};
+  },
+};
 
 fs.mkdirSync(outputDir, { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`);
