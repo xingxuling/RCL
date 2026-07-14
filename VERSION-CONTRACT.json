@@ -1,0 +1,81 @@
+{
+  "format": "taowind.canonical-language-source-contract.v1",
+  "repository": "xingxuling/RCL",
+  "canonicalBranch": "main",
+  "canonical": true,
+  "package": "@taowind/rcl-reality-forge",
+  "packageVersion": "0.94.0-alpha.1",
+  "verifiedCeiling": {
+    "stage": "stage40_rcl_owned_dual_need_warrant_lowering_subset",
+    "targetSourceRoot": "71e899db3794f862101f898dbf0549a534db488f4320f30d07585d523a25ce14",
+    "targetRbcSha256": "4dbfe7408fb24484065b06e7b2d5b421cd2f6773bef28e29cfacd393c724e318",
+    "staticInstructions": 407,
+    "executedInstructions": 367,
+    "checkWarrantOperations": 20
+  },
+  "claims": {
+    "nativeCoreSelfHosting": true,
+    "wholeLanguageRuntimeSelfHosting": false,
+    "advancedDomainRuntime": "JavaScript",
+    "downstreamByteIdentity": false
+  },
+  "downstreamCopies": [
+    {
+      "repository": "xingxuling/RNCS-Unified-Platform-",
+      "path": "packages/languages/reality-computation-language",
+      "relation": "embedded extension delta; synchronize before byte-identity claims"
+    },
+    {
+      "repository": "xingxuling/zhinao",
+      "path": "vendor/rcl",
+      "relation": "vendored snapshot; current audit observed Stage39 pending sync"
+    }
+  ],
+  "verificationCommands": [
+    "npm run verify:version-contract",
+    "npm run verify:selfhost-stage40",
+    "npm run verify:native-boundary",
+    "npm test",
+    "npm run verify:selfhost-examples"
+  ],
+  "authority": {
+    "canonicalLanguage": "RCL",
+    "canonicalCompilerSources": [
+      "selfhost/compiler-core.rcl",
+      "selfhost/compiler-main.rcl"
+    ],
+    "stage40Fixture": "selfhost/rcl-dual-need-stage40.rcl",
+    "referenceOnly": [
+      "src/compiler.mjs",
+      "src/runtime.mjs"
+    ],
+    "derivedArtifacts": [
+      "selfhost/compiler.rbc",
+      "native/native-windows-manifest.json",
+      "output/selfhost/*.json"
+    ]
+  },
+  "boundary": {
+    "nativeCoreCompilerSelfHosting": true,
+    "fullSelfHosting": false,
+    "completeRuntime": false,
+    "jsReferenceRuntimeStillRequired": true,
+    "windowsExecutionVerified": false,
+    "hostNativeExecutionVerified": "environment-dependent"
+  },
+  "evidence": {
+    "scripts": [
+      "scripts/verify-rcl-selfhost-stage40.mjs",
+      "scripts/verify-rcl-selfhost-all.mjs",
+      "scripts/verify-selfhost-example-parity.mjs",
+      "scripts/verify-native-windows-boundary.mjs"
+    ],
+    "tests": [
+      "tests/general-selfhost-fixedpoint.test.mjs",
+      "tests/selfhost-toolchain.test.mjs",
+      "tests/stage40-dual-need.test.mjs"
+    ],
+    "ciRequired": true,
+    "ciRun": null
+  }
+}

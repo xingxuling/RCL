@@ -251,9 +251,19 @@
     "test:v0.94": "node --test --test-concurrency=1 tests/autonomous-sandbox-file-emission-protocol.test.mjs",
     "demo:autonomous-file-emission": "node src/cli.mjs autonomous-file-emission-demo",
     "demo:autonomous-file-emission:run": "node src/cli.mjs autonomous-file-emission-run output/v0.94/autonomous-sandbox-file-emission",
-    "demo:autonomous-file-emission:spec": "node src/cli.mjs autonomous-file-emission-spec output/v0.94/autonomous-sandbox-file-emission-spec"
+    "demo:autonomous-file-emission:spec": "node src/cli.mjs autonomous-file-emission-spec output/v0.94/autonomous-sandbox-file-emission-spec",
+    "verify:version-contract": "node scripts/verify-version-contract.mjs",
+    "verify:selfhost-stage40": "node scripts/verify-rcl-selfhost-stage40.mjs",
+    "verify:selfhost-all": "node scripts/verify-rcl-selfhost-all.mjs",
+    "verify:native-boundary": "node scripts/verify-native-windows-boundary.mjs",
+    "verify:provenance": "npm run verify:version-contract",
+    "verify:release": "npm run verify:selfhost-all && npm run verify:selfhost-examples && npm run verify:provenance"
   },
   "engines": {
     "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xingxuling/RCL.git"
   }
 }

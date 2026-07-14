@@ -1,4 +1,4 @@
-# Current RCL Context: v0.86 Agent Civilization Federation
+# Historical RCL Context: v0.86 Agent Civilization Federation
 
 This package upgrades RCL to v0.86.0-alpha.1 and adds a callable Agent Civilization Federation runtime for product embedding.
 

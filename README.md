@@ -3,6 +3,11 @@
 
 # RCL v0.94.0-alpha.1
 
+> Canonical source: `xingxuling/RCL@main`. The verified ceiling is Stage40 native-core RCL self-hosting. Whole-language runtime self-hosting and byte identity with downstream copies are not claimed; see `VERSION-CONTRACT.json`.
+
+> Release-history sections below are historical records and do not represent the current `main` state. Current release facts are defined by `package.json`, `CURRENT-STATUS.md`, and `VERSION-CONTRACT.json`.
+
+
 RCL stopped borrowing its compiler.
 
 The repository now contains a general compiler written in RCL, a checked-in fixed-point compiler artifact, a real Windows `rclc.exe`, and a native VM capable of compiling that compiler again. JavaScript is used once to create C0. Native C0 emits C1. Native C1 emits C2. All three artifacts are byte-identical.
