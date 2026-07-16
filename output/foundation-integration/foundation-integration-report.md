@@ -45,6 +45,7 @@ The RCL report also records Reference Runtime mode separately from Native VM mod
 
 - **Everbloom TypeScript noEmit** (fail-existing): Repository-wide existing type debt includes pg, bun:test and unrelated application errors; production build is the release gate used here
 - **Aether Earth Android Gradle/APK** (blocked): No Gradle wrapper, Android SDK or ANDROID_HOME is available; APK success is not claimed
+- **GitHub Actions runners** (blocked): Jobs were rejected before runner allocation because recent account payments failed or the GitHub Actions spending limit must be increased; runner_id=0 and steps=[]
 
 ## Performance
 

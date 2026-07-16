@@ -72,6 +72,7 @@ const verification = [
   testResult('Everbloom production build', 'npm run build', 'pass', 'Vite client, SSR and Nitro Cloudflare module build passed'),
   testResult('Everbloom TypeScript noEmit', 'npx tsc --noEmit', 'fail-existing', 'Repository-wide existing type debt includes pg, bun:test and unrelated application errors; production build is the release gate used here'),
   testResult('Aether Earth Android Gradle/APK', './gradlew test assembleDebug', 'blocked', 'No Gradle wrapper, Android SDK or ANDROID_HOME is available; APK success is not claimed'),
+  testResult('GitHub Actions runners', 'RCL verify; RNCS engine-reference; Everbloom validate', 'blocked', 'Jobs were rejected before runner allocation because recent account payments failed or the GitHub Actions spending limit must be increased; runner_id=0 and steps=[]'),
 ];
 
 const auditMaterials = [
@@ -85,6 +86,7 @@ const auditMaterials = [
 const blocked = [
   { item: 'Aether Forge Pocket independent project', reason: definitions.find((item) => item.project === 'Aether Forge Pocket').blockedReason },
   { item: 'Aether Earth Android Gradle/APK execution', reason: 'Android SDK and Gradle wrapper are unavailable.' },
+  { item: 'GitHub Actions remote verification', reason: 'GitHub rejected three jobs before runner allocation because of account billing or spending-limit state.' },
   { item: 'Canonical Foundation domains in RCL Native VM', reason: 'Declared-domain lowering remains explicitly unsupported; Reference Runtime coverage is separate.' },
 ];
 

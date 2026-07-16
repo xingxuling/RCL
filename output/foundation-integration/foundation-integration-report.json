@@ -1,6 +1,6 @@
 {
   "format": "taowind.foundation-integration-report.v0.1",
-  "generatedAt": "2026-07-16T19:41:13.649Z",
+  "generatedAt": "2026-07-16T19:43:44.940Z",
   "status": "partial-with-verified-runtime-bridges",
   "contract": {
     "format": "taowind.rcl-foundation-contract.v0.1",
@@ -2040,6 +2040,12 @@
       "command": "./gradlew test assembleDebug",
       "status": "blocked",
       "evidence": "No Gradle wrapper, Android SDK or ANDROID_HOME is available; APK success is not claimed"
+    },
+    {
+      "name": "GitHub Actions runners",
+      "command": "RCL verify; RNCS engine-reference; Everbloom validate",
+      "status": "blocked",
+      "evidence": "Jobs were rejected before runner allocation because recent account payments failed or the GitHub Actions spending limit must be increased; runner_id=0 and steps=[]"
     }
   ],
   "performance": {
@@ -2184,6 +2190,10 @@
     {
       "item": "Aether Earth Android Gradle/APK execution",
       "reason": "Android SDK and Gradle wrapper are unavailable."
+    },
+    {
+      "item": "GitHub Actions remote verification",
+      "reason": "GitHub rejected three jobs before runner allocation because of account billing or spending-limit state."
     },
     {
       "item": "Canonical Foundation domains in RCL Native VM",
