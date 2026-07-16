@@ -13,6 +13,19 @@ export function toRncsProposalInput(program, transition, options = {}) {
   const baseGeneration = Number(options.baseGeneration ?? 0);
   const baseGenerationRoot = options.baseGenerationRoot ?? '0'.repeat(64);
   const subjectId = transition.actor ?? options.subjectId ?? 'rcl:system';
+  const providerCapabilities = transition.hostCalls?.map(call => ({ host: call.host ?? null, capability: call.capability, required: true })) ?? [];
+  const evidenceRequirements = (transition.witnesses ?? []).map((witness, index) => ({ kind: 'rcl-witness', reference: witness, required: true, sequence: index + 1 }));
+  const foundationGovernance = {
+    explicitVariables: options.explicitVariables ?? [],
+    uncertainty: options.uncertainty ?? { status: 'undeclared', variables: [] },
+    providerCapabilities: { required: providerCapabilities, externalSideEffects: providerCapabilities.length > 0 },
+    authorityRequirements: transition.authority?.needs ?? [],
+    irreversibleEffects: options.irreversibleEffects ?? [{ classification: options.irreversibility ?? 'unknown', effects: [] }],
+    invariants: options.invariants ?? [],
+    adaptiveInvariantField: options.adaptiveInvariantField ?? { version: '0.1.0', mode: 'static-plus-runtime', active: [] },
+    causalParents: options.causalParents ?? [{ kind: transition.ruleKind ?? 'transition', rule: transition.rule, beforeRoot: transition.beforeRoot }],
+    evidenceRequirements: evidenceRequirements.length ? evidenceRequirements : [{ kind: 'rcl-transition-root', reference: transition.afterRoot, required: true }],
+  };
 
   return {
     reality_id: realityId,
@@ -58,6 +71,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
       })),
       edges: [],
     },
+    foundation_governance: foundationGovernance,
     extensions: {
       rcl: {
         program: program.name,
@@ -66,6 +80,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
         after_root: transition.afterRoot,
         from_subject: transition.from,
         into_subject: transition.into,
+        foundation_governance: foundationGovernance,
       },
     },
   };

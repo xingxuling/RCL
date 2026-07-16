@@ -25,7 +25,13 @@ export {
   upperBound,
   QUANTITY_TYPES,
 } from './quantity.mjs';
-export { REALITY_DOMAINS, CROSS_DOMAIN_AXES, COMPOSITE_REALITY_PLANES, META_REALITY_PLANES, foundationSummary } from './foundation.mjs';
+export { REALITY_DOMAINS, CROSS_DOMAIN_AXES, COMPOSITE_REALITY_PLANES, META_REALITY_PLANES, foundationSummary } from './foundation.mjs';export {
+  FOUNDATION_CONTRACT_FORMAT, FOUNDATION_CONTRACT_VERSION, FOUNDATION_RUNTIME_RESULT_FORMAT, FOUNDATION_EXECUTION_MODES,
+  FOUNDATION_DOMAINS, FOUNDATION_COMPOSITE_PLANES, FOUNDATION_META_PLANES, FOUNDATION_CROSS_DOMAIN_AXES, FOUNDATION_4R,
+  FOUNDATION_MANIFEST, FOUNDATION_MANIFEST_ROOT, getFoundationSpec, resolveFoundationId,
+  createFoundationRuntimeResult, validateFoundationRuntimeResult, standardizeFoundationRecord,
+  buildFoundationRuntimeResults, foundationManifestSummary,
+} from './foundation-contract.mjs';
 export { knowledgeType, isKnowledgeType, knowledgeBaseType, knowledgeClaim, isKnowledge, reviseKnowledge, decayKnowledge } from './knowledge.mjs';
 export { buildInnerReality, buildExecutionReality, buildNaturalLanguageReality, buildUnderstandingReality, buildCreativeReality } from './planes.mjs';
 export {

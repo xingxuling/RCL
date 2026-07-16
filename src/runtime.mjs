@@ -13,6 +13,7 @@ import {
   quantityConstructors,
 } from './quantity.mjs';
 import { foundationSummary } from './foundation.mjs';
+import { buildFoundationRuntimeResults } from './foundation-contract.mjs';
 import { knowledgeClaim, isKnowledge, reviseKnowledge, decayKnowledge } from './knowledge.mjs';
 import { buildInnerReality, buildExecutionReality, buildNaturalLanguageReality, buildUnderstandingReality, buildCreativeReality } from './planes.mjs';
 import {
@@ -1557,6 +1558,7 @@ export async function runReality(compiledOrSource, options = {}) {
     spiritReality: runtime.history.filter(item => item.domainKind === 'spirit'),
     innerReality: buildInnerReality(program, state),
     executionReality: buildExecutionReality(program, runtime.history, runtime.projections),
+    foundationRuntime: buildFoundationRuntimeResults({ history: runtime.history, projections: runtime.projections, programRoot: program.programRoot }),
     outputs,
   };
 }
