@@ -131,7 +131,7 @@ const report = {
       { repository: 'xingxuling/RCL', commits: ['e21dbed', '395be8c', '39181fd', '5c95b1c'], note: 'plus the commit containing this regenerated report' },
       { repository: 'xingxuling/RNCS-Unified-Platform-', commits: ['fbde8bb', 'f7ea993', '71b009e'] },
       { repository: 'xingxuling/zhinao', commits: ['84cdd5d', '82abf4a'] },
-      { repository: 'xingxuling/everbloom-worlds', commits: ['c836f80'] },
+      { repository: 'xingxuling/everbloom-worlds', commits: ['c836f80', '90fab2d'] },
     ],
     pullRequestsCreated: [
       'https://github.com/xingxuling/RCL/pull/3',

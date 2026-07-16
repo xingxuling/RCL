@@ -264,7 +264,7 @@ The RCL report also records Reference Runtime mode separately from Native VM mod
 - xingxuling/RCL: `e21dbed`, `395be8c`, `39181fd`, `5c95b1c`; plus the commit containing this regenerated report
 - xingxuling/RNCS-Unified-Platform-: `fbde8bb`, `f7ea993`, `71b009e`
 - xingxuling/zhinao: `84cdd5d`, `82abf4a`
-- xingxuling/everbloom-worlds: `c836f80`
+- xingxuling/everbloom-worlds: `c836f80`, `90fab2d`
 - https://github.com/xingxuling/RCL/pull/3
 - https://github.com/xingxuling/RNCS-Unified-Platform-/pull/14
 - https://github.com/xingxuling/zhinao/pull/2
