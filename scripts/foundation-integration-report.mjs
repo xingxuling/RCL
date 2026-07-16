@@ -125,9 +125,19 @@ const report = {
     'The initial product action targeted a nonexistent Farm location; AIF correctly froze it and the verified action now targets civic-arcology.',
   ],
   git: {
-    commitsCreated: [],
-    pullRequestsCreated: [],
-    note: 'No commit or PR was created because all inspected repositories already contained broad unrelated user changes; the working trees were preserved.',
+    commitsCreated: [
+      { repository: 'xingxuling/RCL', commits: ['e21dbed', '395be8c'] },
+      { repository: 'xingxuling/RNCS-Unified-Platform-', commits: ['fbde8bb', 'f7ea993'] },
+      { repository: 'xingxuling/zhinao', commits: ['84cdd5d', '82abf4a'] },
+      { repository: 'xingxuling/everbloom-worlds', commits: ['c836f80'] },
+    ],
+    pullRequestsCreated: [
+      'https://github.com/xingxuling/RCL/pull/3',
+      'https://github.com/xingxuling/RNCS-Unified-Platform-/pull/14',
+      'https://github.com/xingxuling/zhinao/pull/2',
+      'https://github.com/xingxuling/everbloom-worlds/pull/27',
+    ],
+    note: 'Four scoped codex branches and PRs were created. Broad unrelated working-tree changes were left unstaged and were not included in these commits.',
   },
 };
 
@@ -298,6 +308,8 @@ function markdown(data) {
     '## Git',
     '',
     `- ${data.git.note}`,
+    ...data.git.commitsCreated.map((item) => `- ${item.repository}: ${item.commits.map((commit) => `\`${commit}\``).join(', ')}`),
+    ...data.git.pullRequestsCreated.map((url) => `- ${url}`),
     '',
     'See `foundation-integration-matrix.csv`, `foundation-integration-report.json`, `verification-log.json`, and `MIGRATION-GUIDE.md` in this directory.',
     '',
