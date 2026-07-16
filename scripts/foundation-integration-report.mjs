@@ -128,8 +128,8 @@ const report = {
   ],
   git: {
     commitsCreated: [
-      { repository: 'xingxuling/RCL', commits: ['e21dbed', '395be8c'] },
-      { repository: 'xingxuling/RNCS-Unified-Platform-', commits: ['fbde8bb', 'f7ea993'] },
+      { repository: 'xingxuling/RCL', commits: ['e21dbed', '395be8c', '39181fd', '5c95b1c'], note: 'plus the commit containing this regenerated report' },
+      { repository: 'xingxuling/RNCS-Unified-Platform-', commits: ['fbde8bb', 'f7ea993', '71b009e'] },
       { repository: 'xingxuling/zhinao', commits: ['84cdd5d', '82abf4a'] },
       { repository: 'xingxuling/everbloom-worlds', commits: ['c836f80'] },
     ],
@@ -310,7 +310,7 @@ function markdown(data) {
     '## Git',
     '',
     `- ${data.git.note}`,
-    ...data.git.commitsCreated.map((item) => `- ${item.repository}: ${item.commits.map((commit) => `\`${commit}\``).join(', ')}`),
+    ...data.git.commitsCreated.map((item) => `- ${item.repository}: ${item.commits.map((commit) => `\`${commit}\``).join(', ')}${item.note ? `; ${item.note}` : ''}`),
     ...data.git.pullRequestsCreated.map((url) => `- ${url}`),
     '',
     'See `foundation-integration-matrix.csv`, `foundation-integration-report.json`, `verification-log.json`, and `MIGRATION-GUIDE.md` in this directory.',

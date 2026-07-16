@@ -261,8 +261,8 @@ The RCL report also records Reference Runtime mode separately from Native VM mod
 ## Git
 
 - Four scoped codex branches and PRs were created. Broad unrelated working-tree changes were left unstaged and were not included in these commits.
-- xingxuling/RCL: `e21dbed`, `395be8c`
-- xingxuling/RNCS-Unified-Platform-: `fbde8bb`, `f7ea993`
+- xingxuling/RCL: `e21dbed`, `395be8c`, `39181fd`, `5c95b1c`; plus the commit containing this regenerated report
+- xingxuling/RNCS-Unified-Platform-: `fbde8bb`, `f7ea993`, `71b009e`
 - xingxuling/zhinao: `84cdd5d`, `82abf4a`
 - xingxuling/everbloom-worlds: `c836f80`
 - https://github.com/xingxuling/RCL/pull/3
