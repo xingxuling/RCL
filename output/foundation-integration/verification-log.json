@@ -1,0 +1,95 @@
+{
+  "format": "taowind.foundation-verification-log.v0.1",
+  "generatedAt": "2026-07-16T19:33:21.161Z",
+  "results": [
+    {
+      "name": "RCL Foundation Contract",
+      "command": "node --test --test-concurrency=1 tests/foundation-contract.test.mjs",
+      "status": "pass",
+      "evidence": "4/4 tests"
+    },
+    {
+      "name": "RCL Conformance",
+      "command": "npm run conformance:foundation",
+      "status": "pass",
+      "evidence": "20/20 checks; JSON, CSV, Markdown, TAP and JUnit emitted"
+    },
+    {
+      "name": "RCL Stage40",
+      "command": "node scripts/verify-rcl-selfhost-stage40.mjs",
+      "status": "pass",
+      "evidence": "18/18 verification flags; target RBC equals JS reference and runs in native VM"
+    },
+    {
+      "name": "RNCS Core and 4R Gate",
+      "command": "npm test --workspace @taowind/rncs-core-contract",
+      "status": "pass",
+      "evidence": "8 lifecycle checks plus Foundation governance positive and negative commit gate"
+    },
+    {
+      "name": "RNCS RCL Control Plane",
+      "command": "npm test --workspace @taowind/rncs-rcl-control-plane",
+      "status": "pass",
+      "evidence": "15/15 tests"
+    },
+    {
+      "name": "Aether Earth Android Foundation Provider",
+      "command": "npm run verify:aether-earth:android-foundation",
+      "status": "pass",
+      "evidence": "RCL rule mutation changes biomass; authority rejection and replay root verified"
+    },
+    {
+      "name": "GameBrain full suite",
+      "command": "npm test",
+      "status": "pass",
+      "evidence": "22/22 test files; 150/150 tests"
+    },
+    {
+      "name": "GameBrain Foundation Conformance",
+      "command": "npm run conformance:foundation",
+      "status": "pass",
+      "evidence": "14/14 checks; JSON, CSV, Markdown, TAP and JUnit emitted"
+    },
+    {
+      "name": "GameBrain vendored RCL",
+      "command": "npm run verify:vendor-rcl",
+      "status": "pass",
+      "evidence": "Stage40 and vendor provenance verification passed; no byte-identity claim"
+    },
+    {
+      "name": "GameBrain Foundation performance",
+      "command": "npm run benchmark:foundation",
+      "status": "pass",
+      "evidence": "single retention 144.34%, ten-subject retention 131.47%"
+    },
+    {
+      "name": "Everbloom Foundation product bridge",
+      "command": "npm run test:foundation",
+      "status": "pass",
+      "evidence": "8 checks; real GameBrain product runtime moved helios-array to civic-arcology through five planes"
+    },
+    {
+      "name": "Everbloom production build",
+      "command": "npm run build",
+      "status": "pass",
+      "evidence": "Vite client, SSR and Nitro Cloudflare module build passed"
+    },
+    {
+      "name": "Everbloom TypeScript noEmit",
+      "command": "npx tsc --noEmit",
+      "status": "fail-existing",
+      "evidence": "Repository-wide existing type debt includes pg, bun:test and unrelated application errors; production build is the release gate used here"
+    },
+    {
+      "name": "Aether Earth Android Gradle/APK",
+      "command": "./gradlew test assembleDebug",
+      "status": "blocked",
+      "evidence": "No Gradle wrapper, Android SDK or ANDROID_HOME is available; APK success is not claimed"
+    }
+  ],
+  "transientFailuresFixed": [
+    "The first Everbloom verifier attempted to import undeclared esbuild directly; it now uses the declared Vite API.",
+    "The initial multi-intent fixture mixed share and warning; safety-priority warn classification was correct and the fixture was separated.",
+    "The initial product action targeted a nonexistent Farm location; AIF correctly froze it and the verified action now targets civic-arcology."
+  ]
+}
