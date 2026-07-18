@@ -1574,3 +1574,19 @@ export {
   writeRclRncsFusionReports,
   runRclRncsFusionDemo,
 } from './rncs-rcl-fusion.mjs';
+
+export {
+  FOUNDATION_NATIVE_BATCH_A_FORMAT,
+  FOUNDATION_NATIVE_BATCH_A_REQUEST_FORMAT,
+  FOUNDATION_NATIVE_HOST_FORMAT,
+  FOUNDATION_NATIVE_PROVIDER_ID,
+  DEFAULT_FOUNDATION_NATIVE_HOST_PATH,
+  FOUNDATION_NATIVE_BATCH_A,
+  FoundationNativeBridgeError,
+  normalizeFoundationNativeBatchARequest,
+  renderFoundationNativeBatchASource,
+  compileFoundationNativeBatchA,
+  runFoundationNativeHost,
+  verifyFoundationNativeBatchAExecution,
+  runFoundationNativeBatchA,
+} from './foundation-native-bridge.mjs';

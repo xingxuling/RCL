@@ -13,6 +13,7 @@ const exePath = path.join(root, 'native', 'rclvm.exe');
 const compilerPath = path.join(root, 'native', 'rclc.exe');
 const daemonPath = path.join(root, 'native', 'rclvmd.exe');
 const providerDemoPath = path.join(root, 'native', 'provider_demo.exe');
+const foundationProviderPath = path.join(root, 'native', 'rclfoundation.exe');
 const objectPath = path.join(root, 'native', 'rclvm.o');
 const staticLibraryPath = path.join(root, 'native', 'librclvm.a');
 const sharedLibraryPath = path.join(root, 'native', 'rclvm.dll');
@@ -26,6 +27,7 @@ const sourceFiles = [
   'native/rclc.c',
   'native/rclvmd.c',
   'native/provider_demo.c',
+  'native/foundation_provider.c',
   'scripts/build-native-windows.mjs',
 ];
 
@@ -34,6 +36,7 @@ const distributedArtifacts = [
   compilerPath,
   daemonPath,
   providerDemoPath,
+  foundationProviderPath,
   staticLibraryPath,
   sharedLibraryPath,
   importLibraryPath,
@@ -247,6 +250,19 @@ const targets = [
       '-DRCLVM_EMBEDDED_ONLY',
       '-o', providerDemoPath,
       path.join(root, 'native', 'provider_demo.c'),
+      sourcePath,
+      '-lbcrypt',
+      '-lm',
+    ],
+  },
+  {
+    id: 'rclfoundation',
+    path: foundationProviderPath,
+    args: [
+      ...commonArgs,
+      '-DRCLVM_EMBEDDED_ONLY',
+      '-o', foundationProviderPath,
+      path.join(root, 'native', 'foundation_provider.c'),
       sourcePath,
       '-lbcrypt',
       '-lm',

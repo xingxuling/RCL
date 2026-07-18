@@ -16,7 +16,20 @@
   "claims": {
     "nativeCoreSelfHosting": true,
     "wholeLanguageRuntimeSelfHosting": false,
-    "advancedDomainRuntime": "JavaScript",
+    "advancedDomainRuntime": "JavaScript Reference Runtime plus six-domain Native Provider bridge",
+    "foundationNativeProviderBridge": {
+      "mode": "bridge",
+      "providerId": "rcl.foundation.batch-a",
+      "providerAbi": 1,
+      "domains": [
+        "quantitative",
+        "knowledge",
+        "perception",
+        "natural-language-reality",
+        "understanding-reality",
+        "creative-reality"
+      ]
+    },
     "downstreamByteIdentity": false
   },
   "downstreamCopies": [
@@ -35,6 +48,8 @@
     "npm run verify:version-contract",
     "npm run verify:selfhost-stage40",
     "npm run verify:native-boundary",
+    "npm run test:foundation-native-batch-a",
+    "npm run conformance:foundation",
     "npm test",
     "npm run verify:selfhost-examples"
   ],
@@ -51,6 +66,7 @@
     ],
     "derivedArtifacts": [
       "selfhost/compiler.rbc",
+      "native/rclfoundation.exe",
       "native/native-windows-manifest.json",
       "output/selfhost/*.json"
     ]
@@ -60,20 +76,24 @@
     "fullSelfHosting": false,
     "completeRuntime": false,
     "jsReferenceRuntimeStillRequired": true,
-    "windowsExecutionVerified": false,
-    "hostNativeExecutionVerified": "environment-dependent"
+    "foundationNativeProviderBridge": true,
+    "declaredFoundationSyntaxNative": false,
+    "windowsExecutionVerified": true,
+    "hostNativeExecutionVerified": true
   },
   "evidence": {
     "scripts": [
       "scripts/verify-rcl-selfhost-stage40.mjs",
       "scripts/verify-rcl-selfhost-all.mjs",
       "scripts/verify-selfhost-example-parity.mjs",
-      "scripts/verify-native-windows-boundary.mjs"
+      "scripts/verify-native-windows-boundary.mjs",
+      "scripts/foundation-conformance.mjs"
     ],
     "tests": [
       "tests/general-selfhost-fixedpoint.test.mjs",
       "tests/selfhost-toolchain.test.mjs",
-      "tests/stage40-dual-need.test.mjs"
+      "tests/stage40-dual-need.test.mjs",
+      "tests/foundation-native-bridge.test.mjs"
     ],
     "ciRequired": true,
     "ciRun": null

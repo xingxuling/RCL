@@ -59,7 +59,8 @@ const benchmark = readJson(path.join(REPOS, 'zhinao', 'evidence', 'benchmark-fou
 
 const verification = [
   testResult('RCL Foundation Contract', 'node --test --test-concurrency=1 tests/foundation-contract.test.mjs', 'pass', '4/4 tests'),
-  testResult('RCL Conformance', 'npm run conformance:foundation', 'pass', '20/20 checks; JSON, CSV, Markdown, TAP and JUnit emitted'),
+  testResult('RCL Conformance', 'npm run conformance:foundation', 'pass', '31/31 checks; six Foundation modules verified through the Native Provider ABI in bridge mode'),
+  testResult('RCL Foundation Native Batch A', 'npm run test:foundation-native-batch-a', 'pass', '6/6 tests; RBC 1.2 self-host parity, causal chain, counterfactual, negative gates and performance baseline'),
   testResult('RCL Stage40', 'node scripts/verify-rcl-selfhost-stage40.mjs', 'pass', '18/18 verification flags; target RBC equals JS reference and runs in native VM'),
   testResult('RNCS Core and 4R Gate', 'npm test --workspace @taowind/rncs-core-contract', 'pass', '8 lifecycle checks plus Foundation governance positive and negative commit gate'),
   testResult('RNCS RCL Control Plane', 'npm test --workspace @taowind/rncs-rcl-control-plane', 'pass', '15/15 tests'),
@@ -87,11 +88,11 @@ const blocked = [
   { item: 'Aether Forge Pocket independent project', reason: definitions.find((item) => item.project === 'Aether Forge Pocket').blockedReason },
   { item: 'Aether Earth Android Gradle/APK execution', reason: 'Android SDK and Gradle wrapper are unavailable.' },
   { item: 'GitHub Actions remote verification', reason: 'GitHub rejected three jobs before runner allocation because of account billing or spending-limit state.' },
-  { item: 'Canonical Foundation domains in RCL Native VM', reason: 'Declared-domain lowering remains explicitly unsupported; Reference Runtime coverage is separate.' },
+  { item: 'Remaining declared Foundation syntax in RCL Native VM', reason: 'Batch A is verified through RclVmProviderV1 in bridge mode; declared-domain lowering and uncovered modules remain explicitly unsupported.' },
 ];
 
 const knownLimitations = [
-  'RCL JavaScript Reference Runtime covers the Foundation surface, but the C Native VM still reports none for declared Foundation-domain lowering.',
+  'RCL Native Provider Batch A covers quantitative, knowledge, perception, natural-language, understanding and creative modules in bridge mode; declared-domain syntax and the remaining modules are not native yet.',
   'GameBrain five-plane cognition is a verified bridge; its 14 domain records remain projection and are not counted as native integration.',
   'GameBrain ten-subject heap delta is about three times the historical measurement even though throughput exceeds the 80% retention gate.',
   'Everbloom requires GAMEBRAIN_MODULE_PATH or an installed GameBrain package for the verified five-plane path; its lexical fallback is Natural Language Reality only.',

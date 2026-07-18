@@ -15,8 +15,44 @@
   },
   "executionLayers": {
     "referenceRuntime": "native",
-    "nativeVm": "none",
-    "nativeVmLimitation": "Current bytecode lowering explicitly rejects declared Foundation provider domains; no native conformance is claimed."
+    "nativeVm": "bridge",
+    "nativeVmLimitation": "The Native Provider ABI covers Foundation Batch A in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.",
+    "nativeProviderBridge": {
+      "mode": "bridge",
+      "providerId": "rcl.foundation.batch-a",
+      "providerAbi": 1,
+      "host": "native/rclfoundation.exe",
+      "domains": [
+        "quantitative",
+        "knowledge",
+        "perception",
+        "natural-language-reality",
+        "understanding-reality",
+        "creative-reality"
+      ],
+      "bytecodeVersion": "1.2",
+      "bytecodeRoot": "3705305f0548d2945a313609c2f27da0c24166f31ee9659dc5ba7b0e57403209",
+      "deterministicReceiptRoot": "0ec9121a4c0367e51de068b06d294d4ba2bec4f4a8f5e76ba5c0d253a2288b3d",
+      "finalStateRoot": "ea668d63168483bf6bc8e68a2c0166338df5912f355f2ae0edce5fc1d30d91ad",
+      "metrics": {
+        "compileMs": 173.47170000000003,
+        "oracleCompileMs": 4.7701,
+        "selfhostCompileMs": 168.7016,
+        "sourceBytes": 4106,
+        "bytecodeBytes": 2533,
+        "runtimeMs": 127.3692,
+        "replayMs": 42.4132,
+        "processRssDeltaBytes": 0,
+        "estimatedWorkingSetBytes": 44314,
+        "eventCount": 65,
+        "resultCount": 6,
+        "nativeInstructionCount": 65,
+        "providerCallCount": 6,
+        "cacheHitRate": 0,
+        "resultBytes": 11223,
+        "compressionRatio": 1.621003
+      }
+    }
   },
   "domains": {
     "metacomputation": {
@@ -37,7 +73,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "computation": {
@@ -79,7 +115,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "energy": {
@@ -100,7 +136,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "elemental": {
@@ -121,28 +157,28 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "perception": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#perceptual",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "neural": {
@@ -163,7 +199,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "embodiment": {
@@ -184,7 +220,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "life": {
@@ -205,7 +241,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "genetic": {
@@ -226,49 +262,49 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "quantitative": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#quantitative",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "knowledge": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#knowledge",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "scientific": {
@@ -289,7 +325,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "spiritual": {
@@ -310,70 +346,70 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "natural-language-reality": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#natural-language-plane",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "understanding-reality": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#understanding-plane",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "creative-reality": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#creative-plane",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "inner-reality": {
@@ -415,7 +451,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "meta-spacetime": {
@@ -436,7 +472,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "meta-acceleration": {
@@ -457,7 +493,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "meta-compression": {
@@ -478,7 +514,7 @@
         "deterministic-replay"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance."
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
       ]
     },
     "authority-boundary": {
@@ -750,6 +786,126 @@
       "id": "root-consistency",
       "passed": true,
       "details": {}
+    },
+    {
+      "id": "native-batch-a-runtime-invocation",
+      "passed": true,
+      "details": {
+        "domains": [
+          "quantitative",
+          "knowledge",
+          "perception",
+          "natural-language-reality",
+          "understanding-reality",
+          "creative-reality"
+        ],
+        "providerHost": {
+          "providerId": "rcl.foundation.batch-a",
+          "providerAbi": 1,
+          "providerCallCount": 6,
+          "cacheHits": 0,
+          "cacheHitRate": 0
+        }
+      }
+    },
+    {
+      "id": "native-batch-a-result-shape",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-selfhost",
+      "passed": true,
+      "details": {
+        "bytecodeRoot": "3705305f0548d2945a313609c2f27da0c24166f31ee9659dc5ba7b0e57403209",
+        "bytecodeVersion": "1.2"
+      }
+    },
+    {
+      "id": "native-batch-a-deterministic-replay",
+      "passed": true,
+      "details": {
+        "receiptRoot": "0ec9121a4c0367e51de068b06d294d4ba2bec4f4a8f5e76ba5c0d253a2288b3d"
+      }
+    },
+    {
+      "id": "native-batch-a-behavior-mutation",
+      "passed": true,
+      "details": {
+        "originalAction": "generate-authorized-candidate",
+        "counterfactualAction": "generate-observation-candidate",
+        "originalRoot": "ea668d63168483bf6bc8e68a2c0166338df5912f355f2ae0edce5fc1d30d91ad",
+        "counterfactualRoot": "01616afe7f2bc484e1829e19464655c33feb9a9316dc9f770bb8f9ced92d63d8"
+      }
+    },
+    {
+      "id": "native-batch-a-causal-chain",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-negative-authority",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-invariant-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-evidence-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-provider-degradation",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-performance",
+      "passed": true,
+      "details": {
+        "metrics": {
+          "compileMs": 173.47170000000003,
+          "oracleCompileMs": 4.7701,
+          "selfhostCompileMs": 168.7016,
+          "sourceBytes": 4106,
+          "bytecodeBytes": 2533,
+          "runtimeMs": 127.3692,
+          "replayMs": 42.4132,
+          "processRssDeltaBytes": 0,
+          "estimatedWorkingSetBytes": 44314,
+          "eventCount": 65,
+          "resultCount": 6,
+          "nativeInstructionCount": 65,
+          "providerCallCount": 6,
+          "cacheHitRate": 0,
+          "resultBytes": 11223,
+          "compressionRatio": 1.621003
+        },
+        "baseline": {
+          "format": "taowind.rcl-foundation-native-batch-a.performance-baseline.v0.1",
+          "request": "default",
+          "maximumRegressionRatio": 0.2,
+          "deterministicResourceBaseline": {
+            "bytecodeBytes": 2533,
+            "estimatedWorkingSetBytes": 44314,
+            "nativeInstructionCount": 65,
+            "resultBytes": 11223
+          },
+          "exactContractCounts": {
+            "providerCallCount": 6,
+            "resultCount": 6
+          },
+          "wallClockBudgetsMs": {
+            "compileMs": 5000,
+            "runtimeMs": 5000,
+            "replayMs": 5000
+          }
+        }
+      }
     },
     {
       "id": "native-boundary-explicit",

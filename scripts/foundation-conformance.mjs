@@ -13,6 +13,9 @@ import {
   runReality,
   compileReality,
   tryCompileRealityToBytecode,
+  FOUNDATION_NATIVE_BATCH_A,
+  FoundationNativeBridgeError,
+  runFoundationNativeBatchA,
 } from '../src/index.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -100,26 +103,126 @@ async function main() {
   check(checks, 'invariant-rejection', invariantRejected);
   check(checks, 'root-consistency', replay.stateRoot === replayAgain.stateRoot && replay.foundationRuntime.every(item => item.stateDelta.beforeRoot && item.stateDelta.afterRoot));
 
+  const nativeBatchA = runFoundationNativeBatchA();
+  const nativeCounterfactual = runFoundationNativeBatchA({
+    input: {
+      speechAct: 'inspect',
+      utterance: 'Inspect the bounded reality without creating it.',
+    },
+  });
+  check(checks, 'native-batch-a-runtime-invocation', nativeBatchA.results.length === 6 && nativeBatchA.providerHost.providerCallCount === 6, {
+    domains: nativeBatchA.results.map(item => item.domain),
+    providerHost: nativeBatchA.providerHost,
+  });
+  check(checks, 'native-batch-a-result-shape', nativeBatchA.results.every(item => (
+    item.format === 'taowind.rcl-foundation-runtime-result.v0.1'
+    && item.proposal?.mode === 'bridge'
+    && item.evidence.length > 0
+    && item.authorityRequired.length > 0
+  )));
+  check(checks, 'native-batch-a-selfhost', nativeBatchA.selfhostByteIdentical && nativeBatchA.bytecodeVersion === '1.2', {
+    bytecodeRoot: nativeBatchA.bytecodeRoot,
+    bytecodeVersion: nativeBatchA.bytecodeVersion,
+  });
+  check(checks, 'native-batch-a-deterministic-replay', nativeBatchA.replayVerified, {
+    receiptRoot: nativeBatchA.deterministicReceiptRoot,
+  });
+  check(checks, 'native-batch-a-behavior-mutation', (
+    nativeBatchA.finalCandidate.selectedAction !== nativeCounterfactual.finalCandidate.selectedAction
+    && nativeBatchA.finalStateRoot !== nativeCounterfactual.finalStateRoot
+  ), {
+    originalAction: nativeBatchA.finalCandidate.selectedAction,
+    counterfactualAction: nativeCounterfactual.finalCandidate.selectedAction,
+    originalRoot: nativeBatchA.finalStateRoot,
+    counterfactualRoot: nativeCounterfactual.finalStateRoot,
+  });
+  check(checks, 'native-batch-a-causal-chain', nativeBatchA.results.every((item, index) => (
+    index === 0
+      ? item.stateDelta.beforeRoot === nativeBatchA.request.causalParents[0]
+      : item.stateDelta.beforeRoot === nativeBatchA.results[index - 1].stateDelta.afterRoot
+  )));
+  const rejectsNativeBatchA = (request, expectedCode, options = {}) => {
+    try {
+      runFoundationNativeBatchA(request, { ...options, verifyReplay: false });
+      return false;
+    } catch (error) {
+      return error instanceof FoundationNativeBridgeError && error.code === expectedCode;
+    }
+  };
+  check(checks, 'native-batch-a-negative-authority', rejectsNativeBatchA(
+    { authorized: false },
+    'RCL_FOUNDATION_AUTHORITY_DENIED',
+  ));
+  check(checks, 'native-batch-a-invariant-rejection', rejectsNativeBatchA(
+    { aifDecision: 'unstable' },
+    'RCL_FOUNDATION_AIF_REJECTED',
+  ));
+  check(checks, 'native-batch-a-evidence-rejection', rejectsNativeBatchA(
+    { evidence: [] },
+    'RCL_FOUNDATION_EVIDENCE_REQUIRED',
+  ));
+  check(checks, 'native-batch-a-provider-degradation', rejectsNativeBatchA(
+    {},
+    'RCL_NATIVE_PROVIDER_MISSING',
+    { disableProvider: true },
+  ));
+  const performanceBaseline = JSON.parse(await fs.readFile(path.join(ROOT, 'benchmarks', 'foundation-native-batch-a-baseline.json'), 'utf8'));
+  const maximumResourceRatio = 1 + performanceBaseline.maximumRegressionRatio;
+  const resourceGatePassed = Object.entries(performanceBaseline.deterministicResourceBaseline).every(
+    ([metric, baseline]) => nativeBatchA.metrics[metric] <= Math.ceil(baseline * maximumResourceRatio),
+  );
+  const wallClockGatePassed = Object.entries(performanceBaseline.wallClockBudgetsMs).every(
+    ([metric, budget]) => nativeBatchA.metrics[metric] <= budget,
+  );
+  check(checks, 'native-batch-a-performance', resourceGatePassed && wallClockGatePassed, {
+    metrics: nativeBatchA.metrics,
+    baseline: performanceBaseline,
+  });
+
   const nativeProbe = tryCompileRealityToBytecode(await fs.readFile(path.join(ROOT, fixtures[1]), 'utf8'));
   const nativeExplicitBoundary = !nativeProbe.ok && nativeProbe.diagnostics.some(item => item.code === 'RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED');
   check(checks, 'native-boundary-explicit', nativeExplicitBoundary, { diagnostics: nativeProbe.diagnostics?.map(item => item.code) ?? [] });
 
   const project = 'RCL';
+  const nativeBatchADomains = new Set(FOUNDATION_NATIVE_BATCH_A.map(item => item.domain));
+  const nativeBatchATests = checks.filter(item => item.id.startsWith('native-batch-a-')).map(item => item.id);
   const conformance = {
     format: 'taowind.foundation-conformance-report.v0.1',
     project,
     contract: foundationManifestSummary(),
     executionLayers: {
       referenceRuntime: 'native',
-      nativeVm: 'none',
-      nativeVmLimitation: nativeExplicitBoundary ? 'Current bytecode lowering explicitly rejects declared Foundation provider domains; no native conformance is claimed.' : null,
+      nativeVm: 'bridge',
+      nativeVmLimitation: nativeExplicitBoundary
+        ? 'The Native Provider ABI covers Foundation Batch A in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.'
+        : null,
+      nativeProviderBridge: {
+        mode: 'bridge',
+        providerId: nativeBatchA.providerHost.providerId,
+        providerAbi: nativeBatchA.providerHost.providerAbi,
+        host: 'native/rclfoundation.exe',
+        domains: nativeBatchA.results.map(item => item.domain),
+        bytecodeVersion: nativeBatchA.bytecodeVersion,
+        bytecodeRoot: nativeBatchA.bytecodeRoot,
+        deterministicReceiptRoot: nativeBatchA.deterministicReceiptRoot,
+        finalStateRoot: nativeBatchA.finalStateRoot,
+        metrics: nativeBatchA.metrics,
+      },
     },
     domains: Object.fromEntries([...FOUNDATION_DOMAINS, ...FOUNDATION_COMPOSITE_PLANES, ...FOUNDATION_META_PLANES, ...FOUNDATION_CROSS_DOMAIN_AXES].map(spec => [spec.id, {
-      mode: 'none',
+      mode: nativeBatchADomains.has(spec.id) ? 'bridge' : 'none',
       referenceRuntimeMode: runtimeDomains.has(spec.id) ? 'native' : 'none',
-      implementation: runtimeDomains.has(spec.id) ? `src/runtime.mjs#${spec.runtimeId}` : null,
-      tests: checks.filter(item => item.id.includes('runtime') || item.id.includes('replay') || item.id.includes('mutation')).map(item => item.id),
-      knownLimitations: runtimeDomains.has(spec.id) ? ['Reference Runtime is covered; Native VM lowering still requires an explicit provider and is not counted as native conformance.'] : ['No runtime fixture covered this module.'],
+      implementation: nativeBatchADomains.has(spec.id)
+        ? 'native/foundation_provider.c + src/foundation-native-bridge.mjs'
+        : runtimeDomains.has(spec.id) ? `src/runtime.mjs#${spec.runtimeId}` : null,
+      tests: nativeBatchADomains.has(spec.id)
+        ? nativeBatchATests
+        : checks.filter(item => !item.id.startsWith('native-batch-a-') && (item.id.includes('runtime') || item.id.includes('replay') || item.id.includes('mutation'))).map(item => item.id),
+      knownLimitations: nativeBatchADomains.has(spec.id)
+        ? ['Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax.']
+        : runtimeDomains.has(spec.id)
+          ? ['Reference Runtime is covered; Native VM integration is not yet implemented for this domain.']
+          : ['No runtime fixture covered this module.'],
     }])),
     realityRobustness: Object.fromEntries(FOUNDATION_4R.map(item => [item.id, { status: checks.some(checkItem => checkItem.passed && item.minimumConformanceTests.every(testId => checks.some(candidate => candidate.id === testId))) ? 'partial' : 'declared', tests: item.minimumConformanceTests }])) ,
     fixtures: runs,
@@ -128,7 +231,7 @@ async function main() {
   };
   const rows = ['project,domain,category,mode,referenceRuntimeMode,implementation,knownLimitations'];
   for (const [id, item] of Object.entries(conformance.domains)) rows.push([project, id, FOUNDATION_MANIFEST.domains.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.compositePlanes.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.metaRealityPlanes.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.crossDomainAxes.find(spec => spec.id === id)?.category ?? '', item.mode, item.referenceRuntimeMode, item.implementation ?? '', item.knownLimitations.join('; ')].map(csvCell).join(','));
-  const markdown = [`# RCL Foundation Conformance`, ``, `- status: **${conformance.status}**`, `- contract: ${conformance.contract.format} ${conformance.contract.version}`, `- contract root: \`${conformance.contract.root}\``, `- reference runtime: ${conformance.executionLayers.referenceRuntime}`, `- native VM: ${conformance.executionLayers.nativeVm}`, ``, `| Check | Status |`, `| --- | --- |`, ...checks.map(item => `| ${item.id} | ${item.passed ? 'pass' : 'fail'} |`), ``, `Native boundary is recorded explicitly; unsupported Native VM lowering is not counted as native conformance.`].join('\n') + '\n';
+  const markdown = [`# RCL Foundation Conformance`, ``, `- status: **${conformance.status}**`, `- contract: ${conformance.contract.format} ${conformance.contract.version}`, `- contract root: \`${conformance.contract.root}\``, `- reference runtime: ${conformance.executionLayers.referenceRuntime}`, `- native VM: ${conformance.executionLayers.nativeVm}`, `- Batch A provider: \`${nativeBatchA.providerHost.providerId}\` through \`RclVmProviderV1\``, `- Batch A domains: ${nativeBatchA.results.map(item => item.domain).join(', ')}`, `- deterministic receipt: \`${nativeBatchA.deterministicReceiptRoot}\``, ``, `| Check | Status |`, `| --- | --- |`, ...checks.map(item => `| ${item.id} | ${item.passed ? 'pass' : 'fail'} |`), ``, `Batch A is counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.`].join('\n') + '\n';
   const json = `${JSON.stringify(conformance, null, 2)}\n`;
   await fs.writeFile(path.join(out, 'foundation-conformance.json'), json);
   await fs.writeFile(path.join(ROOT, 'foundation-conformance.json'), json);
