@@ -27,6 +27,7 @@ Stage40 target: 407 static instructions / 367 executed / 20 CHECK_WARRANT operat
 native artifacts: rclvm.exe, rclc.exe, rclvmd.exe, provider_demo.exe, rclfoundation.exe, librclvm.a, rclvm.dll, rclvm.lib
 default bytecode/native compiler: selfhost/compiler.rbc via native/rclc.exe
 Foundation Native Batch A: six domains through a verified RclVmProviderV1 bridge
+Foundation Native Meta Batch B: spacetime, bounded acceleration, and reversible root compression through a second verified provider
 advanced declared-domain syntax: still JavaScript Reference Runtime
 whole-language runtime self-hosting: not claimed
 ```
@@ -39,6 +40,7 @@ npm run build:selfhost-compiler
 npm run verify:selfhost-fixedpoint
 npm run verify:selfhost-examples
 npm run test:foundation-native-batch-a
+npm run test:foundation-native-meta-batch-b
 npm run conformance:foundation
 node scripts/verify-native-windows-boundary.mjs
 node scripts/verify-rcl-selfhost-stage40.mjs
@@ -47,7 +49,7 @@ node scripts/verify-rcl-selfhost-all.mjs
 
 ## Honest Boundary
 
-The native-core compiler has escaped JavaScript after the one-time C0 bootstrap. Foundation Native Batch A now runs quantitative, knowledge, perception, natural-language, understanding, and creative proposals through RBC 1.2 and a real `RclVmProviderV1` host. This is bridge mode, not native Foundation syntax. Physical, biological, spacetime, science, product-domain execution, and all uncovered Foundation modules still run in the JavaScript Reference Runtime. Programs that the native-bytecode backend rejects are reported separately and are not counted as self-host parity successes.
+The native-core compiler has escaped JavaScript after the one-time C0 bootstrap. Foundation Native Batch A now runs quantitative, knowledge, perception, natural-language, understanding, and creative proposals through RBC 1.2 and a real `RclVmProviderV1` host. Meta Batch B adds causal timeline mutation, bounded acceleration, and reversible content-root representation compression through a second provider. Both are bridge mode, not native Foundation syntax. Physical, biological, scientific, product-domain execution, and all uncovered Foundation modules still run in the JavaScript Reference Runtime. Programs that the native-bytecode backend rejects are reported separately and are not counted as self-host parity successes.
 
 See `docs/foundation-native-provider-bridge.md` for the ABI, failure contract, migration path, and performance evidence. The remaining work is moving more domain semantics, the typed module toolchain, and the package authority path onto the same native foundation.
 

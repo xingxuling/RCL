@@ -14,8 +14,10 @@ import {
   compileReality,
   tryCompileRealityToBytecode,
   FOUNDATION_NATIVE_BATCH_A,
+  FOUNDATION_NATIVE_META_BATCH_B,
   FoundationNativeBridgeError,
   runFoundationNativeBatchA,
+  runFoundationNativeMetaBatchB,
 } from '../src/index.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -55,6 +57,28 @@ function junit(checks) {
     ? `    <testcase name="${xml(item.id)}"/>`
     : `    <testcase name="${xml(item.id)}"><failure message="conformance check failed">${xml(item.details)}</failure></testcase>`).join('\n');
   return `<testsuite name="RCL Foundation Conformance" tests="${checks.length}" failures="${failures}">\n${cases}\n</testsuite>\n`;
+}
+
+function metaBatchBInput(speechAct = 'create', overrides = {}) {
+  return {
+    speechAct,
+    timeline: {
+      tick: 0,
+      observerFrame: 'subjective-bounded',
+      eventCount: 1,
+      ...overrides.timeline,
+    },
+    acceleration: {
+      requestedFactor: 2,
+      fidelityFloor: 1,
+      ...overrides.acceleration,
+    },
+    compression: {
+      codec: 'content-addressed',
+      restoreRequired: true,
+      ...overrides.compression,
+    },
+  };
 }
 
 async function main() {
@@ -179,13 +203,167 @@ async function main() {
     baseline: performanceBaseline,
   });
 
+  const nativeMetaBatchB = runFoundationNativeMetaBatchB();
+  const nativeMetaCounterfactual = runFoundationNativeMetaBatchB({
+    input: metaBatchBInput('inspect'),
+  });
+  const nativeMetaClamped = runFoundationNativeMetaBatchB({
+    input: metaBatchBInput('create', {
+      acceleration: { requestedFactor: 64 },
+    }),
+  });
+  check(checks, 'native-meta-batch-b-runtime-invocation', (
+    nativeMetaBatchB.results.length === 3
+    && nativeMetaBatchB.providerHost.providerCallCount === 3
+  ), {
+    domains: nativeMetaBatchB.results.map(item => item.domain),
+    providerHost: nativeMetaBatchB.providerHost,
+  });
+  check(checks, 'native-meta-batch-b-result-shape', nativeMetaBatchB.results.every(item => (
+    item.format === 'taowind.rcl-foundation-runtime-result.v0.1'
+    && item.proposal?.mode === 'bridge'
+    && item.evidence.length > 0
+    && item.authorityRequired.length > 0
+  )));
+  check(checks, 'native-meta-batch-b-selfhost', (
+    nativeMetaBatchB.selfhostByteIdentical
+    && nativeMetaBatchB.bytecodeVersion === '1.2'
+  ), {
+    bytecodeRoot: nativeMetaBatchB.bytecodeRoot,
+    bytecodeVersion: nativeMetaBatchB.bytecodeVersion,
+  });
+  check(checks, 'native-meta-batch-b-deterministic-replay', nativeMetaBatchB.replayVerified, {
+    receiptRoot: nativeMetaBatchB.deterministicReceiptRoot,
+  });
+  check(checks, 'native-meta-batch-b-behavior-mutation', (
+    nativeMetaBatchB.results.every((item, index) => (
+      item.proposal.selectedAction
+      !== nativeMetaCounterfactual.results[index].proposal.selectedAction
+    ))
+    && nativeMetaBatchB.finalStateRoot !== nativeMetaCounterfactual.finalStateRoot
+  ), {
+    originalActions: nativeMetaBatchB.results.map(item => item.proposal.selectedAction),
+    counterfactualActions: nativeMetaCounterfactual.results.map(item => item.proposal.selectedAction),
+    originalRoot: nativeMetaBatchB.finalStateRoot,
+    counterfactualRoot: nativeMetaCounterfactual.finalStateRoot,
+  });
+  check(checks, 'native-meta-batch-b-causal-chain', nativeMetaBatchB.results.every((item, index) => (
+    index === 0
+      ? item.stateDelta.beforeRoot === nativeMetaBatchB.request.causalParents[0]
+      : item.stateDelta.beforeRoot === nativeMetaBatchB.results[index - 1].stateDelta.afterRoot
+  )));
+  const [metaSpacetime, metaAcceleration, metaCompression] = nativeMetaBatchB.results;
+  check(checks, 'native-meta-batch-b-spacetime-semantics', (
+    metaSpacetime.proposal.parameters?.timeline?.ordering === 'causal'
+    && metaSpacetime.proposal.parameters.timeline.tickBefore === 0
+    && metaSpacetime.proposal.parameters.timeline.tickAfter === 1
+    && nativeMetaCounterfactual.results[0].proposal.parameters.timeline.tickAfter === 0
+  ), {
+    create: metaSpacetime.proposal.parameters,
+    inspect: nativeMetaCounterfactual.results[0].proposal.parameters,
+  });
+  check(checks, 'native-meta-batch-b-acceleration-semantics', (
+    metaAcceleration.proposal.parameters?.acceleration?.effectiveFactor === 2
+    && metaAcceleration.proposal.parameters.acceleration.maximumFactor === 8
+    && metaAcceleration.proposal.parameters.acceleration.fidelityPreserved === true
+    && nativeMetaClamped.results[1].proposal.parameters.acceleration.effectiveFactor === 8
+    && nativeMetaClamped.results[1].proposal.parameters.acceleration.clamped === true
+  ), {
+    default: metaAcceleration.proposal.parameters,
+    clamped: nativeMetaClamped.results[1].proposal.parameters,
+  });
+  check(checks, 'native-meta-batch-b-compression-semantics', (
+    metaCompression.proposal.parameters?.compression?.sourceTextBytes === 64
+    && metaCompression.proposal.parameters.compression.compressedBytes === 32
+    && metaCompression.proposal.parameters.compression.reversible === true
+    && metaCompression.proposal.parameters.compression.restoreVerified === true
+    && metaCompression.proposal.parameters.compression.sourceRoot
+      === metaCompression.proposal.parameters.compression.restoreRoot
+    && metaCompression.proposal.parameters.compression.sourceRoot
+      === metaCompression.stateDelta.beforeRoot
+  ), metaCompression.proposal.parameters);
+  const rejectsNativeMetaBatchB = (request, expectedCode, options = {}) => {
+    try {
+      runFoundationNativeMetaBatchB(request, {
+        ...options,
+        verifyReplay: false,
+      });
+      return false;
+    } catch (error) {
+      return (
+        error instanceof FoundationNativeBridgeError
+        && error.code === expectedCode
+      );
+    }
+  };
+  check(checks, 'native-meta-batch-b-negative-authority', rejectsNativeMetaBatchB(
+    { authorized: false },
+    'RCL_FOUNDATION_AUTHORITY_DENIED',
+  ));
+  check(checks, 'native-meta-batch-b-invariant-rejection', rejectsNativeMetaBatchB(
+    { aifDecision: 'unstable' },
+    'RCL_FOUNDATION_AIF_REJECTED',
+  ));
+  check(checks, 'native-meta-batch-b-evidence-rejection', rejectsNativeMetaBatchB(
+    { evidence: [] },
+    'RCL_FOUNDATION_EVIDENCE_REQUIRED',
+  ));
+  check(checks, 'native-meta-batch-b-provider-degradation', rejectsNativeMetaBatchB(
+    {},
+    'RCL_NATIVE_PROVIDER_MISSING',
+    { disableProvider: true },
+  ));
+  check(checks, 'native-meta-batch-b-semantic-rejection', rejectsNativeMetaBatchB(
+    {
+      input: metaBatchBInput('create', {
+        compression: { restoreRequired: false },
+      }),
+    },
+    'RCL_FOUNDATION_META_COMPRESSION_INVALID',
+  ));
+  const metaPerformanceBaseline = JSON.parse(await fs.readFile(
+    path.join(ROOT, 'benchmarks', 'foundation-native-meta-batch-b-baseline.json'),
+    'utf8',
+  ));
+  const metaMaximumResourceRatio = 1 + metaPerformanceBaseline.maximumRegressionRatio;
+  const metaResourceGatePassed = Object.entries(
+    metaPerformanceBaseline.deterministicResourceBaseline,
+  ).every(
+    ([metric, baseline]) => (
+      nativeMetaBatchB.metrics[metric]
+      <= Math.ceil(baseline * metaMaximumResourceRatio)
+    ),
+  );
+  const metaWallClockGatePassed = Object.entries(
+    metaPerformanceBaseline.wallClockBudgetsMs,
+  ).every(
+    ([metric, budget]) => nativeMetaBatchB.metrics[metric] <= budget,
+  );
+  check(checks, 'native-meta-batch-b-performance', (
+    metaResourceGatePassed
+    && metaWallClockGatePassed
+  ), {
+    metrics: nativeMetaBatchB.metrics,
+    baseline: metaPerformanceBaseline,
+  });
+
   const nativeProbe = tryCompileRealityToBytecode(await fs.readFile(path.join(ROOT, fixtures[1]), 'utf8'));
   const nativeExplicitBoundary = !nativeProbe.ok && nativeProbe.diagnostics.some(item => item.code === 'RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED');
   check(checks, 'native-boundary-explicit', nativeExplicitBoundary, { diagnostics: nativeProbe.diagnostics?.map(item => item.code) ?? [] });
 
   const project = 'RCL';
   const nativeBatchADomains = new Set(FOUNDATION_NATIVE_BATCH_A.map(item => item.domain));
+  const nativeMetaBatchBDomains = new Set(
+    FOUNDATION_NATIVE_META_BATCH_B.map(item => item.domain),
+  );
+  const nativeBridgeDomains = new Set([
+    ...nativeBatchADomains,
+    ...nativeMetaBatchBDomains,
+  ]);
   const nativeBatchATests = checks.filter(item => item.id.startsWith('native-batch-a-')).map(item => item.id);
+  const nativeMetaBatchBTests = checks
+    .filter(item => item.id.startsWith('native-meta-batch-b-'))
+    .map(item => item.id);
   const conformance = {
     format: 'taowind.foundation-conformance-report.v0.1',
     project,
@@ -194,7 +372,7 @@ async function main() {
       referenceRuntime: 'native',
       nativeVm: 'bridge',
       nativeVmLimitation: nativeExplicitBoundary
-        ? 'The Native Provider ABI covers Foundation Batch A in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.'
+        ? 'The Native Provider ABI covers Foundation Batch A and Meta Batch B in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.'
         : null,
       nativeProviderBridge: {
         mode: 'bridge',
@@ -208,17 +386,41 @@ async function main() {
         finalStateRoot: nativeBatchA.finalStateRoot,
         metrics: nativeBatchA.metrics,
       },
+      nativeMetaProviderBridge: {
+        mode: 'bridge',
+        providerId: nativeMetaBatchB.providerHost.providerId,
+        providerAbi: nativeMetaBatchB.providerHost.providerAbi,
+        host: 'native/rclfoundation.exe',
+        domains: nativeMetaBatchB.results.map(item => item.domain),
+        bytecodeVersion: nativeMetaBatchB.bytecodeVersion,
+        bytecodeRoot: nativeMetaBatchB.bytecodeRoot,
+        deterministicReceiptRoot: nativeMetaBatchB.deterministicReceiptRoot,
+        finalStateRoot: nativeMetaBatchB.finalStateRoot,
+        metrics: nativeMetaBatchB.metrics,
+      },
     },
     domains: Object.fromEntries([...FOUNDATION_DOMAINS, ...FOUNDATION_COMPOSITE_PLANES, ...FOUNDATION_META_PLANES, ...FOUNDATION_CROSS_DOMAIN_AXES].map(spec => [spec.id, {
-      mode: nativeBatchADomains.has(spec.id) ? 'bridge' : 'none',
+      mode: nativeBridgeDomains.has(spec.id) ? 'bridge' : 'none',
       referenceRuntimeMode: runtimeDomains.has(spec.id) ? 'native' : 'none',
       implementation: nativeBatchADomains.has(spec.id)
         ? 'native/foundation_provider.c + src/foundation-native-bridge.mjs'
+        : nativeMetaBatchBDomains.has(spec.id)
+          ? 'native/foundation_provider.c + src/foundation-native-meta-bridge.mjs'
         : runtimeDomains.has(spec.id) ? `src/runtime.mjs#${spec.runtimeId}` : null,
       tests: nativeBatchADomains.has(spec.id)
         ? nativeBatchATests
-        : checks.filter(item => !item.id.startsWith('native-batch-a-') && (item.id.includes('runtime') || item.id.includes('replay') || item.id.includes('mutation'))).map(item => item.id),
-      knownLimitations: nativeBatchADomains.has(spec.id)
+        : nativeMetaBatchBDomains.has(spec.id)
+          ? nativeMetaBatchBTests
+        : checks.filter(item => (
+          !item.id.startsWith('native-batch-a-')
+          && !item.id.startsWith('native-meta-batch-b-')
+          && (
+            item.id.includes('runtime')
+            || item.id.includes('replay')
+            || item.id.includes('mutation')
+          )
+        )).map(item => item.id),
+      knownLimitations: nativeBridgeDomains.has(spec.id)
         ? ['Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax.']
         : runtimeDomains.has(spec.id)
           ? ['Reference Runtime is covered; Native VM integration is not yet implemented for this domain.']
@@ -231,7 +433,29 @@ async function main() {
   };
   const rows = ['project,domain,category,mode,referenceRuntimeMode,implementation,knownLimitations'];
   for (const [id, item] of Object.entries(conformance.domains)) rows.push([project, id, FOUNDATION_MANIFEST.domains.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.compositePlanes.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.metaRealityPlanes.find(spec => spec.id === id)?.category ?? FOUNDATION_MANIFEST.crossDomainAxes.find(spec => spec.id === id)?.category ?? '', item.mode, item.referenceRuntimeMode, item.implementation ?? '', item.knownLimitations.join('; ')].map(csvCell).join(','));
-  const markdown = [`# RCL Foundation Conformance`, ``, `- status: **${conformance.status}**`, `- contract: ${conformance.contract.format} ${conformance.contract.version}`, `- contract root: \`${conformance.contract.root}\``, `- reference runtime: ${conformance.executionLayers.referenceRuntime}`, `- native VM: ${conformance.executionLayers.nativeVm}`, `- Batch A provider: \`${nativeBatchA.providerHost.providerId}\` through \`RclVmProviderV1\``, `- Batch A domains: ${nativeBatchA.results.map(item => item.domain).join(', ')}`, `- deterministic receipt: \`${nativeBatchA.deterministicReceiptRoot}\``, ``, `| Check | Status |`, `| --- | --- |`, ...checks.map(item => `| ${item.id} | ${item.passed ? 'pass' : 'fail'} |`), ``, `Batch A is counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.`].join('\n') + '\n';
+  const markdown = [
+    '# RCL Foundation Conformance',
+    '',
+    `- status: **${conformance.status}**`,
+    `- contract: ${conformance.contract.format} ${conformance.contract.version}`,
+    `- contract root: \`${conformance.contract.root}\``,
+    `- reference runtime: ${conformance.executionLayers.referenceRuntime}`,
+    `- native VM: ${conformance.executionLayers.nativeVm}`,
+    `- Batch A provider: \`${nativeBatchA.providerHost.providerId}\` through \`RclVmProviderV1\``,
+    `- Batch A domains: ${nativeBatchA.results.map(item => item.domain).join(', ')}`,
+    `- Batch A receipt: \`${nativeBatchA.deterministicReceiptRoot}\``,
+    `- Meta Batch B provider: \`${nativeMetaBatchB.providerHost.providerId}\` through \`RclVmProviderV1\``,
+    `- Meta Batch B domains: ${nativeMetaBatchB.results.map(item => item.domain).join(', ')}`,
+    `- Meta Batch B receipt: \`${nativeMetaBatchB.deterministicReceiptRoot}\``,
+    '',
+    '| Check | Status |',
+    '| --- | --- |',
+    ...checks.map(
+      item => `| ${item.id} | ${item.passed ? 'pass' : 'fail'} |`,
+    ),
+    '',
+    'Batch A and Meta Batch B are counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.',
+  ].join('\n') + '\n';
   const json = `${JSON.stringify(conformance, null, 2)}\n`;
   await fs.writeFile(path.join(out, 'foundation-conformance.json'), json);
   await fs.writeFile(path.join(ROOT, 'foundation-conformance.json'), json);

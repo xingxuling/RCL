@@ -16,7 +16,7 @@
   "claims": {
     "nativeCoreSelfHosting": true,
     "wholeLanguageRuntimeSelfHosting": false,
-    "advancedDomainRuntime": "JavaScript Reference Runtime plus six-domain Native Provider bridge",
+    "advancedDomainRuntime": "JavaScript Reference Runtime plus six-domain Batch A and three-plane Meta Batch B Native Provider bridges",
     "foundationNativeProviderBridge": {
       "mode": "bridge",
       "providerId": "rcl.foundation.batch-a",
@@ -28,7 +28,17 @@
         "natural-language-reality",
         "understanding-reality",
         "creative-reality"
-      ]
+      ],
+      "metaBatchB": {
+        "mode": "bridge",
+        "providerId": "rcl.foundation.meta-batch-b",
+        "providerAbi": 1,
+        "domains": [
+          "meta-spacetime",
+          "meta-acceleration",
+          "meta-compression"
+        ]
+      }
     },
     "downstreamByteIdentity": false
   },
@@ -49,6 +59,7 @@
     "npm run verify:selfhost-stage40",
     "npm run verify:native-boundary",
     "npm run test:foundation-native-batch-a",
+    "npm run test:foundation-native-meta-batch-b",
     "npm run conformance:foundation",
     "npm test",
     "npm run verify:selfhost-examples"
@@ -93,7 +104,8 @@
       "tests/general-selfhost-fixedpoint.test.mjs",
       "tests/selfhost-toolchain.test.mjs",
       "tests/stage40-dual-need.test.mjs",
-      "tests/foundation-native-bridge.test.mjs"
+      "tests/foundation-native-bridge.test.mjs",
+      "tests/foundation-native-meta-bridge.test.mjs"
     ],
     "ciRequired": true,
     "ciRun": null
