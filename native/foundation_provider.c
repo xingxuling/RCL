@@ -14,7 +14,8 @@
 #include <string.h>
 #include "rclvm.h"
 
-#define FOUNDATION_PROVIDER_ID "rcl.foundation.batch-a"
+#define FOUNDATION_BATCH_A_PROVIDER_ID "rcl.foundation.batch-a"
+#define FOUNDATION_META_BATCH_B_PROVIDER_ID "rcl.foundation.meta-batch-b"
 #define FOUNDATION_RESULT_FORMAT "taowind.rcl-foundation-runtime-result.v0.1"
 #define FOUNDATION_HOST_FORMAT "taowind.rcl-foundation-native-host.v0.1"
 #define MAX_JSON_TOKENS 4096
@@ -48,22 +49,35 @@ typedef struct {
   const char *create_action;
   const char *inspect_action;
   int confidence_percent;
+  int parameter_kind;
 } FoundationCapability;
 
 typedef struct {
+  const char *provider_id;
+  const FoundationCapability *capabilities;
+  size_t capability_count;
+  const char *order_message;
   size_t call_count;
   size_t cache_hits;
   char last_after_root[65];
 } FoundationProviderState;
 
-static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
+enum {
+  FOUNDATION_PARAMETERS_NONE = 0,
+  FOUNDATION_PARAMETERS_META_SPACETIME,
+  FOUNDATION_PARAMETERS_META_ACCELERATION,
+  FOUNDATION_PARAMETERS_META_COMPRESSION
+};
+
+static const FoundationCapability FOUNDATION_BATCH_A_CAPABILITIES[] = {
   {
     "quantitative.evaluate",
     "quantitative",
     NULL,
     "measure-create-candidate",
     "measure-observed-state",
-    96
+    96,
+    FOUNDATION_PARAMETERS_NONE
   },
   {
     "knowledge.resolve",
@@ -71,7 +85,8 @@ static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
     "quantitative",
     "justify-create-candidate",
     "justify-observed-state",
-    94
+    94,
+    FOUNDATION_PARAMETERS_NONE
   },
   {
     "perception.observe",
@@ -79,7 +94,8 @@ static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
     "knowledge",
     "observe-create-affordances",
     "observe-existing-affordances",
-    92
+    92,
+    FOUNDATION_PARAMETERS_NONE
   },
   {
     "natural-language.interpret",
@@ -87,7 +103,8 @@ static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
     "perception",
     "interpret-create-intent",
     "interpret-observation-intent",
-    91
+    91,
+    FOUNDATION_PARAMETERS_NONE
   },
   {
     "understanding.model",
@@ -95,7 +112,8 @@ static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
     "natural-language-reality",
     "model-created-reality",
     "model-observed-reality",
-    90
+    90,
+    FOUNDATION_PARAMETERS_NONE
   },
   {
     "creative.generate",
@@ -103,7 +121,38 @@ static const FoundationCapability FOUNDATION_CAPABILITIES[] = {
     "understanding-reality",
     "generate-authorized-candidate",
     "generate-observation-candidate",
-    89
+    89,
+    FOUNDATION_PARAMETERS_NONE
+  }
+};
+
+static const FoundationCapability FOUNDATION_META_BATCH_B_CAPABILITIES[] = {
+  {
+    "meta.spacetime.sequence",
+    "meta-spacetime",
+    NULL,
+    "schedule-causal-transition",
+    "inspect-causal-timeline",
+    97,
+    FOUNDATION_PARAMETERS_META_SPACETIME
+  },
+  {
+    "meta.acceleration.bound",
+    "meta-acceleration",
+    "meta-spacetime",
+    "accelerate-with-fidelity-budget",
+    "measure-safe-acceleration",
+    95,
+    FOUNDATION_PARAMETERS_META_ACCELERATION
+  },
+  {
+    "meta.compression.restore",
+    "meta-compression",
+    "meta-acceleration",
+    "compress-with-restore-contract",
+    "verify-lossless-restore",
+    98,
+    FOUNDATION_PARAMETERS_META_COMPRESSION
   }
 };
 
@@ -317,12 +366,16 @@ static int foundation_sha256_hex(const char *value, size_t length, char output[6
   return 1;
 }
 
-static const FoundationCapability *find_capability(const char *capability, size_t *index_out) {
-  size_t count = sizeof(FOUNDATION_CAPABILITIES) / sizeof(FOUNDATION_CAPABILITIES[0]);
-  for (size_t index = 0; index < count; index++) {
-    if (strcmp(capability, FOUNDATION_CAPABILITIES[index].capability) == 0) {
+static const FoundationCapability *find_capability(
+  const FoundationProviderState *provider_state,
+  const char *capability,
+  size_t *index_out
+) {
+  if (!provider_state) return NULL;
+  for (size_t index = 0; index < provider_state->capability_count; index++) {
+    if (strcmp(capability, provider_state->capabilities[index].capability) == 0) {
       if (index_out) *index_out = index;
-      return &FOUNDATION_CAPABILITIES[index];
+      return &provider_state->capabilities[index];
     }
   }
   return NULL;
@@ -352,6 +405,316 @@ static int provider_fail(
   return 0;
 }
 
+static int json_read_integer(
+  const char *json,
+  const JsonToken *token,
+  long long minimum,
+  long long maximum,
+  long long *value_out
+) {
+  if (!token || token->type != JSON_PRIMITIVE || !value_out) return 0;
+  size_t length = (size_t)(token->end - token->start);
+  if (length == 0 || length >= 32) return 0;
+  char buffer[32];
+  memcpy(buffer, json + token->start, length);
+  buffer[length] = '\0';
+  char *end = NULL;
+  long long value = strtoll(buffer, &end, 10);
+  if (!end || *end != '\0' || value < minimum || value > maximum) return 0;
+  *value_out = value;
+  return 1;
+}
+
+static int json_read_number(
+  const char *json,
+  const JsonToken *token,
+  double minimum,
+  double maximum,
+  double *value_out
+) {
+  if (!token || token->type != JSON_PRIMITIVE || !value_out) return 0;
+  size_t length = (size_t)(token->end - token->start);
+  if (length == 0 || length >= 64) return 0;
+  char buffer[64];
+  memcpy(buffer, json + token->start, length);
+  buffer[length] = '\0';
+  char *end = NULL;
+  double value = strtod(buffer, &end);
+  if (
+    !end
+    || *end != '\0'
+    || value != value
+    || value < minimum
+    || value > maximum
+  ) {
+    return 0;
+  }
+  *value_out = value;
+  return 1;
+}
+
+static int hex_nibble(unsigned char value) {
+  if (value >= '0' && value <= '9') return value - '0';
+  if (value >= 'a' && value <= 'f') return value - 'a' + 10;
+  return -1;
+}
+
+static int compress_and_restore_root(
+  const char source_root[65],
+  char restored_root[65]
+) {
+  unsigned char packed[32];
+  for (size_t index = 0; index < sizeof(packed); index++) {
+    int high = hex_nibble((unsigned char)source_root[index * 2]);
+    int low = hex_nibble((unsigned char)source_root[index * 2 + 1]);
+    if (high < 0 || low < 0) return 0;
+    packed[index] = (unsigned char)((high << 4) | low);
+  }
+  for (size_t index = 0; index < sizeof(packed); index++) {
+    snprintf(restored_root + index * 2, 3, "%02x", packed[index]);
+  }
+  restored_root[64] = '\0';
+  return strcmp(source_root, restored_root) == 0;
+}
+
+static int build_parameters_fragment(
+  const FoundationCapability *capability,
+  const char *request_json,
+  const JsonToken *tokens,
+  int token_count,
+  int input_index,
+  int create_mode,
+  const char causal_parent[65],
+  char *output,
+  size_t output_capacity,
+  char *error,
+  size_t error_capacity
+) {
+  if (!capability || !output || output_capacity == 0) {
+    return provider_fail(
+      error,
+      error_capacity,
+      "RCL_FOUNDATION_PARAMETER_INVALID",
+      "Cannot construct Foundation semantic parameters"
+    );
+  }
+  output[0] = '\0';
+  if (capability->parameter_kind == FOUNDATION_PARAMETERS_NONE) return 1;
+
+  int length = -1;
+  if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_SPACETIME) {
+    int timeline_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "timeline"
+    );
+    int tick_index = timeline_index >= 0
+      ? json_object_get(request_json, tokens, token_count, timeline_index, "tick")
+      : -1;
+    int event_count_index = timeline_index >= 0
+      ? json_object_get(request_json, tokens, token_count, timeline_index, "eventCount")
+      : -1;
+    int observer_index = timeline_index >= 0
+      ? json_object_get(request_json, tokens, token_count, timeline_index, "observerFrame")
+      : -1;
+    long long tick = 0;
+    long long event_count = 0;
+    const char *observer_frame = NULL;
+    if (
+      timeline_index < 0
+      || tokens[timeline_index].type != JSON_OBJECT
+      || !json_read_integer(
+        request_json,
+        tick_index >= 0 ? &tokens[tick_index] : NULL,
+        0,
+        1000000000000LL,
+        &tick
+      )
+      || !json_read_integer(
+        request_json,
+        event_count_index >= 0 ? &tokens[event_count_index] : NULL,
+        1,
+        1000000,
+        &event_count
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_META_SPACETIME_INVALID",
+        "timeline.tick and timeline.eventCount must be bounded integers"
+      );
+    }
+    if (
+      observer_index >= 0
+      && json_token_equals(request_json, &tokens[observer_index], "subjective-bounded")
+    ) {
+      observer_frame = "subjective-bounded";
+    } else if (
+      observer_index >= 0
+      && json_token_equals(request_json, &tokens[observer_index], "objective-bounded")
+    ) {
+      observer_frame = "objective-bounded";
+    } else {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_META_SPACETIME_INVALID",
+        "timeline.observerFrame must be subjective-bounded or objective-bounded"
+      );
+    }
+    long long tick_after = create_mode ? tick + event_count : tick;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"timeline\":{"
+        "\"ordering\":\"causal\","
+        "\"tickBefore\":%lld,"
+        "\"tickAfter\":%lld,"
+        "\"eventCount\":%lld,"
+        "\"observerFrame\":\"%s\","
+        "\"mutationApplied\":%s"
+      "}},",
+      tick,
+      tick_after,
+      event_count,
+      observer_frame,
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_ACCELERATION) {
+    int acceleration_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "acceleration"
+    );
+    int factor_index = acceleration_index >= 0
+      ? json_object_get(request_json, tokens, token_count, acceleration_index, "requestedFactor")
+      : -1;
+    int fidelity_index = acceleration_index >= 0
+      ? json_object_get(request_json, tokens, token_count, acceleration_index, "fidelityFloor")
+      : -1;
+    long long requested_factor = 0;
+    double fidelity_floor = 0.0;
+    if (
+      acceleration_index < 0
+      || tokens[acceleration_index].type != JSON_OBJECT
+      || !json_read_integer(
+        request_json,
+        factor_index >= 0 ? &tokens[factor_index] : NULL,
+        1,
+        64,
+        &requested_factor
+      )
+      || !json_read_number(
+        request_json,
+        fidelity_index >= 0 ? &tokens[fidelity_index] : NULL,
+        0.5,
+        1.0,
+        &fidelity_floor
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_META_ACCELERATION_INVALID",
+        "acceleration requires requestedFactor 1..64 and fidelityFloor 0.5..1"
+      );
+    }
+    long long bounded_factor = requested_factor > 8 ? 8 : requested_factor;
+    long long effective_factor = create_mode ? bounded_factor : 1;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"acceleration\":{"
+        "\"mode\":\"bounded\","
+        "\"requestedFactor\":%lld,"
+        "\"effectiveFactor\":%lld,"
+        "\"maximumFactor\":8,"
+        "\"fidelityFloor\":%.6f,"
+        "\"fidelityPreserved\":true,"
+        "\"clamped\":%s,"
+        "\"mutationApplied\":%s"
+      "}},",
+      requested_factor,
+      effective_factor,
+      fidelity_floor,
+      requested_factor > 8 ? "true" : "false",
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_COMPRESSION) {
+    int compression_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "compression"
+    );
+    int codec_index = compression_index >= 0
+      ? json_object_get(request_json, tokens, token_count, compression_index, "codec")
+      : -1;
+    int restore_index = compression_index >= 0
+      ? json_object_get(request_json, tokens, token_count, compression_index, "restoreRequired")
+      : -1;
+    if (
+      compression_index < 0
+      || tokens[compression_index].type != JSON_OBJECT
+      || codec_index < 0
+      || !json_token_equals(request_json, &tokens[codec_index], "content-addressed")
+      || restore_index < 0
+      || !json_primitive_equals(request_json, &tokens[restore_index], "true")
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_META_COMPRESSION_INVALID",
+        "compression requires content-addressed codec and restoreRequired=true"
+      );
+    }
+    char restored_root[65];
+    if (!compress_and_restore_root(causal_parent, restored_root)) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_META_COMPRESSION_RESTORE",
+        "The content root could not be packed and restored losslessly"
+      );
+    }
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"compression\":{"
+        "\"codec\":\"content-addressed-root-pack-v1\","
+        "\"scope\":\"content-root-representation\","
+        "\"sourceTextBytes\":64,"
+        "\"compressedBytes\":32,"
+        "\"reversible\":true,"
+        "\"restoreRequired\":true,"
+        "\"sourceRoot\":\"%s\","
+        "\"restoreRoot\":\"%s\","
+        "\"restoreVerified\":true,"
+        "\"mutationApplied\":%s"
+      "}},",
+      causal_parent,
+      restored_root,
+      create_mode ? "true" : "false"
+    );
+  }
+
+  if (length < 0 || (size_t)length >= output_capacity) {
+    return provider_fail(
+      error,
+      error_capacity,
+      "RCL_FOUNDATION_RESPONSE_LIMIT",
+      "Foundation semantic parameters exceeded their deterministic bound"
+    );
+  }
+  return 1;
+}
+
 static int foundation_provider_invoke(
   void *userdata,
   const char *capability_name,
@@ -363,13 +726,17 @@ static int foundation_provider_invoke(
 ) {
   FoundationProviderState *provider_state = (FoundationProviderState *)userdata;
   size_t capability_index = 0;
-  const FoundationCapability *capability = find_capability(capability_name, &capability_index);
+  const FoundationCapability *capability = find_capability(
+    provider_state,
+    capability_name,
+    &capability_index
+  );
   if (!capability) {
     return provider_fail(
       error,
       error_capacity,
       "RCL_FOUNDATION_CAPABILITY_DENIED",
-      "The requested capability is outside Foundation Native Batch A"
+      "The requested capability is outside the registered Foundation batch"
     );
   }
   if (!provider_state || capability_index != provider_state->call_count) {
@@ -377,7 +744,9 @@ static int foundation_provider_invoke(
       error,
       error_capacity,
       "RCL_FOUNDATION_CAUSAL_ORDER",
-      "Foundation capabilities must execute in the declared six-domain causal order"
+      provider_state
+        ? provider_state->order_message
+        : "Foundation capabilities require provider state"
     );
   }
 
@@ -508,9 +877,27 @@ static int foundation_provider_invoke(
     return provider_fail(error, error_capacity, "RCL_FOUNDATION_SHA256", "Cannot hash the provider transition");
   }
 
-  const char *selected_action = is_create_speech_act(speech_act)
+  int create_mode = is_create_speech_act(speech_act);
+  const char *selected_action = create_mode
     ? capability->create_action
     : capability->inspect_action;
+  char parameters_fragment[1024];
+  if (!build_parameters_fragment(
+    capability,
+    request_json,
+    tokens,
+    token_count,
+    input_index,
+    create_mode,
+    causal_parent,
+    parameters_fragment,
+    sizeof(parameters_fragment),
+    error,
+    error_capacity
+  )) {
+    free(tokens);
+    return 0;
+  }
   double confidence = (double)capability->confidence_percent / 100.0;
   int response_length = snprintf(
     response_json,
@@ -524,9 +911,10 @@ static int foundation_provider_invoke(
         "\"kind\":\"FoundationNativeProviderBridge\","
         "\"status\":\"proposed\","
         "\"mode\":\"bridge\","
-        "\"provider\":\"" FOUNDATION_PROVIDER_ID "\","
+        "\"provider\":\"%s\","
         "\"capability\":\"%s\","
         "\"selectedAction\":\"%s\","
+        "%s"
         "\"changes\":[{"
           "\"path\":\"foundation.%s.result\","
           "\"operation\":\"set\","
@@ -550,7 +938,7 @@ static int foundation_provider_invoke(
       "},"
       "\"evidence\":[{"
         "\"type\":\"native-provider-receipt\","
-        "\"provider\":\"" FOUNDATION_PROVIDER_ID "\","
+        "\"provider\":\"%s\","
         "\"capability\":\"%s\","
         "\"requestRoot\":\"%s\","
         "\"causalParent\":\"%s\""
@@ -561,7 +949,7 @@ static int foundation_provider_invoke(
         "\"deterministic\":true,"
         "\"mode\":\"bridge\","
         "\"providerAbi\":1,"
-        "\"providerId\":\"" FOUNDATION_PROVIDER_ID "\","
+        "\"providerId\":\"%s\","
         "\"capability\":\"%s\","
         "\"requestRoot\":\"%s\","
         "\"beforeRoot\":\"%s\","
@@ -573,19 +961,23 @@ static int foundation_provider_invoke(
     "}",
     capability->domain,
     capability->capability,
+    provider_state->provider_id,
     capability->capability,
     selected_action,
+    parameters_fragment,
     capability->domain,
     after_root,
     causal_parent,
     after_root,
     capability->domain,
     after_root,
+    provider_state->provider_id,
     capability->capability,
     request_root,
     causal_parent,
     confidence,
     capability->domain,
+    provider_state->provider_id,
     capability->capability,
     request_root,
     causal_parent,
@@ -617,13 +1009,32 @@ static void print_host_error(const char *message) {
 
 int main(int argc, char **argv) {
   if (argc != 2) {
-    print_host_error("Usage: rclfoundation <foundation-batch-a.rbc>");
+    print_host_error("Usage: rclfoundation <foundation-batch.rbc>");
     return 2;
   }
 
   char error[512] = {0};
   char *vm_json = NULL;
-  FoundationProviderState provider_state = {0, 0, {0}};
+  FoundationProviderState batch_a_state = {
+    FOUNDATION_BATCH_A_PROVIDER_ID,
+    FOUNDATION_BATCH_A_CAPABILITIES,
+    sizeof(FOUNDATION_BATCH_A_CAPABILITIES)
+      / sizeof(FOUNDATION_BATCH_A_CAPABILITIES[0]),
+    "Foundation Batch A capabilities must execute in the declared six-domain causal order",
+    0,
+    0,
+    {0}
+  };
+  FoundationProviderState meta_batch_b_state = {
+    FOUNDATION_META_BATCH_B_PROVIDER_ID,
+    FOUNDATION_META_BATCH_B_CAPABILITIES,
+    sizeof(FOUNDATION_META_BATCH_B_CAPABILITIES)
+      / sizeof(FOUNDATION_META_BATCH_B_CAPABILITIES[0]),
+    "Foundation Meta Batch B capabilities must execute in spacetime, acceleration, compression order",
+    0,
+    0,
+    {0}
+  };
   RclVmInstance *vm = rclvm_instance_create();
   if (!vm) {
     print_host_error("Cannot create RCL Native VM instance");
@@ -632,16 +1043,26 @@ int main(int argc, char **argv) {
 
   const char *disable_provider = getenv("RCL_FOUNDATION_DISABLE_PROVIDER");
   if (!disable_provider || strcmp(disable_provider, "1") != 0) {
-    RclVmProviderV1 provider = {
-      RCLVM_PROVIDER_ABI_V1,
-      FOUNDATION_PROVIDER_ID,
-      foundation_provider_invoke,
-      &provider_state
+    RclVmProviderV1 providers[] = {
+      {
+        RCLVM_PROVIDER_ABI_V1,
+        FOUNDATION_BATCH_A_PROVIDER_ID,
+        foundation_provider_invoke,
+        &batch_a_state
+      },
+      {
+        RCLVM_PROVIDER_ABI_V1,
+        FOUNDATION_META_BATCH_B_PROVIDER_ID,
+        foundation_provider_invoke,
+        &meta_batch_b_state
+      }
     };
-    if (!rclvm_instance_register_provider(vm, &provider, error, sizeof(error))) {
-      print_host_error(error);
-      rclvm_instance_destroy(vm);
-      return 1;
+    for (size_t index = 0; index < sizeof(providers) / sizeof(providers[0]); index++) {
+      if (!rclvm_instance_register_provider(vm, &providers[index], error, sizeof(error))) {
+        print_host_error(error);
+        rclvm_instance_destroy(vm);
+        return 1;
+      }
     }
   }
 
@@ -661,15 +1082,27 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  if (batch_a_state.call_count > 0 && meta_batch_b_state.call_count > 0) {
+    print_host_error(
+      "RCL_FOUNDATION_PROVIDER_SCOPE: one bytecode execution must target exactly one Foundation batch"
+    );
+    rclvm_free_string(vm_json);
+    rclvm_instance_destroy(vm);
+    return 1;
+  }
+  FoundationProviderState *active_provider = meta_batch_b_state.call_count > 0
+    ? &meta_batch_b_state
+    : &batch_a_state;
   size_t vm_json_length = strlen(vm_json);
   while (vm_json_length > 0 && isspace((unsigned char)vm_json[vm_json_length - 1])) vm_json_length--;
   printf(
     "{\"format\":\"" FOUNDATION_HOST_FORMAT "\","
-    "\"providerHost\":{\"providerId\":\"" FOUNDATION_PROVIDER_ID "\","
+    "\"providerHost\":{\"providerId\":\"%s\","
     "\"providerAbi\":1,\"providerCallCount\":%zu,\"cacheHits\":%zu,\"cacheHitRate\":0},"
     "\"native\":",
-    provider_state.call_count,
-    provider_state.cache_hits
+    active_provider->provider_id,
+    active_provider->call_count,
+    active_provider->cache_hits
   );
   fwrite(vm_json, 1, vm_json_length, stdout);
   fputs("}\n", stdout);

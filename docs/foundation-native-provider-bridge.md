@@ -1,10 +1,13 @@
-# Foundation Native Provider Bridge Batch A
+# Foundation Native Provider Bridge
 
 ## Status
 
-Batch A is a verified `bridge`, not native Foundation syntax. It executes RBC 1.2 in the C Native VM and calls a registered `RclVmProviderV1` implementation in `native/foundation_provider.c`.
+Foundation Batch A and Meta Batch B are verified `bridge` integrations, not
+native Foundation syntax. Both execute self-hosted RBC 1.2 in the C Native VM
+and call registered `RclVmProviderV1` implementations in
+`native/foundation_provider.c`.
 
-Covered domains, in enforced causal order:
+Batch A provider `rcl.foundation.batch-a` covers, in enforced causal order:
 
 1. `quantitative`
 2. `knowledge`
@@ -13,45 +16,87 @@ Covered domains, in enforced causal order:
 5. `understanding-reality`
 6. `creative-reality`
 
-Declared Foundation-domain syntax remains outside the native bytecode subset and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
+Meta Batch B provider `rcl.foundation.meta-batch-b` covers:
+
+1. `meta-spacetime`
+2. `meta-acceleration`
+3. `meta-compression`
+
+Declared Foundation-domain syntax remains outside the native bytecode subset
+and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
 ## Runtime Path
 
 ```text
 request
-  -> src/foundation-native-bridge.mjs
+  -> Batch A or Meta Batch B JS adapter
+  -> shared foundation-native-batch-runtime.mjs
   -> selfhost/compiler.rbc through native/rclc.exe
-  -> RBC 1.2 with six dynamic provider_call instructions
+  -> RBC 1.2 with ordered dynamic provider_call instructions
   -> native/rclfoundation.exe
-  -> RclVmProviderV1 "rcl.foundation.batch-a"
-  -> six standard Foundation runtime results
-  -> deterministic receipt and replay verification
+  -> selected RclVmProviderV1 provider
+  -> standard Foundation runtime results
+  -> semantic validation, deterministic receipt, replay verification
 ```
 
-Every result has `proposal`, `constraints`, `stateDelta`, `evidence`, `confidence`, `authorityRequired`, and `replayMetadata`. Each result's `beforeRoot` must equal the previous result's `afterRoot`.
+Every result has `proposal`, `constraints`, `stateDelta`, `evidence`,
+`confidence`, `authorityRequired`, and `replayMetadata`. Each result's
+`beforeRoot` must equal the preceding result's `afterRoot`.
+
+Meta Batch B adds executable semantics:
+
+- `meta-spacetime` advances a bounded causal timeline for create operations and
+  leaves it unchanged for inspect operations.
+- `meta-acceleration` applies a requested integer factor with a hard maximum of
+  8 and an explicit fidelity floor.
+- `meta-compression` packs a 64-byte hexadecimal content-root representation
+  into 32 bytes and verifies an exact restoration before returning a result.
+  Its scope is root representation, not arbitrary asset compression.
 
 ## Run
 
 ```bash
 npm run build:native
 npm run demo:foundation-native-batch-a
+npm run demo:foundation-native-meta-batch-b
 npm run test:foundation-native-batch-a
+npm run test:foundation-native-meta-batch-b
 npm run conformance:foundation
 ```
 
 Programmatic use:
 
 ```js
-import { runFoundationNativeBatchA } from '@taowind/rcl-reality-forge';
+import {
+  runFoundationNativeBatchA,
+  runFoundationNativeMetaBatchB,
+} from '@taowind/rcl-reality-forge';
 
-const result = runFoundationNativeBatchA({
-  authorized: true,
-  aifDecision: 'stable',
+const foundation = runFoundationNativeBatchA({
   input: {
     speechAct: 'create',
     utterance: 'Create one bounded reality candidate.',
   },
-  evidence: [{ type: 'operator-intent', id: 'request-1' }],
+});
+
+const meta = runFoundationNativeMetaBatchB({
+  causalParents: [foundation.finalStateRoot],
+  input: {
+    speechAct: 'create',
+    timeline: {
+      tick: 12,
+      observerFrame: 'subjective-bounded',
+      eventCount: 3,
+    },
+    acceleration: {
+      requestedFactor: 4,
+      fidelityFloor: 0.95,
+    },
+    compression: {
+      codec: 'content-addressed',
+      restoreRequired: true,
+    },
+  },
 });
 ```
 
@@ -62,14 +107,31 @@ const result = runFoundationNativeBatchA({
 - `RCL_FOUNDATION_AIF_REJECTED`: `aifDecision` is not `stable`.
 - `RCL_FOUNDATION_EVIDENCE_REQUIRED`: evidence or causal parents are empty.
 - `RCL_FOUNDATION_CAUSAL_ORDER`: capabilities were called out of order.
-- `RCL_FOUNDATION_PARENT_INVALID`: a predecessor result has the wrong format, domain, or root.
+- `RCL_FOUNDATION_PARENT_INVALID`: a predecessor result has the wrong format,
+  domain, or root.
+- `RCL_FOUNDATION_META_SPACETIME_INVALID`: timeline input is unbounded.
+- `RCL_FOUNDATION_META_ACCELERATION_INVALID`: factor or fidelity is outside the
+  accepted input range.
+- `RCL_FOUNDATION_META_COMPRESSION_INVALID`: the reversible restore contract is
+  absent.
+- `RCL_FOUNDATION_RESULT_SEMANTICS`: a format-valid host result does not match
+  the requested semantic transition.
 
 ## Migration
 
-Consumers should import `runFoundationNativeBatchA` from the canonical RCL package instead of copying the Provider or synthesizing Foundation results locally. Treat returned results as proposals; authority requirements remain explicit and this bridge does not execute irreversible product actions.
+Consumers should import the canonical RCL runners instead of copying provider
+code or synthesizing Foundation results locally. Treat returned results as
+proposals: authority requirements remain explicit, and neither bridge executes
+irreversible product actions by itself.
 
-The checked Windows distribution adds `native/rclfoundation.exe`. Linux and macOS builds produce `native/rclfoundation` through `native/Makefile` and require OpenSSL, matching the existing Native VM build contract.
+The checked Windows distribution includes `native/rclfoundation.exe`. Linux and
+macOS builds produce `native/rclfoundation` through `native/Makefile` and
+require OpenSSL, matching the existing Native VM build contract.
 
 ## Performance Evidence
 
-`benchmarks/foundation-native-batch-a-baseline.json` records deterministic bytecode, instruction, result, and working-set estimates. Tests reject resource growth above 20 percent. Wall-clock compile, runtime, and replay latency are reported separately under broad environment budgets because compiler cache and host load make exact timing non-deterministic.
+The files under `benchmarks/foundation-native-*-baseline.json` record
+deterministic bytecode, instruction, result, and working-set estimates. Tests
+reject resource growth above 20 percent. Wall-clock compile, runtime, and
+replay latency use broad environment budgets because compiler cache and host
+load make exact timing non-deterministic.
