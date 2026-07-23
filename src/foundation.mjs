@@ -1,4 +1,14 @@
-export const REALITY_DOMAINS = Object.freeze([
+import {
+  FOUNDATION_CONTRACT_FORMAT,
+  FOUNDATION_CONTRACT_VERSION,
+  FOUNDATION_DOMAINS,
+  FOUNDATION_COMPOSITE_PLANES,
+  FOUNDATION_META_PLANES,
+  FOUNDATION_CROSS_DOMAIN_AXES,
+  FOUNDATION_MANIFEST_ROOT,
+  foundationManifestSummary,
+} from './foundation-contract.mjs';
+const LEGACY_REALITY_DOMAINS = Object.freeze([
   {
     id: 'meta-computational', keyword: 'meta',
     question: 'How can computation inspect, validate and transform computation itself?',
@@ -57,7 +67,7 @@ export const REALITY_DOMAINS = Object.freeze([
   },
 ]);
 
-export const CROSS_DOMAIN_AXES = Object.freeze([
+const LEGACY_CROSS_DOMAIN_AXES = Object.freeze([
   {
     id: 'authority', primitives: ['warrant', 'needs', 'preserve'],
     role: 'opens bounded powers while constraining which changes can become authoritative reality',
@@ -68,7 +78,7 @@ export const CROSS_DOMAIN_AXES = Object.freeze([
   },
 ]);
 
-export const COMPOSITE_REALITY_PLANES = Object.freeze([
+const LEGACY_COMPOSITE_REALITY_PLANES = Object.freeze([
   {
     id: 'natural-language-reality',
     primitives: ['language', 'utterance', 'intent', 'interpret'],
@@ -99,7 +109,7 @@ export const COMPOSITE_REALITY_PLANES = Object.freeze([
   },
 ]);
 
-export const META_REALITY_PLANES = Object.freeze([
+const LEGACY_META_REALITY_PLANES = Object.freeze([
   {
     id: 'meta-spacetime-reality',
     primitives: ['spacetime', 'frame', 'clock', 'coordinate', 'relation', 'synchronize'],
@@ -120,9 +130,17 @@ export const META_REALITY_PLANES = Object.freeze([
   },
 ]);
 
+// Keep the compiler IR byte-stable. Canonical IDs and schemas live in the
+// Foundation Contract; the legacy runtime descriptors remain the compiler ABI.
+export const REALITY_DOMAINS = LEGACY_REALITY_DOMAINS;
+export const CROSS_DOMAIN_AXES = LEGACY_CROSS_DOMAIN_AXES;
+export const COMPOSITE_REALITY_PLANES = LEGACY_COMPOSITE_REALITY_PLANES;
+export const META_REALITY_PLANES = LEGACY_META_REALITY_PLANES;
 export function foundationSummary(program) {
   return {
     format: 'rcl.reality-foundation.v0.6',
+    contract: { format: FOUNDATION_CONTRACT_FORMAT, version: FOUNDATION_CONTRACT_VERSION, root: FOUNDATION_MANIFEST_ROOT },
+    contractSummary: foundationManifestSummary(),
     program: program.name,
     languageVersion: program.languageVersion,
     programRoot: program.programRoot,
@@ -142,6 +160,7 @@ export function foundationSummary(program) {
       science: program.sciences?.length ?? 0,
       spirit: program.spirits?.length ?? 0,
     },
+    canonicalDomainIds: FOUNDATION_DOMAINS.map(domain => domain.id),
     runningPlanes: {
       naturalLanguage: program.naturalLanguages?.length ?? 0,
       understanding: program.understandings?.length ?? 0,

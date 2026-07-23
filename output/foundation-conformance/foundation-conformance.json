@@ -1,0 +1,1187 @@
+{
+  "format": "taowind.foundation-conformance-report.v0.1",
+  "project": "RCL",
+  "contract": {
+    "format": "taowind.rcl-foundation-contract.v0.1",
+    "version": "0.1.0",
+    "root": "34e508fe3b6587e630cc32a075edbad87323c7359434b2a2aaf01cf7e250f7e1",
+    "counts": {
+      "domains": 14,
+      "compositePlanes": 5,
+      "metaRealityPlanes": 3,
+      "crossDomainAxes": 2,
+      "realityRobustness": 4
+    }
+  },
+  "executionLayers": {
+    "referenceRuntime": "native",
+    "nativeVm": "bridge",
+    "nativeVmLimitation": "The Native Provider ABI covers Foundation Batch A and Meta Batch B in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.",
+    "nativeProviderBridge": {
+      "mode": "bridge",
+      "providerId": "rcl.foundation.batch-a",
+      "providerAbi": 1,
+      "host": "native/rclfoundation.exe",
+      "domains": [
+        "quantitative",
+        "knowledge",
+        "perception",
+        "natural-language-reality",
+        "understanding-reality",
+        "creative-reality"
+      ],
+      "bytecodeVersion": "1.2",
+      "bytecodeRoot": "3705305f0548d2945a313609c2f27da0c24166f31ee9659dc5ba7b0e57403209",
+      "deterministicReceiptRoot": "0ec9121a4c0367e51de068b06d294d4ba2bec4f4a8f5e76ba5c0d253a2288b3d",
+      "finalStateRoot": "ea668d63168483bf6bc8e68a2c0166338df5912f355f2ae0edce5fc1d30d91ad",
+      "metrics": {
+        "compileMs": 89.4264,
+        "oracleCompileMs": 2.9531,
+        "selfhostCompileMs": 86.4733,
+        "sourceBytes": 4106,
+        "bytecodeBytes": 2533,
+        "runtimeMs": 46.3925,
+        "replayMs": 44.862,
+        "processRssDeltaBytes": 0,
+        "estimatedWorkingSetBytes": 44314,
+        "eventCount": 65,
+        "resultCount": 6,
+        "nativeInstructionCount": 65,
+        "providerCallCount": 6,
+        "cacheHitRate": 0,
+        "resultBytes": 11223,
+        "compressionRatio": 1.621003
+      }
+    },
+    "nativeMetaProviderBridge": {
+      "mode": "bridge",
+      "providerId": "rcl.foundation.meta-batch-b",
+      "providerAbi": 1,
+      "host": "native/rclfoundation.exe",
+      "domains": [
+        "meta-spacetime",
+        "meta-acceleration",
+        "meta-compression"
+      ],
+      "bytecodeVersion": "1.2",
+      "bytecodeRoot": "e5ed4c14852ed7d531e36eed46779533d9c7905deecb34364e19edaff8d3048f",
+      "deterministicReceiptRoot": "1d22b8565c04538abe431b5d644d3776d0e0322cf546e61ce23afc6859741318",
+      "finalStateRoot": "5563283f81d4e407af65129034a5cb80d3a2d9a19082ca9de0f15e3cc7467df3",
+      "metrics": {
+        "compileMs": 70.2491,
+        "oracleCompileMs": 0.5921,
+        "selfhostCompileMs": 69.657,
+        "sourceBytes": 2610,
+        "bytecodeBytes": 2126,
+        "runtimeMs": 52.5975,
+        "replayMs": 58.6078,
+        "processRssDeltaBytes": 0,
+        "estimatedWorkingSetBytes": 25638,
+        "eventCount": 32,
+        "resultCount": 3,
+        "nativeInstructionCount": 32,
+        "providerCallCount": 3,
+        "cacheHitRate": 0,
+        "resultBytes": 6460,
+        "compressionRatio": 1.227658
+      }
+    }
+  },
+  "domains": {
+    "metacomputation": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#meta-computational",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "computation": {
+      "mode": "none",
+      "referenceRuntimeMode": "none",
+      "implementation": null,
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "No runtime fixture covered this module."
+      ]
+    },
+    "physical": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#physical",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "energy": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#energy",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "elemental": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#elemental",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "perception": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "neural": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#neural",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "embodiment": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#embodied",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "life": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#living",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "genetic": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#genetic",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "quantitative": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "knowledge": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "scientific": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#science",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "spiritual": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#spirit",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "natural-language-reality": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "understanding-reality": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "creative-reality": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-bridge.mjs",
+      "tests": [
+        "native-batch-a-runtime-invocation",
+        "native-batch-a-result-shape",
+        "native-batch-a-selfhost",
+        "native-batch-a-deterministic-replay",
+        "native-batch-a-behavior-mutation",
+        "native-batch-a-causal-chain",
+        "native-batch-a-negative-authority",
+        "native-batch-a-invariant-rejection",
+        "native-batch-a-evidence-rejection",
+        "native-batch-a-provider-degradation",
+        "native-batch-a-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "inner-reality": {
+      "mode": "none",
+      "referenceRuntimeMode": "none",
+      "implementation": null,
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "No runtime fixture covered this module."
+      ]
+    },
+    "execution-reality": {
+      "mode": "none",
+      "referenceRuntimeMode": "native",
+      "implementation": "src/runtime.mjs#execution-reality",
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+      ]
+    },
+    "meta-spacetime": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-meta-bridge.mjs",
+      "tests": [
+        "native-meta-batch-b-runtime-invocation",
+        "native-meta-batch-b-result-shape",
+        "native-meta-batch-b-selfhost",
+        "native-meta-batch-b-deterministic-replay",
+        "native-meta-batch-b-behavior-mutation",
+        "native-meta-batch-b-causal-chain",
+        "native-meta-batch-b-spacetime-semantics",
+        "native-meta-batch-b-acceleration-semantics",
+        "native-meta-batch-b-compression-semantics",
+        "native-meta-batch-b-negative-authority",
+        "native-meta-batch-b-invariant-rejection",
+        "native-meta-batch-b-evidence-rejection",
+        "native-meta-batch-b-provider-degradation",
+        "native-meta-batch-b-semantic-rejection",
+        "native-meta-batch-b-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "meta-acceleration": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-meta-bridge.mjs",
+      "tests": [
+        "native-meta-batch-b-runtime-invocation",
+        "native-meta-batch-b-result-shape",
+        "native-meta-batch-b-selfhost",
+        "native-meta-batch-b-deterministic-replay",
+        "native-meta-batch-b-behavior-mutation",
+        "native-meta-batch-b-causal-chain",
+        "native-meta-batch-b-spacetime-semantics",
+        "native-meta-batch-b-acceleration-semantics",
+        "native-meta-batch-b-compression-semantics",
+        "native-meta-batch-b-negative-authority",
+        "native-meta-batch-b-invariant-rejection",
+        "native-meta-batch-b-evidence-rejection",
+        "native-meta-batch-b-provider-degradation",
+        "native-meta-batch-b-semantic-rejection",
+        "native-meta-batch-b-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "meta-compression": {
+      "mode": "bridge",
+      "referenceRuntimeMode": "native",
+      "implementation": "native/foundation_provider.c + src/foundation-native-meta-bridge.mjs",
+      "tests": [
+        "native-meta-batch-b-runtime-invocation",
+        "native-meta-batch-b-result-shape",
+        "native-meta-batch-b-selfhost",
+        "native-meta-batch-b-deterministic-replay",
+        "native-meta-batch-b-behavior-mutation",
+        "native-meta-batch-b-causal-chain",
+        "native-meta-batch-b-spacetime-semantics",
+        "native-meta-batch-b-acceleration-semantics",
+        "native-meta-batch-b-compression-semantics",
+        "native-meta-batch-b-negative-authority",
+        "native-meta-batch-b-invariant-rejection",
+        "native-meta-batch-b-evidence-rejection",
+        "native-meta-batch-b-provider-degradation",
+        "native-meta-batch-b-semantic-rejection",
+        "native-meta-batch-b-performance"
+      ],
+      "knownLimitations": [
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
+      ]
+    },
+    "authority-boundary": {
+      "mode": "none",
+      "referenceRuntimeMode": "none",
+      "implementation": null,
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "No runtime fixture covered this module."
+      ]
+    },
+    "causality-evidence": {
+      "mode": "none",
+      "referenceRuntimeMode": "none",
+      "implementation": null,
+      "tests": [
+        "runtime-invocation:examples/eight-domain-foundation.rcl",
+        "runtime-result-shape:examples/eight-domain-foundation.rcl",
+        "runtime-invocation:examples/foundation-closure.rcl",
+        "runtime-result-shape:examples/foundation-closure.rcl",
+        "runtime-invocation:examples/cognitive-creation-agent.rcl",
+        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+        "runtime-invocation:examples/meta-runtime-foundation.rcl",
+        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+        "runtime-coverage",
+        "behavior-mutation",
+        "deterministic-replay"
+      ],
+      "knownLimitations": [
+        "No runtime fixture covered this module."
+      ]
+    }
+  },
+  "realityRobustness": {
+    "explicit-variable": {
+      "status": "partial",
+      "tests": [
+        "behavior-mutation",
+        "deterministic-replay"
+      ]
+    },
+    "provider-capability-boundary": {
+      "status": "partial",
+      "tests": [
+        "negative-authority",
+        "version-compatibility"
+      ]
+    },
+    "authorization-evidence": {
+      "status": "partial",
+      "tests": [
+        "negative-authority",
+        "evidence-production"
+      ]
+    },
+    "adaptive-invariant-field": {
+      "status": "partial",
+      "tests": [
+        "invariant-rejection",
+        "root-consistency"
+      ]
+    }
+  },
+  "fixtures": [
+    {
+      "fixture": "examples/eight-domain-foundation.rcl",
+      "stateRoot": "c097eb49475406dbe599d18225387072ca7be0740b33fc279d395b9135614fed",
+      "runtimeRecords": 9,
+      "domains": [
+        "metacomputation",
+        "physical",
+        "perception",
+        "life",
+        "neural",
+        "genetic",
+        "quantitative"
+      ]
+    },
+    {
+      "fixture": "examples/foundation-closure.rcl",
+      "stateRoot": "b453b7e8a3285fa028d886421b5cf464b4352ceacf6403c61ae0060b0e20ddc9",
+      "runtimeRecords": 5,
+      "domains": [
+        "energy",
+        "elemental",
+        "scientific",
+        "embodiment",
+        "spiritual"
+      ]
+    },
+    {
+      "fixture": "examples/cognitive-creation-agent.rcl",
+      "stateRoot": "7118a55993a1f2e1ed2907cbf53d76e7e1574f962ec653ef06926e0cbb54beea",
+      "runtimeRecords": 6,
+      "domains": [
+        "knowledge",
+        "natural-language-reality",
+        "understanding-reality",
+        "creative-reality",
+        "execution-reality"
+      ]
+    },
+    {
+      "fixture": "examples/meta-runtime-foundation.rcl",
+      "stateRoot": "d8b42b64b3fd57c42ad5a49d2cb255d3784298ace14deaedb256f9fd0cd533f0",
+      "runtimeRecords": 8,
+      "domains": [
+        "meta-spacetime",
+        "meta-acceleration",
+        "execution-reality",
+        "meta-compression"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "manifest-completeness",
+      "passed": true,
+      "details": {
+        "counts": {
+          "domains": 14,
+          "compositePlanes": 5,
+          "metaRealityPlanes": 3,
+          "crossDomainAxes": 2,
+          "realityRobustness": 4
+        }
+      }
+    },
+    {
+      "id": "manifest-schema-fields",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "version-compatibility",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "runtime-invocation:examples/eight-domain-foundation.rcl",
+      "passed": true,
+      "details": {
+        "records": 9,
+        "domains": [
+          "metacomputation",
+          "physical",
+          "perception",
+          "life",
+          "neural",
+          "genetic",
+          "quantitative"
+        ]
+      }
+    },
+    {
+      "id": "runtime-result-shape:examples/eight-domain-foundation.rcl",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "runtime-invocation:examples/foundation-closure.rcl",
+      "passed": true,
+      "details": {
+        "records": 5,
+        "domains": [
+          "energy",
+          "elemental",
+          "scientific",
+          "embodiment",
+          "spiritual"
+        ]
+      }
+    },
+    {
+      "id": "runtime-result-shape:examples/foundation-closure.rcl",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "runtime-invocation:examples/cognitive-creation-agent.rcl",
+      "passed": true,
+      "details": {
+        "records": 6,
+        "domains": [
+          "knowledge",
+          "natural-language-reality",
+          "understanding-reality",
+          "creative-reality",
+          "execution-reality"
+        ]
+      }
+    },
+    {
+      "id": "runtime-result-shape:examples/cognitive-creation-agent.rcl",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "runtime-invocation:examples/meta-runtime-foundation.rcl",
+      "passed": true,
+      "details": {
+        "records": 8,
+        "domains": [
+          "meta-spacetime",
+          "meta-acceleration",
+          "execution-reality",
+          "meta-compression"
+        ]
+      }
+    },
+    {
+      "id": "runtime-result-shape:examples/meta-runtime-foundation.rcl",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "module-existence",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "runtime-coverage",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "behavior-mutation",
+      "passed": true,
+      "details": {
+        "original": "c097eb49475406dbe599d18225387072ca7be0740b33fc279d395b9135614fed",
+        "mutated": "5395f4278621bb4d188e5ba0714bb9148d852bef4f32ed3e676749d3e0be568b"
+      }
+    },
+    {
+      "id": "deterministic-replay",
+      "passed": true,
+      "details": {
+        "stateRoot": "7118a55993a1f2e1ed2907cbf53d76e7e1574f962ec653ef06926e0cbb54beea"
+      }
+    },
+    {
+      "id": "evidence-production",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "negative-authority",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "invariant-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "root-consistency",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-runtime-invocation",
+      "passed": true,
+      "details": {
+        "domains": [
+          "quantitative",
+          "knowledge",
+          "perception",
+          "natural-language-reality",
+          "understanding-reality",
+          "creative-reality"
+        ],
+        "providerHost": {
+          "providerId": "rcl.foundation.batch-a",
+          "providerAbi": 1,
+          "providerCallCount": 6,
+          "cacheHits": 0,
+          "cacheHitRate": 0
+        }
+      }
+    },
+    {
+      "id": "native-batch-a-result-shape",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-selfhost",
+      "passed": true,
+      "details": {
+        "bytecodeRoot": "3705305f0548d2945a313609c2f27da0c24166f31ee9659dc5ba7b0e57403209",
+        "bytecodeVersion": "1.2"
+      }
+    },
+    {
+      "id": "native-batch-a-deterministic-replay",
+      "passed": true,
+      "details": {
+        "receiptRoot": "0ec9121a4c0367e51de068b06d294d4ba2bec4f4a8f5e76ba5c0d253a2288b3d"
+      }
+    },
+    {
+      "id": "native-batch-a-behavior-mutation",
+      "passed": true,
+      "details": {
+        "originalAction": "generate-authorized-candidate",
+        "counterfactualAction": "generate-observation-candidate",
+        "originalRoot": "ea668d63168483bf6bc8e68a2c0166338df5912f355f2ae0edce5fc1d30d91ad",
+        "counterfactualRoot": "01616afe7f2bc484e1829e19464655c33feb9a9316dc9f770bb8f9ced92d63d8"
+      }
+    },
+    {
+      "id": "native-batch-a-causal-chain",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-negative-authority",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-invariant-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-evidence-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-provider-degradation",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-a-performance",
+      "passed": true,
+      "details": {
+        "metrics": {
+          "compileMs": 89.4264,
+          "oracleCompileMs": 2.9531,
+          "selfhostCompileMs": 86.4733,
+          "sourceBytes": 4106,
+          "bytecodeBytes": 2533,
+          "runtimeMs": 46.3925,
+          "replayMs": 44.862,
+          "processRssDeltaBytes": 0,
+          "estimatedWorkingSetBytes": 44314,
+          "eventCount": 65,
+          "resultCount": 6,
+          "nativeInstructionCount": 65,
+          "providerCallCount": 6,
+          "cacheHitRate": 0,
+          "resultBytes": 11223,
+          "compressionRatio": 1.621003
+        },
+        "baseline": {
+          "format": "taowind.rcl-foundation-native-batch-a.performance-baseline.v0.1",
+          "request": "default",
+          "maximumRegressionRatio": 0.2,
+          "deterministicResourceBaseline": {
+            "bytecodeBytes": 2533,
+            "estimatedWorkingSetBytes": 44314,
+            "nativeInstructionCount": 65,
+            "resultBytes": 11223
+          },
+          "exactContractCounts": {
+            "providerCallCount": 6,
+            "resultCount": 6
+          },
+          "wallClockBudgetsMs": {
+            "compileMs": 5000,
+            "runtimeMs": 5000,
+            "replayMs": 5000
+          }
+        }
+      }
+    },
+    {
+      "id": "native-meta-batch-b-runtime-invocation",
+      "passed": true,
+      "details": {
+        "domains": [
+          "meta-spacetime",
+          "meta-acceleration",
+          "meta-compression"
+        ],
+        "providerHost": {
+          "providerId": "rcl.foundation.meta-batch-b",
+          "providerAbi": 1,
+          "providerCallCount": 3,
+          "cacheHits": 0,
+          "cacheHitRate": 0
+        }
+      }
+    },
+    {
+      "id": "native-meta-batch-b-result-shape",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-selfhost",
+      "passed": true,
+      "details": {
+        "bytecodeRoot": "e5ed4c14852ed7d531e36eed46779533d9c7905deecb34364e19edaff8d3048f",
+        "bytecodeVersion": "1.2"
+      }
+    },
+    {
+      "id": "native-meta-batch-b-deterministic-replay",
+      "passed": true,
+      "details": {
+        "receiptRoot": "1d22b8565c04538abe431b5d644d3776d0e0322cf546e61ce23afc6859741318"
+      }
+    },
+    {
+      "id": "native-meta-batch-b-behavior-mutation",
+      "passed": true,
+      "details": {
+        "originalActions": [
+          "schedule-causal-transition",
+          "accelerate-with-fidelity-budget",
+          "compress-with-restore-contract"
+        ],
+        "counterfactualActions": [
+          "inspect-causal-timeline",
+          "measure-safe-acceleration",
+          "verify-lossless-restore"
+        ],
+        "originalRoot": "5563283f81d4e407af65129034a5cb80d3a2d9a19082ca9de0f15e3cc7467df3",
+        "counterfactualRoot": "6be6fc69c6e4c9db59d5579fc81800e3037e5922f76875648c8db6c6f4e33f07"
+      }
+    },
+    {
+      "id": "native-meta-batch-b-causal-chain",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-spacetime-semantics",
+      "passed": true,
+      "details": {
+        "create": {
+          "timeline": {
+            "ordering": "causal",
+            "tickBefore": 0,
+            "tickAfter": 1,
+            "eventCount": 1,
+            "observerFrame": "subjective-bounded",
+            "mutationApplied": true
+          }
+        },
+        "inspect": {
+          "timeline": {
+            "ordering": "causal",
+            "tickBefore": 0,
+            "tickAfter": 0,
+            "eventCount": 1,
+            "observerFrame": "subjective-bounded",
+            "mutationApplied": false
+          }
+        }
+      }
+    },
+    {
+      "id": "native-meta-batch-b-acceleration-semantics",
+      "passed": true,
+      "details": {
+        "default": {
+          "acceleration": {
+            "mode": "bounded",
+            "requestedFactor": 2,
+            "effectiveFactor": 2,
+            "maximumFactor": 8,
+            "fidelityFloor": 1,
+            "fidelityPreserved": true,
+            "clamped": false,
+            "mutationApplied": true
+          }
+        },
+        "clamped": {
+          "acceleration": {
+            "mode": "bounded",
+            "requestedFactor": 64,
+            "effectiveFactor": 8,
+            "maximumFactor": 8,
+            "fidelityFloor": 1,
+            "fidelityPreserved": true,
+            "clamped": true,
+            "mutationApplied": true
+          }
+        }
+      }
+    },
+    {
+      "id": "native-meta-batch-b-compression-semantics",
+      "passed": true,
+      "details": {
+        "compression": {
+          "codec": "content-addressed-root-pack-v1",
+          "scope": "content-root-representation",
+          "sourceTextBytes": 64,
+          "compressedBytes": 32,
+          "reversible": true,
+          "restoreRequired": true,
+          "sourceRoot": "9dd138a806aa507b18f07630fdbd9edd30a1920a478d579415377356335a6f3f",
+          "restoreRoot": "9dd138a806aa507b18f07630fdbd9edd30a1920a478d579415377356335a6f3f",
+          "restoreVerified": true,
+          "mutationApplied": true
+        }
+      }
+    },
+    {
+      "id": "native-meta-batch-b-negative-authority",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-invariant-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-evidence-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-provider-degradation",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-semantic-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-meta-batch-b-performance",
+      "passed": true,
+      "details": {
+        "metrics": {
+          "compileMs": 70.2491,
+          "oracleCompileMs": 0.5921,
+          "selfhostCompileMs": 69.657,
+          "sourceBytes": 2610,
+          "bytecodeBytes": 2126,
+          "runtimeMs": 52.5975,
+          "replayMs": 58.6078,
+          "processRssDeltaBytes": 0,
+          "estimatedWorkingSetBytes": 25638,
+          "eventCount": 32,
+          "resultCount": 3,
+          "nativeInstructionCount": 32,
+          "providerCallCount": 3,
+          "cacheHitRate": 0,
+          "resultBytes": 6460,
+          "compressionRatio": 1.227658
+        },
+        "baseline": {
+          "format": "taowind.rcl-foundation-native-meta-batch-b.performance-baseline.v0.1",
+          "request": "default",
+          "maximumRegressionRatio": 0.2,
+          "deterministicResourceBaseline": {
+            "bytecodeBytes": 2126,
+            "estimatedWorkingSetBytes": 25638,
+            "nativeInstructionCount": 32,
+            "resultBytes": 6460
+          },
+          "exactContractCounts": {
+            "providerCallCount": 3,
+            "resultCount": 3
+          },
+          "wallClockBudgetsMs": {
+            "compileMs": 5000,
+            "runtimeMs": 5000,
+            "replayMs": 5000
+          }
+        }
+      }
+    },
+    {
+      "id": "native-boundary-explicit",
+      "passed": true,
+      "details": {
+        "diagnostics": [
+          "RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+          "RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+          "RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+          "RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+          "RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_FACET_UNSUPPORTED",
+          "RCL_NATIVE_DIRECTIVE_UNSUPPORTED",
+          "RCL_NATIVE_DIRECTIVE_UNSUPPORTED",
+          "RCL_NATIVE_DIRECTIVE_UNSUPPORTED",
+          "RCL_NATIVE_DIRECTIVE_UNSUPPORTED",
+          "RCL_NATIVE_DIRECTIVE_UNSUPPORTED"
+        ]
+      }
+    }
+  ],
+  "status": "pass"
+}

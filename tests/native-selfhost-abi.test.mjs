@@ -268,6 +268,7 @@ test('Windows native manifest tracks the exact required prebuilt path set and ha
     'native/rclc.c',
     'native/rclvmd.c',
     'native/provider_demo.c',
+    'native/foundation_provider.c',
     'scripts/build-native-windows.mjs',
   ];
   const expectedArtifacts = [
@@ -275,6 +276,7 @@ test('Windows native manifest tracks the exact required prebuilt path set and ha
     'native/rclc.exe',
     'native/rclvmd.exe',
     'native/provider_demo.exe',
+    'native/rclfoundation.exe',
     'native/librclvm.a',
     'native/rclvm.dll',
     'native/rclvm.lib',
