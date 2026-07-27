@@ -16,7 +16,7 @@
   "executionLayers": {
     "referenceRuntime": "native",
     "nativeVm": "bridge",
-    "nativeVmLimitation": "The Native Provider ABI covers Foundation Batch A, Meta Batch B and Batch C in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.",
+    "nativeVmLimitation": "The Native Provider ABI covers Foundation Batch A, Meta Batch B, Batch C and Batch D in bridge mode. Declared Foundation-domain syntax still rejects lowering and is not counted as native mode.",
     "nativeProviderBridge": {
       "mode": "bridge",
       "providerId": "rcl.foundation.batch-a",
@@ -35,14 +35,14 @@
       "deterministicReceiptRoot": "0ec9121a4c0367e51de068b06d294d4ba2bec4f4a8f5e76ba5c0d253a2288b3d",
       "finalStateRoot": "ea668d63168483bf6bc8e68a2c0166338df5912f355f2ae0edce5fc1d30d91ad",
       "metrics": {
-        "compileMs": 173.2518,
-        "oracleCompileMs": 3.9925,
-        "selfhostCompileMs": 169.2593,
+        "compileMs": 85.7566,
+        "oracleCompileMs": 3.0202,
+        "selfhostCompileMs": 82.7364,
         "sourceBytes": 4106,
         "bytecodeBytes": 2533,
-        "runtimeMs": 142.471,
-        "replayMs": 72.465,
-        "processRssDeltaBytes": 110592,
+        "runtimeMs": 69.9265,
+        "replayMs": 33.1494,
+        "processRssDeltaBytes": 8192,
         "estimatedWorkingSetBytes": 44314,
         "eventCount": 65,
         "resultCount": 6,
@@ -68,14 +68,14 @@
       "deterministicReceiptRoot": "1d22b8565c04538abe431b5d644d3776d0e0322cf546e61ce23afc6859741318",
       "finalStateRoot": "5563283f81d4e407af65129034a5cb80d3a2d9a19082ca9de0f15e3cc7467df3",
       "metrics": {
-        "compileMs": 53.5391,
-        "oracleCompileMs": 0.5681,
-        "selfhostCompileMs": 52.971,
+        "compileMs": 68.671,
+        "oracleCompileMs": 0.673,
+        "selfhostCompileMs": 67.998,
         "sourceBytes": 2610,
         "bytecodeBytes": 2126,
-        "runtimeMs": 30.6843,
-        "replayMs": 36.0581,
-        "processRssDeltaBytes": 4096,
+        "runtimeMs": 39.0986,
+        "replayMs": 42.6411,
+        "processRssDeltaBytes": 0,
         "estimatedWorkingSetBytes": 25638,
         "eventCount": 32,
         "resultCount": 3,
@@ -100,13 +100,13 @@
       "deterministicReceiptRoot": "706b39f9731158570d2fe21a1f80cd532fa11308b04c3a6f1ad7052e279335e0",
       "finalStateRoot": "2740eb8b9fb8ff18d3aeae50a68996ab837e10601fbd38bb8beac741ae6a04ed",
       "metrics": {
-        "compileMs": 55.1446,
-        "oracleCompileMs": 0.4861,
-        "selfhostCompileMs": 54.6585,
+        "compileMs": 49.3003,
+        "oracleCompileMs": 0.5689,
+        "selfhostCompileMs": 48.7314,
         "sourceBytes": 1564,
         "bytecodeBytes": 1695,
-        "runtimeMs": 36.8572,
-        "replayMs": 33.8207,
+        "runtimeMs": 37.5635,
+        "replayMs": 40.3271,
         "processRssDeltaBytes": 0,
         "estimatedWorkingSetBytes": 15969,
         "eventCount": 21,
@@ -116,6 +116,39 @@
         "cacheHitRate": 0,
         "resultBytes": 4088,
         "compressionRatio": 0.922714
+      }
+    },
+    "nativeBatchDProviderBridge": {
+      "mode": "bridge",
+      "providerId": "rcl.foundation.batch-d",
+      "providerAbi": 1,
+      "host": "native/rclfoundation.exe",
+      "domains": [
+        "energy",
+        "elemental",
+        "neural"
+      ],
+      "bytecodeVersion": "1.2",
+      "bytecodeRoot": "46c8480d2232d73312f8072a450d028f6544142a24654787f1f4c54e752f70db",
+      "deterministicReceiptRoot": "4877fe73b3ef8a7f209ce08843e043c590c6747c9a7ab783b9df0232854041e0",
+      "finalStateRoot": "60e94e8d86e2413c4b61fd0d1441315a895e8144b0b56e2a3e5c38e97d116b31",
+      "metrics": {
+        "compileMs": 53.9345,
+        "oracleCompileMs": 0.4937,
+        "selfhostCompileMs": 53.4408,
+        "sourceBytes": 3043,
+        "bytecodeBytes": 2378,
+        "runtimeMs": 38.5343,
+        "replayMs": 35.3237,
+        "processRssDeltaBytes": 0,
+        "estimatedWorkingSetBytes": 26817,
+        "eventCount": 32,
+        "resultCount": 3,
+        "nativeInstructionCount": 32,
+        "providerCallCount": 3,
+        "cacheHitRate": 0,
+        "resultBytes": 6413,
+        "compressionRatio": 1.279647
       }
     }
   },
@@ -188,45 +221,57 @@
       ]
     },
     "energy": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#energy",
+      "implementation": "native/foundation_provider.c + src/foundation-native-batch-d.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-d-runtime-invocation",
+        "native-batch-d-result-shape",
+        "native-batch-d-selfhost",
+        "native-batch-d-deterministic-replay",
+        "native-batch-d-behavior-mutation",
+        "native-batch-d-causal-chain",
+        "native-batch-d-energy-semantics",
+        "native-batch-d-elemental-semantics",
+        "native-batch-d-neural-semantics",
+        "native-batch-d-negative-authority",
+        "native-batch-d-invariant-rejection",
+        "native-batch-d-evidence-rejection",
+        "native-batch-d-provider-degradation",
+        "native-batch-d-energy-rejection",
+        "native-batch-d-elemental-rejection",
+        "native-batch-d-neural-rejection",
+        "native-batch-d-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "elemental": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#elemental",
+      "implementation": "native/foundation_provider.c + src/foundation-native-batch-d.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-d-runtime-invocation",
+        "native-batch-d-result-shape",
+        "native-batch-d-selfhost",
+        "native-batch-d-deterministic-replay",
+        "native-batch-d-behavior-mutation",
+        "native-batch-d-causal-chain",
+        "native-batch-d-energy-semantics",
+        "native-batch-d-elemental-semantics",
+        "native-batch-d-neural-semantics",
+        "native-batch-d-negative-authority",
+        "native-batch-d-invariant-rejection",
+        "native-batch-d-evidence-rejection",
+        "native-batch-d-provider-degradation",
+        "native-batch-d-energy-rejection",
+        "native-batch-d-elemental-rejection",
+        "native-batch-d-neural-rejection",
+        "native-batch-d-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "perception": {
@@ -251,24 +296,30 @@
       ]
     },
     "neural": {
-      "mode": "none",
+      "mode": "bridge",
       "referenceRuntimeMode": "native",
-      "implementation": "src/runtime.mjs#neural",
+      "implementation": "native/foundation_provider.c + src/foundation-native-batch-d.mjs",
       "tests": [
-        "runtime-invocation:examples/eight-domain-foundation.rcl",
-        "runtime-result-shape:examples/eight-domain-foundation.rcl",
-        "runtime-invocation:examples/foundation-closure.rcl",
-        "runtime-result-shape:examples/foundation-closure.rcl",
-        "runtime-invocation:examples/cognitive-creation-agent.rcl",
-        "runtime-result-shape:examples/cognitive-creation-agent.rcl",
-        "runtime-invocation:examples/meta-runtime-foundation.rcl",
-        "runtime-result-shape:examples/meta-runtime-foundation.rcl",
-        "runtime-coverage",
-        "behavior-mutation",
-        "deterministic-replay"
+        "native-batch-d-runtime-invocation",
+        "native-batch-d-result-shape",
+        "native-batch-d-selfhost",
+        "native-batch-d-deterministic-replay",
+        "native-batch-d-behavior-mutation",
+        "native-batch-d-causal-chain",
+        "native-batch-d-energy-semantics",
+        "native-batch-d-elemental-semantics",
+        "native-batch-d-neural-semantics",
+        "native-batch-d-negative-authority",
+        "native-batch-d-invariant-rejection",
+        "native-batch-d-evidence-rejection",
+        "native-batch-d-provider-degradation",
+        "native-batch-d-energy-rejection",
+        "native-batch-d-elemental-rejection",
+        "native-batch-d-neural-rejection",
+        "native-batch-d-performance"
       ],
       "knownLimitations": [
-        "Reference Runtime is covered; Native VM integration is not yet implemented for this domain."
+        "Verified through RclVmProviderV1 in bridge mode; declared domain syntax is still not Native VM syntax."
       ]
     },
     "embodiment": {
@@ -953,14 +1004,14 @@
       "passed": true,
       "details": {
         "metrics": {
-          "compileMs": 173.2518,
-          "oracleCompileMs": 3.9925,
-          "selfhostCompileMs": 169.2593,
+          "compileMs": 85.7566,
+          "oracleCompileMs": 3.0202,
+          "selfhostCompileMs": 82.7364,
           "sourceBytes": 4106,
           "bytecodeBytes": 2533,
-          "runtimeMs": 142.471,
-          "replayMs": 72.465,
-          "processRssDeltaBytes": 110592,
+          "runtimeMs": 69.9265,
+          "replayMs": 33.1494,
+          "processRssDeltaBytes": 8192,
           "estimatedWorkingSetBytes": 44314,
           "eventCount": 65,
           "resultCount": 6,
@@ -1157,14 +1208,14 @@
       "passed": true,
       "details": {
         "metrics": {
-          "compileMs": 53.5391,
-          "oracleCompileMs": 0.5681,
-          "selfhostCompileMs": 52.971,
+          "compileMs": 68.671,
+          "oracleCompileMs": 0.673,
+          "selfhostCompileMs": 67.998,
           "sourceBytes": 2610,
           "bytecodeBytes": 2126,
-          "runtimeMs": 30.6843,
-          "replayMs": 36.0581,
-          "processRssDeltaBytes": 4096,
+          "runtimeMs": 39.0986,
+          "replayMs": 42.6411,
+          "processRssDeltaBytes": 0,
           "estimatedWorkingSetBytes": 25638,
           "eventCount": 32,
           "resultCount": 3,
@@ -1317,13 +1368,13 @@
       "passed": true,
       "details": {
         "metrics": {
-          "compileMs": 55.1446,
-          "oracleCompileMs": 0.4861,
-          "selfhostCompileMs": 54.6585,
+          "compileMs": 49.3003,
+          "oracleCompileMs": 0.5689,
+          "selfhostCompileMs": 48.7314,
           "sourceBytes": 1564,
           "bytecodeBytes": 1695,
-          "runtimeMs": 36.8572,
-          "replayMs": 33.8207,
+          "runtimeMs": 37.5635,
+          "replayMs": 40.3271,
           "processRssDeltaBytes": 0,
           "estimatedWorkingSetBytes": 15969,
           "eventCount": 21,
@@ -1347,6 +1398,201 @@
           "exactContractCounts": {
             "providerCallCount": 2,
             "resultCount": 2
+          },
+          "wallClockBudgetsMs": {
+            "compileMs": 5000,
+            "runtimeMs": 5000,
+            "replayMs": 5000
+          }
+        }
+      }
+    },
+    {
+      "id": "native-batch-d-runtime-invocation",
+      "passed": true,
+      "details": {
+        "domains": [
+          "energy",
+          "elemental",
+          "neural"
+        ],
+        "providerHost": {
+          "providerId": "rcl.foundation.batch-d",
+          "providerAbi": 1,
+          "providerCallCount": 3,
+          "cacheHits": 0,
+          "cacheHitRate": 0
+        }
+      }
+    },
+    {
+      "id": "native-batch-d-result-shape",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-selfhost",
+      "passed": true,
+      "details": {
+        "bytecodeRoot": "46c8480d2232d73312f8072a450d028f6544142a24654787f1f4c54e752f70db",
+        "bytecodeVersion": "1.2"
+      }
+    },
+    {
+      "id": "native-batch-d-deterministic-replay",
+      "passed": true,
+      "details": {
+        "receiptRoot": "4877fe73b3ef8a7f209ce08843e043c590c6747c9a7ab783b9df0232854041e0"
+      }
+    },
+    {
+      "id": "native-batch-d-behavior-mutation",
+      "passed": true,
+      "details": {
+        "originalActions": [
+          "transfer-bounded-energy",
+          "compose-bounded-material",
+          "integrate-signal-control"
+        ],
+        "counterfactualActions": [
+          "inspect-energy-budget",
+          "inspect-material-composition",
+          "inspect-neural-state"
+        ],
+        "originalRoot": "60e94e8d86e2413c4b61fd0d1441315a895e8144b0b56e2a3e5c38e97d116b31",
+        "counterfactualRoot": "407300186b4214fcddb95739b0f7718fd2489745c2e534e019adaf376cdad6df"
+      }
+    },
+    {
+      "id": "native-batch-d-causal-chain",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-energy-semantics",
+      "passed": true,
+      "details": {
+        "energy": {
+          "model": "bounded-transfer-v1",
+          "availableMilliJoules": 120000,
+          "requestedMilliJoules": 75000,
+          "effectiveMilliJoules": 75000,
+          "lossPpm": 10000,
+          "lossMilliJoules": 750,
+          "deliveredMilliJoules": 74250,
+          "remainingMilliJoules": 45000,
+          "tickBefore": 4,
+          "tickAfter": 5,
+          "clamped": false,
+          "mutationApplied": true
+        }
+      }
+    },
+    {
+      "id": "native-batch-d-elemental-semantics",
+      "passed": true,
+      "details": {
+        "elemental": {
+          "materialId": "material:steel",
+          "massMg": 250000,
+          "purityPpm": 950000,
+          "temperatureMilliK": 300000,
+          "energyUseMilliJoules": 50000,
+          "energyParentRoot": "2fea58f47dcadaddc29f16087e00eda42355ac82bb5813c788fc90c5345b9fff",
+          "compositionState": "composed",
+          "stable": true,
+          "mutationApplied": true
+        }
+      }
+    },
+    {
+      "id": "native-batch-d-neural-semantics",
+      "passed": true,
+      "details": {
+        "neural": {
+          "signalId": "signal:operator",
+          "amplitudePpm": 850000,
+          "effectiveAmplitudePpm": 850000,
+          "memoryBudgetBytes": 4096,
+          "retainedMemoryBytes": 2048,
+          "attentionWindow": 32,
+          "inhibitionPpm": 100000,
+          "controlScorePpm": 765000,
+          "elementalParentRoot": "30a57c47af42acc52e9d6fd141b3d5a8014fc041fe875186e3166e10d702c108",
+          "mutationApplied": true
+        }
+      }
+    },
+    {
+      "id": "native-batch-d-negative-authority",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-invariant-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-evidence-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-provider-degradation",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-energy-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-elemental-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-neural-rejection",
+      "passed": true,
+      "details": {}
+    },
+    {
+      "id": "native-batch-d-performance",
+      "passed": true,
+      "details": {
+        "metrics": {
+          "compileMs": 53.9345,
+          "oracleCompileMs": 0.4937,
+          "selfhostCompileMs": 53.4408,
+          "sourceBytes": 3043,
+          "bytecodeBytes": 2378,
+          "runtimeMs": 38.5343,
+          "replayMs": 35.3237,
+          "processRssDeltaBytes": 0,
+          "estimatedWorkingSetBytes": 26817,
+          "eventCount": 32,
+          "resultCount": 3,
+          "nativeInstructionCount": 32,
+          "providerCallCount": 3,
+          "cacheHitRate": 0,
+          "resultBytes": 6413,
+          "compressionRatio": 1.279647
+        },
+        "baseline": {
+          "format": "taowind.rcl-foundation-native-batch-d.performance-baseline.v0.1",
+          "request": "default",
+          "maximumRegressionRatio": 0.2,
+          "deterministicResourceBaseline": {
+            "bytecodeBytes": 2378,
+            "estimatedWorkingSetBytes": 26817,
+            "nativeInstructionCount": 32,
+            "resultBytes": 6413
+          },
+          "exactContractCounts": {
+            "providerCallCount": 3,
+            "resultCount": 3
           },
           "wallClockBudgetsMs": {
             "compileMs": 5000,

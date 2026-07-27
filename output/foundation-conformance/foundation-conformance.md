@@ -14,6 +14,9 @@
 - Batch C provider: `rcl.foundation.batch-c` through `RclVmProviderV1`
 - Batch C domains: physical, embodiment
 - Batch C receipt: `706b39f9731158570d2fe21a1f80cd532fa11308b04c3a6f1ad7052e279335e0`
+- Batch D provider: `rcl.foundation.batch-d` through `RclVmProviderV1`
+- Batch D domains: energy, elemental, neural
+- Batch D receipt: `4877fe73b3ef8a7f209ce08843e043c590c6747c9a7ab783b9df0232854041e0`
 
 | Check | Status |
 | --- | --- |
@@ -77,6 +80,23 @@
 | native-batch-c-physical-rejection | pass |
 | native-batch-c-embodiment-rejection | pass |
 | native-batch-c-performance | pass |
+| native-batch-d-runtime-invocation | pass |
+| native-batch-d-result-shape | pass |
+| native-batch-d-selfhost | pass |
+| native-batch-d-deterministic-replay | pass |
+| native-batch-d-behavior-mutation | pass |
+| native-batch-d-causal-chain | pass |
+| native-batch-d-energy-semantics | pass |
+| native-batch-d-elemental-semantics | pass |
+| native-batch-d-neural-semantics | pass |
+| native-batch-d-negative-authority | pass |
+| native-batch-d-invariant-rejection | pass |
+| native-batch-d-evidence-rejection | pass |
+| native-batch-d-provider-degradation | pass |
+| native-batch-d-energy-rejection | pass |
+| native-batch-d-elemental-rejection | pass |
+| native-batch-d-neural-rejection | pass |
+| native-batch-d-performance | pass |
 | native-boundary-explicit | pass |
 
-Batch A, Meta Batch B and Batch C are counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.
+Batch A, Meta Batch B, Batch C and Batch D are counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.
