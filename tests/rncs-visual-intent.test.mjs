@@ -22,6 +22,13 @@ const visualInput = {
     timeSeconds: 0.5,
     transition: { fromStateId: 'idle', toStateId: 'run', progress: 0.75 },
   },
+  animationConstraints: [{
+    type: 'look-at',
+    nodeId: 'node:root',
+    target: [1, 0, 0],
+    up: null,
+    weight: 1,
+  }],
   deformation: {
     nodeId: 'node:root',
     skinId: 'skin:hero',
@@ -37,8 +44,39 @@ test('RCL RNCS visual intent is normalized, rooted and convertible to VSR option
     animation: undefined,
     animationLayers: undefined,
     animationGraph: intent.animationGraph,
+    animationConstraints: intent.animationConstraints,
     visualIntentRoot: intent.root,
   });
+});
+
+test('constraint-only visual intent is valid and deterministic', () => {
+  const first = createRclRncsVisualIntent({
+    sourceAssetId: 'asset:rig',
+    sceneId: 'scene:rig',
+    animationConstraints: [{
+      type: 'two-bone-ik',
+      rootNodeId: 'root',
+      midNodeId: 'mid',
+      endNodeId: 'end',
+      target: [1, 1, 0],
+      pole: [0, 0, 1],
+    }],
+  });
+  const second = createRclRncsVisualIntent({
+    sourceAssetId: 'asset:rig',
+    sceneId: 'scene:rig',
+    animationConstraints: [{
+      type: 'two-bone-ik',
+      rootNodeId: 'root',
+      midNodeId: 'mid',
+      endNodeId: 'end',
+      target: [1, 1, 0],
+      pole: [0, 0, 1],
+    }],
+  });
+  assert.equal(verifyRclRncsVisualIntent(first).ok, true);
+  assert.equal(first.root, second.root);
+  assert.deepEqual(rclRncsVisualIntentToSpatialOptions(first).animationConstraints, first.animationConstraints);
 });
 
 test('visual intent input mutation changes its root and fails after tampering', () => {
