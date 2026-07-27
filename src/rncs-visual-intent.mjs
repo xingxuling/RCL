@@ -35,13 +35,16 @@ export function normalizeRclRncsVisualIntent(input = {}) {
   const animationGraph = input.animationGraph == null
     ? null
     : normalizeAnimationGraph(input.animationGraph);
+  const animationConstraints = input.animationConstraints == null
+    ? null
+    : normalizeAnimationConstraints(input.animationConstraints);
   const deformation = input.deformation == null
     ? null
     : normalizeDeformation(input.deformation);
 
-  if (!animation && !animationLayers && !animationGraph) {
+  if (!animation && !animationLayers && !animationGraph && !animationConstraints) {
     throw new TypeError(
-      'visual intent requires animation, animationLayers, or animationGraph',
+      'visual intent requires animation, animationLayers, animationGraph, or animationConstraints',
     );
   }
 
@@ -52,6 +55,7 @@ export function normalizeRclRncsVisualIntent(input = {}) {
     animation,
     animationLayers,
     animationGraph,
+    animationConstraints,
     deformation,
   };
 }
@@ -76,7 +80,8 @@ export function verifyRclRncsVisualIntent(intent) {
       deterministicInputs: Boolean(
         normalized.animation
         || normalized.animationLayers
-        || normalized.animationGraph,
+        || normalized.animationGraph
+        || normalized.animationConstraints,
       ),
     };
     return {
@@ -102,6 +107,7 @@ export function rclRncsVisualIntentToSpatialOptions(intent) {
     animation: intent.animation ?? undefined,
     animationLayers: intent.animationLayers ?? undefined,
     animationGraph: intent.animationGraph ?? undefined,
+    animationConstraints: intent.animationConstraints ?? undefined,
     visualIntentRoot: intent.root,
   };
 }
@@ -253,6 +259,44 @@ function normalizeDeformation(value) {
   return { nodeId, skinId, morphWeights };
 }
 
+function normalizeAnimationConstraints(value) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new TypeError('animationConstraints must be a non-empty array');
+  }
+  return value.map((constraint, index) => {
+    assertObject(constraint, `animationConstraints[${index}]`);
+    const weight = constraint.weight == null
+      ? 1
+      : boundedNumber(constraint.weight, 0, 1, `animationConstraints[${index}].weight`);
+    const target = vector3(constraint.target, `animationConstraints[${index}].target`);
+    if (constraint.type === 'look-at') {
+      return {
+        type: 'look-at',
+        nodeId: nonEmptyString(constraint.nodeId, `animationConstraints[${index}].nodeId`),
+        target,
+        up: constraint.up == null
+          ? null
+          : vector3(constraint.up, `animationConstraints[${index}].up`),
+        weight,
+      };
+    }
+    if (constraint.type === 'two-bone-ik') {
+      return {
+        type: 'two-bone-ik',
+        rootNodeId: nonEmptyString(constraint.rootNodeId, `animationConstraints[${index}].rootNodeId`),
+        midNodeId: nonEmptyString(constraint.midNodeId, `animationConstraints[${index}].midNodeId`),
+        endNodeId: nonEmptyString(constraint.endNodeId, `animationConstraints[${index}].endNodeId`),
+        target,
+        pole: constraint.pole == null
+          ? null
+          : vector3(constraint.pole, `animationConstraints[${index}].pole`),
+        weight,
+      };
+    }
+    throw new RangeError(`animationConstraints[${index}].type is invalid`);
+  });
+}
+
 function assertObject(value, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new TypeError(`${label} must be an object`);
@@ -269,6 +313,13 @@ function nonEmptyString(value, label) {
 function stringArray(value, label) {
   if (!Array.isArray(value)) throw new TypeError(`${label} must be an array`);
   return value.map((item, index) => nonEmptyString(item, `${label}[${index}]`));
+}
+
+function vector3(value, label) {
+  if (!Array.isArray(value) || value.length !== 3) {
+    throw new TypeError(`${label} must contain three numbers`);
+  }
+  return value.map((component, index) => boundedNumber(component, -Infinity, Infinity, `${label}[${index}]`));
 }
 
 function booleanValue(value, label) {

@@ -9,6 +9,7 @@ The contract carries:
 - source asset and optional scene identifiers;
 - a single clip, deterministic animation layers, or an animation graph;
 - override/additive blending and node masks;
+- optional deterministic `look-at` and `two-bone-ik` animation constraints;
 - an optional target deformation with one skin and up to four morph weights;
 - a content root over the normalized payload.
 
@@ -21,7 +22,8 @@ state change.
 The RNCS VSR consumer is
 `compileSpatialFrameFromVisualIntent(scene, intent, options)`. It verifies the
 format and root, applies the requested deformation to a cloned scene, selects
-the graph/layer/clip path, and seals the intent root into the frame plan. A
+the graph/layer/clip path, applies the declared look-at or two-bone IK constraints,
+and seals the intent root into the frame plan. A
 world authority or external provider still needs its own authorization and
 receipt contract.
 
