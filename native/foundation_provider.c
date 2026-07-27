@@ -16,6 +16,7 @@
 
 #define FOUNDATION_BATCH_A_PROVIDER_ID "rcl.foundation.batch-a"
 #define FOUNDATION_META_BATCH_B_PROVIDER_ID "rcl.foundation.meta-batch-b"
+#define FOUNDATION_BATCH_C_PROVIDER_ID "rcl.foundation.batch-c"
 #define FOUNDATION_RESULT_FORMAT "taowind.rcl-foundation-runtime-result.v0.1"
 #define FOUNDATION_HOST_FORMAT "taowind.rcl-foundation-native-host.v0.1"
 #define MAX_JSON_TOKENS 4096
@@ -66,7 +67,9 @@ enum {
   FOUNDATION_PARAMETERS_NONE = 0,
   FOUNDATION_PARAMETERS_META_SPACETIME,
   FOUNDATION_PARAMETERS_META_ACCELERATION,
-  FOUNDATION_PARAMETERS_META_COMPRESSION
+  FOUNDATION_PARAMETERS_META_COMPRESSION,
+  FOUNDATION_PARAMETERS_PHYSICAL,
+  FOUNDATION_PARAMETERS_EMBODIMENT
 };
 
 static const FoundationCapability FOUNDATION_BATCH_A_CAPABILITIES[] = {
@@ -153,6 +156,27 @@ static const FoundationCapability FOUNDATION_META_BATCH_B_CAPABILITIES[] = {
     "verify-lossless-restore",
     98,
     FOUNDATION_PARAMETERS_META_COMPRESSION
+  }
+};
+
+static const FoundationCapability FOUNDATION_BATCH_C_CAPABILITIES[] = {
+  {
+    "physical.simulate-step",
+    "physical",
+    NULL,
+    "simulate-constrained-step",
+    "inspect-physical-state",
+    95,
+    FOUNDATION_PARAMETERS_PHYSICAL
+  },
+  {
+    "embodiment.integrate",
+    "embodiment",
+    "physical",
+    "integrate-embodied-state",
+    "inspect-embodied-state",
+    93,
+    FOUNDATION_PARAMETERS_EMBODIMENT
   }
 };
 
@@ -502,7 +526,144 @@ static int build_parameters_fragment(
   if (capability->parameter_kind == FOUNDATION_PARAMETERS_NONE) return 1;
 
   int length = -1;
-  if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_SPACETIME) {
+  if (capability->parameter_kind == FOUNDATION_PARAMETERS_PHYSICAL) {
+    int physical_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "physical"
+    );
+    int tick_index = physical_index >= 0
+      ? json_object_get(request_json, tokens, token_count, physical_index, "tick")
+      : -1;
+    int dt_index = physical_index >= 0
+      ? json_object_get(request_json, tokens, token_count, physical_index, "dtMicros")
+      : -1;
+    int body_count_index = physical_index >= 0
+      ? json_object_get(request_json, tokens, token_count, physical_index, "bodyCount")
+      : -1;
+    int contact_budget_index = physical_index >= 0
+      ? json_object_get(request_json, tokens, token_count, physical_index, "contactBudget")
+      : -1;
+    long long tick = 0;
+    long long dt_micros = 0;
+    long long body_count = 0;
+    long long contact_budget = 0;
+    if (
+      physical_index < 0
+      || tokens[physical_index].type != JSON_OBJECT
+      || !json_read_integer(
+        request_json,
+        tick_index >= 0 ? &tokens[tick_index] : NULL,
+        0,
+        1000000000000LL,
+        &tick
+      )
+      || !json_read_integer(
+        request_json,
+        dt_index >= 0 ? &tokens[dt_index] : NULL,
+        1,
+        1000000,
+        &dt_micros
+      )
+      || !json_read_integer(
+        request_json,
+        body_count_index >= 0 ? &tokens[body_count_index] : NULL,
+        1,
+        1000000,
+        &body_count
+      )
+      || !json_read_integer(
+        request_json,
+        contact_budget_index >= 0 ? &tokens[contact_budget_index] : NULL,
+        0,
+        1000000,
+        &contact_budget
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_PHYSICAL_INVALID",
+        "physical requires bounded tick, dtMicros, bodyCount, and contactBudget integers"
+      );
+    }
+    long long tick_after = create_mode ? tick + 1 : tick;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"physical\":{"
+        "\"solver\":\"deterministic-semi-implicit\","
+        "\"tickBefore\":%lld,"
+        "\"tickAfter\":%lld,"
+        "\"dtMicros\":%lld,"
+        "\"bodyCount\":%lld,"
+        "\"contactBudget\":%lld,"
+        "\"mutationApplied\":%s"
+      "}},",
+      tick,
+      tick_after,
+      dt_micros,
+      body_count,
+      contact_budget,
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_EMBODIMENT) {
+    int embodiment_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "embodiment"
+    );
+    int subject_index = embodiment_index >= 0
+      ? json_object_get(request_json, tokens, token_count, embodiment_index, "subjectId")
+      : -1;
+    int command_index = embodiment_index >= 0
+      ? json_object_get(request_json, tokens, token_count, embodiment_index, "command")
+      : -1;
+    const char *subject_id = NULL;
+    const char *command = NULL;
+    if (subject_index >= 0 && json_token_equals(request_json, &tokens[subject_index], "subject:operator")) {
+      subject_id = "subject:operator";
+    } else if (subject_index >= 0 && json_token_equals(request_json, &tokens[subject_index], "body:avatar")) {
+      subject_id = "body:avatar";
+    }
+    if (command_index >= 0 && json_token_equals(request_json, &tokens[command_index], "walk")) {
+      command = "walk";
+    } else if (command_index >= 0 && json_token_equals(request_json, &tokens[command_index], "observe")) {
+      command = "observe";
+    }
+    if (
+      embodiment_index < 0
+      || tokens[embodiment_index].type != JSON_OBJECT
+      || !subject_id
+      || !command
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_EMBODIMENT_INVALID",
+        "embodiment requires a bounded subjectId and command"
+      );
+    }
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"embodiment\":{"
+        "\"subjectId\":\"%s\","
+        "\"command\":\"%s\","
+        "\"controlMode\":\"authority-bounded\","
+        "\"physicalParentRoot\":\"%s\","
+        "\"mutationApplied\":%s"
+      "}},",
+      subject_id,
+      command,
+      causal_parent,
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_SPACETIME) {
     int timeline_index = json_object_get(
       request_json,
       tokens,
@@ -1035,6 +1196,16 @@ int main(int argc, char **argv) {
     0,
     {0}
   };
+  FoundationProviderState batch_c_state = {
+    FOUNDATION_BATCH_C_PROVIDER_ID,
+    FOUNDATION_BATCH_C_CAPABILITIES,
+    sizeof(FOUNDATION_BATCH_C_CAPABILITIES)
+      / sizeof(FOUNDATION_BATCH_C_CAPABILITIES[0]),
+    "Foundation Batch C capabilities must execute in physical then embodiment order",
+    0,
+    0,
+    {0}
+  };
   RclVmInstance *vm = rclvm_instance_create();
   if (!vm) {
     print_host_error("Cannot create RCL Native VM instance");
@@ -1055,6 +1226,12 @@ int main(int argc, char **argv) {
         FOUNDATION_META_BATCH_B_PROVIDER_ID,
         foundation_provider_invoke,
         &meta_batch_b_state
+      },
+      {
+        RCLVM_PROVIDER_ABI_V1,
+        FOUNDATION_BATCH_C_PROVIDER_ID,
+        foundation_provider_invoke,
+        &batch_c_state
       }
     };
     for (size_t index = 0; index < sizeof(providers) / sizeof(providers[0]); index++) {
@@ -1082,7 +1259,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  if (batch_a_state.call_count > 0 && meta_batch_b_state.call_count > 0) {
+  size_t active_provider_count = 0;
+  if (batch_a_state.call_count > 0) active_provider_count++;
+  if (meta_batch_b_state.call_count > 0) active_provider_count++;
+  if (batch_c_state.call_count > 0) active_provider_count++;
+  if (active_provider_count > 1) {
     print_host_error(
       "RCL_FOUNDATION_PROVIDER_SCOPE: one bytecode execution must target exactly one Foundation batch"
     );
@@ -1090,9 +1271,9 @@ int main(int argc, char **argv) {
     rclvm_instance_destroy(vm);
     return 1;
   }
-  FoundationProviderState *active_provider = meta_batch_b_state.call_count > 0
-    ? &meta_batch_b_state
-    : &batch_a_state;
+  FoundationProviderState *active_provider = &batch_a_state;
+  if (meta_batch_b_state.call_count > 0) active_provider = &meta_batch_b_state;
+  if (batch_c_state.call_count > 0) active_provider = &batch_c_state;
   size_t vm_json_length = strlen(vm_json);
   while (vm_json_length > 0 && isspace((unsigned char)vm_json[vm_json_length - 1])) vm_json_length--;
   printf(

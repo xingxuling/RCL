@@ -2,7 +2,7 @@
 
 ## Status
 
-Foundation Batch A and Meta Batch B are verified `bridge` integrations, not
+Foundation Batch A, Meta Batch B, and Batch C are verified `bridge` integrations, not
 native Foundation syntax. Both execute self-hosted RBC 1.2 in the C Native VM
 and call registered `RclVmProviderV1` implementations in
 `native/foundation_provider.c`.
@@ -22,6 +22,11 @@ Meta Batch B provider `rcl.foundation.meta-batch-b` covers:
 2. `meta-acceleration`
 3. `meta-compression`
 
+Batch C provider `rcl.foundation.batch-c` covers, in enforced causal order:
+
+1. `physical`
+2. `embodiment`
+
 Declared Foundation-domain syntax remains outside the native bytecode subset
 and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
@@ -29,7 +34,7 @@ and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
 ```text
 request
-  -> Batch A or Meta Batch B JS adapter
+  -> Batch A, Meta Batch B, or Batch C JS adapter
   -> shared foundation-native-batch-runtime.mjs
   -> selfhost/compiler.rbc through native/rclc.exe
   -> RBC 1.2 with ordered dynamic provider_call instructions
@@ -53,6 +58,13 @@ Meta Batch B adds executable semantics:
   into 32 bytes and verifies an exact restoration before returning a result.
   Its scope is root representation, not arbitrary asset compression.
 
+Batch C adds executable semantics:
+
+- `physical` validates bounded tick, timestep, body-count, and contact-budget
+  variables for a deterministic semi-implicit step.
+- `embodiment` accepts only bounded body commands and binds its
+  `physicalParentRoot` to the preceding physical causal root.
+
 ## Run
 
 ```bash
@@ -61,6 +73,7 @@ npm run demo:foundation-native-batch-a
 npm run demo:foundation-native-meta-batch-b
 npm run test:foundation-native-batch-a
 npm run test:foundation-native-meta-batch-b
+npm run test:foundation-native-batch-c
 npm run conformance:foundation
 ```
 
