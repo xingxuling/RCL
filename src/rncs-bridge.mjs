@@ -1,4 +1,5 @@
 import { realityRoot } from './canonical.mjs';
+import { createRclRncsVisualIntent } from './rncs-visual-intent.mjs';
 
 /**
  * Convert an RCL realized transition into the input expected by
@@ -13,6 +14,9 @@ export function toRncsProposalInput(program, transition, options = {}) {
   const baseGeneration = Number(options.baseGeneration ?? 0);
   const baseGenerationRoot = options.baseGenerationRoot ?? '0'.repeat(64);
   const subjectId = transition.actor ?? options.subjectId ?? 'rcl:system';
+  const visualIntent = options.visualIntent
+    ? createRclRncsVisualIntent(options.visualIntent)
+    : null;
   const providerCapabilities = transition.hostCalls?.map(call => ({ host: call.host ?? null, capability: call.capability, required: true })) ?? [];
   const evidenceRequirements = (transition.witnesses ?? []).map((witness, index) => ({ kind: 'rcl-witness', reference: witness, required: true, sequence: index + 1 }));
   const foundationGovernance = {
@@ -41,13 +45,23 @@ export function toRncsProposalInput(program, transition, options = {}) {
       source: 'rcl.realize',
       goals: [{ rule: transition.rule, after_root: transition.afterRoot }],
       constraints: transition.authority?.needs ?? [],
+      visual_intent_root: visualIntent?.root ?? null,
     },
     capability_plan: {
       capabilities: transition.authority?.activeWarrants ?? [],
       host_bindings: transition.hostCalls?.map(call => ({ host: call.host, capability: call.capability })) ?? [],
       required_scopes: (transition.authority?.needs ?? []).map(need => `${need.capability}@${need.target}`),
     },
-    inputs: [{ kind: 'rcl-program', program_root: program.programRoot }],
+    inputs: [
+      { kind: 'rcl-program', program_root: program.programRoot },
+      ...(visualIntent
+        ? [{
+          kind: 'rcl-rncs-visual-intent',
+          source_asset_id: visualIntent.sourceAssetId,
+          root: visualIntent.root,
+        }]
+        : []),
+    ],
     provisional_delta: {
       operations: transition.changes.map(change => ({
         op: 'rcl.set-facet',
@@ -60,7 +74,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
     causal_basis: {
       events: [{ kind: transition.ruleKind, rule: transition.rule, actor: transition.actor }],
       rules: [{ language: 'RCL', version: program.languageVersion, rule: transition.rule }],
-      simulation_refs: [],
+      simulation_refs: visualIntent ? [visualIntent.root] : [],
     },
     evidence: {
       nodes: (transition.witnesses ?? []).map((witness, index) => ({
@@ -69,7 +83,13 @@ export function toRncsProposalInput(program, transition, options = {}) {
         source: witness,
         transition_root: transition.afterRoot,
       })),
-      edges: [],
+      edges: visualIntent
+        ? [{
+          from: visualIntent.root,
+          to: transition.afterRoot,
+          kind: 'visual-intent-input',
+        }]
+        : [],
     },
     foundation_governance: foundationGovernance,
     extensions: {
@@ -81,6 +101,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
         from_subject: transition.from,
         into_subject: transition.into,
         foundation_governance: foundationGovernance,
+        visual_intent: visualIntent,
       },
     },
   };

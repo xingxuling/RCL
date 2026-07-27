@@ -16,6 +16,15 @@ export { runReality } from './runtime.mjs';
 export { RCLError, RCLSyntaxError, RCLCompileError, RCLRuntimeError } from './errors.mjs';
 export { toRncsProposalInput } from './rncs-bridge.mjs';
 export {
+  createRclRncsVisualIntent,
+  normalizeRclRncsVisualIntent,
+  verifyRclRncsVisualIntent,
+  rclRncsVisualIntentToSpatialOptions,
+  RCL_RNCS_VISUAL_INTENT_FORMAT,
+  RCL_RNCS_VISUAL_INTENT_VERSION,
+  RCL_RNCS_VISUAL_INTENT_BLEND_MODES,
+} from './rncs-visual-intent.mjs';
+export {
   quantity,
   measurement,
   isQuantity,
