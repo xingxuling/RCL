@@ -2,7 +2,7 @@
 
 ## Status
 
-Foundation Batch A, Meta Batch B, and Batch C are verified `bridge` integrations, not
+Foundation Batch A, Meta Batch B, Batch C, and Batch D are verified `bridge` integrations, not
 native Foundation syntax. Both execute self-hosted RBC 1.2 in the C Native VM
 and call registered `RclVmProviderV1` implementations in
 `native/foundation_provider.c`.
@@ -27,6 +27,12 @@ Batch C provider `rcl.foundation.batch-c` covers, in enforced causal order:
 1. `physical`
 2. `embodiment`
 
+Batch D provider `rcl.foundation.batch-d` covers, in enforced causal order:
+
+1. `energy`
+2. `elemental`
+3. `neural`
+
 Declared Foundation-domain syntax remains outside the native bytecode subset
 and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
@@ -34,7 +40,7 @@ and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
 ```text
 request
-  -> Batch A, Meta Batch B, or Batch C JS adapter
+  -> Batch A, Meta Batch B, Batch C, or Batch D JS adapter
   -> shared foundation-native-batch-runtime.mjs
   -> selfhost/compiler.rbc through native/rclc.exe
   -> RBC 1.2 with ordered dynamic provider_call instructions
@@ -65,6 +71,16 @@ Batch C adds executable semantics:
 - `embodiment` accepts only bounded body commands and binds its
   `physicalParentRoot` to the preceding physical causal root.
 
+Batch D adds executable semantics:
+
+- `energy` performs bounded integer milli-joule transfer with a capped loss,
+  remaining budget, tick mutation, and explicit clamping.
+- `elemental` validates a bounded material, mass, purity, temperature, and
+  energy-use contract, then binds its `energyParentRoot` to the energy result.
+- `neural` validates a signal, amplitude, memory budget, attention window, and
+  inhibition budget, then computes deterministic retained memory and control
+  score while binding its `elementalParentRoot`.
+
 ## Run
 
 ```bash
@@ -74,6 +90,7 @@ npm run demo:foundation-native-meta-batch-b
 npm run test:foundation-native-batch-a
 npm run test:foundation-native-meta-batch-b
 npm run test:foundation-native-batch-c
+npm run test:foundation-native-batch-d
 npm run conformance:foundation
 ```
 
@@ -127,6 +144,12 @@ const meta = runFoundationNativeMetaBatchB({
   accepted input range.
 - `RCL_FOUNDATION_META_COMPRESSION_INVALID`: the reversible restore contract is
   absent.
+- `RCL_FOUNDATION_ENERGY_INVALID`: energy transfer inputs exceed the bounded
+  integer contract.
+- `RCL_FOUNDATION_ELEMENTAL_INVALID`: material composition inputs are missing,
+  unsupported, or outside the bounded contract.
+- `RCL_FOUNDATION_NEURAL_INVALID`: signal, memory, attention, or inhibition
+  inputs are missing or outside the bounded contract.
 - `RCL_FOUNDATION_RESULT_SEMANTICS`: a format-valid host result does not match
   the requested semantic transition.
 

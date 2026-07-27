@@ -17,6 +17,7 @@
 #define FOUNDATION_BATCH_A_PROVIDER_ID "rcl.foundation.batch-a"
 #define FOUNDATION_META_BATCH_B_PROVIDER_ID "rcl.foundation.meta-batch-b"
 #define FOUNDATION_BATCH_C_PROVIDER_ID "rcl.foundation.batch-c"
+#define FOUNDATION_BATCH_D_PROVIDER_ID "rcl.foundation.batch-d"
 #define FOUNDATION_RESULT_FORMAT "taowind.rcl-foundation-runtime-result.v0.1"
 #define FOUNDATION_HOST_FORMAT "taowind.rcl-foundation-native-host.v0.1"
 #define MAX_JSON_TOKENS 4096
@@ -69,7 +70,10 @@ enum {
   FOUNDATION_PARAMETERS_META_ACCELERATION,
   FOUNDATION_PARAMETERS_META_COMPRESSION,
   FOUNDATION_PARAMETERS_PHYSICAL,
-  FOUNDATION_PARAMETERS_EMBODIMENT
+  FOUNDATION_PARAMETERS_EMBODIMENT,
+  FOUNDATION_PARAMETERS_ENERGY,
+  FOUNDATION_PARAMETERS_ELEMENTAL,
+  FOUNDATION_PARAMETERS_NEURAL
 };
 
 static const FoundationCapability FOUNDATION_BATCH_A_CAPABILITIES[] = {
@@ -177,6 +181,36 @@ static const FoundationCapability FOUNDATION_BATCH_C_CAPABILITIES[] = {
     "inspect-embodied-state",
     93,
     FOUNDATION_PARAMETERS_EMBODIMENT
+  }
+};
+
+static const FoundationCapability FOUNDATION_BATCH_D_CAPABILITIES[] = {
+  {
+    "energy.balance",
+    "energy",
+    NULL,
+    "transfer-bounded-energy",
+    "inspect-energy-budget",
+    94,
+    FOUNDATION_PARAMETERS_ENERGY
+  },
+  {
+    "elemental.compose",
+    "elemental",
+    "energy",
+    "compose-bounded-material",
+    "inspect-material-composition",
+    92,
+    FOUNDATION_PARAMETERS_ELEMENTAL
+  },
+  {
+    "neural.integrate",
+    "neural",
+    "elemental",
+    "integrate-signal-control",
+    "inspect-neural-state",
+    90,
+    FOUNDATION_PARAMETERS_NEURAL
   }
 };
 
@@ -660,6 +694,313 @@ static int build_parameters_fragment(
       "}},",
       subject_id,
       command,
+      causal_parent,
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_ENERGY) {
+    int energy_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "energy"
+    );
+    int available_index = energy_index >= 0
+      ? json_object_get(request_json, tokens, token_count, energy_index, "availableMilliJoules")
+      : -1;
+    int requested_index = energy_index >= 0
+      ? json_object_get(request_json, tokens, token_count, energy_index, "requestedMilliJoules")
+      : -1;
+    int loss_index = energy_index >= 0
+      ? json_object_get(request_json, tokens, token_count, energy_index, "lossPpm")
+      : -1;
+    int tick_index = energy_index >= 0
+      ? json_object_get(request_json, tokens, token_count, energy_index, "tick")
+      : -1;
+    long long available = 0;
+    long long requested = 0;
+    long long loss_ppm = 0;
+    long long tick = 0;
+    if (
+      energy_index < 0
+      || tokens[energy_index].type != JSON_OBJECT
+      || !json_read_integer(
+        request_json,
+        available_index >= 0 ? &tokens[available_index] : NULL,
+        1,
+        1000000000000000LL,
+        &available
+      )
+      || !json_read_integer(
+        request_json,
+        requested_index >= 0 ? &tokens[requested_index] : NULL,
+        1,
+        1000000000000000LL,
+        &requested
+      )
+      || !json_read_integer(
+        request_json,
+        loss_index >= 0 ? &tokens[loss_index] : NULL,
+        0,
+        500000,
+        &loss_ppm
+      )
+      || !json_read_integer(
+        request_json,
+        tick_index >= 0 ? &tokens[tick_index] : NULL,
+        0,
+        1000000000000LL,
+        &tick
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_ENERGY_INVALID",
+        "energy requires bounded available, requested, lossPpm, and tick integers"
+      );
+    }
+    long long effective = create_mode
+      ? (requested > available ? available : requested)
+      : 0;
+    long long loss = (effective / 1000000LL) * loss_ppm
+      + ((effective % 1000000LL) * loss_ppm) / 1000000LL;
+    long long delivered = effective - loss;
+    long long remaining = available - effective;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"energy\":{"
+        "\"model\":\"bounded-transfer-v1\","
+        "\"availableMilliJoules\":%lld,"
+        "\"requestedMilliJoules\":%lld,"
+        "\"effectiveMilliJoules\":%lld,"
+        "\"lossPpm\":%lld,"
+        "\"lossMilliJoules\":%lld,"
+        "\"deliveredMilliJoules\":%lld,"
+        "\"remainingMilliJoules\":%lld,"
+        "\"tickBefore\":%lld,"
+        "\"tickAfter\":%lld,"
+        "\"clamped\":%s,"
+        "\"mutationApplied\":%s"
+      "}},",
+      available,
+      requested,
+      effective,
+      loss_ppm,
+      loss,
+      delivered,
+      remaining,
+      tick,
+      create_mode ? tick + 1 : tick,
+      requested > available ? "true" : "false",
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_ELEMENTAL) {
+    int elemental_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "elemental"
+    );
+    int material_index = elemental_index >= 0
+      ? json_object_get(request_json, tokens, token_count, elemental_index, "materialId")
+      : -1;
+    int mass_index = elemental_index >= 0
+      ? json_object_get(request_json, tokens, token_count, elemental_index, "massMg")
+      : -1;
+    int purity_index = elemental_index >= 0
+      ? json_object_get(request_json, tokens, token_count, elemental_index, "purityPpm")
+      : -1;
+    int temperature_index = elemental_index >= 0
+      ? json_object_get(request_json, tokens, token_count, elemental_index, "temperatureMilliK")
+      : -1;
+    int energy_use_index = elemental_index >= 0
+      ? json_object_get(request_json, tokens, token_count, elemental_index, "energyUseMilliJoules")
+      : -1;
+    long long mass = 0;
+    long long purity = 0;
+    long long temperature = 0;
+    long long energy_use = 0;
+    const char *material_id = NULL;
+    if (material_index >= 0 && json_token_equals(request_json, &tokens[material_index], "material:steel")) {
+      material_id = "material:steel";
+    } else if (material_index >= 0 && json_token_equals(request_json, &tokens[material_index], "material:water")) {
+      material_id = "material:water";
+    } else if (material_index >= 0 && json_token_equals(request_json, &tokens[material_index], "material:carbon")) {
+      material_id = "material:carbon";
+    }
+    if (
+      elemental_index < 0
+      || tokens[elemental_index].type != JSON_OBJECT
+      || !material_id
+      || !json_read_integer(
+        request_json,
+        mass_index >= 0 ? &tokens[mass_index] : NULL,
+        1,
+        1000000000000LL,
+        &mass
+      )
+      || !json_read_integer(
+        request_json,
+        purity_index >= 0 ? &tokens[purity_index] : NULL,
+        0,
+        1000000,
+        &purity
+      )
+      || !json_read_integer(
+        request_json,
+        temperature_index >= 0 ? &tokens[temperature_index] : NULL,
+        1,
+        1000000000LL,
+        &temperature
+      )
+      || !json_read_integer(
+        request_json,
+        energy_use_index >= 0 ? &tokens[energy_use_index] : NULL,
+        1,
+        1000000000000000LL,
+        &energy_use
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_ELEMENTAL_INVALID",
+        "elemental requires a bounded material, mass, purity, temperature, and energy use"
+      );
+    }
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"elemental\":{"
+        "\"materialId\":\"%s\","
+        "\"massMg\":%lld,"
+        "\"purityPpm\":%lld,"
+        "\"temperatureMilliK\":%lld,"
+        "\"energyUseMilliJoules\":%lld,"
+        "\"energyParentRoot\":\"%s\","
+        "\"compositionState\":\"%s\","
+        "\"stable\":%s,"
+        "\"mutationApplied\":%s"
+      "}},",
+      material_id,
+      mass,
+      purity,
+      temperature,
+      energy_use,
+      causal_parent,
+      create_mode ? "composed" : "observed",
+      purity >= 900000 ? "true" : "false",
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_NEURAL) {
+    int neural_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "neural"
+    );
+    int signal_index = neural_index >= 0
+      ? json_object_get(request_json, tokens, token_count, neural_index, "signalId")
+      : -1;
+    int amplitude_index = neural_index >= 0
+      ? json_object_get(request_json, tokens, token_count, neural_index, "amplitudePpm")
+      : -1;
+    int memory_index = neural_index >= 0
+      ? json_object_get(request_json, tokens, token_count, neural_index, "memoryBudgetBytes")
+      : -1;
+    int attention_index = neural_index >= 0
+      ? json_object_get(request_json, tokens, token_count, neural_index, "attentionWindow")
+      : -1;
+    int inhibition_index = neural_index >= 0
+      ? json_object_get(request_json, tokens, token_count, neural_index, "inhibitionPpm")
+      : -1;
+    long long amplitude = 0;
+    long long memory_budget = 0;
+    long long attention_window = 0;
+    long long inhibition = 0;
+    const char *signal_id = NULL;
+    if (signal_index >= 0 && json_token_equals(request_json, &tokens[signal_index], "signal:operator")) {
+      signal_id = "signal:operator";
+    } else if (signal_index >= 0 && json_token_equals(request_json, &tokens[signal_index], "signal:sensor")) {
+      signal_id = "signal:sensor";
+    } else if (signal_index >= 0 && json_token_equals(request_json, &tokens[signal_index], "signal:memory")) {
+      signal_id = "signal:memory";
+    }
+    if (
+      neural_index < 0
+      || tokens[neural_index].type != JSON_OBJECT
+      || !signal_id
+      || !json_read_integer(
+        request_json,
+        amplitude_index >= 0 ? &tokens[amplitude_index] : NULL,
+        0,
+        1000000,
+        &amplitude
+      )
+      || !json_read_integer(
+        request_json,
+        memory_index >= 0 ? &tokens[memory_index] : NULL,
+        64,
+        1000000000LL,
+        &memory_budget
+      )
+      || !json_read_integer(
+        request_json,
+        attention_index >= 0 ? &tokens[attention_index] : NULL,
+        1,
+        1000000,
+        &attention_window
+      )
+      || !json_read_integer(
+        request_json,
+        inhibition_index >= 0 ? &tokens[inhibition_index] : NULL,
+        0,
+        1000000,
+        &inhibition
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_NEURAL_INVALID",
+        "neural requires a bounded signal, amplitude, memory budget, attention window, and inhibition"
+      );
+    }
+    long long effective_amplitude = create_mode ? amplitude : 0;
+    long long attention_capacity = attention_window > 15625000LL
+      ? 1000000000LL
+      : attention_window * 64LL;
+    long long retained_memory = create_mode
+      ? (memory_budget < attention_capacity ? memory_budget : attention_capacity)
+      : 0;
+    long long control_score = (effective_amplitude * (1000000LL - inhibition)) / 1000000LL;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"neural\":{"
+        "\"signalId\":\"%s\","
+        "\"amplitudePpm\":%lld,"
+        "\"effectiveAmplitudePpm\":%lld,"
+        "\"memoryBudgetBytes\":%lld,"
+        "\"retainedMemoryBytes\":%lld,"
+        "\"attentionWindow\":%lld,"
+        "\"inhibitionPpm\":%lld,"
+        "\"controlScorePpm\":%lld,"
+        "\"elementalParentRoot\":\"%s\","
+        "\"mutationApplied\":%s"
+      "}},",
+      signal_id,
+      amplitude,
+      effective_amplitude,
+      memory_budget,
+      retained_memory,
+      attention_window,
+      inhibition,
+      control_score,
       causal_parent,
       create_mode ? "true" : "false"
     );
@@ -1206,6 +1547,16 @@ int main(int argc, char **argv) {
     0,
     {0}
   };
+  FoundationProviderState batch_d_state = {
+    FOUNDATION_BATCH_D_PROVIDER_ID,
+    FOUNDATION_BATCH_D_CAPABILITIES,
+    sizeof(FOUNDATION_BATCH_D_CAPABILITIES)
+      / sizeof(FOUNDATION_BATCH_D_CAPABILITIES[0]),
+    "Foundation Batch D capabilities must execute in energy, elemental, neural order",
+    0,
+    0,
+    {0}
+  };
   RclVmInstance *vm = rclvm_instance_create();
   if (!vm) {
     print_host_error("Cannot create RCL Native VM instance");
@@ -1232,6 +1583,12 @@ int main(int argc, char **argv) {
         FOUNDATION_BATCH_C_PROVIDER_ID,
         foundation_provider_invoke,
         &batch_c_state
+      },
+      {
+        RCLVM_PROVIDER_ABI_V1,
+        FOUNDATION_BATCH_D_PROVIDER_ID,
+        foundation_provider_invoke,
+        &batch_d_state
       }
     };
     for (size_t index = 0; index < sizeof(providers) / sizeof(providers[0]); index++) {
@@ -1263,6 +1620,7 @@ int main(int argc, char **argv) {
   if (batch_a_state.call_count > 0) active_provider_count++;
   if (meta_batch_b_state.call_count > 0) active_provider_count++;
   if (batch_c_state.call_count > 0) active_provider_count++;
+  if (batch_d_state.call_count > 0) active_provider_count++;
   if (active_provider_count > 1) {
     print_host_error(
       "RCL_FOUNDATION_PROVIDER_SCOPE: one bytecode execution must target exactly one Foundation batch"
@@ -1274,6 +1632,7 @@ int main(int argc, char **argv) {
   FoundationProviderState *active_provider = &batch_a_state;
   if (meta_batch_b_state.call_count > 0) active_provider = &meta_batch_b_state;
   if (batch_c_state.call_count > 0) active_provider = &batch_c_state;
+  if (batch_d_state.call_count > 0) active_provider = &batch_d_state;
   size_t vm_json_length = strlen(vm_json);
   while (vm_json_length > 0 && isspace((unsigned char)vm_json[vm_json_length - 1])) vm_json_length--;
   printf(
