@@ -1639,3 +1639,15 @@ export {
   verifyFoundationNativeBatchDExecution,
   runFoundationNativeBatchD,
 } from './foundation-native-batch-d.mjs';
+
+export {
+  FOUNDATION_NATIVE_BATCH_E_FORMAT,
+  FOUNDATION_NATIVE_BATCH_E_REQUEST_FORMAT,
+  FOUNDATION_NATIVE_BATCH_E_PROVIDER_ID,
+  FOUNDATION_NATIVE_BATCH_E,
+  normalizeFoundationNativeBatchERequest,
+  renderFoundationNativeBatchESource,
+  compileFoundationNativeBatchE,
+  verifyFoundationNativeBatchEExecution,
+  runFoundationNativeBatchE,
+} from './foundation-native-batch-e.mjs';

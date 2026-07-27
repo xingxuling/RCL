@@ -30,6 +30,7 @@ Foundation Native Batch A: six domains through a verified RclVmProviderV1 bridge
 Foundation Native Meta Batch B: spacetime, bounded acceleration, and reversible root compression through a second verified provider
 Foundation Native Batch C: deterministic physical stepping and authority-bounded embodiment integration through a third verified provider
 Foundation Native Batch D: bounded energy transfer, elemental composition, and neural signal integration through a fourth verified provider
+Foundation Native Batch E: bounded metacomputation planning and computation execution through a fifth verified provider
 advanced declared-domain syntax: still JavaScript Reference Runtime
 whole-language runtime self-hosting: not claimed
 ```
@@ -43,6 +44,9 @@ npm run verify:selfhost-fixedpoint
 npm run verify:selfhost-examples
 npm run test:foundation-native-batch-a
 npm run test:foundation-native-meta-batch-b
+npm run test:foundation-native-batch-c
+npm run test:foundation-native-batch-d
+npm run test:foundation-native-batch-e
 npm run conformance:foundation
 node scripts/verify-native-windows-boundary.mjs
 node scripts/verify-rcl-selfhost-stage40.mjs
@@ -51,7 +55,7 @@ node scripts/verify-rcl-selfhost-all.mjs
 
 ## Honest Boundary
 
-The native-core compiler has escaped JavaScript after the one-time C0 bootstrap. Foundation Native Batch A now runs quantitative, knowledge, perception, natural-language, understanding, and creative proposals through RBC 1.2 and a real `RclVmProviderV1` host. Meta Batch B adds causal timeline mutation, bounded acceleration, and reversible content-root representation compression through a second provider. Batch C adds a bounded physical step followed by embodiment integration through a third provider. Batch D adds bounded energy transfer, elemental composition, and neural signal integration through a fourth provider. All four are bridge mode, not native Foundation syntax. Biological, scientific, product-domain execution, and all uncovered Foundation modules still run in the JavaScript Reference Runtime. Programs that the native-bytecode backend rejects are reported separately and are not counted as self-host parity successes.
+The native-core compiler has escaped JavaScript after the one-time C0 bootstrap. Foundation Native Batch A now runs quantitative, knowledge, perception, natural-language, understanding, and creative proposals through RBC 1.2 and a real `RclVmProviderV1` host. Meta Batch B adds causal timeline mutation, bounded acceleration, and reversible content-root representation compression through a second provider. Batch C adds a bounded physical step followed by embodiment integration through a third provider. Batch D adds bounded energy transfer, elemental composition, and neural signal integration through a fourth provider. Batch E adds bounded metacomputation planning and computation execution through a fifth provider. All five are bridge mode, not native Foundation syntax. Biological, scientific, product-domain execution, and all uncovered Foundation modules still run in the JavaScript Reference Runtime. Programs that the native-bytecode backend rejects are reported separately and are not counted as self-host parity successes.
 
 See `docs/foundation-native-provider-bridge.md` for the ABI, failure contract, migration path, and performance evidence. The remaining work is moving more domain semantics, the typed module toolchain, and the package authority path onto the same native foundation.
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Foundation Batch A, Meta Batch B, Batch C, and Batch D are verified `bridge` integrations, not
+Foundation Batch A, Meta Batch B, Batch C, Batch D, and Batch E are verified `bridge` integrations, not
 native Foundation syntax. Both execute self-hosted RBC 1.2 in the C Native VM
 and call registered `RclVmProviderV1` implementations in
 `native/foundation_provider.c`.
@@ -33,6 +33,11 @@ Batch D provider `rcl.foundation.batch-d` covers, in enforced causal order:
 2. `elemental`
 3. `neural`
 
+Batch E provider `rcl.foundation.batch-e` covers, in enforced causal order:
+
+1. `metacomputation`
+2. `computation`
+
 Declared Foundation-domain syntax remains outside the native bytecode subset
 and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
@@ -40,7 +45,7 @@ and continues to fail with `RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED`.
 
 ```text
 request
-  -> Batch A, Meta Batch B, Batch C, or Batch D JS adapter
+  -> Batch A, Meta Batch B, Batch C, Batch D, or Batch E JS adapter
   -> shared foundation-native-batch-runtime.mjs
   -> selfhost/compiler.rbc through native/rclc.exe
   -> RBC 1.2 with ordered dynamic provider_call instructions
@@ -81,6 +86,13 @@ Batch D adds executable semantics:
   inhibition budget, then computes deterministic retained memory and control
   score while binding its `elementalParentRoot`.
 
+Batch E adds executable semantics:
+
+- `metacomputation` bounds a selected computation plan by requested and maximum
+  step budgets, records clamping, and advances a deterministic planning tick.
+- `computation` executes bounded sum, difference, or product operations with an
+  instruction budget and binds its `metacomputationParentRoot` to the plan.
+
 ## Run
 
 ```bash
@@ -91,6 +103,7 @@ npm run test:foundation-native-batch-a
 npm run test:foundation-native-meta-batch-b
 npm run test:foundation-native-batch-c
 npm run test:foundation-native-batch-d
+npm run test:foundation-native-batch-e
 npm run conformance:foundation
 ```
 
@@ -150,6 +163,10 @@ const meta = runFoundationNativeMetaBatchB({
   unsupported, or outside the bounded contract.
 - `RCL_FOUNDATION_NEURAL_INVALID`: signal, memory, attention, or inhibition
   inputs are missing or outside the bounded contract.
+- `RCL_FOUNDATION_METACOMPUTATION_INVALID`: computation plan, strategy, or
+  step budget is missing or outside the bounded contract.
+- `RCL_FOUNDATION_COMPUTATION_INVALID`: computation program, operation,
+  operands, or instruction budget is missing or outside the bounded contract.
 - `RCL_FOUNDATION_RESULT_SEMANTICS`: a format-valid host result does not match
   the requested semantic transition.
 

@@ -18,6 +18,7 @@
 #define FOUNDATION_META_BATCH_B_PROVIDER_ID "rcl.foundation.meta-batch-b"
 #define FOUNDATION_BATCH_C_PROVIDER_ID "rcl.foundation.batch-c"
 #define FOUNDATION_BATCH_D_PROVIDER_ID "rcl.foundation.batch-d"
+#define FOUNDATION_BATCH_E_PROVIDER_ID "rcl.foundation.batch-e"
 #define FOUNDATION_RESULT_FORMAT "taowind.rcl-foundation-runtime-result.v0.1"
 #define FOUNDATION_HOST_FORMAT "taowind.rcl-foundation-native-host.v0.1"
 #define MAX_JSON_TOKENS 4096
@@ -73,7 +74,9 @@ enum {
   FOUNDATION_PARAMETERS_EMBODIMENT,
   FOUNDATION_PARAMETERS_ENERGY,
   FOUNDATION_PARAMETERS_ELEMENTAL,
-  FOUNDATION_PARAMETERS_NEURAL
+  FOUNDATION_PARAMETERS_NEURAL,
+  FOUNDATION_PARAMETERS_METACOMPUTATION,
+  FOUNDATION_PARAMETERS_COMPUTATION
 };
 
 static const FoundationCapability FOUNDATION_BATCH_A_CAPABILITIES[] = {
@@ -211,6 +214,27 @@ static const FoundationCapability FOUNDATION_BATCH_D_CAPABILITIES[] = {
     "inspect-neural-state",
     90,
     FOUNDATION_PARAMETERS_NEURAL
+  }
+};
+
+static const FoundationCapability FOUNDATION_BATCH_E_CAPABILITIES[] = {
+  {
+    "metacomputation.plan",
+    "metacomputation",
+    NULL,
+    "transform-bounded-computation-plan",
+    "inspect-computation-plan",
+    93,
+    FOUNDATION_PARAMETERS_METACOMPUTATION
+  },
+  {
+    "computation.execute",
+    "computation",
+    "metacomputation",
+    "execute-bounded-computation",
+    "inspect-computation-state",
+    91,
+    FOUNDATION_PARAMETERS_COMPUTATION
   }
 };
 
@@ -1004,6 +1028,221 @@ static int build_parameters_fragment(
       causal_parent,
       create_mode ? "true" : "false"
     );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_METACOMPUTATION) {
+    int plan_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "metacomputation"
+    );
+    int plan_id_index = plan_index >= 0
+      ? json_object_get(request_json, tokens, token_count, plan_index, "planId")
+      : -1;
+    int strategy_index = plan_index >= 0
+      ? json_object_get(request_json, tokens, token_count, plan_index, "strategy")
+      : -1;
+    int requested_steps_index = plan_index >= 0
+      ? json_object_get(request_json, tokens, token_count, plan_index, "requestedSteps")
+      : -1;
+    int maximum_steps_index = plan_index >= 0
+      ? json_object_get(request_json, tokens, token_count, plan_index, "maximumSteps")
+      : -1;
+    int tick_index = plan_index >= 0
+      ? json_object_get(request_json, tokens, token_count, plan_index, "tick")
+      : -1;
+    long long requested_steps = 0;
+    long long maximum_steps = 0;
+    long long tick = 0;
+    const char *plan_id = NULL;
+    const char *strategy = NULL;
+    if (plan_id_index >= 0 && json_token_equals(request_json, &tokens[plan_id_index], "plan:sum-v1")) {
+      plan_id = "plan:sum-v1";
+    } else if (plan_id_index >= 0 && json_token_equals(request_json, &tokens[plan_id_index], "plan:product-v1")) {
+      plan_id = "plan:product-v1";
+    } else if (plan_id_index >= 0 && json_token_equals(request_json, &tokens[plan_id_index], "plan:reduction-v1")) {
+      plan_id = "plan:reduction-v1";
+    }
+    if (strategy_index >= 0 && json_token_equals(request_json, &tokens[strategy_index], "bounded-step")) {
+      strategy = "bounded-step";
+    } else if (strategy_index >= 0 && json_token_equals(request_json, &tokens[strategy_index], "budgeted-reuse")) {
+      strategy = "budgeted-reuse";
+    }
+    if (
+      plan_index < 0
+      || tokens[plan_index].type != JSON_OBJECT
+      || !plan_id
+      || !strategy
+      || !json_read_integer(
+        request_json,
+        requested_steps_index >= 0 ? &tokens[requested_steps_index] : NULL,
+        1,
+        1000000000000LL,
+        &requested_steps
+      )
+      || !json_read_integer(
+        request_json,
+        maximum_steps_index >= 0 ? &tokens[maximum_steps_index] : NULL,
+        1,
+        1000000000000LL,
+        &maximum_steps
+      )
+      || !json_read_integer(
+        request_json,
+        tick_index >= 0 ? &tokens[tick_index] : NULL,
+        0,
+        1000000000000LL,
+        &tick
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_METACOMPUTATION_INVALID",
+        "metacomputation requires a bounded plan, strategy, step budget, and tick"
+      );
+    }
+    long long effective_steps = create_mode
+      ? (requested_steps > maximum_steps ? maximum_steps : requested_steps)
+      : 0;
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"metacomputation\":{"
+        "\"planId\":\"%s\","
+        "\"strategy\":\"%s\","
+        "\"requestedSteps\":%lld,"
+        "\"maximumSteps\":%lld,"
+        "\"effectiveSteps\":%lld,"
+        "\"tickBefore\":%lld,"
+        "\"tickAfter\":%lld,"
+        "\"clamped\":%s,"
+        "\"mutationApplied\":%s"
+      "}},",
+      plan_id,
+      strategy,
+      requested_steps,
+      maximum_steps,
+      effective_steps,
+      tick,
+      create_mode ? tick + 1 : tick,
+      requested_steps > maximum_steps ? "true" : "false",
+      create_mode ? "true" : "false"
+    );
+  } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_COMPUTATION) {
+    int computation_index = json_object_get(
+      request_json,
+      tokens,
+      token_count,
+      input_index,
+      "computation"
+    );
+    int program_id_index = computation_index >= 0
+      ? json_object_get(request_json, tokens, token_count, computation_index, "programId")
+      : -1;
+    int operation_index = computation_index >= 0
+      ? json_object_get(request_json, tokens, token_count, computation_index, "operation")
+      : -1;
+    int left_index = computation_index >= 0
+      ? json_object_get(request_json, tokens, token_count, computation_index, "leftOperand")
+      : -1;
+    int right_index = computation_index >= 0
+      ? json_object_get(request_json, tokens, token_count, computation_index, "rightOperand")
+      : -1;
+    int budget_index = computation_index >= 0
+      ? json_object_get(request_json, tokens, token_count, computation_index, "instructionBudget")
+      : -1;
+    long long left_operand = 0;
+    long long right_operand = 0;
+    long long instruction_budget = 0;
+    const char *program_id = NULL;
+    const char *operation = NULL;
+    if (program_id_index >= 0 && json_token_equals(request_json, &tokens[program_id_index], "program:sum-v1")) {
+      program_id = "program:sum-v1";
+    } else if (program_id_index >= 0 && json_token_equals(request_json, &tokens[program_id_index], "program:difference-v1")) {
+      program_id = "program:difference-v1";
+    } else if (program_id_index >= 0 && json_token_equals(request_json, &tokens[program_id_index], "program:product-v1")) {
+      program_id = "program:product-v1";
+    }
+    if (operation_index >= 0 && json_token_equals(request_json, &tokens[operation_index], "sum")) {
+      operation = "sum";
+    } else if (operation_index >= 0 && json_token_equals(request_json, &tokens[operation_index], "difference")) {
+      operation = "difference";
+    } else if (operation_index >= 0 && json_token_equals(request_json, &tokens[operation_index], "product")) {
+      operation = "product";
+    }
+    if (
+      computation_index < 0
+      || tokens[computation_index].type != JSON_OBJECT
+      || !program_id
+      || !operation
+      || !json_read_integer(
+        request_json,
+        left_index >= 0 ? &tokens[left_index] : NULL,
+        -1000000,
+        1000000,
+        &left_operand
+      )
+      || !json_read_integer(
+        request_json,
+        right_index >= 0 ? &tokens[right_index] : NULL,
+        -1000000,
+        1000000,
+        &right_operand
+      )
+      || !json_read_integer(
+        request_json,
+        budget_index >= 0 ? &tokens[budget_index] : NULL,
+        1,
+        1000000000000LL,
+        &instruction_budget
+      )
+    ) {
+      return provider_fail(
+        error,
+        error_capacity,
+        "RCL_FOUNDATION_COMPUTATION_INVALID",
+        "computation requires a bounded program, operation, operands, and instruction budget"
+      );
+    }
+    long long computed_value = 0;
+    long long steps_used = 0;
+    if (strcmp(operation, "sum") == 0) {
+      computed_value = left_operand + right_operand;
+      steps_used = 1;
+    } else if (strcmp(operation, "difference") == 0) {
+      computed_value = left_operand - right_operand;
+      steps_used = 1;
+    } else {
+      computed_value = left_operand * right_operand;
+      steps_used = 3;
+    }
+    length = snprintf(
+      output,
+      output_capacity,
+      "\"parameters\":{\"computation\":{"
+        "\"programId\":\"%s\","
+        "\"operation\":\"%s\","
+        "\"leftOperand\":%lld,"
+        "\"rightOperand\":%lld,"
+        "\"result\":%lld,"
+        "\"instructionBudget\":%lld,"
+        "\"stepsUsed\":%lld,"
+        "\"budgetSatisfied\":%s,"
+        "\"metacomputationParentRoot\":\"%s\","
+        "\"mutationApplied\":%s"
+      "}},",
+      program_id,
+      operation,
+      left_operand,
+      right_operand,
+      create_mode ? computed_value : 0,
+      instruction_budget,
+      create_mode ? steps_used : 0,
+      instruction_budget >= steps_used ? "true" : "false",
+      causal_parent,
+      create_mode ? "true" : "false"
+    );
   } else if (capability->parameter_kind == FOUNDATION_PARAMETERS_META_SPACETIME) {
     int timeline_index = json_object_get(
       request_json,
@@ -1557,6 +1796,16 @@ int main(int argc, char **argv) {
     0,
     {0}
   };
+  FoundationProviderState batch_e_state = {
+    FOUNDATION_BATCH_E_PROVIDER_ID,
+    FOUNDATION_BATCH_E_CAPABILITIES,
+    sizeof(FOUNDATION_BATCH_E_CAPABILITIES)
+      / sizeof(FOUNDATION_BATCH_E_CAPABILITIES[0]),
+    "Foundation Batch E capabilities must execute in metacomputation then computation order",
+    0,
+    0,
+    {0}
+  };
   RclVmInstance *vm = rclvm_instance_create();
   if (!vm) {
     print_host_error("Cannot create RCL Native VM instance");
@@ -1589,6 +1838,12 @@ int main(int argc, char **argv) {
         FOUNDATION_BATCH_D_PROVIDER_ID,
         foundation_provider_invoke,
         &batch_d_state
+      },
+      {
+        RCLVM_PROVIDER_ABI_V1,
+        FOUNDATION_BATCH_E_PROVIDER_ID,
+        foundation_provider_invoke,
+        &batch_e_state
       }
     };
     for (size_t index = 0; index < sizeof(providers) / sizeof(providers[0]); index++) {
@@ -1621,6 +1876,7 @@ int main(int argc, char **argv) {
   if (meta_batch_b_state.call_count > 0) active_provider_count++;
   if (batch_c_state.call_count > 0) active_provider_count++;
   if (batch_d_state.call_count > 0) active_provider_count++;
+  if (batch_e_state.call_count > 0) active_provider_count++;
   if (active_provider_count > 1) {
     print_host_error(
       "RCL_FOUNDATION_PROVIDER_SCOPE: one bytecode execution must target exactly one Foundation batch"
@@ -1633,6 +1889,7 @@ int main(int argc, char **argv) {
   if (meta_batch_b_state.call_count > 0) active_provider = &meta_batch_b_state;
   if (batch_c_state.call_count > 0) active_provider = &batch_c_state;
   if (batch_d_state.call_count > 0) active_provider = &batch_d_state;
+  if (batch_e_state.call_count > 0) active_provider = &batch_e_state;
   size_t vm_json_length = strlen(vm_json);
   while (vm_json_length > 0 && isspace((unsigned char)vm_json[vm_json_length - 1])) vm_json_length--;
   printf(
