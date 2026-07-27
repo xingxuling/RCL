@@ -1615,3 +1615,15 @@ export {
   verifyFoundationNativeMetaBatchBExecution,
   runFoundationNativeMetaBatchB,
 } from './foundation-native-meta-bridge.mjs';
+
+export {
+  FOUNDATION_NATIVE_BATCH_C_FORMAT,
+  FOUNDATION_NATIVE_BATCH_C_REQUEST_FORMAT,
+  FOUNDATION_NATIVE_BATCH_C_PROVIDER_ID,
+  FOUNDATION_NATIVE_BATCH_C,
+  normalizeFoundationNativeBatchCRequest,
+  renderFoundationNativeBatchCSource,
+  compileFoundationNativeBatchC,
+  verifyFoundationNativeBatchCExecution,
+  runFoundationNativeBatchC,
+} from './foundation-native-batch-c.mjs';

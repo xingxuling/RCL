@@ -11,6 +11,9 @@
 - Meta Batch B provider: `rcl.foundation.meta-batch-b` through `RclVmProviderV1`
 - Meta Batch B domains: meta-spacetime, meta-acceleration, meta-compression
 - Meta Batch B receipt: `1d22b8565c04538abe431b5d644d3776d0e0322cf546e61ce23afc6859741318`
+- Batch C provider: `rcl.foundation.batch-c` through `RclVmProviderV1`
+- Batch C domains: physical, embodiment
+- Batch C receipt: `706b39f9731158570d2fe21a1f80cd532fa11308b04c3a6f1ad7052e279335e0`
 
 | Check | Status |
 | --- | --- |
@@ -59,6 +62,21 @@
 | native-meta-batch-b-provider-degradation | pass |
 | native-meta-batch-b-semantic-rejection | pass |
 | native-meta-batch-b-performance | pass |
+| native-batch-c-runtime-invocation | pass |
+| native-batch-c-result-shape | pass |
+| native-batch-c-selfhost | pass |
+| native-batch-c-deterministic-replay | pass |
+| native-batch-c-behavior-mutation | pass |
+| native-batch-c-causal-chain | pass |
+| native-batch-c-physical-semantics | pass |
+| native-batch-c-embodiment-semantics | pass |
+| native-batch-c-negative-authority | pass |
+| native-batch-c-invariant-rejection | pass |
+| native-batch-c-evidence-rejection | pass |
+| native-batch-c-provider-degradation | pass |
+| native-batch-c-physical-rejection | pass |
+| native-batch-c-embodiment-rejection | pass |
+| native-batch-c-performance | pass |
 | native-boundary-explicit | pass |
 
-Batch A and Meta Batch B are counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.
+Batch A, Meta Batch B and Batch C are counted as bridge mode. Unsupported declared-domain lowering remains explicit and is not counted as native mode.
