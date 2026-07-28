@@ -1,5 +1,6 @@
 import { realityRoot } from './canonical.mjs';
 import { createRclRncsVisualIntent } from './rncs-visual-intent.mjs';
+import { createRclRncsRuntimeBinding } from './rncs-runtime-binding.mjs';
 
 /**
  * Convert an RCL realized transition into the input expected by
@@ -16,6 +17,9 @@ export function toRncsProposalInput(program, transition, options = {}) {
   const subjectId = transition.actor ?? options.subjectId ?? 'rcl:system';
   const visualIntent = options.visualIntent
     ? createRclRncsVisualIntent(options.visualIntent)
+    : null;
+  const runtimeBinding = options.runtimeBinding
+    ? createRclRncsRuntimeBinding(options.runtimeBinding)
     : null;
   const providerCapabilities = transition.hostCalls?.map(call => ({ host: call.host ?? null, capability: call.capability, required: true })) ?? [];
   const evidenceRequirements = (transition.witnesses ?? []).map((witness, index) => ({ kind: 'rcl-witness', reference: witness, required: true, sequence: index + 1 }));
@@ -46,6 +50,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
       goals: [{ rule: transition.rule, after_root: transition.afterRoot }],
       constraints: transition.authority?.needs ?? [],
       visual_intent_root: visualIntent?.root ?? null,
+      runtime_binding_root: runtimeBinding?.bindingRoot ?? null,
     },
     capability_plan: {
       capabilities: transition.authority?.activeWarrants ?? [],
@@ -61,6 +66,14 @@ export function toRncsProposalInput(program, transition, options = {}) {
           root: visualIntent.root,
         }]
         : []),
+      ...(runtimeBinding
+        ? [{
+          kind: 'rncs-authority-presentation-binding',
+          root: runtimeBinding.bindingRoot,
+          authority_frame_root: runtimeBinding.authorityFrame.frameRoot,
+          temporal_packet_root: runtimeBinding.temporalPacket.packetRoot,
+        }]
+        : []),
     ],
     provisional_delta: {
       operations: transition.changes.map(change => ({
@@ -74,7 +87,10 @@ export function toRncsProposalInput(program, transition, options = {}) {
     causal_basis: {
       events: [{ kind: transition.ruleKind, rule: transition.rule, actor: transition.actor }],
       rules: [{ language: 'RCL', version: program.languageVersion, rule: transition.rule }],
-      simulation_refs: visualIntent ? [visualIntent.root] : [],
+      simulation_refs: [
+        ...(visualIntent ? [visualIntent.root] : []),
+        ...(runtimeBinding ? [runtimeBinding.bindingRoot] : []),
+      ],
     },
     evidence: {
       nodes: (transition.witnesses ?? []).map((witness, index) => ({
@@ -83,13 +99,18 @@ export function toRncsProposalInput(program, transition, options = {}) {
         source: witness,
         transition_root: transition.afterRoot,
       })),
-      edges: visualIntent
-        ? [{
+      edges: [
+        ...(visualIntent ? [{
           from: visualIntent.root,
           to: transition.afterRoot,
           kind: 'visual-intent-input',
-        }]
-        : [],
+        }] : []),
+        ...(runtimeBinding ? [{
+          from: runtimeBinding.bindingRoot,
+          to: transition.afterRoot,
+          kind: 'rncs-authority-presentation-binding',
+        }] : []),
+      ],
     },
     foundation_governance: foundationGovernance,
     extensions: {
@@ -102,6 +123,7 @@ export function toRncsProposalInput(program, transition, options = {}) {
         into_subject: transition.into,
         foundation_governance: foundationGovernance,
         visual_intent: visualIntent,
+        runtime_binding: runtimeBinding,
       },
     },
   };

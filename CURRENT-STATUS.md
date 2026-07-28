@@ -6,6 +6,7 @@
 - Whole-language runtime self-hosting is not claimed. Six Foundation domains, the three Meta Batch B planes, the `physical` -> `embodiment` Batch C chain, the `energy` -> `elemental` -> `neural` Batch D chain, and the `metacomputation` -> `computation` Batch E chain now execute through RBC 1.2 and five `RclVmProviderV1` Native Provider bridges; uncovered and declared-domain runtime remains JavaScript.
 - The bridge is explicitly reported as `bridge`, not native Foundation syntax. Its executable is `native/rclfoundation.exe`.
 - RCL RNCS Visual Intent v0.1 now provides a rooted bridge input for animation graphs, blend layers, masks, look-at/two-bone IK constraints, skin selection and morph weights; it is an input contract and not a rendering claim.
+- RCL RNCS Runtime Binding v0.1 now consumes the RNCS authority-presentation receipt, verifies the state/frame/packet root links and carries the binding into RCL proposals, causal references and evidence edges; it remains a migration consumer and does not execute RSR or VSR itself.
 - Downstream copies in RNCS and zhinao are tracked as migration consumers, not as byte-identical sources.
 - Machine-readable contract: `VERSION-CONTRACT.json`.
 - Verification entrypoint: `npm run verify:version-contract`; the bridge gates are `npm run test:foundation-native-batch-a`, `npm run test:foundation-native-meta-batch-b`, `npm run test:foundation-native-batch-c`, `npm run test:foundation-native-batch-d`, `npm run test:foundation-native-batch-e`, and `npm run conformance:foundation`.

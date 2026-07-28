@@ -25,6 +25,13 @@ export {
   RCL_RNCS_VISUAL_INTENT_BLEND_MODES,
 } from './rncs-visual-intent.mjs';
 export {
+  createRclRncsRuntimeBinding,
+  normalizeRclRncsRuntimeBinding,
+  verifyRclRncsRuntimeBinding,
+  RCL_RNCS_RUNTIME_BINDING_FORMAT,
+  RCL_RNCS_RUNTIME_BINDING_VERSION,
+} from './rncs-runtime-binding.mjs';
+export {
   quantity,
   measurement,
   isQuantity,
