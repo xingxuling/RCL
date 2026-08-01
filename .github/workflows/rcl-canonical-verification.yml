@@ -35,6 +35,8 @@ jobs:
         run: node --test tests/000-source-capability-metabolism-integration.test.mjs
       - name: Verify source capability SQL gate
         run: node --test tests/001-source-capability-sql-diagnostic.test.mjs
+      - name: Verify equivalence corpus forge gate
+        run: node --test tests/002-equivalence-corpus-forge.test.mjs
       - name: Run RCL test suite
         run: npm test
       - name: Verify self-hosted examples
