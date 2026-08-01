@@ -135,6 +135,30 @@ test('timeouts become comparable error observations rather than uncaught failure
   assert.equal(report.cases[0].source.primary.error.code, 'RCL_DIFFERENTIAL_EXECUTION_TIMEOUT');
 });
 
+test('negative controls require semantic mismatch rather than infrastructure failure', async () => {
+  const report = await runIndependentDifferentialAbsorption({
+    capability: 'control_timeout_probe',
+    source: { id: 'source', runtime: 'source-runtime', execute: () => 1 },
+    absorbed: { id: 'absorbed', runtime: 'absorbed-runtime', execute: () => 1 },
+    cases: [{ id: 'stable', input: null }],
+    repeats: 1,
+    timeoutMs: 5,
+    negativeControls: [{
+      id: 'timeout_only_control',
+      adapter: {
+        id: 'timeout_control',
+        runtime: 'timeout-runtime',
+        execute: async () => new Promise(resolve => setTimeout(() => resolve(2), 30)),
+      },
+      mustDifferCaseIds: ['stable'],
+    }],
+  });
+  assert.equal(report.passed, false);
+  assert.equal(report.controlsPassed, false);
+  assert.equal(report.negativeControls[0].detected, false);
+  assert.deepEqual(report.negativeControls[0].detectedCaseIds, []);
+});
+
 test('differential evidence can be attached to a matching metabolism report', async () => {
   const differential = await runIndependentDifferentialAbsorption({
     capability: 'attach_probe',
