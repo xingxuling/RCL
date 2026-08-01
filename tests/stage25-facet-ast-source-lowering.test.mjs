@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-test('Stage-25 RCL-owned facet AST source lowering emits literal, LOAD_STATE builtin and provider bytecode through native rclvm.exe', () => {
+test('Stage-25 RCL-owned facet AST source lowering emits literal, LOAD_STATE builtin and provider bytecode through the selected native VM', () => {
   const out = execFileSync('node', ['scripts/verify-rcl-selfhost-stage25.mjs'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
@@ -27,7 +27,7 @@ test('Stage-25 RCL-owned facet AST source lowering emits literal, LOAD_STATE bui
   assert.equal(report.compiler.literalAst.kind, 'FacetDecl');
   assert.equal(report.compiler.literalAst.path, 'seed.request');
   assert.equal(report.compiler.builtinArg0, 'seed.request');
-  assert.equal(report.nativeVm.path, 'native/rclvm.exe');
+  assert.equal(report.nativeVm.path, process.platform === 'win32' ? 'native/rclvm.exe' : 'native/rclvm');
   assert.equal(report.target.bytes, 361);
   assert.equal(report.target.exactReferenceMatch, true);
   assert.equal(report.target.instructions[2].name, 'LOAD_STATE');

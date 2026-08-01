@@ -12,3 +12,9 @@
 - Verification entrypoint: `npm run verify:version-contract`; the bridge gates are `npm run test:foundation-native-batch-a`, `npm run test:foundation-native-meta-batch-b`, `npm run test:foundation-native-batch-c`, `npm run test:foundation-native-batch-d`, `npm run test:foundation-native-batch-e`, and `npm run conformance:foundation`.
 
 ``CONTEXT.md`` is retained as historical handoff material; its prior “Current” heading has been renamed to avoid presenting v0.86 as the current release.
+
+## Experimental capability metabolism layer
+
+- `Capability Metabolism v0.1` adds a bounded external-capability manifest, semantic-kernel extraction, generated RCL declarations, declared-equivalence evidence, absorption-stage scoring and cross-domain compound-organ synthesis.
+- The layer deliberately reports `native-candidate` rather than native status. Native promotion still requires independent source/runtime differential execution, RBC lowering and native-VM parity evidence.
+- Verification entrypoints: `node --test --test-concurrency=1 tests/capability-metabolism.test.mjs` and `node examples/capability-metabolism-demo.mjs`.
