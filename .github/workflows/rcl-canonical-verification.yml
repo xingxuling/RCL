@@ -37,6 +37,8 @@ jobs:
         run: node --test tests/001-source-capability-sql-diagnostic.test.mjs
       - name: Verify equivalence corpus forge gate
         run: node --test tests/002-equivalence-corpus-forge.test.mjs
+      - name: Verify executable negative controls and adaptive corpus gate
+        run: node --test tests/003-executable-negative-controls-adaptive-loop.test.mjs
       - name: Run RCL test suite
         run: npm test
       - name: Verify self-hosted examples

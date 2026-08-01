@@ -59,3 +59,24 @@ export {
   differentialCasesFromCorpus,
   createDifferentialExperimentPlan,
 } from './equivalence-corpus-forge.mjs';
+
+export {
+  RCL_EXECUTABLE_NEGATIVE_CONTROLS_VERSION,
+  RCL_EXECUTABLE_NEGATIVE_CONTROL_SET_FORMAT,
+  RCL_CORPUS_DIFFERENTIAL_EXPERIMENT_FORMAT,
+  RCL_ADAPTIVE_CAPABILITY_CORPUS_FORMAT,
+  RCLExecutableNegativeControlError,
+  verifyExecutableCorpusIntegrity,
+  synthesizeExecutableNegativeControls,
+  runCorpusDifferentialExperiment,
+} from './executable-negative-controls.mjs';
+
+export {
+  RCL_ADAPTIVE_CORPUS_VERSION,
+  RCL_ADAPTIVE_CORPUS_CYCLE_FORMAT,
+  RCL_ADAPTIVE_CORPUS_LOOP_FORMAT,
+  RCLAdaptiveCorpusError,
+  analyzeCorpusFeedback,
+  materializeAdaptiveCorpusRevision,
+  runAdaptiveCorpusLoop,
+} from './adaptive-corpus-loop.mjs';
