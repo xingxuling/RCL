@@ -23,7 +23,7 @@ external construct
 - Generation of compilable RCL declarations.
 - Reuse of the existing native absorption kernel, capability verifier and content-addressed reality store.
 - Declared-output equivalence checks with explicit evidence boundaries.
-- Stage classification: `semantic-absorbed`, `bridge-verified`, `native-candidate`, or `rejected`.
+- Stage classification: `semantic-absorbed`, `bridge-verified`, `native-candidate`, `native-verified`, or `rejected`. `native-verified` is issued only by the separate native promotion gate.
 - Cross-domain synthesis of multiple accepted capability reports.
 
 ## What v0.1 does not claim
@@ -32,6 +32,7 @@ external construct
 - It does not independently execute SQL, Rust or another external runtime.
 - `native-candidate` does not mean the capability is already implemented in the native RCL VM.
 - Canonical equality of supplied outputs is weaker than independent differential execution.
+- `native-verified` remains bounded to the cases, implementation manifest and native VM binary recorded by the promotion report.
 
 ## Why this layer is necessary
 
@@ -56,14 +57,17 @@ The contract forces every candidate capability to expose:
 ## Next engineering gates
 
 1. Add source-language front ends that produce the capability manifest from parsers or formal specifications.
-2. Add independent differential runners for source runtime versus RCL candidate runtime.
-3. Lower accepted semantic kernels into executable RBC rather than declaration-only RCL.
-4. Promote a candidate to native only after native-VM parity, negative controls and replay evidence pass.
+2. Move independent differential adapters into isolated processes with signed artifact and runtime receipts.
+3. Generalize executable RBC promotion beyond case-specific implementation manifests.
+4. Add cross-platform native parity evidence for Windows, Linux and macOS hosts.
 5. Add conflict-resolution rules for cross-domain synthesis.
 
 ## Verification
 
 ```bash
 node --test --test-concurrency=1 tests/capability-metabolism.test.mjs
+node --test --test-concurrency=1 tests/differential-absorption-runner.test.mjs
+node --test --test-concurrency=1 tests/native-capability-promotion.test.mjs
 node examples/capability-metabolism-demo.mjs
+node examples/native-capability-promotion-demo.mjs
 ```
