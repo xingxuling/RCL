@@ -44,3 +44,18 @@ export {
   extractSourceCapabilities,
   metabolizeSourceCapabilityBundle,
 } from './source-capability-frontends.mjs';
+
+export {
+  RCL_EQUIVALENCE_CORPUS_VERSION,
+  RCL_EQUIVALENCE_CORPUS_FORMAT,
+  RCL_CAPABILITY_CORPUS_FORMAT,
+  RCL_EQUIVALENCE_CASE_FORMAT,
+  RCL_MUTATION_PLAN_FORMAT,
+  RCLEquivalenceCorpusError,
+  forgeJsonSchemaCapabilityCorpus,
+  forgeOpenApiCapabilityCorpus,
+  forgeSqlCapabilityCorpus,
+  forgeEquivalenceCorpus,
+  differentialCasesFromCorpus,
+  createDifferentialExperimentPlan,
+} from './equivalence-corpus-forge.mjs';
