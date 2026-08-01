@@ -36,13 +36,22 @@ function executableFormat(filePath) {
 }
 
 function commandExists(command) {
-  const result = spawnSync('where.exe', [command], { encoding: 'utf8' });
+  const result = process.platform === 'win32'
+    ? spawnSync('where.exe', [command], { encoding: 'utf8' })
+    : spawnSync('sh', ['-lc', 'command -v -- "$1"', 'rcl-command-probe', command], { encoding: 'utf8' });
+  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+  const stderr = typeof result.stderr === 'string' ? result.stderr : '';
   return {
     command,
+    probe: process.platform === 'win32' ? 'where.exe' : 'command -v',
     exists: result.status === 0,
-    stdout: result.stdout.trim().split(/\r?\n/).filter(Boolean),
-    stderr: result.stderr.trim(),
-    exitCode: result.status,
+    stdout: stdout.trim().split(/\r?\n/).filter(Boolean),
+    stderr: stderr.trim(),
+    exitCode: Number.isInteger(result.status) ? result.status : null,
+    error: result.error ? {
+      code: result.error.code ?? result.error.name,
+      message: result.error.message,
+    } : null,
   };
 }
 
