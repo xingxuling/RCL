@@ -1,0 +1,49 @@
+{
+  "format": "rcl.external-capability-spec.v0.1",
+  "id": "ownership_lifecycle",
+  "version": "0.1.0",
+  "source": {
+    "ecosystem": "rust",
+    "construct": "ownership and move semantics",
+    "version": "conceptual-core"
+  },
+  "operation": {
+    "name": "transfer_ownership",
+    "inputs": ["Resource", "CurrentOwner", "NextOwner"],
+    "outputs": ["OwnedResource", "TransferReceipt"]
+  },
+  "semantics": {
+    "description": "Exclusive resource authority transfer with explicit lifetime evidence.",
+    "effects": ["Authority", "Preserve", "Evidence"],
+    "invariants": [
+      "an exclusive resource has at most one active owner",
+      "ownership transfer invalidates the previous owner capability",
+      "resource lifetime remains traceable"
+    ],
+    "failureModes": ["double-owner", "use-after-transfer", "expired-lifetime"],
+    "resourceModel": ["exclusive-resource", "lifetime-region"],
+    "authority": ["only the current owner may transfer authority"]
+  },
+  "lowering": {
+    "targets": ["authority", "machine"],
+    "providerRequired": false,
+    "nativeLoweringWitness": {
+      "kind": "rcl-ir-design",
+      "statement": "owner capability and lifetime boundary represented in RCL IR"
+    }
+  },
+  "evidence": {
+    "equivalenceCases": [
+      {
+        "id": "single_owner_transfer",
+        "input": {"resource": "buffer-1", "from": "a", "to": "b"},
+        "sourceOutput": {"resource": "buffer-1", "owner": "b", "previousOwnerValid": false},
+        "absorbedOutput": {"resource": "buffer-1", "owner": "b", "previousOwnerValid": false}
+      }
+    ]
+  },
+  "synthesis": {
+    "tags": ["ownership", "resource", "lifecycle", "authority"],
+    "compatibleWith": ["relational_transaction", "actor_supervision"]
+  }
+}
