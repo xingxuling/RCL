@@ -31,3 +31,16 @@ export {
   createNativeRuntimeObservation,
   promoteCapabilityToNative,
 } from './native-capability-promotion.mjs';
+
+export {
+  RCL_SOURCE_CAPABILITY_FRONTENDS_VERSION,
+  RCL_SOURCE_CAPABILITY_BUNDLE_FORMAT,
+  RCL_SOURCE_CAPABILITY_FRONTEND_KINDS,
+  RCLSourceCapabilityFrontendError,
+  detectSourceCapabilityKind,
+  extractCapabilitiesFromJsonSchema,
+  extractCapabilitiesFromOpenApi,
+  extractCapabilitiesFromSqlDdl,
+  extractSourceCapabilities,
+  metabolizeSourceCapabilityBundle,
+} from './source-capability-frontends.mjs';
