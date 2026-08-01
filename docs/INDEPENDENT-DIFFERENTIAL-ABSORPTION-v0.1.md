@@ -38,6 +38,8 @@ For every case, the runner checks:
 
 A report is promotion-eligible only when all required cases pass, all required negative controls are detected, adapter separation is satisfied and the evidence score reaches 0.8.
 
+A negative control counts as detected only when its semantic root differs from the source observation. Timeout, nondeterminism or another infrastructure failure is recorded separately and cannot satisfy the mutation-detection gate.
+
 ## Independence boundary
 
 The current proof level is `declared-separate-adapters`. Distinct descriptors and JavaScript function references prevent accidental self-comparison, but do not cryptographically prove that two adapters use different processes, binaries or implementations. Stronger levels require external process isolation, artifact hashing, signed runtime receipts and independently controlled execution environments.
