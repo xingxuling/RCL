@@ -31,6 +31,8 @@ jobs:
         run: npm run verify:selfhost-stage40
       - name: Verify native platform boundary
         run: npm run verify:native-boundary
+      - name: Verify source capability metabolism gate
+        run: node --test tests/000-source-capability-metabolism-integration.test.mjs
       - name: Run RCL test suite
         run: npm test
       - name: Verify self-hosted examples
