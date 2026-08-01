@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-test('Stage-22 RCL-owned source lowering emits provider_call bytecode through native rclvm.exe', () => {
+test('Stage-22 RCL-owned source lowering emits provider_call bytecode through the selected native VM', () => {
   const out = execFileSync('node', ['scripts/verify-rcl-selfhost-stage22.mjs'], {
     cwd: new URL('..', import.meta.url),
     encoding: 'utf8',
@@ -21,9 +21,10 @@ test('Stage-22 RCL-owned source lowering emits provider_call bytecode through na
   assert.equal(report.checks.decodedInterpreterContainsSourceLoweringRuntime, true);
   assert.equal(report.checks.boundaryHonest, true);
 
-  assert.equal(report.nativeVm.path, 'native/rclvm.exe');
-  assert.equal(report.nativeVm.executableFormat.mz, true);
-  assert.equal(report.nativeVm.executableFormat.pe, true);
+  assert.equal(report.nativeVm.path, process.platform === 'win32' ? 'native/rclvm.exe' : 'native/rclvm');
+  assert.equal(report.nativeVm.executableFormat.exists, true);
+  assert.equal(report.nativeVm.executableFormat.mz, process.platform === 'win32');
+  assert.equal(report.nativeVm.executableFormat.pe, process.platform === 'win32');
   assert.equal(report.target.bytes, 241);
   assert.equal(report.target.program, 'RuntimeProviderSourceLoweringTarget');
   assert.equal(report.target.sourceRoot, report.compiler.sourceRoot);
