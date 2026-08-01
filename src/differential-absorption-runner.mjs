@@ -240,7 +240,9 @@ async function evaluateNegativeControl(control, cases, sourceRuns, repeats, time
   const requiredCaseIds = control.mustDifferCaseIds.length > 0
     ? control.mustDifferCaseIds
     : cases.map(testCase => testCase.id);
-  const detectedCaseIds = comparisons.filter(comparison => !comparison.passed).map(comparison => comparison.caseId);
+  const detectedCaseIds = comparisons
+    .filter(comparison => !comparison.equivalent && !comparison.infrastructureFailure)
+    .map(comparison => comparison.caseId);
   const missingDetections = requiredCaseIds.filter(caseId => !detectedCaseIds.includes(caseId));
   const report = {
     id: control.id,
