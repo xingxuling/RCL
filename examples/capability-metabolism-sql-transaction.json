@@ -1,0 +1,70 @@
+{
+  "format": "rcl.external-capability-spec.v0.1",
+  "id": "relational_transaction",
+  "version": "0.1.0",
+  "source": {
+    "ecosystem": "sql",
+    "construct": "serializable transaction",
+    "version": "SQL:2016",
+    "license": "conceptual-standard-model"
+  },
+  "operation": {
+    "name": "commit_transaction",
+    "inputs": ["TransactionState", "WriteSet"],
+    "outputs": ["CommittedState", "TransactionReceipt"]
+  },
+  "semantics": {
+    "description": "Serializable state transition with atomic commit and rollback semantics.",
+    "effects": [
+      {
+        "name": "AlterReality",
+        "deterministic": true,
+        "replay": "transaction-log",
+        "evidenceRequired": true
+      },
+      {
+        "name": "Evidence",
+        "deterministic": true,
+        "replay": "commit-receipt",
+        "evidenceRequired": true
+      }
+    ],
+    "invariants": [
+      "a committed write set is atomic",
+      "failed transactions do not modify committed state",
+      "serialization order is represented in evidence"
+    ],
+    "failureModes": ["serialization-conflict", "constraint-violation", "rollback"],
+    "resourceModel": ["transaction-log", "lock-or-mvcc-state"],
+    "authority": ["commit requires transaction authority"]
+  },
+  "lowering": {
+    "targets": ["authority", "temporal", "machine"],
+    "providerRequired": false,
+    "nativeLoweringWitness": {
+      "kind": "rcl-ir-design",
+      "statement": "transaction state, commit event and rollback boundary represented in RCL IR"
+    }
+  },
+  "evidence": {
+    "provenance": ["SQL transaction semantics model"],
+    "equivalenceCases": [
+      {
+        "id": "atomic_commit",
+        "input": {"state": {"balance": 10}, "write": {"balance": 7}},
+        "sourceOutput": {"status": "committed", "state": {"balance": 7}},
+        "absorbedOutput": {"status": "committed", "state": {"balance": 7}}
+      },
+      {
+        "id": "rollback_on_failure",
+        "input": {"state": {"balance": 10}, "write": {"balance": -1}},
+        "sourceOutput": {"status": "rolled-back", "state": {"balance": 10}},
+        "absorbedOutput": {"status": "rolled-back", "state": {"balance": 10}}
+      }
+    ]
+  },
+  "synthesis": {
+    "tags": ["transaction", "state", "rollback", "evidence"],
+    "compatibleWith": ["ownership_lifecycle", "actor_supervision"]
+  }
+}
