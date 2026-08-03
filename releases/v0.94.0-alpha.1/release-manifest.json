@@ -1,0 +1,44 @@
+{
+  "format": "taowind.rcl.developer-release.v1",
+  "package": "@taowind/rcl-reality-forge",
+  "version": "0.94.0-alpha.1",
+  "channel": "alpha",
+  "runtimeRequirement": ">=18",
+  "publicationStatus": "metadata-published-artifact-upload-pending",
+  "artifact": {
+    "fileName": "taowind-rcl-reality-forge-0.94.0-alpha.1.tgz",
+    "bytes": 2159164,
+    "unpackedBytes": 8184589,
+    "sha256": "128ca227f562f458fd64f5ff3bb665066f1febe555b0a25ef1a479efea187cb6",
+    "mediaType": "application/gzip",
+    "downloadUrl": null
+  },
+  "skillArtifact": {
+    "fileName": "RCL_Tutor_Skill_v1.1.0_for_RCL_0.94.0-alpha.1.zip",
+    "sha256": "124cf1518815b43da596584020e75dd5c74bf2806a55e5d750425dec2549a68d",
+    "downloadUrl": null
+  },
+  "integrationArtifact": {
+    "fileName": "RCL_Reality_Hub_Integration_Pack_v0.94.0-alpha.1.zip",
+    "sha256": "64fed7adf046f3e23d0d582cd39cdb62f94b3b3406e3161976d8a8e28659d279",
+    "downloadUrl": null
+  },
+  "install": {
+    "npm": "npm install -g ./taowind-rcl-reality-forge-0.94.0-alpha.1.tgz",
+    "posix": "./install.sh",
+    "powershell": ".\\install.ps1"
+  },
+  "verify": [
+    "rcl --version",
+    "rcl doctor",
+    "rcl check ./hello-reality.rcl",
+    "rcl run ./hello-reality.rcl"
+  ],
+  "compilerBoundary": {
+    "canonicalSource": true,
+    "nativeCoreCompilerSelfHosting": true,
+    "fullSelfHosting": false,
+    "completeRuntime": false,
+    "jsReferenceRuntimeStillRequired": true
+  }
+}
