@@ -161,8 +161,8 @@ jobs:
         run: |
           set -euo pipefail
           if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            echo "Release ${RELEASE_TAG} already exists; refusing to overwrite immutable assets."
-            exit 1
+            echo "Release ${RELEASE_TAG} already exists; immutable assets will not be overwritten."
+            exit 0
           fi
           gh release create "${RELEASE_TAG}" \
             dist/release-assets/* \
