@@ -43,14 +43,13 @@ try {
     'docs/**',
     'benchmarks/**',
     'VERSION-CONTRACT.json',
-    'foundation-conformance.json'
+    'foundation-conformance.json',
   ];
   stagedPackage.scripts = {
-    ...stagedPackage.scripts,
-    'test:cli-public-contract':
-      'node --test --test-concurrency=1 tests/cli-public-contract.test.mjs',
-    'verify:hub-contract':
-      'npm run test:cli-public-contract && node src/reality-hub-cli.mjs doctor && node src/reality-hub-cli.mjs check examples/hello-reality.rcl',
+    mcp: 'node src/rcl-mcp-server.mjs',
+    demo: 'node src/reality-hub-cli.mjs run examples/hello-reality.rcl',
+    'verify:install':
+      'node src/reality-hub-cli.mjs doctor && node src/reality-hub-cli.mjs check examples/hello-reality.rcl',
   };
   fs.writeFileSync(stagedPackagePath, `${JSON.stringify(stagedPackage, null, 2)}\n`);
 
@@ -144,6 +143,8 @@ try {
     'This package is staged from the canonical repository and replaces only the public rcl bin entry with the Reality Hub contract wrapper. All advanced commands delegate to the existing CLI.',
     '',
     'Release metadata, Tutor Skill sources, integration contracts, tests and CI files are deliberately excluded from the runtime npm archive so the artifact hash is not self-referential.',
+    '',
+    'The published package.json exposes only scripts whose referenced files are included in the runtime archive: mcp, demo and verify:install.',
     '',
     '## Honest boundary',
     '',
