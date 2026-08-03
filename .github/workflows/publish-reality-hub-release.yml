@@ -71,11 +71,17 @@ jobs:
             -czf "dist/release-assets/${INTEGRATION_FILE}" -C integrations/reality-hub v0.94.0-alpha.1
 
           RUNTIME_SHA=$(sha256sum "dist/release-assets/${RUNTIME_FILE}" | awk '{print $1}')
-          EXPECTED_RUNTIME_SHA=$(node -e "const m=require('./releases/v0.94.0-alpha.1/release-manifest.json'); process.stdout.write(m.artifact.sha256)")
-          test "${RUNTIME_SHA}" = "${EXPECTED_RUNTIME_SHA}"
-
           SKILL_SHA=$(sha256sum "dist/release-assets/${SKILL_FILE}" | awk '{print $1}')
           INTEGRATION_SHA=$(sha256sum "dist/release-assets/${INTEGRATION_FILE}" | awk '{print $1}')
+
+          EXPECTED_RUNTIME_SHA=$(node -e "const m=require('./releases/v0.94.0-alpha.1/release-manifest.json'); process.stdout.write(m.artifact.sha256)")
+          EXPECTED_SKILL_SHA=$(node -e "const m=require('./releases/v0.94.0-alpha.1/release-manifest.json'); process.stdout.write(m.skillArtifact.sha256)")
+          EXPECTED_INTEGRATION_SHA=$(node -e "const m=require('./releases/v0.94.0-alpha.1/release-manifest.json'); process.stdout.write(m.integrationArtifact.sha256)")
+
+          test "${RUNTIME_SHA}" = "${EXPECTED_RUNTIME_SHA}"
+          test "${SKILL_SHA}" = "${EXPECTED_SKILL_SHA}"
+          test "${INTEGRATION_SHA}" = "${EXPECTED_INTEGRATION_SHA}"
+
           RUNTIME_BYTES=$(stat -c%s "dist/release-assets/${RUNTIME_FILE}")
           SKILL_BYTES=$(stat -c%s "dist/release-assets/${SKILL_FILE}")
           INTEGRATION_BYTES=$(stat -c%s "dist/release-assets/${INTEGRATION_FILE}")
