@@ -33,6 +33,18 @@ try {
     rcl: './src/reality-hub-cli.mjs',
   };
   stagedPackage.engines = { node: '>=18' };
+  stagedPackage.files = [
+    'src/**',
+    'examples/**',
+    'selfhost/**',
+    'native/**',
+    'bootstrap/**',
+    'api/**',
+    'docs/**',
+    'benchmarks/**',
+    'VERSION-CONTRACT.json',
+    'foundation-conformance.json'
+  ];
   stagedPackage.scripts = {
     ...stagedPackage.scripts,
     'test:cli-public-contract':
@@ -130,6 +142,8 @@ try {
     `# RCL Developer Release ${stagedPackage.version}`,
     '',
     'This package is staged from the canonical repository and replaces only the public rcl bin entry with the Reality Hub contract wrapper. All advanced commands delegate to the existing CLI.',
+    '',
+    'Release metadata, Tutor Skill sources, integration contracts, tests and CI files are deliberately excluded from the runtime npm archive so the artifact hash is not self-referential.',
     '',
     '## Honest boundary',
     '',
