@@ -26,13 +26,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: publish-rcl-reality-hub-v0.94.0-alpha.1
+  group: publish-rcl-reality-hub-v0.94.0-alpha.1-r2
   cancel-in-progress: false
 
 env:
-  RELEASE_TAG: rcl-v0.94.0-alpha.1-reality-hub.1
+  RELEASE_TAG: rcl-v0.94.0-alpha.1-reality-hub.2
   RUNTIME_FILE: taowind-rcl-reality-forge-0.94.0-alpha.1.tgz
-  SKILL_FILE: RCL_Tutor_Skill_v1.1.0_for_RCL_0.94.0-alpha.1.tar.gz
+  SKILL_FILE: RCL_Tutor_Skill_v1.1.1_for_RCL_0.94.0-alpha.1.tar.gz
   INTEGRATION_FILE: RCL_Reality_Hub_Integration_Pack_v0.94.0-alpha.1.tar.gz
 
 jobs:
@@ -124,9 +124,11 @@ jobs:
           )
 
           cat > dist/release-assets/RELEASE_NOTES.md <<'NOTES'
-          # RCL v0.94.0-alpha.1 Reality Hub Pre-release
+          # RCL v0.94.0-alpha.1 Reality Hub Pre-release .2
 
-          This private-repository pre-release provides the canonical RCL runtime package, version-locked Tutor Skill source, Reality Hub integration contracts, installation scripts, checksums and a published release manifest.
+          This private-repository pre-release provides the canonical RCL runtime package, RCL Tutor Skill v1.1.1, Reality Hub integration contracts, installation scripts, checksums and a published release manifest.
+
+          Tutor Skill v1.1.1 corrects the runtime checksum and binds installation to an authenticated private GitHub release source.
 
           ## Truth boundary
 
@@ -155,7 +157,7 @@ jobs:
       - name: Upload immutable release candidate evidence
         uses: actions/upload-artifact@v4
         with:
-          name: rcl-reality-hub-publish-candidate-v0.94.0-alpha.1
+          name: rcl-reality-hub-publish-candidate-v0.94.0-alpha.1-r2
           path: dist/release-assets
           if-no-files-found: error
 
@@ -174,6 +176,6 @@ jobs:
             dist/release-assets/* \
             --repo "${GITHUB_REPOSITORY}" \
             --target "${GITHUB_SHA}" \
-            --title "RCL v0.94.0-alpha.1 Reality Hub Pre-release" \
+            --title "RCL v0.94.0-alpha.1 Reality Hub Pre-release .2" \
             --notes-file dist/release-assets/RELEASE_NOTES.md \
             --prerelease
