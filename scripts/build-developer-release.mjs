@@ -16,13 +16,9 @@ const stageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-developer-release-'
 function copyFilter(source) {
   const relative = path.relative(root, source).replaceAll('\\', '/');
   if (!relative) return true;
-  return ![
-    '.git',
-    'node_modules',
-    'dist',
-    'output',
-    '.DS_Store',
-  ].some((blocked) => relative === blocked || relative.startsWith(`${blocked}/`));
+  return !['.git', 'node_modules', 'dist', 'output', '.DS_Store'].some(
+    (blocked) => relative === blocked || relative.startsWith(`${blocked}/`),
+  );
 }
 
 try {
@@ -130,14 +126,21 @@ try {
     `$ErrorActionPreference = "Stop"\n$Package = Join-Path $PSScriptRoot "${packInfo.filename}"\nnpm install -g $Package\nrcl --version\nrcl doctor\nrcl check (Join-Path $PSScriptRoot "hello-reality.rcl")\n`,
   );
 
-  fs.writeFileSync(
-    path.join(outDir, 'RELEASE_NOTES.md'),
-    `# RCL Developer Release ${stagedPackage.version}\n\n` +
-      `This package is staged from the canonical repository and replaces only the public \\`rcl\\` bin entry with the Reality Hub contract wrapper. All advanced commands delegate to the existing CLI.\n\n` +
-      `## Honest boundary\n\n` +
-      `Native core compiler self-hosting is verified only at the declared subset. Full self-hosting and a complete native runtime are not claimed.\n\n` +
-      `Artifact: \\`${packInfo.filename}\\`\n\nSHA-256: \\`${sha256}\\`\n`,
-  );
+  const notes = [
+    `# RCL Developer Release ${stagedPackage.version}`,
+    '',
+    'This package is staged from the canonical repository and replaces only the public rcl bin entry with the Reality Hub contract wrapper. All advanced commands delegate to the existing CLI.',
+    '',
+    '## Honest boundary',
+    '',
+    'Native core compiler self-hosting is verified only at the declared subset. Full self-hosting and a complete native runtime are not claimed.',
+    '',
+    `Artifact: ${packInfo.filename}`,
+    '',
+    `SHA-256: ${sha256}`,
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(outDir, 'RELEASE_NOTES.md'), notes);
 
   console.log(JSON.stringify({ ok: true, outputDir: outDir, manifest }, null, 2));
 } finally {
