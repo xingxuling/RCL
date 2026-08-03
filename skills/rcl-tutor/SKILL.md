@@ -5,6 +5,9 @@ description: Install, verify, teach, and diagnose RCL 0.94.0-alpha.1. Use when a
 
 # RCL Tutor Skill
 
+Skill version: `1.1.1`  
+Bound RCL version: `0.94.0-alpha.1`
+
 ## Fixed version
 
 This Skill is bound to RCL `0.94.0-alpha.1`. Never combine syntax, documentation, examples, diagnostics, or binaries from another RCL version unless the user explicitly requests migration.
@@ -23,6 +26,8 @@ This Skill is bound to RCL `0.94.0-alpha.1`. Never combine syntax, documentation
 - Verify the artifact SHA-256 before installation.
 - Never invent a download URL.
 - A remote URL is usable only after it is explicitly configured in `release-sources.yaml`.
+- The current release source is a private GitHub pre-release and requires authenticated repository access.
+- Never present the authenticated-private URL as an anonymous public download.
 - Node.js `>=18` is required.
 
 ## Teaching order
