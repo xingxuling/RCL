@@ -31,6 +31,7 @@ concurrency:
 
 env:
   RELEASE_TAG: rcl-v0.94.0-alpha.1-reality-hub.1
+  RELEASE_TARGET: ${{ github.event.pull_request.head.sha || github.sha }}
   RUNTIME_FILE: taowind-rcl-reality-forge-0.94.0-alpha.1.tgz
   SKILL_FILE: RCL_Tutor_Skill_v1.1.0_for_RCL_0.94.0-alpha.1.tar.gz
   INTEGRATION_FILE: RCL_Reality_Hub_Integration_Pack_v0.94.0-alpha.1.tar.gz
@@ -146,6 +147,15 @@ jobs:
           npm --prefix "${PREFIX}/node_modules/@taowind/rcl-reality-forge" run verify:install
           npm --prefix "${PREFIX}/node_modules/@taowind/rcl-reality-forge" run demo
 
+      - name: Run complete RCL release gate
+        if: >
+          github.event_name != 'pull_request' ||
+          (github.head_ref == 'release/execute-rcl-prerelease-v0.94.0-alpha.1' &&
+           github.event.pull_request.head.repo.full_name == github.repository)
+        run: |
+          npm test
+          npm run verify:selfhost-examples
+
       - name: Upload immutable release candidate evidence
         uses: actions/upload-artifact@v4
         with:
@@ -154,20 +164,23 @@ jobs:
           if-no-files-found: error
 
       - name: Create immutable GitHub pre-release
-        if: github.event_name != 'pull_request'
+        if: >
+          github.event_name != 'pull_request' ||
+          (github.head_ref == 'release/execute-rcl-prerelease-v0.94.0-alpha.1' &&
+           github.event.pull_request.head.repo.full_name == github.repository)
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            echo "Release ${RELEASE_TAG} already exists; refusing to overwrite immutable assets."
-            exit 1
+            echo "Release ${RELEASE_TAG} already exists; immutable assets will not be overwritten."
+            exit 0
           fi
           gh release create "${RELEASE_TAG}" \
             dist/release-assets/* \
             --repo "${GITHUB_REPOSITORY}" \
-            --target "${GITHUB_SHA}" \
+            --target "${RELEASE_TARGET}" \
             --title "RCL v0.94.0-alpha.1 Reality Hub Pre-release" \
             --notes-file dist/release-assets/RELEASE_NOTES.md \
             --prerelease
