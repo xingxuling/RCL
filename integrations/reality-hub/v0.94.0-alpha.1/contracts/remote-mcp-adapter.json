@@ -1,0 +1,31 @@
+{
+  "format": "rcl.reality-hub.remote-mcp-adapter.v1",
+  "adapterId": "rcl-mcp-0.94.0-alpha.1",
+  "displayName": "RCL MCP Compiler 0.94.0-alpha.1",
+  "rclVersion": "0.94.0-alpha.1",
+  "transport": "mcp-json-rpc-http",
+  "endpoint": "CONFIGURE_AT_DEPLOYMENT",
+  "healthEndpoint": "CONFIGURE_AT_DEPLOYMENT",
+  "protocolVersion": "2025-06-18",
+  "operations": {
+    "status": { "tool": "rcl_status" },
+    "packageMetadata": { "tool": "rcl_package_metadata" },
+    "compile": {
+      "tool": "rcl_compile_source",
+      "arguments": { "source": "{source}", "runNative": false }
+    },
+    "nativeCompileAndRun": {
+      "tool": "rcl_compile_source",
+      "arguments": { "source": "{source}", "runNative": true, "timeoutMs": 5000 }
+    },
+    "examples": { "tool": "rcl_list_examples" },
+    "readExample": { "tool": "rcl_read_example", "arguments": { "file": "{file}" } }
+  },
+  "safety": {
+    "serverSideOnly": true,
+    "browserMustNotSpawnLocalProcess": true,
+    "compileIsReadOnly": true,
+    "nativeRunRequiresExplicitUserAction": true,
+    "endpointMustUseHttpsOutsideLocalDevelopment": true
+  }
+}

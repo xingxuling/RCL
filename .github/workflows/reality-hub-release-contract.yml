@@ -1,0 +1,39 @@
+name: Reality Hub Release Contract
+
+on:
+  pull_request:
+    paths:
+      - "src/cli-contract.mjs"
+      - "src/reality-hub-cli.mjs"
+      - "tests/cli-public-contract.test.mjs"
+      - "scripts/build-developer-release.mjs"
+      - "releases/v0.94.0-alpha.1/**"
+      - "integrations/reality-hub/v0.94.0-alpha.1/**"
+      - "skills/rcl-tutor/**"
+      - ".github/workflows/reality-hub-release-contract.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install package metadata dependencies
+        run: npm install --ignore-scripts
+      - name: Verify public CLI contract
+        run: node --test --test-concurrency=1 tests/cli-public-contract.test.mjs
+      - name: Verify doctor
+        run: node src/reality-hub-cli.mjs doctor
+      - name: Verify canonical source check
+        run: node src/reality-hub-cli.mjs check examples/hello-reality.rcl
+      - name: Build isolated developer release
+        run: node scripts/build-developer-release.mjs dist/reality-hub-release
+      - name: Upload developer release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcl-reality-hub-v0.94.0-alpha.1
+          path: dist/reality-hub-release
+          if-no-files-found: error

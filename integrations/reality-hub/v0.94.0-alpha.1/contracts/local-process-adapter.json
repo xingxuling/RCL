@@ -1,0 +1,31 @@
+{
+  "format": "rcl.reality-hub.local-process-adapter.v1",
+  "adapterId": "rcl-local-0.94.0-alpha.1",
+  "displayName": "RCL Canonical Local Compiler 0.94.0-alpha.1",
+  "rclVersion": "0.94.0-alpha.1",
+  "transport": "local-process",
+  "executable": "rcl",
+  "operations": {
+    "version": { "args": ["version", "--json"], "output": "json", "successExitCodes": [0] },
+    "doctor": { "args": ["doctor"], "output": "json", "successExitCodes": [0] },
+    "check": {
+      "args": ["check", "{sourceFile}"],
+      "output": "json",
+      "successExitCodes": [0],
+      "diagnosticExitCodes": [1]
+    },
+    "run": { "args": ["run", "{sourceFile}"], "output": "json", "successExitCodes": [0] }
+  },
+  "authenticity": {
+    "check": "canonical-source-reference-check",
+    "run": "canonical-javascript-reference-runtime",
+    "nativeCoreCompilerSelfHosting": true,
+    "fullSelfHosting": false
+  },
+  "safety": {
+    "shell": false,
+    "networkRequired": false,
+    "executionRequiresExplicitRun": true,
+    "checkNeverExecutesProgram": true
+  }
+}
