@@ -1,0 +1,167 @@
+name: Publish RCL Reality Hub Release
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/publish-reality-hub-release.yml"
+      - "scripts/build-developer-release.mjs"
+      - "src/cli-contract.mjs"
+      - "src/reality-hub-cli.mjs"
+      - "releases/v0.94.0-alpha.1/**"
+      - "skills/rcl-tutor/**"
+      - "integrations/reality-hub/v0.94.0-alpha.1/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-reality-hub-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-rcl-reality-hub-v0.94.0-alpha.1
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: rcl-v0.94.0-alpha.1-reality-hub.1
+  RUNTIME_FILE: taowind-rcl-reality-forge-0.94.0-alpha.1.tgz
+  SKILL_FILE: RCL_Tutor_Skill_v1.1.0_for_RCL_0.94.0-alpha.1.tar.gz
+  INTEGRATION_FILE: RCL_Reality_Hub_Integration_Pack_v0.94.0-alpha.1.tar.gz
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install package metadata dependencies
+        run: npm install --ignore-scripts
+
+      - name: Build canonical runtime package
+        run: node scripts/build-developer-release.mjs dist/runtime
+
+      - name: Assemble deterministic release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release-assets
+
+          cp "dist/runtime/${RUNTIME_FILE}" dist/release-assets/
+          cp dist/runtime/install.sh dist/release-assets/
+          cp dist/runtime/install.ps1 dist/release-assets/
+          cp dist/runtime/hello-reality.rcl dist/release-assets/
+          cp releases/v0.94.0-alpha.1/VERSION-CONTRACT.json dist/release-assets/
+
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -czf "dist/release-assets/${SKILL_FILE}" -C skills rcl-tutor
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -czf "dist/release-assets/${INTEGRATION_FILE}" -C integrations/reality-hub v0.94.0-alpha.1
+
+          RUNTIME_SHA=$(sha256sum "dist/release-assets/${RUNTIME_FILE}" | awk '{print $1}')
+          EXPECTED_RUNTIME_SHA=$(node -e "const m=require('./releases/v0.94.0-alpha.1/release-manifest.json'); process.stdout.write(m.artifact.sha256)")
+          test "${RUNTIME_SHA}" = "${EXPECTED_RUNTIME_SHA}"
+
+          SKILL_SHA=$(sha256sum "dist/release-assets/${SKILL_FILE}" | awk '{print $1}')
+          INTEGRATION_SHA=$(sha256sum "dist/release-assets/${INTEGRATION_FILE}" | awk '{print $1}')
+          RUNTIME_BYTES=$(stat -c%s "dist/release-assets/${RUNTIME_FILE}")
+          SKILL_BYTES=$(stat -c%s "dist/release-assets/${SKILL_FILE}")
+          INTEGRATION_BYTES=$(stat -c%s "dist/release-assets/${INTEGRATION_FILE}")
+          BASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}"
+
+          jq \
+            --arg status "private-github-prerelease" \
+            --arg visibility "authenticated-private" \
+            --arg runtimeFile "${RUNTIME_FILE}" \
+            --arg runtimeSha "${RUNTIME_SHA}" \
+            --arg runtimeUrl "${BASE_URL}/${RUNTIME_FILE}" \
+            --argjson runtimeBytes "${RUNTIME_BYTES}" \
+            --arg skillFile "${SKILL_FILE}" \
+            --arg skillSha "${SKILL_SHA}" \
+            --arg skillUrl "${BASE_URL}/${SKILL_FILE}" \
+            --argjson skillBytes "${SKILL_BYTES}" \
+            --arg integrationFile "${INTEGRATION_FILE}" \
+            --arg integrationSha "${INTEGRATION_SHA}" \
+            --arg integrationUrl "${BASE_URL}/${INTEGRATION_FILE}" \
+            --argjson integrationBytes "${INTEGRATION_BYTES}" \
+            '.publicationStatus=$status |
+             .availability=$visibility |
+             .artifact.fileName=$runtimeFile |
+             .artifact.sha256=$runtimeSha |
+             .artifact.bytes=$runtimeBytes |
+             .artifact.downloadUrl=$runtimeUrl |
+             .skillArtifact={fileName:$skillFile,sha256:$skillSha,bytes:$skillBytes,downloadUrl:$skillUrl} |
+             .integrationArtifact={fileName:$integrationFile,sha256:$integrationSha,bytes:$integrationBytes,downloadUrl:$integrationUrl}' \
+            releases/v0.94.0-alpha.1/release-manifest.json \
+            > dist/release-assets/release-manifest.json
+
+          (
+            cd dist/release-assets
+            sha256sum \
+              "${RUNTIME_FILE}" \
+              "${SKILL_FILE}" \
+              "${INTEGRATION_FILE}" \
+              install.sh install.ps1 hello-reality.rcl VERSION-CONTRACT.json \
+              > RELEASE_SHA256SUMS
+          )
+
+          cat > dist/release-assets/RELEASE_NOTES.md <<'NOTES'
+          # RCL v0.94.0-alpha.1 Reality Hub Pre-release
+
+          This private-repository pre-release provides the canonical RCL runtime package, version-locked Tutor Skill source, Reality Hub integration contracts, installation scripts, checksums and a published release manifest.
+
+          ## Truth boundary
+
+          - Native core compiler self-hosting is verified only at the declared Stage-40 subset.
+          - Full self-hosting is false.
+          - Complete native runtime is false.
+          - The JavaScript reference compiler/runtime remains required.
+          - `rcl check` validates without executing the source.
+          - Native execution and Provider effects require explicit user action.
+          - The repository is private, so asset URLs require authenticated GitHub access.
+          NOTES
+
+      - name: Verify runtime package install and scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          PREFIX="${RUNNER_TEMP}/rcl-install"
+          npm install --prefix "${PREFIX}" "./dist/release-assets/${RUNTIME_FILE}"
+          RCL="${PREFIX}/node_modules/.bin/rcl"
+          "${RCL}" --version
+          "${RCL}" doctor
+          "${RCL}" check ./dist/release-assets/hello-reality.rcl
+          npm --prefix "${PREFIX}/node_modules/@taowind/rcl-reality-forge" run verify:install
+          npm --prefix "${PREFIX}/node_modules/@taowind/rcl-reality-forge" run demo
+
+      - name: Upload immutable release candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcl-reality-hub-publish-candidate-v0.94.0-alpha.1
+          path: dist/release-assets
+          if-no-files-found: error
+
+      - name: Create immutable GitHub pre-release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "Release ${RELEASE_TAG} already exists; refusing to overwrite immutable assets."
+            exit 1
+          fi
+          gh release create "${RELEASE_TAG}" \
+            dist/release-assets/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "RCL v0.94.0-alpha.1 Reality Hub Pre-release" \
+            --notes-file dist/release-assets/RELEASE_NOTES.md \
+            --prerelease
