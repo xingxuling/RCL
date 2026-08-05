@@ -33,6 +33,7 @@ jobs:
           rm .github/workflows/materialize-semantic-root-number-audit.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add scripts/audit-semantic-root-number-corpus.mjs output/semantic-state-root-number-corpus/report.json .github/workflows/materialize-semantic-root-number-audit.yml
+          git add scripts/audit-semantic-root-number-corpus.mjs .github/workflows/materialize-semantic-root-number-audit.yml
+          git add -f output/semantic-state-root-number-corpus/report.json
           git commit -m 'research(root): record numeric semantic-root differential evidence'
           git push origin HEAD:research/semantic-root-number-corpus-v0.1
