@@ -1,0 +1,41 @@
+{
+  "format": "rcl.downstream-consumer-contract.v1",
+  "canonical": {
+    "repository": "xingxuling/RCL",
+    "branch": "main",
+    "auditAnchor": "0895f6d8b196fbcf475c1cf69dd458b1b630c09a",
+    "auditAnchorRole": "historical audit anchor; consumers must resolve the current canonical head before synchronization"
+  },
+  "policy": {
+    "canonicalSourceCount": 1,
+    "implicitByteIdentityForbidden": true,
+    "consumerDriftMustBeExplicit": true,
+    "nativeArtifactsRequireIndependentRebuildEvidence": true
+  },
+  "consumers": [
+    {
+      "repository": "xingxuling/RNCS-Unified-Platform-",
+      "branch": "main-95",
+      "path": "packages/languages/reality-computation-language",
+      "relation": "embedded-extension-delta",
+      "byteIdentityAllowed": false,
+      "contractPath": "packages/languages/reality-computation-language/RCL-UPSTREAM.json",
+      "status": "contract-missing",
+      "syncRequired": true,
+      "requiredAction": "add an upstream provenance contract and classify canonical files, RNCS extensions and generated artifacts before any synchronization claim"
+    },
+    {
+      "repository": "xingxuling/zhinao",
+      "branch": "tarot",
+      "path": "vendor/rcl",
+      "relation": "vendored-snapshot",
+      "byteIdentityAllowed": false,
+      "contractPath": "vendor/rcl/VENDOR-SOURCE.json",
+      "observedCanonicalCommit": "7c239ae3437c5ac0d1d78c6e74b1fd46dadc654b",
+      "observedCeiling": "stage39",
+      "status": "stale",
+      "syncRequired": true,
+      "requiredAction": "run the declared vendor synchronization workflow from a verified canonical checkout, then regenerate native artifact and test evidence"
+    }
+  ]
+}

@@ -4,12 +4,14 @@
 - Verified ceiling: Stage40 native-core RCL self-hosting.
 - The repository contains the native-core compiler/VM path and fixed-point artifacts described in the main README.
 - The current native VM emits `rcl.semantic-state-root.v1`; the JavaScript boundary independently recomputes the canonical semantic state root, rejects algorithm/root mismatch, and supports strict evidence enforcement through `requireNativeStateRoot: true`.
+- Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed. Six Foundation domains, the three Meta Batch B planes, the `physical` -> `embodiment` Batch C chain, the `energy` -> `elemental` -> `neural` Batch D chain, and the `metacomputation` -> `computation` Batch E chain now execute through RBC 1.2 and five `RclVmProviderV1` Native Provider bridges; uncovered and declared-domain runtime remains JavaScript.
 - The bridge is explicitly reported as `bridge`, not native Foundation syntax. Its executable is `native/rclfoundation.exe`.
 - RCL RNCS Visual Intent v0.1 now provides a rooted bridge input for animation graphs, blend layers, masks, look-at/two-bone IK constraints, skin selection and morph weights; it is an input contract and not a rendering claim.
 - RCL RNCS Runtime Binding v0.1 now consumes the RNCS authority-presentation receipt, verifies the state/frame/packet root links and carries the binding into RCL proposals, causal references and evidence edges; it remains a migration consumer and does not execute RSR or VSR itself.
-- Downstream copies in RNCS and zhinao are tracked as migration consumers, not as byte-identical sources.
-- Machine-readable contract: `VERSION-CONTRACT.json`.
+- Downstream copies are governed by `DOWNSTREAM-CONSUMERS.json`, not treated as implicit byte-identical sources. The RNCS embedded extension currently lacks its required upstream provenance contract; the Zhinao vendor snapshot is explicitly stale and requires synchronization plus rebuilt evidence.
+- Machine-readable canonical contract: `VERSION-CONTRACT.json`.
+- Technical-debt authority: `docs/governance/RCL_TECHNICAL_DEBT_REGISTER_v0.1.md`.
 - Verification entrypoint: `npm run verify:version-contract`; the semantic-authority gate is `node --test tests/native-semantic-state-root-native.test.mjs`; the bridge gates are `npm run test:foundation-native-batch-a`, `npm run test:foundation-native-meta-batch-b`, `npm run test:foundation-native-batch-c`, `npm run test:foundation-native-batch-d`, `npm run test:foundation-native-batch-e`, and `npm run conformance:foundation`.
 
 ``CONTEXT.md`` is retained as historical handoff material; its prior “Current” heading has been renamed to avoid presenting v0.86 as the current release.
