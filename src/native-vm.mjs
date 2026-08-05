@@ -4,6 +4,19 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
+import {
+  RCL_NATIVE_STATE_ROOT_ALGORITHM,
+  RCLSemanticStateRootError,
+  semanticStateRoot,
+  semanticValue,
+  verifyNativeSemanticStateRoot,
+} from './semantic-state-root.mjs';
+
+export {
+  RCL_NATIVE_STATE_ROOT_ALGORITHM,
+  semanticStateRoot,
+  verifyNativeSemanticStateRoot,
+};
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const DEFAULT_NATIVE_VM_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
@@ -22,6 +35,20 @@ export class RCLNativeVMError extends Error {
 function parsePayload(text, fallback) {
   try { return JSON.parse(text); }
   catch { return fallback; }
+}
+
+function verifyNativePayload(payload, options) {
+  if (payload?.code === 'RCL_NATIVE_OUTPUT' || payload?.status === 'error') return payload;
+  try {
+    return verifyNativeSemanticStateRoot(payload, {
+      requireNativeRoot: options.requireNativeStateRoot === true,
+    });
+  } catch (error) {
+    if (error instanceof RCLSemanticStateRootError) {
+      throw new RCLNativeVMError({ code: error.code, message: error.message }, error.details);
+    }
+    throw error;
+  }
 }
 
 export function runNativeBytecode(bytecodeOrPath, options = {}) {
@@ -50,7 +77,8 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
       const payload = parsePayload(result.stderr.trim(), { code: 'RCL_NATIVE_PROCESS', message: result.stderr.trim() || `Native VM exited with ${result.status}` });
       throw new RCLNativeVMError(payload, { status: result.status, stdout: result.stdout, stderr: result.stderr });
     }
-    return parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout });
+    const payload = parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout });
+    return verifyNativePayload(payload, options);
   } finally {
     if (temporaryDir) fs.rmSync(temporaryDir, { recursive: true, force: true });
   }
@@ -111,11 +139,19 @@ export async function verifyNativeParity(source, options = {}) {
   const program = compileReality(source);
   const reference = await runReality(program, options.referenceRuntime ?? {});
   const native = runRealityNative(program, options.nativeRuntime ?? {});
+  const referenceSemanticStateRoot = semanticStateRoot(reference.state);
   const parity = {
-    state: equalJson(native.state, reference.state),
+    state: equalJson(semanticValue(native.state), semanticValue(reference.state)),
     projections: native.projections.length === reference.projections.length,
     history: native.history.length === reference.history.length,
     roots: native.history.every((record, index) => record.beforeRoot === reference.history[index]?.beforeRoot && record.afterRoot === reference.history[index]?.afterRoot),
+    semanticStateRoot: native.semanticStateRoot === referenceSemanticStateRoot,
   };
-  return { ok: Object.values(parity).every(Boolean), parity, reference, native };
+  const nativeAuthority = {
+    algorithm: native.stateRootAlgorithm,
+    emittedByNative: native.nativeStateRoot !== null,
+    verified: native.stateRootVerified === true,
+    parity: native.stateRootParity === true,
+  };
+  return { ok: Object.values(parity).every(Boolean), parity, nativeAuthority, reference, native };
 }
