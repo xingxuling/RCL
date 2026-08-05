@@ -1,0 +1,91 @@
+name: Materialize Native Semantic State Root
+
+on:
+  push:
+    branches: [feat/native-semantic-state-root-producer-v0.1]
+    paths:
+      - .github/workflows/materialize-native-semantic-state-root.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/native-semantic-state-root-producer-v0.1
+          fetch-depth: 0
+
+      - name: Apply audited semantic-root patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check patches/native-semantic-state-root.patch
+          git apply patches/native-semantic-state-root.patch
+          grep -q 'stateRootAlgorithm\\":\\"rcl.semantic-state-root.v1' native/rclvm.c
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Linux native host
+        run: npm run build:native
+
+      - name: Verify strict native semantic-root emission
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {
+            RCL_NATIVE_STATE_ROOT_ALGORITHM,
+            runRealityNative,
+            semanticStateRoot,
+          } from './src/native-vm.mjs';
+
+          const result = runRealityNative(`reality NativeSemanticAuthority {
+            facet world.ready : Truth = true
+            facet world.count : Number = 2
+          }`, { requireNativeStateRoot: true });
+
+          assert.equal(result.stateRootAlgorithm, RCL_NATIVE_STATE_ROOT_ALGORITHM);
+          assert.equal(result.stateRootVerified, true);
+          assert.equal(result.stateRootParity, true);
+          assert.equal(result.nativeStateRoot, semanticStateRoot(result.state));
+          NODE
+
+      - name: Install Zig 0.14.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz \
+            --output /tmp/zig.tar.xz
+          tar -xf /tmp/zig.tar.xz -C /tmp
+          echo "ZIG=/tmp/zig-x86_64-linux-0.14.1/zig" >> "$GITHUB_ENV"
+          /tmp/zig-x86_64-linux-0.14.1/zig version
+
+      - name: Rebuild and record Windows native distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$ZIG" version
+          node scripts/build-native-windows.mjs
+          npm run verify:native-boundary
+
+      - name: Commit source, rebuilt artifacts and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm patches/native-semantic-state-root.patch
+          rm .github/workflows/materialize-native-semantic-state-root.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git status --short
+          git diff --cached --check
+          git commit -m 'feat(native): emit verified semantic authority roots'
+          git push origin HEAD:feat/native-semantic-state-root-producer-v0.1
