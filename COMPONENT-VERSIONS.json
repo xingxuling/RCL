@@ -1,0 +1,35 @@
+{
+  "format": "rcl.component-version-contract.v1",
+  "package": {
+    "name": "@taowind/rcl-reality-forge",
+    "version": "0.94.0-alpha.1",
+    "source": "package.json"
+  },
+  "policy": {
+    "componentVersionsAreIndependent": true,
+    "packageVersionEqualityRequired": false,
+    "versionPromotionRequiresSourceAndEvidenceUpdate": true
+  },
+  "components": {
+    "nativeVm": {
+      "id": "rcl-native-vm",
+      "version": "0.6.0-alpha.1",
+      "source": "native/rclvm.c#RCL_VM_VERSION",
+      "relationToPackage": "independent-runtime-component"
+    },
+    "typedReferenceAbi": {
+      "id": "rcl-typed-reference-abi",
+      "version": "0.36.0-alpha.1",
+      "format": "rcl.typed-reference-abi.v0.36",
+      "source": "src/typed-reference-abi.mjs#RCL_TYPED_REFERENCE_ABI_VERSION",
+      "relationToPackage": "independent-abi-component"
+    },
+    "semanticStateRoot": {
+      "id": "rcl-semantic-state-root",
+      "algorithm": "rcl.semantic-state-root.v1",
+      "producer": "native/rclvm.c",
+      "verifier": "src/semantic-state-root.mjs",
+      "relationToPackage": "versioned-authority-algorithm"
+    }
+  }
+}

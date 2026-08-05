@@ -5,6 +5,9 @@
   "canonical": true,
   "package": "@taowind/rcl-reality-forge",
   "packageVersion": "0.94.0-alpha.1",
+  "componentVersionContract": "COMPONENT-VERSIONS.json",
+  "downstreamConsumerContract": "DOWNSTREAM-CONSUMERS.json",
+  "technicalDebtRegister": "docs/governance/RCL_TECHNICAL_DEBT_REGISTER_v0.1.md",
   "verifiedCeiling": {
     "stage": "stage40_rcl_owned_dual_need_warrant_lowering_subset",
     "targetSourceRoot": "71e899db3794f862101f898dbf0549a534db488f4320f30d07585d523a25ce14",
@@ -53,12 +56,12 @@
     {
       "repository": "xingxuling/RNCS-Unified-Platform-",
       "path": "packages/languages/reality-computation-language",
-      "relation": "embedded extension delta; synchronize before byte-identity claims"
+      "relation": "embedded-extension-delta"
     },
     {
       "repository": "xingxuling/zhinao",
       "path": "vendor/rcl",
-      "relation": "vendored snapshot; current audit observed Stage39 pending sync"
+      "relation": "vendored-snapshot"
     }
   ],
   "verificationCommands": [
@@ -107,7 +110,8 @@
       "scripts/verify-rcl-selfhost-all.mjs",
       "scripts/verify-selfhost-example-parity.mjs",
       "scripts/verify-native-windows-boundary.mjs",
-      "scripts/foundation-conformance.mjs"
+      "scripts/foundation-conformance.mjs",
+      "scripts/verify-version-contract.mjs"
     ],
     "tests": [
       "tests/general-selfhost-fixedpoint.test.mjs",
