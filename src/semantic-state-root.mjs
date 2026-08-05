@@ -2,7 +2,13 @@ import { createHash } from 'node:crypto';
 
 export const RCL_NATIVE_STATE_ROOT_ALGORITHM = 'rcl.semantic-state-root.v1';
 
-const NATIVE_HEAP_METADATA = new Set(['__rclKind', '__rclType', '__rclObjectId', '__rclFieldOffsets']);
+const NATIVE_HEAP_METADATA = new Set([
+  '__rclKind',
+  '__rclType',
+  '__rclObjectId',
+  '__rclFieldOffsets',
+  '__rclPayloadOffsets',
+]);
 
 export class RCLSemanticStateRootError extends Error {
   constructor(code, message, details = {}) {
