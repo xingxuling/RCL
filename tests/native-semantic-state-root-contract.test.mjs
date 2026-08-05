@@ -30,6 +30,20 @@ test('semantic state root strips native heap metadata but preserves semantic typ
   assert.notEqual(semanticStateRoot({ value: 1 }), semanticStateRoot({ value: '1' }));
 });
 
+test('typed union layout offsets do not enter semantic authority roots', () => {
+  const semanticUnion = { variant: 'Ok', payload: ['accepted'] };
+  const nativeUnion = {
+    __rclKind: 'Union',
+    __rclType: 'core::LoginResult<Text,Text>',
+    __rclObjectId: 2,
+    __rclPayloadOffsets: { 0: 0 },
+    variant: 'Ok',
+    payload: ['accepted'],
+  };
+  assert.deepEqual(semanticValue(nativeUnion), semanticUnion);
+  assert.equal(semanticStateRoot(nativeUnion), semanticStateRoot(semanticUnion));
+});
+
 test('Intent slot arrays normalize to semantic slot objects', () => {
   const nativeIntent = { kind: 'Intent', slots: ['target', 'world', 'priority', 5] };
   const referenceIntent = { kind: 'Intent', slots: { priority: 5, target: 'world' } };
