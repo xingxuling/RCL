@@ -15,6 +15,13 @@
   },
   "claims": {
     "nativeCoreSelfHosting": true,
+    "nativeSemanticAuthorityRoot": {
+      "algorithm": "rcl.semantic-state-root.v1",
+      "producer": "native/rclvm.c",
+      "verifier": "src/semantic-state-root.mjs",
+      "strictOption": "requireNativeStateRoot",
+      "status": "verified"
+    },
     "wholeLanguageRuntimeSelfHosting": false,
     "advancedDomainRuntime": "JavaScript Reference Runtime plus six-domain Batch A and three-plane Meta Batch B Native Provider bridges",
     "foundationNativeProviderBridge": {
@@ -58,6 +65,7 @@
     "npm run verify:version-contract",
     "npm run verify:selfhost-stage40",
     "npm run verify:native-boundary",
+    "node --test tests/native-semantic-state-root-native.test.mjs",
     "npm run test:foundation-native-batch-a",
     "npm run test:foundation-native-meta-batch-b",
     "npm run conformance:foundation",
@@ -90,7 +98,8 @@
     "foundationNativeProviderBridge": true,
     "declaredFoundationSyntaxNative": false,
     "windowsExecutionVerified": true,
-    "hostNativeExecutionVerified": true
+    "hostNativeExecutionVerified": true,
+    "nativeSemanticStateRootVerified": true
   },
   "evidence": {
     "scripts": [
@@ -105,7 +114,9 @@
       "tests/selfhost-toolchain.test.mjs",
       "tests/stage40-dual-need.test.mjs",
       "tests/foundation-native-bridge.test.mjs",
-      "tests/foundation-native-meta-bridge.test.mjs"
+      "tests/foundation-native-meta-bridge.test.mjs",
+      "tests/native-semantic-state-root-contract.test.mjs",
+      "tests/native-semantic-state-root-native.test.mjs"
     ],
     "ciRequired": true,
     "ciRun": null
