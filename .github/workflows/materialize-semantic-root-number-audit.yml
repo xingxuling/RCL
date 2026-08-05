@@ -1,0 +1,38 @@
+name: Materialize Semantic Root Number Audit
+
+on:
+  push:
+    branches: [research/semantic-root-number-corpus-v0.1]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout research branch
+        uses: actions/checkout@v4
+        with:
+          ref: research/semantic-root-number-corpus-v0.1
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install from lockfile
+        run: npm ci --ignore-scripts
+      - name: Build current native host
+        run: npm run build:native
+      - name: Run Number serialization corpus
+        run: node scripts/audit-semantic-root-number-corpus.mjs
+      - name: Remove one-shot workflow and commit audit evidence
+        run: |
+          rm .github/workflows/materialize-semantic-root-number-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/audit-semantic-root-number-corpus.mjs output/semantic-state-root-number-corpus/report.json .github/workflows/materialize-semantic-root-number-audit.yml
+          git commit -m 'research(root): record numeric semantic-root differential evidence'
+          git push origin HEAD:research/semantic-root-number-corpus-v0.1
