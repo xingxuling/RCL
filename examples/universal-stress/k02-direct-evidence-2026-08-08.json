@@ -1,0 +1,87 @@
+{
+  "schema": "rcl.universal-stress.k02.direct-evidence.v0.2",
+  "taskId": "K02",
+  "cellId": "browser::web",
+  "goal": "complete web application",
+  "environment": {
+    "browser": "Chromium 144.0.7559.96 built on Debian GNU/Linux 13 (trixie)",
+    "driver": "Playwright Python",
+    "browserExecution": "real Chromium via page.set_content",
+    "networkBoundary": "browser navigation to file:// and loopback HTTP is blocked by administrator policy; Node HTTP/API path was executed separately on loopback"
+  },
+  "build": {
+    "status": "BUILT",
+    "outputPath": "/mnt/data/rcl-k02/RCL-main/output/universal-stress-k02/index.html",
+    "manifestPath": "/mnt/data/rcl-k02/RCL-main/output/universal-stress-k02/index.manifest.json",
+    "serverPath": "/mnt/data/rcl-k02/RCL-main/output/universal-stress-k02/index.server.mjs",
+    "htmlBytes": 9961,
+    "htmlSha256": "101ce667f9f78119b70202af241cec9917b33d11936b44c32483c0f1ba8bc68c",
+    "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+    "elapsedMs": 51.69
+  },
+  "browser": {
+    "loadMs": 17.2,
+    "addInteractionMs": 90.74,
+    "positive": {
+      "todoCountAfterAdd": 1,
+      "lastActionAfterAdd": "first",
+      "inputAfterAdd": "",
+      "domCountAfterAdd": "1",
+      "historyAfterAdd": 2,
+      "todoCountAfterReset": 0,
+      "lastActionAfterReset": "reset",
+      "historyAfterReset": 3,
+      "pass": true
+    },
+    "preserveNegative": {
+      "threw": true,
+      "error": "Error: RCL_WEB_PRESERVE_FAILED:addTodo",
+      "count": 0,
+      "last": "boot",
+      "pass": true
+    }
+  },
+  "serverApi": {
+    "elapsedMs": 38.740397,
+    "statuses": [200, 200, 200, 200],
+    "initial": {"app.todo_count": 0, "app.todo_input": "", "app.last_action": "boot"},
+    "afterObserve": {"app.todo_count": 0, "app.todo_input": "server-first", "app.last_action": "boot"},
+    "afterAdd": {"app.todo_count": 1, "app.todo_input": "", "app.last_action": "server-first"},
+    "final": {"app.todo_count": 1, "app.todo_input": "", "app.last_action": "server-first"},
+    "historyLength": 2,
+    "pass": true
+  },
+  "compileAuthorityNegative": {
+    "rejected": true,
+    "code": "RCL_COMPILE_ERROR",
+    "message": "RCL_COMPILE_ERROR: Unknown causing subject 'user'; Subject 'user' lacks warrant 'app.write' on 'app' required by 'addTodo'; Unknown causing subject 'user'; Subject 'user' lacks warrant 'app.write' on 'app' required by 'resetTodos'",
+    "pass": true
+  },
+  "unitTests": {
+    "command": "node --test tests/web-application-compiler.test.mjs",
+    "passed": 4,
+    "failed": 0
+  },
+  "gates": {
+    "EXPRESS": "PASS",
+    "COMPILE": "PASS",
+    "LOWER": "PASS",
+    "EXECUTE": "PASS",
+    "CORRECT": "PASS",
+    "ROBUST": "PASS",
+    "PERFORMANCE": "PASS",
+    "AI_GENERATE": "UNVERIFIED",
+    "EVIDENCE": "PASS"
+  },
+  "overall": "BLOCKED",
+  "passedGates": 8,
+  "totalGates": 9,
+  "coverageMode": "lowered-execution",
+  "limitations": [
+    "Browser network navigation could not be exercised in this container because administrator policy blocks page navigation; browser runtime and Node HTTP/API runtime were executed independently.",
+    "AI_GENERATE requires an independent reproducible intent-to-web-app generation/repair trial; this development run is not self-certified.",
+    "Web morphology is still a companion structured manifest, not native RCL Web syntax.",
+    "This is not a standards-complete browser engine or full WHATWG/W3C conformance claim."
+  ],
+  "evidenceRoot": "87d7d4e48322579c867b58f8469562a2f89a49c44676a1b137119ee75a02e45d"
+}

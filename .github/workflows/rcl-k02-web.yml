@@ -1,0 +1,50 @@
+name: RCL K02 Complete Web App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/rcl-web-browser-v0.1
+    paths:
+      - 'src/web-application-compiler.mjs'
+      - 'src/universal-stress-k02-web-adapter.mjs'
+      - 'tests/web-application-compiler.test.mjs'
+      - 'tests/universal-stress-k02-web-adapter.test.mjs'
+      - 'scripts/build-k02-web-app.mjs'
+      - 'examples/universal-stress/k02-*'
+      - 'docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k02-web.yml'
+  pull_request:
+    paths:
+      - 'src/web-application-compiler.mjs'
+      - 'src/universal-stress-k02-web-adapter.mjs'
+      - 'tests/web-application-compiler.test.mjs'
+      - 'tests/universal-stress-k02-web-adapter.test.mjs'
+      - 'scripts/build-k02-web-app.mjs'
+      - 'examples/universal-stress/k02-*'
+      - 'docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k02-web.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-k02-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: K02 web and stress-adapter tests
+        run: node --test tests/web-application-compiler.test.mjs tests/universal-stress-k02-web-adapter.test.mjs
+      - name: Build standalone K02 Web artifact
+        run: node scripts/build-k02-web-app.mjs output/universal-stress-k02/index.html
+      - name: Smoke test generated HTTP API
+        run: |
+          PORT=8791 node output/universal-stress-k02/index.server.mjs > /tmp/k02-server.log 2>&1 &
+          pid=$!
+          sleep 1
+          node --input-type=module -e "const b='http://127.0.0.1:8791'; await fetch(b+'/api/observe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({path:'app.todo_input',value:'ci'})}); const r=await fetch(b+'/api/rule/addTodo',{method:'POST'}); const x=await r.json(); if(x.state['app.todo_count']!==1) process.exit(3);"
+          kill $pid
