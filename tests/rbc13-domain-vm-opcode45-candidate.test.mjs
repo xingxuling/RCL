@@ -7,7 +7,8 @@ import test from 'node:test';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { assembleRbc13DomainCallProgram } from '../src/rbc13-domain-bytecode-candidate.mjs';
 import { materializeRbc13DomainVmCandidate } from '../scripts/materialize-rbc13-domain-vm-candidate.mjs';
-import { quantity } from '../src/quantity.mjs';
+import { measurement, quantity } from '../src/quantity.mjs';
+import { knowledgeClaim } from '../src/knowledge.mjs';
 import { semanticStateRoot } from '../src/semantic-state-root.mjs';
 
 function commandExists(command) {
@@ -80,10 +81,59 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     assert.equal(quantityPayload.state['result.quantity'].type, 'Temperature');
     assert.equal(quantityPayload.state['result.quantity'].value, 25);
     assert.equal(quantityPayload.state['result.quantity'].unit, '°C');
-    assert.equal(
-      quantityPayload.stateRoot,
-      semanticStateRoot({ 'result.quantity': quantity('Temperature', 25) }),
-    );
+    assert.equal(quantityPayload.stateRoot, semanticStateRoot({ 'result.quantity': quantity('Temperature', 25) }));
+
+    const chainPath = path.join(temp, 'chain.rbc');
+    writeFileSync(chainPath, assembleRbc13DomainCallProgram({
+      program: 'Rbc13DomainChain',
+      calls: [
+        { domain: 'quantity', operation: 'make', args: ['Temperature', 25, ''], target: 'q.value' },
+        { domain: 'quantity', operation: 'make', args: ['Temperature', 0.5, ''], target: 'q.uncertainty' },
+        {
+          domain: 'quantitative', operation: 'measure', target: 'measure.temp',
+          args: ['Temperature', { $state: 'q.value' }, { $state: 'q.uncertainty' }, 0.9, '', 'ratio', ['sensor:e1', 'sensor:e1', 'sensor:e2'], 'sensor-A'],
+        },
+        {
+          domain: 'knowledge', operation: 'claim', target: 'knowledge.temp',
+          args: ['Temperature', { $state: 'q.value' }, 0.8, ['e1', 'e1', 'e2'], 'lab', 'local', 'provisional', ['dep:a', 'dep:a', 'dep:b'], 1, 'root-1'],
+        },
+      ],
+    }));
+    const chainRun = spawnSync(host, [chainPath, '--candidate-minimum'], { encoding: 'utf8' });
+    assert.equal(chainRun.status, 0, `${chainRun.stdout}\n${chainRun.stderr}`);
+    const chainPayload = parsePayload(chainRun);
+    const q = quantity('Temperature', 25);
+    const uncertainty = quantity('Temperature', 0.5);
+    const measured = measurement('Temperature', q, {
+      uncertainty,
+      confidence: 0.9,
+      scale: 'ratio',
+      evidence: ['sensor:e1', 'sensor:e1', 'sensor:e2'],
+      calibratedBy: 'sensor-A',
+    });
+    const known = knowledgeClaim('Temperature', q, {
+      confidence: 0.8,
+      evidence: ['e1', 'e1', 'e2'],
+      source: 'lab',
+      scope: 'local',
+      status: 'provisional',
+      dependencies: ['dep:a', 'dep:a', 'dep:b'],
+      revision: 1,
+      formedAtRoot: 'root-1',
+    });
+    const expectedState = {
+      'q.value': q,
+      'q.uncertainty': uncertainty,
+      'measure.temp': measured,
+      'knowledge.temp': known,
+    };
+    assert.equal(chainPayload.state['measure.temp'].kind, 'Measurement');
+    assert.deepEqual(chainPayload.state['measure.temp'].evidence, ['sensor:e1', 'sensor:e1', 'sensor:e2']);
+    assert.equal(chainPayload.state['knowledge.temp'].kind, 'Knowledge');
+    assert.deepEqual(chainPayload.state['knowledge.temp'].evidence, ['e1', 'e2']);
+    assert.deepEqual(chainPayload.state['knowledge.temp'].dependencies, ['dep:a', 'dep:b']);
+    assert.equal(semanticStateRoot(chainPayload.state), semanticStateRoot(expectedState));
+    assert.equal(chainPayload.stateRoot, semanticStateRoot(expectedState));
 
     const invalidQuantityPath = path.join(temp, 'invalid-quantity.rbc');
     writeFileSync(invalidQuantityPath, assembleRbc13DomainCallProgram({
