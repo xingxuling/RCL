@@ -1,0 +1,86 @@
+{
+  "format": "taowind.rcl-rbc13-opcode45-candidate-local-evidence.v0.1",
+  "status": "PASS_WITH_EXACT_CURRENT_VM_CI_PENDING",
+  "executedAt": "2026-08-08T06:04:00+08:00",
+  "candidate": {
+    "bytecodeVersion": "1.3",
+    "opcode": 45,
+    "dispatchModes": ["literal", "dynamic"],
+    "canonicalNativeVmModified": false,
+    "materialization": "scripts/materialize-rbc13-domain-vm-candidate.mjs"
+  },
+  "localBasis": {
+    "uploadedSnapshot": "RCL-main (2)(6).zip",
+    "nativeRclvmGitBlob": "0b50c2db2f2e2078c5470763b86bf17bb2694736",
+    "candidateVmSourceSha256": "799590bb8ac481b06c8306ac685d7ac3b8d506443450edad9f05752fa5ea0d7b",
+    "candidateHostSha256": "59295d99dbfd94cf8f712c8ae3cacfa415309e9c3121628195b00a2d63e3cbac",
+    "note": "The uploaded native VM predates PR #29 semantic-root emission. Exact current-branch compilation and stateRoot assertions are checked in as tests but remain CI-pending."
+  },
+  "candidateOrgans": [
+    {
+      "key": "core.echo",
+      "tier": "native-candidate",
+      "localResult": "PASS"
+    },
+    {
+      "key": "quantity.make",
+      "tier": "native-candidate",
+      "localResult": "PASS",
+      "positive": {
+        "input": ["Temperature", 25, ""],
+        "state": {
+          "kind": "Quantity",
+          "type": "Temperature",
+          "value": 25,
+          "unit": "°C"
+        },
+        "expectedSemanticStateRootOnCurrentAlgorithm": "18022b790c72ace7be2e32fefdd21ee785ce2454a36343498bfce5960a0678ea"
+      },
+      "negative": {
+        "input": ["Warp", 25, ""],
+        "exitCode": 2,
+        "errorCode": "RCL_NATIVE_DOMAIN_ORGAN_FAILURE",
+        "messageContains": "RCL_DOMAIN_QUANTITY_TYPE"
+      }
+    }
+  ],
+  "executionChecks": [
+    {
+      "case": "default evidence minimum rejects native-candidate core.echo",
+      "exitCode": 2,
+      "messageContains": "RCL_DOMAIN_ORGAN_EVIDENCE_TIER"
+    },
+    {
+      "case": "literal core.echo(Text)",
+      "exitCode": 0,
+      "state": { "result.echo": "hello" }
+    },
+    {
+      "case": "dynamic core.echo(Number)",
+      "exitCode": 0,
+      "state": { "result.dynamic": 42 }
+    },
+    {
+      "case": "missing domain operation",
+      "exitCode": 2,
+      "messageContains": "RCL_DOMAIN_ORGAN_MISSING"
+    },
+    {
+      "case": "legacy RBC 1.1 regression",
+      "exitCode": 0,
+      "state": { "world.ready": true }
+    }
+  ],
+  "artifacts": {
+    "quantityRbcSha256": "9cd667a502d63b812f6fd340cf71bfb7d551d498e3dfa61f1405a101bab5846c",
+    "invalidQuantityRbcSha256": "2d3a89bc4ace4128b1635f6764919af2829b36940fd81e1be13dc6c3cea56b34",
+    "localAdmittedOrgansSourceSha256": "7a80a13d75b160619181f120e4c817c69dbc45047483ace79e13b8a7604b2719"
+  },
+  "boundaries": [
+    "core.echo and quantity.make remain native-candidate, not native-verified",
+    "quantitative.measure and knowledge.claim are not yet implemented as C candidate organs",
+    "canonical src/bytecode.mjs and native/rclvm.c remain unchanged",
+    "canonical RBC version has not moved to 1.3",
+    "exact current native semantic-state-root execution remains CI-pending"
+  ]
+}
