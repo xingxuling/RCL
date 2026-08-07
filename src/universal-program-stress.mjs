@@ -163,6 +163,11 @@ export function evaluateStressCell(cell) {
     cell.coverageMode === COVERAGE_MODE.LOWERED_EXECUTION;
 
   const specialCaseAudit = detectSpecialCaseInflation(cell.changes ?? []);
+  const universalGrowthEligible =
+    status === STRESS_STATUS.PASS &&
+    specialCaseAudit.status === STRESS_STATUS.PASS &&
+    !providerOnly;
+
   const reportWithoutRoot = {
     schema: 'rcl.universal-stress.cell.v0.1',
     id: cell.id ?? `${cell.environment}::${cell.programFamily}`,
@@ -175,6 +180,7 @@ export function evaluateStressCell(cell) {
     nativeSemanticCredit,
     executableCredit,
     specialCaseAudit,
+    universalGrowthEligible,
     authoritativeStateMutated: false,
   };
 
@@ -240,7 +246,8 @@ export function classifyUniversalMaturity({
 } = {}) {
   const reports = evaluatedCells;
   const passed = reports.filter((report) => report.status === STRESS_STATUS.PASS);
-  const passRatio = reports.length === 0 ? 0 : passed.length / reports.length;
+  const generalPassed = passed.filter((report) => report.specialCaseAudit?.status !== STRESS_STATUS.FAIL);
+  const passRatio = reports.length === 0 ? 0 : generalPassed.length / reports.length;
   const expressRatio = reports.length === 0
     ? 0
     : reports.filter((report) => report.gates?.EXPRESS?.status === STRESS_STATUS.PASS).length / reports.length;
@@ -248,9 +255,9 @@ export function classifyUniversalMaturity({
     ? 0
     : reports.filter((report) => report.gates?.AI_GENERATE?.status === STRESS_STATUS.PASS).length / reports.length;
   const matrixCoverage = totalMatrixCells === 0 ? 0 : reports.length / totalMatrixCells;
-  const executablePassed = passed.filter((report) => report.executableCredit).length;
-  const nativePassed = passed.filter((report) => report.nativeSemanticCredit).length;
-  const opaquePassed = passed.filter((report) => report.providerOnly).length;
+  const executablePassed = generalPassed.filter((report) => report.executableCredit).length;
+  const nativePassed = generalPassed.filter((report) => report.nativeSemanticCredit).length;
+  const opaquePassed = generalPassed.filter((report) => report.providerOnly).length;
   const competitiveWins = competitiveComparisons.filter((item) => item.rclScore >= item.referenceScore).length;
   const competitiveRatio = competitiveComparisons.length === 0 ? 0 : competitiveWins / competitiveComparisons.length;
   const kernelChangeRate = novelTaskTrials === 0 ? 1 : kernelChangesForNovelTasks / novelTaskTrials;
@@ -261,9 +268,9 @@ export function classifyUniversalMaturity({
   if (level === 'U1' && passRatio >= 0.6 && executablePassed >= 3) level = 'U2';
   if (
     level === 'U2' &&
-    passed.length > 0 &&
-    (nativePassed + passed.filter((report) => report.coverageMode === COVERAGE_MODE.LOWERED_EXECUTION).length) / passed.length >= 0.8 &&
-    opaquePassed / passed.length <= 0.2
+    generalPassed.length > 0 &&
+    (nativePassed + generalPassed.filter((report) => report.coverageMode === COVERAGE_MODE.LOWERED_EXECUTION).length) / generalPassed.length >= 0.8 &&
+    opaquePassed / generalPassed.length <= 0.2
   ) level = 'U3';
   if (level === 'U3' && competitiveComparisons.length >= 5 && competitiveRatio >= 0.8) level = 'U4';
   if (
@@ -280,6 +287,7 @@ export function classifyUniversalMaturity({
     metrics: {
       evaluatedCells: reports.length,
       passedCells: passed.length,
+      generalPassedCells: generalPassed.length,
       passRatio,
       expressRatio,
       aiGenerateRatio,
@@ -291,7 +299,7 @@ export function classifyUniversalMaturity({
       kernelChangeRate,
       unabsorbedAdvantages: unabsorbedAdvantages.length,
     },
-    caveat: 'maturity is evidence-bound; unexecuted or opaque-delegated claims do not receive native-language credit',
+    caveat: 'maturity is evidence-bound; special-case patches and opaque delegation do not receive universal-language growth credit',
   };
 }
 
@@ -309,7 +317,9 @@ export function decideGenomeAdmission({
   if (regression.status === STRESS_STATUS.FAIL || !identityGenomePreserved) return 'REJECT';
   if (usesOpaqueDelegation && !semanticNovelty && !capabilityGain) return 'ORGAN_ONLY';
 
-  const allStressPassed = stressReports.length > 0 && stressReports.every((report) => report.status === STRESS_STATUS.PASS);
+  const allStressPassed =
+    stressReports.length > 0 &&
+    stressReports.every((report) => report.status === STRESS_STATUS.PASS && report.universalGrowthEligible === true);
   if (!allStressPassed || !evidenceSufficient) return 'EXPERIMENTAL_GENOME';
   return 'CANONICAL_RCL_GENOME';
 }
