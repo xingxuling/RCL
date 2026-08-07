@@ -126,6 +126,16 @@ export {
   assertRclAbsorptionKernel,
 } from './absorption-kernel.mjs';
 
+export {
+  RCL_ANDROID_APPLICATION_COMPILER_VERSION,
+  RCL_ANDROID_APPLICATION_FORMAT,
+  RCL_ANDROID_RUNTIME_MANIFEST_FORMAT,
+  compileRclAndroidApplication,
+  emitNativeAndroidActivity,
+  buildRclAndroidApplication,
+  simulateRclAndroidApplication,
+} from './android-application-compiler.mjs';
+
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
 
