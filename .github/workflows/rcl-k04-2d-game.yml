@@ -1,0 +1,55 @@
+name: RCL K04 2D Game
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/rcl-k04-2d-game-v0.1
+    paths:
+      - 'src/game-2d-compiler.mjs'
+      - 'src/universal-stress-k04-game-adapter.mjs'
+      - 'tests/game-2d-compiler.test.mjs'
+      - 'tests/universal-stress-k04-game-adapter.test.mjs'
+      - 'scripts/build-k04-2d-game.mjs'
+      - 'scripts/run-k04-direct-evidence.mjs'
+      - 'examples/k04-*'
+      - 'docs/K04_2D_GAME_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k04-2d-game.yml'
+  pull_request:
+    paths:
+      - 'src/game-2d-compiler.mjs'
+      - 'src/universal-stress-k04-game-adapter.mjs'
+      - 'tests/game-2d-compiler.test.mjs'
+      - 'tests/universal-stress-k04-game-adapter.test.mjs'
+      - 'scripts/build-k04-2d-game.mjs'
+      - 'scripts/run-k04-direct-evidence.mjs'
+      - 'examples/k04-*'
+      - 'docs/K04_2D_GAME_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k04-2d-game.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-k04-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: K04 compiler and adapter tests
+        run: node --test --test-concurrency=1 tests/game-2d-compiler.test.mjs tests/universal-stress-k04-game-adapter.test.mjs
+      - name: Generate K04 game artifact
+        run: node scripts/build-k04-2d-game.mjs
+      - name: Run K04 direct evidence
+        run: node scripts/run-k04-direct-evidence.mjs
+      - name: Upload K04 evidence and artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcl-k04-2d-game-evidence
+          path: |
+            examples/k04-direct-evidence-2026-08-08.json
+            output/universal-stress-k04
+          if-no-files-found: error
