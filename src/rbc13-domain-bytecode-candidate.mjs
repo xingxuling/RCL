@@ -8,8 +8,15 @@ const BASE = Object.freeze({
   PUSH_NUMBER: 1,
   PUSH_BOOL: 2,
   PUSH_STRING: 3,
+  LOAD_STATE: 4,
   STORE_STATE: 5,
+  CALL_BUILTIN: 30,
   HALT: 31,
+});
+
+const BUILTIN = Object.freeze({
+  EMPTY_SEQUENCE: 12,
+  SEQUENCE_APPEND: 13,
 });
 
 class Pool {
@@ -38,11 +45,26 @@ class Pool {
   }
 }
 
-function literalInstruction(pool, value) {
-  if (typeof value === 'number' && Number.isFinite(value)) return { op: BASE.PUSH_NUMBER, a: pool.number(value) };
-  if (typeof value === 'boolean') return { op: BASE.PUSH_BOOL, a: value ? 1 : 0 };
-  if (typeof value === 'string') return { op: BASE.PUSH_STRING, a: pool.string(value) };
-  throw new TypeError('RBC 1.3 DOMAIN_CALL candidate assembler currently accepts finite Number, Truth and Text arguments only');
+function argumentInstructions(pool, value, depth = 0) {
+  if (depth > 64) throw new TypeError('RBC 1.3 DOMAIN_CALL candidate argument nesting exceeds 64 levels');
+  if (typeof value === 'number' && Number.isFinite(value)) return [{ op: BASE.PUSH_NUMBER, a: pool.number(value) }];
+  if (typeof value === 'boolean') return [{ op: BASE.PUSH_BOOL, a: value ? 1 : 0 }];
+  if (typeof value === 'string') return [{ op: BASE.PUSH_STRING, a: pool.string(value) }];
+  if (Array.isArray(value)) {
+    const instructions = [{ op: BASE.CALL_BUILTIN, a: BUILTIN.EMPTY_SEQUENCE, b: 0 }];
+    for (const item of value) {
+      instructions.push(...argumentInstructions(pool, item, depth + 1));
+      instructions.push({ op: BASE.CALL_BUILTIN, a: BUILTIN.SEQUENCE_APPEND, b: 2 });
+    }
+    return instructions;
+  }
+  if (value && typeof value === 'object' && !Array.isArray(value)
+      && Object.keys(value).length === 1 && typeof value.$state === 'string' && value.$state.length > 0) {
+    return [{ op: BASE.LOAD_STATE, a: pool.string(value.$state) }];
+  }
+  throw new TypeError(
+    'RBC 1.3 DOMAIN_CALL candidate arguments accept finite Number, Truth, Text, recursive Sequence, or { $state: "path" } references',
+  );
 }
 
 function encode({ pool, instructions, programNameIndex, sourceRootIndex }) {
@@ -104,7 +126,7 @@ export function assembleRbc13DomainCallProgram({
       instructions.push({ op: BASE.PUSH_STRING, a: pool.string(domain) });
       instructions.push({ op: BASE.PUSH_STRING, a: pool.string(operation) });
     }
-    instructions.push(...args.map(value => literalInstruction(pool, value)));
+    for (const value of args) instructions.push(...argumentInstructions(pool, value));
     instructions.push({
       op: RBC13_DOMAIN_CALL_OPCODE,
       flags: dynamic ? RBC13_DOMAIN_CALL_FLAGS.dynamic : RBC13_DOMAIN_CALL_FLAGS.literal,
