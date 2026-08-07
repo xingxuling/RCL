@@ -1,0 +1,39 @@
+{
+  "format": "taowind.rcl-rbc13-domain-value-membrane-evidence.v0.1",
+  "status": "PASS_WITH_CURRENT_VM_CI_PENDING",
+  "executedAt": "2026-08-08T06:04:00+08:00",
+  "localBasis": {
+    "uploadedSnapshot": "RCL-main (2)(6).zip",
+    "nativeRclvmGitBlob": "0b50c2db2f2e2078c5470763b86bf17bb2694736",
+    "note": "The uploaded native/rclvm.c predates the later semantic-state-root producer patch. The bridge-relevant Value/typed-record/sequence helpers used by this smoke are unchanged by the recorded PR #29 semantic-root diff, but exact current-branch execution remains a CI gate."
+  },
+  "domainValueAbi": {
+    "compiler": "cc -std=c11 -Wall -Wextra -pedantic",
+    "result": "PASS",
+    "checks": [
+      "native-candidate organ is rejected by a native-verified minimum tier",
+      "Text crosses the organ boundary by owned clone",
+      "Quantity-shaped typed Record crosses the organ boundary by owned deep clone",
+      "duplicate Record field names are rejected",
+      "invalid Truth payload is rejected at the organ boundary",
+      "uninitialized output value is rejected"
+    ]
+  },
+  "vmValueMembrane": {
+    "compiler": "cc -std=c11 -Wall -Wextra -pedantic + libcrypto + libm",
+    "result": "PASS",
+    "checks": [
+      "native Text -> Domain Value -> native Value round-trip",
+      "Domain Quantity/Temperature Record -> native typed Record -> Domain Value round-trip",
+      "Domain Sequence -> native Sequence -> Domain Value round-trip",
+      "unsupported native Span fails closed with RCL_NATIVE_DOMAIN_VALUE_UNSUPPORTED"
+    ]
+  },
+  "boundaries": [
+    "canonical src/bytecode.mjs remains unchanged",
+    "canonical native/rclvm.c remains unchanged in this PR",
+    "opcode 45 is not yet executed by the canonical native VM",
+    "exact current-rclvm membrane compilation is represented by the checked-in branch test and remains CI-pending",
+    "no organ is native-verified by this evidence"
+  ]
+}
