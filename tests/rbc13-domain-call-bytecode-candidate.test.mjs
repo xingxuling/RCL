@@ -40,3 +40,20 @@ test('candidate assembler emits dynamic DOMAIN_CALL while canonical decoder rema
   assert.equal(call.operation, undefined);
   assert.equal(call.argc, 1);
 });
+
+test('candidate arguments lower recursive sequences and prior-state references without changing DOMAIN_CALL arity', () => {
+  const decoded = decodeRbc13DomainCallCandidate(assembleRbc13DomainCallProgram({
+    calls: [
+      { domain: 'quantity', operation: 'make', args: ['Temperature', 25, ''], target: 'q.value' },
+      {
+        domain: 'knowledge', operation: 'claim', target: 'knowledge.temp',
+        args: ['Temperature', { $state: 'q.value' }, 0.8, ['e1', ['nested', 'e2']], 'lab', 'local', 'provisional', [], 1, 'root-1'],
+      },
+    ],
+  }));
+  const domainCalls = decoded.instructions.filter(item => item.op === RBC13_DOMAIN_CALL_OPCODE);
+  assert.equal(domainCalls.length, 2);
+  assert.equal(domainCalls[1].argc, 10);
+  assert.ok(decoded.instructions.some(item => item.name === 'LOAD_STATE'));
+  assert.ok(decoded.instructions.filter(item => item.name === 'CALL_BUILTIN').length >= 5);
+});
