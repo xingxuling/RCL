@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  compileRcl2DGame,
   compileRcl2DGameFromProgram,
   emitRcl2DGameHtml,
   evidenceRoot,
@@ -13,6 +14,7 @@ import {
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SPEC = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples/k04-2d-game.game.json'), 'utf8'));
+const SOURCE = fs.readFileSync(path.join(ROOT, 'examples/k04-2d-game.rcl'), 'utf8');
 
 const lit = (value) => ({ kind: 'LiteralExpr', value });
 const pathExpr = (value) => ({ kind: 'PathExpr', path: value });
@@ -113,6 +115,13 @@ test('K04 compiles RCL-owned game state, authority and rules into a rooted runti
   assert.equal(manifest.rules.length, 6);
   assert.deepEqual(manifest.warrants, [{ subject: 'player', capability: 'game.write', target: 'game' }]);
   assert.match(manifest.manifestRoot, /^[0-9a-f]{64}$/u);
+});
+
+test('K04 compiles the checked-in RCL source through the repository compiler boundary', () => {
+  const manifest = compileRcl2DGame(SOURCE, SPEC);
+  assert.equal(manifest.program, 'K04StarRunner');
+  assert.equal(manifest.rules.some((rule) => rule.name === 'collectStar'), true);
+  assert.equal(manifest.metadata.coverageMode, 'lowered-execution');
 });
 
 test('K04 fixed-step runtime executes movement, jump, collision and collection', () => {
