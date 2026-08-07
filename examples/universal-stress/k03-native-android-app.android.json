@@ -1,0 +1,55 @@
+{
+  "schema": "rcl.android-application.v0.1",
+  "title": "RCL K03 Native Android Application",
+  "applicationId": "com.taowind.rcl.k03",
+  "activity": "MainActivity",
+  "minSdk": 26,
+  "compileSdk": 35,
+  "targetSdk": 35,
+  "theme": "light",
+  "lifecycle": {
+    "restoreState": true
+  },
+  "screen": {
+    "id": "root",
+    "type": "column",
+    "children": [
+      {
+        "id": "title",
+        "type": "text",
+        "text": "RCL K03 原生 Android 应用"
+      },
+      {
+        "id": "count",
+        "type": "text",
+        "text": "计数：",
+        "textState": "app.count"
+      },
+      {
+        "id": "input",
+        "type": "input",
+        "hint": "输入一次动作名称",
+        "observeState": "app.input",
+        "valueState": "app.input"
+      },
+      {
+        "id": "increment",
+        "type": "button",
+        "text": "提交事务",
+        "rule": "increment"
+      },
+      {
+        "id": "reset",
+        "type": "button",
+        "text": "重置",
+        "rule": "reset"
+      },
+      {
+        "id": "lastAction",
+        "type": "text",
+        "text": "最近动作：",
+        "textState": "app.last_action"
+      }
+    ]
+  }
+}
