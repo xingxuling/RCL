@@ -21,9 +21,30 @@ function parsePayload(run) {
   return JSON.parse(run.stdout.trim());
 }
 
+function oracleError(fn) {
+  try {
+    fn();
+    assert.fail('oracle was expected to throw');
+  } catch (error) {
+    if (error?.name === 'AssertionError') throw error;
+    return {
+      code: String(error?.code ?? error?.name ?? 'Error'),
+      message: String(error?.message ?? error),
+    };
+  }
+}
+
+function assertNativeMatchesOracleError(run, expected) {
+  assert.equal(run.status, 2, `${run.stdout}\n${run.stderr}`);
+  const payload = parsePayload(run);
+  assert.equal(payload.code, expected.code);
+  assert.equal(payload.message, expected.message);
+  return payload;
+}
+
 const compilerAvailable = process.platform !== 'win32' && (commandExists('cc') || commandExists('gcc'));
 
-test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and authority-rooted', { skip: !compilerAvailable }, () => {
+test('experimental RBC 1.3 opcode45 preserves positive and negative semantic identity', { skip: !compilerAvailable }, () => {
   const compiler = commandExists('cc') ? 'cc' : 'gcc';
   const temp = mkdtempSync(path.join(os.tmpdir(), 'rcl-rbc13-domain-vm-'));
   const generated = path.join(temp, 'rclvm-rbc13-domain-candidate.c');
@@ -49,8 +70,8 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     const denied = spawnSync(host, [literalPath], { encoding: 'utf8' });
     assert.equal(denied.status, 2, `${denied.stdout}\n${denied.stderr}`);
     const deniedPayload = parsePayload(denied);
-    assert.equal(deniedPayload.code, 'RCL_NATIVE_DOMAIN_ORGAN_FAILURE');
-    assert.match(deniedPayload.message, /RCL_DOMAIN_ORGAN_EVIDENCE_TIER/);
+    assert.equal(deniedPayload.code, 'RCL_DOMAIN_ORGAN_EVIDENCE_TIER');
+    assert.equal(deniedPayload.message, 'RCL_DOMAIN_ORGAN_EVIDENCE_TIER: Organ has not reached required evidence tier');
 
     const admitted = spawnSync(host, [literalPath, '--candidate-minimum'], { encoding: 'utf8' });
     assert.equal(admitted.status, 0, `${admitted.stdout}\n${admitted.stderr}`);
@@ -139,9 +160,58 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     writeFileSync(invalidQuantityPath, assembleRbc13DomainCallProgram({
       calls: [{ domain: 'quantity', operation: 'make', args: ['Warp', 25, ''], target: 'result.quantity' }],
     }));
-    const invalidQuantity = spawnSync(host, [invalidQuantityPath, '--candidate-minimum'], { encoding: 'utf8' });
-    assert.equal(invalidQuantity.status, 2, `${invalidQuantity.stdout}\n${invalidQuantity.stderr}`);
-    assert.match(parsePayload(invalidQuantity).message, /RCL_DOMAIN_QUANTITY_TYPE/);
+    assertNativeMatchesOracleError(
+      spawnSync(host, [invalidQuantityPath, '--candidate-minimum'], { encoding: 'utf8' }),
+      oracleError(() => quantity('Warp', 25)),
+    );
+
+    const invalidMeasureConfidencePath = path.join(temp, 'invalid-measure-confidence.rbc');
+    writeFileSync(invalidMeasureConfidencePath, assembleRbc13DomainCallProgram({
+      calls: [{
+        domain: 'quantitative', operation: 'measure', target: 'result.measure',
+        args: ['Number', 42, 0.25, 2, '', 'ratio', [], ''],
+      }],
+    }));
+    assertNativeMatchesOracleError(
+      spawnSync(host, [invalidMeasureConfidencePath, '--candidate-minimum'], { encoding: 'utf8' }),
+      oracleError(() => measurement('Number', 42, { uncertainty: 0.25, confidence: 2, scale: 'ratio', evidence: [], calibratedBy: null })),
+    );
+
+    const invalidMeasureTypePath = path.join(temp, 'invalid-measure-type.rbc');
+    writeFileSync(invalidMeasureTypePath, assembleRbc13DomainCallProgram({
+      calls: [{
+        domain: 'quantitative', operation: 'measure', target: 'result.measure',
+        args: ['Number', 'forty-two', 0.25, 0.9, '', 'ratio', [], ''],
+      }],
+    }));
+    assertNativeMatchesOracleError(
+      spawnSync(host, [invalidMeasureTypePath, '--candidate-minimum'], { encoding: 'utf8' }),
+      oracleError(() => measurement('Number', 'forty-two', { uncertainty: 0.25, confidence: 0.9, scale: 'ratio', evidence: [], calibratedBy: null })),
+    );
+
+    const invalidKnowledgeConfidencePath = path.join(temp, 'invalid-knowledge-confidence.rbc');
+    writeFileSync(invalidKnowledgeConfidencePath, assembleRbc13DomainCallProgram({
+      calls: [{
+        domain: 'knowledge', operation: 'claim', target: 'result.knowledge',
+        args: ['Number', 42, 2, [], '', 'local', 'provisional', [], 1, ''],
+      }],
+    }));
+    assertNativeMatchesOracleError(
+      spawnSync(host, [invalidKnowledgeConfidencePath, '--candidate-minimum'], { encoding: 'utf8' }),
+      oracleError(() => knowledgeClaim('Number', 42, { confidence: 2, evidence: [], source: null, scope: 'local', status: 'provisional', dependencies: [], revision: 1, formedAtRoot: null })),
+    );
+
+    const invalidKnowledgeTypePath = path.join(temp, 'invalid-knowledge-type.rbc');
+    writeFileSync(invalidKnowledgeTypePath, assembleRbc13DomainCallProgram({
+      calls: [{
+        domain: 'knowledge', operation: 'claim', target: 'result.knowledge',
+        args: ['Text', 42, 0.8, [], '', 'local', 'provisional', [], 1, ''],
+      }],
+    }));
+    assertNativeMatchesOracleError(
+      spawnSync(host, [invalidKnowledgeTypePath, '--candidate-minimum'], { encoding: 'utf8' }),
+      oracleError(() => knowledgeClaim('Text', 42, { confidence: 0.8, evidence: [], source: null, scope: 'local', status: 'provisional', dependencies: [], revision: 1, formedAtRoot: null })),
+    );
 
     const missingPath = path.join(temp, 'missing.rbc');
     writeFileSync(missingPath, assembleRbc13DomainCallProgram({
@@ -149,7 +219,9 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     }));
     const missing = spawnSync(host, [missingPath, '--candidate-minimum'], { encoding: 'utf8' });
     assert.equal(missing.status, 2, `${missing.stdout}\n${missing.stderr}`);
-    assert.match(parsePayload(missing).message, /RCL_DOMAIN_ORGAN_MISSING/);
+    const missingPayload = parsePayload(missing);
+    assert.equal(missingPayload.code, 'RCL_DOMAIN_ORGAN_MISSING');
+    assert.equal(missingPayload.message, 'RCL_DOMAIN_ORGAN_MISSING: Domain operation is not registered');
 
     const legacyPath = path.join(temp, 'legacy.rbc');
     writeFileSync(legacyPath, compileRealityToBytecode('reality Legacy { facet world.ready : Truth = true }'));
