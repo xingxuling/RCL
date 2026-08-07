@@ -44,9 +44,9 @@ int rcl_domain_organ_invoke(
   const char *domain,
   const char *operation,
   RclDomainOrganEvidenceTier required_tier,
-  const char *request_json,
-  char *response_json,
-  size_t response_capacity,
+  const RclDomainValueV1 *args,
+  size_t argc,
+  RclDomainValueV1 *result,
   char *error,
   size_t error_capacity
 ) {
@@ -56,7 +56,18 @@ int rcl_domain_organ_invoke(
     return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_TIER: invalid required evidence tier");
   }
   if (organ->evidence_tier < required_tier) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_EVIDENCE_TIER: organ has not reached required evidence tier");
-  if (!response_json || response_capacity == 0) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_OUTPUT: response buffer is required");
-  response_json[0] = '\0';
-  return organ->invoke(organ->userdata, domain, operation, request_json ? request_json : "null", response_json, response_capacity, error, error_capacity);
+  if ((argc && !args) || !result) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_ARGUMENT: args/result contract is invalid");
+  for (size_t i = 0; i < argc; i++) {
+    if (args[i].abi_version != RCL_DOMAIN_VALUE_ABI_V1) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_ABI: argument has unsupported value ABI");
+  }
+  rcl_domain_value_init(result);
+  if (!organ->invoke(organ->userdata, domain, operation, args, argc, result, error, error_capacity)) {
+    rcl_domain_value_free(result);
+    return 0;
+  }
+  if (result->abi_version != RCL_DOMAIN_VALUE_ABI_V1) {
+    rcl_domain_value_free(result);
+    return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_ABI: result has unsupported value ABI");
+  }
+  return 1;
 }
