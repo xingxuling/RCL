@@ -5,6 +5,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createExecutionObservation } from './differential-absorption-runner.mjs';
+import { runtimeType } from './quantity.mjs';
 import { semanticValue, verifyNativeSemanticStateRoot } from './semantic-state-root.mjs';
 import { assembleRbc13DomainCallProgram } from './rbc13-domain-bytecode-candidate.mjs';
 import { materializeRbc13DomainVmWithPublicApi } from '../scripts/materialize-rbc13-domain-vm-public-api.mjs';
@@ -101,10 +102,37 @@ function parsePayload(run, context) {
   }
 }
 
-function throwSemanticNativeError(payload, receipt) {
+function semanticErrorDetails(payload, input) {
+  const code = String(payload?.code ?? '');
+  const args = Array.isArray(input?.args) ? input.args : [];
+  if (code === 'RCL_MEASUREMENT_TYPE') {
+    return { baseType: args[0], actual: runtimeType(args[1]) };
+  }
+  if (code === 'RCL_UNCERTAINTY_TYPE') {
+    return { baseType: args[0], actual: runtimeType(args[2]) };
+  }
+  if (code === 'RCL_CONFIDENCE_RANGE') {
+    return { confidence: Number(args[3]) };
+  }
+  if (code === 'RCL_KNOWLEDGE_TYPE') {
+    return { baseType: args[0], actual: runtimeType(args[1]) };
+  }
+  if (code === 'RCL_KNOWLEDGE_CONFIDENCE_RANGE') {
+    return { confidence: Number(args[2]) };
+  }
+  return null;
+}
+
+function throwSemanticNativeError(payload, receipt, input) {
   const error = new Error(String(payload?.message ?? 'Candidate DOMAIN_CALL failed'));
   error.code = String(payload?.code ?? 'RCL_RBC13_NATIVE_FAILURE');
-  error.details = { nativeReceipt: receipt, payload };
+  error.details = semanticErrorDetails(payload, input);
+  Object.defineProperty(error, 'nativeReceipt', {
+    value: receipt,
+    enumerable: false,
+    configurable: false,
+    writable: false,
+  });
   throw error;
 }
 
@@ -195,7 +223,7 @@ export function buildRbc13DomainCandidateHost(options = {}) {
       nativeStateRoot: payload?.stateRoot ?? null,
       nativeStateRootAlgorithm: payload?.stateRootAlgorithm ?? null,
     });
-    if (run.status !== 0) throwSemanticNativeError(payload, receipt);
+    if (run.status !== 0) throwSemanticNativeError(payload, receipt, input);
     const verified = verifyNativeSemanticStateRoot(payload, { requireNativeRoot: true });
     if (!Object.prototype.hasOwnProperty.call(verified.state ?? {}, program.target)) {
       const error = new Error(`Candidate native state is missing ${program.target}`);
