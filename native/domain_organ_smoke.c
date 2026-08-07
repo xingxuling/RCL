@@ -83,6 +83,7 @@ int main(void) {
 
   rcl_domain_value_free(&quantity);
   rcl_domain_value_free(&text);
+  rcl_domain_organ_registry_free(&registry);
   puts("domain-organ-value-smoke: PASS");
   return 0;
 }
