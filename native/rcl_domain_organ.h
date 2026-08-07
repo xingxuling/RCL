@@ -10,6 +10,8 @@ extern "C" {
 
 #define RCL_DOMAIN_ORGAN_ABI_V1 1u
 #define RCL_DOMAIN_ORGAN_MAX 128u
+#define RCL_DOMAIN_ERROR_CODE_MAX 128u
+#define RCL_DOMAIN_ERROR_MESSAGE_MAX 512u
 
 typedef enum {
   RCL_DOMAIN_ORGAN_QUARANTINED = 0,
@@ -18,6 +20,14 @@ typedef enum {
   RCL_DOMAIN_ORGAN_NATIVE_VERIFIED = 3
 } RclDomainOrganEvidenceTier;
 
+typedef struct {
+  char code[RCL_DOMAIN_ERROR_CODE_MAX];
+  char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+} RclDomainOrganErrorV1;
+
+void rcl_domain_organ_error_clear(RclDomainOrganErrorV1 *error);
+void rcl_domain_organ_error_set(RclDomainOrganErrorV1 *error, const char *code, const char *message);
+
 typedef int (*RclDomainOrganInvokeFn)(
   void *userdata,
   const char *domain,
@@ -25,8 +35,7 @@ typedef int (*RclDomainOrganInvokeFn)(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 );
 
 typedef struct {
@@ -59,8 +68,7 @@ int rcl_domain_organ_invoke(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 );
 
 #ifdef __cplusplus
