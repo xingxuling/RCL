@@ -8,6 +8,9 @@ extern "C" {
 #endif
 
 #define RCL_DOMAIN_VALUE_ABI_V1 1u
+#define RCL_DOMAIN_VALUE_MAX_DEPTH 64u
+#define RCL_DOMAIN_VALUE_MAX_ITEMS 65536u
+#define RCL_DOMAIN_VALUE_MAX_TEXT_BYTES (16u * 1024u * 1024u)
 
 typedef enum {
   RCL_DOMAIN_VALUE_NULL = 0,
@@ -51,6 +54,7 @@ struct RclDomainValueV1 {
 void rcl_domain_value_init(RclDomainValueV1 *value);
 void rcl_domain_value_free(RclDomainValueV1 *value);
 int rcl_domain_value_clone(RclDomainValueV1 *target, const RclDomainValueV1 *source);
+int rcl_domain_value_validate(const RclDomainValueV1 *value);
 
 int rcl_domain_value_set_null(RclDomainValueV1 *value, const char *semantic_type);
 int rcl_domain_value_set_number(RclDomainValueV1 *value, double number, const char *semantic_type);
