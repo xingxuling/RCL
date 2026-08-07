@@ -48,6 +48,7 @@ typedef struct {
 } RclDomainOrganRegistry;
 
 void rcl_domain_organ_registry_init(RclDomainOrganRegistry *registry);
+void rcl_domain_organ_registry_free(RclDomainOrganRegistry *registry);
 int rcl_domain_organ_register(RclDomainOrganRegistry *registry, const RclDomainOrganV1 *organ, char *error, size_t error_capacity);
 const RclDomainOrganV1 *rcl_domain_organ_resolve(const RclDomainOrganRegistry *registry, const char *domain, const char *operation);
 int rcl_domain_organ_invoke(
