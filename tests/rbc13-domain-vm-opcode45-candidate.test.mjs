@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { assembleRbc13DomainCallProgram } from '../src/rbc13-domain-bytecode-candidate.mjs';
-import { materializeRbc13DomainVmCandidate } from '../scripts/materialize-rbc13-domain-vm-candidate.mjs';
+import { materializeRbc13DomainVmWithPublicApi } from '../scripts/materialize-rbc13-domain-vm-public-api.mjs';
 import { measurement, quantity } from '../src/quantity.mjs';
 import { knowledgeClaim } from '../src/knowledge.mjs';
 import { semanticStateRoot } from '../src/semantic-state-root.mjs';
@@ -30,7 +30,7 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
   const host = path.join(temp, 'domain-vm-opcode45-candidate');
   try {
     const currentNative = fs.readFileSync('native/rclvm.c', 'utf8');
-    writeFileSync(generated, materializeRbc13DomainVmCandidate(currentNative));
+    writeFileSync(generated, materializeRbc13DomainVmWithPublicApi(currentNative));
     const build = spawnSync(compiler, [
       '-std=c11', '-Wall', '-Wextra', '-pedantic', '-Inative', `-I${temp}`,
       'native/rcl_domain_value.c',
