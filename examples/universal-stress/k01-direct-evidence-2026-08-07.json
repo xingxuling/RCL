@@ -1,0 +1,118 @@
+{
+  "schema": "rcl.universal-stress.k01.direct-evidence.v0.1",
+  "taskId": "K01",
+  "task": "self-hosting compiler",
+  "capturedAt": "2026-08-07T15:56:02.672107+00:00",
+  "sourceSnapshot": {
+    "githubRepository": "xingxuling/RCL",
+    "githubMainCommit": "13ce6deb9467af36797340937ba99e67203c6d06",
+    "criticalGitBlobShas": {
+      "selfhost/compiler.rbc": "7d523237abf9ae64c4b6b7c5f7b938bd5c9ae890",
+      "selfhost/compiler-core.rcl": "ea7b27005b35edcc30d1b8fc9da14b18ffc49652",
+      "selfhost/compiler-main.rcl": "2d91f0b86390e3998305c742220ac8cdf9178035",
+      "scripts/verify-rcl-selfhost-all.mjs": "c26632f336fbfa790faa9b58e85cbc2287d8365d",
+      "tests/selfhost-toolchain.test.mjs": "8e3b987e544c5d813ae910489459bf4618a9fb38",
+      "tests/general-selfhost-fixedpoint.test.mjs": "f48b0cb07b102cdfcaf085313c831f4d3159be5e"
+    }
+  },
+  "nativeBuild": {
+    "status": "PASS",
+    "command": "node scripts/build-native.mjs",
+    "artifacts": {
+      "native/rclc": {
+        "sha256": "946ad5b7adb86727576d2972f4d68032d376062a6ed11273d82413a9dae7d476",
+        "bytes": 103904
+      },
+      "native/rclvm": {
+        "bytes": 95096
+      }
+    }
+  },
+  "fixedPoint": {
+    "status": "PASS",
+    "compilerSourceSha256": "662818d50f0fefab3d05b1b6096451231733ce19debc71d23a1549387a93672a",
+    "compilerSourceBytes": 127825,
+    "compilerArtifactSha256": "a2e9cd44c9afb0a488ef797431f6bbf53e621c756d5b9906ad85bc3fa350789c",
+    "compilerArtifactBytes": 160572,
+    "c0ToC1": {
+      "status": "PASS",
+      "elapsedSeconds": 18.93,
+      "peakRssKb": 99304,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217,
+      "outputSha256": "a2e9cd44c9afb0a488ef797431f6bbf53e621c756d5b9906ad85bc3fa350789c",
+      "byteIdenticalToInputCompiler": true
+    },
+    "c1ToC2": {
+      "status": "PASS",
+      "elapsedSeconds": 19.96,
+      "peakRssKb": 99304,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217,
+      "outputSha256": "a2e9cd44c9afb0a488ef797431f6bbf53e621c756d5b9906ad85bc3fa350789c",
+      "byteIdenticalToC1": true
+    },
+    "totalMeasuredSeconds": 38.89,
+    "declaredBudgetSeconds": 240
+  },
+  "toolchainTests": {
+    "status": "PASS",
+    "command": "node --test --test-concurrency=1 tests/selfhost-toolchain.test.mjs",
+    "tests": 4,
+    "passed": 4,
+    "failed": 0,
+    "durationMs": 290.572318
+  },
+  "positiveParity": {
+    "status": "PASS",
+    "fixtureCount": 9,
+    "exactRbcMatches": 9,
+    "fixtures": [
+      {"path":"examples/selfhost-core/literal.rcl","elapsedMs":7,"bytes":201,"exact":true},
+      {"path":"examples/selfhost-core/text-truth.rcl","elapsedMs":7,"bytes":280,"exact":true},
+      {"path":"examples/selfhost-core/reckon-choose.rcl","elapsedMs":7,"bytes":520,"exact":true},
+      {"path":"examples/selfhost-core/subject-warrants.rcl","elapsedMs":7,"bytes":361,"exact":true},
+      {"path":"examples/selfhost-core/emergence-multi.rcl","elapsedMs":11,"bytes":1684,"exact":true},
+      {"path":"examples/selfhost-core/resonance-multi.rcl","elapsedMs":13,"bytes":2261,"exact":true},
+      {"path":"examples/rcl-native-absorption-kernel.rcl","elapsedMs":12,"bytes":1027,"exact":true},
+      {"path":"examples/whole-language-parser-target.rcl","elapsedMs":12,"bytes":1057,"exact":true},
+      {"path":"examples/selfhost-core/dynamic-provider-v12.rcl","elapsedMs":8,"bytes":438,"exact":true}
+    ]
+  },
+  "negativeControls": {
+    "status": "PASS",
+    "cases": 8,
+    "rejected": 8,
+    "unexpectedAccepts": 0,
+    "errors": [
+      "RCL_SEMANTIC_ASSERT: reality at 1:1",
+      "RCL_SEMANTIC_ASSERT: EOF at 1:53",
+      "RCL_SEMANTIC_ASSERT: <eof> at 1:50",
+      "RCL_SEMANTIC_ASSERT: mystery at 1:22",
+      "RCL_SEMANTIC_ASSERT: missing.value at 1:1",
+      "RCL_SEMANTIC_ASSERT: missing_call at 1:1",
+      "RCL_SEMANTIC_TYPE_MISMATCH: world.value at 1:1",
+      "RCL_SEMANTIC_ASSERT: physical at 1:29"
+    ]
+  },
+  "gates": {
+    "EXPRESS": "PASS",
+    "COMPILE": "PASS",
+    "LOWER": "PASS",
+    "EXECUTE": "PASS",
+    "CORRECT": "PASS",
+    "ROBUST": "PASS",
+    "PERFORMANCE": "PASS",
+    "AI_GENERATE": "UNVERIFIED",
+    "EVIDENCE": "PASS"
+  },
+  "overall": "BLOCKED",
+  "blockingGate": "AI_GENERATE",
+  "boundary": {
+    "wholeRuntimeFullSelfHostingRequiredForK01": false,
+    "trustedBootstrapAllowed": true,
+    "opaqueDelegationAllowedForNativeCredit": false,
+    "claim": "8/9 gates have direct local execution evidence; AI_GENERATE remains unverified."
+  },
+  "evidenceRoot": "a3f49b866c736f70e9ddf13d633903574be8ddb7e351d7bc18f47e307f03e7dc"
+}

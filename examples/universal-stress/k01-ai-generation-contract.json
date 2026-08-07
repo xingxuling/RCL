@@ -1,0 +1,43 @@
+{
+  "schema": "rcl.universal-stress.k01.ai-generation-contract.v0.1",
+  "taskId": "K01",
+  "requiredTrials": 3,
+  "status": "UNVERIFIED",
+  "purpose": "Prove that an AI can make evidence-bearing changes to the self-hosted RCL compiler from bounded intent, rather than merely emit ordinary RCL application code.",
+  "rules": [
+    "The AI receives the intent, allowed files, forbidden shortcuts, and acceptance tests.",
+    "The AI must modify RCL-owned compiler source or compiler semantics, not replace the compiler with an opaque external compiler.",
+    "Each trial must reach the native self-hosted compiler fixed point after the change.",
+    "Each trial must preserve all pre-existing fixed-point/parity/negative-control tests.",
+    "A trial is not successful until compile, execution, correctness, regression, and evidence receipts exist.",
+    "The same AI session may not invent a mutation, reveal its oracle patch to itself, restore the known original, and count that as an independent success.",
+    "At least one trial must be generated from an independently specified change request or hidden mutation whose oracle repair is unavailable to the generating AI.",
+    "AI_GENERATE is a reproducibility gate, not a declaration that prior AI-assisted development probably occurred."
+  ],
+  "trials": [
+    {
+      "id": "K01-AI-01",
+      "intent": "Extend or repair one general expression/compiler behavior in the RCL-owned compiler while preserving byte-identical self-host fixed point and existing semantics.",
+      "allowedFiles": ["selfhost/compiler-core.rcl", "selfhost/compiler-main.rcl", "tests/*selfhost*.test.mjs"],
+      "forbidden": ["replace compiler with JS", "skip native rclc", "hard-code fixture bytecode", "delete regression tests", "self-invent trivial mutation and restore known original"],
+      "status": "UNVERIFIED",
+      "evidence": []
+    },
+    {
+      "id": "K01-AI-02",
+      "intent": "Add or repair a general parser/lowering capability in the RCL-owned compiler and demonstrate that the capability works on at least two structurally distinct source fixtures.",
+      "allowedFiles": ["selfhost/compiler-core.rcl", "selfhost/compiler-main.rcl", "examples/selfhost-core/**", "tests/*selfhost*.test.mjs"],
+      "forbidden": ["fixture-specific parser branch", "opaque delegation", "relax byte-identical fixed-point requirement", "reuse a disclosed oracle patch"],
+      "status": "UNVERIFIED",
+      "evidence": []
+    },
+    {
+      "id": "K01-AI-03",
+      "intent": "Repair a deliberately introduced compiler mutation using only the failing evidence and compiler sources, then restore fixed-point, parity and rejection behavior.",
+      "allowedFiles": ["selfhost/compiler-core.rcl", "selfhost/compiler-main.rcl"],
+      "forbidden": ["read hidden oracle patch", "change expected outputs", "disable failing test", "route compilation to external language"],
+      "status": "UNVERIFIED",
+      "evidence": []
+    }
+  ]
+}
