@@ -1,0 +1,30 @@
+reality K03NativeAndroidApp {
+  facet app.count : Number = 0
+  facet app.input : Text = ""
+  facet app.last_action : Text = "boot"
+
+  subject user {
+    warrant app.write on app
+  }
+
+  emergence increment {
+    cause user
+    when app.input != ""
+    needs app.write on app
+    alter app.count <- app.count + 1
+    alter app.last_action <- app.input
+    alter app.input <- ""
+    preserve app.count >= 0
+    witness "rcl:k03:increment"
+  }
+
+  emergence reset {
+    cause user
+    when app.count >= 0
+    needs app.write on app
+    alter app.count <- 0
+    alter app.last_action <- "reset"
+    preserve app.count >= 0
+    witness "rcl:k03:reset"
+  }
+}
