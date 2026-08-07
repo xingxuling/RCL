@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int fail(char *error, size_t capacity, const char *message) {
-  if (error && capacity) snprintf(error, capacity, "%s", message);
+static int fail(RclDomainOrganErrorV1 *error, const char *code, const char *message) {
+  rcl_domain_organ_error_set(error, code, message);
   return 0;
 }
 
@@ -62,12 +62,11 @@ static int core_echo(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 ) {
   (void)userdata; (void)domain; (void)operation;
-  if (argc != 1) return fail(error, error_capacity, "RCL_DOMAIN_CORE_ECHO_ARITY: core.echo expects one argument");
-  if (!rcl_domain_value_clone(result, &args[0])) return fail(error, error_capacity, "RCL_DOMAIN_CORE_ECHO_CLONE: unable to clone core.echo argument");
+  if (argc != 1) return fail(error, "RCL_DOMAIN_CORE_ECHO_ARITY", "RCL_DOMAIN_CORE_ECHO_ARITY: core.echo expects one argument");
+  if (!rcl_domain_value_clone(result, &args[0])) return fail(error, "RCL_DOMAIN_CORE_ECHO_CLONE", "RCL_DOMAIN_CORE_ECHO_CLONE: unable to clone core.echo argument");
   return 1;
 }
 
@@ -89,22 +88,21 @@ static int quantity_make(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 ) {
   (void)userdata; (void)domain; (void)operation;
   if (argc != 3 || args[0].kind != RCL_DOMAIN_VALUE_TEXT || args[1].kind != RCL_DOMAIN_VALUE_NUMBER || args[2].kind != RCL_DOMAIN_VALUE_TEXT) {
-    return fail(error, error_capacity, "RCL_DOMAIN_QUANTITY_ARGUMENT: quantity.make expects Text type, Number value and Text unit");
+    return fail(error, "RCL_DOMAIN_QUANTITY_ARGUMENT", "RCL_DOMAIN_QUANTITY_ARGUMENT: quantity.make expects Text type, Number value and Text unit");
   }
   const char *type = args[0].as.text.data;
   const char *fallback = default_unit(type);
   if (!fallback) {
-    char message[384];
-    snprintf(message, sizeof(message), "RCL_DOMAIN_QUANTITY_TYPE: unknown quantity type '%s'", type ? type : "");
-    return fail(error, error_capacity, message);
+    char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+    snprintf(message, sizeof(message), "Unknown quantity type '%s'", type ? type : "");
+    return fail(error, "TypeError", message);
   }
   const char *unit = args[2].as.text.length ? args[2].as.text.data : fallback;
-  if (!rcl_domain_value_make_record(result, "Quantity", 4, type)) return fail(error, error_capacity, "RCL_DOMAIN_QUANTITY_OOM: unable to construct quantity result");
+  if (!rcl_domain_value_make_record(result, "Quantity", 4, type)) return fail(error, "RCL_DOMAIN_QUANTITY_OOM", "RCL_DOMAIN_QUANTITY_OOM: unable to construct quantity result");
   RclDomainValueV1 field;
   rcl_domain_value_init(&field);
   if (!rcl_domain_value_set_text(&field, "Quantity", "Text") || !set_field(result, 0, "kind", &field)
@@ -113,7 +111,7 @@ static int quantity_make(
       || !rcl_domain_value_set_text(&field, unit, "Text") || !set_field(result, 3, "unit", &field)) {
     rcl_domain_value_free(&field);
     rcl_domain_value_free(result);
-    return fail(error, error_capacity, "RCL_DOMAIN_QUANTITY_BUILD: unable to populate quantity result");
+    return fail(error, "RCL_DOMAIN_QUANTITY_BUILD", "RCL_DOMAIN_QUANTITY_BUILD: unable to populate quantity result");
   }
   return 1;
 }
@@ -125,30 +123,37 @@ static int quantitative_measure(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 ) {
   (void)userdata; (void)domain; (void)operation;
   if (argc != 8 || args[0].kind != RCL_DOMAIN_VALUE_TEXT || args[3].kind != RCL_DOMAIN_VALUE_NUMBER
       || args[4].kind != RCL_DOMAIN_VALUE_TEXT || args[5].kind != RCL_DOMAIN_VALUE_TEXT
       || args[6].kind != RCL_DOMAIN_VALUE_SEQUENCE || args[7].kind != RCL_DOMAIN_VALUE_TEXT) {
-    return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_ARGUMENT: quantitative.measure expects baseType, value, uncertainty, confidence, unit, scale, evidence and calibratedBy");
+    return fail(error, "RCL_DOMAIN_MEASUREMENT_ARGUMENT", "RCL_DOMAIN_MEASUREMENT_ARGUMENT: quantitative.measure expects baseType, value, uncertainty, confidence, unit, scale, evidence and calibratedBy");
   }
   const char *base_type = args[0].as.text.data;
   const char *value_type = domain_runtime_type(&args[1]);
   const char *uncertainty_type = domain_runtime_type(&args[2]);
-  if (!value_type || strcmp(value_type, base_type) != 0) return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_TYPE: measurement value does not match base type");
+  if (!value_type || strcmp(value_type, base_type) != 0) {
+    char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+    snprintf(message, sizeof(message), "RCL_MEASUREMENT_TYPE: Measurement %s received %s", base_type, value_type ? value_type : "Unknown");
+    return fail(error, "RCL_MEASUREMENT_TYPE", message);
+  }
   if (strcmp(base_type, "Text") != 0 && strcmp(base_type, "Truth") != 0
       && (!uncertainty_type || strcmp(uncertainty_type, base_type) != 0)) {
-    return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_UNCERTAINTY: uncertainty does not match base type");
+    char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+    snprintf(message, sizeof(message), "RCL_UNCERTAINTY_TYPE: Uncertainty for %s must be %s", base_type, base_type);
+    return fail(error, "RCL_UNCERTAINTY_TYPE", message);
   }
   double confidence = args[3].as.number;
-  if (confidence < 0 || confidence > 1) return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_CONFIDENCE: confidence must be between 0 and 1");
+  if (confidence < 0 || confidence > 1) {
+    return fail(error, "RCL_CONFIDENCE_RANGE", "RCL_CONFIDENCE_RANGE: Measurement confidence must be between 0 and 1");
+  }
 
   char *semantic_type = generic_type("Measure", base_type);
   if (!semantic_type || !rcl_domain_value_make_record(result, "Measurement", 9, semantic_type)) {
     free(semantic_type);
-    return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_OOM: unable to construct measurement result");
+    return fail(error, "RCL_DOMAIN_MEASUREMENT_OOM", "RCL_DOMAIN_MEASUREMENT_OOM: unable to construct measurement result");
   }
   free(semantic_type);
 
@@ -178,7 +183,7 @@ static int quantitative_measure(
   if (!ok) {
     rcl_domain_value_free(&field);
     rcl_domain_value_free(result);
-    return fail(error, error_capacity, "RCL_DOMAIN_MEASUREMENT_BUILD: unable to populate measurement result");
+    return fail(error, "RCL_DOMAIN_MEASUREMENT_BUILD", "RCL_DOMAIN_MEASUREMENT_BUILD: unable to populate measurement result");
   }
   return 1;
 }
@@ -215,8 +220,7 @@ static int knowledge_claim(
   const RclDomainValueV1 *args,
   size_t argc,
   RclDomainValueV1 *result,
-  char *error,
-  size_t error_capacity
+  RclDomainOrganErrorV1 *error
 ) {
   (void)userdata; (void)domain; (void)operation;
   if (argc != 10 || args[0].kind != RCL_DOMAIN_VALUE_TEXT || args[2].kind != RCL_DOMAIN_VALUE_NUMBER
@@ -224,17 +228,23 @@ static int knowledge_claim(
       || args[5].kind != RCL_DOMAIN_VALUE_TEXT || args[6].kind != RCL_DOMAIN_VALUE_TEXT
       || args[7].kind != RCL_DOMAIN_VALUE_SEQUENCE || args[8].kind != RCL_DOMAIN_VALUE_NUMBER
       || args[9].kind != RCL_DOMAIN_VALUE_TEXT) {
-    return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_ARGUMENT: knowledge.claim expects baseType, value, confidence, evidence, source, scope, status, dependencies, revision and formedAtRoot");
+    return fail(error, "RCL_DOMAIN_KNOWLEDGE_ARGUMENT", "RCL_DOMAIN_KNOWLEDGE_ARGUMENT: knowledge.claim expects baseType, value, confidence, evidence, source, scope, status, dependencies, revision and formedAtRoot");
   }
   const char *base_type = args[0].as.text.data;
   const char *value_type = domain_runtime_type(&args[1]);
-  if (!value_type || strcmp(value_type, base_type) != 0) return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_TYPE: knowledge value does not match base type");
-  if (args[2].as.number < 0 || args[2].as.number > 1) return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_CONFIDENCE: confidence must be between 0 and 1");
+  if (!value_type || strcmp(value_type, base_type) != 0) {
+    char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+    snprintf(message, sizeof(message), "RCL_KNOWLEDGE_TYPE: Knowledge %s received %s", base_type, value_type ? value_type : "Unknown");
+    return fail(error, "RCL_KNOWLEDGE_TYPE", message);
+  }
+  if (args[2].as.number < 0 || args[2].as.number > 1) {
+    return fail(error, "RCL_KNOWLEDGE_CONFIDENCE_RANGE", "RCL_KNOWLEDGE_CONFIDENCE_RANGE: Knowledge confidence must be between 0 and 1");
+  }
 
   char *semantic_type = generic_type("Know", base_type);
   if (!semantic_type || !rcl_domain_value_make_record(result, "Knowledge", 12, semantic_type)) {
     free(semantic_type);
-    return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_OOM: unable to construct knowledge result");
+    return fail(error, "RCL_DOMAIN_KNOWLEDGE_OOM", "RCL_DOMAIN_KNOWLEDGE_OOM: unable to construct knowledge result");
   }
   free(semantic_type);
 
@@ -247,7 +257,7 @@ static int knowledge_claim(
       || !rcl_domain_value_make_sequence(&alternatives, 0, "Sequence")) {
     rcl_domain_value_free(&evidence); rcl_domain_value_free(&dependencies); rcl_domain_value_free(&alternatives);
     rcl_domain_value_free(result);
-    return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_SEQUENCE: unable to normalize evidence/dependencies");
+    return fail(error, "RCL_DOMAIN_KNOWLEDGE_SEQUENCE", "RCL_DOMAIN_KNOWLEDGE_SEQUENCE: unable to normalize evidence/dependencies");
   }
 
   int ok = rcl_domain_value_set_text(&field, "Knowledge", "Text") && set_field(result, 0, "kind", &field)
@@ -276,7 +286,7 @@ static int knowledge_claim(
     rcl_domain_value_free(&dependencies);
     rcl_domain_value_free(&alternatives);
     rcl_domain_value_free(result);
-    return fail(error, error_capacity, "RCL_DOMAIN_KNOWLEDGE_BUILD: unable to populate knowledge result");
+    return fail(error, "RCL_DOMAIN_KNOWLEDGE_BUILD", "RCL_DOMAIN_KNOWLEDGE_BUILD: unable to populate knowledge result");
   }
   return 1;
 }
