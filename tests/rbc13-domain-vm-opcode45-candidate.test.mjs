@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import fs, { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -7,7 +7,8 @@ import test from 'node:test';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { assembleRbc13DomainCallProgram } from '../src/rbc13-domain-bytecode-candidate.mjs';
 import { materializeRbc13DomainVmCandidate } from '../scripts/materialize-rbc13-domain-vm-candidate.mjs';
-import fs from 'node:fs';
+import { quantity } from '../src/quantity.mjs';
+import { semanticStateRoot } from '../src/semantic-state-root.mjs';
 
 function commandExists(command) {
   const probe = spawnSync('sh', ['-lc', `command -v ${command}`], { encoding: 'utf8' });
@@ -33,6 +34,7 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
       '-std=c11', '-Wall', '-Wextra', '-pedantic', '-Inative', `-I${temp}`,
       'native/rcl_domain_value.c',
       'native/rcl_domain_organ.c',
+      'native/rcl_domain_admitted_organs.c',
       'native/domain_vm_opcode45_candidate_host.c',
       '-lcrypto', '-lm', '-o', host,
     ], { cwd: process.cwd(), encoding: 'utf8' });
@@ -55,7 +57,7 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     assert.equal(admittedPayload.bytecodeVersion, '1.3');
     assert.equal(admittedPayload.state['result.echo'], 'hello');
     assert.equal(admittedPayload.stateRootAlgorithm, 'rcl.semantic-state-root.v1');
-    assert.match(admittedPayload.stateRoot, /^[a-f0-9]{64}$/);
+    assert.equal(admittedPayload.stateRoot, semanticStateRoot({ 'result.echo': 'hello' }));
 
     const dynamicPath = path.join(temp, 'dynamic.rbc');
     writeFileSync(dynamicPath, assembleRbc13DomainCallProgram({
@@ -63,7 +65,33 @@ test('experimental RBC 1.3 opcode45 dispatch is host-gated, fail-closed and auth
     }));
     const dynamic = spawnSync(host, [dynamicPath, '--candidate-minimum'], { encoding: 'utf8' });
     assert.equal(dynamic.status, 0, `${dynamic.stdout}\n${dynamic.stderr}`);
-    assert.equal(parsePayload(dynamic).state['result.dynamic'], 42);
+    const dynamicPayload = parsePayload(dynamic);
+    assert.equal(dynamicPayload.state['result.dynamic'], 42);
+    assert.equal(dynamicPayload.stateRoot, semanticStateRoot({ 'result.dynamic': 42 }));
+
+    const quantityPath = path.join(temp, 'quantity.rbc');
+    writeFileSync(quantityPath, assembleRbc13DomainCallProgram({
+      calls: [{ domain: 'quantity', operation: 'make', args: ['Temperature', 25, ''], target: 'result.quantity' }],
+    }));
+    const quantityRun = spawnSync(host, [quantityPath, '--candidate-minimum'], { encoding: 'utf8' });
+    assert.equal(quantityRun.status, 0, `${quantityRun.stdout}\n${quantityRun.stderr}`);
+    const quantityPayload = parsePayload(quantityRun);
+    assert.equal(quantityPayload.state['result.quantity'].kind, 'Quantity');
+    assert.equal(quantityPayload.state['result.quantity'].type, 'Temperature');
+    assert.equal(quantityPayload.state['result.quantity'].value, 25);
+    assert.equal(quantityPayload.state['result.quantity'].unit, '°C');
+    assert.equal(
+      quantityPayload.stateRoot,
+      semanticStateRoot({ 'result.quantity': quantity('Temperature', 25) }),
+    );
+
+    const invalidQuantityPath = path.join(temp, 'invalid-quantity.rbc');
+    writeFileSync(invalidQuantityPath, assembleRbc13DomainCallProgram({
+      calls: [{ domain: 'quantity', operation: 'make', args: ['Warp', 25, ''], target: 'result.quantity' }],
+    }));
+    const invalidQuantity = spawnSync(host, [invalidQuantityPath, '--candidate-minimum'], { encoding: 'utf8' });
+    assert.equal(invalidQuantity.status, 2, `${invalidQuantity.stdout}\n${invalidQuantity.stderr}`);
+    assert.match(parsePayload(invalidQuantity).message, /RCL_DOMAIN_QUANTITY_TYPE/);
 
     const missingPath = path.join(temp, 'missing.rbc');
     writeFileSync(missingPath, assembleRbc13DomainCallProgram({
