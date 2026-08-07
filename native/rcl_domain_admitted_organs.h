@@ -7,8 +7,6 @@
 extern "C" {
 #endif
 
-const RclDomainOrganV1 *rcl_domain_admitted_candidates_v01(size_t *count);
-
 int rcl_domain_register_admitted_candidates_v01(
   RclDomainOrganRegistry *registry,
   char *error,
