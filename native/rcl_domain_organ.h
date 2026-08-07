@@ -1,0 +1,68 @@
+#ifndef RCL_DOMAIN_ORGAN_H
+#define RCL_DOMAIN_ORGAN_H
+
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define RCL_DOMAIN_ORGAN_ABI_V1 1u
+#define RCL_DOMAIN_ORGAN_MAX 128u
+
+typedef enum {
+  RCL_DOMAIN_ORGAN_QUARANTINED = 0,
+  RCL_DOMAIN_ORGAN_DIFFERENTIAL_VERIFIED = 1,
+  RCL_DOMAIN_ORGAN_NATIVE_CANDIDATE = 2,
+  RCL_DOMAIN_ORGAN_NATIVE_VERIFIED = 3
+} RclDomainOrganEvidenceTier;
+
+typedef int (*RclDomainOrganInvokeFn)(
+  void *userdata,
+  const char *domain,
+  const char *operation,
+  const char *request_json,
+  char *response_json,
+  size_t response_capacity,
+  char *error,
+  size_t error_capacity
+);
+
+typedef struct {
+  unsigned int abi_version;
+  const char *domain;
+  const char *operation;
+  const char *semantic_identity;
+  const char *implementation_id;
+  const char *artifact_root;
+  RclDomainOrganEvidenceTier evidence_tier;
+  int deterministic;
+  RclDomainOrganInvokeFn invoke;
+  void *userdata;
+} RclDomainOrganV1;
+
+typedef struct {
+  RclDomainOrganV1 entries[RCL_DOMAIN_ORGAN_MAX];
+  size_t count;
+} RclDomainOrganRegistry;
+
+void rcl_domain_organ_registry_init(RclDomainOrganRegistry *registry);
+int rcl_domain_organ_register(RclDomainOrganRegistry *registry, const RclDomainOrganV1 *organ, char *error, size_t error_capacity);
+const RclDomainOrganV1 *rcl_domain_organ_resolve(const RclDomainOrganRegistry *registry, const char *domain, const char *operation);
+int rcl_domain_organ_invoke(
+  const RclDomainOrganRegistry *registry,
+  const char *domain,
+  const char *operation,
+  RclDomainOrganEvidenceTier required_tier,
+  const char *request_json,
+  char *response_json,
+  size_t response_capacity,
+  char *error,
+  size_t error_capacity
+);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
