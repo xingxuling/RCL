@@ -341,7 +341,9 @@ function emitRender(manifest, boundNodes) {
   for (const node of boundNodes) {
     const field = nodeFieldName(node);
     const pathName = node.textState ?? node.valueState;
-    const next = `String.valueOf(rclPath(state, ${javaString(pathName)}))`;
+    const next = node.text !== undefined
+      ? `String.valueOf(${javaString(node.text)}) + String.valueOf(rclPath(state, ${javaString(pathName)}))`
+      : `String.valueOf(rclPath(state, ${javaString(pathName)}))`;
     if (node.type === 'input') lines.push(`    if (!${field}.getText().toString().equals(${next})) ${field}.setText(${next});`);
     else lines.push(`    ${field}.setText(${next});`);
   }
