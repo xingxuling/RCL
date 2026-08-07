@@ -1,10 +1,12 @@
 #include "rcl_domain_value.h"
 
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 static char *copy_text_n(const char *text, size_t length) {
+  if (length > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES) return NULL;
   char *copy = (char *)malloc(length + 1);
   if (!copy) return NULL;
   if (length && text) memcpy(copy, text, length);
@@ -86,7 +88,7 @@ int rcl_domain_value_set_truth(RclDomainValueV1 *value, int truth, const char *s
 }
 
 int rcl_domain_value_set_text_n(RclDomainValueV1 *value, const char *text, size_t length, const char *semantic_type) {
-  if (!value || (length && !text)) return 0;
+  if (!value || (length && !text) || length > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES) return 0;
   rcl_domain_value_free(value);
   value->kind = RCL_DOMAIN_VALUE_TEXT;
   value->as.text.data = copy_text_n(text ? text : "", length);
@@ -101,7 +103,7 @@ int rcl_domain_value_set_text(RclDomainValueV1 *value, const char *text, const c
 }
 
 int rcl_domain_value_make_sequence(RclDomainValueV1 *value, size_t count, const char *semantic_type) {
-  if (!value || count > SIZE_MAX / sizeof(RclDomainValueV1)) return 0;
+  if (!value || count > RCL_DOMAIN_VALUE_MAX_ITEMS || count > SIZE_MAX / sizeof(RclDomainValueV1)) return 0;
   rcl_domain_value_free(value);
   value->kind = RCL_DOMAIN_VALUE_SEQUENCE;
   if (count) {
@@ -120,7 +122,8 @@ int rcl_domain_value_sequence_set(RclDomainValueV1 *sequence, size_t index, cons
 }
 
 int rcl_domain_value_make_record(RclDomainValueV1 *value, const char *type_name, size_t field_count, const char *semantic_type) {
-  if (!value || !type_name || !type_name[0] || field_count > SIZE_MAX / sizeof(RclDomainFieldV1)) return 0;
+  if (!value || !type_name || !type_name[0] || strlen(type_name) > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES
+      || field_count > RCL_DOMAIN_VALUE_MAX_ITEMS || field_count > SIZE_MAX / sizeof(RclDomainFieldV1)) return 0;
   rcl_domain_value_free(value);
   value->kind = RCL_DOMAIN_VALUE_RECORD;
   value->as.record.type_name = copy_text(type_name);
@@ -135,7 +138,11 @@ int rcl_domain_value_make_record(RclDomainValueV1 *value, const char *type_name,
 }
 
 int rcl_domain_value_record_set(RclDomainValueV1 *record, size_t index, const char *field_name, const RclDomainValueV1 *field_value) {
-  if (!record || record->kind != RCL_DOMAIN_VALUE_RECORD || index >= record->as.record.count || !field_name || !field_name[0] || !field_value) return 0;
+  if (!record || record->kind != RCL_DOMAIN_VALUE_RECORD || index >= record->as.record.count || !field_name || !field_name[0]
+      || strlen(field_name) > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES || !field_value) return 0;
+  for (size_t i = 0; i < record->as.record.count; i++) {
+    if (i != index && record->as.record.fields[i].name && strcmp(record->as.record.fields[i].name, field_name) == 0) return 0;
+  }
   RclDomainFieldV1 *field = &record->as.record.fields[index];
   char *name = copy_text(field_name);
   RclDomainValueV1 *copy = (RclDomainValueV1 *)malloc(sizeof(RclDomainValueV1));
@@ -149,8 +156,46 @@ int rcl_domain_value_record_set(RclDomainValueV1 *record, size_t index, const ch
   return 1;
 }
 
+static int validate_value(const RclDomainValueV1 *value, size_t depth) {
+  if (!value || value->abi_version != RCL_DOMAIN_VALUE_ABI_V1 || depth > RCL_DOMAIN_VALUE_MAX_DEPTH) return 0;
+  if (value->semantic_type && strlen(value->semantic_type) > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES) return 0;
+  switch (value->kind) {
+    case RCL_DOMAIN_VALUE_NULL:
+      return 1;
+    case RCL_DOMAIN_VALUE_NUMBER:
+      return isfinite(value->as.number);
+    case RCL_DOMAIN_VALUE_TRUTH:
+      return value->as.truth == 0 || value->as.truth == 1;
+    case RCL_DOMAIN_VALUE_TEXT:
+      return value->as.text.length <= RCL_DOMAIN_VALUE_MAX_TEXT_BYTES
+        && (value->as.text.length == 0 || value->as.text.data != NULL);
+    case RCL_DOMAIN_VALUE_SEQUENCE:
+      if (value->as.sequence.count > RCL_DOMAIN_VALUE_MAX_ITEMS || (value->as.sequence.count && !value->as.sequence.items)) return 0;
+      for (size_t i = 0; i < value->as.sequence.count; i++) if (!validate_value(&value->as.sequence.items[i], depth + 1)) return 0;
+      return 1;
+    case RCL_DOMAIN_VALUE_RECORD:
+      if (!value->as.record.type_name || !value->as.record.type_name[0] || strlen(value->as.record.type_name) > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES
+          || value->as.record.count > RCL_DOMAIN_VALUE_MAX_ITEMS || (value->as.record.count && !value->as.record.fields)) return 0;
+      for (size_t i = 0; i < value->as.record.count; i++) {
+        const RclDomainFieldV1 *field = &value->as.record.fields[i];
+        if (!field->name || !field->name[0] || strlen(field->name) > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES || !field->value || !validate_value(field->value, depth + 1)) return 0;
+        for (size_t j = i + 1; j < value->as.record.count; j++) {
+          if (value->as.record.fields[j].name && strcmp(field->name, value->as.record.fields[j].name) == 0) return 0;
+        }
+      }
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+int rcl_domain_value_validate(const RclDomainValueV1 *value) {
+  return validate_value(value, 0);
+}
+
 int rcl_domain_value_clone(RclDomainValueV1 *target, const RclDomainValueV1 *source) {
-  if (!target || !source || source->abi_version != RCL_DOMAIN_VALUE_ABI_V1 || target == source) return target == source;
+  if (!target || !source || target == source) return target == source;
+  if (!rcl_domain_value_validate(source)) return 0;
   rcl_domain_value_free(target);
   int ok = 0;
   switch (source->kind) {
@@ -174,7 +219,7 @@ int rcl_domain_value_clone(RclDomainValueV1 *target, const RclDomainValueV1 *sou
       ok = rcl_domain_value_make_record(target, source->as.record.type_name, source->as.record.count, source->semantic_type);
       if (ok) for (size_t i = 0; i < source->as.record.count; i++) {
         const RclDomainFieldV1 *field = &source->as.record.fields[i];
-        if (!field->name || !field->value || !rcl_domain_value_record_set(target, i, field->name, field->value)) { ok = 0; break; }
+        if (!rcl_domain_value_record_set(target, i, field->name, field->value)) { ok = 0; break; }
       }
       break;
     default:
@@ -194,7 +239,7 @@ static const RclDomainFieldV1 *find_field(const RclDomainValueV1 *record, const 
 }
 
 int rcl_domain_value_equal(const RclDomainValueV1 *left, const RclDomainValueV1 *right) {
-  if (!left || !right || left->abi_version != RCL_DOMAIN_VALUE_ABI_V1 || right->abi_version != RCL_DOMAIN_VALUE_ABI_V1) return 0;
+  if (!rcl_domain_value_validate(left) || !rcl_domain_value_validate(right)) return 0;
   if (left->kind != right->kind || !same_optional_text(left->semantic_type, right->semantic_type)) return 0;
   switch (left->kind) {
     case RCL_DOMAIN_VALUE_NULL:
@@ -214,9 +259,8 @@ int rcl_domain_value_equal(const RclDomainValueV1 *left, const RclDomainValueV1 
       if (!same_optional_text(left->as.record.type_name, right->as.record.type_name) || left->as.record.count != right->as.record.count) return 0;
       for (size_t i = 0; i < left->as.record.count; i++) {
         const RclDomainFieldV1 *field = &left->as.record.fields[i];
-        if (!field->name || !field->value) return 0;
         const RclDomainFieldV1 *other = find_field(right, field->name);
-        if (!other || !other->value || !rcl_domain_value_equal(field->value, other->value)) return 0;
+        if (!other || !rcl_domain_value_equal(field->value, other->value)) return 0;
       }
       return 1;
     default:
