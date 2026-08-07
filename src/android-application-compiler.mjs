@@ -196,7 +196,7 @@ function collectBoundNodes(node, result = []) {
   return result;
 }
 
-function emitUiNode(node, lines, indent, state) {
+function emitUiNode(node, lines, indent) {
   const variable = nodeFieldName(node);
   const type = node.type === 'text' ? 'TextView' : node.type === 'input' ? 'EditText' : node.type === 'button' ? 'Button' : 'LinearLayout';
   const bound = Boolean(node.textState || node.valueState);
@@ -205,7 +205,7 @@ function emitUiNode(node, lines, indent, state) {
     lines.push(`${indent}${variable}.setOrientation(LinearLayout.${node.type === 'column' ? 'VERTICAL' : 'HORIZONTAL'});`);
     lines.push(`${indent}${variable}.setPadding(24, 16, 24, 16);`);
     for (const child of node.children ?? []) {
-      const childVariable = emitUiNode(child, lines, indent, state);
+      const childVariable = emitUiNode(child, lines, indent);
       lines.push(`${indent}${variable}.addView(${childVariable}, new LinearLayout.LayoutParams(-1, -2));`);
     }
   }
@@ -326,13 +326,13 @@ function emitStateLifecycle(manifest) {
     if (facet.valueType === 'Boolean') return `    outState.putBoolean(${key}, rclTruthy(state.get(${javaString(facet.path)})));`;
     return `    outState.putLong(${key}, ((Number) state.get(${javaString(facet.path)})).longValue());`;
   }).join('\n');
-  const restore = manifest.facets.map((facet) => {
+  const restore = manifest.lifecycle.restoreState ? manifest.facets.map((facet) => {
     const key = javaString(`rcl.state.${facet.path}`);
     const pathLiteral = javaString(facet.path);
     if (facet.valueType === 'Text') return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getString(${key}));`;
     if (facet.valueType === 'Boolean') return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getBoolean(${key}));`;
     return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getLong(${key}));`;
-  }).join('\n');
+  }).join('\n') : '';
   return { init, save, restore };
 }
 
@@ -356,7 +356,7 @@ export function emitNativeAndroidActivity(manifest) {
   const boundNodes = collectBoundNodes(manifest.screen);
   const lifecycle = emitStateLifecycle(manifest);
   const uiLines = [];
-  const rootVariable = emitUiNode(manifest.screen, uiLines, '    ', manifest.state);
+  const rootVariable = emitUiNode(manifest.screen, uiLines, '    ');
   const dispatch = manifest.rules.map((rule) => `    if (${javaString(rule.name)}.equals(name)) { realize_${javaIdentifier(rule.name, 'rule')}(); return; }`).join('\n');
   const ruleMethods = manifest.rules.map(emitRuleMethod).join('\n\n');
   const fields = boundNodes.map((node) => `  private ${node.type === 'input' ? 'EditText' : 'TextView'} ${nodeFieldName(node)};`).join('\n');
