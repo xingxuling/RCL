@@ -56,18 +56,19 @@ int rcl_domain_organ_invoke(
     return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_TIER: invalid required evidence tier");
   }
   if (organ->evidence_tier < required_tier) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_EVIDENCE_TIER: organ has not reached required evidence tier");
-  if ((argc && !args) || !result) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_ARGUMENT: args/result contract is invalid");
+  if ((argc && !args) || !result || argc > RCL_DOMAIN_VALUE_MAX_ITEMS) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_ARGUMENT: args/result contract is invalid");
   for (size_t i = 0; i < argc; i++) {
-    if (args[i].abi_version != RCL_DOMAIN_VALUE_ABI_V1) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_ABI: argument has unsupported value ABI");
+    if (!rcl_domain_value_validate(&args[i])) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_INVALID: argument violates domain value ABI");
   }
-  rcl_domain_value_init(result);
+  if (result->abi_version != RCL_DOMAIN_VALUE_ABI_V1) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_OUTPUT_INIT: result must be initialized with rcl_domain_value_init");
+  rcl_domain_value_free(result);
   if (!organ->invoke(organ->userdata, domain, operation, args, argc, result, error, error_capacity)) {
     rcl_domain_value_free(result);
     return 0;
   }
-  if (result->abi_version != RCL_DOMAIN_VALUE_ABI_V1) {
+  if (!rcl_domain_value_validate(result)) {
     rcl_domain_value_free(result);
-    return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_ABI: result has unsupported value ABI");
+    return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_VALUE_INVALID: organ returned an invalid domain value");
   }
   return 1;
 }
