@@ -1,0 +1,112 @@
+{
+  "format": "rcl.semantic-state-root-number-corpus.v1",
+  "algorithmUnderAudit": "rcl.semantic-state-root.v1",
+  "admittedSurface": "RCL Number literals accepted by the current compiler and executed by the current native VM",
+  "conclusion": "V1_NUMBER_SERIALIZATION_NOT_PROVEN_OVER_ADMITTED_CORPUS",
+  "caseCount": 10,
+  "parityCount": 7,
+  "mismatchCount": 3,
+  "records": [
+    {
+      "id": "zero",
+      "literal": "0",
+      "status": "parity",
+      "value": 0,
+      "stateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb",
+      "nativeStateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb",
+      "semanticStateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb"
+    },
+    {
+      "id": "negative-zero",
+      "literal": "-0",
+      "status": "parity",
+      "value": 0,
+      "stateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb",
+      "nativeStateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb",
+      "semanticStateRoot": "eb3071e3e223daaf695ecd56d95db8460ef6442845920f11737d2f273e60c9cb"
+    },
+    {
+      "id": "one-tenth",
+      "literal": "0.1",
+      "status": "parity",
+      "value": 0.1,
+      "stateRoot": "3b4571fe10d5943d6b0efa9b386873fb6b4f236ab97a44e75a1415a023123742",
+      "nativeStateRoot": "3b4571fe10d5943d6b0efa9b386873fb6b4f236ab97a44e75a1415a023123742",
+      "semanticStateRoot": "3b4571fe10d5943d6b0efa9b386873fb6b4f236ab97a44e75a1415a023123742"
+    },
+    {
+      "id": "binary-rounding",
+      "literal": "0.30000000000000004",
+      "status": "parity",
+      "value": 0.3,
+      "stateRoot": "76d6e9db29f445015bf6514bbbbcb671779d86cddf35866c5e5ac8c51ab7c611",
+      "nativeStateRoot": "76d6e9db29f445015bf6514bbbbcb671779d86cddf35866c5e5ac8c51ab7c611",
+      "semanticStateRoot": "76d6e9db29f445015bf6514bbbbcb671779d86cddf35866c5e5ac8c51ab7c611"
+    },
+    {
+      "id": "fifteen-significant",
+      "literal": "1.23456789012345",
+      "status": "parity",
+      "value": 1.23456789012345,
+      "stateRoot": "80590ccf8794540eee62d51a23df7ca99558c2a26600ad59ed68983917958fa2",
+      "nativeStateRoot": "80590ccf8794540eee62d51a23df7ca99558c2a26600ad59ed68983917958fa2",
+      "semanticStateRoot": "80590ccf8794540eee62d51a23df7ca99558c2a26600ad59ed68983917958fa2"
+    },
+    {
+      "id": "seventeen-significant",
+      "literal": "1.2345678901234567",
+      "status": "parity",
+      "value": 1.23456789012346,
+      "stateRoot": "e68e241004a1d94236157a2a4ab66b4ea641f11949d02fdab67705f94a8f5366",
+      "nativeStateRoot": "e68e241004a1d94236157a2a4ab66b4ea641f11949d02fdab67705f94a8f5366",
+      "semanticStateRoot": "e68e241004a1d94236157a2a4ab66b4ea641f11949d02fdab67705f94a8f5366"
+    },
+    {
+      "id": "max-safe-integer",
+      "literal": "9007199254740991",
+      "status": "mismatch",
+      "code": "RCL_NATIVE_STATE_ROOT_MISMATCH",
+      "message": "Native state root cf31644ef8a90524f35b82f473cabea5fa086b30bb4d346f33f2b7e9e5c23a55 does not match semantic state root 37cbd13c04472bd5d93085b70b45dc1a367884c10422e49befa77e84f17ec2c0",
+      "details": {
+        "nativeStateRoot": "cf31644ef8a90524f35b82f473cabea5fa086b30bb4d346f33f2b7e9e5c23a55",
+        "computedStateRoot": "37cbd13c04472bd5d93085b70b45dc1a367884c10422e49befa77e84f17ec2c0"
+      }
+    },
+    {
+      "id": "max-safe-minus-one",
+      "literal": "9007199254740990",
+      "status": "mismatch",
+      "code": "RCL_NATIVE_STATE_ROOT_MISMATCH",
+      "message": "Native state root cf31644ef8a90524f35b82f473cabea5fa086b30bb4d346f33f2b7e9e5c23a55 does not match semantic state root 37cbd13c04472bd5d93085b70b45dc1a367884c10422e49befa77e84f17ec2c0",
+      "details": {
+        "nativeStateRoot": "cf31644ef8a90524f35b82f473cabea5fa086b30bb4d346f33f2b7e9e5c23a55",
+        "computedStateRoot": "37cbd13c04472bd5d93085b70b45dc1a367884c10422e49befa77e84f17ec2c0"
+      }
+    },
+    {
+      "id": "large-decimal",
+      "literal": "1234567890123456",
+      "status": "mismatch",
+      "code": "RCL_NATIVE_STATE_ROOT_MISMATCH",
+      "message": "Native state root b89ed89f339a31af0e27cd74bb76ac2e7f253783ac9f971619b4cffead086ae7 does not match semantic state root cdd607b80dd5c99904b772d372513b9f0efb803a8155f9ff9f4c4c7d1daa6704",
+      "details": {
+        "nativeStateRoot": "b89ed89f339a31af0e27cd74bb76ac2e7f253783ac9f971619b4cffead086ae7",
+        "computedStateRoot": "cdd607b80dd5c99904b772d372513b9f0efb803a8155f9ff9f4c4c7d1daa6704"
+      }
+    },
+    {
+      "id": "small-decimal",
+      "literal": "0.000000000000001",
+      "status": "parity",
+      "value": 1e-15,
+      "stateRoot": "267169e3fe1972875c96e8317989e88dc8a3bc960e37b2fbd0d09d8553f3b5d0",
+      "nativeStateRoot": "267169e3fe1972875c96e8317989e88dc8a3bc960e37b2fbd0d09d8553f3b5d0",
+      "semanticStateRoot": "267169e3fe1972875c96e8317989e88dc8a3bc960e37b2fbd0d09d8553f3b5d0"
+    }
+  ],
+  "boundary": {
+    "changesAlgorithm": false,
+    "promotesCapability": false,
+    "requiredNextStep": "define a separately versioned canonical Number encoding; do not silently mutate v1"
+  }
+}
