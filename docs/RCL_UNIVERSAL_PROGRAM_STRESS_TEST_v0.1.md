@@ -116,6 +116,35 @@ Generated source, IR, APK project, SQL, shader, or config file is not execution 
 
 These deliberately attack different weaknesses: computation, state, UI, concurrency, persistence, distribution, performance, AI, deadlines, numerical semantics, tool execution, authority/evidence/commit.
 
+### K01 direct evidence update — 2026-08-07
+
+K01 was executed directly against a local snapshot whose critical compiler/test files were bound back to GitHub `main` by matching Git blob SHAs. Native `rclc` was built successfully; the RCL-authored compiler reached a byte-identical C0 → C1 → C2 fixed point; 9/9 positive fixtures matched the JS bootstrap oracle byte-for-byte; 8/8 malformed/unsupported negative controls were rejected; and the focused production self-host toolchain returned 4/4 PASS.
+
+Current K01 result:
+
+```text
+EXPRESS      PASS
+COMPILE      PASS
+LOWER        PASS
+EXECUTE      PASS
+CORRECT      PASS
+ROBUST       PASS
+PERFORMANCE  PASS
+AI_GENERATE  UNVERIFIED
+EVIDENCE     PASS
+
+OVERALL      BLOCKED
+```
+
+The detailed evidence lives in:
+
+```text
+examples/universal-stress/k01-direct-evidence-2026-08-07.json
+docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md
+```
+
+K01 means compiler self-hosting after a trusted bootstrap; it does not silently require the entire RCL runtime/VM/toolchain to be implemented in RCL. Whole-runtime self-hosting is a stronger, separate proposition.
+
 ## 7. Evolution loop
 
 ```text
@@ -199,6 +228,7 @@ The report runner never upgrades a missing gate to PASS.
 ```bash
 node --test tests/universal-program-stress.test.mjs
 node scripts/universal-program-stress-report.mjs
+node scripts/run-universal-stress-k01.mjs
 ```
 
 Optional evidence and output paths:
