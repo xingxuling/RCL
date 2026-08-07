@@ -1,0 +1,78 @@
+{
+  "format": "taowind.rcl-rbc13-domain-chain-local-evidence.v0.1",
+  "status": "PASS_WITH_EXACT_CURRENT_NATIVE_ROOT_CI_PENDING",
+  "executedAt": "2026-08-08T06:04:00+08:00",
+  "chain": [
+    "quantity.make Temperature 25",
+    "quantity.make Temperature 0.5 uncertainty",
+    "quantitative.measure using prior state references",
+    "knowledge.claim using prior quantity plus Sequence evidence/dependencies"
+  ],
+  "candidateOrgans": {
+    "core.echo": "native-candidate",
+    "quantity.make": "native-candidate",
+    "quantitative.measure": "native-candidate",
+    "knowledge.claim": "native-candidate"
+  },
+  "rbc": {
+    "version": "1.3",
+    "opcode": 45,
+    "instructions": 51,
+    "bytes": 1191,
+    "sha256": "d3ddd2e84e22759a610a040f4ad4119bdd6f67ea9c0040214eb37298a62dd30c"
+  },
+  "execution": {
+    "exitCode": 0,
+    "typedHeapAllocated": 7,
+    "typedHeapRegistered": 7,
+    "stateEntries": 4,
+    "peakStackDepth": 10,
+    "semanticParityWithCurrentJsOracles": true,
+    "independentlyComputedSemanticStateRoot": "736b336eecb96c4fb3a02eaa7d4b9d6e07fd126d65de31d541cf47444bc33509"
+  },
+  "measurement": {
+    "kind": "Measurement",
+    "baseType": "Temperature",
+    "value": { "kind": "Quantity", "type": "Temperature", "value": 25, "unit": "°C" },
+    "uncertainty": { "kind": "Quantity", "type": "Temperature", "value": 0.5, "unit": "°C" },
+    "confidence": 0.9,
+    "unit": "°C",
+    "scale": "ratio",
+    "evidence": ["sensor:e1", "sensor:e1", "sensor:e2"],
+    "calibratedBy": "sensor-A"
+  },
+  "knowledge": {
+    "kind": "Knowledge",
+    "baseType": "Temperature",
+    "value": { "kind": "Quantity", "type": "Temperature", "value": 25, "unit": "°C" },
+    "confidence": 0.8,
+    "evidence": ["e1", "e2"],
+    "source": "lab",
+    "scope": "local",
+    "status": "provisional",
+    "dependencies": ["dep:a", "dep:b"],
+    "revision": 1,
+    "alternatives": [],
+    "formedAtRoot": "root-1"
+  },
+  "parityMethod": {
+    "quantityOracle": "src/quantity.mjs::quantity",
+    "measurementOracle": "src/quantity.mjs::measurement",
+    "knowledgeOracle": "src/knowledge.mjs::knowledgeClaim",
+    "nativeHeapMetadataExcluded": ["__rclKind", "__rclType", "__rclObjectId", "__rclFieldOffsets", "__rclPayloadOffsets"],
+    "result": "The native candidate state and JS oracle state are byte-identical after canonical semantic normalization; both independently hash to the same semantic root shown above."
+  },
+  "localBasis": {
+    "uploadedSnapshot": "RCL-main (2)(6).zip",
+    "nativeRclvmGitBlob": "0b50c2db2f2e2078c5470763b86bf17bb2694736",
+    "candidateHostSha256": "da4d1d9cd4e625e1c5135cf1b0fc528e12d6c891a0cf873539f9131a04ede4ff",
+    "outputSha256": "d624fb7dd123e4548d590da1dc30205f379122731a2a0c4bf4047fb58a0dec21"
+  },
+  "boundaries": [
+    "All four organs are candidate implementations only; none is native-verified.",
+    "The local uploaded native VM predates native stateRoot emission, so the root above was computed independently from semantic state and compared with current JavaScript oracles.",
+    "The checked-in exact-current-source integration test additionally requires the materialized current native VM to emit the same stateRoot.",
+    "Canonical native/rclvm.c and src/bytecode.mjs remain unchanged.",
+    "Canonical RBC admission remains undecided."
+  ]
+}
