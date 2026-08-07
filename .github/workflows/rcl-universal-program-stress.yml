@@ -7,7 +7,8 @@ on:
       - codex/rcl-universal-stress-v0.1
     paths:
       - 'src/universal-program-stress.mjs'
-      - 'tests/universal-program-stress*.test.mjs'
+      - 'src/universal-stress-*.mjs'
+      - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
@@ -15,7 +16,8 @@ on:
   pull_request:
     paths:
       - 'src/universal-program-stress.mjs'
-      - 'tests/universal-program-stress*.test.mjs'
+      - 'src/universal-stress-*.mjs'
+      - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
@@ -34,7 +36,7 @@ jobs:
         with:
           node-version: 22
       - name: Universal stress unit tests
-        run: node --test tests/universal-program-stress*.test.mjs
+        run: node --test tests/universal*stress*.test.mjs
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Upload evidence report
