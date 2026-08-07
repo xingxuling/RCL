@@ -39,6 +39,7 @@ int main(void) {
   rcl_domain_value_init(&result);
   if (!rcl_domain_value_set_text(&text, "hello", "Text")) return 9;
   if (!rcl_domain_organ_register(&registry, &organ, error, sizeof(error))) return 10;
+
   if (rcl_domain_organ_invoke(&registry, "core", "echo", RCL_DOMAIN_ORGAN_NATIVE_VERIFIED, &text, 1, &result, error, sizeof(error))) return 11;
   if (strstr(error, "RCL_DOMAIN_ORGAN_EVIDENCE_TIER") == NULL) return 12;
   error[0] = '\0';
@@ -54,10 +55,32 @@ int main(void) {
   if (!rcl_domain_value_set_text(&field, "Temperature", "Text") || !set_field(&quantity, 1, "type", &field)) return 17;
   if (!rcl_domain_value_set_number(&field, 25, "Number") || !set_field(&quantity, 2, "value", &field)) return 18;
   if (!rcl_domain_value_set_text(&field, "°C", "Text") || !set_field(&quantity, 3, "unit", &field)) return 19;
-  if (!rcl_domain_organ_invoke(&registry, "core", "echo", RCL_DOMAIN_ORGAN_NATIVE_CANDIDATE, &quantity, 1, &result, error, sizeof(error))) return 20;
-  if (!rcl_domain_value_equal(&quantity, &result)) return 21;
-
+  if (!rcl_domain_value_validate(&quantity)) return 20;
+  if (!rcl_domain_organ_invoke(&registry, "core", "echo", RCL_DOMAIN_ORGAN_NATIVE_CANDIDATE, &quantity, 1, &result, error, sizeof(error))) return 21;
+  if (!rcl_domain_value_equal(&quantity, &result)) return 22;
   rcl_domain_value_free(&result);
+
+  if (!rcl_domain_value_set_text(&field, "duplicate", "Text")) return 23;
+  if (rcl_domain_value_record_set(&quantity, 3, "type", &field)) return 24;
+  rcl_domain_value_free(&field);
+  if (!rcl_domain_value_validate(&quantity)) return 25;
+
+  RclDomainValueV1 invalid;
+  rcl_domain_value_init(&invalid);
+  if (!rcl_domain_value_set_truth(&invalid, 1, "Truth")) return 26;
+  invalid.as.truth = 2;
+  error[0] = '\0';
+  if (rcl_domain_organ_invoke(&registry, "core", "echo", RCL_DOMAIN_ORGAN_NATIVE_CANDIDATE, &invalid, 1, &result, error, sizeof(error))) return 27;
+  if (strstr(error, "RCL_DOMAIN_ORGAN_VALUE_INVALID") == NULL) return 28;
+  invalid.as.truth = 1;
+  rcl_domain_value_free(&invalid);
+
+  RclDomainValueV1 uninitialized;
+  memset(&uninitialized, 0, sizeof(uninitialized));
+  error[0] = '\0';
+  if (rcl_domain_organ_invoke(&registry, "core", "echo", RCL_DOMAIN_ORGAN_NATIVE_CANDIDATE, &text, 1, &uninitialized, error, sizeof(error))) return 29;
+  if (strstr(error, "RCL_DOMAIN_ORGAN_OUTPUT_INIT") == NULL) return 30;
+
   rcl_domain_value_free(&quantity);
   rcl_domain_value_free(&text);
   puts("domain-organ-value-smoke: PASS");
