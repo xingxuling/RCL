@@ -2,6 +2,7 @@
 #define RCL_DOMAIN_ORGAN_H
 
 #include <stddef.h>
+#include "rcl_domain_value.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +22,9 @@ typedef int (*RclDomainOrganInvokeFn)(
   void *userdata,
   const char *domain,
   const char *operation,
-  const char *request_json,
-  char *response_json,
-  size_t response_capacity,
+  const RclDomainValueV1 *args,
+  size_t argc,
+  RclDomainValueV1 *result,
   char *error,
   size_t error_capacity
 );
@@ -54,9 +55,9 @@ int rcl_domain_organ_invoke(
   const char *domain,
   const char *operation,
   RclDomainOrganEvidenceTier required_tier,
-  const char *request_json,
-  char *response_json,
-  size_t response_capacity,
+  const RclDomainValueV1 *args,
+  size_t argc,
+  RclDomainValueV1 *result,
   char *error,
   size_t error_capacity
 );
