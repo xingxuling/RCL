@@ -10,6 +10,7 @@ on:
       - 'src/universal-stress-*.mjs'
       - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
+      - 'scripts/run-universal-stress-k01.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
@@ -19,6 +20,7 @@ on:
       - 'src/universal-stress-*.mjs'
       - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
+      - 'scripts/run-universal-stress-k01.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
@@ -29,7 +31,7 @@ permissions:
 jobs:
   focused-verification:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,6 +41,8 @@ jobs:
         run: node --test tests/universal*stress*.test.mjs
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
+      - name: K01 self-hosting compiler campaign
+        run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
       - name: Upload evidence report
         uses: actions/upload-artifact@v4
         with:
