@@ -266,7 +266,10 @@
     "verify:selfhost-all": "node scripts/verify-rcl-selfhost-all.mjs",
     "verify:native-boundary": "node scripts/verify-native-windows-boundary.mjs",
     "verify:provenance": "npm run verify:version-contract",
-    "verify:release": "npm run verify:selfhost-all && npm run verify:selfhost-examples && npm run verify:provenance"
+    "verify:release": "npm run verify:selfhost-all && npm run verify:selfhost-examples && npm run verify:provenance",
+    "test:k03-android": "node --test --test-concurrency=1 tests/android-application-compiler.test.mjs tests/universal-stress-k03-android-adapter.test.mjs",
+    "build:k03-android": "node scripts/build-k03-android-app.mjs",
+    "evidence:k03-android": "node scripts/run-k03-direct-evidence.mjs"
   },
   "engines": {
     "node": ">=20"

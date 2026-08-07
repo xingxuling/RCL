@@ -1,0 +1,111 @@
+{
+  "schema": "rcl.universal-stress.k03.direct-evidence.v0.1",
+  "taskId": "K03",
+  "cellId": "android::mobile",
+  "goal": "native Android application",
+  "compiler": {
+    "status": "PASS",
+    "compilerVersion": "0.1.0",
+    "manifestRoot": "4e65294dfb33ebfa45ec6d0477da85c995741c659b5259c7eb6366a9df1ef3c4",
+    "generatedProject": {
+      "status": "PROJECT_GENERATED",
+      "root": "output/universal-stress-k03",
+      "program": "K03NativeAndroidApp",
+      "applicationId": "com.taowind.rcl.k03",
+      "manifestRoot": "4e65294dfb33ebfa45ec6d0477da85c995741c659b5259c7eb6366a9df1ef3c4",
+      "activitySource": "output/universal-stress-k03/app/src/main/java/com/taowind/rcl/k03/MainActivity.java",
+      "buildCommand": "./gradle-build.sh",
+      "coverageMode": "lowered-execution"
+    }
+  },
+  "hostSimulation": {
+    "positive": {
+      "finalState": {
+        "app.count": 0,
+        "app.input": "",
+        "app.last_action": "reset"
+      },
+      "realizedRules": ["increment", "reset"],
+      "pass": true
+    },
+    "preserveNegative": {
+      "threw": true,
+      "error": "Error: RCL_ANDROID_PRESERVE_FAILED:increment",
+      "pass": true
+    },
+    "authorityNegative": {
+      "threw": true,
+      "error": "Error: RCL_ANDROID_AUTHORITY_DENIED:increment:app.write",
+      "pass": true
+    }
+  },
+  "android": {
+    "build": {
+      "status": "UNVERIFIED",
+      "projectDir": "output/universal-stress-k03"
+    },
+    "runtime": {
+      "status": "UNVERIFIED",
+      "note": "Real APK install and emulator/device interaction are required before this becomes EXECUTED."
+    },
+    "environment": {
+      "projectDir": "output/universal-stress-k03",
+      "java": {
+        "command": "java",
+        "available": true,
+        "status": 0,
+        "error": null,
+        "stdout": "",
+        "stderr": "openjdk version \"17.0.19\"\nOpenJDK Runtime Environment (build 17.0.19+10-1-24.04.2-Ubuntu)\nOpenJDK 64-Bit Server VM (build 17.0.19+10-1-24.04.2-Ubuntu, mixed mode, sharing)\n"
+      },
+      "gradle": {
+        "command": "gradle",
+        "available": false,
+        "status": null,
+        "error": "spawnSync gradle ENOENT",
+        "stdout": "",
+        "stderr": ""
+      },
+      "adb": {
+        "command": "adb",
+        "available": false,
+        "status": null,
+        "error": "spawnSync adb ENOENT",
+        "stdout": "",
+        "stderr": ""
+      },
+      "emulator": {
+        "command": "emulator",
+        "available": false,
+        "status": null,
+        "error": "spawnSync emulator ENOENT",
+        "stdout": "",
+        "stderr": ""
+      },
+      "androidHome": null,
+      "androidSdkExists": false,
+      "buildStatus": "UNVERIFIED",
+      "runtimeStatus": "UNVERIFIED"
+    }
+  },
+  "gates": {
+    "EXPRESS": "PASS",
+    "COMPILE": "PASS",
+    "LOWER": "PASS",
+    "EXECUTE": "UNVERIFIED",
+    "CORRECT": "UNVERIFIED",
+    "ROBUST": "PASS",
+    "PERFORMANCE": "UNVERIFIED",
+    "AI_GENERATE": "UNVERIFIED",
+    "EVIDENCE": "PASS"
+  },
+  "coverageMode": "lowered-execution",
+  "overall": "BLOCKED",
+  "limitations": [
+    "The generated Activity and Gradle project are real Android artifacts, but no Android SDK, Gradle, emulator or adb was available in this execution environment.",
+    "Host semantic replay is not a substitute for installing and interacting with the APK.",
+    "AI_GENERATE remains independently unverified.",
+    "This is a native Android application lowering path, not a claim that RCL already owns the Android OS or the full Android framework semantics."
+  ],
+  "evidenceRoot": "1a5f0c5f3f873e80d38984787820a0926b1e6efb638677fed80554a4117445d6"
+}

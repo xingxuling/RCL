@@ -1,0 +1,73 @@
+name: RCL K03 Native Android Application
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/rcl-k03-native-android-v0.1
+    paths:
+      - 'src/android-application-compiler.mjs'
+      - 'src/universal-stress-k03-android-adapter.mjs'
+      - 'tests/android-application-compiler.test.mjs'
+      - 'tests/universal-stress-k03-android-adapter.test.mjs'
+      - 'scripts/build-k03-android-app.mjs'
+      - 'scripts/run-k03-direct-evidence.mjs'
+      - 'examples/universal-stress/k03-*'
+      - 'docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k03-android.yml'
+  pull_request:
+    paths:
+      - 'src/android-application-compiler.mjs'
+      - 'src/universal-stress-k03-android-adapter.mjs'
+      - 'tests/android-application-compiler.test.mjs'
+      - 'tests/universal-stress-k03-android-adapter.test.mjs'
+      - 'scripts/build-k03-android-app.mjs'
+      - 'scripts/run-k03-direct-evidence.mjs'
+      - 'examples/universal-stress/k03-*'
+      - 'docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md'
+      - '.github/workflows/rcl-k03-android.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-k03-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: K03 compiler and stress adapter tests
+        run: node --test tests/android-application-compiler.test.mjs tests/universal-stress-k03-android-adapter.test.mjs
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android build tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Generate K03 Android project
+        run: node scripts/build-k03-android-app.mjs
+      - name: Build debug APK
+        working-directory: output/universal-stress-k03
+        run: gradle assembleDebug --no-daemon --stacktrace
+      - name: Collect K03 artifacts
+        if: always()
+        run: |
+          mkdir -p k03-artifacts
+          find output/universal-stress-k03/app/build/outputs -type f -name '*.apk' -exec cp {} k03-artifacts/ \; || true
+          cp examples/universal-stress/k03-direct-evidence-2026-08-08.json k03-artifacts/ 2>/dev/null || true
+      - name: Upload K03 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcl-k03-debug-apk
+          path: k03-artifacts
+          if-no-files-found: error
