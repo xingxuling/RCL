@@ -1,6 +1,7 @@
 #include "rcl_domain_organ.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int fail(char *error, size_t capacity, const char *message) {
@@ -8,8 +9,34 @@ static int fail(char *error, size_t capacity, const char *message) {
   return 0;
 }
 
+static char *copy_text(const char *text) {
+  if (!text) return NULL;
+  size_t length = strlen(text);
+  if (length > RCL_DOMAIN_VALUE_MAX_TEXT_BYTES) return NULL;
+  char *copy = (char *)malloc(length + 1);
+  if (!copy) return NULL;
+  memcpy(copy, text, length + 1);
+  return copy;
+}
+
+static void free_entry(RclDomainOrganV1 *entry) {
+  if (!entry) return;
+  free((void *)entry->domain);
+  free((void *)entry->operation);
+  free((void *)entry->semantic_identity);
+  free((void *)entry->implementation_id);
+  free((void *)entry->artifact_root);
+  memset(entry, 0, sizeof(*entry));
+}
+
 void rcl_domain_organ_registry_init(RclDomainOrganRegistry *registry) {
   if (registry) memset(registry, 0, sizeof(*registry));
+}
+
+void rcl_domain_organ_registry_free(RclDomainOrganRegistry *registry) {
+  if (!registry) return;
+  for (size_t i = 0; i < registry->count; i++) free_entry(&registry->entries[i]);
+  memset(registry, 0, sizeof(*registry));
 }
 
 int rcl_domain_organ_register(RclDomainOrganRegistry *registry, const RclDomainOrganV1 *organ, char *error, size_t error_capacity) {
@@ -27,7 +54,18 @@ int rcl_domain_organ_register(RclDomainOrganRegistry *registry, const RclDomainO
     }
   }
   if (registry->count >= RCL_DOMAIN_ORGAN_MAX) return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_FULL: registry capacity exceeded");
-  registry->entries[registry->count++] = *organ;
+
+  RclDomainOrganV1 copy = *organ;
+  copy.domain = copy_text(organ->domain);
+  copy.operation = copy_text(organ->operation);
+  copy.semantic_identity = copy_text(organ->semantic_identity);
+  copy.implementation_id = copy_text(organ->implementation_id);
+  copy.artifact_root = organ->artifact_root ? copy_text(organ->artifact_root) : NULL;
+  if (!copy.domain || !copy.operation || !copy.semantic_identity || !copy.implementation_id || (organ->artifact_root && !copy.artifact_root)) {
+    free_entry(&copy);
+    return fail(error, error_capacity, "RCL_DOMAIN_ORGAN_OOM: unable to own organ identity strings");
+  }
+  registry->entries[registry->count++] = copy;
   return 1;
 }
 
