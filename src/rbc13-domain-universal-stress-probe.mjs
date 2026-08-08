@@ -34,7 +34,7 @@ function assertNativeVerifiedSuite(suite) {
   }
 }
 
-export function buildRbc13DomainUniversalStressCandidateCell(suite) {
+export function buildRbc13DomainUniversalStressCandidateCell(suite, evidenceBundle = {}) {
   assertNativeVerifiedSuite(suite);
   const reports = suite.reports;
   const reportByOperation = new Map(reports.map(report => [report.operationKey, report]));
@@ -47,6 +47,13 @@ export function buildRbc13DomainUniversalStressCandidateCell(suite) {
   const reportRoots = ADMITTED_OPERATION_KEYS.map(operationKey => reportByOperation.get(operationKey).root);
   const allGatesPassed = reports.every(report => Object.values(report.gates ?? {}).every(Boolean));
   const allControlsPassed = reports.every(report => report.operationDifferential?.controlsPassed === true);
+  const performanceVerified = evidenceBundle.performance?.status === 'VERIFIED'
+    && evidenceBundle.performance?.measures?.allPathsExecuted === true
+    && evidenceBundle.performance?.measures?.repeatedSamples === true
+    && evidenceBundle.performance?.measures?.varianceRecorded === true;
+  const aiStatus = evidenceBundle.aiGenerate?.status;
+  const aiPassed = evidenceBundle.aiGenerate?.gate === 'PASS'
+    && Number(evidenceBundle.aiGenerate?.successfulTrials ?? 0) >= Number(evidenceBundle.aiGenerate?.requiredTrials ?? 1);
   const cell = evaluateStressCell({
     id: 'wasm-vm::algorithm',
     environment: 'wasm-vm',
@@ -78,14 +85,28 @@ export function buildRbc13DomainUniversalStressCandidateCell(suite) {
         evidence: evidence('negative-controls-and-fail-closed-domain-value-membrane', reportRoots),
       },
       PERFORMANCE: {
-        status: STRESS_STATUS.UNVERIFIED,
-        evidence: ['no-declared-cross-environment-performance-budget-in-this-probe'],
-        note: 'Native execution is verified; performance competitiveness is not claimed.',
+        status: performanceVerified ? STRESS_STATUS.PASS : STRESS_STATUS.UNVERIFIED,
+        evidence: performanceVerified
+          ? evidence('fixed-protocol-three-path-performance', [evidenceBundle.performance.root])
+          : ['no-declared-three-path-performance-evidence-in-this-probe'],
+        note: performanceVerified
+          ? 'Repeated Primitive / Native Organ / Provider measurements exist; no competitive winner is claimed.'
+          : 'Native execution is verified; performance evidence is not yet attached.',
       },
       AI_GENERATE: {
-        status: STRESS_STATUS.UNVERIFIED,
-        evidence: ['no-reproducible-ai-generation-contract-in-this-probe'],
-        note: 'The probe measures execution evidence only; it does not claim generative coverage.',
+        status: aiPassed
+          ? STRESS_STATUS.PASS
+          : aiStatus === 'NEGATIVE_RESULT'
+            ? STRESS_STATUS.FAIL
+            : STRESS_STATUS.UNVERIFIED,
+        evidence: aiPassed || aiStatus === 'NEGATIVE_RESULT'
+          ? evidence('blind-json-schema-donor-experiment', [evidenceBundle.aiGenerate.root])
+          : ['no-reproducible-ai-generation-contract-in-this-probe'],
+        note: aiPassed
+          ? 'One independent donor schema passed its declared generation and extraction contract.'
+          : aiStatus === 'NEGATIVE_RESULT'
+            ? 'The independent donor response was captured but failed the declared schema contract.'
+            : 'The probe measures execution evidence only; it does not claim generative coverage.',
       },
       EVIDENCE: {
         status: STRESS_STATUS.PASS,
@@ -110,12 +131,14 @@ export function buildRbc13DomainUniversalStressCandidateCell(suite) {
     suiteRoot: suite.root,
     operationKeys: ADMITTED_OPERATION_KEYS,
     operationReportRoots: reportRoots,
+    performanceEvidenceRoot: evidenceBundle.performance?.root ?? null,
+    aiGenerateEvidenceRoot: evidenceBundle.aiGenerate?.root ?? null,
     caseCount: reports.reduce((sum, reportItem) => sum + Number(reportItem.caseCount ?? 0), 0),
     verifiedCaseCount: reports.reduce((sum, reportItem) => sum + Number(reportItem.verifiedCaseCount ?? 0), 0),
     cell,
     universalGrowthEligible: cell.universalGrowthEligible,
     boundary:
-      'This is one Universal Stress candidate cell. Its special-case audit passes because the ABI is declared as a reusable primitive, but the cell remains BLOCKED until PERFORMANCE and AI_GENERATE evidence are supplied. It does not raise universal maturity or canonical RBC admission.',
+      'This is one Universal Stress candidate cell. Its special-case audit passes because the ABI is declared as a reusable primitive. Performance evidence is measurement-only, and a failed AI_GENERATE donor gate fails the cell; neither result raises universal maturity or canonical RBC admission.',
   };
   return Object.freeze({
     ...report,

@@ -1,0 +1,26 @@
+{
+  "format": "rcl.rbc13-ai-generate-json-schema-contract.v0.1",
+  "model": "aetherseed-tinyllama-runtime:latest",
+  "task": "Generate one JSON Schema draft 2020-12 for a donor measurement object from a bounded intent. The donor output is a source capability only; it must not contain RCL, DOMAIN_CALL, native-organ, provider implementation, repository source, or expected test output.",
+  "requirements": {
+    "rootType": "object",
+    "title": "DonorMeasurement",
+    "requiredExactly": ["id", "value", "unit", "confidence"],
+    "additionalProperties": false,
+    "properties": {
+      "id": {"type": "string", "minLength": 1},
+      "value": {"type": "number"},
+      "unit": {"type": "string", "minLength": 1},
+      "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+    }
+  },
+  "evaluation": [
+    "Parse one JSON object with no markdown wrapper.",
+    "Check the donor schema contract independently of the RCL implementation.",
+    "Extract a capability with the existing JSON Schema frontend.",
+    "Forge a deterministic equivalence corpus and record its root.",
+    "Run a negative control that removes one required schema constraint.",
+    "A missing model, invalid JSON, or contract failure is recorded as BLOCKED or NEGATIVE_RESULT; it is never upgraded to PASS."
+  ],
+  "boundary": "This is an AI_GENERATE donor experiment contract. It does not prove native execution, semantic equivalence, or canonical admission."
+}

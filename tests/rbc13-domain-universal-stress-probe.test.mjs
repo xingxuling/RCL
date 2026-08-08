@@ -60,3 +60,29 @@ test('candidate probe refuses an incomplete native promotion suite', () => {
     error => error?.code === 'RCL_RBC13_UNIVERSAL_STRESS_OPERATION_COVERAGE_REQUIRED',
   );
 });
+
+test('candidate cell records measured performance and fails on a negative AI donor gate', () => {
+  const probe = buildRbc13DomainUniversalStressCandidateCell(syntheticSuite(), {
+    performance: {
+      status: 'VERIFIED',
+      root: ROOT,
+      measures: {
+        allPathsExecuted: true,
+        repeatedSamples: true,
+        varianceRecorded: true,
+      },
+    },
+    aiGenerate: {
+      status: 'NEGATIVE_RESULT',
+      gate: 'FAIL',
+      root: ROOT,
+      successfulTrials: 0,
+      requiredTrials: 1,
+    },
+  });
+
+  assert.equal(probe.status, STRESS_STATUS.FAIL);
+  assert.equal(probe.cell.gates.PERFORMANCE.status, STRESS_STATUS.PASS);
+  assert.equal(probe.cell.gates.AI_GENERATE.status, STRESS_STATUS.FAIL);
+  assert.equal(probe.universalGrowthEligible, false);
+});
