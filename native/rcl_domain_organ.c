@@ -106,7 +106,11 @@ int rcl_domain_organ_invoke(
 ) {
   rcl_domain_organ_error_clear(error);
   const RclDomainOrganV1 *organ = rcl_domain_organ_resolve(registry, domain, operation);
-  if (!organ) return fail_invoke(error, "RCL_DOMAIN_ORGAN_MISSING", "RCL_DOMAIN_ORGAN_MISSING: Domain operation is not registered");
+  if (!organ) {
+    char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+    snprintf(message, sizeof(message), "RCL_DOMAIN_OPERATION_MISSING: Domain operation '%s.%s' is not present in the RBC 1.3 salvage inventory", domain ? domain : "", operation ? operation : "");
+    return fail_invoke(error, "RCL_DOMAIN_OPERATION_MISSING", message);
+  }
   if (required_tier < RCL_DOMAIN_ORGAN_QUARANTINED || required_tier > RCL_DOMAIN_ORGAN_NATIVE_VERIFIED) {
     return fail_invoke(error, "RCL_DOMAIN_ORGAN_TIER", "RCL_DOMAIN_ORGAN_TIER: Invalid required evidence tier");
   }

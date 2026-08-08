@@ -9,6 +9,7 @@ import { runtimeType } from './quantity.mjs';
 import { semanticValue, verifyNativeSemanticStateRoot } from './semantic-state-root.mjs';
 import { assembleRbc13DomainCallProgram } from './rbc13-domain-bytecode-candidate.mjs';
 import { materializeRbc13DomainVmWithPublicApi } from '../scripts/materialize-rbc13-domain-vm-public-api.mjs';
+import { compileNativeC, nativeCCompilerVersion, resolveNativeCCompiler } from './native-c-compiler.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -22,18 +23,8 @@ function sha256File(filePath) {
   return sha256(fs.readFileSync(filePath));
 }
 
-function commandExists(command) {
-  const probe = spawnSync('sh', ['-lc', `command -v ${command}`], { encoding: 'utf8' });
-  return probe.status === 0;
-}
-
 export function resolveDomainCandidateCompiler(options = {}) {
-  if (process.platform === 'win32') return null;
-  const requested = options.compiler ?? process.env.RCL_DOMAIN_CC ?? null;
-  if (requested) return commandExists(requested) ? requested : null;
-  if (commandExists('cc')) return 'cc';
-  if (commandExists('gcc')) return 'gcc';
-  return null;
+  return resolveNativeCCompiler(options)?.command ?? null;
 }
 
 function pureOperationObservation(output, receipts = [], metadata = null) {
@@ -75,7 +66,7 @@ export function buildRbc13NativeOperationProgram(input, options = {}) {
   const calls = [];
   const args = rawArgs.map((value, index) => lowerStructuredArg(calls, value, `${index + 1}`));
   const target = options.target ?? '__rbc13.result';
-  calls.push({ domain, operation, args, target, dynamic: options.dynamic === true });
+  calls.push({ domain, operation, args, target, dynamic: options.dynamic === true || input?.dynamic === true });
   const bytecode = assembleRbc13DomainCallProgram({
     program: `Rbc13Native_${operationKey.replaceAll('.', '_')}`,
     sourceRoot: `candidate:native:${operationKey}`,
@@ -105,6 +96,10 @@ function parsePayload(run, context) {
 function semanticErrorDetails(payload, input) {
   const code = String(payload?.code ?? '');
   const args = Array.isArray(input?.args) ? input.args : [];
+  if (code === 'RCL_DOMAIN_OPERATION_MISSING') {
+    return { key: `${input?.domain ?? ''}.${input?.operation ?? ''}` };
+  }
+  if (code === 'RCL_DOMAIN_CORE_ECHO_ARITY') return {};
   if (code === 'RCL_MEASUREMENT_TYPE') {
     return { baseType: args[0], actual: runtimeType(args[1]) };
   }
@@ -124,9 +119,19 @@ function semanticErrorDetails(payload, input) {
 }
 
 function throwSemanticNativeError(payload, receipt, input) {
-  const error = new Error(String(payload?.message ?? 'Candidate DOMAIN_CALL failed'));
-  error.code = String(payload?.code ?? 'RCL_RBC13_NATIVE_FAILURE');
-  error.details = semanticErrorDetails(payload, input);
+  const nativeCode = String(payload?.code ?? 'RCL_RBC13_NATIVE_FAILURE');
+  const nonFiniteQuantity = input?.domain === 'quantity'
+    && input?.operation === 'make'
+    && !Number.isFinite(input?.args?.[1]);
+  const code = nonFiniteQuantity && nativeCode === 'RCL_NATIVE_DOMAIN_VALUE_UNSUPPORTED'
+    ? 'TypeError'
+    : nativeCode;
+  const message = nonFiniteQuantity && nativeCode === 'RCL_NATIVE_DOMAIN_VALUE_UNSUPPORTED'
+    ? `Quantity '${String(input?.args?.[0] ?? 'undefined')}' must be finite`
+    : String(payload?.message ?? 'Candidate DOMAIN_CALL failed');
+  const error = new Error(message);
+  error.code = code;
+  error.details = nonFiniteQuantity && code === 'TypeError' ? null : semanticErrorDetails(payload, input);
   Object.defineProperty(error, 'nativeReceipt', {
     value: receipt,
     enumerable: false,
@@ -137,22 +142,25 @@ function throwSemanticNativeError(payload, receipt, input) {
 }
 
 export function buildRbc13DomainCandidateHost(options = {}) {
-  const compiler = resolveDomainCandidateCompiler(options);
-  if (!compiler) {
+  const compilerSpec = resolveNativeCCompiler({ compiler: options.compiler ?? undefined });
+  if (!compilerSpec) {
     const error = new Error('No supported C compiler is available for the RBC 1.3 Domain Organ candidate host');
     error.code = 'RCL_RBC13_NATIVE_COMPILER_MISSING';
     throw error;
   }
+  const compiler = compilerSpec.command;
   const root = path.resolve(options.root ?? ROOT);
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-rbc13-domain-native-'));
   const generatedVmPath = path.join(tempDir, 'rclvm-rbc13-domain-candidate.c');
-  const hostPath = path.join(tempDir, 'rbc13-domain-candidate-host');
+  const hostPath = path.join(tempDir, `rbc13-domain-candidate-host${process.platform === 'win32' ? '.exe' : ''}`);
   const currentNativePath = path.join(root, 'native', 'rclvm.c');
   const currentNative = fs.readFileSync(currentNativePath, 'utf8');
   const materializedVm = materializeRbc13DomainVmWithPublicApi(currentNative);
   fs.writeFileSync(generatedVmPath, materializedVm);
 
   const sourceFiles = [
+    'native/rclvm.c',
+    'native/rclvm.h',
     'native/rcl_domain_value.c',
     'native/rcl_domain_value.h',
     'native/rcl_domain_organ.c',
@@ -162,6 +170,7 @@ export function buildRbc13DomainCandidateHost(options = {}) {
     'native/rcl_domain_vm_value_bridge.inc',
     'native/rcl_domain_vm_candidate.h',
     'native/domain_vm_opcode45_candidate_host.c',
+    'src/native-c-compiler.mjs',
     'scripts/materialize-rbc13-domain-vm-candidate.mjs',
     'scripts/materialize-rbc13-domain-vm-public-api.mjs',
   ];
@@ -172,15 +181,19 @@ export function buildRbc13DomainCandidateHost(options = {}) {
     sourceRoots,
   }));
 
-  const build = spawnSync(compiler, [
-    '-std=c11', '-Wall', '-Wextra', '-pedantic',
-    `-I${path.join(root, 'native')}`, `-I${tempDir}`,
-    path.join(root, 'native', 'rcl_domain_value.c'),
-    path.join(root, 'native', 'rcl_domain_organ.c'),
-    path.join(root, 'native', 'rcl_domain_admitted_organs.c'),
-    path.join(root, 'native', 'domain_vm_opcode45_candidate_host.c'),
-    '-lcrypto', '-lm', '-o', hostPath,
-  ], { cwd: root, encoding: 'utf8', timeout: options.buildTimeout ?? 120_000 });
+  const build = compileNativeC(compilerSpec, {
+    cwd: root,
+    includeDirs: [path.join(root, 'native'), tempDir],
+    sources: [
+      path.join(root, 'native', 'rcl_domain_value.c'),
+      path.join(root, 'native', 'rcl_domain_organ.c'),
+      path.join(root, 'native', 'rcl_domain_admitted_organs.c'),
+      path.join(root, 'native', 'domain_vm_opcode45_candidate_host.c'),
+    ],
+    linkLibraries: process.platform === 'win32' ? ['bcrypt'] : ['crypto', 'm'],
+    output: hostPath,
+    timeout: options.buildTimeout ?? 120_000,
+  });
   if (build.status !== 0) {
     fs.rmSync(tempDir, { recursive: true, force: true });
     const error = new Error('Failed to build the RBC 1.3 Domain Organ candidate host');
@@ -190,7 +203,7 @@ export function buildRbc13DomainCandidateHost(options = {}) {
   }
 
   const hostRoot = sha256File(hostPath);
-  const compilerVersion = spawnSync(compiler, ['--version'], { encoding: 'utf8' }).stdout?.split(/\r?\n/)[0]?.trim() ?? compiler;
+  const compilerVersion = nativeCCompilerVersion(compilerSpec) ?? compiler;
   let closed = false;
 
   function execute(input, context = {}) {
@@ -257,6 +270,11 @@ export function buildRbc13DomainCandidateHost(options = {}) {
     hostRoot,
     implementationRoot,
     materializedVmRoot: sha256(materializedVm),
+    materializedFromCurrentSource: true,
+    nativeVmSourceRoots: Object.freeze({
+      'native/rclvm.c': sourceRoots['native/rclvm.c'],
+      'native/rclvm.h': sourceRoots['native/rclvm.h'],
+    }),
     sourceRoots: Object.freeze(sourceRoots),
     execute,
     close,

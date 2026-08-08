@@ -141,17 +141,91 @@ export async function promoteRbc13DomainOrganPlan(plan, runtime, options = {}) {
   const hostBound = typeof runtime.hostRoot === 'string' && /^[a-f0-9]{64}$/.test(runtime.hostRoot);
   const sharedImplementationBound = typeof runtime.implementationRoot === 'string'
     && /^[a-f0-9]{64}$/.test(runtime.implementationRoot);
+  const sourceRoot = runtime.sourceRoots['native/rcl_domain_admitted_organs.c'];
   const operationImplementationRoot = realityRoot({
     operationKey: plan.operationKey,
     implementationId: plan.candidate.implementation.id,
     sharedImplementationRoot: runtime.implementationRoot,
     materializedVmRoot: runtime.materializedVmRoot,
-    sourceRoot: runtime.sourceRoots['native/rcl_domain_admitted_organs.c'],
+    sourceRoot,
+  });
+
+  const declaredCaseIds = cases.map(item => item.id);
+  const nativeCaseIds = nativeDifferential.cases.map(item => item.id);
+  const sameCaseIds = declaredCaseIds.length === nativeCaseIds.length
+    && declaredCaseIds.every((id, index) => id === nativeCaseIds[index]);
+  const positiveCases = cases.filter(item => item.tags?.includes('positive'));
+  const negativeCases = cases.filter(item => item.tags?.includes('negative'));
+  const nativeCasesById = new Map(nativeDifferential.cases.map(item => [item.id, item]));
+  const positiveSemanticEquivalent = positiveCases.length > 0
+    && positiveCases.every(item => nativeCasesById.get(item.id)?.comparison?.passed === true);
+  const negativeSemanticEquivalent = negativeCases.length > 0
+    && negativeCases.every(item => nativeCasesById.get(item.id)?.comparison?.passed === true);
+  const operationDifferentialReport = plan.differential?.report ?? null;
+  const operationScopedDifferential = plan.differential?.passed === true
+    && plan.differential?.promotionEligible === true
+    && operationDifferentialReport?.independence?.satisfied === true
+    && Number(operationDifferentialReport?.repeats ?? 0) >= 2
+    && operationDifferentialReport?.requireDeterministicReplay === true
+    && operationDifferentialReport?.requireNegativeControl === true
+    && Number(operationDifferentialReport?.negativeControls?.length ?? 0) > 0
+    && operationDifferentialReport?.controlsPassed === true;
+  const experimentalBytecodeDeterministic = caseManifest.length === cases.length
+    && caseManifest.every(item => item.bytecodeVersion === '1.3'
+      && item.opcode === 45
+      && item.deterministic
+      && /^[a-f0-9]{64}$/.test(item.bytecodeRoot));
+  const currentNativeVmMaterialized = runtime.materializedFromCurrentSource === true
+    && /^[a-f0-9]{64}$/.test(runtime.materializedVmRoot)
+    && Object.values(runtime.nativeVmSourceRoots ?? {}).length === 2
+    && Object.values(runtime.nativeVmSourceRoots ?? {}).every(root => /^[a-f0-9]{64}$/.test(root));
+  const nativeReplayDeterministic = nativeDifferential.cases.length === cases.length
+    && nativeDifferential.cases.every(item => item.absorbed?.deterministic === true
+      && item.comparison?.replayPassed === true);
+  const nativeSemanticStateRoots = rootChecks.length === positiveCases.length * Number(nativeDifferential.repeats ?? 0)
+    && nativeRootsVerified;
+  const semanticRootParity = positiveCases.length > 0
+    && positiveCases.every(item => {
+      const differentialCase = nativeCasesById.get(item.id);
+      return differentialCase?.comparison?.sourceSemanticRoot
+        && differentialCase?.comparison?.absorbedSemanticRoot
+        && differentialCase.comparison.sourceSemanticRoot === differentialCase.comparison.absorbedSemanticRoot;
+    });
+  const rootsRecorded = hostBound
+    && sharedImplementationBound
+    && /^[a-f0-9]{64}$/.test(operationImplementationRoot)
+    && /^[a-f0-9]{64}$/.test(sourceRoot)
+    && caseManifest.every(item => /^[a-f0-9]{64}$/.test(item.root))
+    && rootChecks.every(item => /^[a-f0-9]{64}$/.test(item.hostRoot)
+      && /^[a-f0-9]{64}$/.test(item.bytecodeRoot)
+      && (!item.receiptPresent || /^[a-f0-9]{64}$/.test(item.nativeStateRoot)));
+  const noCaseSilentlySkipped = sameCaseIds
+    && nativeDifferential.caseCount === caseManifest.length
+    && nativeDifferential.cases.length === caseManifest.length
+    && nativeDifferential.failedCaseCount === 0;
+  const nativePromotionEvidenceTier = plan.candidate.evidenceTier === 'native-candidate'
+    && plan.candidate.canonicalAdmission === false
+    && plan.promotion?.nativePromotionRequired === true
+    && nativeDifferential.promotionEligible === true;
+
+  const gates = Object.freeze({
+    G1_operationScopedDifferential: operationScopedDifferential,
+    G2_experimentalRbc13BytesDeterministic: experimentalBytecodeDeterministic,
+    G3_currentNativeSourceMaterialized: currentNativeVmMaterialized,
+    G4_candidateNativeHostBuilt: hostBound,
+    G5_positiveSemanticEquivalence: positiveSemanticEquivalent,
+    G6_negativeSemanticEquivalence: negativeSemanticEquivalent,
+    G7_nativeReplayDeterministic: nativeReplayDeterministic,
+    G8_nativeSemanticStateRootEmittedAndVerified: nativeSemanticStateRoots,
+    G9_semanticRootParity: semanticRootParity,
+    G10_allEvidenceRootsRecorded: rootsRecorded,
+    G11_noCaseSilentlySkipped: noCaseSilentlySkipped,
+    G12_nativePromotionEvidenceTier: nativePromotionEvidenceTier,
   });
 
   const checks = Object.freeze({
-    semanticDifferentialPassed: true,
-    semanticDifferentialPromotionEligible: true,
+    semanticDifferentialPassed: plan.differential?.passed === true,
+    semanticDifferentialPromotionEligible: plan.differential?.promotionEligible === true,
     nativeDifferentialPassed: nativeDifferential.passed === true,
     currentNativeEquivalent,
     bytecodeDeterministic,
@@ -159,9 +233,9 @@ export async function promoteRbc13DomainOrganPlan(plan, runtime, options = {}) {
     nativeRootsVerified,
     hostBound,
     sharedImplementationBound,
-    caseCountAligned: nativeDifferential.caseCount === caseManifest.length,
+    caseCountAligned: sameCaseIds && nativeDifferential.caseCount === caseManifest.length,
   });
-  const verified = Object.values(checks).every(Boolean);
+  const verified = Object.values(gates).every(Boolean);
   const caseReports = caseManifest.map(manifest => {
     const differentialCase = nativeDifferential.cases.find(item => item.id === manifest.id);
     const report = {
@@ -195,13 +269,23 @@ export async function promoteRbc13DomainOrganPlan(plan, runtime, options = {}) {
     sharedImplementationRoot: runtime.implementationRoot,
     nativeVm: {
       experimental: true,
-      materializedFromCurrentSource: true,
+      materializedFromCurrentSource: currentNativeVmMaterialized,
       hostRoot: runtime.hostRoot,
       materializedVmRoot: runtime.materializedVmRoot,
+      sourceRoots: runtime.nativeVmSourceRoots,
       compiler: runtime.compiler,
       compilerVersion: runtime.compilerVersion,
     },
     checks,
+    gates,
+    operationDifferential: {
+      repeats: operationDifferentialReport?.repeats ?? null,
+      requireDeterministicReplay: operationDifferentialReport?.requireDeterministicReplay ?? null,
+      requireNegativeControl: operationDifferentialReport?.requireNegativeControl ?? null,
+      negativeControlCount: operationDifferentialReport?.negativeControls?.length ?? 0,
+      controlsPassed: operationDifferentialReport?.controlsPassed ?? false,
+      independence: operationDifferentialReport?.independence ?? null,
+    },
     caseCount: caseReports.length,
     verifiedCaseCount: caseReports.filter(item => item.verified).length,
     failedCaseCount: caseReports.filter(item => !item.verified).length,
@@ -210,10 +294,12 @@ export async function promoteRbc13DomainOrganPlan(plan, runtime, options = {}) {
     proofChain: [
       { kind: 'operation-semantic-differential', root: plan.differential.differentialRoot },
       { kind: 'native-process-differential', root: nativeDifferential.root },
+      { kind: 'current-native-vm-source', roots: runtime.nativeVmSourceRoots },
+      { kind: 'experimental-rbc13-bytecode-cases', roots: caseManifest.map(item => item.root) },
       { kind: 'operation-implementation', root: operationImplementationRoot },
       { kind: 'candidate-native-host', root: runtime.hostRoot },
     ],
-    gaps: verified ? [] : Object.entries(checks).filter(([, passed]) => !passed).map(([name]) => name),
+    gaps: verified ? [] : Object.entries(gates).filter(([, passed]) => !passed).map(([name]) => name),
     bindingProofLevel: 'current-source-materialized-candidate-vm-plus-vm-emitted-semantic-root',
     boundary:
       'native-verified is operation-, case-, host- and experimental-RBC-bound. It proves the declared cases through an independently invoked C candidate host materialized from current native VM source. It does not admit RBC 1.3 into the canonical language or prove the other quarantined historical operations.',

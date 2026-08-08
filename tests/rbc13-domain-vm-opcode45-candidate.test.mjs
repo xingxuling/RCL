@@ -10,11 +10,7 @@ import { materializeRbc13DomainVmWithPublicApi } from '../scripts/materialize-rb
 import { measurement, quantity } from '../src/quantity.mjs';
 import { knowledgeClaim } from '../src/knowledge.mjs';
 import { semanticStateRoot } from '../src/semantic-state-root.mjs';
-
-function commandExists(command) {
-  const probe = spawnSync('sh', ['-lc', `command -v ${command}`], { encoding: 'utf8' });
-  return probe.status === 0;
-}
+import { compileNativeC, resolveNativeCCompiler } from '../src/native-c-compiler.mjs';
 
 function parsePayload(run) {
   assert.ok(run.stdout.trim(), `${run.stdout}\n${run.stderr}`);
@@ -42,24 +38,27 @@ function assertNativeMatchesOracleError(run, expected) {
   return payload;
 }
 
-const compilerAvailable = process.platform !== 'win32' && (commandExists('cc') || commandExists('gcc'));
+const compiler = resolveNativeCCompiler();
 
-test('experimental RBC 1.3 opcode45 preserves positive and negative semantic identity', { skip: !compilerAvailable }, () => {
-  const compiler = commandExists('cc') ? 'cc' : 'gcc';
+test('experimental RBC 1.3 opcode45 preserves positive and negative semantic identity', { skip: !compiler }, () => {
   const temp = mkdtempSync(path.join(os.tmpdir(), 'rcl-rbc13-domain-vm-'));
   const generated = path.join(temp, 'rclvm-rbc13-domain-candidate.c');
   const host = path.join(temp, 'domain-vm-opcode45-candidate');
   try {
     const currentNative = fs.readFileSync('native/rclvm.c', 'utf8');
     writeFileSync(generated, materializeRbc13DomainVmWithPublicApi(currentNative));
-    const build = spawnSync(compiler, [
-      '-std=c11', '-Wall', '-Wextra', '-pedantic', '-Inative', `-I${temp}`,
-      'native/rcl_domain_value.c',
-      'native/rcl_domain_organ.c',
-      'native/rcl_domain_admitted_organs.c',
-      'native/domain_vm_opcode45_candidate_host.c',
-      '-lcrypto', '-lm', '-o', host,
-    ], { cwd: process.cwd(), encoding: 'utf8' });
+    const build = compileNativeC(compiler, {
+      cwd: process.cwd(),
+      includeDirs: ['native', temp],
+      sources: [
+        'native/rcl_domain_value.c',
+        'native/rcl_domain_organ.c',
+        'native/rcl_domain_admitted_organs.c',
+        'native/domain_vm_opcode45_candidate_host.c',
+      ],
+      linkLibraries: process.platform === 'win32' ? ['bcrypt'] : ['crypto', 'm'],
+      output: host,
+    });
     assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
 
     const literalPath = path.join(temp, 'literal.rbc');
@@ -220,8 +219,8 @@ test('experimental RBC 1.3 opcode45 preserves positive and negative semantic ide
     const missing = spawnSync(host, [missingPath, '--candidate-minimum'], { encoding: 'utf8' });
     assert.equal(missing.status, 2, `${missing.stdout}\n${missing.stderr}`);
     const missingPayload = parsePayload(missing);
-    assert.equal(missingPayload.code, 'RCL_DOMAIN_ORGAN_MISSING');
-    assert.equal(missingPayload.message, 'RCL_DOMAIN_ORGAN_MISSING: Domain operation is not registered');
+    assert.equal(missingPayload.code, 'RCL_DOMAIN_OPERATION_MISSING');
+    assert.equal(missingPayload.message, "RCL_DOMAIN_OPERATION_MISSING: Domain operation 'core.missing' is not present in the RBC 1.3 salvage inventory");
 
     const legacyPath = path.join(temp, 'legacy.rbc');
     writeFileSync(legacyPath, compileRealityToBytecode('reality Legacy { facet world.ready : Truth = true }'));

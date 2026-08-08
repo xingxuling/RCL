@@ -92,6 +92,11 @@ static int quantity_make(
 ) {
   (void)userdata; (void)domain; (void)operation;
   if (argc != 3 || args[0].kind != RCL_DOMAIN_VALUE_TEXT || args[1].kind != RCL_DOMAIN_VALUE_NUMBER || args[2].kind != RCL_DOMAIN_VALUE_TEXT) {
+    if (argc >= 1 && args[0].kind == RCL_DOMAIN_VALUE_TEXT && (argc < 2 || args[1].kind != RCL_DOMAIN_VALUE_NUMBER)) {
+      char message[RCL_DOMAIN_ERROR_MESSAGE_MAX];
+      snprintf(message, sizeof(message), "Quantity '%s' must be finite", args[0].as.text.data);
+      return fail(error, "TypeError", message);
+    }
     return fail(error, "RCL_DOMAIN_QUANTITY_ARGUMENT", "RCL_DOMAIN_QUANTITY_ARGUMENT: quantity.make expects Text type, Number value and Text unit");
   }
   const char *type = args[0].as.text.data;

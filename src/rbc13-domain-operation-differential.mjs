@@ -1,5 +1,6 @@
 import { quantity, measurement } from './quantity.mjs';
 import { knowledgeClaim } from './knowledge.mjs';
+import { RCLRuntimeError } from './errors.mjs';
 import {
   createExecutionObservation,
   runIndependentDifferentialAbsorption,
@@ -19,7 +20,10 @@ export const RBC13_ADMITTED_DOMAIN_OPERATION_KEYS = Object.freeze([
 function currentOracle(input) {
   const key = `${input?.domain}.${input?.operation}`;
   const args = input?.args ?? [];
-  if (key === 'core.echo') return args[0];
+  if (key === 'core.echo') {
+    if (args.length !== 1) throw new RCLRuntimeError('RCL_DOMAIN_CORE_ECHO_ARITY', 'core.echo expects one argument');
+    return args[0];
+  }
   if (key === 'quantity.make') return quantity(args[0], args[1], args[2] || undefined);
   if (key === 'quantitative.measure') {
     return measurement(args[0], args[1], {
@@ -43,9 +47,11 @@ function currentOracle(input) {
       formedAtRoot: args[9] || null,
     });
   }
-  const error = new Error(`Current oracle does not expose '${key}'`);
-  error.code = 'RCL_DOMAIN_OPERATION_MISSING';
-  throw error;
+  throw new RCLRuntimeError(
+    'RCL_DOMAIN_OPERATION_MISSING',
+    `Domain operation '${key}' is not present in the RBC 1.3 salvage inventory`,
+    { key },
+  );
 }
 
 function pureOperationObservation(output) {
@@ -100,12 +106,19 @@ const CASES = Object.freeze({
   'core.echo': Object.freeze([
     Object.freeze({ id: 'echo_text', tags: ['positive'], input: Object.freeze({ domain: 'core', operation: 'echo', args: Object.freeze(['hello']) }) }),
     Object.freeze({ id: 'echo_number', tags: ['positive'], input: Object.freeze({ domain: 'core', operation: 'echo', args: Object.freeze([42]) }) }),
+    Object.freeze({ id: 'echo_truth', tags: ['positive'], input: Object.freeze({ domain: 'core', operation: 'echo', args: Object.freeze([true]) }) }),
     Object.freeze({ id: 'echo_sequence', tags: ['positive'], input: Object.freeze({ domain: 'core', operation: 'echo', args: Object.freeze([Object.freeze(['a', 1, true])]) }) }),
+    Object.freeze({ id: 'echo_dynamic_dispatch', tags: ['positive', 'dynamic'], input: Object.freeze({ domain: 'core', operation: 'echo', dynamic: true, args: Object.freeze(['dynamic']) }) }),
+    Object.freeze({ id: 'echo_invalid_dispatch', tags: ['negative', 'dispatch'], input: Object.freeze({ domain: 'core', operation: 'missing', args: Object.freeze(['x']) }) }),
+    Object.freeze({ id: 'echo_invalid_arity', tags: ['negative', 'arity'], input: Object.freeze({ domain: 'core', operation: 'echo', args: Object.freeze([]) }) }),
   ]),
   'quantity.make': Object.freeze([
     Object.freeze({ id: 'quantity_temperature_default_unit', tags: ['positive'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Temperature', 25, '']) }) }),
     Object.freeze({ id: 'quantity_length_custom_unit', tags: ['positive'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Length', 2, 'cm']) }) }),
     Object.freeze({ id: 'quantity_invalid_type', tags: ['negative'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Warp', 1, '']) }) }),
+    Object.freeze({ id: 'quantity_non_finite_value', tags: ['negative', 'non-finite'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Temperature', Number.NaN, '']) }) }),
+    Object.freeze({ id: 'quantity_invalid_value_parameter', tags: ['negative', 'parameter'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Temperature', 'not-a-number', '']) }) }),
+    Object.freeze({ id: 'quantity_missing_value_parameter', tags: ['negative', 'parameter'], input: Object.freeze({ domain: 'quantity', operation: 'make', args: Object.freeze(['Temperature']) }) }),
   ]),
   'quantitative.measure': Object.freeze([
     Object.freeze({
@@ -123,6 +136,10 @@ const CASES = Object.freeze({
     Object.freeze({
       id: 'measure_type_mismatch', tags: ['negative'],
       input: Object.freeze({ domain: 'quantitative', operation: 'measure', args: Object.freeze(['Number', 'forty-two', 0.25, 0.9, '', 'ratio', Object.freeze([]), '']) }),
+    }),
+    Object.freeze({
+      id: 'measure_uncertainty_type_mismatch', tags: ['negative'],
+      input: Object.freeze({ domain: 'quantitative', operation: 'measure', args: Object.freeze(['Number', 42, 'quarter', 0.9, '', 'ratio', Object.freeze([]), '']) }),
     }),
   ]),
   'knowledge.claim': Object.freeze([

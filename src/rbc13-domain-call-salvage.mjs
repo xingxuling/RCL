@@ -128,7 +128,10 @@ export function invokeRbc13DomainCallReference(domainInput, operationInput, args
     );
   }
 
-  if (key === 'core.echo') return args[0];
+  if (key === 'core.echo') {
+    if (args.length !== 1) throw new RCLRuntimeError('RCL_DOMAIN_CORE_ECHO_ARITY', 'core.echo expects one argument');
+    return args[0];
+  }
   if (key === 'quantity.make') {
     return quantity(args[0], args[1], args[2] || undefined);
   }

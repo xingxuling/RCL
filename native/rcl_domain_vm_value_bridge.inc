@@ -30,6 +30,10 @@ static int rcl_domain_bridge_native_to_domain_impl(VM *vm, const Value *source, 
     case VALUE_NULL:
       return rcl_domain_value_set_null(target, "Null");
     case VALUE_NUMBER:
+      if (!isfinite(source->number)) {
+        rcl_domain_bridge_fail(vm, "Non-finite Number is not admitted by Domain Value ABI v1");
+        return 0;
+      }
       return rcl_domain_value_set_number(target, source->number, "Number");
     case VALUE_BOOL:
       return rcl_domain_value_set_truth(target, source->boolean, "Truth");

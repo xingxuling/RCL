@@ -4,25 +4,21 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
+import { compileNativeC, resolveNativeCCompiler } from '../src/native-c-compiler.mjs';
 
-function commandExists(command) {
-  const probe = spawnSync('sh', ['-lc', `command -v ${command}`], { encoding: 'utf8' });
-  return probe.status === 0;
-}
+const compiler = resolveNativeCCompiler();
 
-const compilerAvailable = process.platform !== 'win32' && (commandExists('cc') || commandExists('gcc'));
-
-test('private VM ↔ Domain Value membrane round-trips admitted values and rejects unsupported kinds', { skip: !compilerAvailable }, () => {
-  const compiler = commandExists('cc') ? 'cc' : 'gcc';
+test('private VM ↔ Domain Value membrane round-trips admitted values and rejects unsupported kinds', { skip: !compiler }, () => {
   const temp = mkdtempSync(path.join(os.tmpdir(), 'rcl-domain-vm-value-'));
   const output = path.join(temp, 'domain-vm-value-smoke');
   try {
-    const build = spawnSync(compiler, [
-      '-std=c11', '-Wall', '-Wextra', '-pedantic', '-Inative',
-      'native/rcl_domain_value.c',
-      'native/domain_vm_value_bridge_smoke.c',
-      '-lcrypto', '-lm', '-o', output,
-    ], { cwd: process.cwd(), encoding: 'utf8' });
+    const build = compileNativeC(compiler, {
+      cwd: process.cwd(),
+      includeDirs: ['native'],
+      sources: ['native/rcl_domain_value.c', 'native/domain_vm_value_bridge_smoke.c'],
+      linkLibraries: process.platform === 'win32' ? ['bcrypt'] : ['crypto', 'm'],
+      output,
+    });
     assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
     const run = spawnSync(output, [], { encoding: 'utf8' });
     assert.equal(run.status, 0, `${run.stdout}\n${run.stderr}`);

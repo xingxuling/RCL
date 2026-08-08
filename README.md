@@ -1,7 +1,7 @@
-# RCL — Reality Compiler Language
+# RCL v0.94.0-alpha.1 — Reality Compiler Language
 
 **Current package:** `v0.94.0-alpha.1`  
-**Canonical source:** `xingxuling/RCL@main`  
+Canonical source: `xingxuling/RCL@main`
 **License:** Apache-2.0
 
 > RCL is an evidence-bearing, permission-constrained reality transaction language, compiler, native VM, provider runtime, and verification toolchain.

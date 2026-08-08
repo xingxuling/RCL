@@ -47,7 +47,9 @@ class Pool {
 
 function argumentInstructions(pool, value, depth = 0) {
   if (depth > 64) throw new TypeError('RBC 1.3 DOMAIN_CALL candidate argument nesting exceeds 64 levels');
-  if (typeof value === 'number' && Number.isFinite(value)) return [{ op: BASE.PUSH_NUMBER, a: pool.number(value) }];
+  // Non-finite numbers are encoded only so negative controls can prove that
+  // the native Domain Value membrane rejects them before organ invocation.
+  if (typeof value === 'number') return [{ op: BASE.PUSH_NUMBER, a: pool.number(value) }];
   if (typeof value === 'boolean') return [{ op: BASE.PUSH_BOOL, a: value ? 1 : 0 }];
   if (typeof value === 'string') return [{ op: BASE.PUSH_STRING, a: pool.string(value) }];
   if (Array.isArray(value)) {
@@ -63,7 +65,7 @@ function argumentInstructions(pool, value, depth = 0) {
     return [{ op: BASE.LOAD_STATE, a: pool.string(value.$state) }];
   }
   throw new TypeError(
-    'RBC 1.3 DOMAIN_CALL candidate arguments accept finite Number, Truth, Text, recursive Sequence, or { $state: "path" } references',
+    'RBC 1.3 DOMAIN_CALL candidate arguments accept Number, Truth, Text, recursive Sequence, or { $state: "path" } references',
   );
 }
 

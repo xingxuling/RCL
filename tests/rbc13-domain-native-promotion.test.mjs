@@ -45,6 +45,23 @@ test('all four admitted organs require operation differential + current-source c
     assert.equal(report.checks.bytecodeDeterministic, true);
     assert.equal(report.checks.replayDeterministic, true);
     assert.equal(report.checks.nativeRootsVerified, true);
+    assert.deepEqual(Object.keys(report.gates), [
+      'G1_operationScopedDifferential',
+      'G2_experimentalRbc13BytesDeterministic',
+      'G3_currentNativeSourceMaterialized',
+      'G4_candidateNativeHostBuilt',
+      'G5_positiveSemanticEquivalence',
+      'G6_negativeSemanticEquivalence',
+      'G7_nativeReplayDeterministic',
+      'G8_nativeSemanticStateRootEmittedAndVerified',
+      'G9_semanticRootParity',
+      'G10_allEvidenceRootsRecorded',
+      'G11_noCaseSilentlySkipped',
+      'G12_nativePromotionEvidenceTier',
+    ]);
+    assert.equal(Object.values(report.gates).every(Boolean), true, `${report.operationKey}: ${report.gaps.join(', ')}`);
+    assert.match(report.nativeVm.sourceRoots['native/rclvm.c'], /^[a-f0-9]{64}$/);
+    assert.match(report.nativeVm.sourceRoots['native/rclvm.h'], /^[a-f0-9]{64}$/);
     assert.equal(report.nativeVm.experimental, true);
     assert.equal(report.nativeVm.materializedFromCurrentSource, true);
     assert.match(report.root, /^[a-f0-9]{64}$/);
