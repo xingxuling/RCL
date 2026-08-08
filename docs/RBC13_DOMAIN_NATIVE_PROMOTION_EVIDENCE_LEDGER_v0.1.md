@@ -178,10 +178,10 @@ The current `rcl.semantic-state-root.v1` Number corpus remains incomplete: 7/10 
 
 ## 14. CI and release boundary
 
-The latest PR runs at audit time were:
+The latest PR runs for commit `e3f1c59db4c565f40caabf62ed17e0604a7f4a08` were:
 
-- `31226363140` — `RCL Authority Contract`, failure before any step (`steps=[]`).
-- `31226363148` — `RCL Canonical Verification`, failure before any step (`steps=[]`).
+- `31258043787` — `RCL Authority Contract`, failure before any step (`steps=[]`).
+- `31258043777` — `RCL Canonical Verification`, failure before any step (`steps=[]`).
 
 Both are classified `INFRASTRUCTURE_BLOCKED`, not test failures. Local build, native compile, promotion, semantic-root, selfhost, and focused/full test evidence above was run directly in the current Windows environment.
 
