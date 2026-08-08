@@ -108,7 +108,7 @@ Integration Court therefore returns `BLOCKED`; no canonical changes are authoriz
 
 ## Hosted checks and next step
 
-Base hosted runs `31281979844` (Authority Contract) and `31281979851` (Canonical Verification) failed with `steps=[]`, so they are classified as `INFRASTRUCTURE_BLOCKED`, not as local test failures. A post-push check must be inspected separately.
+For the source-evidence push at `632d7702e08757639e44c96f3636e84240e74cde`, hosted run `31284594800` (Authority Contract) and run `31284594799` (Canonical Verification) both failed with `steps=[]` before executing a job step. They are classified as `INFRASTRUCTURE_BLOCKED`, not as local test failures. The Vercel preview context was still pending at the observation point; it has no admission authority.
 
 RCL autonomous growth assessment: `Level 3/5` — bounded selfhosted compiler closure plus a reproducible native graph candidate can be generated and evaluated from existing primitives, but general universal growth, independent AI donor promotion, and autonomous canonical admission are not established. Level 5 is not claimed.
 
