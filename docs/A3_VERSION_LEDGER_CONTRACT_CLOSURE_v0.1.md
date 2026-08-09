@@ -2,7 +2,8 @@
 
 - Status: **VERIFIED**
 - Scope: RBC 1.1 / RBC 1.2 legacy receipt closure and current full-suite contract
-- Receipt closure root: `3d549ff4e79801b56c434512fc74e4c7f36cff384a5024ceedcab2533eea87b4`
+- Receipt closure evidence root: `d8a439e0aa0a88552a118557106996de86bd41ae0ad7524ce6991d95b60b863a`
+- Receipt inventory root: `c33453601f567a33a11413b7d958f864ebca7f1445b65cae16b5f70a04003a8a`
 - Receipt inventory: 6 expected / 6 verified / 0 missing / 0 duplicate / 0 stale / 0 altered / 0 replay mismatch
 
 ## Original failure
