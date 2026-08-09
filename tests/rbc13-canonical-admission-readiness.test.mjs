@@ -56,3 +56,32 @@ test('legacy full-suite drift remains a named admission blocker', () => {
   assert.equal(report.gates.A3_legacyRegressionClosure.passed, false);
   assert.equal(report.blockingGates.includes('A3_legacyRegressionClosure'), true);
 });
+
+test('compatibility ACL2 and experimental WASM parity do not silently grant formal A10', () => {
+  const report = buildRbc13CanonicalAdmissionReadiness(input({
+    aiGenerate: {},
+    aiCompatibility: {
+      status: 'NEGATIVE_RESULT',
+      root: ROOT,
+      donor: { root: ROOT },
+      corpus: { root: ROOT },
+      protocol: { promptRoot: ROOT },
+      summary: { humanRepairs: 0, formalA10: false },
+      formalA10: { status: 'NEGATIVE_RESULT' },
+      strictGrowthAssessment: { globalLevel: 'Level 2 VERIFIED', nextLevel: 'Level 3 CANDIDATE/BLOCKED' },
+    },
+    wasmGrowthCell: {
+      status: 'VERIFIED',
+      universalGrowthEligible: true,
+      nativeC: { status: 'VERIFIED' },
+      wasm: { status: 'VERIFIED' },
+      replay: { status: 'VERIFIED' },
+      cases: [{ semanticRootParity: true, resultOrErrorParity: true, statusParity: true }],
+      root: ROOT,
+    },
+  }));
+  assert.equal(report.gates.A10_aiGenerateDonor.passed, false);
+  assert.equal(report.gates.A12_universalStressAdmissionCell.passed, true);
+  assert.equal(report.strictAutonomousGrowth.globalMaximum, 'Level 2 VERIFIED');
+  assert.equal(report.strictAutonomousGrowth.nextLevel, 'Level 3 CANDIDATE/BLOCKED');
+});

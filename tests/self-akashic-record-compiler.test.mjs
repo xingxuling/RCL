@@ -39,7 +39,7 @@ test('v0.57 scans RCL repository as finite self-record', () => {
   assert.ok(scan.counts.docCount >= 1);
   assert.ok(scan.counts.testCount >= 38);
   assert.ok(scan.counts.commandCount >= 85);
-  assert.ok(scan.counts.versionLedgerCount >= 60);
+  assert.ok(scan.counts.versionLedgerCount >= DEFAULT_SELF_AKASHIC_RECORD_SPEC.thresholds.minVersionLedgerCount);
   assert.match(scan.package.version, /^0\.94\./);
 });
 

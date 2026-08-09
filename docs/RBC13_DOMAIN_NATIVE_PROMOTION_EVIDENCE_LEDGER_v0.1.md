@@ -6,6 +6,8 @@ Branch: `research/rbc13-domain-call-salvage-v0.1`
 PR: [#39](https://github.com/xingxuling/RCL/pull/39)
 Starting head audited: `a7f06b39d5b0aec74c7f2c9d9edd598e09ec32dc`
 
+Historical-snapshot notice: this ledger preserves the earlier native-promotion round, including its native-only Universal Stress blocker. The current A3/A10/A12 closure is generated in `docs/RBC13_FINAL_BLOCKER_CLOSURE_EVIDENCE_LEDGER_v0.1.md`; formal A10 remains `NEGATIVE_RESULT`.
+
 ## 1. Target ruling
 
 The four declared operations have **VERIFIED** operation- and candidate-host-bounded Native Promotion evidence. The result is not canonical RBC 1.3 activation. The RBC 1.3 candidate remains **CANDIDATE**, and the Universal Stress probe remains **BLOCKED** until performance and AI-generation gates have evidence.

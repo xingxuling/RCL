@@ -169,6 +169,21 @@ function copyTreeNoSymlinks(sourceDir, targetDir) {
   }
 }
 
+function finalizeInstalledAppDirectory(sourceDir, targetDir) {
+  try {
+    fs.renameSync(sourceDir, targetDir);
+    return 'rename';
+  } catch (error) {
+    if (process.platform !== 'win32' || !['EPERM', 'EACCES', 'EBUSY'].includes(error?.code)) throw error;
+    // Windows security/indexing software can briefly hold a freshly copied staging
+    // directory open. Preserve the verified payload and finish with a bounded copy
+    // fallback; the destination is removed before staging starts above.
+    fs.cpSync(sourceDir, targetDir, { recursive: true, errorOnExist: true, force: false });
+    fs.rmSync(sourceDir, { recursive: true, force: true });
+    return 'copy-fallback';
+  }
+}
+
 function scanInstallSafety(packageDir) {
   const diagnostics = [];
   for (const file of walkFiles(packageDir)) {
@@ -307,7 +322,7 @@ export function installRclApp(packageDir, options = {}) {
   };
   writeJson(path.join(tmpDir, 'rclapp.json'), { ...installedManifest, root: realityRoot(installedManifest) });
   fs.rmSync(appDir, { recursive: true, force: true });
-  fs.renameSync(tmpDir, appDir);
+  const installMaterialization = finalizeInstalledAppDirectory(tmpDir, appDir);
   const record = {
     appId,
     program: packageManifest.program,
@@ -334,6 +349,7 @@ export function installRclApp(packageDir, options = {}) {
     packageDir: packageTargetDir,
     record,
     verification,
+    installMaterialization,
     registryRoot: savedRegistry.root,
   };
   return Object.freeze({ ...report, root: realityRoot(report) });

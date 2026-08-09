@@ -10,6 +10,8 @@ Final verdict: `BLOCKED`
 Canonical admission: `false`  
 Readiness report root: `ac10f7592e9f183f89e7ffbb5779f86eb3260aae31c9c3ba4a30d7cee3597b2e`
 
+Historical snapshot notice: this v0.1 ledger records the pre-closure state. The current v0.2 closure is recorded in `docs/RBC13_FINAL_BLOCKER_CLOSURE_EVIDENCE_LEDGER_v0.1.md`; the A3 version-ledger contract is now closed, A10 uses the Compatibility Surface/ACL protocol, and A12 uses the independent C/WASM graph cell.
+
 ## Evidence rule
 
 Each claim records `claim_id`, gate, status, commit, environment, command, input root, artifact root, result root, receipt root, test count/pass/fail/skip, blocker, and reproduction command. A local root is not a hosted-CI result. A candidate is not a canonical activation. No canonical branch, version contract, RBC 1.1/1.2 contract, or native VM source was changed.
@@ -110,7 +112,7 @@ Integration Court therefore returns `BLOCKED`; no canonical changes are authoriz
 
 For the source-evidence push at `632d7702e08757639e44c96f3636e84240e74cde`, hosted run `31284594800` (Authority Contract) and run `31284594799` (Canonical Verification) both failed with `steps=[]` before executing a job step. They are classified as `INFRASTRUCTURE_BLOCKED`, not as local test failures. The Vercel preview context was still pending at the observation point; it has no admission authority.
 
-RCL autonomous growth assessment: `Level 3/5` — bounded selfhosted compiler closure plus a reproducible native graph candidate can be generated and evaluated from existing primitives, but general universal growth, independent AI donor promotion, and autonomous canonical admission are not established. Level 5 is not claimed.
+Strict autonomous growth assessment in this historical snapshot: `Level 2 VERIFIED`; `Level 3 CANDIDATE/BLOCKED`. A reproducible native graph candidate or a compatibility ACL2 result does not establish strict Level 3 without an AI-generated implementation and independent differential verification, and no formal Native Promotion is inferred.
 
 Required next gates:
 

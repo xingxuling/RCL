@@ -4,6 +4,8 @@ Committee material — proposal only, not a canonical activation.
 
 Current proposal verdict: `BLOCKED`. `canonicalReady = false`. Canonical language, formal version contracts, and the released native VM ABI remain unchanged.
 
+Current strict-growth ruling: `Level 2 VERIFIED` is the global maximum supported by the closed evidence surface; `Level 3 CANDIDATE/BLOCKED` remains gated. Compatibility ACL2, C/WASM parity, or a bounded native candidate does not grant canonical admission or formal A10 promotion.
+
 ## 1. Motivation
 
 RBC 1.3 / `DOMAIN_CALL` is intended to let RCL absorb bounded external semantics into evidence-gated native organs while preserving typed values, authority, receipts, deterministic replay, and a stable bytecode boundary. The admission question is not whether one experimental VM can execute four operations; it is whether the feature has enough non-compensable evidence to become language infrastructure.
@@ -30,7 +32,7 @@ The candidate distinguishes diagnostic/development evidence, differential candid
 
 ## 7. Capability Metabolism relationship
 
-The intended metabolism is extraction → capability spec → corpus → differential absorption → candidate organ → promotion attempt. The AI donor experiment reached extraction/corpus and negative-control evaluation, but stopped before native promotion because the generated contract was invalid.
+The intended metabolism is extraction → capability spec → corpus → independent differential absorption → candidate organ → promotion attempt. The current Compatibility Surface tested the same blinded donor protocol against three local models: the medium tier reached ACL2 with 0 human repair, while tiny/strong produced invalid or incomplete donors; formal A10 remains `NEGATIVE_RESULT` because Native Candidate/Native Process/Semantic Root/Replay/Promotion are not closed.
 
 ## 8. Failure semantics
 
@@ -46,7 +48,7 @@ The current canonical semantic root, RBC 1.1/1.2 behavior, version contract, and
 
 ## 11. Self-host compatibility
 
-Current selfhost fixed point is 9/9, the eligible example parity suite is 16/16 with zero failures, and Stage40 is verified. This proves the existing selfhost boundaries. It does not yet prove that the full RBC 1.3 candidate is emitted and executed by the complete selfhost compiler.
+Current selfhost fixed point is 9/9, the eligible example parity suite is 17/17 with zero failures, and Stage40 is verified. This proves the existing selfhost boundaries. It does not yet prove that the full RBC 1.3 candidate is emitted and executed by the complete selfhost compiler.
 
 ## 12. Security and authority implications
 
@@ -62,11 +64,11 @@ The three-path benchmark is `VERIFIED` as a measurement: primitive, native organ
 
 ## 15. AI_GENERATE evidence
 
-The blinded JSON Schema donor is `NEGATIVE_RESULT`: 0/1 successful trials. The response was parseable and the negative control was detected, but the contract used draft-07 and omitted the required `unit` constraint. No native promotion credit is granted.
+The earlier single-donor JSON Schema trial remains historical `NEGATIVE_RESULT`: its response used draft-07 and omitted the required `unit` constraint. The current same-protocol Compatibility Surface is also `NEGATIVE_RESULT`: medium reached ACL2, tiny/strong were ACL0, human repairs were 0, and no model reached Native Promotion. No native promotion credit is granted.
 
 ## 16. Universal Stress evidence
 
-The updated RBC13 cell records fresh native-promotion, performance, and AI evidence. Special-case audit remains intact, but AI_GENERATE is negative and universal growth eligibility is false. Current Universal Stress report root: `2ab51068aa3ac6259c22116371babad23d09beb06e3a5e88bac8403ce906f1cd`.
+The earlier native-only Universal Stress snapshot remains historical and blocked. The current A12 cell records verified JS/C/WASM parity, ABI negative controls, and replay for one bounded graph workload, but this experimental result does not grant universal maturity or canonical language; formal A10 remains negative.
 
 ## 17. Alternatives considered
 
@@ -86,7 +88,7 @@ Open risks are legacy/full-suite drift, incomplete Universal Stress closure, AI 
 
 ## 21. Migration plan
 
-First close A3/A10/A12 and rerun the complete matrix. Then publish an explicit v2 root/number migration receipt and cross-runtime conformance package. Only after an independent Integration Court review should a separate canonical PR propose formal version changes.
+Close formal A10, rerun the complete matrix, and publish an explicit v2 root/number migration receipt and cross-runtime conformance package. Only after an independent Integration Court review should a separate canonical PR propose formal version changes.
 
 ## 22. Rollback plan
 
@@ -102,7 +104,7 @@ None are authorized in this preparation round. A future admission would require 
 | --- | --- |
 | A1 Number canonicality | `VERIFIED` |
 | A2 Native Promotion inventory | `VERIFIED` |
-| A3 Legacy regression closure | `BLOCKED` |
+| A3 Legacy regression closure | `VERIFIED` after version-ledger test-contract closure; final admission still depends on the full-suite result |
 | A4 Positive semantic parity | `VERIFIED` |
 | A5 Negative semantic parity | `VERIFIED` |
 | A6 Replay determinism | `VERIFIED` |
@@ -111,9 +113,9 @@ None are authorized in this preparation round. A future admission would require 
 | A9 Performance evidence | `VERIFIED` |
 | A10 AI_GENERATE donor | `NEGATIVE_RESULT` |
 | A11 Selfhost/version contract | `VERIFIED` |
-| A12 Universal Stress admission cell | `BLOCKED` |
+| A12 Universal Stress admission cell | `VERIFIED` as an experimental C/WASM cross-body graph cell; canonical admission remains separate |
 
-Canonical readiness is the conjunction of all twelve gates. The current blocking gates are A3, A10, and A12.
+Canonical readiness is the conjunction of all twelve gates. A3 and A12 have current experimental closure evidence; formal A10 remains a blocker, and the final readiness ledger must bind the final full-suite result before any admission recommendation.
 
 ## 25. Integration Court verdict
 

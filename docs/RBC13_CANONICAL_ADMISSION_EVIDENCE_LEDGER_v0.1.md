@@ -6,6 +6,8 @@ Date: 2026-08-09, Asia/Shanghai. Repository: `C:\Users\User\Documents\RCL\_workt
 
 Every row records the claim, status, command, environment, source/input identity, artifact/output roots, counts, blocker, and reproduction path. A local evidence root is not a hosted-CI result. A candidate report is not a canonical activation.
 
+This file is a historical snapshot from the earlier closure attempt. Its `npm test` and native-only A12 blocker rows are preserved as history; the current generated A1-A12 result is `docs/RBC13_FINAL_BLOCKER_CLOSURE_EVIDENCE_LEDGER_v0.1.md`.
+
 ## Evidence rows
 
 | Claim | Status | Command/environment | Input/artifact root | Output root and counts | Blocker |

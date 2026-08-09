@@ -25,8 +25,10 @@ const input = {
   performance: read('output/rbc13-execution-benchmark/report.json'),
   aiGenerate: read('output/rbc13-ai-generate-json-schema/report.json'),
   aiThreshold: read('output/rbc13-ai-assimilation-threshold/ai_assimilation_threshold_results.json'),
+  aiCompatibility: read('output/rbc13-ai-assimilation-compatibility/compatibility_surface_results.json'),
   universal: read('output/universal-stress-rbc13-domain/wasm-vm-algorithm-candidate.json'),
   growthCell: read('output/rbc13-universal-growth-cell/report.json'),
+  wasmGrowthCell: read('output/rbc13-wasm-graph-growth-cell/report.json'),
   legacyClosure: read('output/rbc13-legacy-evidence-closure/report.json'),
   legacy: {
     v1FocusedStatus: arg('legacy-v1', 'UNVERIFIED'),

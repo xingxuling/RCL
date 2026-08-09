@@ -76,6 +76,14 @@ A failed required gate fails the cell. Missing evidence blocks it. No weighted s
 
 ---
 
+## RBC 1.3 admission boundary
+
+RBC 1.3 `DOMAIN_CALL` remains an experimental research surface in PR #39. The strict autonomous-growth maximum is currently `Level 2 VERIFIED`; `Level 3 CANDIDATE/BLOCKED` is not promoted by a bounded native candidate, an ACL2 compatibility result, or C/WASM parity alone. Formal A10 requires the full independent Native Promotion chain, and canonical language/version changes remain human-gated.
+
+Evidence: [`RBC13_FINAL_BLOCKER_CLOSURE_EVIDENCE_LEDGER_v0.1.md`](docs/RBC13_FINAL_BLOCKER_CLOSURE_EVIDENCE_LEDGER_v0.1.md), [`RCL_CAPABILITY_ASSIMILATION_COMPATIBILITY_SURFACE_v0.1.md`](docs/RCL_CAPABILITY_ASSIMILATION_COMPATIBILITY_SURFACE_v0.1.md), and [`RCL_WASM_DOMAIN_ORGAN_ABI_v0.1.md`](docs/RCL_WASM_DOMAIN_ORGAN_ABI_v0.1.md).
+
+---
+
 ## Current killer-task frontier
 
 | Task | Target | Coverage mode | Current result | Main remaining blocker |

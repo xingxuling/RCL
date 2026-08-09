@@ -1,0 +1,84 @@
+{
+  "format": "rcl.rbc13-json-schema-donor-contract.v0.1",
+  "version": "0.1.0",
+  "id": "rbc13_donor_measurement_bounded_subset_v1",
+  "title": "RBC13 DonorMeasurement bounded JSON Schema subset",
+  "subset": {
+    "supported": [
+      "$schema",
+      "$id",
+      "title",
+      "description",
+      "type",
+      "required",
+      "properties",
+      "additionalProperties",
+      "enum",
+      "minimum",
+      "maximum",
+      "minLength",
+      "maxLength",
+      "items",
+      "minItems",
+      "maxItems"
+    ],
+    "unsupported": [
+      "$ref",
+      "$defs",
+      "oneOf",
+      "anyOf",
+      "allOf",
+      "not",
+      "if",
+      "then",
+      "else",
+      "pattern",
+      "format",
+      "propertyNames",
+      "dependentRequired",
+      "dependentSchemas",
+      "contains",
+      "uniqueItems",
+      "unevaluatedProperties",
+      "unevaluatedItems",
+      "const",
+      "multipleOf"
+    ],
+    "undefinedOutOfScope": "Schemas using keywords outside supported are not eligible for this donor experiment and are not used as negative evidence against the candidate."
+  },
+  "intent": {
+    "rootType": "object",
+    "title": "DonorMeasurement",
+    "description": "A bounded measurement record with optional tags and metadata.",
+    "requiredFields": ["id", "value", "unit"],
+    "properties": {
+      "id": { "type": "string", "minLength": 3, "maxLength": 64 },
+      "value": { "type": "number", "minimum": -1000, "maximum": 1000 },
+      "unit": { "type": "string", "enum": ["mL", "ml", "g"] },
+      "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "minItems": 0,
+        "maxItems": 4
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "verified": { "type": "boolean" }
+        },
+        "required": ["source"],
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "boundary": {
+    "oracleMustBeIndependent": true,
+    "candidateMustStartEmpty": true,
+    "hiddenCorpus": true,
+    "humanRepairs": 0,
+    "nonFiniteNumbersAreInvalid": true
+  }
+}

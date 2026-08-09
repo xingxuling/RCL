@@ -37,8 +37,10 @@ export function buildRbc13CanonicalAdmissionReadiness(input = {}) {
   const performance = input.performance ?? {};
   const aiGenerate = input.aiGenerate ?? {};
   const aiThreshold = input.aiThreshold ?? {};
+  const aiCompatibility = input.aiCompatibility ?? {};
   const universal = input.universal ?? {};
   const growthCell = input.growthCell ?? {};
+  const wasmGrowthCell = input.wasmGrowthCell ?? {};
   const legacy = input.legacy ?? {};
   const legacyClosure = input.legacyClosure ?? {};
   const selfhost = input.selfhost ?? {};
@@ -58,8 +60,14 @@ export function buildRbc13CanonicalAdmissionReadiness(input = {}) {
     && performance.measures?.repeatedSamples === true
     && performance.measures?.varianceRecorded === true
     && performance.measures?.rssProxyRecorded === true;
+  const hasAiCompatibility = Object.keys(aiCompatibility).length > 0;
   const hasAiThreshold = Object.keys(aiThreshold).length > 0;
-  const aiPass = hasAiThreshold
+  const aiPass = hasAiCompatibility
+    ? aiCompatibility.status === 'VERIFIED'
+      && aiCompatibility.formalA10?.status === 'VERIFIED'
+      && aiCompatibility.summary?.formalA10 === true
+      && Number(aiCompatibility.summary?.humanRepairs ?? 0) === 0
+    : hasAiThreshold
     ? aiThreshold.status === 'VERIFIED'
       && aiThreshold.summary?.allTiersReachedL4 === true
       && Number(aiThreshold.summary?.humanInterventions ?? 0) === 0
@@ -67,7 +75,15 @@ export function buildRbc13CanonicalAdmissionReadiness(input = {}) {
       && aiGenerate.gate === 'PASS'
       && Number(aiGenerate.successfulTrials ?? 0) >= Number(aiGenerate.requiredTrials ?? 1);
   const hasGrowthCell = Object.keys(growthCell).length > 0;
-  const universalPass = hasGrowthCell
+  const hasWasmGrowthCell = Object.keys(wasmGrowthCell).length > 0;
+  const universalPass = hasWasmGrowthCell
+    ? wasmGrowthCell.status === 'VERIFIED'
+      && wasmGrowthCell.universalGrowthEligible === true
+      && wasmGrowthCell.nativeC?.status === 'VERIFIED'
+      && wasmGrowthCell.wasm?.status === 'VERIFIED'
+      && wasmGrowthCell.replay?.status === 'VERIFIED'
+      && wasmGrowthCell.cases?.every(item => item.semanticRootParity === true && item.resultOrErrorParity === true && item.statusParity === true)
+    : hasGrowthCell
     ? growthCell.status === 'VERIFIED' && growthCell.universalGrowthEligible === true
     : universal.status === 'PASS' && universal.universalGrowthEligible === true;
   const hasLegacyClosure = Object.keys(legacyClosure).length > 0;
@@ -92,9 +108,16 @@ export function buildRbc13CanonicalAdmissionReadiness(input = {}) {
     A7_semanticRootEvidence: gate('A7_semanticRootEvidence', allRoots, nativeReports.map(report => report.root), allRoots ? null : 'Native semantic state-root emission/parity is incomplete'),
     A8_authorityAndEvidenceBoundary: gate('A8_authorityAndEvidenceBoundary', authorityBoundary, [native.root, versionContract.root], authorityBoundary ? null : 'Evidence roots/tier boundary or canonical isolation is incomplete'),
     A9_performanceEvidence: gate('A9_performanceEvidence', performancePass, [performance.root, performance.hostRoot], performancePass ? null : 'Three-path performance evidence is incomplete'),
-    A10_aiGenerateDonor: gate('A10_aiGenerateDonor', aiPass, hasAiThreshold ? [aiThreshold.root, aiThreshold.protocol?.promptRoot, aiThreshold.donorSpec?.root] : [aiGenerate.root, aiGenerate.responseRoot, aiGenerate.corpus?.root], aiPass ? null : `AI_GENERATE donor status is ${hasAiThreshold ? aiThreshold.status ?? 'missing' : aiGenerate.status ?? 'missing'}`),
+    A10_aiGenerateDonor: gate('A10_aiGenerateDonor', aiPass, hasAiCompatibility
+      ? [aiCompatibility.root, aiCompatibility.protocol?.promptRoot, aiCompatibility.donor?.root, aiCompatibility.corpus?.root]
+      : hasAiThreshold
+        ? [aiThreshold.root, aiThreshold.protocol?.promptRoot, aiThreshold.donorSpec?.root]
+        : [aiGenerate.root, aiGenerate.responseRoot, aiGenerate.corpus?.root],
+    aiPass ? null : `AI_GENERATE donor status is ${hasAiCompatibility ? aiCompatibility.status ?? 'missing' : hasAiThreshold ? aiThreshold.status ?? 'missing' : aiGenerate.status ?? 'missing'}`),
       A11_selfhostAndVersionContract: gate('A11_selfhostAndVersionContract', selfhost.fixedpointStatus === 'VERIFIED' && selfhost.examplesStatus === 'VERIFIED' && selfhost.stage40Status === 'VERIFIED' && versionContract.status === 'VERIFIED', [selfhost.fixedpointRoot, selfhost.examplesRoot, selfhost.stage40Root, versionContract.root], selfhost.fixedpointStatus === 'VERIFIED' && selfhost.examplesStatus === 'VERIFIED' && selfhost.stage40Status === 'VERIFIED' && versionContract.status === 'VERIFIED' ? null : 'Selfhost or version-contract evidence is incomplete'),
-    A12_universalStressAdmissionCell: gate('A12_universalStressAdmissionCell', universalPass, hasGrowthCell ? [growthCell.root] : [universal.root], universalPass ? null : `Universal Stress cell is ${hasGrowthCell ? growthCell.status ?? 'missing' : universal.status ?? 'missing'}`),
+    A12_universalStressAdmissionCell: gate('A12_universalStressAdmissionCell', universalPass,
+      hasWasmGrowthCell ? [wasmGrowthCell.root] : hasGrowthCell ? [growthCell.root] : [universal.root],
+    universalPass ? null : `Universal Stress cell is ${hasWasmGrowthCell ? wasmGrowthCell.status ?? 'missing' : hasGrowthCell ? growthCell.status ?? 'missing' : universal.status ?? 'missing'}`),
   };
   const blockingGates = RBC13_CANONICAL_ADMISSION_GATE_KEYS.filter(key => !gates[key].passed);
   const canonicalReady = blockingGates.length === 0;
@@ -106,6 +129,13 @@ export function buildRbc13CanonicalAdmissionReadiness(input = {}) {
     canonicalAdmission: false,
     gates,
     blockingGates,
+    strictAutonomousGrowth: hasAiCompatibility
+      ? {
+        globalMaximum: aiCompatibility.strictGrowthAssessment?.globalLevel ?? 'Level 2 VERIFIED',
+        nextLevel: aiCompatibility.strictGrowthAssessment?.nextLevel ?? 'Level 3 CANDIDATE/BLOCKED',
+        formalA10: aiCompatibility.formalA10?.status ?? 'NEGATIVE_RESULT',
+      }
+      : null,
     requiredBeforeCanonicalAdmission: [
       'Resolve every blocking gate without mutating the v1 contract in place.',
       'Re-run the full current-source/native/legacy/selfhost evidence matrix on the final proposed roots.',
