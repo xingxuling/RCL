@@ -1,0 +1,245 @@
+{
+  "format": "rcl.exotic-program.e01-minimal-living-intelligence.v0.1",
+  "version": "0.1.0",
+  "status": "VERIFIED",
+  "subjectId": "e01-mind",
+  "program": {
+    "name": "MinimalLivingIntelligence",
+    "programRoot": "4910841160ec155849c570bf25640179a629e39fd0155d92e4433c5c48004a96",
+    "sourceRoot": "795031307b801a67dfbe502c6a4501efae71f3a84d095816d54e57eaa0caa512",
+    "compiled": true
+  },
+  "initialBodyRoot": "4c4cc3f5bc3bb1eca753b339c852bf1a794b015bb4f91ee4f21bb9a387e5e1e1",
+  "initialStateRoot": "553c578117579fd87ff886105d6cad6c156aa25997232959c00583a4d662570d",
+  "finalBodyRoot": "4c4cc3f5bc3bb1eca753b339c852bf1a794b015bb4f91ee4f21bb9a387e5e1e1",
+  "finalStateRoot": "f84afe52039678ddeab1c53319e03a8c2bd31bb1001c39a12fdf685257913154",
+  "maxAttempts": 8,
+  "attempts": 5,
+  "builtins": [
+    "observe",
+    "remember",
+    "compare",
+    "branch",
+    "sequence",
+    "basic_arithmetic",
+    "structured_data",
+    "goal_evaluation",
+    "capability_query"
+  ],
+  "taskResults": {
+    "taskA": {
+      "status": "VERIFIED",
+      "result": {
+        "highest": 7,
+        "threshold": 6,
+        "satisfied": true
+      },
+      "usedCapability": "compare"
+    },
+    "taskBInitial": {
+      "status": "BLOCKED",
+      "failure": {
+        "kind": "rcl.e01.failure.v0.1",
+        "taskId": "task-b",
+        "failureKind": "CAPABILITY_FAILURE",
+        "failureClass": "ORGAN_LIMIT",
+        "requiredCapability": "weighted_sum",
+        "reason": "missing capability 'weighted_sum'",
+        "details": {
+          "capabilityInventory": [
+            "basic_arithmetic",
+            "branch",
+            "capability_query",
+            "compare",
+            "goal_evaluation",
+            "observe",
+            "remember",
+            "sequence",
+            "structured_data"
+          ]
+        },
+        "root": "7bc005141c35006a621771619696591e3e31d2ab6d071f22cb75d89249612785"
+      }
+    },
+    "taskBRetry": {
+      "status": "VERIFIED",
+      "result": {
+        "value": 16,
+        "expected": 16,
+        "satisfied": true
+      },
+      "usedCapability": "weighted_sum"
+    },
+    "taskBReplayAfterDeletion": {
+      "status": "BLOCKED",
+      "failure": {
+        "kind": "rcl.e01.failure.v0.1",
+        "taskId": "task-b",
+        "failureKind": "CAPABILITY_FAILURE",
+        "failureClass": "ORGAN_LIMIT",
+        "requiredCapability": "weighted_sum",
+        "reason": "missing capability 'weighted_sum'",
+        "details": {
+          "capabilityInventory": [
+            "basic_arithmetic",
+            "branch",
+            "capability_query",
+            "compare",
+            "goal_evaluation",
+            "observe",
+            "remember",
+            "sequence",
+            "structured_data"
+          ]
+        },
+        "root": "7bc005141c35006a621771619696591e3e31d2ab6d071f22cb75d89249612785"
+      }
+    },
+    "taskCInitial": {
+      "status": "BLOCKED",
+      "failure": {
+        "kind": "rcl.e01.failure.v0.1",
+        "taskId": "task-c",
+        "failureKind": "CAPABILITY_FAILURE",
+        "failureClass": "ORGAN_LIMIT",
+        "requiredCapability": "weighted_sum",
+        "reason": "missing capability 'weighted_sum'",
+        "details": {
+          "capabilityInventory": [
+            "basic_arithmetic",
+            "branch",
+            "capability_query",
+            "compare",
+            "goal_evaluation",
+            "observe",
+            "remember",
+            "sequence",
+            "structured_data"
+          ]
+        },
+        "root": "20fad860b37272aac8dc21556f169103f2780b4c81c68d25d3aae76d20787362"
+      }
+    }
+  },
+  "donorTrials": [
+    {
+      "taskId": "task-b",
+      "status": "VERIFIED",
+      "selectedCandidateId": "weighted_sum_valid_donor",
+      "candidateIds": [
+        "weighted_sum_valid_donor",
+        "weighted_sum_wrong_donor"
+      ],
+      "humanSelected": true,
+      "metabolismRoot": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d",
+      "differentialRoot": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32",
+      "envelopeRoot": "61845f5c33d623ae5fde858cde53afb026d2e4d62a2e719f6caab7865efc76e9",
+      "metabolismStage": "native-candidate",
+      "differentialPassed": true,
+      "failureClass": null,
+      "contaminationFree": true,
+      "candidateNotInstalled": false,
+      "installation": {
+        "status": "VERIFIED",
+        "descriptor": {
+          "id": "weighted_sum_valid_donor",
+          "capabilityId": "weighted_sum",
+          "tier": "candidate-organ",
+          "canonical": false,
+          "evidenceRoot": "61845f5c33d623ae5fde858cde53afb026d2e4d62a2e719f6caab7865efc76e9",
+          "metabolismRoot": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d",
+          "differentialRoot": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32"
+        },
+        "bodyRootBefore": "4c4cc3f5bc3bb1eca753b339c852bf1a794b015bb4f91ee4f21bb9a387e5e1e1",
+        "bodyRootAfter": "ddac906847140ca8f56f4c5190a033de27106061ae2ac86f848905dc19740af6",
+        "preservedRootBefore": "33c1c10a06bdc97b9c89d0701fd8307ff5bb4632535d13bbc66188755c844ff5",
+        "preservedRootAfter": "33c1c10a06bdc97b9c89d0701fd8307ff5bb4632535d13bbc66188755c844ff5",
+        "preservedMemoryPrefixLength": 6,
+        "preservedStateUnchanged": true
+      }
+    },
+    {
+      "taskId": "task-c",
+      "status": "BLOCKED",
+      "selectedCandidateId": "weighted_sum_wrong_donor",
+      "candidateIds": [
+        "weighted_sum_wrong_donor",
+        "weighted_sum_wrong_donor_alt"
+      ],
+      "humanSelected": true,
+      "metabolismRoot": "4725bad5b8b4de88c5d123adbcd2fbc721cb2fdb03b156ba52e012f630fc9ef1",
+      "differentialRoot": "5979706929d33c7c1775580cb789b2634b1a3e23769c8416c667dc7591f9a7ef",
+      "envelopeRoot": "5ec12f70e2fb2c29b4fab7e8e6f324e9ad61548cae24503701aa53c3202ebec9",
+      "metabolismStage": "native-candidate",
+      "differentialPassed": false,
+      "failureClass": "EVIDENCE_LIMIT",
+      "contaminationFree": true,
+      "candidateNotInstalled": true,
+      "installation": null
+    }
+  ],
+  "checks": {
+    "taskFailureVsCapabilityFailure": true,
+    "capabilityGapDescribed": true,
+    "persistentState": true,
+    "differentialEvidenceBeforeInstall": true,
+    "retryUsesNewOrgan": true,
+    "statePreservedAcrossInstall": true,
+    "deleteReproducesOriginalFailure": true,
+    "failedDonorDoesNotContaminateBody": true,
+    "honestCClosure": true,
+    "boundedTermination": true,
+    "growthHistoryComplete": true,
+    "candidateNeverCanonical": true
+  },
+  "failureClasses": {
+    "taskBInitial": "ORGAN_LIMIT",
+    "taskCInitial": "ORGAN_LIMIT",
+    "taskCDonor": "EVIDENCE_LIMIT"
+  },
+  "honestClosure": {
+    "taskA": "VERIFIED",
+    "taskB": "VERIFIED after candidate-organ assimilation and bounded retry",
+    "taskC": "BLOCKED after donor differential failure; no installation"
+  },
+  "authorityBoundary": {
+    "humanDonorSelection": true,
+    "networkSearch": false,
+    "candidateOrganCanonical": false,
+    "canonicalLanguageModified": false,
+    "rbc13CanonicalModified": false
+  },
+  "store": {
+    "format": "rcl.content-addressed-reality-store.v0.13",
+    "version": "0.13.0-alpha.1",
+    "objectCount": 95,
+    "branchCount": 0,
+    "branches": {},
+    "root": "7f9662faf14ff66d1944e3a4f3801cdcb83c12daf43d634788dc44ce8e81e55e"
+  },
+  "finalCommitRoot": "d32b884f2db6f3fbb6ce294a1b6406544bbc7b67523c5cefe2a191ba76f46853",
+  "receiptRoots": [
+    "d1b7d80804b49d241eb96d2a7141253201d6b0b695cf5651dfe4d136f67cc9b6",
+    "edb30a92fc27f038a35ae9b639c5e13814ec3613737b66acc631584987e3b3ab",
+    "8de1e811662baae1ec57cd7536239df520517b3cdd02c681ac0473f60272a326",
+    "de4cb13e5b9d3c55ade7f5e2e7beecfcba05705b74e0e2f599820f8ae5e53aa2",
+    "617d01b03e08844342bc5cab58e983e19366734bfeb5609b566a2bf2d14309d1",
+    "0e17f3c6cbf8235990341902a4bbc4726a4277e642725618f8508129abe006a0",
+    "54028fdd004380618654bceb8c6caf134cff084adb90e2f34da8ffb79fd8d00f",
+    "45adbae047260fab3b25f905b5f8f2dea4b613f66e5a3d882e9f630fc79219ac",
+    "54558ebb479685d5dae0ddbc68af6dab43d2f2e32cd922fb11353bcd2f9b117f",
+    "cb93da17905d570314188786abb62d759b5f161370ade5b4e93cce7c2ff62d78",
+    "bca05fd93361714805e1c4f9deef2bddc25851b2a982514c91c3e6918d910926",
+    "94bd46f6ed06a8679ddbaae72a2eca6ee215c45a2362ed7d2c27b85435304fe0",
+    "71391b3c02a9a402714260c1cfc625e52ceb4d8f4b96abb048c72b7b168b7a2d",
+    "0c58bd0375b5d3cba90655772b5edd8c029e331c2f8c8478acc9504ea2798514",
+    "ce8f6b30280813d9d17cc68fd350f4e4c3cba9139a0cd30009fb5451ab2d1041",
+    "a7ba23ed1730c7b6d8478823a94ae797be64a294a8eb72626d9fd16b101e1d2d",
+    "3b83404996223e2295ca384d415855af27de517d14caa89f3a47372ce1ab9f4c",
+    "379caa568160f94a815c3f2926c7b33d20fbd72d95400e31945fc81a846cbe50",
+    "d32b884f2db6f3fbb6ce294a1b6406544bbc7b67523c5cefe2a191ba76f46853"
+  ],
+  "growthHistoryRoot": "9557902038f2cf174a46f9d40c3f97b93f9c894439efbf50fb6b4fd47dbe82c8",
+  "boundary": "E01 verifies one bounded living-intelligence lifecycle. It is not an LLM, not autonomous network donor search, not canonical organ promotion, and not general intelligence evidence.",
+  "root": "c21edf1c7ffb1908d3b563cbe295c073e0b19bd2fc4a65c7edd17f29a71d395e"
+}

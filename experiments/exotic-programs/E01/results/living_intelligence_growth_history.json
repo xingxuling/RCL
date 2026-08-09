@@ -1,0 +1,420 @@
+{
+  "format": "rcl.e01-living-intelligence-growth-history.v0.1",
+  "experimentId": "E01",
+  "subjectId": "e01-mind",
+  "status": "VERIFIED",
+  "root": "9557902038f2cf174a46f9d40c3f97b93f9c894439efbf50fb6b4fd47dbe82c8",
+  "entries": [
+    {
+      "sequence": 1,
+      "type": "subject.genesis",
+      "payload": {
+        "programRoot": "4910841160ec155849c570bf25640179a629e39fd0155d92e4433c5c48004a96",
+        "builtins": [
+          "observe",
+          "remember",
+          "compare",
+          "branch",
+          "sequence",
+          "basic_arithmetic",
+          "structured_data",
+          "goal_evaluation",
+          "capability_query"
+        ]
+      },
+      "eventRoot": "1fc40707edbbd4622485591f9cd880b942bd57e1663d79043f18dc19bf36bee0"
+    },
+    {
+      "sequence": 2,
+      "type": "observation.recorded",
+      "payload": {
+        "taskId": "task-a",
+        "reason": "normal",
+        "input": {
+          "scores": [
+            4,
+            7,
+            5
+          ],
+          "threshold": 6
+        },
+        "availableCapabilities": [
+          "basic_arithmetic",
+          "branch",
+          "capability_query",
+          "compare",
+          "goal_evaluation",
+          "observe",
+          "remember",
+          "sequence",
+          "structured_data"
+        ],
+        "stateVersionBefore": 1
+      },
+      "eventRoot": "0b0e5027901ca8f0fccf651971170bea9ff051c54c63e09d601cdc5b68480a40"
+    },
+    {
+      "sequence": 3,
+      "type": "task.completed",
+      "payload": {
+        "taskId": "task-a",
+        "result": {
+          "highest": 7,
+          "threshold": 6,
+          "satisfied": true
+        },
+        "usedCapability": "compare"
+      },
+      "eventRoot": "8546b8e33be0be87e5255122f104ce86a48ec651acd1e6e331b25407941aeca8"
+    },
+    {
+      "sequence": 4,
+      "type": "observation.recorded",
+      "payload": {
+        "taskId": "task-b",
+        "reason": "normal",
+        "input": {
+          "values": [
+            2,
+            4,
+            6
+          ],
+          "weights": [
+            1,
+            2,
+            1
+          ]
+        },
+        "availableCapabilities": [
+          "basic_arithmetic",
+          "branch",
+          "capability_query",
+          "compare",
+          "goal_evaluation",
+          "observe",
+          "remember",
+          "sequence",
+          "structured_data"
+        ],
+        "stateVersionBefore": 3
+      },
+      "eventRoot": "a4ecd8f7bcdda89f0dbbaca49a59ddfeeb873572bab52f1899d3833f7fcc20ac"
+    },
+    {
+      "sequence": 5,
+      "type": "task.failed-capability-gap",
+      "payload": {
+        "taskId": "task-b",
+        "failure": {
+          "kind": "rcl.e01.failure.v0.1",
+          "taskId": "task-b",
+          "failureKind": "CAPABILITY_FAILURE",
+          "failureClass": "ORGAN_LIMIT",
+          "requiredCapability": "weighted_sum",
+          "reason": "missing capability 'weighted_sum'",
+          "details": {
+            "capabilityInventory": [
+              "basic_arithmetic",
+              "branch",
+              "capability_query",
+              "compare",
+              "goal_evaluation",
+              "observe",
+              "remember",
+              "sequence",
+              "structured_data"
+            ]
+          },
+          "root": "7bc005141c35006a621771619696591e3e31d2ab6d071f22cb75d89249612785"
+        }
+      },
+      "eventRoot": "c1149afa32e55d12bb371c0e1cc64a73dd6bff75d13818d65b78349d91a35b52"
+    },
+    {
+      "sequence": 6,
+      "type": "donor.selected-by-human",
+      "payload": {
+        "taskId": "task-b",
+        "actor": "human",
+        "candidateIds": [
+          "weighted_sum_valid_donor",
+          "weighted_sum_wrong_donor"
+        ],
+        "selectedCandidateId": "weighted_sum_valid_donor"
+      },
+      "eventRoot": "7047b87a1a3f66320d52f7bb4054084411ec4362df9b3e7425d5307c82325f2f"
+    },
+    {
+      "sequence": 7,
+      "type": "donor.evaluated",
+      "payload": {
+        "taskId": "task-b",
+        "status": "VERIFIED",
+        "selectedCandidateId": "weighted_sum_valid_donor",
+        "candidateIds": [
+          "weighted_sum_valid_donor",
+          "weighted_sum_wrong_donor"
+        ],
+        "humanSelected": true,
+        "metabolismRoot": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d",
+        "differentialRoot": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32",
+        "envelopeRoot": "61845f5c33d623ae5fde858cde53afb026d2e4d62a2e719f6caab7865efc76e9",
+        "metabolismStage": "native-candidate",
+        "differentialPassed": true,
+        "failureClass": null,
+        "error": null
+      },
+      "eventRoot": "aa81cc95b3ef796cdd11bd17cba0e4c913dedb44fa9aa3bb30c58ced16ae54f7"
+    },
+    {
+      "sequence": 8,
+      "type": "organ.candidate-installed",
+      "payload": {
+        "id": "weighted_sum_valid_donor",
+        "capabilityId": "weighted_sum",
+        "tier": "candidate-organ",
+        "canonical": false,
+        "evidenceRoot": "61845f5c33d623ae5fde858cde53afb026d2e4d62a2e719f6caab7865efc76e9",
+        "metabolismRoot": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d",
+        "differentialRoot": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32"
+      },
+      "eventRoot": "e1c9d7a086862cdb7a4180b9caac1bbf47af74f667e9fdc6cd884fbdba350bea"
+    },
+    {
+      "sequence": 9,
+      "type": "task.retry-requested",
+      "payload": {
+        "taskId": "task-b",
+        "remainingBefore": 2
+      },
+      "eventRoot": "bd63399943ba70d08751887e88b9b85dc8c195e86f350f025e0976e9640fdde0"
+    },
+    {
+      "sequence": 10,
+      "type": "observation.recorded",
+      "payload": {
+        "taskId": "task-b",
+        "reason": "capability-installed-retry",
+        "input": {
+          "values": [
+            2,
+            4,
+            6
+          ],
+          "weights": [
+            1,
+            2,
+            1
+          ]
+        },
+        "availableCapabilities": [
+          "basic_arithmetic",
+          "branch",
+          "capability_query",
+          "compare",
+          "goal_evaluation",
+          "observe",
+          "remember",
+          "sequence",
+          "structured_data",
+          "weighted_sum"
+        ],
+        "stateVersionBefore": 9
+      },
+      "eventRoot": "f8dc519712e74f70a12a5bcc4228e9361b5c7658f8c1f95d2e25094b4d476390"
+    },
+    {
+      "sequence": 11,
+      "type": "task.completed-with-organ",
+      "payload": {
+        "taskId": "task-b",
+        "result": {
+          "value": 16,
+          "expected": 16,
+          "satisfied": true
+        },
+        "usedCapability": "weighted_sum"
+      },
+      "eventRoot": "0bfda8c645a993872b1a47ea274b77a3a6d913589e720be2fb8d3cd193f4b0b1"
+    },
+    {
+      "sequence": 12,
+      "type": "organ.candidate-removed",
+      "payload": {
+        "capabilityId": "weighted_sum"
+      },
+      "eventRoot": "287e425eef31987ef05d799861c161900380365a9e21f7e990aea60a97ade31e"
+    },
+    {
+      "sequence": 13,
+      "type": "observation.recorded",
+      "payload": {
+        "taskId": "task-b",
+        "reason": "after-organ-deletion-replay",
+        "input": {
+          "values": [
+            2,
+            4,
+            6
+          ],
+          "weights": [
+            1,
+            2,
+            1
+          ]
+        },
+        "availableCapabilities": [
+          "basic_arithmetic",
+          "branch",
+          "capability_query",
+          "compare",
+          "goal_evaluation",
+          "observe",
+          "remember",
+          "sequence",
+          "structured_data"
+        ],
+        "stateVersionBefore": 12
+      },
+      "eventRoot": "465ad3a0ab5b73d40544921aa3342cf4a9cfe0fb010cedf8b88183352021eb16"
+    },
+    {
+      "sequence": 14,
+      "type": "task.failed-capability-gap",
+      "payload": {
+        "taskId": "task-b",
+        "failure": {
+          "kind": "rcl.e01.failure.v0.1",
+          "taskId": "task-b",
+          "failureKind": "CAPABILITY_FAILURE",
+          "failureClass": "ORGAN_LIMIT",
+          "requiredCapability": "weighted_sum",
+          "reason": "missing capability 'weighted_sum'",
+          "details": {
+            "capabilityInventory": [
+              "basic_arithmetic",
+              "branch",
+              "capability_query",
+              "compare",
+              "goal_evaluation",
+              "observe",
+              "remember",
+              "sequence",
+              "structured_data"
+            ]
+          },
+          "root": "7bc005141c35006a621771619696591e3e31d2ab6d071f22cb75d89249612785"
+        }
+      },
+      "eventRoot": "41042b4da38188f6f2c127ec7fd84eb3b047c1a93d3aaeb2cc84a8d4be77ef9a"
+    },
+    {
+      "sequence": 15,
+      "type": "observation.recorded",
+      "payload": {
+        "taskId": "task-c",
+        "reason": "normal",
+        "input": {
+          "values": [
+            2,
+            4,
+            6
+          ],
+          "weights": [
+            1,
+            2,
+            1
+          ]
+        },
+        "availableCapabilities": [
+          "basic_arithmetic",
+          "branch",
+          "capability_query",
+          "compare",
+          "goal_evaluation",
+          "observe",
+          "remember",
+          "sequence",
+          "structured_data"
+        ],
+        "stateVersionBefore": 14
+      },
+      "eventRoot": "9922044a36b1254b4d26e646121a906fa4da994a0f7e7a50f8bac0984028eb74"
+    },
+    {
+      "sequence": 16,
+      "type": "task.failed-capability-gap",
+      "payload": {
+        "taskId": "task-c",
+        "failure": {
+          "kind": "rcl.e01.failure.v0.1",
+          "taskId": "task-c",
+          "failureKind": "CAPABILITY_FAILURE",
+          "failureClass": "ORGAN_LIMIT",
+          "requiredCapability": "weighted_sum",
+          "reason": "missing capability 'weighted_sum'",
+          "details": {
+            "capabilityInventory": [
+              "basic_arithmetic",
+              "branch",
+              "capability_query",
+              "compare",
+              "goal_evaluation",
+              "observe",
+              "remember",
+              "sequence",
+              "structured_data"
+            ]
+          },
+          "root": "20fad860b37272aac8dc21556f169103f2780b4c81c68d25d3aae76d20787362"
+        }
+      },
+      "eventRoot": "e36395efcb7911773ff6ab0f688fbace82c66c418a427f07c42a395b607a0fed"
+    },
+    {
+      "sequence": 17,
+      "type": "donor.selected-by-human",
+      "payload": {
+        "taskId": "task-c",
+        "actor": "human",
+        "candidateIds": [
+          "weighted_sum_wrong_donor",
+          "weighted_sum_wrong_donor_alt"
+        ],
+        "selectedCandidateId": "weighted_sum_wrong_donor"
+      },
+      "eventRoot": "c02de44ae4b918c7826e775eeccc0380cb3ff8e1e9529be479855dcae2589c11"
+    },
+    {
+      "sequence": 18,
+      "type": "donor.evaluated",
+      "payload": {
+        "taskId": "task-c",
+        "status": "BLOCKED",
+        "selectedCandidateId": "weighted_sum_wrong_donor",
+        "candidateIds": [
+          "weighted_sum_wrong_donor",
+          "weighted_sum_wrong_donor_alt"
+        ],
+        "humanSelected": true,
+        "metabolismRoot": "4725bad5b8b4de88c5d123adbcd2fbc721cb2fdb03b156ba52e012f630fc9ef1",
+        "differentialRoot": "5979706929d33c7c1775580cb789b2634b1a3e23769c8416c667dc7591f9a7ef",
+        "envelopeRoot": "5ec12f70e2fb2c29b4fab7e8e6f324e9ad61548cae24503701aa53c3202ebec9",
+        "metabolismStage": "native-candidate",
+        "differentialPassed": false,
+        "failureClass": "EVIDENCE_LIMIT",
+        "error": null
+      },
+      "eventRoot": "2c9121d0dacd7e151aea5c8fbffc55fbd0c5e12f1feea6e550a8143889ee4f59"
+    },
+    {
+      "sequence": 19,
+      "type": "subject.terminated",
+      "payload": {
+        "reason": "task-c-honest-blocked-closure",
+        "attemptCount": 5
+      },
+      "eventRoot": "cdd180e412e7e17ae8f043319cc272256cf832c19bb3f0da57057a3f45a77547"
+    }
+  ]
+}

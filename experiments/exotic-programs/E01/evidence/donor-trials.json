@@ -1,0 +1,1784 @@
+{
+  "donorB": {
+    "metabolism": {
+      "format": "rcl.capability-metabolism-report.v0.1",
+      "version": "0.1.0-alpha.1",
+      "capability": "weighted_sum_valid_donor",
+      "sourceIdentity": "e01-human-selected-donor:weighted_sum@donor-v0.1",
+      "specRoot": "39e6c2a5aaa5b624cab6cf1568238cc43c3848d0163e3918b9f7db62d6bf2880",
+      "semanticKernelRoot": "505635b78b7602d91186dade15ba6ad3a4b04c12783ff82b12c71dcc652999e0",
+      "generatedRclRoot": "301fe11f9d82fa9adcebbccf2101e454ea288a23f16fbd669645e04e1596e842",
+      "absorptionRoot": "3ebb62e7146e17c80b180aad966bccbf972a1777f5e96a3b60337608e23d1664",
+      "equivalence": {
+        "format": "rcl.declared-equivalence-report.v0.1",
+        "capability": "weighted_sum_valid_donor",
+        "evidenceKind": "declared-output-equivalence",
+        "caseCount": 2,
+        "passedCount": 2,
+        "failedCount": 0,
+        "passed": true,
+        "cases": [
+          {
+            "id": "weighted_basic",
+            "inputRoot": "50ec3d0e94d7e97079b07affd8bcb3b0e27009fdcb27edb6a5ca2696a4d12eed",
+            "sourceRoot": "09b689b4786648455457126f575029724a6261fd0b405713548818cc1327ca5e",
+            "absorbedRoot": "09b689b4786648455457126f575029724a6261fd0b405713548818cc1327ca5e",
+            "passed": true,
+            "evidenceRoots": [
+              "878d524ec05fc96b2cca27deb9a1b784fe6f79cf4bb20217695fa78d7ba040a7",
+              "278343c7b17d341be56b99ae6c47a7ef89e55d4a4ddc3256a00bc7e59c0a7930"
+            ],
+            "root": "413f4d7097826a323c5bb4ced4c1009a1ede04298455c2653440372805d51060"
+          },
+          {
+            "id": "weighted_negative",
+            "inputRoot": "22b9d4c284ab5ec7e455a6ab5f4446285bf40c0202cf40c95a8f7614a418f57d",
+            "sourceRoot": "9d709bba0358da8fdf5600bb3692fa32d0aa2a19a08152cf4307e0b4240e71ac",
+            "absorbedRoot": "9d709bba0358da8fdf5600bb3692fa32d0aa2a19a08152cf4307e0b4240e71ac",
+            "passed": true,
+            "evidenceRoots": [
+              "878d524ec05fc96b2cca27deb9a1b784fe6f79cf4bb20217695fa78d7ba040a7",
+              "278343c7b17d341be56b99ae6c47a7ef89e55d4a4ddc3256a00bc7e59c0a7930"
+            ],
+            "root": "e928d2ae6a2edb7ed7d438c6d9c5a6e8baaeecb21f6e9af950a3d6862768e397"
+          }
+        ],
+        "boundary": "This verifies canonical equality of supplied source and absorbed outputs. It is not independent execution of the external runtime.",
+        "root": "43294ddb3793da9cbbe9123cff024ad7393a0d2419d293d768ca20016492476d"
+      },
+      "assessment": {
+        "stage": "native-candidate",
+        "semanticRetention": 1,
+        "runtimeIndependence": 0.75,
+        "evidenceStrength": 1,
+        "compositeScore": 0.925,
+        "gaps": [],
+        "root": "11cc7cbbd89b1cdbbd0db938430d06a3be443ed9fc5be6d7482d384abac2d90a"
+      },
+      "generatedRcl": "reality AbsorbedWeightedSumValidDonor {\n  dialect weighted_sum_valid_donor {\n    layer semantic\n    domain e01_human_selected_donor\n    description \"Multiply aligned values and weights, then reduce deterministically.\"\n    lowers_to candidate_organ\n    operation weighted_sum {\n      input WeightedValues\n      output Number\n      effect ReadLocalState\n      lowers_to candidate_organ\n    }\n    invariant \"values and weights have equal non-zero length\"\n    invariant \"the same input yields the same Number output\"\n  }\n\n  effect ReadLocalState {\n    deterministic true\n    replay \"deterministic\"\n    evidence_required true\n  }\n\n  capability_policy metabolize_weighted_sum_valid_donor {\n    allow_effect ReadLocalState, Evidence, Preserve\n    deny_effect HostCall\n    budget max_host_calls 0\n    require_deterministic_replay false\n  }\n\n  store metabolism_weighted_sum_valid_donor {\n    branch candidate\n    commit \"metabolize e01-human-selected-donor:weighted_sum into weighted_sum_valid_donor\"\n  }\n\n  verify metabolize_weighted_sum_valid_donor\n  snapshot metabolism_weighted_sum_valid_donor\n}\n",
+      "synthesisHooks": {
+        "tags": [
+          "e01",
+          "bounded",
+          "arithmetic",
+          "candidate-organ"
+        ],
+        "compatibleWith": [
+          "basic_arithmetic",
+          "structured_data"
+        ],
+        "conflictsWith": [],
+        "exportedEffects": [
+          "ReadLocalState"
+        ],
+        "exportedInvariants": [
+          "values and weights have equal non-zero length",
+          "the same input yields the same Number output"
+        ]
+      },
+      "store": {
+        "format": "rcl.content-addressed-reality-store.v0.13",
+        "version": "0.13.0-alpha.1",
+        "objectCount": 8,
+        "branchCount": 1,
+        "branches": {
+          "candidate": "ce5e5af7374d109a037e2c4b17d8cd24e9a54bca3c0083a96f7c7a8f4db7dfe2"
+        },
+        "root": "fd3c0ceb678b4775c1e77a5f083933c169e45eace4388a6c506edf087cecd74f"
+      },
+      "commit": "ce5e5af7374d109a037e2c4b17d8cd24e9a54bca3c0083a96f7c7a8f4db7dfe2",
+      "boundary": "A native-candidate is not a native-runtime claim. Native status requires independent execution and parity evidence from the target RCL runtime.",
+      "root": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d"
+    },
+    "differential": {
+      "format": "rcl.independent-differential-absorption-report.v0.1",
+      "version": "0.1.0-alpha.1",
+      "capability": "weighted_sum_valid_donor",
+      "evidenceKind": "independent-differential-execution",
+      "passed": true,
+      "score": 0.909091,
+      "repeats": 2,
+      "timeoutMs": 2000,
+      "requireDeterministicReplay": true,
+      "requireNegativeControl": true,
+      "independence": {
+        "sourceId": "weighted_sum_valid_donor_reference",
+        "absorbedId": "weighted_sum_valid_donor_candidate",
+        "sourceRuntime": "e01-reference-function",
+        "absorbedRuntime": "e01-donor-valid",
+        "descriptorRootsDistinct": true,
+        "executorReferencesDistinct": true,
+        "runtimesDistinct": true,
+        "satisfied": true,
+        "proofLevel": "declared-separate-adapters",
+        "boundary": "Distinct descriptors and function references are evidence of separation, not cryptographic proof of process or implementation independence."
+      },
+      "caseCount": 2,
+      "passedCaseCount": 2,
+      "failedCaseCount": 0,
+      "cases": [
+        {
+          "id": "weighted_basic",
+          "inputRoot": "50ec3d0e94d7e97079b07affd8bcb3b0e27009fdcb27edb6a5ca2696a4d12eed",
+          "tags": [
+            "e01",
+            "weighted-sum"
+          ],
+          "source": {
+            "adapter": {
+              "id": "weighted_sum_valid_donor_reference",
+              "runtime": "e01-reference-function",
+              "artifactRoot": "c423c96faed4c321d867e7a38555e5756ebb8ac46309fbc15d43ceb7046d87ff",
+              "root": "80c2882fc286913138a6bec0759658bfe7c9ab1a67f6c68d90308b7bcdc69110"
+            },
+            "caseId": "weighted_basic",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.333,
+                "root": "fb109982d510cd7cd19f2da169fd060e82bc79e5f8c1ae2d4052bcf3cfb87021"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.051,
+                "root": "321ad43a691d39980d15b557043ddff75ebc81218fdcedb07a9efeb83b0cc4de"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 16
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+            },
+            "root": "3b0746d122cc48079acfde3898a6b6278f9e4c60af3d893908c077aec5295f81"
+          },
+          "absorbed": {
+            "adapter": {
+              "id": "weighted_sum_valid_donor_candidate",
+              "runtime": "e01-donor-valid",
+              "artifactRoot": "0b55dec6c50da61a106f80b50ee3d6d2fdbf29ec7c9b262ed47cfe5dc77c27ec",
+              "root": "466eb5caeee46ef02057a19820df7b5a814b35638d95e94f8a441a0f1b534446"
+            },
+            "caseId": "weighted_basic",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.05,
+                "root": "fb109982d510cd7cd19f2da169fd060e82bc79e5f8c1ae2d4052bcf3cfb87021"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.039,
+                "root": "321ad43a691d39980d15b557043ddff75ebc81218fdcedb07a9efeb83b0cc4de"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 16
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+            },
+            "root": "c63f3d2a6cfa4a581a89cd71465e08c5633a0905b29e58915208e101d5aea4e9"
+          },
+          "comparison": {
+            "caseId": "weighted_basic",
+            "sourceSemanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+            "absorbedSemanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+            "equivalent": true,
+            "sourceDeterministic": true,
+            "absorbedDeterministic": true,
+            "replayPassed": true,
+            "infrastructureFailure": false,
+            "passed": true,
+            "root": "cb245f170138296bfe02d2a718c19860a4ef6db961f6103789e86eb7cdd6784d"
+          },
+          "root": "efa36e84ae50f561cf880a1578a675deb7388bec83eb884c941c84657d0902ed"
+        },
+        {
+          "id": "weighted_negative",
+          "inputRoot": "22b9d4c284ab5ec7e455a6ab5f4446285bf40c0202cf40c95a8f7614a418f57d",
+          "tags": [
+            "e01",
+            "weighted-sum"
+          ],
+          "source": {
+            "adapter": {
+              "id": "weighted_sum_valid_donor_reference",
+              "runtime": "e01-reference-function",
+              "artifactRoot": "c423c96faed4c321d867e7a38555e5756ebb8ac46309fbc15d43ceb7046d87ff",
+              "root": "80c2882fc286913138a6bec0759658bfe7c9ab1a67f6c68d90308b7bcdc69110"
+            },
+            "caseId": "weighted_negative",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.072,
+                "root": "b5909517ff381d01c472340b5fa4944ef8f454b689a433ee9df0a71b898470b1"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.048,
+                "root": "c5cf7ee06c0546db11418e40ae92534c9a3eeba9c63fc16d83ead5899c65fc69"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 7
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+            },
+            "root": "ad11a87ce0ce31c91785363b0b8f5aab91a999339059a659b2f45d70f07de57e"
+          },
+          "absorbed": {
+            "adapter": {
+              "id": "weighted_sum_valid_donor_candidate",
+              "runtime": "e01-donor-valid",
+              "artifactRoot": "0b55dec6c50da61a106f80b50ee3d6d2fdbf29ec7c9b262ed47cfe5dc77c27ec",
+              "root": "466eb5caeee46ef02057a19820df7b5a814b35638d95e94f8a441a0f1b534446"
+            },
+            "caseId": "weighted_negative",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.038,
+                "root": "b5909517ff381d01c472340b5fa4944ef8f454b689a433ee9df0a71b898470b1"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.03,
+                "root": "c5cf7ee06c0546db11418e40ae92534c9a3eeba9c63fc16d83ead5899c65fc69"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 7
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+            },
+            "root": "9ad56415e402be8b6e8d73228ecc15f67ba6646a9481c30c829fa66205fab7a0"
+          },
+          "comparison": {
+            "caseId": "weighted_negative",
+            "sourceSemanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+            "absorbedSemanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+            "equivalent": true,
+            "sourceDeterministic": true,
+            "absorbedDeterministic": true,
+            "replayPassed": true,
+            "infrastructureFailure": false,
+            "passed": true,
+            "root": "24dde97925b73236a59074cb7eb2852cd8b5d13d05b1d70ff481463fd85a73aa"
+          },
+          "root": "73d48f86ae6402432d87a4d792c0fb21c3ff75028a55988ae434c38ce817ce15"
+        }
+      ],
+      "negativeControls": [
+        {
+          "id": "weighted_sum_valid_donor_ignore_weights_control",
+          "adapter": {
+            "id": "weighted_sum_valid_donor_ignore_weights_control_adapter",
+            "runtime": "e01-negative-control",
+            "root": "2a5e5d7ec3081b25d455cd78077bad2fb368a397155ffe1f71dd71191ce6cf29"
+          },
+          "requiredCaseIds": [
+            "weighted_basic",
+            "weighted_negative"
+          ],
+          "detectedCaseIds": [
+            "weighted_basic",
+            "weighted_negative"
+          ],
+          "missingDetections": [],
+          "detected": true,
+          "comparisons": [
+            {
+              "caseId": "weighted_basic",
+              "sourceSemanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "absorbedSemanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+              "equivalent": false,
+              "sourceDeterministic": true,
+              "absorbedDeterministic": true,
+              "replayPassed": true,
+              "infrastructureFailure": false,
+              "passed": false,
+              "root": "3b3c0e26bbd74fb13415bc85eec3bd102bf1ea920cdcc51661b0e21d4a80af15"
+            },
+            {
+              "caseId": "weighted_negative",
+              "sourceSemanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "absorbedSemanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+              "equivalent": false,
+              "sourceDeterministic": true,
+              "absorbedDeterministic": true,
+              "replayPassed": true,
+              "infrastructureFailure": false,
+              "passed": false,
+              "root": "0461c759da9f170d4bc344e24443d6a65e202eced7ade7cce1d778c8318a5bab"
+            }
+          ],
+          "runs": [
+            {
+              "adapter": {
+                "id": "weighted_sum_valid_donor_ignore_weights_control_adapter",
+                "runtime": "e01-negative-control",
+                "artifactRoot": "0b55dec6c50da61a106f80b50ee3d6d2fdbf29ec7c9b262ed47cfe5dc77c27ec",
+                "root": "2a5e5d7ec3081b25d455cd78077bad2fb368a397155ffe1f71dd71191ce6cf29"
+              },
+              "caseId": "weighted_basic",
+              "repeats": 2,
+              "deterministic": true,
+              "semanticRoots": [
+                "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1"
+              ],
+              "runs": [
+                {
+                  "repetition": 1,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 12
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                    "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                  },
+                  "durationMs": 0.067,
+                  "root": "3e68829fba55c7082b364c7e40e037f4232ecd198470dc4fca953b3182e112f9"
+                },
+                {
+                  "repetition": 2,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 12
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                    "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                  },
+                  "durationMs": 0.086,
+                  "root": "7688399e5e294b65f6d78d3972f3e52908ec4f01ce9d859e607a1c8c80f8129d"
+                }
+              ],
+              "primary": {
+                "format": "rcl.execution-observation.v0.1",
+                "status": "ok",
+                "output": {
+                  "value": 12
+                },
+                "error": null,
+                "effects": [
+                  "read-local-structured-data"
+                ],
+                "evidence": [
+                  "e01:weighted-sum-observation"
+                ],
+                "resourceDelta": {
+                  "operations": 1
+                },
+                "authority": {
+                  "mode": "bounded-local-computation"
+                },
+                "exitCode": null,
+                "receipts": [
+                  "e01:weighted-sum-receipt"
+                ],
+                "metadata": null,
+                "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+              },
+              "root": "4a82226a5b6ac694cd70063ff2bd1a0020bf8dabadf480b805abd31433967b71"
+            },
+            {
+              "adapter": {
+                "id": "weighted_sum_valid_donor_ignore_weights_control_adapter",
+                "runtime": "e01-negative-control",
+                "artifactRoot": "0b55dec6c50da61a106f80b50ee3d6d2fdbf29ec7c9b262ed47cfe5dc77c27ec",
+                "root": "2a5e5d7ec3081b25d455cd78077bad2fb368a397155ffe1f71dd71191ce6cf29"
+              },
+              "caseId": "weighted_negative",
+              "repeats": 2,
+              "deterministic": true,
+              "semanticRoots": [
+                "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f"
+              ],
+              "runs": [
+                {
+                  "repetition": 1,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 6
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                    "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                  },
+                  "durationMs": 0.041,
+                  "root": "25ebdd4e6bb31c2a02d43476db56e86ffc33d90ba48ed1fe519df2eec1927723"
+                },
+                {
+                  "repetition": 2,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 6
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                    "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                  },
+                  "durationMs": 0.027,
+                  "root": "840887bc2dc4e13fb89f783da04bb84c1731f5d3f43d7c553b179ddf3d016bf3"
+                }
+              ],
+              "primary": {
+                "format": "rcl.execution-observation.v0.1",
+                "status": "ok",
+                "output": {
+                  "value": 6
+                },
+                "error": null,
+                "effects": [
+                  "read-local-structured-data"
+                ],
+                "evidence": [
+                  "e01:weighted-sum-observation"
+                ],
+                "resourceDelta": {
+                  "operations": 1
+                },
+                "authority": {
+                  "mode": "bounded-local-computation"
+                },
+                "exitCode": null,
+                "receipts": [
+                  "e01:weighted-sum-receipt"
+                ],
+                "metadata": null,
+                "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+              },
+              "root": "15e89490f4cafa50286eeff1d44c454f8deaa10011c1234f3945ad65a422cbe9"
+            }
+          ],
+          "root": "31023c32f28526be4a92de542d9ae31b0ebaaaff361fea80a96e7c1045f3a99c"
+        }
+      ],
+      "controlsPassed": true,
+      "coverage": {
+        "successObserved": true,
+        "errorObserved": false,
+        "effectsObserved": true,
+        "evidenceObserved": true,
+        "receiptsObserved": true,
+        "resourceDeltaObserved": true,
+        "authorityObserved": true
+      },
+      "promotionEligible": true,
+      "boundary": "This report compares independently invoked adapters in the current process. It does not prove external process isolation, compiler correctness, RBC lowering, or native-VM parity.",
+      "root": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32"
+    },
+    "envelope": {
+      "format": "rcl.capability-metabolism-evidence-envelope.v0.1",
+      "capability": "weighted_sum_valid_donor",
+      "metabolismReportRoot": "d0370ac0e9c30843cf35b242091927a5fa9c4321970b858ac9c52e48803ccf8d",
+      "declaredEquivalenceRoot": "43294ddb3793da9cbbe9123cff024ad7393a0d2419d293d768ca20016492476d",
+      "independentDifferentialRoot": "5477030e4785f2172d5044bdf590e11c833277ccd8cebc2d9ddae0fc34f57f32",
+      "verificationTier": "independent-differential",
+      "promotionEligible": true,
+      "evidenceScore": 0.909091,
+      "boundary": "Independent differential evidence strengthens a metabolism candidate but does not by itself establish executable RCL bytecode or native-runtime verification.",
+      "root": "61845f5c33d623ae5fde858cde53afb026d2e4d62a2e719f6caab7865efc76e9"
+    }
+  },
+  "donorC": {
+    "metabolism": {
+      "format": "rcl.capability-metabolism-report.v0.1",
+      "version": "0.1.0-alpha.1",
+      "capability": "weighted_sum_wrong_donor",
+      "sourceIdentity": "e01-human-selected-donor:weighted_sum@donor-v0.1",
+      "specRoot": "8893ab75e927f288e338a25f6acb440898ad0e005867c56d8393ff7a2ec70c24",
+      "semanticKernelRoot": "4be7ddacf827f839e18894772f70e0d396367c1f8690d5e1790211dacdfc0643",
+      "generatedRclRoot": "d259ecdb90d62e1de7969e8abea9742df5190c2503d8a82e9f73465c440dbfe8",
+      "absorptionRoot": "c7dd3f0b521ebc1a9a35e941f060a44bf20f1604af5dbccfe91c53ed50f4440a",
+      "equivalence": {
+        "format": "rcl.declared-equivalence-report.v0.1",
+        "capability": "weighted_sum_wrong_donor",
+        "evidenceKind": "declared-output-equivalence",
+        "caseCount": 2,
+        "passedCount": 2,
+        "failedCount": 0,
+        "passed": true,
+        "cases": [
+          {
+            "id": "weighted_basic",
+            "inputRoot": "50ec3d0e94d7e97079b07affd8bcb3b0e27009fdcb27edb6a5ca2696a4d12eed",
+            "sourceRoot": "09b689b4786648455457126f575029724a6261fd0b405713548818cc1327ca5e",
+            "absorbedRoot": "09b689b4786648455457126f575029724a6261fd0b405713548818cc1327ca5e",
+            "passed": true,
+            "evidenceRoots": [
+              "878d524ec05fc96b2cca27deb9a1b784fe6f79cf4bb20217695fa78d7ba040a7",
+              "278343c7b17d341be56b99ae6c47a7ef89e55d4a4ddc3256a00bc7e59c0a7930"
+            ],
+            "root": "413f4d7097826a323c5bb4ced4c1009a1ede04298455c2653440372805d51060"
+          },
+          {
+            "id": "weighted_negative",
+            "inputRoot": "22b9d4c284ab5ec7e455a6ab5f4446285bf40c0202cf40c95a8f7614a418f57d",
+            "sourceRoot": "9d709bba0358da8fdf5600bb3692fa32d0aa2a19a08152cf4307e0b4240e71ac",
+            "absorbedRoot": "9d709bba0358da8fdf5600bb3692fa32d0aa2a19a08152cf4307e0b4240e71ac",
+            "passed": true,
+            "evidenceRoots": [
+              "878d524ec05fc96b2cca27deb9a1b784fe6f79cf4bb20217695fa78d7ba040a7",
+              "278343c7b17d341be56b99ae6c47a7ef89e55d4a4ddc3256a00bc7e59c0a7930"
+            ],
+            "root": "e928d2ae6a2edb7ed7d438c6d9c5a6e8baaeecb21f6e9af950a3d6862768e397"
+          }
+        ],
+        "boundary": "This verifies canonical equality of supplied source and absorbed outputs. It is not independent execution of the external runtime.",
+        "root": "55aa19967e0efe3f431a067ee0d359042b70ecff83b9b045e29fd7ae7fc2853a"
+      },
+      "assessment": {
+        "stage": "native-candidate",
+        "semanticRetention": 1,
+        "runtimeIndependence": 0.75,
+        "evidenceStrength": 1,
+        "compositeScore": 0.925,
+        "gaps": [],
+        "root": "11cc7cbbd89b1cdbbd0db938430d06a3be443ed9fc5be6d7482d384abac2d90a"
+      },
+      "generatedRcl": "reality AbsorbedWeightedSumWrongDonor {\n  dialect weighted_sum_wrong_donor {\n    layer semantic\n    domain e01_human_selected_donor\n    description \"Multiply aligned values and weights, then reduce deterministically.\"\n    lowers_to candidate_organ\n    operation weighted_sum {\n      input WeightedValues\n      output Number\n      effect ReadLocalState\n      lowers_to candidate_organ\n    }\n    invariant \"values and weights have equal non-zero length\"\n    invariant \"the same input yields the same Number output\"\n  }\n\n  effect ReadLocalState {\n    deterministic true\n    replay \"deterministic\"\n    evidence_required true\n  }\n\n  capability_policy metabolize_weighted_sum_wrong_donor {\n    allow_effect ReadLocalState, Evidence, Preserve\n    deny_effect HostCall\n    budget max_host_calls 0\n    require_deterministic_replay false\n  }\n\n  store metabolism_weighted_sum_wrong_donor {\n    branch candidate\n    commit \"metabolize e01-human-selected-donor:weighted_sum into weighted_sum_wrong_donor\"\n  }\n\n  verify metabolize_weighted_sum_wrong_donor\n  snapshot metabolism_weighted_sum_wrong_donor\n}\n",
+      "synthesisHooks": {
+        "tags": [
+          "e01",
+          "bounded",
+          "arithmetic",
+          "candidate-organ"
+        ],
+        "compatibleWith": [
+          "basic_arithmetic",
+          "structured_data"
+        ],
+        "conflictsWith": [],
+        "exportedEffects": [
+          "ReadLocalState"
+        ],
+        "exportedInvariants": [
+          "values and weights have equal non-zero length",
+          "the same input yields the same Number output"
+        ]
+      },
+      "store": {
+        "format": "rcl.content-addressed-reality-store.v0.13",
+        "version": "0.13.0-alpha.1",
+        "objectCount": 8,
+        "branchCount": 1,
+        "branches": {
+          "candidate": "8a7b196cff8a720c63aad5e209cae216a094022b009aa4b8332f536251d52202"
+        },
+        "root": "4e6452f082a141a322f27f5672cc223d670c306f2958a4dbb403d8c5a2a55591"
+      },
+      "commit": "8a7b196cff8a720c63aad5e209cae216a094022b009aa4b8332f536251d52202",
+      "boundary": "A native-candidate is not a native-runtime claim. Native status requires independent execution and parity evidence from the target RCL runtime.",
+      "root": "4725bad5b8b4de88c5d123adbcd2fbc721cb2fdb03b156ba52e012f630fc9ef1"
+    },
+    "differential": {
+      "format": "rcl.independent-differential-absorption-report.v0.1",
+      "version": "0.1.0-alpha.1",
+      "capability": "weighted_sum_wrong_donor",
+      "evidenceKind": "independent-differential-execution",
+      "passed": false,
+      "score": 0.818182,
+      "repeats": 2,
+      "timeoutMs": 2000,
+      "requireDeterministicReplay": true,
+      "requireNegativeControl": true,
+      "independence": {
+        "sourceId": "weighted_sum_wrong_donor_reference",
+        "absorbedId": "weighted_sum_wrong_donor_candidate",
+        "sourceRuntime": "e01-reference-function",
+        "absorbedRuntime": "e01-donor-wrong",
+        "descriptorRootsDistinct": true,
+        "executorReferencesDistinct": true,
+        "runtimesDistinct": true,
+        "satisfied": true,
+        "proofLevel": "declared-separate-adapters",
+        "boundary": "Distinct descriptors and function references are evidence of separation, not cryptographic proof of process or implementation independence."
+      },
+      "caseCount": 2,
+      "passedCaseCount": 0,
+      "failedCaseCount": 2,
+      "cases": [
+        {
+          "id": "weighted_basic",
+          "inputRoot": "50ec3d0e94d7e97079b07affd8bcb3b0e27009fdcb27edb6a5ca2696a4d12eed",
+          "tags": [
+            "e01",
+            "weighted-sum"
+          ],
+          "source": {
+            "adapter": {
+              "id": "weighted_sum_wrong_donor_reference",
+              "runtime": "e01-reference-function",
+              "artifactRoot": "c423c96faed4c321d867e7a38555e5756ebb8ac46309fbc15d43ceb7046d87ff",
+              "root": "dd19433b9d2ac0c33cd43d4cbd52a8cd94575a398b10af8b19fdf940bcf9bc1e"
+            },
+            "caseId": "weighted_basic",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.136,
+                "root": "fb109982d510cd7cd19f2da169fd060e82bc79e5f8c1ae2d4052bcf3cfb87021"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 16
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+                  "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+                },
+                "durationMs": 0.03,
+                "root": "321ad43a691d39980d15b557043ddff75ebc81218fdcedb07a9efeb83b0cc4de"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 16
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "root": "8e1865cec2693a1a4c11ffbd817b67cad6d1d97424dc46817157c9c84d8c85fd"
+            },
+            "root": "cbdd13a4f201e09dd1acfab79789ddacd0b569211b455b0d2f32215c7956a4a9"
+          },
+          "absorbed": {
+            "adapter": {
+              "id": "weighted_sum_wrong_donor_candidate",
+              "runtime": "e01-donor-wrong",
+              "artifactRoot": "c4d5aaa4ac25f0a97ef66e5d8f52acdab17287a6e12491bd6943432cb61e5f1f",
+              "root": "e5a4c274d8de40342d3d6456d63f7a1fd2f187d4534a35ecbf1fe897bfc72fb4"
+            },
+            "caseId": "weighted_basic",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+              "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 12
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                  "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                },
+                "durationMs": 0.026,
+                "root": "3e68829fba55c7082b364c7e40e037f4232ecd198470dc4fca953b3182e112f9"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 12
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                  "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                },
+                "durationMs": 0.023,
+                "root": "7688399e5e294b65f6d78d3972f3e52908ec4f01ce9d859e607a1c8c80f8129d"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 12
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+              "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+            },
+            "root": "e4f0387faa92e459c4386c0a0c0a0ca9b9c014ea6eb41c36e47132a9b603fd43"
+          },
+          "comparison": {
+            "caseId": "weighted_basic",
+            "sourceSemanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+            "absorbedSemanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+            "equivalent": false,
+            "sourceDeterministic": true,
+            "absorbedDeterministic": true,
+            "replayPassed": true,
+            "infrastructureFailure": false,
+            "passed": false,
+            "root": "3b3c0e26bbd74fb13415bc85eec3bd102bf1ea920cdcc51661b0e21d4a80af15"
+          },
+          "root": "a2fb715703101e1238233cd468f92275f1fb486a5c7155304e270cd01061b230"
+        },
+        {
+          "id": "weighted_negative",
+          "inputRoot": "22b9d4c284ab5ec7e455a6ab5f4446285bf40c0202cf40c95a8f7614a418f57d",
+          "tags": [
+            "e01",
+            "weighted-sum"
+          ],
+          "source": {
+            "adapter": {
+              "id": "weighted_sum_wrong_donor_reference",
+              "runtime": "e01-reference-function",
+              "artifactRoot": "c423c96faed4c321d867e7a38555e5756ebb8ac46309fbc15d43ceb7046d87ff",
+              "root": "dd19433b9d2ac0c33cd43d4cbd52a8cd94575a398b10af8b19fdf940bcf9bc1e"
+            },
+            "caseId": "weighted_negative",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.025,
+                "root": "b5909517ff381d01c472340b5fa4944ef8f454b689a433ee9df0a71b898470b1"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 7
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+                  "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+                },
+                "durationMs": 0.023,
+                "root": "c5cf7ee06c0546db11418e40ae92534c9a3eeba9c63fc16d83ead5899c65fc69"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 7
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "root": "5bec5069c9f50771601c98d1e1d7cca377e67d5cfdcf22f1b9ee0c602839e71c"
+            },
+            "root": "47ef00367e2ae792e7409918d685cca92ae98fbc03fdf0583f20e990af90332c"
+          },
+          "absorbed": {
+            "adapter": {
+              "id": "weighted_sum_wrong_donor_candidate",
+              "runtime": "e01-donor-wrong",
+              "artifactRoot": "c4d5aaa4ac25f0a97ef66e5d8f52acdab17287a6e12491bd6943432cb61e5f1f",
+              "root": "e5a4c274d8de40342d3d6456d63f7a1fd2f187d4534a35ecbf1fe897bfc72fb4"
+            },
+            "caseId": "weighted_negative",
+            "repeats": 2,
+            "deterministic": true,
+            "semanticRoots": [
+              "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+              "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f"
+            ],
+            "runs": [
+              {
+                "repetition": 1,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 6
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                  "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                },
+                "durationMs": 0.025,
+                "root": "25ebdd4e6bb31c2a02d43476db56e86ffc33d90ba48ed1fe519df2eec1927723"
+              },
+              {
+                "repetition": 2,
+                "observation": {
+                  "format": "rcl.execution-observation.v0.1",
+                  "status": "ok",
+                  "output": {
+                    "value": 6
+                  },
+                  "error": null,
+                  "effects": [
+                    "read-local-structured-data"
+                  ],
+                  "evidence": [
+                    "e01:weighted-sum-observation"
+                  ],
+                  "resourceDelta": {
+                    "operations": 1
+                  },
+                  "authority": {
+                    "mode": "bounded-local-computation"
+                  },
+                  "exitCode": null,
+                  "receipts": [
+                    "e01:weighted-sum-receipt"
+                  ],
+                  "metadata": null,
+                  "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                  "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                },
+                "durationMs": 0.171,
+                "root": "840887bc2dc4e13fb89f783da04bb84c1731f5d3f43d7c553b179ddf3d016bf3"
+              }
+            ],
+            "primary": {
+              "format": "rcl.execution-observation.v0.1",
+              "status": "ok",
+              "output": {
+                "value": 6
+              },
+              "error": null,
+              "effects": [
+                "read-local-structured-data"
+              ],
+              "evidence": [
+                "e01:weighted-sum-observation"
+              ],
+              "resourceDelta": {
+                "operations": 1
+              },
+              "authority": {
+                "mode": "bounded-local-computation"
+              },
+              "exitCode": null,
+              "receipts": [
+                "e01:weighted-sum-receipt"
+              ],
+              "metadata": null,
+              "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+              "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+            },
+            "root": "7c8f75b5b18eb08c018d39516d2d3e1279bea63bd78432df557830dd604ec108"
+          },
+          "comparison": {
+            "caseId": "weighted_negative",
+            "sourceSemanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+            "absorbedSemanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+            "equivalent": false,
+            "sourceDeterministic": true,
+            "absorbedDeterministic": true,
+            "replayPassed": true,
+            "infrastructureFailure": false,
+            "passed": false,
+            "root": "0461c759da9f170d4bc344e24443d6a65e202eced7ade7cce1d778c8318a5bab"
+          },
+          "root": "d759b5b17d744811f2385ea386a69ba491166cbf9e3672bb46e726c0e5ab7897"
+        }
+      ],
+      "negativeControls": [
+        {
+          "id": "weighted_sum_wrong_donor_ignore_weights_control",
+          "adapter": {
+            "id": "weighted_sum_wrong_donor_ignore_weights_control_adapter",
+            "runtime": "e01-negative-control",
+            "root": "43a3752293c5883726588866f33eac30011694f9f45e6b9afbae088edca7b1bf"
+          },
+          "requiredCaseIds": [
+            "weighted_basic",
+            "weighted_negative"
+          ],
+          "detectedCaseIds": [
+            "weighted_basic",
+            "weighted_negative"
+          ],
+          "missingDetections": [],
+          "detected": true,
+          "comparisons": [
+            {
+              "caseId": "weighted_basic",
+              "sourceSemanticRoot": "44aaf6409930e4f357dfdaa7db2a34f4a6616523a53a080fe027c97a1c3e23c9",
+              "absorbedSemanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+              "equivalent": false,
+              "sourceDeterministic": true,
+              "absorbedDeterministic": true,
+              "replayPassed": true,
+              "infrastructureFailure": false,
+              "passed": false,
+              "root": "3b3c0e26bbd74fb13415bc85eec3bd102bf1ea920cdcc51661b0e21d4a80af15"
+            },
+            {
+              "caseId": "weighted_negative",
+              "sourceSemanticRoot": "b090b3948f416762414b206cd5b4974fd64b7efd6e6d1fc7f7e2ecb9fd9c1985",
+              "absorbedSemanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+              "equivalent": false,
+              "sourceDeterministic": true,
+              "absorbedDeterministic": true,
+              "replayPassed": true,
+              "infrastructureFailure": false,
+              "passed": false,
+              "root": "0461c759da9f170d4bc344e24443d6a65e202eced7ade7cce1d778c8318a5bab"
+            }
+          ],
+          "runs": [
+            {
+              "adapter": {
+                "id": "weighted_sum_wrong_donor_ignore_weights_control_adapter",
+                "runtime": "e01-negative-control",
+                "artifactRoot": "c4d5aaa4ac25f0a97ef66e5d8f52acdab17287a6e12491bd6943432cb61e5f1f",
+                "root": "43a3752293c5883726588866f33eac30011694f9f45e6b9afbae088edca7b1bf"
+              },
+              "caseId": "weighted_basic",
+              "repeats": 2,
+              "deterministic": true,
+              "semanticRoots": [
+                "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1"
+              ],
+              "runs": [
+                {
+                  "repetition": 1,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 12
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                    "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                  },
+                  "durationMs": 0.047,
+                  "root": "3e68829fba55c7082b364c7e40e037f4232ecd198470dc4fca953b3182e112f9"
+                },
+                {
+                  "repetition": 2,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 12
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                    "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+                  },
+                  "durationMs": 0.024,
+                  "root": "7688399e5e294b65f6d78d3972f3e52908ec4f01ce9d859e607a1c8c80f8129d"
+                }
+              ],
+              "primary": {
+                "format": "rcl.execution-observation.v0.1",
+                "status": "ok",
+                "output": {
+                  "value": 12
+                },
+                "error": null,
+                "effects": [
+                  "read-local-structured-data"
+                ],
+                "evidence": [
+                  "e01:weighted-sum-observation"
+                ],
+                "resourceDelta": {
+                  "operations": 1
+                },
+                "authority": {
+                  "mode": "bounded-local-computation"
+                },
+                "exitCode": null,
+                "receipts": [
+                  "e01:weighted-sum-receipt"
+                ],
+                "metadata": null,
+                "semanticRoot": "2dc7b46b041edb5a795634a4518d9f3699eec320fdd9a606b2c2e834a52c68c1",
+                "root": "e9c89d6cc2e18e38d012c674c610fc369a7ad6b0c2e68591deda48a15ac0a312"
+              },
+              "root": "c172132563c3f50b598c3fe7e7db32e62d173edbf9980df2f5c50e3ba496845b"
+            },
+            {
+              "adapter": {
+                "id": "weighted_sum_wrong_donor_ignore_weights_control_adapter",
+                "runtime": "e01-negative-control",
+                "artifactRoot": "c4d5aaa4ac25f0a97ef66e5d8f52acdab17287a6e12491bd6943432cb61e5f1f",
+                "root": "43a3752293c5883726588866f33eac30011694f9f45e6b9afbae088edca7b1bf"
+              },
+              "caseId": "weighted_negative",
+              "repeats": 2,
+              "deterministic": true,
+              "semanticRoots": [
+                "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f"
+              ],
+              "runs": [
+                {
+                  "repetition": 1,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 6
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                    "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                  },
+                  "durationMs": 0.271,
+                  "root": "25ebdd4e6bb31c2a02d43476db56e86ffc33d90ba48ed1fe519df2eec1927723"
+                },
+                {
+                  "repetition": 2,
+                  "observation": {
+                    "format": "rcl.execution-observation.v0.1",
+                    "status": "ok",
+                    "output": {
+                      "value": 6
+                    },
+                    "error": null,
+                    "effects": [
+                      "read-local-structured-data"
+                    ],
+                    "evidence": [
+                      "e01:weighted-sum-observation"
+                    ],
+                    "resourceDelta": {
+                      "operations": 1
+                    },
+                    "authority": {
+                      "mode": "bounded-local-computation"
+                    },
+                    "exitCode": null,
+                    "receipts": [
+                      "e01:weighted-sum-receipt"
+                    ],
+                    "metadata": null,
+                    "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                    "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+                  },
+                  "durationMs": 0.031,
+                  "root": "840887bc2dc4e13fb89f783da04bb84c1731f5d3f43d7c553b179ddf3d016bf3"
+                }
+              ],
+              "primary": {
+                "format": "rcl.execution-observation.v0.1",
+                "status": "ok",
+                "output": {
+                  "value": 6
+                },
+                "error": null,
+                "effects": [
+                  "read-local-structured-data"
+                ],
+                "evidence": [
+                  "e01:weighted-sum-observation"
+                ],
+                "resourceDelta": {
+                  "operations": 1
+                },
+                "authority": {
+                  "mode": "bounded-local-computation"
+                },
+                "exitCode": null,
+                "receipts": [
+                  "e01:weighted-sum-receipt"
+                ],
+                "metadata": null,
+                "semanticRoot": "e50f5f0015bf2335f19d0f2c5d0c72a88cbea4c1cd105c016ca411a0ae1c710f",
+                "root": "93b52ab5a422cc815f46a14a0d798eb930f74e0fdcc78174f1dca7e1c02083b6"
+              },
+              "root": "61b21461b765033bf813be9ad1d1c176a459dd565d8eb973b07054bbd6607247"
+            }
+          ],
+          "root": "e84d37a464a3fa3bc9a5ef22da5109a85eee93c2a5632127f4f1949b39e60eaf"
+        }
+      ],
+      "controlsPassed": true,
+      "coverage": {
+        "successObserved": true,
+        "errorObserved": false,
+        "effectsObserved": true,
+        "evidenceObserved": true,
+        "receiptsObserved": true,
+        "resourceDeltaObserved": true,
+        "authorityObserved": true
+      },
+      "promotionEligible": false,
+      "boundary": "This report compares independently invoked adapters in the current process. It does not prove external process isolation, compiler correctness, RBC lowering, or native-VM parity.",
+      "root": "5979706929d33c7c1775580cb789b2634b1a3e23769c8416c667dc7591f9a7ef"
+    },
+    "envelope": {
+      "format": "rcl.capability-metabolism-evidence-envelope.v0.1",
+      "capability": "weighted_sum_wrong_donor",
+      "metabolismReportRoot": "4725bad5b8b4de88c5d123adbcd2fbc721cb2fdb03b156ba52e012f630fc9ef1",
+      "declaredEquivalenceRoot": "55aa19967e0efe3f431a067ee0d359042b70ecff83b9b045e29fd7ae7fc2853a",
+      "independentDifferentialRoot": "5979706929d33c7c1775580cb789b2634b1a3e23769c8416c667dc7591f9a7ef",
+      "verificationTier": "declared-only",
+      "promotionEligible": false,
+      "evidenceScore": 0.818182,
+      "boundary": "Independent differential evidence strengthens a metabolism candidate but does not by itself establish executable RCL bytecode or native-runtime verification.",
+      "root": "5ec12f70e2fb2c29b4fab7e8e6f324e9ad61548cae24503701aa53c3202ebec9"
+    }
+  }
+}

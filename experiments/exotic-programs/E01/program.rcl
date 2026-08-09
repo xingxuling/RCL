@@ -1,0 +1,23 @@
+reality MinimalLivingIntelligence {
+  facet life.goal : Text = "complete-three-bounded-tasks"
+  facet life.memory_count : Number = 0
+
+  subject mind {
+    facet persistence : Truth = true
+    facet observations : Number = 0
+    facet capability_count : Number = 9
+    warrant life.observe on life
+  }
+
+  emergence observe {
+    cause mind
+    when mind.persistence == true
+    needs life.observe on life
+    alter mind.observations <- mind.observations + 1
+    alter life.memory_count <- life.memory_count + 1
+    preserve mind.observations >= 0
+    witness "e01:observe"
+  }
+
+  realize observe
+}
