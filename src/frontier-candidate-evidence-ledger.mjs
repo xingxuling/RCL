@@ -70,7 +70,7 @@ function buildCourtEvent(judgment, courtRoot) {
 function buildCandidateEntry(candidate, compilerResultRoot, laneBinding, courtJudgment = null, courtRoot = null) {
   const compilerEvent = buildCompilerEvent(candidate, compilerResultRoot);
   const promoted = candidate.promoted === true;
-  const courtManaged = Boolean(laneBinding && courtJudgment);
+  const courtManaged = Boolean(promoted && laneBinding && courtJudgment);
   const status = !promoted
     ? 'REJECTED_BY_UNKNOWN_KNOWLEDGE_COMPILER_GATE'
     : courtManaged
@@ -135,6 +135,7 @@ export function validateCandidateEvidenceLedger(ledger = {}) {
       failures.push(`evidence_boundary_violation:${entry.candidateId}`);
     }
     if (!entry.promotedByUnknownKnowledgeCompiler && entry.evidenceRung > 0) failures.push(`compiler_rejected_candidate_cannot_have_positive_rung:${entry.candidateId}`);
+    if (!entry.promotedByUnknownKnowledgeCompiler && entry.courtManaged) failures.push(`compiler_rejected_candidate_cannot_enter_court:${entry.candidateId}`);
   }
   const recomputedRoot = ledger.format === RCL_FRONTIER_CANDIDATE_LEDGER_FORMAT
     ? sha256({ ...ledger, root: undefined })
@@ -191,13 +192,13 @@ export function runUnknownKnowledgeEvidenceLoop(options = {}) {
   const courtByLane = new Map(court.judgments.map((row) => [row.laneId, row]));
   const bindings = { ...(options.candidateLaneBindings ?? {}) };
 
-  // If a compiler candidate already uses one of the canonical lane ids, bind it automatically.
+  // Canonical frontier lane ids bind automatically only after the compiler promotes them.
   for (const candidate of compiler.candidates ?? []) {
-    if (PRIMARY_LANES.has(candidate.id) && !bindings[candidate.id]) bindings[candidate.id] = candidate.id;
+    if (candidate.promoted === true && PRIMARY_LANES.has(candidate.id) && !bindings[candidate.id]) bindings[candidate.id] = candidate.id;
   }
 
   const entries = (compiler.candidates ?? []).map((candidate) => {
-    const lane = bindings[candidate.id] ?? null;
+    const lane = candidate.promoted === true ? bindings[candidate.id] ?? null : null;
     return buildCandidateEntry(candidate, compiler.result?.root ?? null, lane, lane ? courtByLane.get(lane) ?? null : null, court.root);
   });
 
