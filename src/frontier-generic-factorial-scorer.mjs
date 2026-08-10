@@ -27,6 +27,13 @@ function termKey(factors, indices) {
   return indices.map((i) => factors[i]).join(':');
 }
 
+function canonicalTargetTerm(termName, factors) {
+  const names = String(termName).split(':').filter(Boolean);
+  const factorIndex = new Map(factors.map((name, index) => [name, index]));
+  if (names.some((name) => !factorIndex.has(name))) return String(termName);
+  return [...names].sort((a, b) => factorIndex.get(a) - factorIndex.get(b)).join(':');
+}
+
 function canonicalCellKey(factors, levels = {}) {
   return factors.map((factor) => `${factor}=${Number(levels[factor])}`).join('|');
 }
@@ -84,10 +91,11 @@ export function validateGenericFullFactorialPayload(payload = {}, grammar = null
   const balanced = replicateCounts.length > 0 && replicateCounts.every((count) => count === replicateCounts[0]);
   if (!balanced) failures.push('unbalanced_factorial_replication');
   if (grammar) {
-    const grammarFactors = uniqueStrings(grammar.factors);
+    const grammarFactors = uniqueStrings(grammar.factors).sort();
+    const payloadFactors = [...factors].sort();
     if (grammar.family !== 'full_factorial_2powk') failures.push('grammar_family_mismatch');
     if (grammar.levelEncoding !== 'pm1') failures.push('grammar_level_encoding_mismatch');
-    if (grammarFactors.join('|') !== factors.join('|')) failures.push('grammar_factor_order_or_membership_mismatch');
+    if (grammarFactors.join('|') !== payloadFactors.join('|')) failures.push('grammar_factor_membership_mismatch');
     if (Number(grammar.expectedCellCount) !== expectedCells) failures.push('grammar_expected_cell_count_mismatch');
   }
   const recomputedRoot = payload.format === RCL_FRONTIER_GENERIC_FACTORIAL_PAYLOAD_FORMAT
@@ -163,13 +171,14 @@ export function computeGenericOrthogonalFactorialEffects(payload = {}, grammar =
   const minStandardizedEffect = Number(options.minStandardizedEffect ?? 2.0);
   const targetTerms = uniqueStrings(grammar?.targetTerms ?? []);
   const targetDecisions = Object.fromEntries(targetTerms.map((termName) => {
-    const canonical = String(termName).replaceAll('_', ':');
-    const term = terms[termName] ?? terms[canonical] ?? null;
+    const canonical = canonicalTargetTerm(termName, factors);
+    const term = terms[canonical] ?? null;
     const standardizedEffect = term && residualSd > 1e-12 ? Math.abs(Number(term.effect)) / residualSd : (term ? Infinity : 0);
     const detected = Boolean(term)
       && Math.abs(Number(term.effect)) >= minAbsEffect
       && standardizedEffect >= minStandardizedEffect;
     return [termName, {
+      canonicalTerm: canonical,
       found: Boolean(term),
       effect: term?.effect ?? null,
       sumSquares: term?.sumSquares ?? null,
