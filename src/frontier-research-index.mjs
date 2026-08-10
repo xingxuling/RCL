@@ -7,3 +7,4 @@ export * from './frontier-independent-file-observation.mjs';
 export * from './frontier-public-factorial-dataset.mjs';
 export * from './frontier-design-grammar-router.mjs';
 export * from './frontier-preregistered-analysis-contract.mjs';
+export * from './frontier-unknown-law-experiment-spec.mjs';
