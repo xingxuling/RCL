@@ -33,7 +33,7 @@ test('formation surrogate rejects false interactions for additive-only main effe
 test('formation surrogate detects both preregistered pair interactions when injected', () => {
   const run = runFormationFactorialSandboxScenario('dual_target_interaction').result;
   assert.equal(run.classificationPass, true);
-  assert.deepEqual(run.detectedTargetTerms, ['boundary_mask:layout_topology', 'layout_topology:orientation']);
+  assert.deepEqual(run.detectedTargetTerms, ['layout_topology:boundary_mask', 'layout_topology:orientation']);
 });
 
 test('formation sandbox pressure suite classifies all seven surrogate worlds and preserves evidence boundary', () => {
