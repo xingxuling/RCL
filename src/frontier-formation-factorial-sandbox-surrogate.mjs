@@ -14,7 +14,7 @@ export const FORMATION_FACTORIAL_GRAMMAR = Object.freeze({
   family: 'full_factorial_2powk',
   factors: ['boundary_mask', 'layout_topology', 'orientation'],
   nuisanceFactors: ['batch', 'room_session'],
-  targetTerms: ['layout_topology', 'layout_topology:orientation', 'boundary_mask:layout_topology'],
+  targetTerms: ['layout_topology', 'layout_topology:orientation', 'layout_topology:boundary_mask'],
   response: 'primary_sensor_residual',
   levelEncoding: 'pm1',
   expectedCellCount: 8,
@@ -40,12 +40,12 @@ export const FORMATION_SANDBOX_SCENARIOS = Object.freeze({
     beta: { 'layout_topology:orientation': 0.70 },
   }),
   topology_boundary_interaction: Object.freeze({
-    expected: ['boundary_mask:layout_topology'],
-    beta: { 'boundary_mask:layout_topology': 0.68 },
+    expected: ['layout_topology:boundary_mask'],
+    beta: { 'layout_topology:boundary_mask': 0.68 },
   }),
   dual_target_interaction: Object.freeze({
-    expected: ['boundary_mask:layout_topology', 'layout_topology:orientation'],
-    beta: { 'layout_topology:orientation': 0.72, 'boundary_mask:layout_topology': 0.66 },
+    expected: ['layout_topology:boundary_mask', 'layout_topology:orientation'],
+    beta: { 'layout_topology:orientation': 0.72, 'layout_topology:boundary_mask': 0.66 },
   }),
 });
 
