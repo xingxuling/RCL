@@ -7,8 +7,13 @@ import {
   validatePublicFactorialDataset,
   computeOrthogonalFactorialEffects,
 } from './frontier-public-factorial-dataset.mjs';
+import {
+  RCL_FRONTIER_GENERIC_FACTORIAL_PAYLOAD_FORMAT,
+  validateGenericFullFactorialPayload,
+  computeGenericOrthogonalFactorialEffects,
+} from './frontier-generic-factorial-scorer.mjs';
 
-export const RCL_FRONTIER_DESIGN_GRAMMAR_ROUTER_VERSION = '0.1.0-alpha.1';
+export const RCL_FRONTIER_DESIGN_GRAMMAR_ROUTER_VERSION = '0.2.0-alpha.1';
 export const RCL_FRONTIER_DESIGN_GRAMMAR_FORMAT = 'rcl.frontier-design-grammar.v0.1';
 export const RCL_FRONTIER_SCORER_ROUTE_FORMAT = 'rcl.frontier-scorer-route.v0.1';
 
@@ -47,6 +52,27 @@ export function normalizeFrontierDesignGrammar(input = {}) {
   return result;
 }
 
+function validateFullFactorialPayload(payload, grammar) {
+  if (payload?.format === RCL_FRONTIER_GENERIC_FACTORIAL_PAYLOAD_FORMAT) {
+    const validation = validateGenericFullFactorialPayload(payload, grammar);
+    return {
+      ok: validation.ok,
+      failures: validation.failures,
+      uniqueDesignCells: validation.uniqueDesignCells,
+      adapter: 'generic_full_factorial_payload_v0_1',
+      validation,
+    };
+  }
+  const validation = validatePublicFactorialDataset(payload);
+  return {
+    ok: validation.ok,
+    failures: validation.failures,
+    uniqueDesignCells: validation.uniqueDesignCells,
+    adapter: 'nist_public_factorial_fixture_v0_1',
+    validation,
+  };
+}
+
 export function validateFrontierDesignGrammar(grammarInput = {}, payload = null) {
   const grammar = normalizeFrontierDesignGrammar(grammarInput);
   const failures = [];
@@ -72,18 +98,14 @@ export function validateFrontierDesignGrammar(grammarInput = {}, payload = null)
     const expected = 2 ** grammar.factors.length;
     if (grammar.expectedCellCount !== null && grammar.expectedCellCount !== expected) failures.push('full_factorial_expected_cell_count_mismatch');
     if (payload) {
-      const fixtureValidation = validatePublicFactorialDataset(payload);
-      if (!fixtureValidation.ok) failures.push('full_factorial_payload_not_supported_by_v0_1_fixture_adapter');
-      if (fixtureValidation.ok && fixtureValidation.uniqueDesignCells !== expected) failures.push('full_factorial_payload_cell_count_mismatch');
+      const payloadValidation = validateFullFactorialPayload(payload, grammar);
+      if (!payloadValidation.ok) failures.push(...payloadValidation.failures.map((x) => `full_factorial_payload:${x}`));
+      if (payloadValidation.ok && payloadValidation.uniqueDesignCells !== expected) failures.push('full_factorial_payload_cell_count_mismatch');
     }
   }
 
-  if (grammar.family === FRONTIER_DESIGN_FAMILIES.REPEATED_MEASURES) {
-    failures.push('repeated_measures_scorer_not_implemented');
-  }
-  if (grammar.family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) {
-    failures.push('continuous_field_scorer_not_implemented');
-  }
+  if (grammar.family === FRONTIER_DESIGN_FAMILIES.REPEATED_MEASURES) failures.push('repeated_measures_scorer_not_implemented');
+  if (grammar.family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) failures.push('continuous_field_scorer_not_implemented');
 
   if (grammar.allowProjectionLoss) warnings.push('projection_loss_override_enabled');
   const result = {
@@ -129,8 +151,13 @@ export function routeFrontierScorer(grammarInput = {}, payload = null, options =
       randomizationSeed: Number(options.randomizationSeed ?? 314159),
     });
   } else if (grammar.family === FRONTIER_DESIGN_FAMILIES.FULL_FACTORIAL_2POWK) {
-    route = 'orthogonal_full_factorial_2powk';
-    score = computeOrthogonalFactorialEffects(payload);
+    if (payload?.format === RCL_FRONTIER_GENERIC_FACTORIAL_PAYLOAD_FORMAT) {
+      route = 'generic_orthogonal_full_factorial_2powk';
+      score = computeGenericOrthogonalFactorialEffects(payload, grammar, options.factorialThresholds ?? {});
+    } else {
+      route = 'orthogonal_full_factorial_2powk';
+      score = computeOrthogonalFactorialEffects(payload);
+    }
   } else {
     throw new Error(`unreachable_design_family:${grammar.family}`);
   }
