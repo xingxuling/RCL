@@ -11,3 +11,5 @@ export * from './frontier-unknown-law-experiment-spec.mjs';
 export * from './frontier-spell-spatial-acquisition-package.mjs';
 export * from './frontier-instrument-binding-contract.mjs';
 export * from './frontier-sandbox-instrument-surrogate.mjs';
+export * from './frontier-generic-factorial-scorer.mjs';
+export * from './frontier-formation-factorial-sandbox-surrogate.mjs';
