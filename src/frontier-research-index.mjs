@@ -8,3 +8,4 @@ export * from './frontier-public-factorial-dataset.mjs';
 export * from './frontier-design-grammar-router.mjs';
 export * from './frontier-preregistered-analysis-contract.mjs';
 export * from './frontier-unknown-law-experiment-spec.mjs';
+export * from './frontier-spell-spatial-acquisition-package.mjs';
