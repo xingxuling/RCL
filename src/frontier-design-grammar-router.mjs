@@ -12,8 +12,13 @@ import {
   validateGenericFullFactorialPayload,
   computeGenericOrthogonalFactorialEffects,
 } from './frontier-generic-factorial-scorer.mjs';
+import {
+  RCL_FRONTIER_CONTINUOUS_FIELD_PAYLOAD_FORMAT,
+  validateContinuousFieldPayload,
+  scoreContinuousFieldPayload,
+} from './frontier-continuous-field-scorer.mjs';
 
-export const RCL_FRONTIER_DESIGN_GRAMMAR_ROUTER_VERSION = '0.2.0-alpha.1';
+export const RCL_FRONTIER_DESIGN_GRAMMAR_ROUTER_VERSION = '0.3.0-alpha.1';
 export const RCL_FRONTIER_DESIGN_GRAMMAR_FORMAT = 'rcl.frontier-design-grammar.v0.1';
 export const RCL_FRONTIER_SCORER_ROUTE_FORMAT = 'rcl.frontier-scorer-route.v0.1';
 
@@ -104,8 +109,20 @@ export function validateFrontierDesignGrammar(grammarInput = {}, payload = null)
     }
   }
 
+  if (grammar.family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) {
+    if (grammar.factors.length < 2) failures.push('continuous_field_requires_multiple_declared_factors');
+    if (grammar.levelEncoding !== 'continuous_plus_binary') failures.push('continuous_field_v0_1_requires_continuous_plus_binary_encoding');
+    if (grammar.expectedCellCount !== null) warnings.push('continuous_field_expected_cell_count_ignored');
+    if (payload) {
+      if (payload.format !== RCL_FRONTIER_CONTINUOUS_FIELD_PAYLOAD_FORMAT) failures.push('continuous_field_payload_format_mismatch');
+      else {
+        const payloadValidation = validateContinuousFieldPayload(payload, grammar);
+        if (!payloadValidation.ok) failures.push(...payloadValidation.failures.map((x) => `continuous_field_payload:${x}`));
+      }
+    }
+  }
+
   if (grammar.family === FRONTIER_DESIGN_FAMILIES.REPEATED_MEASURES) failures.push('repeated_measures_scorer_not_implemented');
-  if (grammar.family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) failures.push('continuous_field_scorer_not_implemented');
 
   if (grammar.allowProjectionLoss) warnings.push('projection_loss_override_enabled');
   const result = {
@@ -158,6 +175,9 @@ export function routeFrontierScorer(grammarInput = {}, payload = null, options =
       route = 'orthogonal_full_factorial_2powk';
       score = computeOrthogonalFactorialEffects(payload);
     }
+  } else if (grammar.family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) {
+    route = 'preregistered_continuous_field_kernel_v0_1';
+    score = scoreContinuousFieldPayload(payload, grammar, options.continuousFieldThresholds ?? {});
   } else {
     throw new Error(`unreachable_design_family:${grammar.family}`);
   }
