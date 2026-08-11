@@ -77,6 +77,15 @@ test('logical time is monotonic and a time scale changes projection speed, not e
   assert.throws(() => normal.advanceTo(2), (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_NON_MONOTONIC');
 });
 
+test('time projection rejects values that cannot remain finite canonical data', () => {
+  const scheduler = new LogicalTimeScheduler({ timeScale: Number.MIN_VALUE });
+
+  assert.throws(
+    () => scheduler.projectWallDuration(Number.MAX_SAFE_INTEGER),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_PROJECTION_INVALID',
+  );
+});
+
 test('event budgets fail before any due event is committed', () => {
   const scheduler = new LogicalTimeScheduler();
   scheduler.scheduleAt({ id: 'one', at: 2, kind: 'world-tick' });
@@ -138,6 +147,31 @@ test('re-rooted snapshots still reject duplicate effects and impossible receipt 
   impossibleSequence.root = realityRoot({ ...impossibleSequence, root: undefined });
   assert.throws(
     () => restoreLogicalTimeScheduler(impossibleSequence),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+});
+
+test('re-rooted snapshots reject state that the public scheduler API could not produce', () => {
+  const scheduler = new LogicalTimeScheduler({ replicaId: 'canonical-snapshot' });
+  scheduler.scheduleAt({ id: 'plan', at: 2, causalParents: ['a', 'b'] });
+  const nonCanonicalQueue = structuredClone(scheduler.snapshot());
+  nonCanonicalQueue.queue[0].causalParents = ['b', 'a', 'b'];
+  nonCanonicalQueue.root = realityRoot({ ...nonCanonicalQueue, root: undefined });
+
+  assert.throws(
+    () => restoreLogicalTimeScheduler(nonCanonicalQueue),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+
+  const proposalScheduler = new LogicalTimeScheduler();
+  proposalScheduler.proposeExternalTime({ id: 'host-observation', source: 'host-clock', observedAtMs: 1, proposedLogicalTime: 1 });
+  const nonCanonicalProposal = structuredClone(proposalScheduler.snapshot());
+  nonCanonicalProposal.externalProposals[0].authoritative = true;
+  nonCanonicalProposal.externalProposals[0].root = realityRoot({ ...nonCanonicalProposal.externalProposals[0], root: undefined });
+  nonCanonicalProposal.root = realityRoot({ ...nonCanonicalProposal, root: undefined });
+
+  assert.throws(
+    () => restoreLogicalTimeScheduler(nonCanonicalProposal),
     (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
   );
 });
