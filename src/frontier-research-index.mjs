@@ -16,3 +16,4 @@ export * from './frontier-formation-factorial-sandbox-surrogate.mjs';
 export * from './frontier-continuous-field-scorer.mjs';
 export * from './frontier-aether-continuous-field-sandbox-surrogate.mjs';
 export * from './frontier-evidence-court-candidate-tournament.mjs';
+export * from './frontier-candidate-evidence-ledger.mjs';
