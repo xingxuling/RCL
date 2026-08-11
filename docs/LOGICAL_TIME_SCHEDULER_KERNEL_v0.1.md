@@ -32,10 +32,10 @@ const replay = restoreLogicalTimeScheduler(snapshot);
 Equal-time schedules use this total order:
 
 ```text
-logical instant → priority (lower first) → stable schedule id
+logical instant → priority (lower first) → stable schedule id (Unicode code-unit order)
 ```
 
-Insertion order and wall-clock timing therefore cannot decide a same-instant outcome.
+Insertion order, host locale and wall-clock timing therefore cannot decide a same-instant outcome.
 
 ## Included guarantees
 
@@ -45,7 +45,8 @@ Insertion order and wall-clock timing therefore cannot decide a same-instant out
 - snapshots carry a content root and reject accidental/tampered changes against that root;
 - external wall-clock observations are non-authoritative proposals;
 - committing external time requires an explicit `temporal.commit` capability;
-- time acceleration changes only wall-time projection, not logical event order.
+- time acceleration changes only wall-time projection, not logical event order;
+- all persisted identifier order uses a fixed Unicode code-unit comparison, rather than a host-locale collation rule.
 
 ## Evidence boundary
 
@@ -60,4 +61,4 @@ node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs
 node examples/logical-time-scheduler-demo.mjs
 ```
 
-The focused suite verifies deterministic same-instant order, relative scheduling/cancellation, monotonicity, acceleration invariance, event-budget atomicity, canonical-data rejection, rooted snapshot restore and explicit external-time authority.
+The focused suite verifies deterministic same-instant order (including locale-sensitive IDs), relative scheduling/cancellation, monotonicity, acceleration invariance, event-budget atomicity, canonical-data rejection, rooted snapshot restore and explicit external-time authority.
