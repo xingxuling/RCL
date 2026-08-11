@@ -6,6 +6,7 @@ import {
   LogicalTimeSchedulerError,
   restoreLogicalTimeScheduler,
 } from '../src/logical-time-scheduler.mjs';
+import { realityRoot } from '../src/canonical.mjs';
 
 function scheduledIds(result) {
   return result.events.filter((event) => event.type === 'scheduled-event-fired').map((event) => event.scheduleId);
@@ -116,6 +117,27 @@ test('snapshots restore into the same future and tampered rooted state is reject
   tampered.queue[0].payload.day = 99;
   assert.throws(
     () => restoreLogicalTimeScheduler(tampered),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+});
+
+test('re-rooted snapshots still reject duplicate effects and impossible receipt sequences', () => {
+  const scheduler = new LogicalTimeScheduler({ replicaId: 'snapshot-rules' });
+  scheduler.scheduleAt({ id: 'once', at: 2, kind: 'world-tick' });
+  const duplicateQueue = structuredClone(scheduler.snapshot());
+  duplicateQueue.queue.push(structuredClone(duplicateQueue.queue[0]));
+  duplicateQueue.root = realityRoot({ ...duplicateQueue, root: undefined });
+
+  assert.throws(
+    () => restoreLogicalTimeScheduler(duplicateQueue),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+
+  const impossibleSequence = structuredClone(scheduler.snapshot());
+  impossibleSequence.eventSequence = 1;
+  impossibleSequence.root = realityRoot({ ...impossibleSequence, root: undefined });
+  assert.throws(
+    () => restoreLogicalTimeScheduler(impossibleSequence),
     (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
   );
 });
