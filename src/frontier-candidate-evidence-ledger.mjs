@@ -247,7 +247,7 @@ export function runUnknownKnowledgeEvidenceLoop(options = {}) {
     ok: validation.ok,
     compilerPromotedCount: Number(compiler.result?.promotedCount ?? 0),
     compilerRejectedCount: Number(compiler.result?.rejectedCount ?? 0),
-    promotedAwaitingExperimentSpec,
+    promotedAwaitingExperimentSpec: promotedAwaitingSpec,
     courtManaged,
     compilerRejected,
     courtEvidenceLeaders: [...(court.evidenceLeaders ?? [])],
