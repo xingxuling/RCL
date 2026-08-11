@@ -42,7 +42,7 @@ Insertion order, host locale and wall-clock timing therefore cannot decide a sam
 - logical time cannot move backward;
 - a declared `maxEvents` budget fails before any due event is committed;
 - scheduled data must be canonical JSON-like data, preventing non-replayable task payloads;
-- snapshots carry a content root and reject accidental/tampered changes against that root;
+- snapshots carry a content root and reject accidental/tampered changes against that root, plus semantically invalid re-rooted state such as duplicate pending effects or impossible receipt sequences;
 - external wall-clock observations are non-authoritative proposals;
 - committing external time requires an explicit `temporal.commit` capability;
 - time acceleration changes only wall-time projection, not logical event order;
@@ -61,4 +61,4 @@ node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs
 node examples/logical-time-scheduler-demo.mjs
 ```
 
-The focused suite verifies deterministic same-instant order (including locale-sensitive IDs), relative scheduling/cancellation, monotonicity, acceleration invariance, event-budget atomicity, canonical-data rejection, rooted snapshot restore and explicit external-time authority.
+The focused suite verifies deterministic same-instant order (including locale-sensitive IDs), relative scheduling/cancellation, monotonicity, acceleration invariance, event-budget atomicity, canonical-data rejection, rooted snapshot restore (including re-rooted invariant violations) and explicit external-time authority.
