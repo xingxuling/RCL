@@ -120,6 +120,13 @@ test('external time is only an observation until an authorized explicit logical 
     (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_AUTHORITY_DENIED',
   );
 
+  const beforeInvalidAuthority = scheduler.snapshot().root;
+  assert.throws(
+    () => scheduler.commitExternalTime(proposal.id, { subject: { not: 'a subject id' }, capabilities: ['temporal.commit'] }),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_TEXT_INVALID',
+  );
+  assert.equal(scheduler.snapshot().root, beforeInvalidAuthority);
+
   const receipt = scheduler.commitExternalTime(proposal.id, {
     subject: 'timekeeper',
     capabilities: ['temporal.commit'],
