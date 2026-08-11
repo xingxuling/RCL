@@ -388,25 +388,47 @@ export function validateLogicalTimeSnapshot(snapshot) {
     requireTimeScale(snapshot.timeScale);
     requireInstant(snapshot.eventSequence, 'snapshot.eventSequence');
     requireInstant(snapshot.revision, 'snapshot.revision');
-    const knownScheduleIds = sortedUniqueStrings(snapshot.knownScheduleIds ?? [], 'snapshot.knownScheduleIds');
-    const knownProposalIds = sortedUniqueStrings(snapshot.knownProposalIds ?? [], 'snapshot.knownProposalIds');
+    const rawScheduleIds = snapshot.knownScheduleIds ?? [];
+    const rawProposalIds = snapshot.knownProposalIds ?? [];
+    const knownScheduleIds = sortedUniqueStrings(rawScheduleIds, 'snapshot.knownScheduleIds');
+    const knownProposalIds = sortedUniqueStrings(rawProposalIds, 'snapshot.knownProposalIds');
+    if (rawScheduleIds.length !== knownScheduleIds.length) failures.push('snapshot_duplicate_schedule_ids');
+    if (rawProposalIds.length !== knownProposalIds.length) failures.push('snapshot_duplicate_proposal_ids');
     const queue = Array.isArray(snapshot.queue) ? snapshot.queue.map((item) => normalizeSchedule(item, snapshot.currentTime)) : null;
     if (!queue) failures.push('snapshot_queue_invalid');
     if (queue && queue.some((schedule, index) => index > 0 && compareSchedule(queue[index - 1], schedule) > 0)) failures.push('snapshot_queue_not_sorted');
     if (queue && queue.some((schedule) => !knownScheduleIds.includes(schedule.id))) failures.push('snapshot_queue_unknown_schedule');
-    if (!Array.isArray(snapshot.eventLog)) failures.push('snapshot_event_log_invalid');
+    if (!Array.isArray(snapshot.eventLog)) {
+      failures.push('snapshot_event_log_invalid');
+    } else {
+      for (const [index, event] of snapshot.eventLog.entries()) {
+        if (!event || typeof event !== 'object') {
+          failures.push(`snapshot_event_invalid:${index}`);
+          continue;
+        }
+        if (event.sequence !== index + 1) failures.push(`snapshot_event_sequence_invalid:${index}`);
+        if (event.root !== realityRoot({ ...event, root: undefined })) failures.push(`event_root_mismatch:${event.id ?? index}`);
+      }
+    }
     if (!Array.isArray(snapshot.externalProposals)) failures.push('snapshot_external_proposals_invalid');
     if (Array.isArray(snapshot.externalProposals)) {
       for (const proposal of snapshot.externalProposals) {
+        requireId(proposal.id, 'snapshot.proposal.id');
         if (!knownProposalIds.includes(proposal.id)) failures.push(`snapshot_unknown_proposal:${proposal.id}`);
+        if (!['proposed', 'committed'].includes(proposal.status)) failures.push(`snapshot_proposal_status_invalid:${proposal.id}`);
         if (proposal.root !== realityRoot({ ...proposal, root: undefined })) failures.push(`proposal_root_mismatch:${proposal.id}`);
       }
     }
   } catch (error) {
     failures.push(error.code ?? 'snapshot_shape_invalid');
   }
-  const expectedRoot = snapshotRoot(snapshot);
-  if (snapshot.root !== expectedRoot) failures.push('snapshot_root_mismatch');
+  let expectedRoot = null;
+  try {
+    expectedRoot = snapshotRoot(snapshot);
+    if (snapshot.root !== expectedRoot) failures.push('snapshot_root_mismatch');
+  } catch (error) {
+    failures.push(error.code ?? 'snapshot_unrootable');
+  }
   return { ok: failures.length === 0, failures, expectedRoot };
 }
 
@@ -418,3 +440,18 @@ export function restoreLogicalTimeScheduler(snapshot) {
   const scheduler = new LogicalTimeScheduler({
     replicaId: snapshot.replicaId,
     startTime: snapshot.currentTime,
+    timeScale: snapshot.timeScale,
+  });
+  scheduler.revision = snapshot.revision;
+  scheduler.eventSequence = snapshot.eventSequence;
+  scheduler.knownScheduleIds = new Set(snapshot.knownScheduleIds);
+  scheduler.knownProposalIds = new Set(snapshot.knownProposalIds);
+  scheduler.queue = clone(snapshot.queue).sort(compareSchedule);
+  scheduler.eventLog = clone(snapshot.eventLog);
+  scheduler.externalProposals = clone(snapshot.externalProposals).sort((left, right) => left.id.localeCompare(right.id));
+  return scheduler;
+}
+
+export function createLogicalTimeScheduler(options = {}) {
+  return new LogicalTimeScheduler(options);
+}
