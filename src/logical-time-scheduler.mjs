@@ -453,6 +453,8 @@ export function validateLogicalTimeSnapshot(snapshot) {
     const knownProposalIds = sortedUniqueStrings(rawProposalIds, 'snapshot.knownProposalIds');
     if (rawScheduleIds.length !== knownScheduleIds.length) failures.push('snapshot_duplicate_schedule_ids');
     if (rawProposalIds.length !== knownProposalIds.length) failures.push('snapshot_duplicate_proposal_ids');
+    if (realityRoot(rawScheduleIds) !== realityRoot(knownScheduleIds)) failures.push('snapshot_schedule_registry_noncanonical');
+    if (realityRoot(rawProposalIds) !== realityRoot(knownProposalIds)) failures.push('snapshot_proposal_registry_noncanonical');
     const queue = Array.isArray(snapshot.queue) ? snapshot.queue.map((item) => normalizeSchedule(item, snapshot.currentTime)) : null;
     if (!queue) failures.push('snapshot_queue_invalid');
     if (queue && queue.some((schedule, index) => realityRoot(snapshot.queue[index]) !== realityRoot(schedule))) failures.push('snapshot_queue_noncanonical');
@@ -473,6 +475,7 @@ export function validateLogicalTimeSnapshot(snapshot) {
         if (event.id !== `logical:${snapshot.replicaId}:${index + 1}`) failures.push(`snapshot_event_id_mismatch:${index}`);
         if (event.sequence !== index + 1) failures.push(`snapshot_event_sequence_invalid:${index}`);
         if (!Number.isSafeInteger(event.logicalTime) || event.logicalTime < 0) failures.push(`snapshot_event_time_invalid:${index}`);
+        if (event.logicalTime > snapshot.currentTime) failures.push(`snapshot_event_time_after_snapshot:${index}`);
         if (event.logicalTime < previousEventTime) failures.push(`snapshot_event_time_non_monotonic:${index}`);
         previousEventTime = event.logicalTime;
         if (event.root !== realityRoot({ ...event, root: undefined })) failures.push(`event_root_mismatch:${event.id ?? index}`);
@@ -517,8 +520,8 @@ export function restoreLogicalTimeScheduler(snapshot) {
   });
   scheduler.revision = snapshot.revision;
   scheduler.eventSequence = snapshot.eventSequence;
-  scheduler.knownScheduleIds = new Set(snapshot.knownScheduleIds);
-  scheduler.knownProposalIds = new Set(snapshot.knownProposalIds);
+  scheduler.knownScheduleIds = new Set(sortedUniqueStrings(snapshot.knownScheduleIds, 'snapshot.knownScheduleIds'));
+  scheduler.knownProposalIds = new Set(sortedUniqueStrings(snapshot.knownProposalIds, 'snapshot.knownProposalIds'));
   scheduler.queue = snapshot.queue.map((schedule) => normalizeSchedule(schedule, snapshot.currentTime)).sort(compareSchedule);
   scheduler.eventLog = clone(snapshot.eventLog);
   scheduler.externalProposals = snapshot.externalProposals
