@@ -149,6 +149,17 @@ test('re-rooted snapshots still reject duplicate effects and impossible receipt 
     () => restoreLogicalTimeScheduler(impossibleSequence),
     (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
   );
+
+  const eventScheduler = new LogicalTimeScheduler({ replicaId: 'event-time' });
+  eventScheduler.advanceTo(5);
+  const futureReceipt = structuredClone(eventScheduler.snapshot());
+  futureReceipt.eventLog[0].logicalTime = 7;
+  futureReceipt.eventLog[0].root = realityRoot({ ...futureReceipt.eventLog[0], root: undefined });
+  futureReceipt.root = realityRoot({ ...futureReceipt, root: undefined });
+  assert.throws(
+    () => restoreLogicalTimeScheduler(futureReceipt),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
 });
 
 test('re-rooted snapshots reject state that the public scheduler API could not produce', () => {
@@ -172,6 +183,32 @@ test('re-rooted snapshots reject state that the public scheduler API could not p
 
   assert.throws(
     () => restoreLogicalTimeScheduler(nonCanonicalProposal),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+});
+
+test('re-rooted snapshots reject non-canonical registry order', () => {
+  const scheduler = new LogicalTimeScheduler();
+  scheduler.scheduleAt({ id: 'a', at: 1 });
+  scheduler.scheduleAt({ id: 'Z', at: 1 });
+  const nonCanonicalScheduleRegistry = structuredClone(scheduler.snapshot());
+  nonCanonicalScheduleRegistry.knownScheduleIds.reverse();
+  nonCanonicalScheduleRegistry.root = realityRoot({ ...nonCanonicalScheduleRegistry, root: undefined });
+
+  assert.throws(
+    () => restoreLogicalTimeScheduler(nonCanonicalScheduleRegistry),
+    (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
+  );
+
+  const proposalScheduler = new LogicalTimeScheduler();
+  proposalScheduler.proposeExternalTime({ id: 'a', source: 'host-clock', observedAtMs: 1, proposedLogicalTime: 1 });
+  proposalScheduler.proposeExternalTime({ id: 'Z', source: 'host-clock', observedAtMs: 2, proposedLogicalTime: 1 });
+  const nonCanonicalProposalRegistry = structuredClone(proposalScheduler.snapshot());
+  nonCanonicalProposalRegistry.knownProposalIds.reverse();
+  nonCanonicalProposalRegistry.root = realityRoot({ ...nonCanonicalProposalRegistry, root: undefined });
+
+  assert.throws(
+    () => restoreLogicalTimeScheduler(nonCanonicalProposalRegistry),
     (error) => error instanceof LogicalTimeSchedulerError && error.code === 'RCL_LOGICAL_TIME_SNAPSHOT_ROOT_MISMATCH',
   );
 });
