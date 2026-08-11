@@ -154,6 +154,53 @@ function proposalWithRoot(proposal) {
   return { ...proposal, root: realityRoot({ ...proposal, root: undefined }) };
 }
 
+function normalizeSnapshotExternalProposal(input, currentTime) {
+  if (!input || typeof input !== 'object') {
+    throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_PROPOSAL_INVALID', 'snapshot proposal must be an object', { input });
+  }
+  const status = input.status;
+  if (!['proposed', 'committed'].includes(status)) {
+    throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_PROPOSAL_INVALID', 'snapshot proposal has an invalid status', { status });
+  }
+  const observedAtLogicalTime = requireInstant(input.observedAtLogicalTime, 'snapshot.proposal.observedAtLogicalTime');
+  const proposedLogicalTime = requireInstant(input.proposedLogicalTime, 'snapshot.proposal.proposedLogicalTime');
+  if (observedAtLogicalTime > currentTime || proposedLogicalTime < observedAtLogicalTime) {
+    throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_PROPOSAL_STALE', 'snapshot proposal has an invalid logical-time relation', {
+      observedAtLogicalTime,
+      proposedLogicalTime,
+      currentTime,
+    });
+  }
+  if (!Number.isFinite(input.observedAtMs)) {
+    throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_EXTERNAL_OBSERVATION_INVALID', 'snapshot proposal.observedAtMs must be finite', {
+      observedAtMs: input.observedAtMs,
+    });
+  }
+  const normalized = {
+    id: requireId(input.id, 'snapshot.proposal.id'),
+    source: requireId(input.source, 'snapshot.proposal.source'),
+    observedAtMs: input.observedAtMs,
+    proposedLogicalTime,
+    metadata: requireCanonicalData(input.metadata, 'snapshot.proposal.metadata'),
+    authoritative: false,
+    status,
+    observedAtLogicalTime,
+  };
+  if (status === 'committed') {
+    const committedAtLogicalTime = requireInstant(input.committedAtLogicalTime, 'snapshot.proposal.committedAtLogicalTime');
+    if (committedAtLogicalTime !== proposedLogicalTime || committedAtLogicalTime > currentTime) {
+      throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_PROPOSAL_STALE', 'committed snapshot proposal has an invalid logical-time relation', {
+        committedAtLogicalTime,
+        proposedLogicalTime,
+        currentTime,
+      });
+    }
+    normalized.committedBy = requireOptionalText(input.committedBy, 'snapshot.proposal.committedBy');
+    normalized.committedAtLogicalTime = committedAtLogicalTime;
+  }
+  return proposalWithRoot(normalized);
+}
+
 export class LogicalTimeScheduler {
   constructor(options = {}) {
     this.format = RCL_LOGICAL_TIME_SCHEDULER_FORMAT;
@@ -269,7 +316,14 @@ export class LogicalTimeScheduler {
 
   projectWallDuration(logicalDuration) {
     const duration = requireInstant(logicalDuration, 'logicalDuration');
-    return duration / this.timeScale;
+    const projectedDuration = duration / this.timeScale;
+    if (!Number.isFinite(projectedDuration)) {
+      throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_PROJECTION_INVALID', 'logical duration cannot be projected as finite wall time', {
+        logicalDuration: duration,
+        timeScale: this.timeScale,
+      });
+    }
+    return projectedDuration;
   }
 
   proposeExternalTime(input) {
@@ -401,6 +455,7 @@ export function validateLogicalTimeSnapshot(snapshot) {
     if (rawProposalIds.length !== knownProposalIds.length) failures.push('snapshot_duplicate_proposal_ids');
     const queue = Array.isArray(snapshot.queue) ? snapshot.queue.map((item) => normalizeSchedule(item, snapshot.currentTime)) : null;
     if (!queue) failures.push('snapshot_queue_invalid');
+    if (queue && queue.some((schedule, index) => realityRoot(snapshot.queue[index]) !== realityRoot(schedule))) failures.push('snapshot_queue_noncanonical');
     if (queue && queue.some((schedule, index) => index > 0 && compareSchedule(queue[index - 1], schedule) > 0)) failures.push('snapshot_queue_not_sorted');
     if (queue && queue.some((schedule) => !knownScheduleIds.includes(schedule.id))) failures.push('snapshot_queue_unknown_schedule');
     if (queue && new Set(queue.map((schedule) => schedule.id)).size !== queue.length) failures.push('snapshot_queue_duplicate_schedule');
@@ -426,18 +481,15 @@ export function validateLogicalTimeSnapshot(snapshot) {
     if (!Array.isArray(snapshot.externalProposals)) failures.push('snapshot_external_proposals_invalid');
     if (Array.isArray(snapshot.externalProposals)) {
       const proposalIds = new Set();
-      for (const proposal of snapshot.externalProposals) {
-        if (!proposal || typeof proposal !== 'object') {
-          failures.push('snapshot_proposal_invalid');
-          continue;
-        }
-        requireId(proposal.id, 'snapshot.proposal.id');
+      const proposals = snapshot.externalProposals.map((proposal) => normalizeSnapshotExternalProposal(proposal, snapshot.currentTime));
+      for (const [index, proposal] of proposals.entries()) {
+        const rawProposal = snapshot.externalProposals[index];
         if (proposalIds.has(proposal.id)) failures.push(`snapshot_duplicate_proposal:${proposal.id}`);
         proposalIds.add(proposal.id);
         if (!knownProposalIds.includes(proposal.id)) failures.push(`snapshot_unknown_proposal:${proposal.id}`);
-        if (!['proposed', 'committed'].includes(proposal.status)) failures.push(`snapshot_proposal_status_invalid:${proposal.id}`);
-        if (proposal.root !== realityRoot({ ...proposal, root: undefined })) failures.push(`proposal_root_mismatch:${proposal.id}`);
+        if (rawProposal.root !== proposal.root) failures.push(`proposal_root_mismatch:${proposal.id}`);
       }
+      if (proposals.some((proposal, index) => index > 0 && compareText(proposals[index - 1].id, proposal.id) > 0)) failures.push('snapshot_proposals_not_sorted');
       if (proposalIds.size !== knownProposalIds.length || knownProposalIds.some((id) => !proposalIds.has(id))) failures.push('snapshot_proposal_registry_mismatch');
     }
   } catch (error) {
@@ -467,9 +519,11 @@ export function restoreLogicalTimeScheduler(snapshot) {
   scheduler.eventSequence = snapshot.eventSequence;
   scheduler.knownScheduleIds = new Set(snapshot.knownScheduleIds);
   scheduler.knownProposalIds = new Set(snapshot.knownProposalIds);
-  scheduler.queue = clone(snapshot.queue).sort(compareSchedule);
+  scheduler.queue = snapshot.queue.map((schedule) => normalizeSchedule(schedule, snapshot.currentTime)).sort(compareSchedule);
   scheduler.eventLog = clone(snapshot.eventLog);
-  scheduler.externalProposals = clone(snapshot.externalProposals).sort((left, right) => compareText(left.id, right.id));
+  scheduler.externalProposals = snapshot.externalProposals
+    .map((proposal) => normalizeSnapshotExternalProposal(proposal, snapshot.currentTime))
+    .sort((left, right) => compareText(left.id, right.id));
   return scheduler;
 }
 
