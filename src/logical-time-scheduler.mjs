@@ -403,26 +403,42 @@ export function validateLogicalTimeSnapshot(snapshot) {
     if (!queue) failures.push('snapshot_queue_invalid');
     if (queue && queue.some((schedule, index) => index > 0 && compareSchedule(queue[index - 1], schedule) > 0)) failures.push('snapshot_queue_not_sorted');
     if (queue && queue.some((schedule) => !knownScheduleIds.includes(schedule.id))) failures.push('snapshot_queue_unknown_schedule');
+    if (queue && new Set(queue.map((schedule) => schedule.id)).size !== queue.length) failures.push('snapshot_queue_duplicate_schedule');
     if (!Array.isArray(snapshot.eventLog)) {
       failures.push('snapshot_event_log_invalid');
     } else {
+      if (snapshot.eventSequence !== snapshot.eventLog.length) failures.push('snapshot_event_sequence_mismatch');
+      let previousEventTime = -1;
       for (const [index, event] of snapshot.eventLog.entries()) {
         if (!event || typeof event !== 'object') {
           failures.push(`snapshot_event_invalid:${index}`);
           continue;
         }
+        if (typeof event.id !== 'string' || event.id.trim().length === 0) failures.push(`snapshot_event_id_invalid:${index}`);
+        if (event.id !== `logical:${snapshot.replicaId}:${index + 1}`) failures.push(`snapshot_event_id_mismatch:${index}`);
         if (event.sequence !== index + 1) failures.push(`snapshot_event_sequence_invalid:${index}`);
+        if (!Number.isSafeInteger(event.logicalTime) || event.logicalTime < 0) failures.push(`snapshot_event_time_invalid:${index}`);
+        if (event.logicalTime < previousEventTime) failures.push(`snapshot_event_time_non_monotonic:${index}`);
+        previousEventTime = event.logicalTime;
         if (event.root !== realityRoot({ ...event, root: undefined })) failures.push(`event_root_mismatch:${event.id ?? index}`);
       }
     }
     if (!Array.isArray(snapshot.externalProposals)) failures.push('snapshot_external_proposals_invalid');
     if (Array.isArray(snapshot.externalProposals)) {
+      const proposalIds = new Set();
       for (const proposal of snapshot.externalProposals) {
+        if (!proposal || typeof proposal !== 'object') {
+          failures.push('snapshot_proposal_invalid');
+          continue;
+        }
         requireId(proposal.id, 'snapshot.proposal.id');
+        if (proposalIds.has(proposal.id)) failures.push(`snapshot_duplicate_proposal:${proposal.id}`);
+        proposalIds.add(proposal.id);
         if (!knownProposalIds.includes(proposal.id)) failures.push(`snapshot_unknown_proposal:${proposal.id}`);
         if (!['proposed', 'committed'].includes(proposal.status)) failures.push(`snapshot_proposal_status_invalid:${proposal.id}`);
         if (proposal.root !== realityRoot({ ...proposal, root: undefined })) failures.push(`proposal_root_mismatch:${proposal.id}`);
       }
+      if (proposalIds.size !== knownProposalIds.length || knownProposalIds.some((id) => !proposalIds.has(id))) failures.push('snapshot_proposal_registry_mismatch');
     }
   } catch (error) {
     failures.push(error.code ?? 'snapshot_shape_invalid');
