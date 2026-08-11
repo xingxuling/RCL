@@ -34,6 +34,22 @@ test('same logical instant is repeatable and uses priority then stable id, not h
   assert.equal(first.snapshot().root, second.snapshot().root);
 });
 
+test('stable ids use code-unit ordering instead of the host locale', () => {
+  const scheduler = new LogicalTimeScheduler();
+  scheduler.scheduleAt({ id: 'a', at: 1, kind: 'world-tick' });
+  scheduler.scheduleAt({ id: 'Z', at: 1, kind: 'world-tick' });
+
+  assert.deepEqual(scheduledIds(scheduler.advanceTo(1)), ['Z', 'a']);
+});
+
+test('external proposal snapshots also use code-unit ordering', () => {
+  const scheduler = new LogicalTimeScheduler();
+  scheduler.proposeExternalTime({ id: 'a', source: 'host-clock', observedAtMs: 1, proposedLogicalTime: 1 });
+  scheduler.proposeExternalTime({ id: 'Z', source: 'host-clock', observedAtMs: 2, proposedLogicalTime: 1 });
+
+  assert.deepEqual(scheduler.snapshot().externalProposals.map((proposal) => proposal.id), ['Z', 'a']);
+});
+
 test('relative scheduling and cancellation are explicit logical operations', () => {
   const scheduler = new LogicalTimeScheduler();
   scheduler.advanceTo(3);
