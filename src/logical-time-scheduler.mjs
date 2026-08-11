@@ -80,15 +80,20 @@ function requireCanonicalData(value, label, seen = new WeakSet()) {
   throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_DATA_INVALID', `${label} must contain JSON-like canonical data`, { label, type: typeof value });
 }
 
+function compareText(left, right) {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+}
+
 function sortedUniqueStrings(values, label) {
   if (!Array.isArray(values) || values.some((value) => typeof value !== 'string')) {
     throw new LogicalTimeSchedulerError('RCL_LOGICAL_TIME_STRING_LIST_INVALID', `${label} must be an array of strings`, { label, values });
   }
-  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+  return [...new Set(values)].sort(compareText);
 }
 
 function compareSchedule(left, right) {
-  return left.at - right.at || left.priority - right.priority || left.id.localeCompare(right.id);
+  return left.at - right.at || left.priority - right.priority || compareText(left.id, right.id);
 }
 
 function snapshotRoot(snapshot) {
@@ -275,7 +280,7 @@ export class LogicalTimeScheduler {
     const rooted = proposalWithRoot(proposal);
     this.knownProposalIds.add(rooted.id);
     this.externalProposals.push(rooted);
-    this.externalProposals.sort((left, right) => left.id.localeCompare(right.id));
+    this.externalProposals.sort((left, right) => compareText(left.id, right.id));
     this.#appendEvent('external-time-observed', {
       proposalId: rooted.id,
       source: rooted.source,
@@ -352,11 +357,11 @@ export class LogicalTimeScheduler {
       timeScale: this.timeScale,
       revision: this.revision,
       eventSequence: this.eventSequence,
-      knownScheduleIds: [...this.knownScheduleIds].sort((left, right) => left.localeCompare(right)),
-      knownProposalIds: [...this.knownProposalIds].sort((left, right) => left.localeCompare(right)),
+      knownScheduleIds: [...this.knownScheduleIds].sort(compareText),
+      knownProposalIds: [...this.knownProposalIds].sort(compareText),
       queue: clone([...this.queue].sort(compareSchedule)),
       eventLog: clone(this.eventLog),
-      externalProposals: clone([...this.externalProposals].sort((left, right) => left.id.localeCompare(right.id))),
+      externalProposals: clone([...this.externalProposals].sort((left, right) => compareText(left.id, right.id))),
     };
     return { ...withoutRoot, root: snapshotRoot(withoutRoot) };
   }
@@ -448,7 +453,7 @@ export function restoreLogicalTimeScheduler(snapshot) {
   scheduler.knownProposalIds = new Set(snapshot.knownProposalIds);
   scheduler.queue = clone(snapshot.queue).sort(compareSchedule);
   scheduler.eventLog = clone(snapshot.eventLog);
-  scheduler.externalProposals = clone(snapshot.externalProposals).sort((left, right) => left.id.localeCompare(right.id));
+  scheduler.externalProposals = clone(snapshot.externalProposals).sort((left, right) => compareText(left.id, right.id));
   return scheduler;
 }
 
