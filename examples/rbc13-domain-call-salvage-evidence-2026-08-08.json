@@ -1,0 +1,50 @@
+{
+  "schema": "rcl.rbc13-domain-call-salvage-evidence.v0.1",
+  "date": "2026-08-08",
+  "status": "CANDIDATE",
+  "branch": "research/rbc13-domain-call-salvage-v0.1",
+  "sourceBranch": "agent/advanced-runtime-rcl",
+  "salvageReportRoot": "73b6c0f5ec20779beb27f6bc289b9164df04d8ebda22716cb1cf0ed0f2bcc1f3",
+  "localFocusedExecution": {
+    "sourceSnapshot": "user-uploaded RCL v0.94.0-alpha.1 source package",
+    "dependencyBlobMatchesCurrentMain": {
+      "src/quantity.mjs": "edeb3926d2b85e0b9f617cac97fc47d23018c1d1",
+      "src/knowledge.mjs": "35d110c060af045d22976b78971bb235e9aa424e",
+      "src/errors.mjs": "4e35b747680cfbc918ee28522a68b3c25de3c46a"
+    },
+    "commandClass": "node --check + node --test focused salvage suite",
+    "tests": {
+      "total": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    "covered": [
+      "historical ABI quarantine",
+      "18-operation inventory partition",
+      "core.echo",
+      "quantity.make",
+      "quantitative.measure",
+      "knowledge.claim",
+      "legacy native-only fail-closed controls",
+      "unknown-operation rejection"
+    ]
+  },
+  "differentialHarness": {
+    "implemented": true,
+    "executedInUploadedSnapshot": false,
+    "reason": "The uploaded source snapshot predates src/differential-absorption-runner.mjs, so it cannot execute the new harness without importing newer main dependencies.",
+    "githubHostedExecution": "INFRASTRUCTURE_BLOCKED",
+    "githubWorkflowObservation": "Pull-request workflows completed as failure with zero executable job steps, consistent with the existing hosted-runner account/billing infrastructure blocker. This is not treated as a code-test failure."
+  },
+  "authority": {
+    "canonicalRbc13Enabled": false,
+    "nativePromotionAllowed": false,
+    "nativeFoundationSyntaxClaimAllowed": false,
+    "oldBinaryReuseAllowed": false
+  },
+  "limitations": [
+    "The focused local test validates the source-only salvage organ against current-main-matching quantity, knowledge and error modules; it is not native execution evidence.",
+    "The differential harness has not yet produced an execution receipt in a checkout containing the current differential runner.",
+    "No opcode, compiler, VM, package version or VERSION-CONTRACT authority has changed."
+  ]
+}

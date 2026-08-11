@@ -1,0 +1,33 @@
+{
+  "format": "taowind.rcl-rbc13-domain-public-api-local-evidence.v0.1",
+  "status": "PASS_WITH_EXACT_CURRENT_SOURCE_CI_PENDING",
+  "executedAt": "2026-08-08T06:04:00+08:00",
+  "api": {
+    "abi": "RCLVM_DOMAIN_CANDIDATE_ABI_V1",
+    "functions": [
+      "rclvm_instance_register_domain_organ",
+      "rclvm_instance_set_domain_minimum_tier",
+      "rclvm_instance_domain_organ_count",
+      "rclvm_instance_domain_minimum_tier"
+    ],
+    "privateVmFieldAccessRequiredByHost": false
+  },
+  "localExecution": {
+    "registeredOrganCount": 4,
+    "quantityMeasurementKnowledgeChainExitCode": 0,
+    "semanticOutputSha256": "d624fb7dd123e4548d590da1dc30205f379122731a2a0c4bf4047fb58a0dec21",
+    "candidatePublicVmSourceSha256": "cf8be9eb60f6c09a5c92559730bad1e454b24bdfb045877be83987cd699208e0",
+    "candidatePublicHostSha256": "574fc81c067d5da02a02e5cd3adb6859e9cc484f12ff97361f6511a8b74a496d"
+  },
+  "architecture": {
+    "registrationOwnership": "The VM registry deep-copies organ identity strings; callers may release temporary descriptor registries after registration.",
+    "defaultMinimumTier": "native-verified",
+    "experimentalHostOverride": "The local candidate host explicitly lowers the minimum tier for candidate experiments; this is not canonical runtime behavior.",
+    "canonicalFilesUntouched": ["src/bytecode.mjs", "native/rclvm.c", "native/rclvm.h"]
+  },
+  "boundaries": [
+    "The candidate public API is materialized into an experimental VM source; it is not part of canonical rclvm.h.",
+    "All four registered organs remain experimental/native-candidate descriptors in the candidate host and are not Native Promotion verified.",
+    "Exact current-source compilation remains represented by checked-in tests and CI-pending."
+  ]
+}

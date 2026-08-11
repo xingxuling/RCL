@@ -1,0 +1,24 @@
+reality Rbc13UniversalGraphTraversal {
+  facet graph.row_a : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), 0), 1), 0), 0)
+  facet graph.row_b : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), 0), 0), 0), 1)
+  facet graph.row_c : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), 0), 0), 0), 0)
+  facet graph.row_d : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), 0), 0), 0), 0)
+  facet graph.matrix : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), graph.row_a), graph.row_b), graph.row_c), graph.row_d)
+  facet graph.start : Number = 0
+  facet graph.target : Number = 3
+  facet graph.depth_budget : Number = 3
+
+  reckon edge(matrix : Sequence, from : Number, to : Number) -> Truth =
+    sequence_get(sequence_get(matrix, from), to) == 1
+
+  reckon reachable(matrix : Sequence, current : Number, target : Number, remaining : Number) -> Truth =
+    choose(current == target, true,
+      choose(remaining <= 0, false,
+        choose(edge(matrix, current, 0) and reachable(matrix, 0, target, remaining - 1), true,
+          choose(edge(matrix, current, 1) and reachable(matrix, 1, target, remaining - 1), true,
+            choose(edge(matrix, current, 2) and reachable(matrix, 2, target, remaining - 1), true,
+              choose(edge(matrix, current, 3) and reachable(matrix, 3, target, remaining - 1), true, false))))))
+
+  facet graph.reachable : Truth = reachable(graph.matrix, graph.start, graph.target, graph.depth_budget)
+  facet graph.unreachable : Truth = reachable(graph.matrix, graph.start, 2, graph.depth_budget)
+}

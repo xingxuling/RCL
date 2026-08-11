@@ -1,0 +1,103 @@
+{
+  "format": "rcl.rbc13-legacy-evidence-expected-inventory.v0.1",
+  "version": "0.1.0",
+  "authority": "committed-stable-id-inventory",
+  "description": "Authoritative current-source RBC 1.1/RBC 1.2 legacy evidence cases for RBC 1.3 admission closure.",
+  "cases": [
+    {
+      "id": "rbc11.stage5.encoder",
+      "rbcVersion": "1.1",
+      "family": "RBC1.1",
+      "runner": "stage5",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/bootstrap.mjs",
+        "src/bytecode.mjs",
+        "src/native-vm.mjs",
+        "bootstrap/compiler-stage5.rcl"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Stage-5 exact RBC 1.1 encoder parity and native target replay"
+    },
+    {
+      "id": "rbc12.foundation.batch-a",
+      "rbcVersion": "1.2",
+      "family": "RBC1.2",
+      "runner": "foundation-batch-a",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/foundation-native-batch-runtime.mjs",
+        "src/foundation-native-bridge.mjs",
+        "native/foundation_provider.c",
+        "native/rclvm.c",
+        "native/rclvm.h"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Six-domain Foundation Native Provider Bridge batch A"
+    },
+    {
+      "id": "rbc12.foundation.meta-batch-b",
+      "rbcVersion": "1.2",
+      "family": "RBC1.2",
+      "runner": "foundation-meta-batch-b",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/foundation-native-batch-runtime.mjs",
+        "src/foundation-native-meta-bridge.mjs",
+        "native/foundation_provider.c",
+        "native/rclvm.c",
+        "native/rclvm.h"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Meta-spacetime/acceleration/compression Foundation Native bridge batch B"
+    },
+    {
+      "id": "rbc12.foundation.batch-c",
+      "rbcVersion": "1.2",
+      "family": "RBC1.2",
+      "runner": "foundation-batch-c",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/foundation-native-batch-runtime.mjs",
+        "src/foundation-native-batch-c.mjs",
+        "native/foundation_provider.c",
+        "native/rclvm.c",
+        "native/rclvm.h"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Physical and embodiment Foundation Native bridge batch C"
+    },
+    {
+      "id": "rbc12.foundation.batch-d",
+      "rbcVersion": "1.2",
+      "family": "RBC1.2",
+      "runner": "foundation-batch-d",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/foundation-native-batch-runtime.mjs",
+        "src/foundation-native-batch-d.mjs",
+        "native/foundation_provider.c",
+        "native/rclvm.c",
+        "native/rclvm.h"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Energy/elemental/neural Foundation Native bridge batch D"
+    },
+    {
+      "id": "rbc12.foundation.batch-e",
+      "rbcVersion": "1.2",
+      "family": "RBC1.2",
+      "runner": "foundation-batch-e",
+      "runtimeVersion": "rcl-native-vm/0.6.0-alpha.1",
+      "sourcePaths": [
+        "src/foundation-native-batch-runtime.mjs",
+        "src/foundation-native-batch-e.mjs",
+        "native/foundation_provider.c",
+        "native/rclvm.c",
+        "native/rclvm.h"
+      ],
+      "expectedStatus": "VERIFIED",
+      "scope": "Metacomputation/computation Foundation Native bridge batch E"
+    }
+  ]
+}
