@@ -1,0 +1,51 @@
+{
+  "schema": "rcl.2d-game.v0.1",
+  "title": "RCL K04 · 星尘收集者",
+  "width": 320,
+  "height": 180,
+  "tickRate": 30,
+  "physics": {
+    "gravity": 1.5,
+    "groundY": 136,
+    "maxFallSpeed": 12,
+    "friction": 1
+  },
+  "player": {
+    "id": "player",
+    "size": { "width": 18, "height": 24 },
+    "color": "#4cc9f0",
+    "state": {
+      "x": "player.x",
+      "y": "player.y",
+      "vx": "player.vx",
+      "vy": "player.vy",
+      "grounded": "player.grounded"
+    }
+  },
+  "entities": [
+    {
+      "id": "star",
+      "kind": "collectible",
+      "x": 220,
+      "y": 124,
+      "width": 14,
+      "height": 14,
+      "color": "#ffd166",
+      "collectedState": "game.star_collected"
+    }
+  ],
+  "controls": {
+    "start": "startGame",
+    "left": "moveLeft",
+    "right": "moveRight",
+    "jump": "jump",
+    "reset": "resetGame",
+    "tick": "advanceFrame",
+    "collect": "collectStar"
+  },
+  "renderer": {
+    "background": "#101827",
+    "ground": "#26354d",
+    "accent": "#f72585"
+  }
+}
