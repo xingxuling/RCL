@@ -41,6 +41,8 @@ The first executable compiler-toolchain arena is defined at `examples/dominance-
 
 The first matched compiler microbenchmark is defined at `examples/dominance-arena/compiler-microbench.v0.1.json`. It uses the same workload `inputRoot` for RCL, real `rustc`, and CPython reference paths, verifies all outputs, and compares raw preparation time, cold runtime and artifact-footprint metrics without a weighted average. RCL beats Rust on this task but loses CPython on artifact footprint, so the multi-reference result is `Dominance: FAIL`; robustness, concurrency, process-memory sampling, authoring cost and broader workload families remain unverified.
 
+The first broader language workload matrix is defined at `examples/dominance-arena/compiler-workload-matrix.v0.1.json`. It executes text normalization, sequence aggregation, UTF-8 byte length and a bounded JSON-shaped text scan through real RCL, rustc and CPython providers. The current run has 12/12 provider executions correct: RCL passes 4/4 raw comparisons against rustc and 1/4 against CPython; the three CPython losses are artifact-footprint losses, so matrix `status=FAIL`. Native JSON parsing, file I/O and concurrency remain explicit `BLOCKED` capability gaps rather than claimed support.
+
 Authority document: `docs/RCL_DOMINANCE_ARENA_v0.1.md`.
 
 ### K01 — Self-hosting compiler

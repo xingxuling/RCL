@@ -1,0 +1,20 @@
+{
+  "schema": "rcl.compiler-microbench.workload.v0.1",
+  "id": "text-normalization-v1",
+  "inputs": {
+    "payload": "  RCL Beats Python  "
+  },
+  "expected": {
+    "outputType": "number",
+    "resultOutput": 16
+  },
+  "benchmark": {
+    "compileIterations": 3,
+    "runtimeIterations": 12
+  },
+  "contract": {
+    "sameInputRootRequired": true,
+    "correctness": "trim payload, lowercase it, require rcl and python, then return normalized character count",
+    "execution": "compile the declared source and execute its emitted artifact"
+  }
+}

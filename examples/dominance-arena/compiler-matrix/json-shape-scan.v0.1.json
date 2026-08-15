@@ -1,0 +1,21 @@
+{
+  "schema": "rcl.compiler-microbench.workload.v0.1",
+  "id": "json-shape-scan-v1",
+  "inputs": {
+    "payload": "{\"name\":\"rcl\",\"version\":1,\"features\":[\"text\",\"sequence\"]}"
+  },
+  "expected": {
+    "outputType": "number",
+    "resultOutput": 57
+  },
+  "benchmark": {
+    "compileIterations": 3,
+    "runtimeIterations": 12
+  },
+  "contract": {
+    "sameInputRootRequired": true,
+    "correctness": "scan the exact JSON-shaped payload for the declared name, version and features fragments, then return byte length",
+    "execution": "compile the declared source and execute its emitted artifact",
+    "boundary": "This is a matched textual shape scan, not JSON parser parity. Native RCL JSON parsing remains a separate gap."
+  }
+}

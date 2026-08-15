@@ -1,0 +1,5 @@
+reality TextNormalization {
+  facet input.payload : Text = "  RCL Beats Python  "
+  facet normalized : Text = lower_text(trim(input.payload))
+  facet result.output : Number = choose(contains(normalized, "rcl") and contains(normalized, "python"), length(normalized), -1)
+}

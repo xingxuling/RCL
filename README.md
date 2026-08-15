@@ -281,6 +281,12 @@ Run the matched RCL/rustc/CPython compiler microbenchmark:
 npm run evidence:dominance-arena:microbench
 ```
 
+Run the broader real language workload matrix:
+
+```bash
+npm run evidence:dominance-arena:matrix
+```
+
 Build the K02 standalone Web artifact:
 
 ```bash
@@ -342,6 +348,7 @@ As of the current `v0.94.0-alpha.1` package baseline:
 - A large fraction of the 400-cell Universal Stress matrix remains unknown by design.
 - The compiler Dominance Arena retains an executable RCL K01 baseline with tool probes only; that broad self-hosting comparison remains `UNVERIFIED`.
 - The separate arithmetic-chain microbenchmark has real RCL/native-VM, rustc and CPython reference paths. RCL beats Rust on the required raw metrics but loses CPython on artifact footprint, so the multi-reference result is `Dominance: FAIL`; it does not establish whole-language, ecosystem, memory, authorability or commercial-product superiority.
+- The compiler workload matrix runs four matched text/data workloads through real RCL, rustc and CPython paths. The current evidence is 4/4 raw comparisons passed against rustc and 1/4 against CPython; the matrix is `FAIL` because CPython wins artifact footprint on three workloads. Native JSON parsing, file I/O and concurrency are still recorded as `BLOCKED` gaps.
 - “RCL can write any program” is **not** a repository claim. The repository instead defines how that proposition must be attacked, measured and potentially falsified.
 
 For the machine-readable current contract, use [`VERSION-CONTRACT.json`](VERSION-CONTRACT.json). For the human-readable authority snapshot, use [`CURRENT-STATUS.md`](CURRENT-STATUS.md).

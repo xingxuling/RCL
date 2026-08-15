@@ -90,6 +90,40 @@ multi-reference arena correctly reports `Dominance: FAIL`. This is a microbenchm
 result only, not proof of whole-language, ecosystem, authoring, concurrency or
 commercial-product superiority.
 
+## Workload matrix: real language pressure
+
+The arithmetic chain is too narrow to stand in for a language. The next bounded
+matrix is defined at:
+
+```text
+examples/dominance-arena/compiler-workload-matrix.v0.1.json
+```
+
+It runs four matched workloads through the same RCL, rustc and CPython runner:
+
+- text normalization;
+- sequence construction and aggregation;
+- actual UTF-8 byte-length measurement;
+- a JSON-shaped textual key/feature scan.
+
+Run it with:
+
+```bash
+npm run evidence:dominance-arena:matrix
+```
+
+The matrix compares each workload independently and never uses provider averages
+to hide a loss. In the current Windows run, all 12 provider executions passed
+correctness. RCL passed every raw comparison against rustc. Against CPython, RCL
+passed one workload and lost three on emitted artifact footprint; the matrix
+status is therefore `FAIL`. The JSON-shaped task is explicitly a textual scan,
+not JSON parser parity.
+
+Three capability gaps are recorded separately as `BLOCKED`: native JSON parsing,
+declared file I/O, and declared concurrency. They are not converted into fake
+provider results. Until those paths exist, this matrix cannot support a broad
+language or Python replacement claim.
+
 ## Promotion requirements
 
 The compiler arena cannot report `Dominance: PASS` until all of the following are present for at least one reference:
@@ -117,6 +151,8 @@ Dominance Arena does not promote a donor feature into the RCL genome. Capability
 ```bash
 npm run test:dominance-arena
 npm run test:dominance-arena:microbench
+npm run test:dominance-arena:matrix
 node --test --test-concurrency=1 tests/universal-stress-k01-selfhost-adapter.test.mjs
 npm run evidence:dominance-arena:microbench
+npm run evidence:dominance-arena:matrix
 ```

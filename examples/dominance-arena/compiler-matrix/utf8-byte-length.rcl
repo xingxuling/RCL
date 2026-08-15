@@ -1,0 +1,5 @@
+reality Utf8ByteLength {
+  facet input.payload : Text = "RCL现实"
+  facet encoded : Sequence = utf8_bytes(input.payload)
+  facet result.output : Number = length(encoded)
+}

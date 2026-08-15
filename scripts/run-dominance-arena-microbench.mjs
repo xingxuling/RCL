@@ -44,6 +44,35 @@ function closeEnough(actual, expected) {
   return Number.isFinite(actual) && Number.isFinite(expected) && Math.abs(actual - expected) <= 1e-9;
 }
 
+function compareOutput(actual, expected, outputType) {
+  if (outputType === 'number') {
+    return {
+      actual,
+      expected,
+      tolerance: 1e-9,
+      passed: closeEnough(Number(actual), Number(expected)),
+    };
+  }
+  const normalizedActual = String(actual ?? '');
+  const normalizedExpected = String(expected ?? '');
+  return {
+    actual: normalizedActual,
+    expected: normalizedExpected,
+    tolerance: 0,
+    passed: normalizedActual === normalizedExpected,
+  };
+}
+
+function parseReferenceOutput(stdout, outputType) {
+  const text = String(stdout ?? '').trim();
+  if (outputType === 'number') {
+    const value = Number(text);
+    if (!Number.isFinite(value)) throw new Error(`reference executable returned non-numeric output: ${stdout}`);
+    return value;
+  }
+  return text;
+}
+
 function readInputs() {
   const workloadBytes = fs.readFileSync(workloadPath);
   const workload = JSON.parse(workloadBytes.toString('utf8'));
@@ -52,7 +81,12 @@ function readInputs() {
   const runtimeIterations = Number(workload.benchmark?.runtimeIterations ?? 1);
   if (!Number.isInteger(compileIterations) || compileIterations < 1) fail('compileIterations must be a positive integer');
   if (!Number.isInteger(runtimeIterations) || runtimeIterations < 1) fail('runtimeIterations must be a positive integer');
-  if (!Number.isFinite(workload.expected?.resultOutput)) fail('expected.resultOutput must be numeric');
+  const expectedOutput = workload.expected?.resultOutput;
+  if (!['number', 'string'].includes(typeof expectedOutput)) fail('expected.resultOutput must be a number or string');
+  const outputType = workload.expected?.outputType ?? typeof expectedOutput;
+  if (!['number', 'text'].includes(outputType)) fail('expected.outputType must be number or text');
+  if (outputType === 'number' && typeof expectedOutput !== 'number') fail('number outputType requires numeric resultOutput');
+  if (outputType === 'text' && typeof expectedOutput !== 'string') fail('text outputType requires string resultOutput');
   return {
     workload,
     source,
@@ -60,7 +94,8 @@ function readInputs() {
     sourceRoot: sha256(Buffer.from(source, 'utf8')),
     compileIterations,
     runtimeIterations,
-    expectedOutput: Number(workload.expected.resultOutput),
+    expectedOutput,
+    outputType,
   };
 }
 
@@ -95,6 +130,7 @@ function commonEvidence(inputs) {
       compileIterations: inputs.compileIterations,
       runtimeIterations: inputs.runtimeIterations,
     },
+    outputType: inputs.outputType,
     contract: inputs.workload.contract ?? null,
   };
 }
@@ -135,8 +171,9 @@ function runRcl(inputs) {
     return;
   }
 
-  const actualOutput = Number(nativeRun?.state?.['result.output']);
-  const correct = closeEnough(actualOutput, inputs.expectedOutput);
+  const actualOutput = nativeRun?.state?.['result.output'];
+  const correctness = compareOutput(actualOutput, inputs.expectedOutput, inputs.outputType);
+  const correct = correctness.passed;
   const compileBuildSpeed = Number((compileTotalMs / inputs.compileIterations).toFixed(3));
   const runtimeMs = Number((runtimeTotalMs / inputs.runtimeIterations).toFixed(3));
   finish({
@@ -150,9 +187,7 @@ function runRcl(inputs) {
       artifactPath,
     },
     correctness: {
-      expected: inputs.expectedOutput,
-      actual: actualOutput,
-      tolerance: 1e-9,
+      ...correctness,
       passed: correct,
       stateRoot: nativeRun.semanticStateRoot ?? nativeRun.stateRoot ?? null,
     },
@@ -232,8 +267,7 @@ function runRust(inputs) {
       runtimeRuns.push(duration);
       if (result.error) throw new Error(result.error.message);
       if (result.status !== 0) throw new Error(result.stderr || `reference executable exited with ${result.status}`);
-      output = Number(String(result.stdout ?? '').trim());
-      if (!Number.isFinite(output)) throw new Error(`reference executable returned non-numeric output: ${result.stdout}`);
+      output = parseReferenceOutput(result.stdout, inputs.outputType);
     }
   } catch (error) {
     finish({
@@ -246,13 +280,14 @@ function runRust(inputs) {
     }, 1);
     return;
   }
-  const correct = closeEnough(output, inputs.expectedOutput);
+  const correctness = compareOutput(output, inputs.expectedOutput, inputs.outputType);
+  const correct = correctness.passed;
   const artifactBytes = fs.statSync(artifactPath).size;
   finish({
     ...commonEvidence(inputs),
     status: correct ? STRESS_STATUS.PASS : STRESS_STATUS.FAIL,
     provider: { id: 'rustc-reference', compiler: 'rustc', executor: artifactPath, sourcePath, artifactPath, rustVersion },
-    correctness: { expected: inputs.expectedOutput, actual: output, tolerance: 1e-9, passed: correct },
+    correctness: { ...correctness, passed: correct },
     metrics: {
       correctness: correct ? 1 : 0,
       compileBuildSpeed: Number((compileTotalMs / inputs.compileIterations).toFixed(3)),
@@ -328,8 +363,7 @@ function runPython(inputs) {
       runtimeRuns.push(duration);
       if (result.error) throw new Error(result.error.message);
       if (result.status !== 0) throw new Error(result.stderr || `Python executable exited with ${result.status}`);
-      output = Number(String(result.stdout ?? '').trim());
-      if (!Number.isFinite(output)) throw new Error(`Python executable returned non-numeric output: ${result.stdout}`);
+      output = parseReferenceOutput(result.stdout, inputs.outputType);
     }
   } catch (error) {
     finish({
@@ -342,7 +376,8 @@ function runPython(inputs) {
     }, 1);
     return;
   }
-  const correct = closeEnough(output, inputs.expectedOutput);
+  const correctness = compareOutput(output, inputs.expectedOutput, inputs.outputType);
+  const correct = correctness.passed;
   const artifactBytes = fs.statSync(artifactPath).size;
   finish({
     ...commonEvidence(inputs),
@@ -357,7 +392,7 @@ function runPython(inputs) {
       executionModel: 'interpreted',
       compileMetricBoundary: 'compileBuildSpeed measures py_compile preparation, not machine-code build time',
     },
-    correctness: { expected: inputs.expectedOutput, actual: output, tolerance: 1e-9, passed: correct },
+    correctness: { ...correctness, passed: correct },
     metrics: {
       correctness: correct ? 1 : 0,
       compileBuildSpeed: Number((compileTotalMs / inputs.compileIterations).toFixed(3)),
