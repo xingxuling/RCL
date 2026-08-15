@@ -117,19 +117,27 @@ function runChild(provider, workloadPath, sourcePath, evidencePath) {
   };
 }
 
-function comparisonContract(manifest) {
+function comparisonContract(manifest, references) {
   const metrics = Object.fromEntries(manifest.requiredMetrics.map(id => [id, {
     candidatePath: `metrics.${id}`,
     referencePath: `metrics.${id}`,
   }]));
   return {
     candidateId: manifest.candidate.id,
-    referenceIds: manifest.references.map(provider => provider.id),
+    referenceIds: references.map(provider => provider.id),
     candidateInputRootPath: 'inputRoot',
     referenceInputRootPath: 'inputRoot',
     metrics,
     note: 'Only raw metrics from successful providers sharing the exact workload inputRoot are comparable.',
   };
+}
+
+function selectWorkloadProviders(manifest, workloadEntry) {
+  const allowed = Array.isArray(workloadEntry.providers) ? new Set(workloadEntry.providers) : null;
+  const providers = manifest.providers.filter(provider => !allowed || allowed.has(provider.id) || allowed.has(provider.mode));
+  if (!providers.some(provider => provider.id === manifest.candidate.id)) fail(`candidate provider is not selected for ${workloadEntry.id}`);
+  if (!providers.some(provider => provider.role === 'reference')) fail(`no reference provider is selected for ${workloadEntry.id}`);
+  return providers;
 }
 
 function providerAverages(results, providers) {
@@ -167,7 +175,8 @@ try {
     const workload = JSON.parse(workloadBytes.toString('utf8'));
     const workloadOutputDir = path.join(outputDir, workloadEntry.id);
     fs.mkdirSync(workloadOutputDir, { recursive: true });
-    const providers = manifest.providers.map(provider => {
+    const selectedProviders = selectWorkloadProviders(manifest, workloadEntry);
+    const providers = selectedProviders.map(provider => {
       const source = workloadEntry.sources[provider.mode];
       if (typeof source !== 'string' || source.length === 0) fail(`missing ${provider.mode} source for ${workloadEntry.id}`);
       const sourcePath = path.resolve(root, source);
@@ -175,9 +184,11 @@ try {
       return runChild(provider, workloadPath, sourcePath, evidencePath);
     });
     const candidate = providers.find(provider => provider.id === manifest.candidate.id);
-    const references = manifest.references.map(provider => providers.find(item => item.id === provider.id));
+    const references = manifest.references
+      .filter(provider => selectedProviders.some(selected => selected.id === provider.id))
+      .map(provider => providers.find(item => item.id === provider.id));
     const rawComparisons = buildProviderEvidenceComparisons({
-      contract: comparisonContract(manifest),
+      contract: comparisonContract(manifest, references),
       candidate,
       references,
       requiredMetrics: manifest.requiredMetrics,
@@ -194,6 +205,7 @@ try {
       workloadPath,
       workloadInputRoot: sha256(workloadBytes),
       sources: workloadEntry.sources,
+      selectedProviders: selectedProviders.map(provider => provider.id),
       notes: workloadEntry.notes ?? [],
       providers,
       dominance,
@@ -219,7 +231,7 @@ try {
     boundary: [
       'Workload dominance is non-compensatory and is evaluated per workload.',
       'Provider averages are descriptive only and never promote a losing workload.',
-      'JSON parsing, file I/O and concurrency are recorded as BLOCKED capability gaps until RCL has real declared execution paths.',
+      'File I/O and concurrency are recorded as BLOCKED capability gaps until RCL has real declared execution paths.',
       'This report is not whole-language, ecosystem or commercial-product superiority evidence.',
     ],
   };

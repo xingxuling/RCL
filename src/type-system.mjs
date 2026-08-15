@@ -731,6 +731,12 @@ export function checkReality(program, options = {}) {
           if (actual !== 'Text' && actual !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `sha256_text expects Text, received ${actual}`, expr));
           return 'Text';
         }
+        if (expr.name === 'json_compact') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'json_compact expects one Text', expr));
+          const actual = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
+          if (actual !== 'Text' && actual !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `json_compact expects Text, received ${actual}`, expr));
+          return 'Text';
+        }
         if (expr.name === 'make_parse_state') {
           if (expr.args.length !== 2) diagnostics.push(diagnostic('RCL_CALL_ARITY', 'make_parse_state expects next index and nodes Sequence', expr));
           const types = expr.args.map(arg => infer(arg, locals));

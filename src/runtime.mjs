@@ -370,6 +370,14 @@ function _evalCore(expr, context) {
         const value = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
         return createHash('sha256').update(value).digest('hex');
       }
+      if (expr.name === 'json_compact') {
+        const value = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
+        try {
+          return JSON.stringify(JSON.parse(value));
+        } catch (error) {
+          throw new RCLRuntimeError('RCL_JSON_INVALID', `json_compact() expects valid JSON: ${error.message}`);
+        }
+      }
       if (expr.name === 'char_at') {
         const text = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
         const index = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });

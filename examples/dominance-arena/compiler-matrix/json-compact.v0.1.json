@@ -1,0 +1,21 @@
+{
+  "schema": "rcl.compiler-microbench.workload.v0.1",
+  "id": "json-compact-v1",
+  "inputs": {
+    "payload": "{ \"features\": [ \"text\", \"sequence\" ], \"name\": \"rcl\", \"version\": 1 }"
+  },
+  "expected": {
+    "outputType": "text",
+    "resultOutput": "{\"features\":[\"text\",\"sequence\"],\"name\":\"rcl\",\"version\":1}"
+  },
+  "benchmark": {
+    "compileIterations": 3,
+    "runtimeIterations": 12
+  },
+  "contract": {
+    "sameInputRootRequired": true,
+    "correctness": "parse the complete JSON value and emit the same value with structural whitespace removed",
+    "execution": "compile the declared source and execute its emitted artifact",
+    "boundary": "Object key order and number lexemes are preserved; this is compact parse-and-emit, not key-sorted canonical JSON."
+  }
+}

@@ -99,12 +99,15 @@ matrix is defined at:
 examples/dominance-arena/compiler-workload-matrix.v0.1.json
 ```
 
-It runs four matched workloads through the same RCL, rustc and CPython runner:
+It runs five matched workload definitions through the same runner. Four use RCL,
+rustc and CPython; the JSON parser slice uses RCL and CPython because this
+repository does not provide a matching Rust standard-library reference:
 
 - text normalization;
 - sequence construction and aggregation;
 - actual UTF-8 byte-length measurement;
-- a JSON-shaped textual key/feature scan.
+- a JSON-shaped textual key/feature scan;
+- complete JSON parse and structural-whitespace compaction.
 
 Run it with:
 
@@ -113,16 +116,21 @@ npm run evidence:dominance-arena:matrix
 ```
 
 The matrix compares each workload independently and never uses provider averages
-to hide a loss. In the current Windows run, all 12 provider executions passed
-correctness. RCL passed every raw comparison against rustc. Against CPython, RCL
-passed one workload and lost three on emitted artifact footprint; the matrix
-status is therefore `FAIL`. The JSON-shaped task is explicitly a textual scan,
-not JSON parser parity.
+to hide a loss. The JSON parser slice is a real Native VM builtin named
+`json_compact`: it validates the complete JSON grammar and removes structural
+whitespace while preserving object key order and number lexemes. It is compact
+parse-and-emit, not key-sorted canonical JSON. The JSON-shaped task remains a
+separate textual scan and is not parser parity.
 
-Three capability gaps are recorded separately as `BLOCKED`: native JSON parsing,
-declared file I/O, and declared concurrency. They are not converted into fake
-provider results. Until those paths exist, this matrix cannot support a broad
-language or Python replacement claim.
+The current Windows evidence has 14/14 provider executions correct. RCL passes
+4/4 raw comparisons against rustc and 2/5 against CPython; the three CPython
+losses are still emitted-artifact-footprint losses, so the matrix remains
+`FAIL`. These are raw per-workload results, not a compensating average.
+
+Two capability gaps are recorded separately as `BLOCKED`: declared file I/O and
+declared concurrency. They are not converted into fake provider results. This
+matrix remains bounded language-runtime evidence, not a broad language or Python
+replacement claim.
 
 ## Promotion requirements
 

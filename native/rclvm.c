@@ -152,6 +152,7 @@ enum {
   BUILTIN_UTF8_BYTES = 68,
   BUILTIN_HEX_BYTES = 69,
   BUILTIN_SHA256_TEXT = 70,
+  BUILTIN_JSON_COMPACT = 71,
 };
 
 typedef enum {
@@ -1464,7 +1465,7 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
       case OP_CALL:
         valid = a >= 0 && (uint32_t)a < instruction_count && b >= 0; break;
       case OP_CALL_BUILTIN:
-        valid = a >= BUILTIN_CONTAINS && a <= BUILTIN_SHA256_TEXT && b >= 0 && b <= 16; break;
+        valid = a >= BUILTIN_CONTAINS && a <= BUILTIN_JSON_COMPACT && b >= 0 && b <= 16; break;
       case OP_PUSH_BOOL:
         valid = a == 0 || a == 1; break;
       default: break;
@@ -1786,6 +1787,199 @@ static int hex_nibble(char ch) {
   if (ch >= 'a' && ch <= 'f') return ch - 'a' + 10;
   if (ch >= 'A' && ch <= 'F') return ch - 'A' + 10;
   return -1;
+}
+
+typedef struct {
+  const char *input;
+  size_t length;
+  size_t offset;
+  size_t depth;
+  StringBuilder *output;
+  char error[160];
+} JsonParser;
+
+static void json_skip_whitespace(JsonParser *parser) {
+  while (parser->offset < parser->length && isspace((unsigned char)parser->input[parser->offset])) parser->offset++;
+}
+
+static int json_error(JsonParser *parser, const char *message) {
+  snprintf(parser->error, sizeof(parser->error), "%s at byte %zu", message, parser->offset);
+  return 0;
+}
+
+static int json_parse_value(JsonParser *parser);
+
+static int json_parse_string(JsonParser *parser) {
+  if (parser->offset >= parser->length || parser->input[parser->offset] != '"') return json_error(parser, "Expected JSON string");
+  sb_append_char(parser->output, '"');
+  parser->offset++;
+  while (parser->offset < parser->length) {
+    unsigned char current = (unsigned char)parser->input[parser->offset++];
+    if (current == '"') {
+      sb_append_char(parser->output, '"');
+      return 1;
+    }
+    if (current < 0x20) return json_error(parser, "JSON string contains a control character");
+    if (current != '\\') {
+      sb_append_char(parser->output, (char)current);
+      continue;
+    }
+    if (parser->offset >= parser->length) return json_error(parser, "JSON string ends after an escape");
+    char escaped = parser->input[parser->offset++];
+    if (escaped == '"' || escaped == '\\' || escaped == '/' || escaped == 'b' || escaped == 'f' || escaped == 'n' || escaped == 'r' || escaped == 't') {
+      sb_append_char(parser->output, '\\');
+      sb_append_char(parser->output, escaped);
+      continue;
+    }
+    if (escaped == 'u') {
+      if (parser->length - parser->offset < 4) return json_error(parser, "JSON unicode escape is incomplete");
+      for (size_t index = 0; index < 4; index++) {
+        if (hex_nibble(parser->input[parser->offset + index]) < 0) return json_error(parser, "JSON unicode escape contains non-hexadecimal text");
+      }
+      sb_append(parser->output, "\\u");
+      sb_append_n(parser->output, parser->input + parser->offset, 4);
+      parser->offset += 4;
+      continue;
+    }
+    return json_error(parser, "JSON string contains an invalid escape");
+  }
+  return json_error(parser, "JSON string is not closed");
+}
+
+static int json_parse_number(JsonParser *parser) {
+  size_t start = parser->offset;
+  if (parser->offset < parser->length && parser->input[parser->offset] == '-') parser->offset++;
+  if (parser->offset >= parser->length) return json_error(parser, "JSON number is incomplete");
+  if (parser->input[parser->offset] == '0') {
+    parser->offset++;
+    if (parser->offset < parser->length && isdigit((unsigned char)parser->input[parser->offset])) return json_error(parser, "JSON number has a leading zero");
+  } else {
+    if (parser->input[parser->offset] < '1' || parser->input[parser->offset] > '9') return json_error(parser, "JSON number requires a digit");
+    while (parser->offset < parser->length && isdigit((unsigned char)parser->input[parser->offset])) parser->offset++;
+  }
+  if (parser->offset < parser->length && parser->input[parser->offset] == '.') {
+    parser->offset++;
+    size_t fraction_start = parser->offset;
+    while (parser->offset < parser->length && isdigit((unsigned char)parser->input[parser->offset])) parser->offset++;
+    if (parser->offset == fraction_start) return json_error(parser, "JSON number fraction is missing digits");
+  }
+  if (parser->offset < parser->length && (parser->input[parser->offset] == 'e' || parser->input[parser->offset] == 'E')) {
+    parser->offset++;
+    if (parser->offset < parser->length && (parser->input[parser->offset] == '+' || parser->input[parser->offset] == '-')) parser->offset++;
+    size_t exponent_start = parser->offset;
+    while (parser->offset < parser->length && isdigit((unsigned char)parser->input[parser->offset])) parser->offset++;
+    if (parser->offset == exponent_start) return json_error(parser, "JSON number exponent is missing digits");
+  }
+  sb_append_n(parser->output, parser->input + start, parser->offset - start);
+  return 1;
+}
+
+static int json_parse_literal(JsonParser *parser, const char *literal) {
+  size_t length = strlen(literal);
+  if (parser->length - parser->offset < length || strncmp(parser->input + parser->offset, literal, length) != 0) return json_error(parser, "Invalid JSON literal");
+  sb_append_n(parser->output, literal, length);
+  parser->offset += length;
+  return 1;
+}
+
+static int json_parse_array(JsonParser *parser) {
+  if (parser->depth++ >= 256) return json_error(parser, "JSON nesting exceeds the native limit");
+  sb_append_char(parser->output, '[');
+  parser->offset++;
+  json_skip_whitespace(parser);
+  if (parser->offset < parser->length && parser->input[parser->offset] == ']') {
+    sb_append_char(parser->output, ']');
+    parser->offset++;
+    parser->depth--;
+    return 1;
+  }
+  while (1) {
+    if (!json_parse_value(parser)) { parser->depth--; return 0; }
+    json_skip_whitespace(parser);
+    if (parser->offset >= parser->length) { parser->depth--; return json_error(parser, "JSON array is not closed"); }
+    if (parser->input[parser->offset] == ']') {
+      sb_append_char(parser->output, ']');
+      parser->offset++;
+      parser->depth--;
+      return 1;
+    }
+    if (parser->input[parser->offset] != ',') { parser->depth--; return json_error(parser, "JSON array expects a comma or closing bracket"); }
+    sb_append_char(parser->output, ',');
+    parser->offset++;
+    json_skip_whitespace(parser);
+  }
+}
+
+static int json_parse_object(JsonParser *parser) {
+  if (parser->depth++ >= 256) return json_error(parser, "JSON nesting exceeds the native limit");
+  sb_append_char(parser->output, '{');
+  parser->offset++;
+  json_skip_whitespace(parser);
+  if (parser->offset < parser->length && parser->input[parser->offset] == '}') {
+    sb_append_char(parser->output, '}');
+    parser->offset++;
+    parser->depth--;
+    return 1;
+  }
+  while (1) {
+    if (!json_parse_string(parser)) { parser->depth--; return 0; }
+    json_skip_whitespace(parser);
+    if (parser->offset >= parser->length || parser->input[parser->offset] != ':') { parser->depth--; return json_error(parser, "JSON object expects a colon"); }
+    sb_append_char(parser->output, ':');
+    parser->offset++;
+    if (!json_parse_value(parser)) { parser->depth--; return 0; }
+    json_skip_whitespace(parser);
+    if (parser->offset >= parser->length) { parser->depth--; return json_error(parser, "JSON object is not closed"); }
+    if (parser->input[parser->offset] == '}') {
+      sb_append_char(parser->output, '}');
+      parser->offset++;
+      parser->depth--;
+      return 1;
+    }
+    if (parser->input[parser->offset] != ',') { parser->depth--; return json_error(parser, "JSON object expects a comma or closing brace"); }
+    sb_append_char(parser->output, ',');
+    parser->offset++;
+    json_skip_whitespace(parser);
+  }
+}
+
+static int json_parse_value(JsonParser *parser) {
+  json_skip_whitespace(parser);
+  if (parser->offset >= parser->length) return json_error(parser, "Expected a JSON value");
+  char current = parser->input[parser->offset];
+  if (current == '"') return json_parse_string(parser);
+  if (current == '{') return json_parse_object(parser);
+  if (current == '[') return json_parse_array(parser);
+  if (current == 't') return json_parse_literal(parser, "true");
+  if (current == 'f') return json_parse_literal(parser, "false");
+  if (current == 'n') return json_parse_literal(parser, "null");
+  if (current == '-' || isdigit((unsigned char)current)) return json_parse_number(parser);
+  return json_error(parser, "Unexpected JSON value");
+}
+
+static int json_compact_text(const char *input, char **output, char *error, size_t error_capacity) {
+  if (!input || !output) return 0;
+  if (strlen(input) > MAX_PROVIDER_RESPONSE) {
+    if (error && error_capacity) snprintf(error, error_capacity, "JSON input exceeds native limit");
+    return 0;
+  }
+  StringBuilder builder;
+  sb_init(&builder);
+  JsonParser parser = { input, strlen(input), 0, 0, &builder, {0} };
+  if (!json_parse_value(&parser)) {
+    if (error && error_capacity) snprintf(error, error_capacity, "%s", parser.error[0] ? parser.error : "Invalid JSON");
+    free(builder.data);
+    return 0;
+  }
+  json_skip_whitespace(&parser);
+  if (parser.offset != parser.length) {
+    json_error(&parser, "Trailing data after JSON value");
+    if (error && error_capacity) snprintf(error, error_capacity, "%s", parser.error);
+    free(builder.data);
+    return 0;
+  }
+  *output = builder.data;
+  return 1;
 }
 
 static int execute_builtin(VM *vm, int builtin, int argc) {
@@ -2129,6 +2323,18 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       for (int i = 0; i < RCL_SHA256_DIGEST_LENGTH; i++) snprintf(hex + i * 2, 3, "%02x", digest[i]);
       hex[64] = '\0';
       result = value_string(hex);
+      break;
+    }
+    case BUILTIN_JSON_COMPACT: {
+      if (argc != 1 || args[0].type != VALUE_STRING) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "json_compact expects Text"); break; }
+      char compact_error[160] = {0};
+      char *compact = NULL;
+      if (!json_compact_text(args[0].string, &compact, compact_error, sizeof(compact_error))) {
+        vm_fail(vm, "RCL_JSON_INVALID", compact_error[0] ? compact_error : "json_compact could not parse JSON");
+        break;
+      }
+      result = value_string(compact);
+      free(compact);
       break;
     }
     default: vm_fail(vm, "RCL_NATIVE_BUILTIN_UNKNOWN", "Unknown native builtin"); break;
@@ -2676,17 +2882,50 @@ static void vm_clear_transient(VM *vm, int clear_state) {
 }
 
 static char *capture_vm_output(VM *vm, int success) {
-  FILE *file = tmpfile();
+  FILE *file = NULL;
+#ifdef _WIN32
+  char temporary_path[MAX_PATH] = {0};
+  char temporary_directory[MAX_PATH] = {0};
+  DWORD directory_length = GetTempPathA((DWORD)sizeof(temporary_directory), temporary_directory);
+  if (directory_length > 0 && directory_length < sizeof(temporary_directory)
+      && GetTempFileNameA(temporary_directory, "rcl", 0, temporary_path) != 0) {
+    file = fopen(temporary_path, "w+b");
+    if (!file) DeleteFileA(temporary_path);
+  }
+#else
+  file = tmpfile();
+#endif
   if (!file) return NULL;
   if (success) print_success(vm, file); else print_error(&vm->error, file);
-  if (fflush(file) != 0 || fseek(file, 0, SEEK_END) != 0) { fclose(file); return NULL; }
+  if (fflush(file) != 0 || fseek(file, 0, SEEK_END) != 0) {
+    fclose(file);
+#ifdef _WIN32
+    DeleteFileA(temporary_path);
+#endif
+    return NULL;
+  }
   long length = ftell(file);
-  if (length < 0 || fseek(file, 0, SEEK_SET) != 0) { fclose(file); return NULL; }
+  if (length < 0 || fseek(file, 0, SEEK_SET) != 0) {
+    fclose(file);
+#ifdef _WIN32
+    DeleteFileA(temporary_path);
+#endif
+    return NULL;
+  }
   char *text = (char *)malloc((size_t)length + 1);
-  if (!text) { fclose(file); return NULL; }
+  if (!text) {
+    fclose(file);
+#ifdef _WIN32
+    DeleteFileA(temporary_path);
+#endif
+    return NULL;
+  }
   size_t read = fread(text, 1, (size_t)length, file);
   text[read] = '\0';
   fclose(file);
+#ifdef _WIN32
+  DeleteFileA(temporary_path);
+#endif
   return text;
 }
 

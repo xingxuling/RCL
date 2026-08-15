@@ -7,7 +7,7 @@
     "name": "RCL language workload matrix against CPython and rustc",
     "environment": "compiler-runtime",
     "programFamily": "compiler",
-    "description": "Run matched text, sequence, UTF-8 and JSON-shaped text workloads through RCL, CPython and rustc; record unsupported native domains separately."
+    "description": "Run matched text, sequence, UTF-8, JSON-shaped text and JSON compact-parse workloads through RCL, CPython and rustc where the provider contract is matched; record unsupported native domains separately."
   },
   "metrics": [
     {
@@ -106,15 +106,20 @@
       },
       "required": true,
       "notes": ["This is a matched textual scan of JSON-shaped bytes. It is not JSON parser parity."]
+    },
+    {
+      "id": "json-compact-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/json-compact.v0.1.json",
+      "providers": ["rcl", "python"],
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/json-compact.rcl",
+        "python": "examples/dominance-arena/compiler-matrix/json-compact.py"
+      },
+      "required": true,
+      "notes": ["This is the first real RCL JSON parse-and-compact path; Rust is intentionally excluded because this repository does not provide a matching stdlib JSON parser reference."]
     }
   ],
   "capabilityGaps": [
-    {
-      "id": "json-parse-native-v1",
-      "domain": "JSON parsing",
-      "status": "BLOCKED",
-      "reason": "The current RCL Native VM exposes text and sequence primitives but no native JSON parse builtin."
-    },
     {
       "id": "file-io-native-v1",
       "domain": "file I/O",
