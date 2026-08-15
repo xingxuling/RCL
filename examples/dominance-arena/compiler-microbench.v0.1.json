@@ -7,12 +7,13 @@
     "name": "RCL arithmetic-chain compiler microbenchmark",
     "environment": "compiler-runtime",
     "programFamily": "compiler",
-    "description": "Compile and execute the same fixed arithmetic-chain workload through RCL and a real rustc reference path."
+    "description": "Compile and execute the same fixed arithmetic-chain workload through RCL, rustc and CPython reference paths."
   },
   "corpus": [
     "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
     "examples/dominance-arena/compiler-microbench/program.rcl",
-    "examples/dominance-arena/compiler-microbench/program.rs"
+    "examples/dominance-arena/compiler-microbench/program.rs",
+    "examples/dominance-arena/compiler-microbench/program.py"
   ],
   "metrics": [
     {
@@ -52,7 +53,7 @@
   ],
   "comparisonContract": {
     "candidateId": "rcl-microbench",
-    "referenceIds": ["rust-microbench"],
+    "referenceIds": ["rust-microbench", "python-microbench"],
     "inputRootPath": "inputRoot",
     "metrics": {
       "correctness": { "candidatePath": "metrics.correctness", "referencePath": "metrics.correctness" },
@@ -90,6 +91,29 @@
   },
   "references": [
     {
+      "id": "python-microbench",
+      "role": "reference",
+      "command": [
+        "node",
+        "scripts/run-dominance-arena-microbench.mjs",
+        "python",
+        "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
+        "examples/dominance-arena/compiler-microbench/program.py",
+        "output/dominance-arena/compiler-microbench-v0.1/python-microbench.json"
+      ],
+      "cwd": ".",
+      "timeoutMs": 180000,
+      "evidenceFile": "output/dominance-arena/compiler-microbench-v0.1/python-microbench.json",
+      "evidenceStatusPath": "status",
+      "artifactPaths": [
+        "output/dominance-arena/compiler-microbench-v0.1/python-microbench.pyc"
+      ],
+      "optional": true,
+      "notes": [
+        "This is a real CPython execution path. compileBuildSpeed is py_compile preparation, not machine-code compilation; runtime is cold interpreter process time."
+      ]
+    },
+    {
       "id": "rust-microbench",
       "role": "reference",
       "command": [
@@ -114,7 +138,7 @@
     }
   ],
   "notes": [
-    "RCL remains the candidate; rustc is a reference adapter only.",
+    "RCL remains the candidate; rustc and CPython are reference adapters only.",
     "The shared inputRoot binds both providers to the same workload bytes.",
     "Artifact footprint is explicitly labeled as a proxy and does not prove total runtime memory efficiency.",
     "Commercial-language superiority, broad ecosystem parity, and the K01 self-hosting claim remain outside this microbenchmark."

@@ -39,7 +39,7 @@ The Universal Stress nine-gate cell remains authoritative for broad stress evide
 
 The first executable compiler-toolchain arena is defined at `examples/dominance-arena/compiler-toolchain.v0.1.json`. It runs the RCL K01 verifier and records reference tool probes, but it does not claim a dominance win before a semantically matched reference corpus exists. The current Dominance result is `UNVERIFIED`.
 
-The first matched compiler microbenchmark is defined at `examples/dominance-arena/compiler-microbench.v0.1.json`. It uses the same workload `inputRoot` for RCL and a real `rustc` reference build, verifies both outputs, and compares raw build time, runtime and artifact-footprint metrics without a weighted average. The current arithmetic-chain run is `Dominance: PASS` on this narrow task only; robustness, concurrency, process-memory sampling, authoring cost and broader workload families remain unverified.
+The first matched compiler microbenchmark is defined at `examples/dominance-arena/compiler-microbench.v0.1.json`. It uses the same workload `inputRoot` for RCL, real `rustc`, and CPython reference paths, verifies all outputs, and compares raw preparation time, cold runtime and artifact-footprint metrics without a weighted average. RCL beats Rust on this task but loses CPython on artifact footprint, so the multi-reference result is `Dominance: FAIL`; robustness, concurrency, process-memory sampling, authoring cost and broader workload families remain unverified.
 
 Authority document: `docs/RCL_DOMINANCE_ARENA_v0.1.md`.
 

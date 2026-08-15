@@ -63,15 +63,17 @@ The first matched reference track is defined at:
 examples/dominance-arena/compiler-microbench.v0.1.json
 ```
 
-It binds both providers to the SHA-256 of the same workload file, then runs:
+It binds all providers to the SHA-256 of the same workload file, then runs:
 
 - RCL `compileRealityToBytecode` followed by the repository's native VM;
 - `rustc` followed by the emitted reference executable.
+- CPython followed by the same source-level program.
 
-Both paths must produce the declared numeric result. The evidence records average
-compile/build time, average artifact runtime and emitted artifact bytes. The last
-metric is explicitly a footprint proxy: a smaller RCL bytecode artifact is not a
-claim that RCL has lower total process memory use.
+Every path must produce the declared numeric result. The evidence records average
+compile/preparation time, average cold-process runtime and emitted artifact bytes.
+For CPython, preparation is `py_compile`, not machine-code compilation. The last
+metric is explicitly a footprint proxy: a smaller artifact is not a claim about
+total process memory use.
 
 Run it with:
 
@@ -79,13 +81,14 @@ Run it with:
 npm run evidence:dominance-arena:microbench
 ```
 
-The provider-evidence comparison is generated at runtime. A missing `rustc`, a
-provider failure or a different `inputRoot` yields `BLOCKED`, `FAIL` or
-`UNVERIFIED` as appropriate; it cannot be converted into a pass by the manifest.
-On the current Windows host, this narrow arithmetic-chain run produced a
-`Dominance: PASS` because RCL won every required raw metric after both correctness
-checks passed. This is a microbenchmark result only, not proof of whole-language,
-ecosystem, authoring, concurrency or commercial-product superiority.
+The provider-evidence comparison is generated at runtime. A missing tool, provider
+failure or different `inputRoot` yields `BLOCKED`, `FAIL` or `UNVERIFIED` as
+appropriate; it cannot be converted into a pass by the manifest. On the current
+Windows host, RCL beats the Rust reference on every required raw metric, but loses
+the CPython comparison on artifact footprint (`2948 B` vs `1204 B`), so the
+multi-reference arena correctly reports `Dominance: FAIL`. This is a microbenchmark
+result only, not proof of whole-language, ecosystem, authoring, concurrency or
+commercial-product superiority.
 
 ## Promotion requirements
 
