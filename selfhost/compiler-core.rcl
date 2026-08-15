@@ -1396,7 +1396,7 @@ reality RCLGeneralSelfHostCompiler {
                                                                                                                                         choose(name == "bytes_f64le", 67,
                                                                                                                                           choose(name == "utf8_bytes", 68,
                                                                                                                                             choose(name == "hex_bytes", 69,
-                                                                                                                                              choose(name == "sha256_text", 70, 0))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                              choose(name == "sha256_text", 70, choose(name == "json_compact", 71, 0)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
   reckon expression_count_array(items : Sequence, index : Number, output : Number) -> Number =
     choose(index >= length(items), output,

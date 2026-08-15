@@ -38,6 +38,12 @@ function measureWait(delayMs, repeats = 1) {
   return { responseMs: round(responseMs, 6), witness: measurements.length };
 }
 
+function resolveTimingScale(options = {}) {
+  const requested = Number(options.timingScale);
+  if (Number.isFinite(requested) && requested >= 1) return requested;
+  return process.platform === 'win32' ? 4 : 1;
+}
+
 function delayForCell(symbolActive, geometryActive, options = {}) {
   const base = Number(options.baseDelayMs ?? 1);
   const symbol = symbolActive ? Number(options.symbolDelayMs ?? 2) : 0;
@@ -50,6 +56,7 @@ export function acquireKnownExternalHostTimingContract(options = {}) {
   const seed = Number(options.seed ?? 20260811);
   const samplesPerCell = Math.max(8, Math.trunc(Number(options.samplesPerCell ?? 12)));
   const repeats = Math.max(1, Math.trunc(Number(options.repeats ?? 2)));
+  const timingScale = resolveTimingScale(options);
   const schedule = [];
   for (const symbolCondition of ['control', 'active']) {
     for (const geometryCondition of ['control', 'active']) {
@@ -68,7 +75,7 @@ export function acquireKnownExternalHostTimingContract(options = {}) {
     const symbolActive = condition.symbolCondition === 'active';
     const geometryActive = condition.geometryCondition === 'active';
     const delayMs = delayForCell(symbolActive, geometryActive, options);
-    const measured = measureWait(delayMs, repeats);
+    const measured = measureWait(delayMs * timingScale, repeats);
     witnessAccumulator ^= measured.witness;
     rows.push({
       observationId: `host_${String(index + 1).padStart(4, '0')}`,
@@ -97,7 +104,7 @@ export function acquireKnownExternalHostTimingContract(options = {}) {
       collector: 'RCL Frontier Known External Host Control v0.1',
       acquiredAt: acquisitionStart,
       licenseOrPermission: 'local-process-measurement-authorized',
-      acquisitionMethod: `randomized 2x2 Atomics.wait timing measured by process.hrtime.bigint; repeats=${repeats}; acquisitionEnd=${acquisitionEnd}; hostFingerprint=${hostFingerprint}; witness=${witnessAccumulator}`,
+      acquisitionMethod: `randomized 2x2 Atomics.wait timing measured by process.hrtime.bigint; repeats=${repeats}; timingScale=${timingScale}; acquisitionEnd=${acquisitionEnd}; hostFingerprint=${hostFingerprint}; witness=${witnessAccumulator}`,
     },
     calibration: {
       status: 'valid',
@@ -118,6 +125,7 @@ export function acquireKnownExternalHostTimingContract(options = {}) {
       samplesPerCell,
       repeats,
       interactionDelayMs: Number(options.interactionDelayMs ?? 8),
+      timingScale,
       hostFingerprint,
       witnessAccumulator,
       acquisitionStart,
