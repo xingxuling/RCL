@@ -29,6 +29,9 @@ const referenceLines = report.references.length === 0
   : report.references
     .map(reference => `- ${reference.id}: **${reference.status}**${reference.probeOnly ? ' (probe only)' : ''}`)
     .join('\n');
+const comparisonNote = report.comparisonPolicy.mode === 'provider-evidence'
+  ? 'Provider evidence was compared dynamically after verifying the declared shared input root.'
+  : 'Declared comparisons were used; reference version probes never contribute dominance credit.';
 const markdown = [
   `# RCL Dominance Arena: ${report.arena.task.name ?? report.arena.task.id}`,
   '',
@@ -46,11 +49,14 @@ const markdown = [
   '',
   referenceLines,
   '',
+  `- Comparison mode: **${report.comparisonPolicy.mode}**`,
+  `- ${comparisonNote}`,
+  '',
   '## Boundary',
   '',
   ...report.evidenceBoundary.map(note => `- ${note}`),
   '',
-  'The current compiler-toolchain arena executes the RCL K01 verification path. Reference probes establish tool availability only; they are not equivalent compiler workload comparisons.',
+  comparisonNote,
   '',
 ].join('\n');
 fs.writeFileSync(markdownPath, markdown, 'utf8');

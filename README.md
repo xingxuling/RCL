@@ -275,6 +275,12 @@ Run the first vertical Dominance Arena baseline:
 npm run evidence:dominance-arena
 ```
 
+Run the matched RCL/rustc compiler microbenchmark:
+
+```bash
+npm run evidence:dominance-arena:microbench
+```
+
 Build the K02 standalone Web artifact:
 
 ```bash
@@ -334,7 +340,8 @@ As of the current `v0.94.0-alpha.1` package baseline:
 - K03 has a real Android lowering/project-generation path, but real APK installation/device execution remains unverified in the recorded campaign.
 - Native Foundation coverage is partial and bridge-based where documented.
 - A large fraction of the 400-cell Universal Stress matrix remains unknown by design.
-- The compiler Dominance Arena has an executable RCL candidate baseline, but no semantically matched reference result is currently claimed; `Dominance` remains `UNVERIFIED`.
+- The compiler Dominance Arena retains an executable RCL K01 baseline with tool probes only; that broad self-hosting comparison remains `UNVERIFIED`.
+- The separate arithmetic-chain microbenchmark has a real RCL/native-VM and rustc/reference execution path. Its current narrow raw-metric result is `Dominance: PASS`; it does not establish whole-language, ecosystem, memory, authorability or commercial-product superiority.
 - “RCL can write any program” is **not** a repository claim. The repository instead defines how that proposition must be attacked, measured and potentially falsified.
 
 For the machine-readable current contract, use [`VERSION-CONTRACT.json`](VERSION-CONTRACT.json). For the human-readable authority snapshot, use [`CURRENT-STATUS.md`](CURRENT-STATUS.md).

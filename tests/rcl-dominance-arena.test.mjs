@@ -6,6 +6,7 @@ import {
   DOMINANCE_ARENA_MANIFEST_SCHEMA,
   STRESS_STATUS,
   buildCapabilityScorecard,
+  buildProviderEvidenceComparisons,
   buildRclScorecard,
   evaluateDominanceArena,
   evaluateDominanceComparison,
@@ -115,7 +116,63 @@ test('manifest validation records an explicit comparison contract', () => {
     comparisons: [],
   });
   assert.equal(manifest.comparisons.length, 0);
+  assert.equal(manifest.comparisonContract, null);
   assert.match(manifest.manifestRoot, /^[0-9a-f]{64}$/);
+});
+
+test('provider evidence comparison binds raw metrics to one input root', () => {
+  const contract = {
+    candidateId: 'rcl',
+    referenceIds: ['rust'],
+    candidateInputRootPath: 'inputRoot',
+    referenceInputRootPath: 'inputRoot',
+    metrics: {
+      correctness: { candidatePath: 'metrics.correctness', referencePath: 'metrics.correctness' },
+      compileBuildSpeed: { candidatePath: 'metrics.compileBuildSpeed', referencePath: 'metrics.compileBuildSpeed' },
+    },
+  };
+  const candidate = {
+    id: 'rcl',
+    status: STRESS_STATUS.PASS,
+    evidenceStatus: STRESS_STATUS.PASS,
+    evidence: { evidenceRoot: 'candidate-root', inputRoot: 'same-root', metrics: { correctness: 1, compileBuildSpeed: 10 } },
+    receipt: { receiptRoot: 'candidate-receipt' },
+  };
+  const reference = {
+    id: 'rust',
+    status: STRESS_STATUS.PASS,
+    evidenceStatus: STRESS_STATUS.PASS,
+    evidence: { evidenceRoot: 'reference-root', inputRoot: 'same-root', metrics: { correctness: 1, compileBuildSpeed: 20 } },
+    receipt: { receiptRoot: 'reference-receipt' },
+  };
+  const comparisons = buildProviderEvidenceComparisons({
+    contract,
+    candidate,
+    references: [reference],
+    requiredMetrics: ['correctness', 'compileBuildSpeed'],
+    metricSpecs: [
+      { id: 'correctness', direction: 'higher-is-better' },
+      { id: 'compileBuildSpeed', direction: 'lower-is-better' },
+    ],
+  });
+  assert.equal(comparisons[0].inputRoots.candidate, 'same-root');
+  assert.equal(comparisons[0].metrics.compileBuildSpeed.candidate, 10);
+  assert.equal(evaluateDominanceArena({
+    comparisons,
+    requiredMetrics: ['correctness', 'compileBuildSpeed'],
+  }).status, STRESS_STATUS.PASS);
+
+  const mismatched = buildProviderEvidenceComparisons({
+    contract,
+    candidate,
+    references: [{ ...reference, evidence: { ...reference.evidence, inputRoot: 'different-root' } }],
+    requiredMetrics: ['correctness', 'compileBuildSpeed'],
+  });
+  assert.equal(mismatched[0].metrics.correctness.comparable, false);
+  assert.equal(evaluateDominanceArena({
+    comparisons: mismatched,
+    requiredMetrics: ['correctness', 'compileBuildSpeed'],
+  }).status, STRESS_STATUS.UNVERIFIED);
 });
 
 test('arena command records real execution and deterministic receipt identity', () => {

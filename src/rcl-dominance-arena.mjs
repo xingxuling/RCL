@@ -160,11 +160,54 @@ function normalizeRunner(raw, label, defaultRole) {
     cwd: raw.cwd ?? '.',
     timeoutMs: Number(raw.timeoutMs ?? 120_000),
     evidenceFile: raw.evidenceFile ?? null,
+    evidenceStatusPath: raw.evidenceStatusPath ?? null,
     artifactPaths: Array.isArray(raw.artifactPaths) ? [...raw.artifactPaths] : [],
     metricPaths: raw.metricPaths && typeof raw.metricPaths === 'object' ? structuredClone(raw.metricPaths) : {},
     optional: raw.optional === true,
     probeOnly: raw.probeOnly === true,
     notes: Array.isArray(raw.notes) ? [...raw.notes] : [],
+  };
+}
+
+function normalizeComparisonContract(raw, metricIds, requiredMetricIds) {
+  if (raw == null) return null;
+  if (!raw || typeof raw !== 'object') throw new Error('RCL_DOMINANCE_COMPARISON_CONTRACT_INVALID');
+  if (typeof raw.candidateId !== 'string' || raw.candidateId.length === 0) {
+    throw new Error('RCL_DOMINANCE_COMPARISON_CANDIDATE_ID');
+  }
+  if (!Array.isArray(raw.referenceIds) || raw.referenceIds.length === 0 || raw.referenceIds.some(id => typeof id !== 'string' || id.length === 0)) {
+    throw new Error('RCL_DOMINANCE_COMPARISON_REFERENCE_IDS');
+  }
+  const metricSet = new Set(metricIds);
+  const comparisonMetricIds = requiredMetricIds.length > 0 ? requiredMetricIds : metricIds;
+  const metrics = {};
+  for (const id of comparisonMetricIds) {
+    if (!metricSet.has(id)) throw new Error(`RCL_DOMINANCE_COMPARISON_METRIC_UNKNOWN:${id}`);
+    const descriptor = raw.metrics?.[id];
+    if (!descriptor || typeof descriptor !== 'object') {
+      throw new Error(`RCL_DOMINANCE_COMPARISON_METRIC_PATHS:${id}`);
+    }
+    const candidatePath = descriptor.candidatePath ?? descriptor.path;
+    const referencePath = descriptor.referencePath ?? descriptor.path;
+    if (typeof candidatePath !== 'string' || candidatePath.length === 0 || typeof referencePath !== 'string' || referencePath.length === 0) {
+      throw new Error(`RCL_DOMINANCE_COMPARISON_METRIC_PATHS:${id}`);
+    }
+    metrics[id] = {
+      candidatePath,
+      referencePath,
+      direction: descriptor.direction ?? null,
+      unit: descriptor.unit ?? null,
+      margin: descriptor.margin ?? 0,
+    };
+  }
+  return {
+    candidateId: raw.candidateId,
+    referenceIds: [...raw.referenceIds],
+    inputRootPath: raw.inputRootPath ?? 'inputRoot',
+    candidateInputRootPath: raw.candidateInputRootPath ?? raw.inputRootPath ?? 'inputRoot',
+    referenceInputRootPath: raw.referenceInputRootPath ?? raw.inputRootPath ?? 'inputRoot',
+    metrics,
+    note: raw.note ?? 'Raw provider evidence must declare the same input root before metric comparison is admitted.',
   };
 }
 
@@ -202,6 +245,7 @@ export function validateDominanceArenaManifest(input) {
     metrics,
     requiredComparisonMetrics,
     comparisons: Array.isArray(input.comparisons) ? structuredClone(input.comparisons) : [],
+    comparisonContract: normalizeComparisonContract(input.comparisonContract, metricIds, requiredComparisonMetrics),
     comparisonPolicy: input.comparisonPolicy ? structuredClone(input.comparisonPolicy) : {
       status: STRESS_STATUS.UNVERIFIED,
       reason: 'No comparable reference result has been attached.',
@@ -346,9 +390,16 @@ function runProvider(provider, repositoryRoot) {
   const artifacts = artifactPaths.map(artifactPath => captureArtifact(repositoryRoot, artifactPath));
   const evidence = readEvidence(repositoryRoot, provider.evidenceFile);
   const metrics = collectMetrics(provider, receipt, evidence.value);
-  const status = receipt.status === STRESS_STATUS.PASS && evidence.status !== STRESS_STATUS.FAIL
-    ? STRESS_STATUS.PASS
-    : receipt.status;
+  const declaredEvidenceStatus = provider.evidenceStatusPath
+    ? readPath(evidence.value, provider.evidenceStatusPath)
+    : null;
+  const status = receipt.status !== STRESS_STATUS.PASS
+    ? receipt.status
+    : evidence.status === STRESS_STATUS.FAIL
+      ? STRESS_STATUS.FAIL
+      : declaredEvidenceStatus && declaredEvidenceStatus !== STRESS_STATUS.PASS
+        ? declaredEvidenceStatus
+        : STRESS_STATUS.PASS;
   return {
     id: provider.id,
     role: provider.role,
@@ -358,12 +409,111 @@ function runProvider(provider, repositoryRoot) {
     receipt,
     status,
     evidenceFile: provider.evidenceFile,
+    evidenceStatusPath: provider.evidenceStatusPath,
     evidenceStatus: evidence.status,
     evidenceError: evidence.error,
     evidence: evidence.value,
     artifacts,
     metrics,
   };
+}
+
+function providerEvidenceIdentity(provider) {
+  return provider?.evidence?.evidenceRoot ?? provider?.receipt?.receiptRoot ?? null;
+}
+
+function providerEvidenceStatus(provider, label) {
+  if (!provider) return `${label} provider is missing`;
+  if (provider.status !== STRESS_STATUS.PASS) return `${label} provider status is ${provider.status}`;
+  if (provider.evidenceStatus !== STRESS_STATUS.PASS || !provider.evidence) {
+    return `${label} evidence is ${provider.evidenceError ?? 'unverified'}`;
+  }
+  return null;
+}
+
+export function buildProviderEvidenceComparisons({
+  contract,
+  candidate,
+  references = [],
+  requiredMetrics = [],
+  metricSpecs = [],
+} = {}) {
+  if (!contract) return [];
+  const referenceById = new Map(references.map(reference => [reference.id, reference]));
+  const specById = new Map(metricSpecs.map(metric => [metric.id, metric]));
+  return contract.referenceIds.map(referenceId => {
+    const reference = referenceById.get(referenceId);
+    const candidateInputRoot = readPath(candidate?.evidence, contract.candidateInputRootPath);
+    const referenceInputRoot = readPath(reference?.evidence, contract.referenceInputRootPath);
+    const candidateProblem = candidate?.id !== contract.candidateId
+      ? `candidate provider id is ${candidate?.id ?? 'missing'}, expected ${contract.candidateId}`
+      : providerEvidenceStatus(candidate, 'candidate');
+    const referenceProblem = providerEvidenceStatus(reference, 'reference');
+    const sameInput = typeof candidateInputRoot === 'string'
+      && candidateInputRoot.length > 0
+      && candidateInputRoot === referenceInputRoot;
+    const baseReason = candidateProblem
+      ?? referenceProblem
+      ?? (!sameInput
+        ? `input roots are not identical (${candidateInputRoot ?? 'missing'} vs ${referenceInputRoot ?? 'missing'})`
+        : null);
+    const candidateEvidenceId = providerEvidenceIdentity(candidate);
+    const referenceEvidenceId = providerEvidenceIdentity(reference);
+    const evidence = unique([
+      candidateEvidenceId ? `candidate:${candidateEvidenceId}` : null,
+      referenceEvidenceId ? `reference:${referenceEvidenceId}` : null,
+      sameInput ? `input:${candidateInputRoot}` : null,
+    ]);
+    const metrics = Object.fromEntries(requiredMetrics.map(id => {
+      const descriptor = contract.metrics[id];
+      const spec = specById.get(id);
+      const candidateValue = readPath(candidate?.evidence, descriptor?.candidatePath);
+      const referenceValue = readPath(reference?.evidence, descriptor?.referencePath);
+      const direction = descriptor?.direction ?? spec?.direction ?? DOMINANCE_METRIC_DIRECTIONS[id] ?? null;
+      const unit = descriptor?.unit ?? spec?.unit ?? null;
+      if (baseReason) {
+        return [id, {
+          comparable: false,
+          reason: baseReason,
+          direction,
+          unit,
+          candidate: finiteNumber(candidateValue) ? candidateValue : null,
+          reference: finiteNumber(referenceValue) ? referenceValue : null,
+          evidence,
+        }];
+      }
+      if (!finiteNumber(candidateValue) || !finiteNumber(referenceValue)) {
+        return [id, {
+          comparable: false,
+          reason: `metric ${id} is missing or non-numeric in provider evidence`,
+          direction,
+          unit,
+          candidate: finiteNumber(candidateValue) ? candidateValue : null,
+          reference: finiteNumber(referenceValue) ? referenceValue : null,
+          evidence,
+        }];
+      }
+      return [id, {
+        candidate: candidateValue,
+        reference: referenceValue,
+        direction,
+        unit,
+        margin: descriptor?.margin ?? 0,
+        evidence,
+      }];
+    }));
+    return {
+      id: `${contract.candidateId}::${referenceId}`,
+      candidateId: contract.candidateId,
+      referenceId,
+      metrics,
+      note: contract.note,
+      inputRoots: {
+        candidate: candidateInputRoot ?? null,
+        reference: referenceInputRoot ?? null,
+      },
+    };
+  });
 }
 
 function normalizeComparisonMetric(id, raw, metricSpec) {
@@ -438,6 +588,7 @@ export function evaluateDominanceComparison(comparison, {
     id: comparison?.id ?? `${comparison?.candidateId ?? 'candidate'}::${comparison?.referenceId ?? 'reference'}`,
     candidateId: comparison?.candidateId ?? null,
     referenceId: comparison?.referenceId ?? null,
+    inputRoots: comparison?.inputRoots ?? null,
     status,
     metrics,
     evidence: unique(metrics.flatMap(metric => metric.evidence)),
@@ -517,7 +668,15 @@ export function runRclDominanceArena(manifestInput, { repositoryRoot = process.c
     : null;
   const candidate = runProvider(manifest.candidate, repositoryRoot);
   const references = manifest.references.map(reference => runProvider(reference, repositoryRoot));
-  const comparisons = Array.isArray(manifest.comparisons) ? manifest.comparisons : [];
+  const comparisons = manifest.comparisonContract
+    ? buildProviderEvidenceComparisons({
+      contract: manifest.comparisonContract,
+      candidate,
+      references,
+      requiredMetrics: manifest.requiredComparisonMetrics,
+      metricSpecs: manifest.metrics,
+    })
+    : (Array.isArray(manifest.comparisons) ? manifest.comparisons : []);
   const dominance = evaluateDominanceArena({
     comparisons,
     requiredMetrics: manifest.requiredComparisonMetrics,
@@ -548,7 +707,11 @@ export function runRclDominanceArena(manifestInput, { repositoryRoot = process.c
     references,
     dominance,
     scorecard,
-    comparisonPolicy: manifest.comparisonPolicy,
+    comparisonPolicy: {
+      ...manifest.comparisonPolicy,
+      mode: manifest.comparisonContract ? 'provider-evidence' : 'declared-comparison',
+      contract: manifest.comparisonContract,
+    },
     notes: manifest.notes,
     evidenceBoundary: [
       'A successful command receipt proves execution of the declared probe, not competitive superiority.',

@@ -55,6 +55,38 @@ Generated JSON and Markdown are written under `output/dominance-arena/`, which i
 - reference probe results;
 - explicit comparability and evidence boundaries.
 
+## Second arena: executable compiler microbenchmark
+
+The first matched reference track is defined at:
+
+```text
+examples/dominance-arena/compiler-microbench.v0.1.json
+```
+
+It binds both providers to the SHA-256 of the same workload file, then runs:
+
+- RCL `compileRealityToBytecode` followed by the repository's native VM;
+- `rustc` followed by the emitted reference executable.
+
+Both paths must produce the declared numeric result. The evidence records average
+compile/build time, average artifact runtime and emitted artifact bytes. The last
+metric is explicitly a footprint proxy: a smaller RCL bytecode artifact is not a
+claim that RCL has lower total process memory use.
+
+Run it with:
+
+```bash
+npm run evidence:dominance-arena:microbench
+```
+
+The provider-evidence comparison is generated at runtime. A missing `rustc`, a
+provider failure or a different `inputRoot` yields `BLOCKED`, `FAIL` or
+`UNVERIFIED` as appropriate; it cannot be converted into a pass by the manifest.
+On the current Windows host, this narrow arithmetic-chain run produced a
+`Dominance: PASS` because RCL won every required raw metric after both correctness
+checks passed. This is a microbenchmark result only, not proof of whole-language,
+ecosystem, authoring, concurrency or commercial-product superiority.
+
 ## Promotion requirements
 
 The compiler arena cannot report `Dominance: PASS` until all of the following are present for at least one reference:
@@ -69,6 +101,10 @@ The compiler arena cannot report `Dominance: PASS` until all of the following ar
 
 Tool availability, a version string, a generated source file or a successful process exit cannot satisfy these requirements.
 
+The microbenchmark is intentionally narrower than the promotion requirements:
+robustness, concurrency, memory sampling, development cost and broader workload
+families remain open evidence dimensions.
+
 ## Capability metabolism boundary
 
 Dominance Arena does not promote a donor feature into the RCL genome. Capability Metabolism remains responsible for semantic absorption and native promotion. A donor advantage found by an arena is an input to that process, not evidence that the donor has already been digested.
@@ -77,5 +113,7 @@ Dominance Arena does not promote a donor feature into the RCL genome. Capability
 
 ```bash
 npm run test:dominance-arena
+npm run test:dominance-arena:microbench
 node --test --test-concurrency=1 tests/universal-stress-k01-selfhost-adapter.test.mjs
+npm run evidence:dominance-arena:microbench
 ```
