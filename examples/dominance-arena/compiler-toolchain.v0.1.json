@@ -1,0 +1,116 @@
+{
+  "schema": "rcl.dominance-arena.manifest.v0.1",
+  "id": "compiler-toolchain-v0.1",
+  "track": "compiler-toolchain",
+  "task": {
+    "id": "K01",
+    "name": "RCL self-hosted compiler fixed point",
+    "environment": "compiler-runtime",
+    "programFamily": "self-hosting",
+    "description": "Run the production K01 self-host verification path and retain its direct claim as the capability input."
+  },
+  "corpus": [
+    "selfhost/compiler-core.rcl",
+    "selfhost/compiler-main.rcl",
+    "examples/selfhost-core/literal.rcl",
+    "examples/selfhost-core/emergence-multi.rcl",
+    "examples/whole-language-parser-target.rcl"
+  ],
+  "metrics": [
+    {
+      "id": "verificationWallClockMs",
+      "direction": "lower-is-better",
+      "unit": "ms",
+      "required": false,
+      "description": "Wall clock for the declared K01 verification command; retained as an observation, not a cross-language win."
+    },
+    {
+      "id": "correctness",
+      "direction": "higher-is-better",
+      "unit": "ratio",
+      "required": true,
+      "description": "Exact parity ratio for the same normalized workload."
+    },
+    {
+      "id": "compileBuildSpeed",
+      "direction": "lower-is-better",
+      "unit": "ms",
+      "required": true,
+      "description": "Compile/build wall clock for a semantically matched corpus."
+    },
+    {
+      "id": "resourceEfficiency",
+      "direction": "higher-is-better",
+      "unit": "normalized",
+      "required": true,
+      "description": "Declared normalized resource efficiency from the same workload."
+    }
+  ],
+  "requiredComparisonMetrics": [
+    "correctness",
+    "compileBuildSpeed",
+    "resourceEfficiency"
+  ],
+  "comparisonPolicy": {
+    "status": "UNVERIFIED",
+    "reason": "K01 currently has an RCL-native fixed-point workload but no semantically matched Rust/Go/Clang result. Version probes are not comparison evidence."
+  },
+  "candidate": {
+    "id": "rcl",
+    "role": "candidate",
+    "command": [
+      "node",
+      "scripts/run-universal-stress-k01.mjs",
+      "output/dominance-arena/compiler-toolchain/k01"
+    ],
+    "cwd": ".",
+    "timeoutMs": 300000,
+    "evidenceFile": "output/dominance-arena/compiler-toolchain/k01/k01-report.json",
+    "artifactPaths": [
+      "output/dominance-arena/compiler-toolchain/k01/k01-report.json",
+      "output/dominance-arena/compiler-toolchain/k01/k01-report.md"
+    ],
+    "metricPaths": {
+      "verificationWallClockMs": {
+        "source": "receipt",
+        "path": "elapsedMs",
+        "direction": "lower-is-better",
+        "unit": "ms"
+      }
+    },
+    "notes": [
+      "This is a real RCL K01 execution receipt.",
+      "The K01 legacy cell may remain BLOCKED because AI_GENERATE is independent from compiler capability."
+    ]
+  },
+  "references": [
+    {
+      "id": "rustc",
+      "role": "reference-probe",
+      "command": ["rustc", "--version"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "optional": true,
+      "probeOnly": true,
+      "notes": [
+        "Tool availability only. No dominance credit is granted until a semantically matched corpus is compiled and measured."
+      ]
+    },
+    {
+      "id": "node",
+      "role": "reference-probe",
+      "command": ["node", "--version"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "optional": true,
+      "probeOnly": true,
+      "notes": [
+        "Tool availability only. The JavaScript bootstrap oracle is not treated as a competing language result."
+      ]
+    }
+  ],
+  "notes": [
+    "This first arena is an executable baseline and comparability gate, not a claim that RCL is already the strongest compiler language.",
+    "The next valid extension is a shared source corpus with independent RCL and reference implementations plus correctness, build, runtime and resource receipts."
+  ]
+}

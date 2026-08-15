@@ -91,6 +91,20 @@ Detailed campaign records:
 - [`K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md)
 - [`K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md)
 
+### Three-axis scorecard
+
+Universal Stress cell status is retained for compatibility, but it is no longer the only summary of a killer task:
+
+```text
+Capability    = all Universal Stress gates except AI_GENERATE
+Dominance     = comparable raw candidate/reference arena results
+Authorability = the independent AI_GENERATE evidence contract
+```
+
+For example, K01 can be `Capability: PASS`, `Dominance: UNVERIFIED` and `Authorability: UNVERIFIED` while its legacy nine-gate cell remains `BLOCKED (8/9)`. This prevents an authoring experiment from hiding direct compiler evidence.
+
+The executable comparison contract is documented in [`RCL_DOMINANCE_ARENA_v0.1.md`](docs/RCL_DOMINANCE_ARENA_v0.1.md).
+
 ### K01 — self-hosting compiler
 
 RCL has a general compiler written in RCL, a checked-in fixed-point compiler artifact, a native compiler/VM path, and direct fixed-point evidence.
@@ -255,6 +269,12 @@ node scripts/universal-program-stress-report.mjs
 node scripts/run-universal-stress-k01.mjs
 ```
 
+Run the first vertical Dominance Arena baseline:
+
+```bash
+npm run evidence:dominance-arena
+```
+
 Build the K02 standalone Web artifact:
 
 ```bash
@@ -278,6 +298,8 @@ The universal-language program deliberately forbids several easy ways to manufac
 
 - **Artifact ≠ execution.** Generated source, HTML, APK project, SQL, shader or config is not runtime evidence.
 - **Provider coverage ≠ language capability.** Delegating the entire program to another language does not make that program native RCL.
+- **Tool availability ≠ dominance.** A reference version probe or a successful process exit is not a competitive comparison.
+- **No weighted dominance claims.** A losing required metric cannot be hidden by an average score.
 - **No special-case inflation.** A failed cell should expose a general missing primitive, not cause one ad-hoc keyword to be added only for that demo.
 - **No regression inheritance.** A new capability cannot be promoted by silently breaking already verified cells.
 - **No self-certifying AI gate.** The same development session cannot invent a trivial task, reveal the oracle patch to itself and count that as independent AI generation evidence.
@@ -312,6 +334,7 @@ As of the current `v0.94.0-alpha.1` package baseline:
 - K03 has a real Android lowering/project-generation path, but real APK installation/device execution remains unverified in the recorded campaign.
 - Native Foundation coverage is partial and bridge-based where documented.
 - A large fraction of the 400-cell Universal Stress matrix remains unknown by design.
+- The compiler Dominance Arena has an executable RCL candidate baseline, but no semantically matched reference result is currently claimed; `Dominance` remains `UNVERIFIED`.
 - “RCL can write any program” is **not** a repository claim. The repository instead defines how that proposition must be attacked, measured and potentially falsified.
 
 For the machine-readable current contract, use [`VERSION-CONTRACT.json`](VERSION-CONTRACT.json). For the human-readable authority snapshot, use [`CURRENT-STATUS.md`](CURRENT-STATUS.md).

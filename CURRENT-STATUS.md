@@ -29,6 +29,18 @@ EVIDENCE
 
 The gates are non-compensatory: a missing required gate blocks the cell, and a failed required gate fails it.
 
+## Three-axis RCL scorecard
+
+The Universal Stress nine-gate cell remains authoritative for broad stress evidence. Dominance Arena adds three non-equivalent views for a selected task:
+
+- `Capability`: all Universal Stress gates except `AI_GENERATE`.
+- `Dominance`: comparable raw candidate/reference results on the same workload.
+- `Authorability`: the independent `AI_GENERATE` contract.
+
+The first executable compiler-toolchain arena is defined at `examples/dominance-arena/compiler-toolchain.v0.1.json`. It runs the RCL K01 verifier and records reference tool probes, but it does not claim a dominance win before a semantically matched reference corpus exists. The current Dominance result is `UNVERIFIED`.
+
+Authority document: `docs/RCL_DOMINANCE_ARENA_v0.1.md`.
+
 ### K01 — Self-hosting compiler
 
 Current result: `BLOCKED (8/9)`.
