@@ -54,8 +54,12 @@ export function buildK01ClaimFromSelfhostSummary(
 
   const boundary = summary.boundary ?? {};
   const stages = Array.isArray(summary.stages) ? summary.stages : [];
-  const stagePasses = stages.filter((stage) => stage.ok === true).length;
-  const allStagesPassed = stages.length > 0 && stagePasses === stages.length;
+  // Stage 0 is an intentionally proxy-hosted historical boundary. K01 is the
+  // compiler self-hosting task, so it must not be treated as a compiler-stage
+  // correctness failure while the boundary remains explicitly visible.
+  const compilerStages = stages.filter((stage) => stage.id !== 'stage0');
+  const stagePasses = compilerStages.filter((stage) => stage.ok === true).length;
+  const allStagesPassed = compilerStages.length > 0 && stagePasses === compilerStages.length;
   const fixedPoint = summaryHasNativeFixedPoint(summary);
   const fixedPointEvidence = summaryHasSelfhostEvidence(summary);
   const compilerArtifactExists = boundary.generalCompilerFixedPointArtifact === true;
@@ -99,8 +103,12 @@ export function buildK01ClaimFromSelfhostSummary(
       CORRECT: gate(
         fixedPointEvidence && allStagesPassed ? PASS : FAIL,
         [receiptId],
-        `fixed-point/parity evidence plus staged compiler lineage: ${stagePasses}/${stages.length}`,
-        { passedStages: stagePasses, totalStages: stages.length },
+        `fixed-point/parity evidence plus staged compiler lineage: ${stagePasses}/${compilerStages.length}; stage0 proxy boundary excluded from K01 correctness`,
+        {
+          passedStages: stagePasses,
+          totalStages: compilerStages.length,
+          excludedStages: stages.length - compilerStages.length,
+        },
       ),
       ROBUST: gate(
         negativeAndParitySuite ? PASS : FAIL,

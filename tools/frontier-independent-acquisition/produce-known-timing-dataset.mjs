@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import process from 'node:process';
 import { createHash } from 'node:crypto';
 
@@ -51,6 +52,10 @@ const baseDelayMs = 1;
 const symbolDelayMs = 3;
 const geometryDelayMs = 5;
 const interactionDelayMs = mode === 'interaction' ? 8 : 0;
+const requestedTimingScale = Number(process.env.RCL_FRONTIER_TIMING_SCALE);
+const timingScale = Number.isFinite(requestedTimingScale) && requestedTimingScale >= 1
+  ? requestedTimingScale
+  : (process.platform === 'win32' ? 32 : 1);
 const startedAt = new Date().toISOString();
 const schedule = [];
 for (const symbolCondition of ['control', 'active']) {
@@ -73,7 +78,7 @@ const rows = schedule.map((c, index) => {
     session: index % 8,
     symbolCondition: c.symbolCondition,
     geometryCondition: c.geometryCondition,
-    response: Number(measure(baseDelayMs + s + g + x, repeats).toFixed(6)),
+    response: Number(measure((baseDelayMs + s + g + x) * timingScale, repeats).toFixed(6)),
     qualityFlags: [],
   };
 });
@@ -105,6 +110,7 @@ const payload = {
     symbolDelayMs,
     geometryDelayMs,
     interactionDelayMs,
+    timingScale,
     truthClass: mode === 'interaction' ? 'known_engineered_interaction' : 'known_engineered_additive',
   },
   provenance: {
@@ -113,7 +119,7 @@ const payload = {
     collector: 'standalone acquisition producer (not RCL runtime)',
     acquiredAt: startedAt,
     licenseOrPermission: 'local-process-measurement-authorized',
-    acquisitionMethod: 'separate Node process; Atomics.wait timing observed by process.hrtime.bigint; output file completed before RCL intake',
+    acquisitionMethod: `separate Node process; Atomics.wait timing observed by process.hrtime.bigint; timingScale=${timingScale}; output file completed before RCL intake`,
   },
   calibration: {
     status: 'valid',
@@ -126,6 +132,6 @@ const payload = {
   rows,
 };
 payload.fileRoot = sha256({ ...payload, fileRoot: undefined });
-fs.mkdirSync(new URL('.', `file://${outputPath}`).pathname, { recursive: true });
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify({ outputPath, mode, observationCount: rows.length, fileRoot: payload.fileRoot, producerProcessId: process.pid }, null, 2));

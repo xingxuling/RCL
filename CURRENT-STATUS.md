@@ -29,6 +29,22 @@ EVIDENCE
 
 The gates are non-compensatory: a missing required gate blocks the cell, and a failed required gate fails it.
 
+## Three-axis RCL scorecard
+
+The Universal Stress nine-gate cell remains authoritative for broad stress evidence. Dominance Arena adds three non-equivalent views for a selected task:
+
+- `Capability`: all Universal Stress gates except `AI_GENERATE`.
+- `Dominance`: comparable raw candidate/reference results on the same workload.
+- `Authorability`: the independent `AI_GENERATE` contract.
+
+The first executable compiler-toolchain arena is defined at `examples/dominance-arena/compiler-toolchain.v0.1.json`. It runs the RCL K01 verifier and records reference tool probes, but it does not claim a dominance win before a semantically matched reference corpus exists. The current Dominance result is `UNVERIFIED`.
+
+The first matched compiler microbenchmark is defined at `examples/dominance-arena/compiler-microbench.v0.1.json`. It uses the same workload `inputRoot` for RCL, real `rustc`, and CPython reference paths, verifies all outputs, and compares raw preparation time, cold runtime and artifact-footprint metrics without a weighted average. RCL beats Rust on this task but loses CPython on artifact footprint, so the multi-reference result is `Dominance: FAIL`; robustness, concurrency, process-memory sampling, authoring cost and broader workload families remain unverified.
+
+The first broader language workload matrix is defined at `examples/dominance-arena/compiler-workload-matrix.v0.1.json`. It executes text normalization, sequence aggregation, UTF-8 byte length, a bounded JSON-shaped text scan and a real JSON parse-and-compact slice. Four workloads use real RCL, rustc and CPython providers; the JSON slice uses RCL and CPython with an explicit provider subset. Current evidence has 14/14 provider executions correct, with RCL passing 4/4 raw comparisons against rustc and 2/5 against CPython; three CPython artifact-footprint losses keep the matrix at `FAIL`. File I/O and concurrency remain explicit `BLOCKED` capability gaps rather than claimed support.
+
+Authority document: `docs/RCL_DOMINANCE_ARENA_v0.1.md`.
+
 ### K01 — Self-hosting compiler
 
 Current result: `BLOCKED (8/9)`.

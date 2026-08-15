@@ -66,6 +66,22 @@ test('fullSelfHosting=false is not itself a K01 compiler-selfhosting failure', (
   assert.equal(claim.gates.EXECUTE.status, STRESS_STATUS.PASS);
 });
 
+test('stage0 proxy boundary does not fail K01 compiler correctness', () => {
+  const claim = buildK01ClaimFromSelfhostSummary(summary({
+    stages: [{ id: 'stage0', ok: false }, { id: 'stage40', ok: true }],
+  }));
+  assert.equal(claim.gates.CORRECT.status, STRESS_STATUS.PASS);
+  assert.equal(claim.gates.CORRECT.metric.excludedStages, 1);
+  assert.equal(claim.status, STRESS_STATUS.BLOCKED);
+});
+
+test('K01 still requires at least one compiler stage', () => {
+  const claim = buildK01ClaimFromSelfhostSummary(summary({
+    stages: [{ id: 'stage0', ok: false }],
+  }));
+  assert.equal(claim.gates.CORRECT.status, STRESS_STATUS.FAIL);
+});
+
 test('missing RCL compiler artifact/self-emission witness fails EXPRESS', () => {
   const claim = buildK01ClaimFromSelfhostSummary(summary({
     boundary: {

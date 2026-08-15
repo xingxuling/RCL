@@ -45,6 +45,29 @@ function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+function sleepSync(milliseconds) {
+  const signal = new Int32Array(new SharedArrayBuffer(4));
+  Atomics.wait(signal, 0, 0, milliseconds);
+}
+
+function renameDirectoryWithRetry(sourceDir, targetDir) {
+  const attempts = process.platform === 'win32' ? 7 : 1;
+  let lastError;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      fs.renameSync(sourceDir, targetDir);
+      return;
+    } catch (error) {
+      lastError = error;
+      const retryable = process.platform === 'win32'
+        && ['EACCES', 'EBUSY', 'EPERM'].includes(error?.code);
+      if (!retryable || attempt === attempts - 1) throw error;
+      sleepSync(25 * (2 ** attempt));
+    }
+  }
+  throw lastError;
+}
+
 function writeJson(file, value) {
   ensureDir(path.dirname(file));
   fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
@@ -307,7 +330,7 @@ export function installRclApp(packageDir, options = {}) {
   };
   writeJson(path.join(tmpDir, 'rclapp.json'), { ...installedManifest, root: realityRoot(installedManifest) });
   fs.rmSync(appDir, { recursive: true, force: true });
-  fs.renameSync(tmpDir, appDir);
+  renameDirectoryWithRetry(tmpDir, appDir);
   const record = {
     appId,
     program: packageManifest.program,

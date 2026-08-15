@@ -69,12 +69,12 @@ test('payload mutation after seal is rejected before scoring', () => {
 
 test('unsupported design family cannot be sealed and never reaches a scorer', () => {
   const grammar = normalizeFrontierDesignGrammar({
-    family: FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD,
+    family: FRONTIER_DESIGN_FAMILIES.REPEATED_MEASURES,
     factors: ['x', 't'],
     response: 'field',
   });
   const sealed = sealFrontierPreregisteredAnalysisContract({ designGrammar: grammar, payload: null });
   assert.equal(sealed.ok, false);
   assert.equal(sealed.status, 'BLOCKED');
-  assert.ok(sealed.failures.includes('continuous_field_scorer_not_implemented'));
+  assert.ok(sealed.failures.includes('repeated_measures_scorer_not_implemented'));
 });

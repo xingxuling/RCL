@@ -5,8 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
+#include <fcntl.h>
 #include <io.h>
 #include <process.h>
+#include <share.h>
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -137,6 +139,33 @@ static int replace_file(const char *temporary_path, const char *output_path) {
 #endif
 }
 
+static FILE *open_exclusive_binary(const char *path) {
+#ifdef _WIN32
+  int descriptor = -1;
+  int result = _sopen_s(
+    &descriptor,
+    path,
+    _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY,
+    _SH_DENYRW,
+    0600
+  );
+  if (result != 0) {
+    errno = result;
+    return NULL;
+  }
+  FILE *file = _fdopen(descriptor, "wb");
+  if (!file) {
+    int saved_errno = errno;
+    _close(descriptor);
+    remove(path);
+    errno = saved_errno;
+  }
+  return file;
+#else
+  return fopen(path, "wbx");
+#endif
+}
+
 static int write_output_file_atomic(const char *path, const uint8_t *bytes, size_t length, char *error, size_t error_capacity) {
   static unsigned long temporary_counter = 0;
   size_t temporary_capacity = strlen(path) + 64;
@@ -151,7 +180,7 @@ static int write_output_file_atomic(const char *path, const uint8_t *bytes, size
     unsigned long counter = temporary_counter++;
     snprintf(temporary_path, temporary_capacity, "%s.tmp.%lu.%lu", path, process_id(), counter);
     errno = 0;
-    file = fopen(temporary_path, "wbx");
+    file = open_exclusive_binary(temporary_path);
     if (file || errno != EEXIST) break;
   }
   if (!file) {

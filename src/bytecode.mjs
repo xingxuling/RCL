@@ -124,6 +124,7 @@ export const BUILTINS = Object.freeze({
   UTF8_BYTES: 68,
   HEX_BYTES: 69,
   SHA256_TEXT: 70,
+  JSON_COMPACT: 71,
 });
 
 const OPCODE_NAMES = Object.freeze(Object.fromEntries(Object.entries(OPCODES).map(([name, value]) => [value, name])));
@@ -367,6 +368,7 @@ function compileBuiltin(expr, asm, compileExpr) {
     utf8_bytes: BUILTINS.UTF8_BYTES,
     hex_bytes: BUILTINS.HEX_BYTES,
     sha256_text: BUILTINS.SHA256_TEXT,
+    json_compact: BUILTINS.JSON_COMPACT,
   };
   const builtin = map[expr.name];
   if (!builtin) return false;

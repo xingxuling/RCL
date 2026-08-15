@@ -1,0 +1,146 @@
+{
+  "schema": "rcl.dominance-arena.manifest.v0.1",
+  "id": "compiler-microbench-v0.1",
+  "track": "compiler-toolchain-microbench",
+  "task": {
+    "id": "K01-MICRO",
+    "name": "RCL arithmetic-chain compiler microbenchmark",
+    "environment": "compiler-runtime",
+    "programFamily": "compiler",
+    "description": "Compile and execute the same fixed arithmetic-chain workload through RCL, rustc and CPython reference paths."
+  },
+  "corpus": [
+    "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
+    "examples/dominance-arena/compiler-microbench/program.rcl",
+    "examples/dominance-arena/compiler-microbench/program.rs",
+    "examples/dominance-arena/compiler-microbench/program.py"
+  ],
+  "metrics": [
+    {
+      "id": "correctness",
+      "direction": "higher-is-better",
+      "unit": "ratio",
+      "required": true,
+      "description": "Exact declared result match, represented as 1 or 0."
+    },
+    {
+      "id": "compileBuildSpeed",
+      "direction": "lower-is-better",
+      "unit": "ms per build",
+      "required": true,
+      "description": "Average measured build time over the shared iteration count."
+    },
+    {
+      "id": "runtimeMs",
+      "direction": "lower-is-better",
+      "unit": "ms per run",
+      "required": true,
+      "description": "Average measured execution time for the emitted artifact."
+    },
+    {
+      "id": "artifactFootprintBytes",
+      "direction": "lower-is-better",
+      "unit": "bytes",
+      "required": true,
+      "description": "Raw emitted artifact size. This is a footprint proxy, not a complete memory-efficiency claim."
+    }
+  ],
+  "requiredComparisonMetrics": [
+    "correctness",
+    "compileBuildSpeed",
+    "runtimeMs",
+    "artifactFootprintBytes"
+  ],
+  "comparisonContract": {
+    "candidateId": "rcl-microbench",
+    "referenceIds": ["rust-microbench", "python-microbench"],
+    "inputRootPath": "inputRoot",
+    "metrics": {
+      "correctness": { "candidatePath": "metrics.correctness", "referencePath": "metrics.correctness" },
+      "compileBuildSpeed": { "candidatePath": "metrics.compileBuildSpeed", "referencePath": "metrics.compileBuildSpeed" },
+      "runtimeMs": { "candidatePath": "metrics.runtimeMs", "referencePath": "metrics.runtimeMs" },
+      "artifactFootprintBytes": { "candidatePath": "metrics.artifactFootprintBytes", "referencePath": "metrics.artifactFootprintBytes" }
+    },
+    "note": "Only raw metrics from successful providers sharing the exact workload inputRoot are comparable."
+  },
+  "comparisonPolicy": {
+    "status": "UNVERIFIED",
+    "reason": "The result is determined by the executed raw comparison; no weighted aggregate can promote a losing metric."
+  },
+  "candidate": {
+    "id": "rcl-microbench",
+    "role": "candidate",
+    "command": [
+      "node",
+      "scripts/run-dominance-arena-microbench.mjs",
+      "rcl",
+      "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
+      "examples/dominance-arena/compiler-microbench/program.rcl",
+      "output/dominance-arena/compiler-microbench-v0.1/rcl-microbench.json"
+    ],
+    "cwd": ".",
+    "timeoutMs": 180000,
+    "evidenceFile": "output/dominance-arena/compiler-microbench-v0.1/rcl-microbench.json",
+    "evidenceStatusPath": "status",
+    "artifactPaths": [
+      "output/dominance-arena/compiler-microbench-v0.1/rcl-microbench.rbc"
+    ],
+    "notes": [
+      "Real RCL compiler and native VM execution; this is an executable microbenchmark, not a whole-language dominance claim."
+    ]
+  },
+  "references": [
+    {
+      "id": "python-microbench",
+      "role": "reference",
+      "command": [
+        "node",
+        "scripts/run-dominance-arena-microbench.mjs",
+        "python",
+        "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
+        "examples/dominance-arena/compiler-microbench/program.py",
+        "output/dominance-arena/compiler-microbench-v0.1/python-microbench.json"
+      ],
+      "cwd": ".",
+      "timeoutMs": 180000,
+      "evidenceFile": "output/dominance-arena/compiler-microbench-v0.1/python-microbench.json",
+      "evidenceStatusPath": "status",
+      "artifactPaths": [
+        "output/dominance-arena/compiler-microbench-v0.1/python-microbench.pyc"
+      ],
+      "optional": true,
+      "notes": [
+        "This is a real CPython execution path. compileBuildSpeed is py_compile preparation, not machine-code compilation; runtime is cold interpreter process time."
+      ]
+    },
+    {
+      "id": "rust-microbench",
+      "role": "reference",
+      "command": [
+        "node",
+        "scripts/run-dominance-arena-microbench.mjs",
+        "rust",
+        "examples/dominance-arena/compiler-microbench/workload.v0.1.json",
+        "examples/dominance-arena/compiler-microbench/program.rs",
+        "output/dominance-arena/compiler-microbench-v0.1/rust-microbench.json"
+      ],
+      "cwd": ".",
+      "timeoutMs": 180000,
+      "evidenceFile": "output/dominance-arena/compiler-microbench-v0.1/rust-microbench.json",
+      "evidenceStatusPath": "status",
+      "artifactPaths": [
+        "output/dominance-arena/compiler-microbench-v0.1/rust-microbench.exe"
+      ],
+      "optional": true,
+      "notes": [
+        "This is a real rustc build and executable run when rustc is available. Missing rustc remains BLOCKED and never becomes a dominance pass."
+      ]
+    }
+  ],
+  "notes": [
+    "RCL remains the candidate; rustc and CPython are reference adapters only.",
+    "The shared inputRoot binds both providers to the same workload bytes.",
+    "Artifact footprint is explicitly labeled as a proxy and does not prove total runtime memory efficiency.",
+    "Commercial-language superiority, broad ecosystem parity, and the K01 self-hosting claim remain outside this microbenchmark."
+  ]
+}

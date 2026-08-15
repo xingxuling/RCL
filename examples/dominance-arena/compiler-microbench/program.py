@@ -1,0 +1,27 @@
+seed = 17.0
+scale = 23.0
+s01 = seed * scale + 11.0
+s02 = s01 * scale - seed
+s03 = s02 + scale * 3.0
+s04 = s03 / 5.0 + seed
+s05 = s04 / 2.0 + seed
+s06 = s05 * scale - seed
+s07 = s06 + scale * 3.0
+s08 = s07 / 5.0 + seed
+s09 = s08 / 2.0 + seed
+s10 = s09 * scale - seed
+s11 = s10 + scale * 3.0
+s12 = s11 / 5.0 + seed
+s13 = s12 / 2.0 + seed
+s14 = s13 * scale - seed
+s15 = s14 + scale * 3.0
+s16 = s15 / 5.0 + seed
+s17 = s16 / 2.0 + seed
+s18 = s17 * scale - seed
+s19 = s18 + scale * 3.0
+s20 = s19 / 5.0 + seed
+s21 = s20 / 2.0 + seed
+s22 = s21 * scale - seed
+s23 = s22 + scale * 3.0
+s24 = s23 / 5.0 + seed
+print(f'{s24:.17g}')

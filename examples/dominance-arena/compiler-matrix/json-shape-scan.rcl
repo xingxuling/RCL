@@ -1,0 +1,4 @@
+reality JsonShapeScan {
+  facet input.payload : Text = "{\"name\":\"rcl\",\"version\":1,\"features\":[\"text\",\"sequence\"]}"
+  facet result.output : Number = choose(contains(input.payload, "\"name\":\"rcl\"") and contains(input.payload, "\"version\":1") and contains(input.payload, "\"features\":["), length(input.payload), -1)
+}

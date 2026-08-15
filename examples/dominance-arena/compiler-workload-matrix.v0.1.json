@@ -1,0 +1,145 @@
+{
+  "schema": "rcl.compiler-workload-matrix.manifest.v0.1",
+  "id": "compiler-workload-matrix-v0.1",
+  "track": "compiler-language-matrix",
+  "task": {
+    "id": "LANGUAGE-MATRIX-01",
+    "name": "RCL language workload matrix against CPython and rustc",
+    "environment": "compiler-runtime",
+    "programFamily": "compiler",
+    "description": "Run matched text, sequence, UTF-8, JSON-shaped text and JSON compact-parse workloads through RCL, CPython and rustc where the provider contract is matched; record unsupported native domains separately."
+  },
+  "metrics": [
+    {
+      "id": "correctness",
+      "direction": "higher-is-better",
+      "unit": "ratio",
+      "required": true,
+      "description": "Declared workload output match, represented as 1 or 0."
+    },
+    {
+      "id": "compileBuildSpeed",
+      "direction": "lower-is-better",
+      "unit": "ms per build",
+      "required": true,
+      "description": "Average measured source preparation or build time. Python is py_compile preparation, not machine-code compilation."
+    },
+    {
+      "id": "runtimeMs",
+      "direction": "lower-is-better",
+      "unit": "ms per cold run",
+      "required": true,
+      "description": "Average cold process execution time."
+    },
+    {
+      "id": "artifactFootprintBytes",
+      "direction": "lower-is-better",
+      "unit": "bytes",
+      "required": true,
+      "description": "Raw emitted artifact size; a footprint proxy, not total process memory."
+    }
+  ],
+  "providers": [
+    {
+      "id": "rcl-microbench",
+      "mode": "rcl",
+      "role": "candidate",
+      "label": "RCL native VM",
+      "optional": false
+    },
+    {
+      "id": "rust-microbench",
+      "mode": "rust",
+      "role": "reference",
+      "label": "rustc reference",
+      "optional": true
+    },
+    {
+      "id": "python-microbench",
+      "mode": "python",
+      "role": "reference",
+      "label": "CPython reference",
+      "optional": true
+    }
+  ],
+  "workloads": [
+    {
+      "id": "text-normalization-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/text-normalization.v0.1.json",
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/text-normalization.rcl",
+        "rust": "examples/dominance-arena/compiler-matrix/text-normalization.rs",
+        "python": "examples/dominance-arena/compiler-matrix/text-normalization.py"
+      },
+      "required": true,
+      "notes": ["Uses RCL trim, lowercase, contains, choose and length builtins."]
+    },
+    {
+      "id": "sequence-aggregation-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/sequence-aggregation.v0.1.json",
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/sequence-aggregation.rcl",
+        "rust": "examples/dominance-arena/compiler-matrix/sequence-aggregation.rs",
+        "python": "examples/dominance-arena/compiler-matrix/sequence-aggregation.py"
+      },
+      "required": true,
+      "notes": ["Uses RCL sequence construction and indexed reads against Python list sum and Rust array iteration."]
+    },
+    {
+      "id": "utf8-byte-length-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/utf8-byte-length.v0.1.json",
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/utf8-byte-length.rcl",
+        "rust": "examples/dominance-arena/compiler-matrix/utf8-byte-length.rs",
+        "python": "examples/dominance-arena/compiler-matrix/utf8-byte-length.py"
+      },
+      "required": true,
+      "notes": ["The non-ASCII fixture is intentional: this measures actual UTF-8 byte encoding, not ASCII-only length."]
+    },
+    {
+      "id": "json-shape-scan-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/json-shape-scan.v0.1.json",
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/json-shape-scan.rcl",
+        "rust": "examples/dominance-arena/compiler-matrix/json-shape-scan.rs",
+        "python": "examples/dominance-arena/compiler-matrix/json-shape-scan.py"
+      },
+      "required": true,
+      "notes": ["This is a matched textual scan of JSON-shaped bytes. It is not JSON parser parity."]
+    },
+    {
+      "id": "json-compact-v1",
+      "workload": "examples/dominance-arena/compiler-matrix/json-compact.v0.1.json",
+      "providers": ["rcl", "python"],
+      "sources": {
+        "rcl": "examples/dominance-arena/compiler-matrix/json-compact.rcl",
+        "python": "examples/dominance-arena/compiler-matrix/json-compact.py"
+      },
+      "required": true,
+      "notes": ["This is the first real RCL JSON parse-and-compact path; Rust is intentionally excluded because this repository does not provide a matching stdlib JSON parser reference."]
+    }
+  ],
+  "capabilityGaps": [
+    {
+      "id": "file-io-native-v1",
+      "domain": "file I/O",
+      "status": "BLOCKED",
+      "reason": "The current RCL Native VM has no declared file read/write capability in this benchmark contract."
+    },
+    {
+      "id": "concurrency-native-v1",
+      "domain": "concurrency",
+      "status": "BLOCKED",
+      "reason": "The current RCL Native VM has no declared thread, async or parallel execution capability in this benchmark contract."
+    }
+  ],
+  "comparisonPolicy": {
+    "status": "UNVERIFIED",
+    "reason": "Each workload is compared on raw metrics only when every provider is PASS and shares the exact workload inputRoot. A workload loss is not hidden by an average."
+  },
+  "notes": [
+    "The matrix is a bounded language-runtime experiment, not a whole-language, ecosystem or commercial-product ranking.",
+    "Provider averages are descriptive only and never determine the dominance verdict.",
+    "Capability gaps are reported separately from executed workload comparisons and are not converted into fake provider passes."
+  ]
+}

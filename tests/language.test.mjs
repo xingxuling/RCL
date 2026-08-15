@@ -1116,6 +1116,37 @@ test('sha256_text computes the same SHA-256 digest in JS and native runtimes', a
   assert.equal(decoded.instructions.some(instruction => instruction.builtin === 'SHA256_TEXT'), true);
 });
 
+test('json_compact parses and compacts the same JSON in JS and native runtimes', async () => {
+  const payload = '{ "features": [ "text", "sequence" ], "name": "rcl", "version": 1 }';
+  const source = `
+  reality JsonCompact {
+    facet json.input : Text = ${JSON.stringify(payload)}
+    facet json.output : Text = json_compact(json.input)
+  }`;
+  const expected = '{"features":["text","sequence"],"name":"rcl","version":1}';
+  const jsRun = await runReality(source);
+  const nativeRun = runRealityNative(source);
+  const decoded = decodeBytecode(compileRealityToBytecode(source));
+
+  assert.equal(jsRun.state['json.output'], expected);
+  assert.equal(nativeRun.state['json.output'], expected);
+  assert.equal(decoded.instructions.some(instruction => instruction.builtin === 'JSON_COMPACT'), true);
+});
+
+test('json_compact rejects malformed JSON in JS and native runtimes', async () => {
+  for (const malformed of ['{"x":[1,]}', '{"x":01}', '{"x":true} trailing']) {
+    const source = `reality InvalidJson { facet json.output : Text = json_compact(${JSON.stringify(malformed)}) }`;
+    await assert.rejects(() => runReality(source), error => {
+      assert.equal(error.code, 'RCL_JSON_INVALID');
+      return true;
+    });
+    assert.throws(() => runRealityNative(source), error => {
+      assert.equal(error.code, 'RCL_JSON_INVALID');
+      return true;
+    });
+  }
+});
+
 test('native byte primitives reject values outside their declared binary range', () => {
   assert.throws(() => runRealityNative('reality InvalidByte { facet bytes.bad : Sequence = bytes_u8(256) }'), error => {
     assert.equal(error.code, 'RCL_BYTE_ENCODING_RANGE');
