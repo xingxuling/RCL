@@ -1,7 +1,7 @@
-# RCL — Reality Compiler Language
+# RCL v0.94.0-alpha.1 — Reality Compiler Language
 
 **Current package:** `v0.94.0-alpha.1`  
-**Canonical source:** `xingxuling/RCL@main`  
+Canonical source: `xingxuling/RCL@main`
 **License:** Apache-2.0
 
 > RCL is an evidence-bearing, permission-constrained reality transaction language, compiler, native VM, provider runtime, and verification toolchain.
@@ -90,6 +90,12 @@ Detailed campaign records:
 - [`K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`](docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md)
 - [`K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md)
 - [`K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md)
+
+### Native UI Genome v0.1 candidate
+
+An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build.
+
+This remains `CANDIDATE`, not promoted `native-semantic`: the syntax/IR currently live in the JavaScript reference compiler path, while `VERSION-CONTRACT.json` names the self-host RCL compiler as canonical. Android device execution is also not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
 
 ### K01 — self-hosting compiler
 

@@ -1,0 +1,42 @@
+{
+  "schema": "rcl.unabsorbed-advantage-ledger.v0.1",
+  "lastUpdated": "2026-08-23",
+  "entries": [
+    {
+      "id": "UA-UI-001",
+      "donor": "Web platform",
+      "capability": "complete DOM, CSS, navigation, focus and accessibility semantics",
+      "affectedCells": ["browser::gui", "browser::web", "browser::reactive"],
+      "evidence": ["docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md", "docs/ui-native-genome/current-state-audit.md"],
+      "performanceDelta": "RCL browser evidence path was approximately 47x slower than the same-process plain DOM Counter in the 2026-08-23 single-run receipt",
+      "semanticDelta": "Native UI v0.1 covers a bounded tree/state/event/layout/style/lifecycle subset, not Web standards conformance.",
+      "whyRclCannotYetMatch": "navigation, focus, accessibility tree, async event loop and broad CSS/DOM semantics are not absorbed",
+      "candidateAbsorptionPath": ["navigation graph", "focus algebra", "accessibility semantics", "async event model"],
+      "status": "OBSERVED_ONE_GENERATION"
+    },
+    {
+      "id": "UA-UI-002",
+      "donor": "Android framework",
+      "capability": "device adaptation, accessibility, resources and verified device lifecycle",
+      "affectedCells": ["android::gui", "android::mobile", "android::reactive"],
+      "evidence": ["docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md", "examples/native-ui/evidence/android-build-result.json"],
+      "performanceDelta": null,
+      "semanticDelta": "RCL emits a real APK but has no device runtime receipt and only a structural View subset.",
+      "whyRclCannotYetMatch": "installed emulator image/device is unavailable and device adaptation/accessibility/resource semantics remain extension points",
+      "candidateAbsorptionPath": ["device-class constraints", "resource semantics", "accessibility semantics", "device evidence harness"],
+      "status": "OBSERVED_ONE_GENERATION"
+    },
+    {
+      "id": "UA-UI-003",
+      "donor": "RCL canonical self-host compiler",
+      "capability": "governed ownership of new grammar and IR",
+      "affectedCells": ["browser::gui", "android::gui", "browser::reactive", "android::reactive", "compiler-runtime::self-hosting"],
+      "evidence": ["VERSION-CONTRACT.json", "docs/ui-native-genome/evidence-ledger.md"],
+      "performanceDelta": null,
+      "semanticDelta": "Native UI is implemented only in the JavaScript reference compiler path.",
+      "whyRclCannotYetMatch": "selfhost/compiler-core.rcl and compiler-main.rcl do not parse or lower Native UI IR",
+      "candidateAbsorptionPath": ["self-host UI parser", "canonical IR emission", "fixed-point differential", "promotion receipt"],
+      "status": "MISSING_CANONICAL_GENE"
+    }
+  ]
+}

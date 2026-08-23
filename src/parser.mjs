@@ -40,6 +40,7 @@ class Parser {
       case 'effect': return this.parseEffectDecl();
       case 'capability_policy': return this.parseCapabilityPolicy();
       case 'store': return this.parseStoreDecl();
+      case 'ui': return this.parseNativeUI();
       case 'verify': return this.parseAbsorptionDirective('VerifyCapabilities', 'policy');
       case 'snapshot': return this.parseAbsorptionDirective('SnapshotStore', 'store');
       case 'meta': return this.parseMeta();
@@ -796,6 +797,197 @@ class Parser {
       else throw new RCLSyntaxError(`Unknown compression declaration '${this.current().value}'`, this.current());
     }
     this.expect('}'); return node;
+  }
+
+  parseUIProperty(allowInheritance = false) {
+    this.expect('property');
+    const name = this.expectType('IDENT', 'Expected UI property name').value;
+    this.expect('=', 'Expected = after UI property name');
+    const expression = this.parseExpression();
+    let inherited = false;
+    if (allowInheritance && this.at('inherit')) { this.advance(); inherited = true; }
+    return { kind: 'UIPropertyDecl', name, expression, inherited };
+  }
+
+  parseUIState(derived = false) {
+    const start = this.advance();
+    const name = this.expectType('IDENT', `Expected ${derived ? 'derived state' : 'state'} identity`).value;
+    this.expect(':', `Expected : after UI ${derived ? 'derived state' : 'state'} identity`);
+    const valueType = this.parseType();
+    this.expect('=', `Expected = after UI ${derived ? 'derived state' : 'state'} type`);
+    return {
+      kind: derived ? 'UIDerivedStateDecl' : 'UIStateDecl',
+      name,
+      valueType,
+      expression: this.parseExpression(),
+      location: { line: start.line, column: start.column },
+    };
+  }
+
+  parseUITheme() {
+    const start = this.expect('theme');
+    const name = this.expectType('IDENT', 'Expected UI theme identity').value;
+    const declarations = [];
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('property')) declarations.push(this.parseUIProperty(true));
+      else throw new RCLSyntaxError(`Unknown UI theme clause '${this.current().value}'`, this.current());
+    }
+    this.expect('}');
+    return { kind: 'UIThemeDecl', name, declarations, location: { line: start.line, column: start.column } };
+  }
+
+  parseUIStyle() {
+    const start = this.expect('style');
+    const name = this.expectType('IDENT', 'Expected UI style identity').value;
+    const node = { kind: 'UIStyleDecl', name, selector: null, priority: 0, declarations: [], location: { line: start.line, column: start.column } };
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('target')) {
+        this.advance();
+        const selectorKind = this.expectType('IDENT', 'Expected UI selector kind').value;
+        const value = this.expectType('IDENT', 'Expected UI selector value').value;
+        node.selector = { kind: selectorKind, value };
+      } else if (this.at('priority')) {
+        this.advance(); node.priority = this.parseNumberLiteral('Expected UI style priority');
+      } else if (this.at('property')) node.declarations.push(this.parseUIProperty(true));
+      else throw new RCLSyntaxError(`Unknown UI style clause '${this.current().value}'`, this.current());
+    }
+    this.expect('}');
+    return node;
+  }
+
+  parseUISize(axis) {
+    this.expect(axis);
+    const mode = this.expectType('IDENT', `Expected ${axis} sizing mode`).value;
+    return { mode, value: mode === 'fixed' ? this.parseExpression() : null };
+  }
+
+  parseUILayout() {
+    const start = this.expect('layout');
+    const mode = this.expectType('IDENT', 'Expected UI layout mode').value;
+    const node = {
+      kind: 'UILayoutDecl', mode, width: null, height: null, gap: null, padding: null,
+      alignment: null, distribution: null, overflow: null, columns: 1,
+      location: { line: start.line, column: start.column },
+    };
+    this.expect('{');
+    while (!this.at('}')) {
+      const keyword = this.current().value;
+      if (keyword === 'width' || keyword === 'height') node[keyword] = this.parseUISize(keyword);
+      else if (keyword === 'gap' || keyword === 'padding') { this.advance(); node[keyword] = this.parseExpression(); }
+      else if (keyword === 'align') { this.advance(); node.alignment = this.expectType('IDENT', 'Expected UI alignment').value; }
+      else if (keyword === 'distribute') { this.advance(); node.distribution = this.expectType('IDENT', 'Expected UI distribution').value; }
+      else if (keyword === 'overflow') { this.advance(); node.overflow = this.expectType('IDENT', 'Expected UI overflow mode').value; }
+      else if (keyword === 'columns') { this.advance(); node.columns = this.parseNumberLiteral('Expected UI grid column count'); }
+      else throw new RCLSyntaxError(`Unknown UI layout clause '${keyword}'`, this.current());
+    }
+    this.expect('}');
+    return node;
+  }
+
+  parseUIEvent() {
+    const start = this.expect('on');
+    const eventType = this.expectType('IDENT', 'Expected canonical UI event type').value;
+    const parameters = [];
+    if (this.at('(')) {
+      this.advance();
+      if (!this.at(')')) {
+        while (true) {
+          const name = this.expectType('IDENT', 'Expected UI event parameter').value;
+          let valueType = null;
+          if (this.at(':')) { this.advance(); valueType = this.parseType(); }
+          parameters.push({ name, valueType });
+          if (!this.at(',')) break;
+          this.advance();
+        }
+      }
+      this.expect(')', 'Expected ) after UI event parameters');
+    }
+    const statements = [];
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('set')) {
+        this.advance();
+        const target = this.parsePath();
+        this.expect('<-', 'Expected <- in UI state mutation');
+        statements.push({ kind: 'UISetState', target, expression: this.parseExpression() });
+      } else if (this.at('realize')) {
+        this.advance();
+        statements.push({ kind: 'UIRealizeReality', rule: this.expectType('IDENT', 'Expected RCL reality rule name').value });
+      } else throw new RCLSyntaxError(`Unknown UI event statement '${this.current().value}'`, this.current());
+    }
+    this.expect('}');
+    return { kind: 'UIEventDecl', eventType, parameters, statements, location: { line: start.line, column: start.column } };
+  }
+
+  parseUIViewNode() {
+    const start = this.advance();
+    const declaration = start.value;
+    const id = this.expectType('IDENT', `Expected stable identity after UI ${declaration}`).value;
+    const roleByDeclaration = { view: 'container', text: 'text', action: 'action', input: 'input' };
+    const node = {
+      kind: 'UIViewNodeDecl', id, role: roleByDeclaration[declaration], classes: [],
+      properties: [], bindings: [], events: [], children: [], layout: null,
+      location: { line: start.line, column: start.column },
+    };
+    this.expect('{');
+    while (!this.at('}')) {
+      const keyword = this.current().value;
+      if (['view', 'text', 'action', 'input'].includes(keyword)) node.children.push(this.parseUIViewNode());
+      else if (keyword === 'role') { this.advance(); node.role = this.expectType('IDENT', 'Expected canonical UI role').value; }
+      else if (keyword === 'layout') node.layout = this.parseUILayout();
+      else if (keyword === 'class') { this.advance(); node.classes.push(this.expectType('IDENT', 'Expected UI style class').value); }
+      else if (keyword === 'property') node.properties.push(this.parseUIProperty(false));
+      else if (['value', 'label', 'placeholder', 'accessibility_label'].includes(keyword)) {
+        this.advance();
+        node.properties.push({ kind: 'UIPropertyDecl', name: keyword, expression: this.parseExpression(), inherited: false });
+      } else if (keyword === 'bind') {
+        this.advance();
+        const property = this.expectType('IDENT', 'Expected UI binding property').value;
+        this.expect('<-', 'Expected <- in UI property binding');
+        node.bindings.push({ kind: 'UIBindingDecl', property, expression: this.parseExpression() });
+      } else if (keyword === 'on') node.events.push(this.parseUIEvent());
+      else throw new RCLSyntaxError(`Unknown UI node clause '${keyword}'`, this.current());
+    }
+    this.expect('}');
+    return node;
+  }
+
+  parseUILifecycle() {
+    const start = this.expect('lifecycle');
+    const node = { kind: 'UILifecycleDecl', stages: [], restore: [], location: { line: start.line, column: start.column } };
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('restore')) { this.advance(); node.restore.push(this.expectType('IDENT', 'Expected UI state identity to restore').value); }
+      else node.stages.push(this.expectType('IDENT', 'Expected canonical UI lifecycle stage').value);
+    }
+    this.expect('}');
+    return node;
+  }
+
+  parseNativeUI() {
+    const start = this.expect('ui');
+    const name = this.expectType('IDENT', 'Expected native UI program identity').value;
+    const node = {
+      kind: 'NativeUIDecl', name, states: [], derivedStates: [], themes: [], styles: [],
+      viewTrees: [], lifecycle: null, location: { line: start.line, column: start.column },
+    };
+    this.expect('{');
+    while (!this.at('}')) {
+      const keyword = this.current().value;
+      if (keyword === 'state') node.states.push(this.parseUIState(false));
+      else if (keyword === 'derived') node.derivedStates.push(this.parseUIState(true));
+      else if (keyword === 'theme') node.themes.push(this.parseUITheme());
+      else if (keyword === 'style') node.styles.push(this.parseUIStyle());
+      else if (keyword === 'lifecycle') {
+        if (node.lifecycle) throw new RCLSyntaxError('Native UI may declare lifecycle only once', this.current());
+        node.lifecycle = this.parseUILifecycle();
+      } else if (keyword === 'view') node.viewTrees.push(this.parseUIViewNode());
+      else throw new RCLSyntaxError(`Unknown native UI declaration '${keyword}'`, this.current());
+    }
+    this.expect('}');
+    return node;
   }
 
 

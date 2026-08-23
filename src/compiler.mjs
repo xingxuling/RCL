@@ -4,6 +4,7 @@ import { RCLCompileError } from './errors.mjs';
 import { realityRoot } from './canonical.mjs';
 import { REALITY_DOMAINS, CROSS_DOMAIN_AXES, COMPOSITE_REALITY_PLANES, META_REALITY_PLANES } from './foundation.mjs';
 import { compileTypedModuleGraph, parseTypeExpression, readTypedModuleSourcesFromDir } from './type-module-kernel.mjs';
+import { compileNativeUiDeclarations } from './ui/ui-compiler.mjs';
 
 export const RCL_LANGUAGE_VERSION = '0.14.0-alpha.1';
 export const RCL_TYPED_COMPILER_VERSION = '0.34.0-alpha.1';
@@ -588,6 +589,11 @@ function lower(program, symbols, extras = {}) {
 export function tryCompileReality(source, options = {}) {
   try {
     const ast = parseReality(source);
+    const nativeUis = compileNativeUiDeclarations(ast);
+    // Preserve the governed v0.10 IR byte shape for every pre-UI program.
+    // An empty feature collection is not semantically neutral once it enters
+    // canonical JSON/programRoot and would invalidate self-host fixed points.
+    const nativeUiExtras = nativeUis.length > 0 ? { nativeUis } : {};
     const typeModuleReport = compileTypeModulesFromOptions(options);
     const externalTypeResolver = createExternalTypeResolver(typeModuleReport);
     const typeDiagnostics = typeModuleReport?.ok === false ? typeModuleReport.diagnostics : [];
@@ -596,12 +602,14 @@ export function tryCompileReality(source, options = {}) {
     if (checked.diagnostics.length > 0) return { ok: false, diagnostics: checked.diagnostics, ast, program: null, typeModuleReport };
     const sourceMap = buildSourceMap(ast);
     const draft = lower(ast, checked.symbols, {
+      ...nativeUiExtras,
       constructorResolver: externalTypeResolver,
       typeModules: typeModuleReport ? { format: typeModuleReport.ir.format, version: typeModuleReport.ir.version, irRoot: typeModuleReport.irRoot, modules: typeModuleReport.ir.modules } : null,
     });
     const typeBindings = buildTypeBindings(draft.facets, externalTypeResolver);
     const semanticMap = buildSemanticMap(draft, typeBindings, sourceMap);
     const program = lower(ast, checked.symbols, {
+      ...nativeUiExtras,
       constructorResolver: externalTypeResolver,
       typeModules: typeModuleReport ? { format: typeModuleReport.ir.format, version: typeModuleReport.ir.version, irRoot: typeModuleReport.irRoot, modules: typeModuleReport.ir.modules } : null,
       typeBindings,

@@ -2,6 +2,14 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { compileReality } from './compiler.mjs';
+import {
+  emitNativeUiWebHtml,
+  emitNativeUiWebServer,
+  lowerNativeUiToWeb,
+  simulateNativeUiWebApplication,
+  traceNativeUiWebApplication,
+} from './ui/web-ui-backend.mjs';
+import { RCL_NATIVE_UI_WEB_FORMAT } from './ui/ui-schema.mjs';
 
 function sha256(value) {
   return createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex');
@@ -56,6 +64,12 @@ function normalizeWebSpec(spec) {
 
 export function compileRclWebApplication(rclSource, webSpec) {
   const program = compileReality(rclSource);
+  if ((program.nativeUis ?? []).length > 0) {
+    if (program.nativeUis.length !== 1) throw new Error(`RCL_UI_PROGRAM_AMBIGUOUS:${program.nativeUis.length}`);
+    const target = webSpec ?? {};
+    if (target.schema && target.schema !== 'rcl.native-ui.web-target.v0.1') throw new Error(`RCL_UI_WEB_TARGET_SCHEMA:${target.schema}`);
+    return lowerNativeUiToWeb(program.nativeUis[0], target);
+  }
   const spec = normalizeWebSpec(webSpec);
   const state = Object.fromEntries(program.facets.filter((facet) => !facet.deferred).map((facet) => [facet.path, literalFacetValue(facet)]));
   const warrants = program.warrants.map((warrant) => ({ subject: warrant.subject, capability: warrant.capability, target: warrant.target }));
@@ -140,6 +154,7 @@ if(new URL(location.href).searchParams.get('rclTest')==='1'){
 }
 
 export function emitStandaloneRclWebHtml(manifest) {
+  if (manifest.schema === RCL_NATIVE_UI_WEB_FORMAT) return emitNativeUiWebHtml(manifest);
   const lang = escapeHtml(manifest.metadata.language || 'en');
   const title = escapeHtml(manifest.metadata.title || manifest.program);
   const css = emitCss(manifest.styles);
@@ -154,12 +169,13 @@ function nodeServerRuntime(manifest, html) {
 }
 
 export function emitStandaloneRclWebServer(manifest, html = emitStandaloneRclWebHtml(manifest)) {
+  if (manifest.schema === RCL_NATIVE_UI_WEB_FORMAT) return emitNativeUiWebServer(manifest, html);
   return nodeServerRuntime(manifest, html);
 }
 
 export function buildRclWebApplication({ rclPath, specPath, outputPath }) {
   const source = fs.readFileSync(rclPath, 'utf8');
-  const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+  const spec = specPath ? JSON.parse(fs.readFileSync(specPath, 'utf8')) : null;
   const manifest = compileRclWebApplication(source, spec);
   const html = emitStandaloneRclWebHtml(manifest);
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
@@ -170,3 +186,5 @@ export function buildRclWebApplication({ rclPath, specPath, outputPath }) {
   fs.writeFileSync(serverPath, emitStandaloneRclWebServer(manifest, html), 'utf8');
   return { outputPath, manifestPath, serverPath, htmlBytes: Buffer.byteLength(html), htmlSha256: sha256(html), manifest };
 }
+
+export { simulateNativeUiWebApplication, traceNativeUiWebApplication };

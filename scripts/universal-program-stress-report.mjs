@@ -27,9 +27,10 @@ function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-function blockedReportFor(cell) {
+function untestedReportFor(cell) {
   return evaluateStressCell({
     ...cell,
+    untested: true,
     coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
     gates: Object.fromEntries(
       UNIVERSAL_STRESS_GATES.map((gate) => [gate, { status: STRESS_STATUS.UNVERIFIED, evidence: [] }]),
@@ -51,7 +52,7 @@ const matrix = buildUniversalStressMatrix();
 const byCellId = new Map((evidence.claims ?? []).map((claim) => [claim.id, claim]));
 const reports = matrix.map((cell) => {
   const claim = byCellId.get(cell.id);
-  if (!claim) return blockedReportFor(cell);
+  if (!claim) return untestedReportFor(cell);
   return evaluateStressCell({ ...cell, ...claim, id: cell.id });
 });
 
@@ -72,6 +73,16 @@ const maturity = classifyUniversalMaturity({
 });
 
 const claimedReports = reports.filter((report) => byCellId.has(report.id));
+const statusCounts = Object.fromEntries(
+  Object.values(STRESS_STATUS).map((status) => [status, reports.filter((report) => report.status === status).length]),
+);
+const coverageModeCounts = Object.fromEntries(
+  Object.values(COVERAGE_MODE).map((mode) => [mode, claimedReports.filter((report) => report.coverageMode === mode).length]),
+);
+const gateCompletion = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+  pass: claimedReports.filter((report) => report.gates[gate].status === STRESS_STATUS.PASS).length,
+  totalClaims: claimedReports.length,
+}]));
 const fullReportWithoutRoot = {
   schema: 'rcl.universal-stress.report.v0.1',
   generatedAt: new Date().toISOString(),
@@ -83,6 +94,9 @@ const fullReportWithoutRoot = {
     totalCells: matrix.length,
     claimedCells: claimedReports.length,
     unverifiedCells: matrix.length - claimedReports.length,
+    statusCounts,
+    coverageModeCounts,
+    gateCompletion,
   },
   killerTasks: killerReports.map(({ report, ...task }) => ({
     ...task,
@@ -93,6 +107,7 @@ const fullReportWithoutRoot = {
   })),
   maturity,
   unabsorbedAdvantages,
+  cells: reports,
   claims: claimedReports,
   antiCheatRules: [
     'No task/environment-specific patch receives universal-growth credit unless it is justified as a reusable general primitive.',
@@ -121,7 +136,9 @@ const markdown = `# RCL Universal Program Stress Test v0.1\n\n` +
   `- Program families: ${fullReport.matrix.programFamilies}\n` +
   `- Permanent cells: ${fullReport.matrix.totalCells}\n` +
   `- Evidence-bearing claims: ${fullReport.matrix.claimedCells}\n` +
-  `- Unverified cells: ${fullReport.matrix.unverifiedCells}\n\n` +
+  `- Unverified cells: ${fullReport.matrix.unverifiedCells}\n` +
+  `- Untested cells: ${fullReport.matrix.statusCounts.UNTESTED}\n` +
+  `- Regressed cells: ${fullReport.matrix.statusCounts.REGRESSED}\n\n` +
   `## Maturity metrics\n\n` +
   `- Passed claimed cells: ${maturity.metrics.passedCells}/${maturity.metrics.evaluatedCells}\n` +
   `- Claimed-cell pass ratio: ${percent(maturity.metrics.passRatio)}\n` +
@@ -148,4 +165,5 @@ console.log(JSON.stringify({
   maturity: maturity.level,
   claimedCells: fullReport.matrix.claimedCells,
   unverifiedCells: fullReport.matrix.unverifiedCells,
+  statusCounts: fullReport.matrix.statusCounts,
 }, null, 2));

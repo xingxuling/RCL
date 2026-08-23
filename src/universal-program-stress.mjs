@@ -17,6 +17,8 @@ export const STRESS_STATUS = Object.freeze({
   FAIL: 'FAIL',
   BLOCKED: 'BLOCKED',
   UNVERIFIED: 'UNVERIFIED',
+  UNTESTED: 'UNTESTED',
+  REGRESSED: 'REGRESSED',
 });
 
 export const COVERAGE_MODE = Object.freeze({
@@ -150,7 +152,11 @@ export function evaluateStressCell(cell) {
   const required = UNIVERSAL_STRESS_GATES.map((gate) => gates[gate]);
 
   let status = STRESS_STATUS.PASS;
-  if (required.some((gate) => gate.status === STRESS_STATUS.FAIL)) {
+  if (cell.untested === true || cell.status === STRESS_STATUS.UNTESTED) {
+    status = STRESS_STATUS.UNTESTED;
+  } else if (cell.status === STRESS_STATUS.REGRESSED || cell.regression?.status === STRESS_STATUS.FAIL) {
+    status = STRESS_STATUS.REGRESSED;
+  } else if (required.some((gate) => gate.status === STRESS_STATUS.FAIL)) {
     status = STRESS_STATUS.FAIL;
   } else if (required.some((gate) => gate.status !== STRESS_STATUS.PASS)) {
     status = STRESS_STATUS.BLOCKED;
@@ -176,6 +182,15 @@ export function evaluateStressCell(cell) {
     coverageMode: cell.coverageMode,
     status,
     gates,
+    gateStatus: Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, gates[gate].status])),
+    evidence: [...new Set(UNIVERSAL_STRESS_GATES.flatMap((gate) => gates[gate].evidence))],
+    lastVerifiedSha: cell.lastVerifiedSha ?? null,
+    lastVerifiedDate: cell.lastVerifiedDate ?? null,
+    knownLimits: Array.isArray(cell.knownLimits) ? [...cell.knownLimits] : [],
+    relatedKillerTasks: Array.isArray(cell.relatedKillerTasks) ? [...cell.relatedKillerTasks] : [],
+    requiredGenes: Array.isArray(cell.requiredGenes) ? [...cell.requiredGenes] : [],
+    donorAdvantages: Array.isArray(cell.donorAdvantages) ? structuredClone(cell.donorAdvantages) : [],
+    regression: cell.regression ?? null,
     providerOnly,
     nativeSemanticCredit,
     executableCredit,

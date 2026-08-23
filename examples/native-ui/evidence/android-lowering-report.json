@@ -1,0 +1,687 @@
+{
+  "schema": "rcl.native-ui.android-lowering.v0.1",
+  "backend": "android",
+  "backendVersion": "0.1.0",
+  "program": "NativeUICounter",
+  "uiProgramRoot": "36ee1c2c02564911ae42c691376b10815ee83a6fb2411b0466153ccf6c95a8fe",
+  "ui": {
+    "format": "rcl.native-ui.program.v0.1",
+    "version": "0.1.0",
+    "kind": "UIProgram",
+    "id": "CounterApp",
+    "reality": "NativeUICounter",
+    "identityNamespace": "NativeUICounter.CounterApp",
+    "state": [
+      {
+        "kind": "UIState",
+        "id": "count",
+        "valueType": "Number",
+        "initial": 0,
+        "mutable": true,
+        "source": {
+          "line": 3,
+          "column": 5
+        }
+      }
+    ],
+    "derivedState": [
+      {
+        "kind": "UIDerivedState",
+        "id": "count_label",
+        "valueType": "Text",
+        "expression": {
+          "kind": "binary",
+          "operator": "+",
+          "left": {
+            "kind": "literal",
+            "value": "计数：",
+            "valueType": "Text"
+          },
+          "right": {
+            "kind": "reference",
+            "scope": "state",
+            "id": "count",
+            "valueType": "Number"
+          },
+          "valueType": "Text"
+        },
+        "source": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "viewTree": {
+      "kind": "UIViewNode",
+      "id": "Root",
+      "identityPath": "Root",
+      "role": "container",
+      "classes": [
+        "surface"
+      ],
+      "localProperties": [
+        {
+          "property": "accessibility_label",
+          "value": "RCL 原生计数器",
+          "valueType": "Text"
+        }
+      ],
+      "bindings": [],
+      "events": [],
+      "layout": {
+        "mode": "vertical",
+        "width": {
+          "mode": "fill"
+        },
+        "height": {
+          "mode": "intrinsic"
+        },
+        "gap": 12,
+        "padding": 24,
+        "alignment": "stretch",
+        "distribution": "start",
+        "overflow": "visible",
+        "columns": 1
+      },
+      "accessibility": {
+        "label": "RCL 原生计数器"
+      },
+      "source": {
+        "line": 41,
+        "column": 5
+      },
+      "children": [
+        {
+          "kind": "UIViewNode",
+          "id": "Title",
+          "identityPath": "Root/Title",
+          "role": "text",
+          "classes": [],
+          "localProperties": [
+            {
+              "property": "value",
+              "value": "RCL Native UI Counter",
+              "valueType": "Text"
+            },
+            {
+              "property": "accessibility_label",
+              "value": "计数器标题",
+              "valueType": "Text"
+            }
+          ],
+          "bindings": [],
+          "events": [],
+          "layout": {
+            "mode": "vertical",
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "intrinsic"
+            },
+            "gap": 0,
+            "padding": 0,
+            "alignment": "stretch",
+            "distribution": "start",
+            "overflow": "visible",
+            "columns": 1
+          },
+          "accessibility": {
+            "label": "计数器标题"
+          },
+          "source": {
+            "line": 54,
+            "column": 7
+          },
+          "children": [],
+          "resolvedStyle": {
+            "values": {
+              "foreground": "#172033",
+              "font_family": "system",
+              "background": "#f5f7fb"
+            },
+            "provenance": {
+              "foreground": "theme:CounterTheme",
+              "font_family": "theme:CounterTheme",
+              "background": "theme:CounterTheme"
+            }
+          }
+        },
+        {
+          "kind": "UIViewNode",
+          "id": "CounterText",
+          "identityPath": "Root/CounterText",
+          "role": "text",
+          "classes": [],
+          "localProperties": [
+            {
+              "property": "accessibility_label",
+              "value": "当前计数",
+              "valueType": "Text"
+            }
+          ],
+          "bindings": [
+            {
+              "id": "CounterText.binding.value",
+              "property": "value",
+              "expression": {
+                "kind": "reference",
+                "scope": "derived",
+                "id": "count_label",
+                "valueType": "Text"
+              }
+            }
+          ],
+          "events": [],
+          "layout": {
+            "mode": "vertical",
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "intrinsic"
+            },
+            "gap": 0,
+            "padding": 0,
+            "alignment": "stretch",
+            "distribution": "start",
+            "overflow": "visible",
+            "columns": 1
+          },
+          "accessibility": {
+            "label": "当前计数"
+          },
+          "source": {
+            "line": 59,
+            "column": 7
+          },
+          "children": [],
+          "resolvedStyle": {
+            "values": {
+              "foreground": "#172033",
+              "font_family": "system",
+              "background": "#f5f7fb",
+              "font_size": 28
+            },
+            "provenance": {
+              "foreground": "theme:CounterTheme",
+              "font_family": "theme:CounterTheme",
+              "background": "theme:CounterTheme",
+              "font_size": "rule:CounterValue"
+            }
+          }
+        },
+        {
+          "kind": "UIViewNode",
+          "id": "ActionsRow",
+          "identityPath": "Root/ActionsRow",
+          "role": "container",
+          "classes": [],
+          "localProperties": [],
+          "bindings": [],
+          "events": [],
+          "layout": {
+            "mode": "horizontal",
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "intrinsic"
+            },
+            "gap": 10,
+            "padding": 0,
+            "alignment": "center",
+            "distribution": "start",
+            "overflow": "visible",
+            "columns": 1
+          },
+          "accessibility": {
+            "label": null
+          },
+          "source": {
+            "line": 64,
+            "column": 7
+          },
+          "children": [
+            {
+              "kind": "UIViewNode",
+              "id": "IncrementButton",
+              "identityPath": "Root/ActionsRow/IncrementButton",
+              "role": "action",
+              "classes": [],
+              "localProperties": [
+                {
+                  "property": "label",
+                  "value": "增加",
+                  "valueType": "Text"
+                },
+                {
+                  "property": "accessibility_label",
+                  "value": "增加计数",
+                  "valueType": "Text"
+                }
+              ],
+              "bindings": [],
+              "events": [
+                {
+                  "id": "IncrementButton.event.activate.0",
+                  "type": "activate",
+                  "parameters": [],
+                  "authority": "ui-local",
+                  "statements": [
+                    {
+                      "kind": "set-state",
+                      "target": "count",
+                      "expression": {
+                        "kind": "binary",
+                        "operator": "+",
+                        "left": {
+                          "kind": "reference",
+                          "scope": "state",
+                          "id": "count",
+                          "valueType": "Number"
+                        },
+                        "right": {
+                          "kind": "literal",
+                          "value": 1,
+                          "valueType": "Number"
+                        },
+                        "valueType": "Number"
+                      }
+                    }
+                  ],
+                  "source": {
+                    "line": 77,
+                    "column": 11
+                  }
+                }
+              ],
+              "layout": {
+                "mode": "vertical",
+                "width": {
+                  "mode": "fill"
+                },
+                "height": {
+                  "mode": "intrinsic"
+                },
+                "gap": 0,
+                "padding": 0,
+                "alignment": "stretch",
+                "distribution": "start",
+                "overflow": "visible",
+                "columns": 1
+              },
+              "accessibility": {
+                "label": "增加计数"
+              },
+              "source": {
+                "line": 74,
+                "column": 9
+              },
+              "children": [],
+              "resolvedStyle": {
+                "values": {
+                  "foreground": "#ffffff",
+                  "font_family": "system",
+                  "background": "#3157d5"
+                },
+                "provenance": {
+                  "foreground": "rule:Actions",
+                  "font_family": "theme:CounterTheme",
+                  "background": "rule:Actions"
+                }
+              }
+            },
+            {
+              "kind": "UIViewNode",
+              "id": "ResetButton",
+              "identityPath": "Root/ActionsRow/ResetButton",
+              "role": "action",
+              "classes": [],
+              "localProperties": [
+                {
+                  "property": "label",
+                  "value": "重置",
+                  "valueType": "Text"
+                },
+                {
+                  "property": "accessibility_label",
+                  "value": "重置计数",
+                  "valueType": "Text"
+                }
+              ],
+              "bindings": [],
+              "events": [
+                {
+                  "id": "ResetButton.event.activate.0",
+                  "type": "activate",
+                  "parameters": [],
+                  "authority": "ui-local",
+                  "statements": [
+                    {
+                      "kind": "set-state",
+                      "target": "count",
+                      "expression": {
+                        "kind": "literal",
+                        "value": 0,
+                        "valueType": "Number"
+                      }
+                    }
+                  ],
+                  "source": {
+                    "line": 85,
+                    "column": 11
+                  }
+                }
+              ],
+              "layout": {
+                "mode": "vertical",
+                "width": {
+                  "mode": "fill"
+                },
+                "height": {
+                  "mode": "intrinsic"
+                },
+                "gap": 0,
+                "padding": 0,
+                "alignment": "stretch",
+                "distribution": "start",
+                "overflow": "visible",
+                "columns": 1
+              },
+              "accessibility": {
+                "label": "重置计数"
+              },
+              "source": {
+                "line": 82,
+                "column": 9
+              },
+              "children": [],
+              "resolvedStyle": {
+                "values": {
+                  "foreground": "#ffffff",
+                  "font_family": "system",
+                  "background": "#3157d5"
+                },
+                "provenance": {
+                  "foreground": "rule:Actions",
+                  "font_family": "theme:CounterTheme",
+                  "background": "rule:Actions"
+                }
+              }
+            }
+          ],
+          "resolvedStyle": {
+            "values": {
+              "foreground": "#172033",
+              "font_family": "system",
+              "background": "#f5f7fb"
+            },
+            "provenance": {
+              "foreground": "theme:CounterTheme",
+              "font_family": "theme:CounterTheme",
+              "background": "theme:CounterTheme"
+            }
+          }
+        }
+      ],
+      "resolvedStyle": {
+        "values": {
+          "foreground": "#172033",
+          "font_family": "system",
+          "background": "#ffffff",
+          "corner_radius": 20
+        },
+        "provenance": {
+          "foreground": "theme:CounterTheme",
+          "font_family": "theme:CounterTheme",
+          "background": "rule:Surface",
+          "corner_radius": "rule:Surface"
+        }
+      }
+    },
+    "styleSheet": {
+      "format": "rcl.native-ui.style-sheet.v0.1",
+      "activeTheme": "CounterTheme",
+      "themes": [
+        {
+          "id": "CounterTheme",
+          "declarations": [
+            {
+              "property": "foreground",
+              "value": "#172033",
+              "inherited": true
+            },
+            {
+              "property": "font_family",
+              "value": "system",
+              "inherited": true
+            },
+            {
+              "property": "background",
+              "value": "#f5f7fb",
+              "inherited": false
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "Surface",
+          "selector": {
+            "kind": "class",
+            "value": "surface"
+          },
+          "priority": 10,
+          "specificity": 10,
+          "order": 0,
+          "declarations": [
+            {
+              "property": "background",
+              "value": "#ffffff",
+              "inherited": false
+            },
+            {
+              "property": "corner_radius",
+              "value": 20,
+              "inherited": false
+            }
+          ]
+        },
+        {
+          "id": "Actions",
+          "selector": {
+            "kind": "role",
+            "value": "action"
+          },
+          "priority": 10,
+          "specificity": 1,
+          "order": 1,
+          "declarations": [
+            {
+              "property": "foreground",
+              "value": "#ffffff",
+              "inherited": true
+            },
+            {
+              "property": "background",
+              "value": "#3157d5",
+              "inherited": false
+            }
+          ]
+        },
+        {
+          "id": "CounterValue",
+          "selector": {
+            "kind": "node",
+            "value": "CounterText"
+          },
+          "priority": 20,
+          "specificity": 100,
+          "order": 2,
+          "declarations": [
+            {
+              "property": "font_size",
+              "value": 28,
+              "inherited": true
+            }
+          ]
+        }
+      ]
+    },
+    "lifecycle": {
+      "stages": [
+        "create",
+        "activate",
+        "suspend",
+        "resume",
+        "destroy"
+      ],
+      "restore": [
+        "count"
+      ]
+    },
+    "eventGraph": {
+      "format": "rcl.native-ui.event-graph.v0.1",
+      "events": [
+        {
+          "nodeId": "IncrementButton",
+          "id": "IncrementButton.event.activate.0",
+          "type": "activate",
+          "parameters": [],
+          "authority": "ui-local",
+          "statements": [
+            {
+              "kind": "set-state",
+              "target": "count",
+              "expression": {
+                "kind": "binary",
+                "operator": "+",
+                "left": {
+                  "kind": "reference",
+                  "scope": "state",
+                  "id": "count",
+                  "valueType": "Number"
+                },
+                "right": {
+                  "kind": "literal",
+                  "value": 1,
+                  "valueType": "Number"
+                },
+                "valueType": "Number"
+              }
+            }
+          ],
+          "source": {
+            "line": 77,
+            "column": 11
+          }
+        },
+        {
+          "nodeId": "ResetButton",
+          "id": "ResetButton.event.activate.0",
+          "type": "activate",
+          "parameters": [],
+          "authority": "ui-local",
+          "statements": [
+            {
+              "kind": "set-state",
+              "target": "count",
+              "expression": {
+                "kind": "literal",
+                "value": 0,
+                "valueType": "Number"
+              }
+            }
+          ],
+          "source": {
+            "line": 85,
+            "column": 11
+          }
+        }
+      ]
+    },
+    "extensionPoints": {
+      "navigation": null,
+      "resources": [],
+      "deviceAdaptation": null
+    },
+    "source": {
+      "line": 2,
+      "column": 3
+    },
+    "semanticRoot": "36ee1c2c02564911ae42c691376b10815ee83a6fb2411b0466153ccf6c95a8fe"
+  },
+  "application": {
+    "applicationId": "com.taowind.rcl.nativeui",
+    "activity": "MainActivity",
+    "title": "RCL Native UI Counter",
+    "minSdk": 26,
+    "compileSdk": 35,
+    "targetSdk": 35,
+    "theme": "light"
+  },
+  "nodeMappings": [
+    {
+      "nodeId": "Root",
+      "canonicalRole": "container",
+      "target": "ViewGroup"
+    },
+    {
+      "nodeId": "Title",
+      "canonicalRole": "text",
+      "target": "TextView"
+    },
+    {
+      "nodeId": "CounterText",
+      "canonicalRole": "text",
+      "target": "TextView"
+    },
+    {
+      "nodeId": "ActionsRow",
+      "canonicalRole": "container",
+      "target": "ViewGroup"
+    },
+    {
+      "nodeId": "IncrementButton",
+      "canonicalRole": "action",
+      "target": "Button"
+    },
+    {
+      "nodeId": "ResetButton",
+      "canonicalRole": "action",
+      "target": "Button"
+    }
+  ],
+  "eventMappings": [
+    {
+      "nodeId": "IncrementButton",
+      "canonicalEvent": "activate",
+      "targetEvent": "View.OnClickListener"
+    },
+    {
+      "nodeId": "ResetButton",
+      "canonicalEvent": "activate",
+      "targetEvent": "View.OnClickListener"
+    }
+  ],
+  "layoutMapping": {
+    "vertical": "LinearLayout.VERTICAL",
+    "horizontal": "LinearLayout.HORIZONTAL",
+    "overlay": "FrameLayout",
+    "grid": "GridLayout"
+  },
+  "lifecycleMapping": {
+    "create": "Activity.onCreate",
+    "activate": "Activity.onStart",
+    "suspend": "Activity.onPause",
+    "resume": "Activity.onResume",
+    "destroy": "Activity.onDestroy"
+  },
+  "coverage": {
+    "semantic": "native-ui-ir",
+    "visualFidelity": "structural-v0.1",
+    "runtime": "android-view-project"
+  },
+  "loweringRoot": "cb5ecc2beee8e0e87689842174711229c85104e3851795794baad7602b4ac722"
+}

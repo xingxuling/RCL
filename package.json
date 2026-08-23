@@ -271,7 +271,12 @@
     "verify:release": "npm run verify:selfhost-all && npm run verify:selfhost-examples && npm run verify:provenance",
     "test:k03-android": "node --test --test-concurrency=1 tests/android-application-compiler.test.mjs tests/universal-stress-k03-android-adapter.test.mjs",
     "build:k03-android": "node scripts/build-k03-android-app.mjs",
-    "evidence:k03-android": "node scripts/run-k03-direct-evidence.mjs"
+    "evidence:k03-android": "node scripts/run-k03-direct-evidence.mjs",
+    "test:native-ui": "node --test --test-concurrency=1 tests/native-ui-*.test.mjs",
+    "evidence:native-ui": "node scripts/build-native-ui-evidence.mjs",
+    "evidence:native-ui:browser": "node scripts/run-native-ui-browser-evidence.mjs",
+    "evidence:native-ui:android-build": "node scripts/build-native-ui-android-evidence.mjs",
+    "benchmark:native-ui": "node scripts/benchmark-native-ui.mjs"
   },
   "engines": {
     "node": ">=20"

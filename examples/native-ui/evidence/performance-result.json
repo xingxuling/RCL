@@ -1,0 +1,81 @@
+{
+  "format": "rcl.native-ui.performance-evidence.v0.1",
+  "date": "2026-08-23",
+  "machineScope": "current Windows host; Node process; warm cache",
+  "nodeVersion": "v24.15.0",
+  "uiProgramRoot": "36ee1c2c02564911ae42c691376b10815ee83a6fb2411b0466153ccf6c95a8fe",
+  "workload": {
+    "program": "counter.rcl",
+    "eventSequence": [
+      {
+        "nodeId": "IncrementButton",
+        "type": "activate"
+      },
+      {
+        "nodeId": "IncrementButton",
+        "type": "activate"
+      },
+      {
+        "nodeId": "ResetButton",
+        "type": "activate"
+      }
+    ],
+    "semanticTransitionsPerSample": 3
+  },
+  "compile": {
+    "samples": 30,
+    "minMs": 0.5725999999999942,
+    "medianMs": 0.968199999999996,
+    "p95Ms": 1.8182000000000045,
+    "maxMs": 3.4905999999999864
+  },
+  "lowering": {
+    "web": {
+      "samples": 30,
+      "minMs": 1.0855999999999995,
+      "medianMs": 1.8545000000000016,
+      "p95Ms": 2.637200000000007,
+      "maxMs": 8.602699999999999
+    },
+    "android": {
+      "samples": 30,
+      "minMs": 0.9830000000000041,
+      "medianMs": 1.5372000000000128,
+      "p95Ms": 2.4795000000000016,
+      "maxMs": 2.7040000000000077
+    }
+  },
+  "runtime": {
+    "rclCanonical": {
+      "samples": 30,
+      "minMs": 26.784899999999993,
+      "medianMs": 32.92530000000011,
+      "p95Ms": 38.10890000000006,
+      "maxMs": 38.55540000000008
+    },
+    "plainJavaScriptReference": {
+      "samples": 30,
+      "minMs": 0.13609999999994216,
+      "medianMs": 0.28320000000007894,
+      "p95Ms": 0.6467999999999847,
+      "maxMs": 0.7691999999999553
+    },
+    "sequencesPerSample": 1000,
+    "rclMedianPerSequenceMs": 0.03292530000000011,
+    "referenceMedianPerSequenceMs": 0.00028320000000007893,
+    "medianSlowdown": 116.26165254234085,
+    "interpretation": "generic rooted state/binding/event/trace runtime versus a task-specific hand-written JavaScript counter",
+    "referenceSink": 150500
+  },
+  "artifacts": {
+    "webHtmlBytes": 18252,
+    "androidActivityJavaBytes": 10251,
+    "apkBytes": 18601
+  },
+  "verdict": "MEASURED_CANDIDATE_NOT_PERFORMANCE_PARITY",
+  "caveats": [
+    "microbenchmark results are local-machine observations, not production claims",
+    "the JavaScript reference is task-specific and does not provide canonical roots, bindings, traces, validation or dual-backend lowering",
+    "browser and Android device performance require their own receipts"
+  ]
+}

@@ -73,6 +73,28 @@ test('missing evidence gates block instead of silently passing', () => {
   assert.equal(report.gates.EVIDENCE.status, STRESS_STATUS.UNVERIFIED);
 });
 
+test('untested and regressed cells remain distinct from ordinary blocked evidence', () => {
+  const untested = passingCell({ status: STRESS_STATUS.UNTESTED, untested: true });
+  assert.equal(untested.status, STRESS_STATUS.UNTESTED);
+  const regressed = passingCell({ regression: { status: STRESS_STATUS.FAIL, reason: 'old receipt no longer reproduces' } });
+  assert.equal(regressed.status, STRESS_STATUS.REGRESSED);
+  assert.equal(regressed.universalGrowthEligible, false);
+});
+
+test('cell reports carry dashboard metadata and aggregated evidence', () => {
+  const report = passingCell({
+    lastVerifiedSha: 'a'.repeat(40),
+    lastVerifiedDate: '2026-08-23',
+    knownLimits: ['device runtime unverified'],
+    relatedKillerTasks: ['K03'],
+    requiredGenes: ['native-ui'],
+    donorAdvantages: [{ donor: 'Android', capability: 'device adaptation' }],
+  });
+  assert.equal(report.gateStatus.EXECUTE, STRESS_STATUS.PASS);
+  assert.ok(report.evidence.includes('receipt:EXECUTE'));
+  assert.deepEqual(report.relatedKillerTasks, ['K03']);
+});
+
 test('opaque delegation never receives native semantic or executable language credit', () => {
   const report = passingCell({ coverageMode: COVERAGE_MODE.OPAQUE_DELEGATION });
   assert.equal(report.status, STRESS_STATUS.PASS);

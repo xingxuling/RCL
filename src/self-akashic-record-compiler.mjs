@@ -63,7 +63,7 @@ function listFiles(root, options = {}) {
         const stat = fs.statSync(p);
         if (stat.isDirectory()) {
           if (includeDirs.has(name)) walk(p, depth + 1);
-        } else if (['package.json', 'package-lock.json', 'README.md', 'CONTEXT.md', 'release-manifest.json'].includes(name) || /^release.*\.json$/.test(name)) {
+        } else if (['package.json', 'package-lock.json', 'README.md', 'CHANGELOG.md', 'CONTEXT.md', 'release-manifest.json'].includes(name) || /^release.*\.json$/.test(name)) {
           out.push(p);
         }
       }
@@ -117,11 +117,14 @@ function parseVersionFromText(text) {
 }
 
 function buildVersionLedger(root) {
-  const docs = [
-    path.join(root, 'README.md'),
-    ...fs.existsSync(path.join(root, 'docs')) ? fs.readdirSync(path.join(root, 'docs')).map(name => path.join(root, 'docs', name)) : [],
-    ...fs.readdirSync(root).filter(name => /^release.*\.json$/.test(name)).map(name => path.join(root, name)),
-  ].filter(p => fs.existsSync(p) && fs.statSync(p).isFile());
+  const docs = listFiles(root, {
+    includeDirs: ['docs'],
+    excludeDirs: ['node_modules', 'output', 'build', 'native', '.git'],
+    maxFiles: 2_000,
+  }).filter(p => {
+    const rel = path.relative(root, p).replaceAll(path.sep, '/');
+    return p.endsWith('.md') || /^release.*\.json$/u.test(rel);
+  });
   const rows = [];
   for (const filePath of docs) {
     const rel = path.relative(root, filePath).replaceAll(path.sep, '/');

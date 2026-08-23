@@ -134,7 +134,28 @@ export {
   emitNativeAndroidActivity,
   buildRclAndroidApplication,
   simulateRclAndroidApplication,
+  traceNativeUiAndroidApplication,
 } from './android-application-compiler.mjs';
+
+export {
+  compileRclWebApplication,
+  emitStandaloneRclWebHtml,
+  emitStandaloneRclWebServer,
+  buildRclWebApplication,
+  simulateNativeUiWebApplication,
+  traceNativeUiWebApplication,
+} from './web-application-compiler.mjs';
+
+export { compileNativeUiDeclarations, compileNativeUiProgram, collectUiNodes } from './ui/ui-compiler.mjs';
+export { createNativeUiRuntime, runNativeUiSemanticTrace } from './ui/ui-event.mjs';
+export { serializeNativeUiProgram, deserializeNativeUiProgram, nativeUiRoot, canonicalUiJson } from './ui/ui-ir.mjs';
+export { validateCanonicalNativeUi } from './ui/ui-validator.mjs';
+export {
+  RCL_NATIVE_UI_VERSION,
+  RCL_NATIVE_UI_FORMAT,
+  RCL_NATIVE_UI_WEB_FORMAT,
+  RCL_NATIVE_UI_ANDROID_FORMAT,
+} from './ui/ui-schema.mjs';
 
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 

@@ -1,0 +1,93 @@
+reality NativeUICounter {
+  ui CounterApp {
+    state count : Number = 0
+    derived count_label : Text = "计数：" + count
+
+    lifecycle {
+      create
+      activate
+      suspend
+      resume
+      destroy
+      restore count
+    }
+
+    theme CounterTheme {
+      property foreground = "#172033" inherit
+      property font_family = "system" inherit
+      property background = "#f5f7fb"
+    }
+
+    style Surface {
+      target class surface
+      priority 10
+      property background = "#ffffff"
+      property corner_radius = 20
+    }
+
+    style Actions {
+      target role action
+      priority 10
+      property foreground = "#ffffff"
+      property background = "#3157d5"
+    }
+
+    style CounterValue {
+      target node CounterText
+      priority 20
+      property font_size = 28 inherit
+    }
+
+    view Root {
+      class surface
+      accessibility_label "RCL 原生计数器"
+      layout vertical {
+        width fill
+        height intrinsic
+        gap 12
+        padding 24
+        align stretch
+        distribute start
+        overflow visible
+      }
+
+      text Title {
+        value "RCL Native UI Counter"
+        accessibility_label "计数器标题"
+      }
+
+      text CounterText {
+        bind value <- count_label
+        accessibility_label "当前计数"
+      }
+
+      view ActionsRow {
+        layout horizontal {
+          width fill
+          height intrinsic
+          gap 10
+          padding 0
+          align center
+          distribute start
+        }
+
+        action IncrementButton {
+          label "增加"
+          accessibility_label "增加计数"
+          on activate {
+            set count <- count + 1
+          }
+        }
+
+        action ResetButton {
+          label "重置"
+          accessibility_label "重置计数"
+          on activate {
+            set count <- 0
+          }
+        }
+      }
+    }
+  }
+}
+

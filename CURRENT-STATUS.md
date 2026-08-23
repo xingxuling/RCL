@@ -89,6 +89,16 @@ The recorded campaign does **not** yet prove real APK installation/device or emu
 
 Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 
+### Native UI Genome v0.1 candidate
+
+- `.rcl` reference-parser syntax, rooted Canonical Native UI IR, reactive state/binding/events, layout, style/cascade and lifecycle are implemented on an isolated candidate branch.
+- Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
+- Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
+- Android installation/device interaction is not verified.
+- Canonical self-host compiler ownership is not implemented, so repository-wide UI remains `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`, not promoted `native-semantic`.
+
+Authority document: `docs/ui-native-genome/evidence-ledger.md`.
+
 ### K04
 
 The next killer task in the declared campaign is a 2D game. No K04 PASS claim is made in this status file until an evidence-bearing campaign is merged.

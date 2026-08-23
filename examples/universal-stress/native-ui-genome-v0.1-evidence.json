@@ -1,0 +1,123 @@
+{
+  "schema": "rcl.universal-stress.evidence.v0.1",
+  "generation": "native-ui-genome-v0.1-candidate-1",
+  "claims": [
+    {
+      "id": "browser::gui",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "PENDING_CANDIDATE_COMMIT",
+      "lastVerifiedDate": "2026-08-23",
+      "knownLimits": [
+        "canonical self-host compiler does not yet own Native UI syntax",
+        "visual fidelity is structural v0.1 rather than pixel parity",
+        "navigation, focus traversal and full accessibility tree are not implemented",
+        "AI_GENERATE is not independently evidenced"
+      ],
+      "relatedKillerTasks": ["K02"],
+      "requiredGenes": ["view-tree", "reactive-state", "binding", "event-graph", "layout-algebra", "style-cascade", "lifecycle"],
+      "donorAdvantages": [
+        { "donor": "Web platform", "capability": "complete DOM/CSS/accessibility/navigation semantics", "status": "PARTIAL_UNABSORBED" }
+      ],
+      "gates": {
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "tests/native-ui-parser-ir.test.mjs"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/web-lowering-report.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json", "tests/native-ui-backends-equivalence.test.mjs"] },
+        "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-authority-boundary.test.mjs", "tests/native-ui-parser-ir.test.mjs"] },
+        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/performance-result.json"], "note": "measured against a plain DOM/JavaScript Counter, but no pre-registered acceptance budget exists and a large donor advantage remains" },
+        "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [], "note": "same development run cannot self-certify independent generation" },
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/evidence-summary.json", "docs/ui-native-genome/evidence-ledger.md"] }
+      },
+      "changes": [
+        { "id": "canonical-native-ui-genome", "kind": "candidate-gene", "scope": ["browser", "android", "game-runtime", "windows"], "generalPrimitive": true, "justification": "platform-neutral UI state/tree/event/layout/style/lifecycle semantics" }
+      ]
+    },
+    {
+      "id": "browser::reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "PENDING_CANDIDATE_COMMIT",
+      "lastVerifiedDate": "2026-08-23",
+      "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
+      "relatedKillerTasks": ["K02"],
+      "requiredGenes": ["reactive-state", "derived-binding", "event-graph"],
+      "donorAdvantages": [],
+      "gates": {
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/web-lowering-report.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json"] },
+        "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-runtime-style-layout.test.mjs"] },
+        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/performance-result.json"], "note": "measured residual is not yet an accepted performance gate" },
+        "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [] },
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/evidence-summary.json"] }
+      },
+      "changes": [
+        { "id": "canonical-reactive-ui", "kind": "candidate-gene", "scope": ["browser", "android", "game-runtime", "windows"], "generalPrimitive": true }
+      ]
+    },
+    {
+      "id": "android::gui",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "PENDING_CANDIDATE_COMMIT",
+      "lastVerifiedDate": "2026-08-23",
+      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler parity is missing", "device adaptation and full accessibility are missing"],
+      "relatedKillerTasks": ["K03"],
+      "requiredGenes": ["view-tree", "reactive-state", "event-graph", "layout-algebra", "style-cascade", "lifecycle", "device-adaptation"],
+      "donorAdvantages": [
+        { "donor": "Android framework", "capability": "device adaptation, focus/accessibility and device runtime", "status": "UNABSORBED" }
+      ],
+      "gates": {
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-lowering-report.json"] },
+        "EXECUTE": { "status": "UNVERIFIED", "evidence": [], "note": "real APK built but no device was available" },
+        "CORRECT": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/semantic-trace-android.json"], "note": "host trace is not device correctness" },
+        "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-authority-boundary.test.mjs", "examples/native-ui/evidence/android-build-result.json"] },
+        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": [] },
+        "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [] },
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-build-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
+      },
+      "changes": [
+        { "id": "canonical-native-ui-genome", "kind": "candidate-gene", "scope": ["browser", "android", "game-runtime", "windows"], "generalPrimitive": true }
+      ]
+    },
+    {
+      "id": "android::reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "PENDING_CANDIDATE_COMMIT",
+      "lastVerifiedDate": "2026-08-23",
+      "knownLimits": ["device execution and performance are unverified", "AI_GENERATE is unverified"],
+      "relatedKillerTasks": ["K03"],
+      "requiredGenes": ["reactive-state", "derived-binding", "event-graph", "lifecycle"],
+      "donorAdvantages": [],
+      "gates": {
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-lowering-report.json"] },
+        "EXECUTE": { "status": "UNVERIFIED", "evidence": [] },
+        "CORRECT": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/semantic-trace-android.json"] },
+        "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-runtime-style-layout.test.mjs"] },
+        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": [] },
+        "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [] },
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-build-result.json"] }
+      },
+      "changes": [
+        { "id": "canonical-reactive-ui", "kind": "candidate-gene", "scope": ["browser", "android", "game-runtime", "windows"], "generalPrimitive": true }
+      ]
+    }
+  ],
+  "competitiveComparisons": [],
+  "donorComparisons": [
+    { "donor": "Web platform", "capability": "complete UI semantics", "taskId": "native-ui-v0.1", "donorScore": 0.95, "rclScore": 0.4, "generationsObserved": 1 },
+    { "donor": "Android framework", "capability": "device adaptation and accessibility", "taskId": "native-ui-v0.1", "donorScore": 0.95, "rclScore": 0.2, "generationsObserved": 1 }
+  ],
+  "novelTaskTrials": 1,
+  "kernelChangesForNovelTasks": 1,
+  "notes": [
+    "Four affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
+    "Coverage is classified lowered-execution until canonical self-host compiler parity is verified.",
+    "The Android APK build is real, but build evidence is not device execution evidence."
+  ]
+}
