@@ -2845,6 +2845,10 @@ size_t rclvm_instance_get_peak_call_frame_depth(const RclVmInstance *instance) {
   return instance ? instance->vm.peak_frame_count : 0;
 }
 
+uint64_t rclvm_instance_get_executed_instruction_count(const RclVmInstance *instance) {
+  return instance ? instance->vm.executed_instructions : 0;
+}
+
 void rclvm_free_string(char *value) { free(value); }
 void rclvm_free_bytes(uint8_t *value) { free(value); }
 

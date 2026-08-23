@@ -93,9 +93,9 @@ Detailed campaign records:
 
 ### Native UI Genome v0.1 candidate
 
-An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build. A minimal `ui App { view Root {} }` slice also reaches the canonical RCL-authored compiler with byte-identical C0/C1/C2 and JS/self-host RBC evidence.
+An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build. The minimal UI and exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice also reach the canonical RCL-authored compiler with byte-identical C0/C1/C2 and JS/self-host RBC evidence.
 
-This remains `CANDIDATE`, not promoted repository-wide `native-semantic`: the full state/event/layout/style grammar still lives in the JavaScript reference path, while the self-host compiler owns only the minimal slice. Android device execution is also not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md), [`docs/ui-native-genome/selfhost-minimal-slice.md`](docs/ui-native-genome/selfhost-minimal-slice.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
+This remains `CANDIDATE`, not promoted repository-wide `native-semantic`: typed event parameters and wider UI forms remain reference-only/fail-closed, and Android device execution is not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md), [`docs/ui-native-genome/selfhost-minimal-slice.md`](docs/ui-native-genome/selfhost-minimal-slice.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
 
 ### K01 — self-hosting compiler
 
@@ -103,8 +103,8 @@ RCL has a general compiler written in RCL, a checked-in fixed-point compiler art
 
 ```text
 C0 == C1 == C2
-RBC bytes: 160,572
-SHA-256: a2e9cd44c9afb0a488ef797431f6bbf53e621c756d5b9906ad85bc3fa350789c
+Current candidate RBC bytes: 221,368
+Current candidate SHA-256: 30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26
 ```
 
 Representative source fixtures match the bootstrap oracle byte-for-byte; malformed/unsupported negative controls are rejected. K01 remains blocked only because the AI-era gate requires independent, reproducible compiler-evolution/repair evidence.

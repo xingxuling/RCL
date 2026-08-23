@@ -37,8 +37,8 @@ Direct evidence supports:
 
 - RCL-authored general compiler;
 - byte-identical native fixed point `C0 == C1 == C2`;
-- fixed-point RBC size `160,572` bytes;
-- fixed-point SHA-256 `a2e9cd44c9afb0a488ef797431f6bbf53e621c756d5b9906ad85bc3fa350789c`;
+- current candidate fixed-point RBC size `221,368` bytes;
+- current candidate fixed-point SHA-256 `30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26`;
 - representative differential parity against the JS bootstrap oracle;
 - malformed/unsupported negative-source rejection;
 - native execution and measured performance within the declared campaign budget.
@@ -95,7 +95,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 - Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
 - Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
 - Android installation/device interaction is not verified.
-- Canonical self-host compiler ownership is verified only for the minimal empty-view slice with byte-identical JS/native fixed-point evidence. The full Counter surface remains blocked, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
+- Canonical self-host compiler ownership is verified for the minimal UI and exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice with byte-identical JS/native fixed-point and mutation evidence. Typed event parameters and wider UI forms remain fail-closed/reference-only, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
 
 Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 

@@ -72,6 +72,7 @@ RCLVM_API int rclvm_instance_get_state_bytes(
 );
 RCLVM_API size_t rclvm_instance_get_peak_stack_depth(const RclVmInstance *instance);
 RCLVM_API size_t rclvm_instance_get_peak_call_frame_depth(const RclVmInstance *instance);
+RCLVM_API uint64_t rclvm_instance_get_executed_instruction_count(const RclVmInstance *instance);
 RCLVM_API void rclvm_free_string(char *value);
 RCLVM_API void rclvm_free_bytes(uint8_t *value);
 

@@ -31,7 +31,7 @@ The evidence generator compiles `examples/native-ui/counter.rcl`, asserts one sh
 - The installed AVD is incomplete and has no usable initial system image, so emulator execution is blocked.
 - Real APK installation, event interaction, recreation, screenshots/logcat and device timings are not verified.
 - Independent AI-generation evidence is not provided by the same development run.
-- Canonical self-host parity is verified only for the minimal empty-view slice; the full Counter surface is intentionally rejected.
+- Canonical self-host parity is verified for the minimal UI and exact Counter semantic slice. Typed event parameters and wider candidate forms are intentionally rejected until separately absorbed.
 - No pre-registered performance acceptance budget exists, so the performance Matrix gate remains unverified despite measured receipts.
 
 Full repository regression results are also recorded in `evidence-ledger.md`; a missing or historically failing test is reported as blocked/fail rather than silently omitted.

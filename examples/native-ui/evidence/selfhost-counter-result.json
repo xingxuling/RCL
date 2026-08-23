@@ -1,0 +1,99 @@
+{
+  "format": "rcl.native-ui.selfhost-counter-evidence.v0.2",
+  "date": "2026-08-23",
+  "status": "CANDIDATE_COUNTER_UI_SELFHOST_SLICE_VERIFIED",
+  "compiler": {
+    "sourceSha256": "4a5eb8f697463c0955c1d5362299776e8096b54e0a55b12a33964fe024a93d0b",
+    "sourceBytes": 173766,
+    "artifactSha256": "30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26",
+    "artifactBytes": 221368,
+    "instructionBudgetPerRun": 300000000,
+    "minimumInstructionHeadroom": 180000000,
+    "c0ToC1ExecutedInstructions": 103063637,
+    "c1ToC2ExecutedInstructions": 103063637,
+    "c0ToC1InstructionHeadroom": 196936363,
+    "c1ToC2InstructionHeadroom": 196936363,
+    "declaredFixedPointBudgetMs": 240000,
+    "fixedPointElapsedMs": 125255.0658,
+    "withinFixedPointBudget": true,
+    "c0ToC1": {
+      "elapsedMs": 62788.5498,
+      "outputSha256": "30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    },
+    "c1ToC2": {
+      "elapsedMs": 62466.515999999996,
+      "outputSha256": "30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    }
+  },
+  "minimalFixture": {
+    "source": "examples/selfhost-core/native-ui-minimal.rcl",
+    "sourceSha256": "641887613f68bb8bf622c0a26bc4673c7b9c139a3eda2d48a25ccf09f4766018",
+    "uiProgramRoot": "d213c9e1144c08edd99f9fa3dba4bbfb25370be9f262096a9225192060698e9b",
+    "realityProgramRoot": "50bbbce501ef0b0040adbe56c7afdd09f2a3e5fa4239acb66f136d086761372b",
+    "rbcSha256": "53941e7f448b36496da9723406c14db40eea408827a5371ae039fddb633362d8",
+    "rbcBytes": 133,
+    "decodedSourceRoot": "50bbbce501ef0b0040adbe56c7afdd09f2a3e5fa4239acb66f136d086761372b",
+    "jsSelfhostByteIdentical": true,
+    "nativeElapsedMs": 35.504100000005565
+  },
+  "counterFixture": {
+    "source": "examples/native-ui/counter.rcl",
+    "sourceSha256": "8b5322e3596a9028d226427f7216efa54c696369f71239a975d79104eef62613",
+    "uiProgramRoot": "04f9c8b26bd97cf0d315d866a0f6b770b8646e3de59ecd46a643b361f5a1028f",
+    "realityProgramRoot": "0337c38903ff8ce784ce02d8997f5bc450ce2dcd2e5925c2515c72084c56167f",
+    "rbcSha256": "d16dd58da9fbd5d9f45c13444cfe3221d6c0e999235568020c8f813c0fb65e46",
+    "rbcBytes": 139,
+    "decodedSourceRoot": "0337c38903ff8ce784ce02d8997f5bc450ce2dcd2e5925c2515c72084c56167f",
+    "jsSelfhostByteIdentical": true,
+    "nativeElapsedMs": 52.79210000000603
+  },
+  "mutationEvidence": [
+    {
+      "id": "derived-text",
+      "sourceRoot": "17de00e571ffb4f185d4c24cd2371c7ec43e3b8c25ba98a1fb36ffd3608f7823",
+      "rbcSha256": "af8ad5a145cec4649329cfff5b0bf4c06c764f286746e151c824673b02315c04",
+      "jsSelfhostByteIdentical": true
+    },
+    {
+      "id": "layout-gap",
+      "sourceRoot": "7a0ea3120d480aa8536b501c06f237a4b03e81d4d18866106a89bdbf838fd548",
+      "rbcSha256": "ebf42c30e0b8d14d7c73b6e8270665a3d7dbd1c78d51fb99dbee5d12806d76b3",
+      "jsSelfhostByteIdentical": true
+    },
+    {
+      "id": "theme-color",
+      "sourceRoot": "d774f0591fc23eff54e673604b3e06e9b524d97f43e75c4097d6c2f9f3f2e687",
+      "rbcSha256": "d055d65740eaf42306cac9ea4483e157ffdc2f38bd408a97520ab86003900b86",
+      "jsSelfhostByteIdentical": true
+    },
+    {
+      "id": "event-increment",
+      "sourceRoot": "6cacf03ac1d2ea74c3245c10e2716c8440a9fd8d1ebb1eaf2fcb190379642f70",
+      "rbcSha256": "3988408527a987310ea104b6ee42b04f40ef9ca537ccd6a3128211e78a86d646",
+      "jsSelfhostByteIdentical": true
+    }
+  ],
+  "failClosedBoundary": {
+    "feature": "typed UI event parameters",
+    "jsReferenceAccepts": true,
+    "selfhostRejects": true,
+    "failure": {
+      "code": "RCLC_COMPILER_FAILURE",
+      "message": "RCL_SEMANTIC_ASSERT: { at 7:19"
+    }
+  },
+  "gates": {
+    "fixedPoint": "PASS",
+    "jsDifferential": "PASS",
+    "nativeExecution": "PASS",
+    "counterNativeUiParity": "PASS",
+    "aiGenerate": "UNVERIFIED"
+  },
+  "boundary": "This verifies the exact Counter state, derived expression, lifecycle, theme, style, recursive view, binding, layout, accessibility and local-event semantic slice. Unsupported Native UI grammar remains fail-closed; this is not repository-wide Native UI parity, Android-device evidence or canonical promotion."
+}

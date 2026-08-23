@@ -6,11 +6,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode, decodeBytecode } from '../src/bytecode.mjs';
+import { compileReality } from '../src/compiler.mjs';
 import { runNativeCompiler } from '../src/native-vm.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 const compilerSource = `${read('selfhost/compiler-core.rcl')}\n${read('selfhost/compiler-main.rcl')}`;
+const MINIMUM_NATIVE_INSTRUCTION_HEADROOM = 180_000_000;
 
 function bytesU16(value) {
   const buffer = Buffer.alloc(2);
@@ -87,8 +89,27 @@ function callBuiltin(id, args) {
   }
 }
 
-function runCompilerArtifact(bytecode, source, { budget = 300_000_000 } = {}) {
+function buildFunctionOwners(program, functionNames) {
+  const haltIndex = program.instructions.findIndex(instruction => instruction.op === 31);
+  assert.ok(haltIndex >= 0, 'profiled compiler artifact must contain HALT');
+  const functionStarts = [haltIndex + 1];
+  for (let index = haltIndex + 1; index < program.instructions.length - 1; index += 1) {
+    if (program.instructions[index].op === 34) functionStarts.push(index + 1);
+  }
+  assert.equal(functionStarts.length, functionNames.length, 'function profile layout must match source reckons');
+  const mainOwner = functionNames.length;
+  const owners = new Int32Array(program.instructions.length);
+  owners.fill(mainOwner, 0, haltIndex + 1);
+  for (let index = 0; index < functionStarts.length; index += 1) {
+    owners.fill(index, functionStarts[index], functionStarts[index + 1] ?? program.instructions.length);
+  }
+  return { owners, mainOwner };
+}
+
+function runCompilerArtifact(bytecode, source, { budget = 300_000_000, profileFunctionNames = null } = {}) {
   const program = decodeBytecode(bytecode);
+  const profileLayout = profileFunctionNames ? buildFunctionOwners(program, profileFunctionNames) : null;
+  const functionSteps = profileLayout ? new Float64Array(profileFunctionNames.length + 1) : null;
   const stack = [];
   const state = new Map();
   const frames = [];
@@ -103,6 +124,7 @@ function runCompilerArtifact(bytecode, source, { budget = 300_000_000 } = {}) {
 
   while (true) {
     assert.ok(++steps <= budget, `RBC execution exceeded ${budget} instructions`);
+    if (functionSteps) functionSteps[profileLayout.owners[ip]] += 1;
     const ins = program.instructions[ip];
     assert.ok(ins, `instruction pointer escaped at ${ip}`);
     ip += 1;
@@ -138,7 +160,15 @@ function runCompilerArtifact(bytecode, source, { budget = 300_000_000 } = {}) {
         stack.push(callBuiltin(ins.a, args));
         break;
       }
-      case 31: return { output: Buffer.from(state.get('compiler.output')), state, steps };
+      case 31: {
+        const functionProfile = functionSteps
+          ? [...profileFunctionNames, '<main>']
+            .map((name, index) => ({ name, steps: functionSteps[index] }))
+            .filter(item => item.steps > 0)
+            .sort((left, right) => right.steps - left.steps)
+          : null;
+        return { output: Buffer.from(state.get('compiler.output')), state, steps, functionProfile };
+      }
       case 32: stack.push(locals[ins.a]); break;
       case 33: {
         const args = stack.splice(stack.length - ins.b, ins.b);
@@ -206,7 +236,8 @@ let fixedPointEvidence;
 function getFixedPointEvidence() {
   if (fixedPointEvidence) return fixedPointEvidence;
   const c0 = compileRealityToBytecode(compilerSource);
-  const first = runCompilerArtifact(c0, compilerSource);
+  const functionNames = compileReality(compilerSource).reckons.map(reckon => reckon.name);
+  const first = runCompilerArtifact(c0, compilerSource, { profileFunctionNames: functionNames });
   const c1 = first.output;
   assertRbcEqual(c1, c0, 'the RCL compiler must reproduce its bootstrap artifact');
   const second = runCompilerArtifact(c1, compilerSource);
@@ -216,14 +247,20 @@ function getFixedPointEvidence() {
   return fixedPointEvidence;
 }
 
-test('general RCL compiler reaches a byte-identical C1/C2 fixed point after one JS bootstrap', { timeout: 300_000 }, () => {
+test('general RCL compiler reaches a byte-identical C1/C2 fixed point after one JS bootstrap', { timeout: 300_000 }, t => {
   const { c1, first, second } = getFixedPointEvidence();
   assert.equal(decodeBytecode(c1).program, 'RCLGeneralSelfHostCompiler');
   assert.ok(first.steps > 0);
   assert.ok(second.steps > 0);
+  assert.ok(first.functionProfile?.length > 0);
+  t.diagnostic(JSON.stringify({
+    executedInstructions: first.steps,
+    topFunctions: first.functionProfile.slice(0, 20),
+  }));
 });
 
 test('general RCL compiler reaches a byte-identical C1/C2 fixed point through native rclc', { timeout: 300_000 }, t => {
+  const jsFunctionProfile = getFixedPointEvidence().first.functionProfile;
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-general-native-fixedpoint-'));
   try {
     const sourcePath = path.join(directory, 'compiler.rcl');
@@ -256,6 +293,10 @@ test('general RCL compiler reaches a byte-identical C1/C2 fixed point through na
     assert.ok(totalElapsedMs < 240_000, `native C0 -> C1 -> C2 took ${totalElapsedMs}ms`);
     assert.ok(first.peakStackDepth > 0 && second.peakStackDepth > 0);
     assert.ok(first.peakCallFrames > 0 && second.peakCallFrames > 0);
+    assert.ok(first.executedInstructions > 0 && first.executedInstructions <= first.instructionBudget);
+    assert.ok(second.executedInstructions > 0 && second.executedInstructions <= second.instructionBudget);
+    assert.ok(first.instructionBudget - first.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
+    assert.ok(second.instructionBudget - second.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
     t.diagnostic(JSON.stringify({
       firstElapsedMs,
       secondElapsedMs,
@@ -267,6 +308,13 @@ test('general RCL compiler reaches a byte-identical C1/C2 fixed point through na
       secondPeakStackDepth: second.peakStackDepth,
       firstPeakCallFrames: first.peakCallFrames,
       secondPeakCallFrames: second.peakCallFrames,
+      firstExecutedInstructions: first.executedInstructions,
+      secondExecutedInstructions: second.executedInstructions,
+      instructionBudget: first.instructionBudget,
+      minimumInstructionHeadroom: MINIMUM_NATIVE_INSTRUCTION_HEADROOM,
+      firstInstructionHeadroom: first.instructionBudget - first.executedInstructions,
+      secondInstructionHeadroom: second.instructionBudget - second.executedInstructions,
+      topFunctions: jsFunctionProfile.slice(0, 20),
     }));
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
@@ -316,7 +364,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
   }
 });
 
-test('self-hosted compiler owns the minimal Native UI syntax/root slice and rejects the expanded candidate surface', { timeout: 300_000 }, () => {
+test('self-hosted compiler owns the minimal and Counter Native UI semantic-root slices', { timeout: 300_000 }, () => {
   const { c1 } = getFixedPointEvidence();
   const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
   const selfHosted = runCompilerArtifact(c1, minimalSource).output;
@@ -324,12 +372,40 @@ test('self-hosted compiler owns the minimal Native UI syntax/root slice and reje
   assertRbcEqual(selfHosted, bootstrapOracle, 'minimal Native UI RBC and program root must match JS exactly');
 
   const expandedSource = read('examples/native-ui/counter.rcl');
-  assert.doesNotThrow(() => compileRealityToBytecode(expandedSource));
-  assert.throws(
-    () => runCompilerArtifact(c1, expandedSource),
-    undefined,
-    'the self-host slice must fail closed instead of pretending to own the expanded Native UI grammar',
-  );
+  const expandedSelfHosted = runCompilerArtifact(c1, expandedSource).output;
+  const expandedOracle = compileRealityToBytecode(expandedSource);
+  assertRbcEqual(expandedSelfHosted, expandedOracle, 'Counter Native UI RBC and semantic root must match JS exactly');
+
+  const baselineRoot = decodeBytecode(expandedOracle).sourceRoot;
+  const mutations = [
+    ['derived text', '"计数：" + count', '"数量：" + count'],
+    ['layout gap', 'gap 12', 'gap 13'],
+    ['theme color', '"#172033" inherit', '"#172034" inherit'],
+    ['event increment', 'count + 1', 'count + 2'],
+  ];
+  for (const [label, before, after] of mutations) {
+    assert.ok(expandedSource.includes(before), `${label} mutation anchor must exist`);
+    const source = expandedSource.replace(before, after);
+    const oracle = compileRealityToBytecode(source);
+    const selfHosted = runCompilerArtifact(c1, source).output;
+    assertRbcEqual(selfHosted, oracle, `${label} mutation must remain byte-identical`);
+    assert.notEqual(decodeBytecode(oracle).sourceRoot, baselineRoot, `${label} mutation must change the reality root`);
+  }
+
+  const unsupportedEventParameter = `reality ParameterizedUI {
+    ui App {
+      state value : Text = ""
+      view Root {
+        input Field {
+          bind value <- value
+          on input(value : Text) { set value <- value }
+        }
+      }
+    }
+  }`;
+  assert.doesNotThrow(() => compileRealityToBytecode(unsupportedEventParameter));
+  assert.throws(() => runCompilerArtifact(c1, unsupportedEventParameter), undefined,
+    'event-parameter UI grammar must remain fail-closed until self-hosted');
 });
 
 test('dynamic provider lowering is exact RBC v1.2 with expression operands', { timeout: 300_000 }, () => {
