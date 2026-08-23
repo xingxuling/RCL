@@ -824,34 +824,96 @@ reality RCLGeneralSelfHostCompiler {
           make_ui_layout(token_text_at(tokens, index + 1), "fill", "", "intrinsic", "", 0, 0, "stretch", "start", "visible", 1)),
         empty_sequence()), empty_sequence())
 
-  reckon make_ui_event(event_type : Text, statements : Sequence) -> Sequence =
-    sequence_append(sequence_append(empty_sequence(), event_type), statements)
+  reckon make_ui_parameter(name : Text, value_type : Text) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), value_type)
+
+  reckon ui_parameter_name(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon ui_parameter_type(node : Sequence) -> Text = sequence_get(node, 1)
+
+  reckon find_ui_parameter_type(items : Sequence, index : Number, name : Text) -> Text =
+    choose(index >= length(items), "",
+      choose(ui_parameter_name(sequence_get(items, index)) == name, ui_parameter_type(sequence_get(items, index)),
+        find_ui_parameter_type(items, index + 1, name)))
+
+  reckon ui_event_type_allowed(event_type : Text) -> Truth =
+    event_type == "activate" or event_type == "input" or event_type == "change" or event_type == "submit"
+      or event_type == "focus" or event_type == "blur" or event_type == "navigate" or event_type == "create"
+      or event_type == "resume" or event_type == "suspend" or event_type == "destroy" or event_type == "custom"
+
+  reckon ui_expected_event_parameter_type(event_type : Text, name : Text) -> Text =
+    choose((event_type == "input" or event_type == "change") and name == "value", "Text",
+      choose(event_type == "navigate" and name == "destination", "Text", ""))
+
+  reckon ui_parameter_value_type(event_type : Text, name : Text, declared_type : Text) -> Text =
+    choose(declared_type != "", declared_type, ui_expected_event_parameter_type(event_type, name))
+
+  reckon ui_parameter_type_allowed(value_type : Text) -> Truth =
+    value_type == "Number" or value_type == "Text" or value_type == "Truth"
+
+  reckon make_ui_event(event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), event_type), parameters), statements)
 
   reckon ui_event_type(node : Sequence) -> Text = sequence_get(node, 0)
-  reckon ui_event_statements(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon ui_event_parameters(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon ui_event_statements(node : Sequence) -> Sequence = sequence_get(node, 2)
   reckon make_ui_set(target : Text, expression : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), target), expression)
   reckon ui_set_target(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_set_expression(node : Sequence) -> Sequence = sequence_get(node, 1)
 
-  reckon parse_ui_event_after_expression(tokens : Sequence, event_type : Text, target : Text, statements : Sequence, expression_state : Sequence) -> Sequence =
-    parse_ui_event_body(tokens, state_index(expression_state), event_type,
+  reckon parse_ui_event_after_expression(tokens : Sequence, event_type : Text, parameters : Sequence, target : Text, statements : Sequence, expression_state : Sequence) -> Sequence =
+    parse_ui_event_body(tokens, state_index(expression_state), event_type, parameters,
       sequence_append(statements, make_ui_set(target, state_node(expression_state))))
 
-  reckon parse_ui_event_after_target(tokens : Sequence, event_type : Text, statements : Sequence, target_state : Sequence) -> Sequence =
+  reckon parse_ui_event_after_target(tokens : Sequence, event_type : Text, parameters : Sequence, statements : Sequence, target_state : Sequence) -> Sequence =
     choose(require_token(tokens, state_index(target_state), "<-", "RCL_UI_EVENT_ASSIGN"),
-      parse_ui_event_after_expression(tokens, event_type, state_text(target_state), statements,
+      parse_ui_event_after_expression(tokens, event_type, parameters, state_text(target_state), statements,
         parse_expression(tokens, state_index(target_state) + 1, 0)), empty_sequence())
 
-  reckon parse_ui_event_body(tokens : Sequence, index : Number, event_type : Text, statements : Sequence) -> Sequence =
-    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, make_ui_event(event_type, statements)),
+  reckon parse_ui_event_body(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, make_ui_event(event_type, parameters, statements)),
       choose(token_text_at(tokens, index) == "set",
-        parse_ui_event_after_target(tokens, event_type, statements, parse_path(tokens, index + 1)),
+        parse_ui_event_after_target(tokens, event_type, parameters, statements, parse_path(tokens, index + 1)),
         syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT")))
+
+  reckon parse_ui_event_parameter_finish(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text, declared_type : Text) -> Sequence =
+    choose(semantic_check(find_ui_parameter_type(parameters, 0, name) == "", "RCL_UI_EVENT_PARAMETER_DUPLICATE", name),
+      choose(semantic_check((event_type == "custom" or ui_expected_event_parameter_type(event_type, name) != "")
+          and ui_parameter_type_allowed(ui_parameter_value_type(event_type, name, declared_type))
+          and (ui_expected_event_parameter_type(event_type, name) == ""
+            or ui_parameter_value_type(event_type, name, declared_type) == ui_expected_event_parameter_type(event_type, name)),
+          "RCL_UI_EVENT_PARAMETER_TYPE", event_type + ":" + name),
+        choose(token_text_at(tokens, index) == ",",
+          parse_ui_event_parameters(tokens, index + 1, event_type,
+            sequence_append(parameters, make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)))),
+          choose(token_text_at(tokens, index) == ")",
+            make_node_state(index + 1,
+              sequence_append(parameters, make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)))),
+            syntax_failure(tokens, index, "RCL_UI_EVENT_PARAMETER_DELIMITER"))), empty_sequence()), empty_sequence())
+
+  reckon parse_ui_event_parameter_after_name(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text) -> Sequence =
+    choose(token_text_at(tokens, index) == ":",
+      choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_EVENT_PARAMETER_TYPE"),
+        parse_ui_event_parameter_finish(tokens, index + 2, event_type, parameters, name, token_text_at(tokens, index + 1)), empty_sequence()),
+      parse_ui_event_parameter_finish(tokens, index, event_type, parameters, name, ""))
+
+  reckon parse_ui_event_parameters(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == ")", make_node_state(index + 1, parameters),
+      choose(require_kind(tokens, index, "IDENT", "RCL_UI_EVENT_PARAMETER"),
+        parse_ui_event_parameter_after_name(tokens, index + 1, event_type, parameters, token_text_at(tokens, index)), empty_sequence()))
+
+  reckon parse_ui_event_after_parameters(tokens : Sequence, event_type : Text, parameter_state : Sequence) -> Sequence =
+    choose(require_token(tokens, state_index(parameter_state), "{", "RCL_UI_EVENT_OPEN"),
+      parse_ui_event_body(tokens, state_index(parameter_state) + 1, event_type, state_node(parameter_state), empty_sequence()), empty_sequence())
 
   reckon parse_ui_event(tokens : Sequence, index : Number) -> Sequence =
     choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_EVENT_TYPE"),
-      choose(require_token(tokens, index + 2, "{", "RCL_UI_EVENT_OPEN"),
-        parse_ui_event_body(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence()), empty_sequence()), empty_sequence())
+      choose(semantic_check(ui_event_type_allowed(token_text_at(tokens, index + 1)), "RCL_UI_EVENT_TYPE", token_text_at(tokens, index + 1)),
+        choose(token_text_at(tokens, index + 2) == "(",
+          parse_ui_event_after_parameters(tokens, token_text_at(tokens, index + 1),
+            parse_ui_event_parameters(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence())),
+          choose(require_token(tokens, index + 2, "{", "RCL_UI_EVENT_OPEN"),
+            parse_ui_event_body(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence(), empty_sequence()), empty_sequence())),
+        empty_sequence()), empty_sequence())
 
   reckon make_ui_view(id : Text, role : Text, classes : Sequence, properties : Sequence, bindings : Sequence, events : Sequence, layout : Sequence, children : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), role), classes), properties), bindings), events), layout), children)
@@ -1126,44 +1188,50 @@ reality RCLGeneralSelfHostCompiler {
       choose(ui_state_name(sequence_get(items, index)) == name, ui_state_type(sequence_get(items, index)),
         find_ui_state_type(items, index + 1, name)))
 
-  reckon ui_reference_type(name : Text, states : Sequence, derived : Sequence) -> Text =
-    choose(find_ui_state_type(states, 0, name) != "", find_ui_state_type(states, 0, name), find_ui_state_type(derived, 0, name))
+  reckon ui_reference_type(name : Text, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
+    choose(find_ui_state_type(states, 0, name) != "", find_ui_state_type(states, 0, name),
+      choose(find_ui_state_type(derived, 0, name) != "", find_ui_state_type(derived, 0, name),
+        choose(find_ui_parameter_type(parameters, 0, name) != "", find_ui_parameter_type(parameters, 0, name),
+          choose(semantic_check(false, "RCL_UI_REFERENCE_UNKNOWN", name), "", ""))))
 
-  reckon ui_reference_scope(name : Text, states : Sequence) -> Text =
-    choose(find_ui_state_type(states, 0, name) != "", "state", "derived")
+  reckon ui_reference_scope(name : Text, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
+    choose(find_ui_state_type(states, 0, name) != "", "state",
+      choose(find_ui_state_type(derived, 0, name) != "", "derived",
+        choose(find_ui_parameter_type(parameters, 0, name) != "", "event",
+          choose(semantic_check(false, "RCL_UI_REFERENCE_UNKNOWN", name), "", ""))))
 
-  reckon ui_expression_type(node : Sequence, states : Sequence, derived : Sequence) -> Text =
+  reckon ui_expression_type(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
     choose(expr_kind(node) == "LiteralExpr", expr_text(node),
-      choose(expr_kind(node) == "PathExpr", ui_reference_type(expr_text(node), states, derived),
+      choose(expr_kind(node) == "PathExpr", ui_reference_type(expr_text(node), states, derived, parameters),
         choose(expr_kind(node) == "UnaryExpr", choose(expr_text(node) == not_operator(), "Truth", "Number"),
           choose(expr_kind(node) == "BinaryExpr",
             choose(expr_text(node) == "+",
-              choose(ui_expression_type(expr_left(node), states, derived) == "Text" or ui_expression_type(expr_right(node), states, derived) == "Text", "Text", "Number"),
+              choose(ui_expression_type(expr_left(node), states, derived, parameters) == "Text" or ui_expression_type(expr_right(node), states, derived, parameters) == "Text", "Text", "Number"),
               choose(expr_text(node) == minus_operator() or expr_text(node) == "*" or expr_text(node) == "/" or expr_text(node) == "%", "Number", "Truth")),
-            choose(expr_text(node) == "choose", ui_expression_type(sequence_get(expr_args(node), 1), states, derived), "")))))
+            choose(expr_text(node) == "choose", ui_expression_type(sequence_get(expr_args(node), 1), states, derived, parameters), "")))))
 
-  reckon canonical_ui_expression_array(items : Sequence, index : Number, states : Sequence, derived : Sequence, output : Text) -> Text =
+  reckon canonical_ui_expression_array(items : Sequence, index : Number, states : Sequence, derived : Sequence, parameters : Sequence, output : Text) -> Text =
     choose(index >= length(items), output + "]",
-      canonical_ui_expression_array(items, index + 1, states, derived,
-        output + choose(index > 0, ",", "") + canonical_ui_expression(sequence_get(items, index), states, derived)))
+      canonical_ui_expression_array(items, index + 1, states, derived, parameters,
+        output + choose(index > 0, ",", "") + canonical_ui_expression(sequence_get(items, index), states, derived, parameters)))
 
-  reckon canonical_ui_expression(node : Sequence, states : Sequence, derived : Sequence) -> Text =
+  reckon canonical_ui_expression(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
     choose(expr_kind(node) == "LiteralExpr",
       "{\"kind\":\"literal\",\"value\":" + ui_literal_json(node) + ",\"valueType\":" + json_quote(expr_text(node)) + "}",
       choose(expr_kind(node) == "PathExpr",
         "{\"id\":" + json_quote(expr_text(node)) + ",\"kind\":\"reference\",\"scope\":"
-          + json_quote(ui_reference_scope(expr_text(node), states)) + ",\"valueType\":"
-          + json_quote(ui_reference_type(expr_text(node), states, derived)) + "}",
+          + json_quote(ui_reference_scope(expr_text(node), states, derived, parameters)) + ",\"valueType\":"
+          + json_quote(ui_reference_type(expr_text(node), states, derived, parameters)) + "}",
         choose(expr_kind(node) == "UnaryExpr",
-          "{\"expression\":" + canonical_ui_expression(expr_left(node), states, derived) + ",\"kind\":\"unary\",\"operator\":"
-            + json_quote(expr_text(node)) + ",\"valueType\":" + json_quote(ui_expression_type(node, states, derived)) + "}",
+          "{\"expression\":" + canonical_ui_expression(expr_left(node), states, derived, parameters) + ",\"kind\":\"unary\",\"operator\":"
+            + json_quote(expr_text(node)) + ",\"valueType\":" + json_quote(ui_expression_type(node, states, derived, parameters)) + "}",
           choose(expr_kind(node) == "BinaryExpr",
-            "{\"kind\":\"binary\",\"left\":" + canonical_ui_expression(expr_left(node), states, derived)
+            "{\"kind\":\"binary\",\"left\":" + canonical_ui_expression(expr_left(node), states, derived, parameters)
               + ",\"operator\":" + json_quote(expr_text(node)) + ",\"right\":"
-              + canonical_ui_expression(expr_right(node), states, derived) + ",\"valueType\":"
-              + json_quote(ui_expression_type(node, states, derived)) + "}",
-            "{\"args\":" + canonical_ui_expression_array(expr_args(node), 0, states, derived, "[")
-              + ",\"kind\":\"choose\",\"valueType\":" + json_quote(ui_expression_type(node, states, derived)) + "}"))))
+              + canonical_ui_expression(expr_right(node), states, derived, parameters) + ",\"valueType\":"
+              + json_quote(ui_expression_type(node, states, derived, parameters)) + "}",
+            "{\"args\":" + canonical_ui_expression_array(expr_args(node), 0, states, derived, parameters, "[")
+              + ",\"kind\":\"choose\",\"valueType\":" + json_quote(ui_expression_type(node, states, derived, parameters)) + "}"))))
 
   reckon canonical_ui_states(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1177,7 +1245,7 @@ reality RCLGeneralSelfHostCompiler {
       canonical_ui_derived(items, index + 1, states,
         output + choose(index > 0, ",", "") + "[\"UIDerivedState\"," + json_quote(ui_state_name(sequence_get(items, index)))
           + "," + json_quote(ui_state_type(sequence_get(items, index))) + ","
-          + canonical_ui_expression(ui_state_expression(sequence_get(items, index)), states, items) + "]"))
+          + canonical_ui_expression(ui_state_expression(sequence_get(items, index)), states, items, empty_sequence()) + "]"))
 
   reckon canonical_ui_texts(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1196,21 +1264,34 @@ reality RCLGeneralSelfHostCompiler {
       canonical_ui_bindings(items, index + 1, node_id, states, derived,
         output + choose(index > 0, ",", "") + "[" + json_quote(node_id + ".binding." + ui_property_name(sequence_get(items, index)))
           + "," + json_quote(ui_property_name(sequence_get(items, index))) + ","
-          + canonical_ui_expression(ui_property_expression(sequence_get(items, index)), states, derived) + "]"))
+          + canonical_ui_expression(ui_property_expression(sequence_get(items, index)), states, derived, empty_sequence()) + "]"))
 
-  reckon canonical_ui_event_statements(items : Sequence, index : Number, states : Sequence, derived : Sequence, output : Text) -> Text =
+  reckon canonical_ui_event_parameters(items : Sequence, index : Number, output : Text) -> Text =
     choose(index >= length(items), output + "]",
-      canonical_ui_event_statements(items, index + 1, states, derived,
-        output + choose(index > 0, ",", "") + "{\"expression\":"
-          + canonical_ui_expression(ui_set_expression(sequence_get(items, index)), states, derived)
-          + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(sequence_get(items, index))) + "}"))
+      canonical_ui_event_parameters(items, index + 1,
+        output + choose(index > 0, ",", "") + "{\"id\":" + json_quote(ui_parameter_name(sequence_get(items, index)))
+          + ",\"valueType\":" + json_quote(ui_parameter_type(sequence_get(items, index))) + "}"))
+
+  reckon canonical_ui_event_statement(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
+    choose(semantic_check(find_ui_state_type(states, 0, ui_set_target(node)) != "", "RCL_UI_EVENT_TARGET_UNKNOWN", ui_set_target(node)),
+      choose(semantic_check(ui_expression_type(ui_set_expression(node), states, derived, parameters)
+          == find_ui_state_type(states, 0, ui_set_target(node)), "RCL_UI_EVENT_MUTATION_TYPE", ui_set_target(node)),
+        "{\"expression\":" + canonical_ui_expression(ui_set_expression(node), states, derived, parameters)
+          + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(node)) + "}", ""), "")
+
+  reckon canonical_ui_event_statements(items : Sequence, index : Number, states : Sequence, derived : Sequence, parameters : Sequence, output : Text) -> Text =
+    choose(index >= length(items), output + "]",
+      canonical_ui_event_statements(items, index + 1, states, derived, parameters,
+        output + choose(index > 0, ",", "") + canonical_ui_event_statement(sequence_get(items, index), states, derived, parameters)))
 
   reckon canonical_ui_events(items : Sequence, index : Number, node_id : Text, states : Sequence, derived : Sequence, output : Text) -> Text =
     choose(index >= length(items), output + "]",
       canonical_ui_events(items, index + 1, node_id, states, derived,
         output + choose(index > 0, ",", "") + "[" + json_quote(node_id + ".event." + ui_event_type(sequence_get(items, index)) + "." + text(index))
-          + "," + json_quote(ui_event_type(sequence_get(items, index))) + ",[],\"ui-local\","
-          + canonical_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, states, derived, "[") + "]"))
+          + "," + json_quote(ui_event_type(sequence_get(items, index))) + ","
+          + canonical_ui_event_parameters(ui_event_parameters(sequence_get(items, index)), 0, "[") + ",\"ui-local\","
+          + canonical_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, states, derived,
+            ui_event_parameters(sequence_get(items, index)), "[") + "]"))
 
   reckon canonical_ui_size(mode : Text, value : Text) -> Text =
     "[" + json_quote(mode) + "," + choose(mode == "fixed", value, "null") + "]"

@@ -15,6 +15,7 @@ const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex'
 const compilerSource = `${read('selfhost/compiler-core.rcl')}\n${read('selfhost/compiler-main.rcl')}`;
 const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
 const expandedSource = read('examples/native-ui/counter.rcl');
+const parameterizedSource = read('examples/selfhost-core/native-ui-parameterized.rcl');
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-native-ui-selfhost-'));
 const minimumInstructionHeadroom = 180_000_000;
 
@@ -27,11 +28,14 @@ try {
   const minimalOutputPath = path.join(tempDir, 'native-ui-minimal.rbc');
   const expandedPath = path.join(tempDir, 'native-ui-expanded.rcl');
   const expandedOutputPath = path.join(tempDir, 'native-ui-expanded.rbc');
+  const parameterizedPath = path.join(tempDir, 'native-ui-parameterized.rcl');
+  const parameterizedOutputPath = path.join(tempDir, 'native-ui-parameterized.rbc');
   const c0 = compileRealityToBytecode(compilerSource);
   fs.writeFileSync(compilerSourcePath, compilerSource);
   fs.writeFileSync(c0Path, c0);
   fs.writeFileSync(minimalPath, minimalSource);
   fs.writeFileSync(expandedPath, expandedSource);
+  fs.writeFileSync(parameterizedPath, parameterizedSource);
 
   const runCompiler = (compiler, source, output) => {
     const startedAt = performance.now();
@@ -82,30 +86,60 @@ try {
     if (sourceRoot === expandedProgram.programRoot) throw new Error(`RCL_UI_SELFHOST_MUTATION_ROOT:${id}`);
     return { id, sourceRoot, rbcSha256: sha256(oracle), jsSelfhostByteIdentical: true };
   });
-  const unsupportedEventParameter = `reality ParameterizedUI {
-    ui App {
-      state value : Text = ""
-      view Root {
-        input Field {
-          bind value <- value
-          on input(value : Text) { set value <- value }
-        }
-      }
-    }
+  const jsParameterized = compileRealityToBytecode(parameterizedSource);
+  const nativeParameterized = runCompiler(c1Path, parameterizedPath, parameterizedOutputPath);
+  if (!nativeParameterized.bytecode.equals(jsParameterized)) throw new Error('RCL_UI_SELFHOST_PARAMETERIZED_DIFFERENTIAL_MISMATCH');
+  const parameterizedProgram = compileReality(parameterizedSource);
+  const inferredParameterizedSource = parameterizedSource.replace('on input(value : Text)', 'on input(value)');
+  const inferredParameterizedPath = path.join(tempDir, 'native-ui-parameterized-inferred.rcl');
+  const inferredParameterizedOutputPath = path.join(tempDir, 'native-ui-parameterized-inferred.rbc');
+  fs.writeFileSync(inferredParameterizedPath, inferredParameterizedSource);
+  const jsInferredParameterized = compileRealityToBytecode(inferredParameterizedSource);
+  const nativeInferredParameterized = runCompiler(c1Path, inferredParameterizedPath, inferredParameterizedOutputPath);
+  if (!nativeInferredParameterized.bytecode.equals(jsInferredParameterized)
+      || !jsInferredParameterized.equals(jsParameterized)) {
+    throw new Error('RCL_UI_SELFHOST_PARAMETER_INFERENCE_DIFFERENTIAL_MISMATCH');
+  }
+
+  const invalidParameterSpecs = [
+    ['wrong-standard-type', 'on input(value : Text)', 'on input(value : Number)'],
+    ['unknown-standard-parameter', 'on input(value : Text)', 'on input(other : Text)'],
+    ['duplicate-parameter', 'on input(value : Text)', 'on input(value : Text, value : Text)'],
+  ];
+  const invalidParameterEvidence = invalidParameterSpecs.map(([id, before, after]) => {
+    const source = parameterizedSource.replace(before, after);
+    let jsRejects = false;
+    try { compileRealityToBytecode(source); } catch { jsRejects = true; }
+    if (!jsRejects) throw new Error(`RCL_UI_SELFHOST_INVALID_PARAMETER_JS_ACCEPTED:${id}`);
+    const sourcePath = path.join(tempDir, `invalid-${id}.rcl`);
+    const outputPath = path.join(tempDir, `invalid-${id}.rbc`);
+    fs.writeFileSync(sourcePath, source);
+    let failure = null;
+    try { runCompiler(c1Path, sourcePath, outputPath); }
+    catch (error) { failure = { code: error.code ?? 'ERROR', message: error.message }; }
+    if (!failure) throw new Error(`RCL_UI_SELFHOST_INVALID_PARAMETER_ACCEPTED:${id}`);
+    return { id, jsRejects: true, selfhostRejects: true, failure };
+  });
+
+  const unsupportedRealityTransaction = `reality GovernedUI {
+    facet app.published : Truth = false
+    subject user { warrant app.publish on app }
+    emergence publish { cause user when app.published == false needs app.publish on app alter app.published <- true preserve app.published == true witness "ui:publish" }
+    ui Console { view Root { action PublishButton { label "Publish" on activate { realize publish } } } }
   }`;
-  compileRealityToBytecode(unsupportedEventParameter);
-  const unsupportedSourcePath = path.join(tempDir, 'unsupported-event-parameter.rcl');
-  const unsupportedOutputPath = path.join(tempDir, 'unsupported-event-parameter.rbc');
-  fs.writeFileSync(unsupportedSourcePath, unsupportedEventParameter);
+  compileRealityToBytecode(unsupportedRealityTransaction);
+  const unsupportedSourcePath = path.join(tempDir, 'unsupported-reality-transaction-ui.rcl');
+  const unsupportedOutputPath = path.join(tempDir, 'unsupported-reality-transaction-ui.rbc');
+  fs.writeFileSync(unsupportedSourcePath, unsupportedRealityTransaction);
   let unsupportedFailure = null;
   try { runCompiler(c1Path, unsupportedSourcePath, unsupportedOutputPath); }
   catch (error) { unsupportedFailure = { code: error.code ?? 'ERROR', message: error.message }; }
-  if (!unsupportedFailure) throw new Error('RCL_UI_SELFHOST_UNSUPPORTED_EVENT_PARAMETER_MUST_FAIL_CLOSED');
+  if (!unsupportedFailure) throw new Error('RCL_UI_SELFHOST_REALITY_TRANSACTION_MUST_FAIL_CLOSED');
 
   const report = {
-    format: 'rcl.native-ui.selfhost-counter-evidence.v0.2',
-    date: '2026-08-23',
-    status: 'CANDIDATE_COUNTER_UI_SELFHOST_SLICE_VERIFIED',
+    format: 'rcl.native-ui.selfhost-parameterized-evidence.v0.3',
+    date: '2026-08-24',
+    status: 'CANDIDATE_PARAMETERIZED_UI_SELFHOST_SLICE_VERIFIED',
     compiler: {
       sourceSha256: sha256(compilerSource),
       sourceBytes: Buffer.byteLength(compilerSource),
@@ -158,8 +192,22 @@ try {
       nativeElapsedMs: nativeExpanded.elapsedMs,
     },
     mutationEvidence: mutations,
+    parameterizedFixture: {
+      source: 'examples/selfhost-core/native-ui-parameterized.rcl',
+      sourceSha256: sha256(parameterizedSource),
+      uiProgramRoot: parameterizedProgram.nativeUis[0].semanticRoot,
+      realityProgramRoot: parameterizedProgram.programRoot,
+      rbcSha256: sha256(jsParameterized),
+      rbcBytes: jsParameterized.length,
+      decodedSourceRoot: decodeBytecode(jsParameterized).sourceRoot,
+      explicitJsSelfhostByteIdentical: true,
+      inferredSignatureNormalizesIdentically: true,
+      nativeElapsedMs: nativeParameterized.elapsedMs,
+      inferredNativeElapsedMs: nativeInferredParameterized.elapsedMs,
+    },
+    invalidParameterEvidence,
     failClosedBoundary: {
-      feature: 'typed UI event parameters',
+      feature: 'reality-transaction UI events',
       jsReferenceAccepts: true,
       selfhostRejects: true,
       failure: unsupportedFailure,
@@ -169,11 +217,12 @@ try {
       jsDifferential: 'PASS',
       nativeExecution: 'PASS',
       counterNativeUiParity: 'PASS',
+      parameterizedUiParity: 'PASS',
       aiGenerate: 'UNVERIFIED',
     },
-    boundary: 'This verifies the exact Counter state, derived expression, lifecycle, theme, style, recursive view, binding, layout, accessibility and local-event semantic slice. Unsupported Native UI grammar remains fail-closed; this is not repository-wide Native UI parity, Android-device evidence or canonical promotion.',
+    boundary: 'This verifies the exact Counter slice plus typed and standard-inferred ui-local event parameters, including event-scope expression roots and invalid-parameter rejection. Reality-transaction UI events and other unsupported grammar remain fail-closed; this is not repository-wide Native UI parity, Android-device evidence or canonical promotion.',
   };
-  const outputPath = path.join(ROOT, 'examples', 'native-ui', 'evidence', 'selfhost-counter-result.json');
+  const outputPath = path.join(ROOT, 'examples', 'native-ui', 'evidence', 'selfhost-parameterized-result.json');
   fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify(report, null, 2));
 } finally {

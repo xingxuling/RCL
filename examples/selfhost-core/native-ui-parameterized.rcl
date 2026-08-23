@@ -1,0 +1,18 @@
+reality ParameterizedUI {
+  ui App {
+    state value : Text = ""
+
+    view Root {
+      input Field {
+        placeholder "Value"
+        bind value <- value
+        on input(value : Text) {
+          set value <- value
+        }
+        on custom(replacement : Text) {
+          set value <- replacement
+        }
+      }
+    }
+  }
+}

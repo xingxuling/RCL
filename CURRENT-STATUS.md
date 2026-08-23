@@ -37,8 +37,8 @@ Direct evidence supports:
 
 - RCL-authored general compiler;
 - byte-identical native fixed point `C0 == C1 == C2`;
-- current candidate fixed-point RBC size `221,368` bytes;
-- current candidate fixed-point SHA-256 `30f38a1ffea63b206cd8907ed421d52f885d1012ae930eb3fcae0007c0123b26`;
+- current candidate fixed-point RBC size `231,618` bytes;
+- current candidate fixed-point SHA-256 `88366fc710677adc7cc4eb636e63d92b2d8f2b49f19e027b86d6301f528a8be5`;
 - representative differential parity against the JS bootstrap oracle;
 - malformed/unsupported negative-source rejection;
 - native execution and measured performance within the declared campaign budget.
@@ -95,7 +95,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 - Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
 - Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
 - Android installation/device interaction is not verified.
-- Canonical self-host compiler ownership is verified for the minimal UI and exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice with byte-identical JS/native fixed-point and mutation evidence. Typed event parameters and wider UI forms remain fail-closed/reference-only, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
+- Canonical self-host compiler ownership is verified for the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, and typed or standard-inferred UI-local event parameters with byte-identical JS/native fixed-point, mutation and negative-control evidence. Reality-transaction UI events, fixed sizing and wider forms remain fail-closed/reference-only, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
 
 Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 

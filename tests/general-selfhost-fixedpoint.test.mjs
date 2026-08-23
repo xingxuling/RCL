@@ -364,7 +364,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
   }
 });
 
-test('self-hosted compiler owns the minimal and Counter Native UI semantic-root slices', { timeout: 300_000 }, () => {
+test('self-hosted compiler owns the minimal, Counter and typed UI-event semantic-root slices', { timeout: 300_000 }, () => {
   const { c1 } = getFixedPointEvidence();
   const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
   const selfHosted = runCompilerArtifact(c1, minimalSource).output;
@@ -392,20 +392,40 @@ test('self-hosted compiler owns the minimal and Counter Native UI semantic-root 
     assert.notEqual(decodeBytecode(oracle).sourceRoot, baselineRoot, `${label} mutation must change the reality root`);
   }
 
-  const unsupportedEventParameter = `reality ParameterizedUI {
-    ui App {
-      state value : Text = ""
+  const typedEventParameter = read('examples/selfhost-core/native-ui-parameterized.rcl');
+  const typedOracle = compileRealityToBytecode(typedEventParameter);
+  const typedSelfHosted = runCompilerArtifact(c1, typedEventParameter).output;
+  assertRbcEqual(typedSelfHosted, typedOracle, 'explicit typed event parameters must be byte-identical');
+
+  const inferredEventParameter = typedEventParameter.replace('on input(value : Text)', 'on input(value)');
+  const inferredOracle = compileRealityToBytecode(inferredEventParameter);
+  const inferredSelfHosted = runCompilerArtifact(c1, inferredEventParameter).output;
+  assertRbcEqual(inferredSelfHosted, inferredOracle, 'standard event parameter inference must be byte-identical');
+  assertRbcEqual(inferredOracle, typedOracle, 'explicit and inferred standard signatures must normalize identically');
+
+  for (const invalidSource of [
+    typedEventParameter.replace('on input(value : Text)', 'on input(value : Number)'),
+    typedEventParameter.replace('on input(value : Text)', 'on input(other : Text)'),
+    typedEventParameter.replace('on input(value : Text)', 'on input(value : Text, value : Text)'),
+  ]) {
+    assert.throws(() => compileRealityToBytecode(invalidSource));
+    assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
+      'invalid event parameters must fail closed in both compilers');
+  }
+
+  const realityTransactionUi = `reality GovernedUI {
+    facet app.published : Truth = false
+    subject user { warrant app.publish on app }
+    emergence publish { cause user when app.published == false needs app.publish on app alter app.published <- true preserve app.published == true witness "ui:publish" }
+    ui Console {
       view Root {
-        input Field {
-          bind value <- value
-          on input(value : Text) { set value <- value }
-        }
+        action PublishButton { label "Publish" on activate { realize publish } }
       }
     }
   }`;
-  assert.doesNotThrow(() => compileRealityToBytecode(unsupportedEventParameter));
-  assert.throws(() => runCompilerArtifact(c1, unsupportedEventParameter), undefined,
-    'event-parameter UI grammar must remain fail-closed until self-hosted');
+  assert.doesNotThrow(() => compileRealityToBytecode(realityTransactionUi));
+  assert.throws(() => runCompilerArtifact(c1, realityTransactionUi), undefined,
+    'reality-transaction UI events remain fail-closed until their governed semantic slice is self-hosted');
 });
 
 test('dynamic provider lowering is exact RBC v1.2 with expression operands', { timeout: 300_000 }, () => {

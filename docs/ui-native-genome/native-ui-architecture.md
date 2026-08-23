@@ -40,6 +40,6 @@ Navigation, resources and device adaptation are reserved in `extensionPoints` bu
 
 ## Promotion boundary
 
-The canonical self-host compiler now owns the minimal UI and exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event semantic slice with byte-identical fixed-point, differential and mutation evidence. The JavaScript reference compiler still owns typed event parameters and wider candidate forms. Formal repository-wide promotion still requires closing those fail-closed gaps, version-contract changes and a human-reviewed promotion receipt.
+The canonical self-host compiler now owns the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event semantic slice, and typed or standard-inferred UI-local event parameters with byte-identical fixed-point, differential, mutation and negative-control evidence. The JavaScript reference compiler still exclusively owns reality-transaction UI events, fixed sizing and wider candidate forms. Formal repository-wide promotion still requires closing those fail-closed gaps, version-contract changes and a human-reviewed promotion receipt.
 
 The UI `semanticRoot` is a versioned semantic-genome hash. The reality `programRoot` binds `{id, semanticRoot}` receipts rather than diagnostic locations or derived caches. This makes roots stable under source relocation without weakening mutation detection.
