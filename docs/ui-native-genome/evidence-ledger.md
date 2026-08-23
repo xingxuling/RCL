@@ -7,7 +7,7 @@
 - Base SHA: `d255c4f21c32a4086643a770f1b80c80968d2c37`
 - Remote `main` at audit: `883b265420645b9ee112f0839c794bd76de50bd6`
 - Parent candidate implementation SHA: `5118e267d7045a12fce2c4cdbe6b6b7dee886fe2`
-- Verified selfhost implementation SHA: pending first selfhost commit
+- Verified selfhost implementation SHA: `e0d9a0848a101d8b69ed53cefb94fcc3367db8fc`
 - Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; report with `git rev-parse HEAD`
 - Rollback point: base SHA above
 
