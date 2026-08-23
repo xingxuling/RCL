@@ -32,6 +32,25 @@ test('native UI identity and serialization are stable across compilation and rou
   assert.equal(serializeNativeUiProgram(restored), serialized);
 });
 
+test('semantic roots ignore diagnostic locations but bind semantic genome mutations', () => {
+  const original = compileReality(SOURCE);
+  const relocated = compileReality(`\n\n${SOURCE}`);
+  assert.notDeepEqual(relocated.nativeUis[0].source, original.nativeUis[0].source);
+  assert.equal(relocated.nativeUis[0].semanticRoot, original.nativeUis[0].semanticRoot);
+  assert.equal(relocated.programRoot, original.programRoot);
+
+  const changed = compileReality(SOURCE.replace('property corner_radius = 20', 'property corner_radius = 21'));
+  assert.notEqual(changed.nativeUis[0].semanticRoot, original.nativeUis[0].semanticRoot);
+  assert.notEqual(changed.programRoot, original.programRoot);
+
+  const tampered = structuredClone(original.nativeUis[0]);
+  tampered.viewTree.resolvedStyle.values.background = '#000000';
+  assert.throws(
+    () => deserializeNativeUiProgram(JSON.stringify(tampered), validateCanonicalNativeUi),
+    /RCL_UI_SEMANTIC_ROOT_MISMATCH/u,
+  );
+});
+
 test('programs without UI preserve the governed pre-UI IR shape and program root', () => {
   const program = compileReality(`reality NoUI { facet value : Number = 1 }`);
   assert.equal(Object.hasOwn(program, 'nativeUis'), false);

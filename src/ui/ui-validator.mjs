@@ -5,7 +5,7 @@ import {
   UI_PROPERTY_TYPES,
   UI_ROLES,
 } from './ui-schema.mjs';
-import { nativeUiRoot } from './ui-ir.mjs';
+import { nativeUiRoot, nativeUiSemanticGenome } from './ui-ir.mjs';
 
 function assert(condition, code) {
   if (!condition) throw new Error(code);
@@ -16,6 +16,7 @@ export function validateCanonicalNativeUi(program) {
   assert(typeof program.id === 'string' && program.id.length > 0, 'RCL_UI_SCHEMA_ID');
   assert(Array.isArray(program.state), 'RCL_UI_SCHEMA_STATE');
   assert(program.viewTree && typeof program.viewTree === 'object', 'RCL_UI_SCHEMA_VIEW_TREE');
+  assert(program.styleSheet?.format === 'rcl.native-ui.style-sheet.v0.1', 'RCL_UI_SCHEMA_STYLE_FORMAT');
   const stateIds = new Set();
   const stateTypes = new Map();
   for (const state of program.state) {
@@ -39,6 +40,8 @@ export function validateCanonicalNativeUi(program) {
     for (const property of node.localProperties) {
       assert(UI_PROPERTY_TYPES[property.property] === property.valueType, `RCL_UI_SCHEMA_PROPERTY_TYPE:${node.id}:${property.property}`);
     }
+    const expectedAccessibilityLabel = node.localProperties.find((property) => property.property === 'accessibility_label')?.value ?? null;
+    assert(node.accessibility?.label === expectedAccessibilityLabel, `RCL_UI_SCHEMA_ACCESSIBILITY:${node.id}`);
     for (const binding of node.bindings) {
       assert(UI_BINDABLE_PROPERTIES_BY_ROLE[node.role].includes(binding.property), `RCL_UI_SCHEMA_BINDING_PROPERTY:${node.id}:${binding.property}`);
       assert(binding.expression?.valueType === UI_PROPERTY_TYPES[binding.property], `RCL_UI_SCHEMA_BINDING_TYPE:${node.id}:${binding.property}`);
@@ -65,6 +68,6 @@ export function validateCanonicalNativeUi(program) {
   assert(typeof program.semanticRoot === 'string' && /^[0-9a-f]{64}$/u.test(program.semanticRoot), 'RCL_UI_SCHEMA_ROOT');
   const draft = structuredClone(program);
   delete draft.semanticRoot;
-  assert(nativeUiRoot(draft) === program.semanticRoot, 'RCL_UI_SEMANTIC_ROOT_MISMATCH');
+  assert(nativeUiRoot(nativeUiSemanticGenome(draft)) === program.semanticRoot, 'RCL_UI_SEMANTIC_ROOT_MISMATCH');
   return true;
 }

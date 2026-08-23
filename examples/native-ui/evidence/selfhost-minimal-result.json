@@ -1,0 +1,57 @@
+{
+  "format": "rcl.native-ui.selfhost-minimal-evidence.v0.1",
+  "date": "2026-08-23",
+  "status": "CANDIDATE_MINIMAL_UI_SELFHOST_SLICE_VERIFIED",
+  "compiler": {
+    "sourceSha256": "ad56a00dfb0ac10d39e575b3c587677e899e39f0179cc9ce26f42554c4f75ab4",
+    "sourceBytes": 130105,
+    "artifactSha256": "51d2765315a9c4a375e3d67146a9672a9964e8a4d5749fc8b814fc6d5124e034",
+    "artifactBytes": 164253,
+    "instructionBudgetPerRun": 300000000,
+    "declaredFixedPointBudgetMs": 240000,
+    "fixedPointElapsedMs": 67144.6519,
+    "withinFixedPointBudget": true,
+    "c0ToC1": {
+      "elapsedMs": 33714.511000000006,
+      "outputSha256": "51d2765315a9c4a375e3d67146a9672a9964e8a4d5749fc8b814fc6d5124e034",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    },
+    "c1ToC2": {
+      "elapsedMs": 33430.14089999999,
+      "outputSha256": "51d2765315a9c4a375e3d67146a9672a9964e8a4d5749fc8b814fc6d5124e034",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    }
+  },
+  "minimalFixture": {
+    "source": "examples/selfhost-core/native-ui-minimal.rcl",
+    "sourceSha256": "641887613f68bb8bf622c0a26bc4673c7b9c139a3eda2d48a25ccf09f4766018",
+    "uiProgramRoot": "d213c9e1144c08edd99f9fa3dba4bbfb25370be9f262096a9225192060698e9b",
+    "realityProgramRoot": "50bbbce501ef0b0040adbe56c7afdd09f2a3e5fa4239acb66f136d086761372b",
+    "rbcSha256": "53941e7f448b36496da9723406c14db40eea408827a5371ae039fddb633362d8",
+    "rbcBytes": 133,
+    "decodedSourceRoot": "50bbbce501ef0b0040adbe56c7afdd09f2a3e5fa4239acb66f136d086761372b",
+    "jsSelfhostByteIdentical": true,
+    "nativeElapsedMs": 29.973399999988033
+  },
+  "negativeBoundary": {
+    "source": "examples/native-ui/counter.rcl",
+    "jsReferenceAccepts": true,
+    "selfhostRejects": true,
+    "failure": {
+      "code": "RCLC_COMPILER_FAILURE",
+      "message": "RCL_SEMANTIC_ASSERT: view at 3:5"
+    }
+  },
+  "gates": {
+    "fixedPoint": "PASS",
+    "jsDifferential": "PASS",
+    "nativeExecution": "PASS",
+    "expandedNativeUiParity": "BLOCKED",
+    "aiGenerate": "UNVERIFIED"
+  },
+  "boundary": "This verifies only ui <id> { view <id> {} }. It does not promote the Counter state/event/layout/style surface or repository-wide Native UI selfhost parity."
+}

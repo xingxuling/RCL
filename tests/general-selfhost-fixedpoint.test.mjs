@@ -285,6 +285,7 @@ test('self-hosted C1 matches JS RBC for core and rule fixtures', { timeout: 300_
     'examples/rcl-native-absorption-kernel.rcl',
     'examples/whole-language-parser-target.rcl',
     'examples/selfhost-core/dynamic-provider-v12.rcl',
+    'examples/selfhost-core/native-ui-minimal.rcl',
   ];
 
   for (const fixture of fixtures) {
@@ -306,12 +307,29 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
     'reality UnknownCall { facet world.value : Number = missing_call(1) }',
     'reality WrongLiteral { facet world.value : Number = "one" }',
     'reality UnsupportedNative { physical universe { } }',
+    'reality MissingUIView { ui App { } }',
   ];
 
   for (const source of rejected) {
     assert.throws(() => compileRealityToBytecode(source), undefined, `JS must reject: ${source}`);
     assert.throws(() => runCompilerArtifact(c1, source), undefined, `self-host must reject: ${source}`);
   }
+});
+
+test('self-hosted compiler owns the minimal Native UI syntax/root slice and rejects the expanded candidate surface', { timeout: 300_000 }, () => {
+  const { c1 } = getFixedPointEvidence();
+  const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
+  const selfHosted = runCompilerArtifact(c1, minimalSource).output;
+  const bootstrapOracle = compileRealityToBytecode(minimalSource);
+  assertRbcEqual(selfHosted, bootstrapOracle, 'minimal Native UI RBC and program root must match JS exactly');
+
+  const expandedSource = read('examples/native-ui/counter.rcl');
+  assert.doesNotThrow(() => compileRealityToBytecode(expandedSource));
+  assert.throws(
+    () => runCompilerArtifact(c1, expandedSource),
+    undefined,
+    'the self-host slice must fail closed instead of pretending to own the expanded Native UI grammar',
+  );
 });
 
 test('dynamic provider lowering is exact RBC v1.2 with expression operands', { timeout: 300_000 }, () => {

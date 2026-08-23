@@ -1,14 +1,44 @@
 {
   "schema": "rcl.universal-stress.evidence.v0.1",
-  "generation": "native-ui-genome-v0.1-candidate-1",
+  "generation": "native-ui-genome-v0.1-candidate-2-selfhost-minimal",
   "claims": [
+    {
+      "id": "compiler-runtime::self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "PENDING_SELFHOST_COMMIT",
+      "lastVerifiedDate": "2026-08-23",
+      "knownLimits": [
+        "self-host ownership is limited to ui <id> { view <id> {} }",
+        "the full Counter state, event, layout, style and lifecycle grammar remains reference-only",
+        "AI_GENERATE remains independently unverified"
+      ],
+      "relatedKillerTasks": ["K01"],
+      "requiredGenes": ["self-host-ui-parser", "semantic-genome-root", "fixed-point-differential"],
+      "donorAdvantages": [
+        { "donor": "RCL JavaScript reference compiler", "capability": "complete Native UI v0.1 candidate grammar", "status": "PARTIAL_UNABSORBED" }
+      ],
+      "gates": {
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/selfhost-core/native-ui-minimal.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "examples/native-ui/evidence/selfhost-minimal-result.json"] },
+        "ROBUST": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs"] },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"], "note": "C0 to C1 to C2 remains inside the pre-existing 240 second wall-clock and 300 million instruction-per-run budgets" },
+        "AI_GENERATE": { "status": "UNVERIFIED", "evidence": ["examples/universal-stress/k01-ai-generation-contract.json"], "note": "this development session cannot self-certify an independent AI-generation trial" },
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
+      },
+      "changes": [
+        { "id": "selfhost-native-ui-minimal", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, roots and byte-lowers a bounded platform-neutral UI slice" }
+      ]
+    },
     {
       "id": "browser::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "5118e267d7045a12fce2c4cdbe6b6b7dee886fe2",
+      "lastVerifiedSha": "PENDING_SELFHOST_COMMIT",
       "lastVerifiedDate": "2026-08-23",
       "knownLimits": [
-        "canonical self-host compiler does not yet own Native UI syntax",
+        "canonical self-host compiler owns only the minimal empty-view slice, not this Counter surface",
         "visual fidelity is structural v0.1 rather than pixel parity",
         "navigation, focus traversal and full accessibility tree are not implemented",
         "AI_GENERATE is not independently evidenced"
@@ -36,7 +66,7 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "5118e267d7045a12fce2c4cdbe6b6b7dee886fe2",
+      "lastVerifiedSha": "PENDING_SELFHOST_COMMIT",
       "lastVerifiedDate": "2026-08-23",
       "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
       "relatedKillerTasks": ["K02"],
@@ -60,9 +90,9 @@
     {
       "id": "android::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "5118e267d7045a12fce2c4cdbe6b6b7dee886fe2",
+      "lastVerifiedSha": "PENDING_SELFHOST_COMMIT",
       "lastVerifiedDate": "2026-08-23",
-      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler parity is missing", "device adaptation and full accessibility are missing"],
+      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns only the minimal empty-view slice", "device adaptation and full accessibility are missing"],
       "relatedKillerTasks": ["K03"],
       "requiredGenes": ["view-tree", "reactive-state", "event-graph", "layout-algebra", "style-cascade", "lifecycle", "device-adaptation"],
       "donorAdvantages": [
@@ -86,7 +116,7 @@
     {
       "id": "android::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "5118e267d7045a12fce2c4cdbe6b6b7dee886fe2",
+      "lastVerifiedSha": "PENDING_SELFHOST_COMMIT",
       "lastVerifiedDate": "2026-08-23",
       "knownLimits": ["device execution and performance are unverified", "AI_GENERATE is unverified"],
       "relatedKillerTasks": ["K03"],
@@ -116,8 +146,8 @@
   "novelTaskTrials": 1,
   "kernelChangesForNovelTasks": 1,
   "notes": [
-    "Four affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
-    "Coverage is classified lowered-execution until canonical self-host compiler parity is verified.",
+    "Five affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
+    "The minimal self-host compiler slice is native-semantic, while the Counter Web and Android claims remain lowered-execution until full canonical self-host parity is verified.",
     "The Android APK build is real, but build evidence is not device execution evidence."
   ]
 }

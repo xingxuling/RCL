@@ -95,7 +95,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 - Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
 - Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
 - Android installation/device interaction is not verified.
-- Canonical self-host compiler ownership is not implemented, so repository-wide UI remains `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`, not promoted `native-semantic`.
+- Canonical self-host compiler ownership is verified only for the minimal empty-view slice with byte-identical JS/native fixed-point evidence. The full Counter surface remains blocked, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
 
 Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 

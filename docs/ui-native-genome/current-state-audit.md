@@ -9,7 +9,7 @@ Audited baseline: `9093096d4f7a47d713622f8772b433102fda203b`
 
 | Capability | Before this candidate | Candidate state | Evidence boundary |
 |---|---|---|---|
-| `.rcl` native UI syntax | `MISSING` | `PARTIAL` | Implemented in the JavaScript reference parser; not yet ported into the canonical self-host compiler sources. |
+| `.rcl` native UI syntax | `MISSING` | `PARTIAL` | Full v0.1 candidate lives in the reference parser; the canonical self-host compiler owns only `ui <id> { view <id> {} }`. |
 | Canonical Native UI IR | `MISSING` | `PARTIAL` | Versioned, rooted, serializable and validated in `src/ui`; candidate-only until the canonical compiler path owns it. |
 | Reactive state/binding/event | `LOWERED_ONLY` | `EXISTING` in candidate | Same IR and trace evaluator feed both candidate backends. |
 | Platform-neutral layout | `MISSING` | `PARTIAL` | Vertical, horizontal, overlay and grid-like modes; no general constraint solver. |
@@ -35,4 +35,4 @@ No shared Reality Markup, DOM, CSS cascade or Android UI kernel existed that cou
 
 ## Canonical-source warning
 
-`VERSION-CONTRACT.json` names `selfhost/compiler-core.rcl` and `selfhost/compiler-main.rcl` as the canonical compiler sources and marks `src/compiler.mjs` as reference-only. This candidate therefore proves a runnable native-UI semantic design and dual-backend closure, but it does **not** yet justify changing the repository-wide capability mode from `lowered-execution` to promoted `native-semantic`.
+`VERSION-CONTRACT.json` names `selfhost/compiler-core.rcl` and `selfhost/compiler-main.rcl` as the canonical compiler sources and marks `src/compiler.mjs` as reference-only. A minimal empty-view slice now reaches canonical self-host fixed-point and RBC differential parity. The Counter state/event/layout/style surface does not, so the dual-backend claim still does **not** justify repository-wide promotion from `lowered-execution` to `native-semantic`.

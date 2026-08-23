@@ -40,5 +40,6 @@ Navigation, resources and device adaptation are reserved in `extensionPoints` bu
 
 ## Promotion boundary
 
-The JavaScript reference compiler currently owns the candidate syntax. Formal canonical promotion additionally requires the self-host compiler to parse and emit the same UI IR, fixed-point/differential evidence, version-contract changes and a human-reviewed promotion receipt.
+The JavaScript reference compiler owns the full candidate syntax. The canonical self-host compiler now owns one minimal empty-view slice with byte-identical fixed-point/differential evidence. Formal promotion still requires expanding that slice through state, expressions, nodes, events, layout, style and lifecycle, followed by Counter parity, version-contract changes and a human-reviewed promotion receipt.
 
+The UI `semanticRoot` is a versioned semantic-genome hash. The reality `programRoot` binds `{id, semanticRoot}` receipts rather than diagnostic locations or derived caches. This makes roots stable under source relocation without weakening mutation detection.

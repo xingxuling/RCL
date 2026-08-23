@@ -673,8 +673,20 @@ reality RCLGeneralSelfHostCompiler {
     parse_policy_body(tokens, index + 3,
       make_policy(token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), "false"))
 
+  reckon pui(tokens : Sequence, index : Number) -> Sequence =
+    choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAME"),
+      choose(require_token(tokens, index + 2, "{", "RCL_UI_OPEN"),
+        choose(require_token(tokens, index + 3, "view", "RCL_UI_VIEW"),
+          choose(require_kind(tokens, index + 4, "IDENT", "RCL_UI_ID"),
+            choose(require_token(tokens, index + 5, "{", "RCL_UI_NODE_OPEN"),
+              choose(require_token(tokens, index + 6, "}", "RCL_UI_MINIMAL"),
+                choose(require_token(tokens, index + 7, "}", "RCL_UI_CLOSE"),
+                  make_node_state(index + 8,
+                    sequence_append(sequence_append(empty_sequence(), token_text_at(tokens, index + 1)), token_text_at(tokens, index + 4))),
+                  empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
+
   reckon make_extras() -> Sequence =
-    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence())
 
   reckon replace_extra(items : Sequence, target : Number, value : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -704,6 +716,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon program_policies(program : Sequence) -> Sequence = sequence_get(program_extras(program), 3)
   reckon program_stores(program : Sequence) -> Sequence = sequence_get(program_extras(program), 4)
   reckon program_absorption(program : Sequence) -> Sequence = sequence_get(program_extras(program), 5)
+  reckon uis(program : Sequence) -> Sequence = sequence_get(program_extras(program), 6)
 
   reckon parse_top(tokens : Sequence, index : Number, facets : Sequence, reckons : Sequence, subjects : Sequence, warrants : Sequence, rules : Sequence, directives : Sequence, extras : Sequence) -> Sequence =
     choose(token_kind_at(tokens, index) == "EOF", syntax_failure(tokens, index, "RCL_REALITY_UNCLOSED"),
@@ -752,12 +765,14 @@ reality RCLGeneralSelfHostCompiler {
             parse_top_after_extra(tokens, parse_policy(tokens, index), 3, facets, reckons, subjects, warrants, rules, directives, extras),
             choose(token_text_at(tokens, index) == "store",
               parse_top_after_extra(tokens, parse_store(tokens, index), 4, facets, reckons, subjects, warrants, rules, directives, extras),
-              choose(either(token_text_at(tokens, index) == "verify", token_text_at(tokens, index) == "snapshot"),
-                parse_top(tokens, index + 2, facets, reckons, subjects, warrants, rules, directives,
-                  append_extra(extras, 5,
-                    make_absorption(choose(token_text_at(tokens, index) == "verify", "VerifyCapabilities", "SnapshotStore"),
-                      token_text_at(tokens, index + 1)))),
-                syntax_failure(tokens, index, "RCL_UNKNOWN_TOP_LEVEL")))))))
+              choose(token_text_at(tokens, index) == "ui",
+                parse_top_after_extra(tokens, pui(tokens, index), 6, facets, reckons, subjects, warrants, rules, directives, extras),
+                choose(either(token_text_at(tokens, index) == "verify", token_text_at(tokens, index) == "snapshot"),
+                  parse_top(tokens, index + 2, facets, reckons, subjects, warrants, rules, directives,
+                    append_extra(extras, 5,
+                      make_absorption(choose(token_text_at(tokens, index) == "verify", "VerifyCapabilities", "SnapshotStore"),
+                        token_text_at(tokens, index + 1)))),
+                  syntax_failure(tokens, index, "RCL_UNKNOWN_TOP_LEVEL"))))))))
 
   reckon parse_program_after_top(tokens : Sequence, parse_state : Sequence) -> Sequence =
     choose(require_kind(tokens, state_index(parse_state), "EOF", "RCL_TRAILING_CONTENT"),
@@ -786,6 +801,17 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon json_quote(value : Text) -> Text = quote_character() + json_escape_from(value, 0, "") + quote_character()
   reckon json_truth(value : Text) -> Text = choose(value == "true", "true", "false")
+
+  reckon cui(node : Sequence, reality : Text) -> Text =
+    "[\"rcl.native-ui.semantic-genome.v0.1\",\"rcl.native-ui.program.v0.1\",\"0.1.0\",\"UIProgram\"," + json_quote(sequence_get(node, 0))
+      + "," + json_quote(reality) + ",[],[],[" + json_quote(sequence_get(node, 1))
+      + ",\"container\",[],[],[],[],[\"vertical\",[\"fill\",null],[\"intrinsic\",null],0,0,\"stretch\",\"start\",\"visible\",1],[{},{}],[]],[null,[],[]],[[\"create\",\"activate\",\"suspend\",\"resume\",\"destroy\"],[]],[null,[],null]]"
+
+  reckon cuis(items : Sequence, index : Number, reality : Text, output : Text) -> Text =
+    choose(index >= length(items), output + "]",
+      cuis(items, index + 1, reality,
+        output + choose(index > 0, ",", "") + "{\"id\":" + json_quote(sequence_get(sequence_get(items, index), 0))
+          + ",\"semanticRoot\":" + json_quote(sha256_text(cui(sequence_get(items, index), reality))) + "}"))
 
   reckon canonical_expression(node : Sequence) -> Text =
     choose(expr_kind(node) == "LiteralExpr",
@@ -1101,6 +1127,8 @@ reality RCLGeneralSelfHostCompiler {
       + ",\"genetics\":[],\"hosts\":" + canonical_hosts(program_hosts(program), 0, "[")
       + ",\"knowledges\":[],\"languageVersion\":\"0.14.0-alpha.1\",\"livings\":[],\"metaDomains\":[],\"name\":"
       + json_quote(program_name(program))
+      + choose(length(uis(program)) > 0,
+        ",\"nativeUis\":" + cuis(uis(program), 0, program_name(program), "["), "")
       + ",\"naturalLanguages\":[],\"neurals\":[],\"perceptions\":[],\"physicals\":[],\"quantitatives\":[],\"reckons\":"
       + canonical_reckons(program_reckons(program), 0, "[")
       + ",\"rules\":" + canonical_rules(program_rules(program), 0, "[")

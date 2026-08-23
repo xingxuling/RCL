@@ -583,7 +583,10 @@ function lower(program, symbols, extras = {}) {
     absorptionDirectives,
     ...irExtras,
   };
-  return Object.freeze({ ...ir, programRoot: realityRoot(ir) });
+  const rootPayload = ir.nativeUis
+    ? { ...ir, nativeUis: ir.nativeUis.map((ui) => ({ id: ui.id, semanticRoot: ui.semanticRoot })) }
+    : ir;
+  return Object.freeze({ ...ir, programRoot: realityRoot(rootPayload) });
 }
 
 export function tryCompileReality(source, options = {}) {

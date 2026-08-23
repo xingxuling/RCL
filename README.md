@@ -93,9 +93,9 @@ Detailed campaign records:
 
 ### Native UI Genome v0.1 candidate
 
-An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build.
+An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build. A minimal `ui App { view Root {} }` slice also reaches the canonical RCL-authored compiler with byte-identical C0/C1/C2 and JS/self-host RBC evidence.
 
-This remains `CANDIDATE`, not promoted `native-semantic`: the syntax/IR currently live in the JavaScript reference compiler path, while `VERSION-CONTRACT.json` names the self-host RCL compiler as canonical. Android device execution is also not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
+This remains `CANDIDATE`, not promoted repository-wide `native-semantic`: the full state/event/layout/style grammar still lives in the JavaScript reference path, while the self-host compiler owns only the minimal slice. Android device execution is also not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md), [`docs/ui-native-genome/selfhost-minimal-slice.md`](docs/ui-native-genome/selfhost-minimal-slice.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
 
 ### K01 — self-hosting compiler
 

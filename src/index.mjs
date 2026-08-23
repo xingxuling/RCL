@@ -148,7 +148,14 @@ export {
 
 export { compileNativeUiDeclarations, compileNativeUiProgram, collectUiNodes } from './ui/ui-compiler.mjs';
 export { createNativeUiRuntime, runNativeUiSemanticTrace } from './ui/ui-event.mjs';
-export { serializeNativeUiProgram, deserializeNativeUiProgram, nativeUiRoot, canonicalUiJson } from './ui/ui-ir.mjs';
+export {
+  serializeNativeUiProgram,
+  deserializeNativeUiProgram,
+  nativeUiRoot,
+  canonicalUiJson,
+  nativeUiSemanticProjection,
+  nativeUiSemanticGenome,
+} from './ui/ui-ir.mjs';
 export { validateCanonicalNativeUi } from './ui/ui-validator.mjs';
 export {
   RCL_NATIVE_UI_VERSION,

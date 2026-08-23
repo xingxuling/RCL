@@ -3,10 +3,11 @@
 ## Source identity
 
 - Repository: `xingxuling/RCL`
-- Branch: `codex/rcl-native-ui-genome-v0.1`
-- Base SHA: `9093096d4f7a47d713622f8772b433102fda203b`
+- Branch: `codex/rcl-native-ui-selfhost-v0.1`
+- Base SHA: `d255c4f21c32a4086643a770f1b80c80968d2c37`
 - Remote `main` at audit: `883b265420645b9ee112f0839c794bd76de50bd6`
-- Verified implementation SHA: `5118e267d7045a12fce2c4cdbe6b6b7dee886fe2`
+- Parent candidate implementation SHA: `5118e267d7045a12fce2c4cdbe6b6b7dee886fe2`
+- Verified selfhost implementation SHA: pending first selfhost commit
 - Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; report with `git rev-parse HEAD`
 - Rollback point: base SHA above
 
@@ -38,12 +39,13 @@ These decisions changed the implementation: companion morphology is forbidden on
 - `android-build-result.json`
 - `evidence-summary.json`
 - `performance-result.json`
+- `selfhost-minimal-result.json`
 
 ## Changed files and module disposition
 
-- Added modules: the canonical candidate UI stack under `src/ui/`, four Native UI test files, three evidence/benchmark runners, the Counter source and compact receipts, and the Native UI documentation set.
+- Added modules: the canonical candidate UI stack under `src/ui/`, four Native UI test files, four evidence/benchmark runners, the Counter and minimal selfhost sources, compact receipts, and the Native UI documentation set.
 - Reused modules: `src/parser.mjs`, `src/compiler.mjs`, the Web/Android application compilers, public exports, package scripts, and the universal stress reporter. The legacy K02/K03 companion routes remain available and are not rewritten into the Native UI route.
-- Replaced modules: none. The candidate is additive and explicitly routed; it does not delete a legacy backend or overwrite the canonical self-host compiler.
+- Replaced modules: none. The candidate remains explicitly routed and does not delete a legacy backend. The canonical self-host compiler is extended only with a fail-closed minimal UI parser/root slice.
 - Governance/support changes: the Akashic scanner now includes root `CHANGELOG.md` and recursively scans governed documentation; the K400 model records `UNTESTED`/`REGRESSED`, gate metadata and full 400-cell output; the repository now includes the declared Apache-2.0 license text.
 
 ## Test and runtime ledger
@@ -51,20 +53,20 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Evidence class | Result |
 |---|---|
 | Parser / IR | PASS — typed parameters, stable identity, serialization and invalid-source rejection |
-| Native UI semantics | PASS — 19/19 focused tests |
+| Native UI semantics | PASS — 20/20 focused tests |
 | Web | PASS — lowering plus Chrome 151 real-DOM interaction |
 | Android | BUILD PASS — Gradle project and APK; DEVICE RUNTIME NOT VERIFIED |
 | Authority | PASS — reality actions require a CandidateReality gateway; mixed authority fails closed |
 | Style / layout / lifecycle | PASS for the declared v0.1 subset; navigation, resources and device adaptation remain absent |
 | K02/K03 compatibility | PASS — 6/6 Web companion and 8/8 Android companion focused tests |
-| Selfhost/fixed point | PASS for existing gates; Native UI canonical selfhost parity is not implemented |
-| Full regression | PASS — 716 tests, 715 pass, 0 fail, 1 Zig-unavailable skip, 350.5 s, exit 0 |
+| Selfhost/fixed point | PASS — 6/6; minimal empty-view UI is JS/native byte-identical, expanded Counter fails closed |
+| Full regression | PASS — 718 tests, 717 pass, 0 fail, 1 Zig-unavailable skip, 253.7 s, exit 0 |
 
 ## Current maturity decision
 
 | Dimension | Decision |
 |---|---|
-| Native semantic coverage | `CANDIDATE` — reference parser/IR/runtime only; selfhost parity blocked |
+| Native semantic coverage | `CANDIDATE` — minimal empty-view selfhost slice verified; full Counter parity blocked |
 | Web lowering | `VERIFIED` for Counter v0.1 |
 | Android lowering | `VERIFIED` for project generation and APK build |
 | Visual fidelity | `PARTIAL` — semantic structure/style subset, no pixel parity claim |
@@ -73,12 +75,12 @@ These decisions changed the implementation: companion morphology is forbidden on
 
 ## Integration Court
 
-- Does RCL own the candidate UI semantics? **Yes in the reference compiler candidate; not yet in the governed canonical self-host compiler.**
+- Does RCL own the candidate UI semantics? **The governed canonical self-host compiler owns the minimal empty-view slice; the reference compiler still owns the full Counter surface.**
 - Do Web and Android consume one Canonical UI? **Yes; lowering roots refer to the same `uiProgramRoot`.**
 - Is platform syntax present in core? **No detected platform widget/layout primitives.**
 - Is Authority/4R preserved? **Yes at the UI boundary; reality actions cannot execute without an external governed gateway.**
 - Is there real execution evidence? **Yes for browser and Android build; no for Android device behavior.**
-- Is regression closed? **Yes for the current reference-candidate changes: 716 tests, 715 pass, 0 fail and 1 Zig-unavailable skip. This does not close canonical selfhost, Android device, performance or AI-generation gates.**
+- Is regression closed? **Yes for this generation: 718 tests, 717 pass, 0 fail and 1 Zig-unavailable skip. This does not close full Counter selfhost, Android device or AI-generation gates.**
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
@@ -88,4 +90,4 @@ The candidate implementation reuses repository interfaces and independently impl
 
 ## Matrix impact
 
-The candidate rerun maps to `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. All four remain `BLOCKED`; the generated 400-cell dashboard reports 4 blocked claims and 396 untested cells. Performance and AI generation remain unverified, and Android also lacks device execute/correct evidence.
+The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. All five remain `BLOCKED`; the generated 400-cell dashboard reports 5 blocked claims and 395 untested cells. K01 remains blocked by independent AI generation; Counter performance and AI generation remain unverified; Android also lacks device execute/correct evidence.
