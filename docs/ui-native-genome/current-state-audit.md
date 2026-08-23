@@ -5,7 +5,7 @@ Repository: `xingxuling/RCL`<br>
 Candidate branch: `codex/rcl-selfhost-headroom-v0.1`<br>
 Generation base: `f64c214bc38295f05b6e8174afb2f4a843834508`<br>
 Counter-selfhost implementation: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
-Parameterized-event implementation: bind after the implementation commit
+Parameterized-event implementation: `3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90`
 
 ## Classification
 
