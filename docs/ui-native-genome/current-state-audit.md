@@ -1,9 +1,10 @@
 # RCL Native UI Genome v0.1 — Current-State Audit
 
-Audit date: 2026-08-23  
-Repository: `xingxuling/RCL`  
-Candidate branch: `codex/rcl-native-ui-genome-v0.1`  
-Audited baseline: `9093096d4f7a47d713622f8772b433102fda203b`
+Audit date: 2026-08-24<br>
+Repository: `xingxuling/RCL`<br>
+Candidate branch: `codex/rcl-selfhost-headroom-v0.1`<br>
+Generation base: `f64c214bc38295f05b6e8174afb2f4a843834508`<br>
+Counter-selfhost implementation: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
 
 ## Classification
 

@@ -1,44 +1,44 @@
 {
   "schema": "rcl.universal-stress.evidence.v0.1",
-  "generation": "native-ui-genome-v0.1-candidate-2-selfhost-minimal",
+  "generation": "native-ui-genome-v0.1-candidate-3-selfhost-counter",
   "claims": [
     {
       "id": "compiler-runtime::self-hosting",
       "coverageMode": "native-semantic",
-      "lastVerifiedSha": "e0d9a0848a101d8b69ed53cefb94fcc3367db8fc",
-      "lastVerifiedDate": "2026-08-23",
+      "lastVerifiedSha": "c442f054b1007c9dab878b57f104e77bd1ffb47d",
+      "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "self-host ownership is limited to ui <id> { view <id> {} }",
-        "the full Counter state, event, layout, style and lifecycle grammar remains reference-only",
+        "self-host ownership includes the exact Counter state, derived, lifecycle, theme, style, recursive tree, binding, layout and UI-local event slice",
+        "typed UI event parameters, fixed sizing, reality-transaction UI events and wider candidate forms remain fail-closed or reference-only",
         "AI_GENERATE remains independently unverified"
       ],
       "relatedKillerTasks": ["K01"],
       "requiredGenes": ["self-host-ui-parser", "semantic-genome-root", "fixed-point-differential"],
       "donorAdvantages": [
-        { "donor": "RCL JavaScript reference compiler", "capability": "complete Native UI v0.1 candidate grammar", "status": "PARTIAL_UNABSORBED" }
+        { "donor": "RCL JavaScript reference compiler", "capability": "wider Native UI v0.1 candidate grammar beyond the Counter slice", "status": "PARTIAL_UNABSORBED" }
       ],
       "gates": {
-        "EXPRESS": { "status": "PASS", "evidence": ["examples/selfhost-core/native-ui-minimal.rcl"] },
-        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
-        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
-        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"] },
-        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "examples/native-ui/evidence/selfhost-minimal-result.json"] },
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-minimal.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-counter-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-counter-result.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-counter-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "examples/native-ui/evidence/selfhost-counter-result.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs"] },
-        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json"], "note": "C0 to C1 to C2 remains inside the pre-existing 240 second wall-clock and 300 million instruction-per-run budgets" },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-counter-result.json"], "note": "each native generation executes 103,063,637 instructions with 196,936,363 headroom; the two generations completed in 125,255.0658 ms on this machine" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": ["examples/universal-stress/k01-ai-generation-contract.json"], "note": "this development session cannot self-certify an independent AI-generation trial" },
-        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-minimal-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-counter-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
       },
       "changes": [
-        { "id": "selfhost-native-ui-minimal", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, roots and byte-lowers a bounded platform-neutral UI slice" }
+        { "id": "selfhost-native-ui-counter", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, roots and byte-lowers the bounded platform-neutral Counter semantic slice with mutation sensitivity" }
       ]
     },
     {
       "id": "browser::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "e0d9a0848a101d8b69ed53cefb94fcc3367db8fc",
-      "lastVerifiedDate": "2026-08-23",
+      "lastVerifiedSha": "c442f054b1007c9dab878b57f104e77bd1ffb47d",
+      "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "canonical self-host compiler owns only the minimal empty-view slice, not this Counter surface",
+        "canonical self-host compiler owns the exact Counter surface; typed event parameters and wider UI forms remain fail-closed or reference-only",
         "visual fidelity is structural v0.1 rather than pixel parity",
         "navigation, focus traversal and full accessibility tree are not implemented",
         "AI_GENERATE is not independently evidenced"
@@ -66,8 +66,8 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "e0d9a0848a101d8b69ed53cefb94fcc3367db8fc",
-      "lastVerifiedDate": "2026-08-23",
+      "lastVerifiedSha": "c442f054b1007c9dab878b57f104e77bd1ffb47d",
+      "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
       "relatedKillerTasks": ["K02"],
       "requiredGenes": ["reactive-state", "derived-binding", "event-graph"],
@@ -90,9 +90,9 @@
     {
       "id": "android::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "e0d9a0848a101d8b69ed53cefb94fcc3367db8fc",
-      "lastVerifiedDate": "2026-08-23",
-      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns only the minimal empty-view slice", "device adaptation and full accessibility are missing"],
+      "lastVerifiedSha": "c442f054b1007c9dab878b57f104e77bd1ffb47d",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns the exact Counter surface; typed event parameters and wider UI forms remain fail-closed or reference-only", "device adaptation and full accessibility are missing"],
       "relatedKillerTasks": ["K03"],
       "requiredGenes": ["view-tree", "reactive-state", "event-graph", "layout-algebra", "style-cascade", "lifecycle", "device-adaptation"],
       "donorAdvantages": [
@@ -116,8 +116,8 @@
     {
       "id": "android::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "e0d9a0848a101d8b69ed53cefb94fcc3367db8fc",
-      "lastVerifiedDate": "2026-08-23",
+      "lastVerifiedSha": "c442f054b1007c9dab878b57f104e77bd1ffb47d",
+      "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["device execution and performance are unverified", "AI_GENERATE is unverified"],
       "relatedKillerTasks": ["K03"],
       "requiredGenes": ["reactive-state", "derived-binding", "event-graph", "lifecycle"],
@@ -147,7 +147,7 @@
   "kernelChangesForNovelTasks": 1,
   "notes": [
     "Five affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
-    "The minimal self-host compiler slice is native-semantic, while the Counter Web and Android claims remain lowered-execution until full canonical self-host parity is verified.",
+    "The exact Counter self-host compiler slice is native-semantic, while the Web and Android claims remain lowered-execution and wider Native UI grammar remains fail-closed or reference-only.",
     "The Android APK build is real, but build evidence is not device execution evidence."
   ]
 }

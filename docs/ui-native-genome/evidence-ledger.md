@@ -8,8 +8,8 @@
 - Remote `main` at audit: `883b265420645b9ee112f0839c794bd76de50bd6`
 - Parent candidate implementation SHA: `5118e267d7045a12fce2c4cdbe6b6b7dee886fe2`
 - Predecessor minimal-selfhost implementation SHA: `e0d9a0848a101d8b69ed53cefb94fcc3367db8fc`
-- Counter-selfhost implementation SHA: bind after the implementation commit; report with `git rev-parse HEAD`
-- Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; report with `git rev-parse HEAD`
+- Counter-selfhost implementation SHA: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
+- Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; reported in the generation handoff because a commit cannot self-bind its own SHA
 - Rollback point: base SHA above
 
 ## Civilizational review decisions
@@ -64,6 +64,7 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Selfhost/fixed point | PASS — 6/6; minimal UI and Counter are JS/self-host/native byte-identical; four UI mutations change roots; typed event parameters fail closed |
 | Instruction headroom | PASS — 103,063,637 executed per native generation; 196,936,363 remain against the 300 million cap; minimum gate 180 million |
 | Full regression | PASS — 718 tests: 717 pass, 0 fail, 1 skip; 306,413.9506 ms on this machine |
+| K400 / Integration Court | BLOCKED — 5 evidence-bearing cells are BLOCKED, 395 remain UNTESTED, 0 PASS; maturity `U0`; report root `697cfe4cba0cdcc8eb890db1eaf86600b7e840dc2e373f0af03a3954489673be` |
 
 ## Current maturity decision
 
@@ -86,6 +87,8 @@ These decisions changed the implementation: companion morphology is forbidden on
 - Is regression closed? **Yes for the current repository suite: focused Native UI/selfhost checks and the full 718-test regression are green. Android device and AI-generation gates remain open.**
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
+
+The SHA-bound matrix report evaluates `native-ui-genome-v0.1-candidate-3-selfhost-counter`: compiler self-hosting is blocked only by independent `AI_GENERATE`; browser claims remain blocked by performance and `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE` (with robustness gaps where declared). These gates do not compensate for one another.
 
 ## License and diff audit
 
