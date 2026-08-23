@@ -6,7 +6,8 @@
 - Branch: `codex/rcl-native-ui-genome-v0.1`
 - Base SHA: `9093096d4f7a47d713622f8772b433102fda203b`
 - Remote `main` at audit: `883b265420645b9ee112f0839c794bd76de50bd6`
-- Final SHA: the commit containing this ledger; report with `git rev-parse HEAD`
+- Verified implementation SHA: `5118e267d7045a12fce2c4cdbe6b6b7dee886fe2`
+- Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; report with `git rev-parse HEAD`
 - Rollback point: base SHA above
 
 ## Civilizational review decisions
