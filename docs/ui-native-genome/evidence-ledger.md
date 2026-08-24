@@ -10,7 +10,7 @@
 - Predecessor minimal-selfhost implementation SHA: `e0d9a0848a101d8b69ed53cefb94fcc3367db8fc`
 - Counter-selfhost implementation SHA: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
 - Parameterized-event implementation SHA: `3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90`
-- Governed-event implementation SHA: pending implementation commit
+- Governed-event implementation SHA: `6a2061bf7724530914a75b99a2d6e0e05616ee0b`
 - Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; reported in the generation handoff because a commit cannot self-bind its own SHA
 - Rollback point: base SHA above
 
@@ -68,7 +68,7 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Selfhost/fixed point | PASS — 6/6; minimal UI, Counter, parameterized UI-local events and governed reality-transaction declarations are JS/self-host/native byte-identical; four Counter mutations and a valid governed-rule rename change roots; invalid parameters, unknown rules and mixed-authority handlers fail closed |
 | Instruction headroom | PASS — 112,233,068 executed per native generation; 187,766,932 remain against the 300 million cap; minimum gate 180 million |
 | Full regression | PASS — governed-event generation: 718 tests, 717 pass, 0 fail, 1 skip; 443,291.2379 ms on this machine. An initial run hit one transient Windows `EPERM` directory-rename failure; the affected focused suite then passed 3/3 and the complete rerun passed cleanly |
-| K400 / Integration Court | BLOCKED — parameterized-event generation has 5 evidence-bearing cells BLOCKED, 395 UNTESTED, 0 PASS; maturity `U0`; report root `723d73ca4a563aeea42e21b03432d4b859b10dd5f7b3dd210e36a9d57c938858` |
+| K400 / Integration Court | BLOCKED — governed-event generation has 5 evidence-bearing cells BLOCKED, 395 UNTESTED, 0 PASS; maturity `U0`; report root `619190511a5103d018010020e40b78eb63220c42012ce415c1c14fd5a08f383d` |
 
 ## Current maturity decision
 
@@ -92,7 +92,7 @@ These decisions changed the implementation: companion morphology is forbidden on
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
-The current sealed SHA-bound report still evaluates the predecessor `native-ui-genome-v0.1-candidate-4-selfhost-parameters`; a governed-event matrix will be generated only after the implementation commit exists, so that every evidence cell can bind the actual implementation SHA. The non-compensatory blockers remain independent: compiler self-hosting lacks `AI_GENERATE`; browser claims lack performance and `AI_GENERATE`; Android claims lack device execution/correctness/performance and `AI_GENERATE` (with robustness gaps where declared).
+The SHA-bound report evaluates `native-ui-genome-v0.1-candidate-5-selfhost-governed` against implementation `6a2061bf7724530914a75b99a2d6e0e05616ee0b`: compiler self-hosting is blocked only by independent `AI_GENERATE`; browser claims remain blocked by performance and `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE` (with robustness gaps where declared). These gates do not compensate for one another.
 
 ## License and diff audit
 

@@ -1,44 +1,46 @@
 {
   "schema": "rcl.universal-stress.evidence.v0.1",
-  "generation": "native-ui-genome-v0.1-candidate-4-selfhost-parameters",
+  "generation": "native-ui-genome-v0.1-candidate-5-selfhost-governed",
   "claims": [
     {
       "id": "compiler-runtime::self-hosting",
       "coverageMode": "native-semantic",
-      "lastVerifiedSha": "3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90",
+      "lastVerifiedSha": "6a2061bf7724530914a75b99a2d6e0e05616ee0b",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "self-host ownership includes the exact Counter slice plus typed/custom and standard-inferred UI-local parameters with event-scope expressions",
-        "fixed sizing, reality-transaction UI events and wider candidate forms remain fail-closed or reference-only",
+        "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, and governed reality-transaction event declarations",
+        "fixed sizing and wider candidate forms remain fail-closed or reference-only",
+        "runtime reality execution remains external to the self-host compiler and UI; only CandidateReality may cross the Gateway",
         "AI_GENERATE remains independently unverified"
       ],
       "relatedKillerTasks": ["K01"],
       "requiredGenes": ["self-host-ui-parser", "semantic-genome-root", "fixed-point-differential"],
       "donorAdvantages": [
-        { "donor": "RCL JavaScript reference compiler", "capability": "wider Native UI v0.1 candidate grammar beyond the parameterized UI-local slice", "status": "PARTIAL_UNABSORBED" }
+        { "donor": "RCL JavaScript reference compiler", "capability": "fixed sizing and wider Native UI v0.1 candidate grammar beyond the governed-event slice", "status": "PARTIAL_UNABSORBED" }
       ],
       "gates": {
-        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-parameterized.rcl", "examples/selfhost-core/native-ui-minimal.rcl"] },
-        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-parameterized-result.json"] },
-        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-parameterized-result.json"] },
-        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-parameterized-result.json"] },
-        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "examples/native-ui/evidence/selfhost-parameterized-result.json"] },
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-parameterized.rcl", "examples/selfhost-core/native-ui-governed.rcl", "examples/selfhost-core/native-ui-minimal.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-governed-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-governed-result.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-governed-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "examples/native-ui/evidence/selfhost-governed-result.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs"] },
-        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-parameterized-result.json"], "note": "each native generation executes 108,605,671 instructions with 191,394,329 headroom; the evidence generations completed in 143,860.1809 ms on this machine" },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-governed-result.json"], "note": "each native generation executes 112,233,068 instructions with 187,766,932 headroom; the evidence generations completed in 142,697.6182 ms on this machine" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": ["examples/universal-stress/k01-ai-generation-contract.json"], "note": "this development session cannot self-certify an independent AI-generation trial" },
-        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-parameterized-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-governed-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
       },
       "changes": [
-        { "id": "selfhost-native-ui-parameters", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, types, roots and byte-lowers platform-neutral UI-local event parameters with signature inference and negative controls" }
+        { "id": "selfhost-native-ui-governed-events", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, roots and byte-lowers platform-neutral governed UI events, validates rule references, rejects mixed authority and preserves the external CandidateReality Gateway boundary" }
       ]
     },
     {
       "id": "browser::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90",
+      "lastVerifiedSha": "6a2061bf7724530914a75b99a2d6e0e05616ee0b",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "canonical self-host compiler owns the Counter and parameterized UI-local surfaces; reality-transaction events and wider UI forms remain fail-closed or reference-only",
+        "canonical self-host compiler owns the Counter, parameterized UI-local and governed-event surfaces; fixed sizing and wider UI forms remain fail-closed or reference-only",
+        "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
         "visual fidelity is structural v0.1 rather than pixel parity",
         "navigation, focus traversal and full accessibility tree are not implemented",
         "AI_GENERATE is not independently evidenced"
@@ -66,7 +68,7 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90",
+      "lastVerifiedSha": "6a2061bf7724530914a75b99a2d6e0e05616ee0b",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
       "relatedKillerTasks": ["K02"],
@@ -90,9 +92,9 @@
     {
       "id": "android::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90",
+      "lastVerifiedSha": "6a2061bf7724530914a75b99a2d6e0e05616ee0b",
       "lastVerifiedDate": "2026-08-24",
-      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns the Counter and parameterized UI-local surfaces; reality-transaction events and wider UI forms remain fail-closed or reference-only", "device adaptation and full accessibility are missing"],
+      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns the Counter, parameterized UI-local and governed-event surfaces; fixed sizing and wider UI forms remain fail-closed or reference-only", "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority", "device adaptation and full accessibility are missing"],
       "relatedKillerTasks": ["K03"],
       "requiredGenes": ["view-tree", "reactive-state", "event-graph", "layout-algebra", "style-cascade", "lifecycle", "device-adaptation"],
       "donorAdvantages": [
@@ -116,7 +118,7 @@
     {
       "id": "android::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90",
+      "lastVerifiedSha": "6a2061bf7724530914a75b99a2d6e0e05616ee0b",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["device execution and performance are unverified", "AI_GENERATE is unverified"],
       "relatedKillerTasks": ["K03"],
@@ -147,7 +149,8 @@
   "kernelChangesForNovelTasks": 1,
   "notes": [
     "Five affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
-    "The exact Counter plus parameterized UI-local self-host compiler slice is native-semantic, while the Web and Android claims remain lowered-execution and wider Native UI grammar remains fail-closed or reference-only.",
+    "The exact Counter, parameterized UI-local and governed-event self-host compiler slices are native-semantic, while the Web and Android claims remain lowered-execution and wider Native UI grammar remains fail-closed or reference-only.",
+    "Governed UI events preserve authority: missing gateways, unknown rules and mixed-authority handlers fail closed, and successful dispatch emits CandidateReality rather than committing reality.",
     "The Android APK build is real, but build evidence is not device execution evidence."
   ]
 }
