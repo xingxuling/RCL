@@ -4,7 +4,7 @@
 
 **A self-hosting programming language and compiler for governed state transitions, evidence-bound execution, and cross-platform software lowering.**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [5-minute Quick Start](GETTING_STARTED.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Package](https://img.shields.io/badge/package-v0.94.0--alpha.1-orange.svg)](package.json)
@@ -15,7 +15,7 @@
 
 > RCL is an evidence-bearing, permission-constrained programming language, compiler, native VM, provider runtime, and verification toolchain.
 
-It is designed around one core idea:
+RCL is built around one core idea:
 
 ```text
 intent
@@ -46,13 +46,97 @@ RCL currently has a self-hosted native-core compiler path, a native VM, Web and 
 
 It does **not** claim to be a universal programming language today. The repository instead defines a falsifiable process for testing how far that objective can be pushed.
 
-**Machine-readable capability contract:** [`VERSION-CONTRACT.json`](VERSION-CONTRACT.json)
+---
+
+# Start here if you are a programmer
+
+If the repository looks too abstract on first glance, do this before reading architecture documents.
+
+## 1. Clone and install
+
+```bash
+git clone https://github.com/xingxuling/RCL.git
+cd RCL
+npm install
+```
+
+Node.js 22+ is required for the JavaScript/reference toolchain.
+
+## 2. Run the smallest real program
+
+```bash
+npm run demo
+```
+
+That command runs [`examples/hello-reality.rcl`](examples/hello-reality.rcl):
+
+```rcl
+reality FirstLight {
+  facet world.greeting : Text = "unformed"
+
+  subject founder {
+    facet awareness : Number = 0
+    warrant world.write on world
+  }
+
+  emergence hello {
+    cause founder
+    when world.greeting == "unformed"
+    needs world.write on world
+    alter world.greeting <- "Hello, reality."
+    alter founder.awareness <- founder.awareness + 1
+    preserve founder.awareness >= 0
+    witness "rcl:first-light"
+  }
+
+  foresee hello
+  realize hello
+}
+```
+
+Read it as:
+
+```text
+initial state
++ actor
++ authority
++ precondition
++ proposed mutation
++ invariant
++ evidence
++ commit
+```
+
+The interesting part is not the greeting. It is that **who may change what, under which conditions, while preserving which invariants, is explicit in the program**.
+
+## 3. Try the native path
+
+```bash
+npm run build:native
+npm run demo:native
+```
+
+Then try explicit bytecode compilation + native execution:
+
+```bash
+npm run demo:bytecode
+```
+
+## 4. Full 5-minute walkthrough
+
+For the rest of the runnable path — Web state, Native UI, Android, bytecode and self-host verification — use:
+
+**→ [`GETTING_STARTED.md`](GETTING_STARTED.md)**
+
+Chinese version:
+
+**→ [`GETTING_STARTED.zh-CN.md`](GETTING_STARTED.zh-CN.md)**
 
 ---
 
 ## Why RCL?
 
-Most programming systems start from operations: call a function, mutate state, send a request.
+Most programming systems begin from operations: call a function, mutate state, send a request.
 
 RCL makes the transition itself a first-class object:
 
@@ -63,9 +147,7 @@ RCL makes the transition itself a first-class object:
 - **what evidence** proves the transition;
 - **what happens when validation fails**.
 
-That makes RCL useful as both a programming language experiment and a research platform for governed software, multi-runtime lowering, reproducible execution, and evidence-bound state transitions.
-
-### Minimal example
+A minimal governed transition looks like this:
 
 ```rcl
 reality Counter {
@@ -91,60 +173,18 @@ This says more than “increment a number”. It declares a subject, authority, 
 
 ## Learn RCL by example
 
-If you are a programmer opening this repository for the first time, **do not read the repository top-down**. Start with these examples in order:
+Recommended order:
 
 | Example | What it shows | Source |
 |---|---|---|
-| Governed state transition | state, authority, guards, mutation, invariants, evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
+| First Light | minimal state + authority + transition | [`examples/hello-reality.rcl`](examples/hello-reality.rcl) |
+| Governed Web state | guards, mutation, invariants, evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
 | Native UI counter | state, derived values, bindings, layout, styles, events | [`examples/native-ui/counter.rcl`](examples/native-ui/counter.rcl) |
 | In-app navigation | routes and atomic UI-local navigation | [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl) |
 | Device adaptation | width profiles and cross-platform adaptive layout intent | [`examples/native-ui/device-adaptation.rcl`](examples/native-ui/device-adaptation.rcl) |
 | Android vertical slice | governed application state lowered toward Android | [`examples/universal-stress/k03-native-android-app.rcl`](examples/universal-stress/k03-native-android-app.rcl) |
 
-### Example 1 — a real state transition
-
-The Web stress example is intentionally small, but it already shows the core RCL model:
-
-```rcl
-reality K02CompleteWebApp {
-  facet app.todo_count : Number = 0
-  facet app.todo_input : Text = ""
-  facet app.last_action : Text = "boot"
-
-  subject user {
-    warrant app.write on app
-  }
-
-  emergence addTodo {
-    cause user
-    when app.todo_input != ""
-    needs app.write on app
-    alter app.todo_count <- app.todo_count + 1
-    alter app.last_action <- app.todo_input
-    alter app.todo_input <- ""
-    preserve app.todo_count >= 0
-    witness "rcl:k02:add-todo"
-  }
-}
-```
-
-Read it as:
-
-```text
-state
-+ actor
-+ authority
-+ precondition
-+ proposed mutations
-+ invariant
-+ evidence
-```
-
-That structure is the recurring pattern behind larger RCL programs.
-
-### Example 2 — Native UI is part of the semantic model
-
-The Native UI counter keeps state and UI behavior inside RCL rather than treating the frontend as an unrelated shell:
+### Native UI example
 
 ```rcl
 reality NativeUICounter {
@@ -177,9 +217,9 @@ reality NativeUICounter {
 }
 ```
 
-The full example also contains lifecycle, themes, styles, accessibility labels and reset behavior. The same rooted UI semantics can lower into Web and Android candidate backends.
+The full example also contains lifecycle, themes, styles, accessibility labels and reset behavior.
 
-### Example 3 — navigation is declared, not hidden in host code
+### Navigation example
 
 ```rcl
 navigation {
@@ -194,9 +234,7 @@ on activate {
 }
 ```
 
-See the complete file: [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl).
-
-### Example 4 — one UI intent, different device layouts
+### Device adaptation example
 
 ```rcl
 adaptation {
@@ -217,16 +255,17 @@ view Root {
 
 The current candidate maps this same semantic intent to Web width-profile behavior and Android `screenWidthDp`-based layout selection.
 
-### Suggested reading path
+Suggested reading path:
 
 ```text
-minimal Counter
+hello-reality.rcl
 → K02 governed Web state
 → Native UI Counter
 → Navigation
 → Device Adaptation
 → K03 Android vertical slice
 → selfhost/compiler-core.rcl
+→ CURRENT-STATUS.md
 ```
 
 Browse all runnable and evidence-bearing examples under [`examples/`](examples/).
@@ -252,8 +291,6 @@ The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives
 
 ### Self-hosting
 
-RCL contains a compiler written in RCL, a checked-in fixed-point compiler artifact, and a native compiler / VM path.
-
 ```text
 RCL compiler source
       ↓
@@ -270,7 +307,7 @@ compile again
 C0 == C1 == C2
 ```
 
-The project distinguishes **native-core self-hosting** from **whole-language runtime self-hosting**. The former is verified; the latter is not claimed.
+RCL distinguishes **native-core self-hosting** from **whole-language runtime self-hosting**. The former is verified; the latter is not claimed.
 
 ---
 
@@ -290,8 +327,6 @@ Current candidate semantics include:
 - fixed sizing intent;
 - in-app navigation;
 - available-width adaptation profiles.
-
-The same rooted UI program can lower into Web and Android backends.
 
 ```mermaid
 flowchart TD
@@ -343,15 +378,7 @@ The UI layer cannot directly commit external reality. Unknown rule references an
 
 ## Universal Program Stress
 
-RCL's main research harness is a permanent **20 × 20 = 400** environment / program matrix.
-
-### 20 environment families
-
-WASM/VM, Linux, Windows, browser, Android, server, serverless, database, GPU, game runtime, scientific runtime, AI runtime, distributed runtime, real-time runtime, embedded runtime, dataflow runtime, compiler runtime, automation runtime, simulation runtime, and RNCS runtime.
-
-### 20 program families
-
-Algorithm, CLI, GUI, Web, mobile, database, compiler, game, simulation, distributed, real-time, scientific, machine learning, agent, media, automation, security-sensitive, reactive, self-hosting, and mixed-paradigm.
+RCL's primary research harness is a permanent **20 × 20 = 400** environment / program matrix.
 
 Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
@@ -402,9 +429,7 @@ Opaque delegation may be useful, but it does **not** count as native RCL capabil
 
 ## Frontier research: compiling unknowns into experiments
 
-RCL also contains an experimental Frontier research line for turning unknown-law or unknown-knowledge questions into explicit, falsifiable experiment contracts.
-
-The current structure includes:
+RCL also contains an experimental Frontier line for turning unknown-law or unknown-knowledge questions into explicit, falsifiable experiment contracts.
 
 ```mermaid
 flowchart LR
@@ -419,9 +444,7 @@ flowchart LR
     I --> J[Evidence Court]
 ```
 
-This stack is deliberately conservative about claims. Sandbox success validates protocol behavior under constructed worlds; it does **not** establish new physics, external information channels, or other unsupported real-world conclusions.
-
-Relevant material is under [`docs/`](docs/) with the `FRONTIER_` prefix.
+Sandbox success validates protocol behavior under constructed worlds; it does **not** establish new physics, external information channels, or other unsupported real-world conclusions.
 
 ---
 
@@ -446,101 +469,22 @@ flowchart TD
     F --> G[Governed Result]
 ```
 
-Foundation semantics, provider bridges, Native UI, RNCS bindings, and research organs sit around this core while retaining explicit capability boundaries.
-
 ---
 
-## Quick start
-
-### Requirements
-
-- Node.js 22+ for the JavaScript / reference toolchain;
-- a supported C/C++ toolchain for native builds;
-- Android tooling only if you want to build the Android targets.
-
-### Install and test
+## Useful commands
 
 ```bash
 npm install
-npm test
-```
-
-### Run an example
-
-```bash
-node src/cli.mjs run examples/hello-reality.rcl
-```
-
-### Build and verify the native toolchain
-
-```bash
+npm run demo
 npm run build:native
+npm run demo:native
+npm run demo:bytecode
 npm run build:selfhost-compiler
 npm run verify:selfhost-fixedpoint
 npm run verify:selfhost-examples
 ```
 
-### Verify Foundation bridge coverage
-
-```bash
-npm run test:foundation-native-batch-a
-npm run test:foundation-native-meta-batch-b
-npm run test:foundation-native-batch-c
-npm run test:foundation-native-batch-d
-npm run test:foundation-native-batch-e
-npm run conformance:foundation
-```
-
-### Run Universal Program Stress
-
-```bash
-node --test tests/universal-program-stress.test.mjs
-node scripts/universal-program-stress-report.mjs
-node scripts/run-universal-stress-k01.mjs
-```
-
-### Build the Web vertical slice
-
-```bash
-node scripts/build-k02-web-app.mjs output/universal-stress-k02/index.html
-```
-
-### Generate the Android vertical slice
-
-```bash
-node scripts/build-k03-android-app.mjs \
-  examples/universal-stress/k03-native-android-app.rcl \
-  examples/universal-stress/k03-native-android-app.android.json \
-  output/universal-stress-k03
-```
-
----
-
-## Anti-cheating rules
-
-RCL's research program explicitly rejects several easy ways to manufacture impressive-looking results:
-
-- **Artifact ≠ execution.** Generated source, HTML, an APK project, SQL, a shader, or config file is not runtime evidence.
-- **Provider coverage ≠ native language capability.** Delegating the whole problem does not make that problem native RCL semantics.
-- **No special-case inflation.** A failed cell should reveal a reusable missing primitive, not trigger a one-off keyword added only for the demo.
-- **No regression inheritance.** New capability cannot be promoted by silently breaking previously verified behavior.
-- **No self-certifying AI gate.** The same development session cannot invent a trivial task, reveal the oracle patch to itself, and count that as independent AI-generation evidence.
-
----
-
-## Maturity ladder
-
-```text
-PRE-U0  insufficient broad evidence
-U0      Expressive
-U1      Generative
-U2      Executable
-U3      Native-General
-U4      Dominant
-U5      Universal Mother
-```
-
-`U5` is intentionally difficult and is always scoped to measured environments and tasks. It is not a claim about uncomputable problems, unavailable hardware, violations of physical law, or bypassing legal / authority constraints.
+For the guided explanation, use [`GETTING_STARTED.md`](GETTING_STARTED.md).
 
 ---
 
@@ -561,30 +505,9 @@ COMPONENT-VERSIONS.json      governed component identities
 
 ---
 
-## Development model
-
-RCL does not grow by simply adding features. The intended loop is:
-
-```text
-Stress
-→ Failure
-→ Missing primitive / unabsorbed advantage
-→ Candidate design
-→ Semantic + execution tests
-→ Regression
-→ Evidence
-→ Selection
-→ Inheritance
-→ Full matrix rerun
-```
-
-A failed experiment is useful when it reveals a real boundary that the language must either absorb, lower correctly, or continue to admit it does not own.
-
----
-
 ## Contributing
 
-RCL is now public and contributions are welcome.
+RCL is public and contributions are welcome.
 
 Good contribution targets include:
 
@@ -593,8 +516,7 @@ Good contribution targets include:
 - backend lowering improvements that preserve RCL-owned semantics;
 - differential tests between reference, self-hosted, and native paths;
 - performance work on the self-host compiler / VM;
-- Native UI semantics, resources, accessibility, and real-device verification;
-- documentation that makes evidence boundaries clearer;
+- Native UI resources, accessibility, and real-device verification;
 - independent AI-generation / repair evaluations for K01 and K02.
 
 Please keep one principle in mind: **a stronger claim requires stronger evidence, not stronger wording.**
