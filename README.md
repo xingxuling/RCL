@@ -58,6 +58,8 @@ RCL now maintains a machine-defined matrix of:
 
 An empty or blocked cell is useful evidence. It is an explicit unknown, not a hidden success claim.
 
+Every permanent cell now also has a stable campaign identity from `K001` through `K400`. The consolidated campaign input and report are generated with `npm run evidence:k400`; completion is fail-closed and requires all 400 cells to pass all nine gates without opaque-delegation or special-case growth credit. Current audited coverage is `0 PASS / 7 BLOCKED / 393 UNTESTED`, so K400 remains `INCOMPLETE`.
+
 ### Nine non-compensatory gates
 
 Every evidence-bearing cell must pass the required gates independently:
@@ -87,6 +89,7 @@ A failed required gate fails the cell. Missing evidence blocks it. No weighted s
 
 Detailed campaign records:
 
+- [`K400_COMPLETION_CAMPAIGN_v0.1.md`](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)
 - [`K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`](docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md)
 - [`K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md)
 - [`K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`](docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md)

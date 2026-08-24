@@ -47,6 +47,8 @@ Total permanent cells:
 20 × 20 = 400
 ```
 
+The row-major matrix assigns stable campaign identities `K001` through `K400` in addition to semantic coordinates such as `browser::web`. Killer-task labels `K01` through `K12` remain a separate compatibility namespace and are always accompanied by their matrix coordinate.
+
 A cell is not PASS merely because RCL can describe the task.
 
 ## 3. Nine non-compensatory gates
@@ -229,6 +231,7 @@ The report runner never upgrades a missing gate to PASS.
 node --test tests/universal-program-stress.test.mjs
 node scripts/universal-program-stress-report.mjs
 node scripts/run-universal-stress-k01.mjs
+npm run evidence:k400
 ```
 
 Optional evidence and output paths:
@@ -242,6 +245,8 @@ node scripts/universal-program-stress-report.mjs path/to/evidence.json output/un
 v0.1 is complete only when:
 
 - the 400-cell matrix is machine-defined;
+- all cells have stable `K001`–`K400` identities and a machine-audited completion verdict;
+- duplicate, unknown or coordinate-conflicting evidence claims fail closed before reporting;
 - the 9-gate non-compensatory evaluator is tested;
 - native/lowered/opaque coverage cannot be conflated;
 - special-case inflation and regression are explicit gates for evolution;
@@ -251,3 +256,16 @@ v0.1 is complete only when:
 - CI runs the focused test suite and emits a report artifact.
 
 It does **not** claim that any of the twelve killer tasks already pass.
+
+## 13. Current K400 campaign state
+
+`examples/universal-stress/k400-current-evidence.json` consolidates the current Native UI generation with the historical K02 and K03 direct receipts without upgrading their dates or gates. The generated report currently records:
+
+```text
+PASS       0
+BLOCKED    7
+UNTESTED 393
+VERDICT    INCOMPLETE
+```
+
+The nearest evidence closures are `K064 browser::web` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. This development process cannot self-certify that independent gate. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` for the closure order and evidence boundary.

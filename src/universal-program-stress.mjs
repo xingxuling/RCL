@@ -73,6 +73,8 @@ export const UNIVERSAL_PROGRAM_FAMILIES = Object.freeze([
   'mixed-paradigm',
 ]);
 
+export const K400_TOTAL_CELLS = UNIVERSAL_ENVIRONMENTS.length * UNIVERSAL_PROGRAM_FAMILIES.length;
+
 export const KILLER_TASKS_V01 = Object.freeze([
   { id: 'K01', environment: 'compiler-runtime', programFamily: 'self-hosting', name: 'self-hosting compiler' },
   { id: 'K02', environment: 'browser', programFamily: 'web', name: 'complete web application' },
@@ -113,6 +115,78 @@ export function reportEvidenceRoot(report) {
   return evidenceRoot(stableReport);
 }
 
+export function campaignCellIdFor(environment, programFamily) {
+  const environmentIndex = UNIVERSAL_ENVIRONMENTS.indexOf(environment);
+  if (environmentIndex < 0) throw new Error(`RCL_STRESS_UNKNOWN_ENVIRONMENT:${environment}`);
+  const programIndex = UNIVERSAL_PROGRAM_FAMILIES.indexOf(programFamily);
+  if (programIndex < 0) throw new Error(`RCL_STRESS_UNKNOWN_PROGRAM_FAMILY:${programFamily}`);
+  const ordinal = (environmentIndex * UNIVERSAL_PROGRAM_FAMILIES.length) + programIndex + 1;
+  return `K${String(ordinal).padStart(3, '0')}`;
+}
+
+export function validateUniversalStressEvidence(evidence) {
+  const errors = [];
+  if (!evidence || evidence.schema !== 'rcl.universal-stress.evidence.v0.1') {
+    errors.push(`schema:${evidence?.schema ?? 'missing'}`);
+  }
+  if (typeof evidence?.generation !== 'string' || evidence.generation.trim().length === 0) {
+    errors.push('generation:missing');
+  }
+  if (!Array.isArray(evidence?.claims)) errors.push('claims:not-array');
+
+  const matrix = buildUniversalStressMatrix();
+  const matrixById = new Map(matrix.map((cell) => [cell.id, cell]));
+  const seen = new Set();
+  for (const [index, claim] of (Array.isArray(evidence?.claims) ? evidence.claims : []).entries()) {
+    const prefix = `claims[${index}]`;
+    if (!claim || typeof claim.id !== 'string') {
+      errors.push(`${prefix}.id:missing`);
+      continue;
+    }
+    if (seen.has(claim.id)) errors.push(`${prefix}.id:duplicate:${claim.id}`);
+    seen.add(claim.id);
+    const matrixCell = matrixById.get(claim.id);
+    if (!matrixCell) {
+      errors.push(`${prefix}.id:unknown:${claim.id}`);
+      continue;
+    }
+    if (claim.environment !== undefined && claim.environment !== matrixCell.environment) {
+      errors.push(`${prefix}.environment:mismatch:${claim.environment}`);
+    }
+    if (claim.programFamily !== undefined && claim.programFamily !== matrixCell.programFamily) {
+      errors.push(`${prefix}.programFamily:mismatch:${claim.programFamily}`);
+    }
+    if (!Object.values(COVERAGE_MODE).includes(claim.coverageMode)) {
+      errors.push(`${prefix}.coverageMode:unknown:${claim.coverageMode ?? 'missing'}`);
+    }
+    const unknownGates = Object.keys(claim.gates ?? {}).filter((gate) => !UNIVERSAL_STRESS_GATES.includes(gate));
+    for (const gate of unknownGates) errors.push(`${prefix}.gates:unknown:${gate}`);
+    for (const [gate, value] of Object.entries(claim.gates ?? {})) {
+      const status = typeof value === 'string' ? value : value?.status;
+      if (!Object.values(STRESS_STATUS).includes(status)) {
+        errors.push(`${prefix}.gates.${gate}.status:unknown:${status ?? 'missing'}`);
+      }
+      const refs = typeof value === 'string' ? [] : value?.evidence;
+      if (refs !== undefined && (!Array.isArray(refs) || refs.some((ref) => typeof ref !== 'string' || ref.length === 0))) {
+        errors.push(`${prefix}.gates.${gate}.evidence:invalid`);
+      }
+    }
+    if (claim.lastVerifiedSha !== undefined && claim.lastVerifiedSha !== null && !/^[0-9a-f]{40}$/.test(claim.lastVerifiedSha)) {
+      errors.push(`${prefix}.lastVerifiedSha:invalid`);
+    }
+    if (claim.lastVerifiedDate !== undefined && claim.lastVerifiedDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(claim.lastVerifiedDate)) {
+      errors.push(`${prefix}.lastVerifiedDate:invalid`);
+    }
+  }
+
+  return {
+    schema: 'rcl.universal-stress.evidence-validation.v0.1',
+    ok: errors.length === 0,
+    claimCount: Array.isArray(evidence?.claims) ? evidence.claims.length : 0,
+    errors,
+  };
+}
+
 function normalizeGateResult(gate, raw) {
   if (typeof raw === 'string') {
     return { gate, status: raw, evidence: [] };
@@ -132,6 +206,7 @@ function normalizeGateResult(gate, raw) {
 export function buildUniversalStressMatrix() {
   return UNIVERSAL_ENVIRONMENTS.flatMap((environment) =>
     UNIVERSAL_PROGRAM_FAMILIES.map((programFamily) => ({
+      campaignId: campaignCellIdFor(environment, programFamily),
       id: `${environment}::${programFamily}`,
       environment,
       programFamily,
@@ -182,6 +257,7 @@ export function evaluateStressCell(cell) {
   const reportWithoutRoot = {
     schema: 'rcl.universal-stress.cell.v0.1',
     id: cell.id ?? `${cell.environment}::${cell.programFamily}`,
+    campaignId: campaignCellIdFor(cell.environment, cell.programFamily),
     environment: cell.environment,
     programFamily: cell.programFamily,
     coverageMode: cell.coverageMode,
@@ -207,6 +283,67 @@ export function evaluateStressCell(cell) {
   return {
     ...reportWithoutRoot,
     evidenceRoot: evidenceRoot(reportWithoutRoot),
+  };
+}
+
+export function auditK400Completion(reports) {
+  const list = Array.isArray(reports) ? reports : [];
+  const expected = buildUniversalStressMatrix();
+  const expectedIds = new Set(expected.map((cell) => cell.id));
+  const seenIds = new Set();
+  const duplicateIds = [];
+  const unknownIds = [];
+  for (const report of list) {
+    if (seenIds.has(report.id)) duplicateIds.push(report.id);
+    seenIds.add(report.id);
+    if (!expectedIds.has(report.id)) unknownIds.push(report.id);
+  }
+  const missingIds = expected.filter((cell) => !seenIds.has(cell.id)).map((cell) => cell.id);
+  const statusCounts = Object.fromEntries(
+    Object.values(STRESS_STATUS).map((status) => [status, list.filter((report) => report.status === status).length]),
+  );
+  const nonPass = list.filter((report) => report.status !== STRESS_STATUS.PASS);
+  const gateBlockers = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate,
+    list.filter((report) => report.gates?.[gate]?.status !== STRESS_STATUS.PASS).length,
+  ]));
+  const evidenceComplete =
+    list.length === K400_TOTAL_CELLS &&
+    missingIds.length === 0 &&
+    duplicateIds.length === 0 &&
+    unknownIds.length === 0 &&
+    nonPass.length === 0;
+  const universalGrowthComplete = evidenceComplete && list.every((report) => report.universalGrowthEligible === true);
+  const prioritized = [...nonPass].sort((a, b) => {
+    const rank = { REGRESSED: 0, FAIL: 1, BLOCKED: 2, UNVERIFIED: 3, UNTESTED: 4 };
+    const statusDelta = (rank[a.status] ?? 5) - (rank[b.status] ?? 5);
+    if (statusDelta !== 0) return statusDelta;
+    const missingGateDelta = UNIVERSAL_STRESS_GATES.filter((gate) => a.gates?.[gate]?.status !== STRESS_STATUS.PASS).length
+      - UNIVERSAL_STRESS_GATES.filter((gate) => b.gates?.[gate]?.status !== STRESS_STATUS.PASS).length;
+    if (missingGateDelta !== 0) return missingGateDelta;
+    return a.campaignId.localeCompare(b.campaignId);
+  });
+
+  return {
+    schema: 'rcl.universal-stress.k400-completion.v0.1',
+    verdict: universalGrowthComplete ? 'COMPLETE' : 'INCOMPLETE',
+    evidenceComplete,
+    universalGrowthComplete,
+    totalCells: K400_TOTAL_CELLS,
+    reportedCells: list.length,
+    passedCells: statusCounts.PASS,
+    remainingCells: K400_TOTAL_CELLS - statusCounts.PASS,
+    statusCounts,
+    gateBlockers,
+    missingIds,
+    duplicateIds: [...new Set(duplicateIds)],
+    unknownIds: [...new Set(unknownIds)],
+    nextPriority: prioritized.slice(0, 12).map((report) => ({
+      campaignId: report.campaignId,
+      id: report.id,
+      status: report.status,
+      blockingGates: UNIVERSAL_STRESS_GATES.filter((gate) => report.gates?.[gate]?.status !== STRESS_STATUS.PASS),
+    })),
+    rule: 'K400 is complete only when all 400 stable cells pass every non-compensatory gate without special-case or opaque-delegation growth credit.',
   };
 }
 

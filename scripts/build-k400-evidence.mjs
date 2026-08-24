@@ -1,0 +1,106 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+
+import {
+  COVERAGE_MODE,
+  STRESS_STATUS,
+  UNIVERSAL_STRESS_GATES,
+  validateUniversalStressEvidence,
+} from '../src/universal-program-stress.mjs';
+
+const root = process.cwd();
+const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
+const k02Path = 'examples/universal-stress/k02-direct-evidence-2026-08-08.json';
+const k03Path = 'examples/universal-stress/k03-direct-evidence-2026-08-08.json';
+const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
+
+function readJson(relativePath) {
+  return JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+function directGates(receipt, receiptPath, notes = {}) {
+  return Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: receipt.gates?.[gate] ?? STRESS_STATUS.UNVERIFIED,
+    evidence: [receiptPath],
+    ...(notes[gate] ? { note: notes[gate] } : {}),
+  }]));
+}
+
+const nativeUi = readJson(nativeUiPath);
+const k02 = readJson(k02Path);
+const k03 = readJson(k03Path);
+
+const directClaims = [
+  {
+    id: 'browser::web',
+    coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
+    lastVerifiedDate: '2026-08-08',
+    knownLimits: k02.limitations,
+    relatedKillerTasks: ['K02'],
+    requiredGenes: ['web-application-semantics', 'browser-lowering', 'server-api', 'authority-preservation'],
+    gates: directGates(k02, k02Path, {
+      AI_GENERATE: 'Independent reproducible generation or repair receipts are still missing.',
+    }),
+    changes: [{
+      id: 'complete-web-application-lowering',
+      kind: 'candidate-gene',
+      scope: ['browser', 'server'],
+      generalPrimitive: true,
+      justification: 'RCL application state, rules and authority lower to browser and server execution without moving commit authority into presentation code.',
+    }],
+  },
+  {
+    id: 'android::mobile',
+    coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
+    lastVerifiedDate: '2026-08-08',
+    knownLimits: k03.limitations,
+    relatedKillerTasks: ['K03'],
+    requiredGenes: ['android-application-lowering', 'reactive-state', 'authority-preservation', 'device-runtime-evidence'],
+    gates: directGates(k03, k03Path, {
+      EXECUTE: 'The historical direct receipt had no Android device or emulator.',
+      CORRECT: 'Host replay is not Android-device correctness.',
+      PERFORMANCE: 'No Android-device timing receipt exists.',
+      AI_GENERATE: 'Independent reproducible generation or repair receipts are still missing.',
+    }),
+    changes: [{
+      id: 'native-android-application-lowering',
+      kind: 'candidate-gene',
+      scope: ['android', 'browser'],
+      generalPrimitive: true,
+      justification: 'Platform-neutral application and UI semantics lower through explicit target backends while preserving authority boundaries.',
+    }],
+  },
+];
+
+const claimsById = new Map(nativeUi.claims.map((claim) => [claim.id, claim]));
+for (const claim of directClaims) claimsById.set(claim.id, claim);
+
+const evidence = {
+  schema: 'rcl.universal-stress.evidence.v0.1',
+  generation: 'k400-consolidated-v0.1',
+  claims: [...claimsById.values()],
+  competitiveComparisons: nativeUi.competitiveComparisons ?? [],
+  donorComparisons: nativeUi.donorComparisons ?? [],
+  novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
+  kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
+  sourceReceipts: [nativeUiPath, k02Path, k03Path],
+  notes: [
+    'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
+    'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
+    'Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.',
+    ...(nativeUi.notes ?? []),
+  ],
+};
+
+const validation = validateUniversalStressEvidence(evidence);
+if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);
+
+fs.mkdirSync(path.dirname(path.join(root, outputPath)), { recursive: true });
+fs.writeFileSync(path.join(root, outputPath), `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+console.log(JSON.stringify({
+  status: 'K400_EVIDENCE_WRITTEN',
+  outputPath,
+  claimCount: evidence.claims.length,
+  sourceReceipts: evidence.sourceReceipts,
+}, null, 2));

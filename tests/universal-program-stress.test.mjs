@@ -8,7 +8,9 @@ import {
   UNIVERSAL_ENVIRONMENTS,
   UNIVERSAL_PROGRAM_FAMILIES,
   UNIVERSAL_STRESS_GATES,
+  auditK400Completion,
   buildUniversalStressMatrix,
+  campaignCellIdFor,
   canonicalJson,
   classifyUniversalMaturity,
   compareRegression,
@@ -18,6 +20,7 @@ import {
   evidenceRoot,
   findUnabsorbedAdvantages,
   reportEvidenceRoot,
+  validateUniversalStressEvidence,
 } from '../src/universal-program-stress.mjs';
 
 function passGates() {
@@ -57,6 +60,58 @@ test('universal matrix is permanently 20 x 20 = 400 cells', () => {
   const matrix = buildUniversalStressMatrix();
   assert.equal(matrix.length, 400);
   assert.equal(new Set(matrix.map((cell) => cell.id)).size, 400);
+  assert.equal(new Set(matrix.map((cell) => cell.campaignId)).size, 400);
+  assert.equal(matrix[0].campaignId, 'K001');
+  assert.equal(matrix.at(-1).campaignId, 'K400');
+  assert.equal(campaignCellIdFor('browser', 'gui'), 'K063');
+});
+
+test('evidence validation rejects duplicate, unknown and coordinate-conflicting claims', () => {
+  const validation = validateUniversalStressEvidence({
+    schema: 'rcl.universal-stress.evidence.v0.1',
+    generation: 'invalid-fixture',
+    claims: [
+      { id: 'browser::gui', environment: 'android', coverageMode: 'lowered-execution', gates: {} },
+      { id: 'browser::gui', coverageMode: 'lowered-execution', gates: { TYPO: { status: 'PASS' } } },
+      { id: 'unknown::cell', coverageMode: 'native-semantic', gates: {} },
+    ],
+  });
+  assert.equal(validation.ok, false);
+  assert.ok(validation.errors.includes('claims[0].environment:mismatch:android'));
+  assert.ok(validation.errors.includes('claims[1].id:duplicate:browser::gui'));
+  assert.ok(validation.errors.includes('claims[1].gates:unknown:TYPO'));
+  assert.ok(validation.errors.includes('claims[2].id:unknown:unknown::cell'));
+});
+
+test('K400 completion cannot be inferred from a partial or provider-only matrix', () => {
+  const partial = auditK400Completion([passingCell()]);
+  assert.equal(partial.verdict, 'INCOMPLETE');
+  assert.equal(partial.evidenceComplete, false);
+
+  const allProvider = buildUniversalStressMatrix().map((cell) => evaluateStressCell({
+    ...cell,
+    coverageMode: COVERAGE_MODE.OPAQUE_DELEGATION,
+    gates: passGates(),
+    changes: [],
+  }));
+  const providerAudit = auditK400Completion(allProvider);
+  assert.equal(providerAudit.evidenceComplete, true);
+  assert.equal(providerAudit.universalGrowthComplete, false);
+  assert.equal(providerAudit.verdict, 'INCOMPLETE');
+});
+
+test('K400 completion requires all stable cells and every non-compensatory gate', () => {
+  const reports = buildUniversalStressMatrix().map((cell) => evaluateStressCell({
+    ...cell,
+    coverageMode: COVERAGE_MODE.NATIVE_SEMANTIC,
+    gates: passGates(),
+    changes: [],
+  }));
+  const completion = auditK400Completion(reports);
+  assert.equal(completion.verdict, 'COMPLETE');
+  assert.equal(completion.passedCells, 400);
+  assert.equal(completion.remainingCells, 0);
+  assert.deepEqual(completion.missingIds, []);
 });
 
 test('killer suite contains 12 cross-domain tasks', () => {

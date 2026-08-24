@@ -1,0 +1,769 @@
+{
+  "schema": "rcl.universal-stress.evidence.v0.1",
+  "generation": "k400-consolidated-v0.1",
+  "claims": [
+    {
+      "id": "compiler-runtime::self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": [
+        "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, governed reality-transaction declarations, fixed width/height intent, canonical in-app navigation, and available-width device profiles with adaptive layout direction",
+        "resource and full accessibility extensions remain absent or partial",
+        "runtime reality execution remains external to the self-host compiler and UI; only CandidateReality may cross the Gateway",
+        "AI_GENERATE remains independently unverified"
+      ],
+      "relatedKillerTasks": [
+        "K01"
+      ],
+      "requiredGenes": [
+        "self-host-ui-parser",
+        "semantic-genome-root",
+        "fixed-point-differential"
+      ],
+      "donorAdvantages": [
+        {
+          "donor": "Web and Android platform frameworks",
+          "capability": "resource, full accessibility and device-adaptation semantics beyond width-profile layout direction",
+          "status": "PARTIAL_UNABSORBED"
+        }
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl",
+            "examples/selfhost-core/native-ui-parameterized.rcl",
+            "examples/selfhost-core/native-ui-governed.rcl",
+            "examples/selfhost-core/native-ui-fixed.rcl",
+            "examples/selfhost-core/native-ui-minimal.rcl",
+            "examples/native-ui/navigation.rcl",
+            "examples/native-ui/device-adaptation.rcl"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "tests/general-selfhost-fixedpoint.test.mjs",
+            "tests/native-ui-backends-equivalence.test.mjs",
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/general-selfhost-fixedpoint.test.mjs"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ],
+          "note": "each native generation executes 88,744,649 instructions with 211,255,351 headroom; the evidence generations completed in 228,988.5857 ms on this machine, within the predeclared 240,000 ms cap"
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k01-ai-generation-contract.json"
+          ],
+          "note": "this development session cannot self-certify an independent AI-generation trial"
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json",
+            "docs/ui-native-genome/evidence-ledger.md"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "selfhost-native-ui-fixed-sizing",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "canonical self-host compiler parses, normalizes, roots and byte-lowers platform-neutral fixed width/height intent; one shared root lowers to Web CSS and Android LayoutParams, with invalid sizes failing closed"
+        },
+        {
+          "id": "selfhost-call-validation-index",
+          "kind": "performance-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "builtin and special calls bypass user-symbol scans while user-call validation resolves its reckon index once, preserving errors and fixed-point bytes while increasing instruction headroom"
+        },
+        {
+          "id": "canonical-native-ui-navigation",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "platform-neutral route identities target direct root children; one UI-local event may atomically combine state mutation and one route transition, while mixed Reality authority fails closed"
+        },
+        {
+          "id": "chunked-selfhost-tokenizer",
+          "kind": "performance-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "tokens are accumulated in bounded 127-token chunks and flattened without changing token order, restoring JS bootstrap under the existing heap boundary without increasing the heap limit"
+        },
+        {
+          "id": "canonical-device-width-adaptation",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "non-overlapping available-width profiles select canonical layout direction overrides; unknown, duplicate and overlapping declarations fail closed while one root lowers to Web and Android"
+        },
+        {
+          "id": "collision-free-nested-choose-labels",
+          "kind": "compiler-correctness-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "assembler-monotonic labels replace instruction-length-derived labels so nested choose lowering cannot collide"
+        }
+      ]
+    },
+    {
+      "id": "browser::gui",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": [
+        "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing, in-app navigation and available-width adaptive-layout surfaces; resource semantics remain absent",
+        "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
+        "visual fidelity is structural v0.1 rather than pixel parity",
+        "focus traversal and the full accessibility tree are not implemented",
+        "AI_GENERATE is not independently evidenced"
+      ],
+      "relatedKillerTasks": [
+        "K02"
+      ],
+      "requiredGenes": [
+        "view-tree",
+        "reactive-state",
+        "binding",
+        "event-graph",
+        "layout-algebra",
+        "style-cascade",
+        "lifecycle"
+      ],
+      "donorAdvantages": [
+        {
+          "donor": "Web platform",
+          "capability": "complete DOM/CSS/accessibility/navigation semantics",
+          "status": "PARTIAL_UNABSORBED"
+        }
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl",
+            "examples/selfhost-core/native-ui-fixed.rcl",
+            "examples/native-ui/navigation.rcl",
+            "examples/native-ui/device-adaptation.rcl",
+            "tests/native-ui-parser-ir.test.mjs"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/canonical-ui-ir.json",
+            "examples/native-ui/evidence/selfhost-navigation-result.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/web-lowering-report.json",
+            "examples/native-ui/evidence/selfhost-navigation-result.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/browser-runtime-result.json",
+            "examples/native-ui/evidence/device-adaptation-browser-result.json"
+          ]
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/semantic-trace-web.json",
+            "tests/native-ui-backends-equivalence.test.mjs",
+            "examples/native-ui/evidence/selfhost-navigation-result.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/native-ui-authority-boundary.test.mjs",
+            "tests/native-ui-parser-ir.test.mjs"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/native-ui/evidence/browser-runtime-result.json",
+            "examples/native-ui/evidence/performance-result.json"
+          ],
+          "note": "measured against a plain DOM/JavaScript Counter, but no pre-registered acceptance budget exists and a large donor advantage remains"
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "same development run cannot self-certify independent generation"
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/evidence-summary.json",
+            "docs/ui-native-genome/evidence-ledger.md"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "canonical-native-ui-genome",
+          "kind": "candidate-gene",
+          "scope": [
+            "browser",
+            "android",
+            "game-runtime",
+            "windows"
+          ],
+          "generalPrimitive": true,
+          "justification": "platform-neutral UI state/tree/event/layout/style/lifecycle semantics"
+        }
+      ]
+    },
+    {
+      "id": "browser::reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": [
+        "async effects and scheduling are outside Native UI v0.1",
+        "AI_GENERATE and reference performance are unverified"
+      ],
+      "relatedKillerTasks": [
+        "K02"
+      ],
+      "requiredGenes": [
+        "reactive-state",
+        "derived-binding",
+        "event-graph"
+      ],
+      "donorAdvantages": [],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/canonical-ui-ir.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/web-lowering-report.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/browser-runtime-result.json"
+          ]
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/semantic-trace-web.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/native-ui-runtime-style-layout.test.mjs"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/native-ui/evidence/browser-runtime-result.json",
+            "examples/native-ui/evidence/performance-result.json"
+          ],
+          "note": "measured residual is not yet an accepted performance gate"
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/evidence-summary.json"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "canonical-reactive-ui",
+          "kind": "candidate-gene",
+          "scope": [
+            "browser",
+            "android",
+            "game-runtime",
+            "windows"
+          ],
+          "generalPrimitive": true
+        }
+      ]
+    },
+    {
+      "id": "android::gui",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": [
+        "APK install and device/emulator interaction are unverified",
+        "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing, in-app navigation and available-width adaptive-layout surfaces; resources remain absent",
+        "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
+        "Android device adaptation behavior and full accessibility remain unverified or incomplete"
+      ],
+      "relatedKillerTasks": [
+        "K03"
+      ],
+      "requiredGenes": [
+        "view-tree",
+        "reactive-state",
+        "event-graph",
+        "layout-algebra",
+        "style-cascade",
+        "lifecycle",
+        "device-adaptation"
+      ],
+      "donorAdvantages": [
+        {
+          "donor": "Android framework",
+          "capability": "device runtime, broader adaptation and focus/accessibility",
+          "status": "PARTIAL_UNABSORBED"
+        }
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl",
+            "examples/selfhost-core/native-ui-fixed.rcl",
+            "examples/native-ui/navigation.rcl",
+            "examples/native-ui/device-adaptation.rcl"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/canonical-ui-ir.json",
+            "examples/native-ui/evidence/selfhost-navigation-result.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/android-lowering-report.json",
+            "examples/native-ui/evidence/selfhost-navigation-result.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "real APK built but no device was available"
+        },
+        "CORRECT": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/native-ui/evidence/semantic-trace-android.json"
+          ],
+          "note": "host trace is not device correctness"
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/native-ui-authority-boundary.test.mjs",
+            "examples/native-ui/evidence/android-build-result.json",
+            "examples/native-ui/evidence/device-adaptation-android-build-result.json"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/android-build-result.json",
+            "docs/ui-native-genome/evidence-ledger.md"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "canonical-native-ui-genome",
+          "kind": "candidate-gene",
+          "scope": [
+            "browser",
+            "android",
+            "game-runtime",
+            "windows"
+          ],
+          "generalPrimitive": true
+        }
+      ]
+    },
+    {
+      "id": "android::reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
+      "lastVerifiedDate": "2026-08-24",
+      "knownLimits": [
+        "device execution and performance are unverified",
+        "AI_GENERATE is unverified"
+      ],
+      "relatedKillerTasks": [
+        "K03"
+      ],
+      "requiredGenes": [
+        "reactive-state",
+        "derived-binding",
+        "event-graph",
+        "lifecycle"
+      ],
+      "donorAdvantages": [],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/canonical-ui-ir.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/android-lowering-report.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "CORRECT": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/native-ui/evidence/semantic-trace-android.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/native-ui-runtime-style-layout.test.mjs"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": []
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/android-build-result.json"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "canonical-reactive-ui",
+          "kind": "candidate-gene",
+          "scope": [
+            "browser",
+            "android",
+            "game-runtime",
+            "windows"
+          ],
+          "generalPrimitive": true
+        }
+      ]
+    },
+    {
+      "id": "browser::web",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-08-08",
+      "knownLimits": [
+        "Browser network navigation could not be exercised in this container because administrator policy blocks page navigation; browser runtime and Node HTTP/API runtime were executed independently.",
+        "AI_GENERATE requires an independent reproducible intent-to-web-app generation/repair trial; this development run is not self-certified.",
+        "Web morphology is still a companion structured manifest, not native RCL Web syntax.",
+        "This is not a standards-complete browser engine or full WHATWG/W3C conformance claim."
+      ],
+      "relatedKillerTasks": [
+        "K02"
+      ],
+      "requiredGenes": [
+        "web-application-semantics",
+        "browser-lowering",
+        "server-api",
+        "authority-preservation"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ],
+          "note": "Independent reproducible generation or repair receipts are still missing."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "complete-web-application-lowering",
+          "kind": "candidate-gene",
+          "scope": [
+            "browser",
+            "server"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL application state, rules and authority lower to browser and server execution without moving commit authority into presentation code."
+        }
+      ]
+    },
+    {
+      "id": "android::mobile",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-08-08",
+      "knownLimits": [
+        "The generated Activity and Gradle project are real Android artifacts, but no Android SDK, Gradle, emulator or adb was available in this execution environment.",
+        "Host semantic replay is not a substitute for installing and interacting with the APK.",
+        "AI_GENERATE remains independently unverified.",
+        "This is a native Android application lowering path, not a claim that RCL already owns the Android OS or the full Android framework semantics."
+      ],
+      "relatedKillerTasks": [
+        "K03"
+      ],
+      "requiredGenes": [
+        "android-application-lowering",
+        "reactive-state",
+        "authority-preservation",
+        "device-runtime-evidence"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ],
+          "note": "The historical direct receipt had no Android device or emulator."
+        },
+        "CORRECT": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ],
+          "note": "Host replay is not Android-device correctness."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ],
+          "note": "No Android-device timing receipt exists."
+        },
+        "AI_GENERATE": {
+          "status": "UNVERIFIED",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ],
+          "note": "Independent reproducible generation or repair receipts are still missing."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "native-android-application-lowering",
+          "kind": "candidate-gene",
+          "scope": [
+            "android",
+            "browser"
+          ],
+          "generalPrimitive": true,
+          "justification": "Platform-neutral application and UI semantics lower through explicit target backends while preserving authority boundaries."
+        }
+      ]
+    }
+  ],
+  "competitiveComparisons": [],
+  "donorComparisons": [
+    {
+      "donor": "Web platform",
+      "capability": "complete UI semantics",
+      "taskId": "native-ui-v0.1",
+      "donorScore": 0.95,
+      "rclScore": 0.4,
+      "generationsObserved": 1
+    },
+    {
+      "donor": "Android framework",
+      "capability": "device adaptation and accessibility",
+      "taskId": "native-ui-v0.1",
+      "donorScore": 0.95,
+      "rclScore": 0.2,
+      "generationsObserved": 1
+    }
+  ],
+  "novelTaskTrials": 1,
+  "kernelChangesForNovelTasks": 1,
+  "sourceReceipts": [
+    "examples/universal-stress/native-ui-genome-v0.1-evidence.json",
+    "examples/universal-stress/k02-direct-evidence-2026-08-08.json",
+    "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+  ],
+  "notes": [
+    "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",
+    "Historical K02 and K03 receipts are not relabeled as current execution evidence.",
+    "Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.",
+    "Five affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
+    "The exact Counter, parameterized UI-local, governed-event, fixed-sizing, canonical-navigation and available-width device-adaptation self-host compiler slices are native-semantic, while Web and Android remain lowered-execution and resource/full-accessibility extensions remain absent or partial.",
+    "Fixed sizes, canonical routes and device width profiles bind the UI root; invalid sizes, routes, profile ranges/references, handler cardinality and mixed navigation/Reality authority fail closed.",
+    "One adaptation root maps to real Chrome media-query/computed-layout behavior and generated Android screenWidthDp orientation logic; Android APK build passes but device behavior remains unverified.",
+    "Governed UI events preserve authority: missing gateways, unknown rules and mixed-authority handlers fail closed, and successful dispatch emits CandidateReality rather than committing reality.",
+    "The Android APK build is real, but build evidence is not device execution evidence."
+  ]
+}

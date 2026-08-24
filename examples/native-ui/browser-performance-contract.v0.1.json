@@ -1,0 +1,25 @@
+{
+  "schema": "rcl.native-ui.browser-performance-contract.v0.1",
+  "frozenDate": "2026-08-25",
+  "scope": [
+    "K063 browser::gui",
+    "K078 browser::reactive"
+  ],
+  "program": "examples/native-ui/counter.rcl",
+  "uiProgramRoot": "04f9c8b26bd97cf0d315d866a0f6b770b8646e3de59ecd46a643b361f5a1028f",
+  "workload": {
+    "minimumIterations": 50,
+    "eventsPerIteration": 3,
+    "eventSequence": [
+      "IncrementButton.activate",
+      "IncrementButton.activate",
+      "ResetButton.activate"
+    ]
+  },
+  "acceptance": {
+    "maxRclPerSequenceMs": 1.5,
+    "maxHostBrowserProcessElapsedMs": 5000
+  },
+  "calibrationBoundary": "The absolute budgets were frozen prospectively for the next acquisition after reviewing the 2026-08-23 candidate measurement. This is baseline-calibrated regression evidence, not blind competitive parity.",
+  "authorityBoundary": "Passing this contract closes only the local browser performance gate for the declared Counter workload. It does not close AI_GENERATE, Android device performance, production scale or cross-machine performance."
+}

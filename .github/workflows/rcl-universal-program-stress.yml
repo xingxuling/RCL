@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - codex/rcl-universal-stress-v0.1
+      - main
+      - 'codex/**'
     paths:
       - 'src/universal-program-stress.mjs'
       - 'src/universal-stress-*.mjs'
       - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
+      - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
@@ -20,6 +22,7 @@ on:
       - 'src/universal-stress-*.mjs'
       - 'tests/universal*stress*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
+      - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'examples/universal-stress/**'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
@@ -41,11 +44,15 @@ jobs:
         run: node --test tests/universal*stress*.test.mjs
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
+      - name: Consolidated K400 campaign report
+        run: npm run evidence:k400
       - name: K01 self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
       - name: Upload evidence report
         uses: actions/upload-artifact@v4
         with:
           name: rcl-universal-stress-v0.1-report
-          path: output/universal-stress-v0.1
+          path: |
+            output/universal-stress-v0.1
+            output/universal-stress-k400
           if-no-files-found: error

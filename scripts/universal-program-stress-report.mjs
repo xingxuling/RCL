@@ -9,11 +9,13 @@ import {
   UNIVERSAL_ENVIRONMENTS,
   UNIVERSAL_PROGRAM_FAMILIES,
   UNIVERSAL_STRESS_GATES,
+  auditK400Completion,
   buildUniversalStressMatrix,
   classifyUniversalMaturity,
   evaluateStressCell,
   findUnabsorbedAdvantages,
   reportEvidenceRoot,
+  validateUniversalStressEvidence,
 } from '../src/universal-program-stress.mjs';
 
 const inputPath = process.argv[2] ?? 'examples/universal-stress/v0.1-baseline-evidence.json';
@@ -44,8 +46,9 @@ function percent(value) {
 }
 
 const evidence = readJson(inputPath);
-if (evidence.schema !== 'rcl.universal-stress.evidence.v0.1') {
-  throw new Error(`RCL_STRESS_EVIDENCE_SCHEMA:${evidence.schema ?? 'missing'}`);
+const evidenceValidation = validateUniversalStressEvidence(evidence);
+if (!evidenceValidation.ok) {
+  throw new Error(`RCL_STRESS_EVIDENCE_INVALID:${evidenceValidation.errors.join('|')}`);
 }
 
 const matrix = buildUniversalStressMatrix();
@@ -73,6 +76,7 @@ const maturity = classifyUniversalMaturity({
 });
 
 const claimedReports = reports.filter((report) => byCellId.has(report.id));
+const k400Completion = auditK400Completion(reports);
 const statusCounts = Object.fromEntries(
   Object.values(STRESS_STATUS).map((status) => [status, reports.filter((report) => report.status === status).length]),
 );
@@ -98,6 +102,7 @@ const fullReportWithoutRoot = {
     coverageModeCounts,
     gateCompletion,
   },
+  k400Completion,
   killerTasks: killerReports.map(({ report, ...task }) => ({
     ...task,
     cellId: report.id,
@@ -139,6 +144,13 @@ const markdown = `# RCL Universal Program Stress Test v0.1\n\n` +
   `- Unverified cells: ${fullReport.matrix.unverifiedCells}\n` +
   `- Untested cells: ${fullReport.matrix.statusCounts.UNTESTED}\n` +
   `- Regressed cells: ${fullReport.matrix.statusCounts.REGRESSED}\n\n` +
+  `## K400 completion\n\n` +
+  `- Verdict: **${k400Completion.verdict}**\n` +
+  `- Passed cells: ${k400Completion.passedCells}/${k400Completion.totalCells}\n` +
+  `- Remaining cells: ${k400Completion.remainingCells}\n` +
+  `- Evidence complete: ${k400Completion.evidenceComplete}\n` +
+  `- Universal-growth complete: ${k400Completion.universalGrowthComplete}\n` +
+  `- Next priority: ${k400Completion.nextPriority.map((cell) => `${cell.campaignId} ${cell.id} [${cell.blockingGates.join(', ')}]`).join('; ') || 'none'}\n\n` +
   `## Maturity metrics\n\n` +
   `- Passed claimed cells: ${maturity.metrics.passedCells}/${maturity.metrics.evaluatedCells}\n` +
   `- Claimed-cell pass ratio: ${percent(maturity.metrics.passRatio)}\n` +
@@ -166,4 +178,7 @@ console.log(JSON.stringify({
   claimedCells: fullReport.matrix.claimedCells,
   unverifiedCells: fullReport.matrix.unverifiedCells,
   statusCounts: fullReport.matrix.statusCounts,
+  k400Verdict: k400Completion.verdict,
+  k400PassedCells: k400Completion.passedCells,
+  k400RemainingCells: k400Completion.remainingCells,
 }, null, 2));

@@ -3,10 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { evaluateBrowserPerformanceContract } from '../src/ui/ui-performance-contract.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const htmlPath = path.join(ROOT, 'output/native-ui-genome-v0.1/web/counter.html');
 const evidencePath = path.join(ROOT, 'examples/native-ui/evidence/browser-runtime-result.json');
+const performanceContractPath = path.join(ROOT, 'examples/native-ui/browser-performance-contract.v0.1.json');
 const profilePath = path.join(ROOT, 'output/native-ui-genome-v0.1/chrome-evidence-profile');
 const referencePath = path.join(ROOT, 'output/native-ui-genome-v0.1/web/reference-counter.html');
 const browsers = [
@@ -17,7 +19,9 @@ const browsers = [
 const browser = browsers.find((candidate) => fs.existsSync(candidate));
 if (!browser) throw new Error('RCL_UI_BROWSER_NOT_FOUND');
 if (!fs.existsSync(htmlPath)) throw new Error('RCL_UI_WEB_BUILD_MISSING');
+if (!fs.existsSync(performanceContractPath)) throw new Error('RCL_UI_BROWSER_PERFORMANCE_CONTRACT_MISSING');
 fs.mkdirSync(profilePath, { recursive: true });
+const performanceContract = JSON.parse(fs.readFileSync(performanceContractPath, 'utf8'));
 
 const url = `${pathToFileURL(htmlPath).href}?rclTest=1`;
 const hostStarted = performance.now();
@@ -54,9 +58,19 @@ const escapedBrowser = browser.replaceAll("'", "''");
 const version = process.platform === 'win32'
   ? spawnSync('powershell.exe', ['-NoProfile', '-Command', `(Get-Item -LiteralPath '${escapedBrowser}').VersionInfo.ProductVersion`], { encoding: 'utf8', timeout: 10000, windowsHide: true })
   : spawnSync(browser, ['--version'], { encoding: 'utf8', timeout: 10000, windowsHide: true });
+const performanceVerdict = evaluateBrowserPerformanceContract(performanceContract, {
+  ...result.performance,
+  hostBrowserProcessElapsedMs: hostElapsedMs,
+});
+if (result.uiProgramRoot !== performanceContract.uiProgramRoot) {
+  performanceVerdict.status = 'FAIL';
+  performanceVerdict.checks.uiProgramRoot = false;
+} else {
+  performanceVerdict.checks.uiProgramRoot = true;
+}
 const evidence = {
-  format: 'rcl.native-ui.browser-runtime-evidence.v0.1',
-  status: result.status,
+  format: 'rcl.native-ui.browser-runtime-evidence.v0.2',
+  status: result.status === 'PASS' && performanceVerdict.status === 'PASS' ? 'PASS' : 'FAIL',
   browser: path.basename(browser),
   browserVersion: version.stdout.trim() || 'UNKNOWN',
   mode: 'headless-real-browser-dom-events',
@@ -71,6 +85,9 @@ const evidence = {
     hostBrowserProcessElapsedMs: hostElapsedMs,
     reference: 'same-process plain DOM button counter',
   },
+  performanceContract: performanceVerdict,
+  boundary: performanceContract.authorityBoundary,
 };
 fs.writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(evidence, null, 2));
+if (evidence.status !== 'PASS') process.exitCode = 1;
