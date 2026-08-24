@@ -335,6 +335,7 @@ test('self-hosted C1 matches JS RBC for core and rule fixtures', { timeout: 300_
     'examples/selfhost-core/dynamic-provider-v12.rcl',
     'examples/selfhost-core/native-ui-minimal.rcl',
     'examples/native-ui/navigation.rcl',
+    'examples/native-ui/device-adaptation.rcl',
   ];
 
   for (const fixture of fixtures) {
@@ -365,7 +366,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
   }
 });
 
-test('self-hosted compiler owns minimal, Counter, parameterized, governed and fixed-size UI semantic-root slices', { timeout: 300_000 }, () => {
+test('self-hosted compiler owns minimal, Counter, parameterized, governed, fixed-size, navigation and device-adaptation UI semantic-root slices', { timeout: 300_000 }, () => {
   const { c1 } = getFixedPointEvidence();
   const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
   const selfHosted = runCompilerArtifact(c1, minimalSource).output;
@@ -523,6 +524,39 @@ test('self-hosted compiler owns minimal, Counter, parameterized, governed and fi
     assert.throws(() => compileRealityToBytecode(invalidSource));
     assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
       'invalid navigation declarations and statements must fail closed in both compilers');
+  }
+
+  const adaptationSource = read('examples/native-ui/device-adaptation.rcl');
+  const adaptationOracle = compileRealityToBytecode(adaptationSource);
+  const adaptationSelfHosted = runCompilerArtifact(c1, adaptationSource).output;
+  assertRbcEqual(adaptationSelfHosted, adaptationOracle,
+    'canonical device adaptation RBC and semantic root must match JS exactly');
+  const adaptationProgram = compileReality(adaptationSource);
+  assert.equal(adaptationProgram.nativeUis[0].extensionPoints.deviceAdaptation.defaultProfile, 'compact');
+  assert.deepEqual(adaptationProgram.nativeUis[0].viewTree.adaptiveLayouts, [{ profile: 'expanded', mode: 'horizontal' }]);
+
+  for (const [before, after] of [
+    ['max_width 599', 'max_width 598'],
+    ['adapt expanded layout horizontal', 'adapt expanded layout vertical'],
+  ]) {
+    const mutated = adaptationSource.replace(before, after);
+    assertRbcEqual(runCompilerArtifact(c1, mutated).output, compileRealityToBytecode(mutated),
+      'device adaptation mutation must remain byte-identical');
+    assert.notEqual(compileReality(mutated).nativeUis[0].semanticRoot,
+      adaptationProgram.nativeUis[0].semanticRoot, 'device adaptation mutation must change the Native UI semantic root');
+  }
+
+  const invalidAdaptationSources = [
+    adaptationSource.replace(/\s+adaptation \{[\s\S]*?\n\s+\}\n\n\s+view Root/u, '\n    view Root'),
+    adaptationSource.replace('adapt expanded layout horizontal', 'adapt missing layout horizontal'),
+    adaptationSource.replace('adapt expanded layout horizontal', 'adapt expanded layout horizontal\n      adapt expanded layout vertical'),
+    adaptationSource.replace('profile expanded min_width 600', 'profile expanded min_width 599'),
+    adaptationSource.replace('default compact', 'default missing'),
+  ];
+  for (const invalidSource of invalidAdaptationSources) {
+    assert.throws(() => compileRealityToBytecode(invalidSource));
+    assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
+      'invalid device adaptation declarations and references must fail closed in both compilers');
   }
 });
 

@@ -284,8 +284,8 @@ function compileBuiltin(expr, asm, compileExpr) {
   }
   if (expr.name === 'choose') {
     if (expr.args.length !== 3) throw new Error('choose() requires three arguments');
-    const elseLabel = `choose_else_${asm.instructions.length}`;
-    const endLabel = `choose_end_${asm.instructions.length}`;
+    const elseLabel = asm.freshLabel('choose_else');
+    const endLabel = asm.freshLabel('choose_end');
     compileExpr(expr.args[0]);
     asm.jump(OPCODES.JUMP_IF_FALSE, elseLabel);
     compileExpr(expr.args[1]);

@@ -97,6 +97,18 @@ test('native core bytecode implements MOD and JS-compatible and/or short circuit
   });
 });
 
+test('nested choose expressions receive collision-free bytecode labels', async () => {
+  const source = `reality NestedChooseLabels {
+    facet result.value : Number = choose(choose(true, false, true), 1, choose(false, 2, 3))
+  }`;
+  const bytecode = compileRealityToBytecode(source);
+  assert.ok(bytecode.length > 0);
+  const native = runRealityNative(source);
+  const reference = await runReality(source);
+  assert.deepEqual(native.state, reference.state);
+  assert.equal(native.state['result.value'], 3);
+});
+
 test('native LOAD_STATE reports the reference runtime missing-state code and message', () => {
   const source = `reality NativeMissingState {
     facet early.value : Truth = late.value
