@@ -886,6 +886,27 @@ class Parser {
     return node;
   }
 
+  parseUINavigation() {
+    const start = this.expect('navigation');
+    const node = { kind: 'UINavigationDecl', initial: null, routes: [], location: { line: start.line, column: start.column } };
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('initial')) {
+        this.advance();
+        if (node.initial !== null) throw new RCLSyntaxError('Native UI navigation may declare initial only once', this.current());
+        node.initial = this.expectType('IDENT', 'Expected initial UI route identity').value;
+      } else if (this.at('route')) {
+        this.advance();
+        const id = this.expectType('IDENT', 'Expected UI route identity').value;
+        this.expect('->', 'Expected -> between UI route and target view');
+        const target = this.expectType('IDENT', 'Expected UI route target view identity').value;
+        node.routes.push({ id, target });
+      } else throw new RCLSyntaxError(`Unknown UI navigation clause '${this.current().value}'`, this.current());
+    }
+    this.expect('}');
+    return node;
+  }
+
   parseUIEvent() {
     const start = this.expect('on');
     const eventType = this.expectType('IDENT', 'Expected canonical UI event type').value;
@@ -915,6 +936,9 @@ class Parser {
       } else if (this.at('realize')) {
         this.advance();
         statements.push({ kind: 'UIRealizeReality', rule: this.expectType('IDENT', 'Expected RCL reality rule name').value });
+      } else if (this.at('navigate')) {
+        this.advance();
+        statements.push({ kind: 'UINavigate', route: this.expectType('IDENT', 'Expected UI navigation route identity').value });
       } else throw new RCLSyntaxError(`Unknown UI event statement '${this.current().value}'`, this.current());
     }
     this.expect('}');
@@ -971,7 +995,7 @@ class Parser {
     const name = this.expectType('IDENT', 'Expected native UI program identity').value;
     const node = {
       kind: 'NativeUIDecl', name, states: [], derivedStates: [], themes: [], styles: [],
-      viewTrees: [], lifecycle: null, location: { line: start.line, column: start.column },
+      viewTrees: [], lifecycle: null, navigation: null, location: { line: start.line, column: start.column },
     };
     this.expect('{');
     while (!this.at('}')) {
@@ -983,6 +1007,9 @@ class Parser {
       else if (keyword === 'lifecycle') {
         if (node.lifecycle) throw new RCLSyntaxError('Native UI may declare lifecycle only once', this.current());
         node.lifecycle = this.parseUILifecycle();
+      } else if (keyword === 'navigation') {
+        if (node.navigation) throw new RCLSyntaxError('Native UI may declare navigation only once', this.current());
+        node.navigation = this.parseUINavigation();
       } else if (keyword === 'view') node.viewTrees.push(this.parseUIViewNode());
       else throw new RCLSyntaxError(`Unknown native UI declaration '${keyword}'`, this.current());
     }

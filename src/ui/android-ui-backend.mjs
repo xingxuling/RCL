@@ -28,6 +28,10 @@ function collectNodes(root, result = []) {
 }
 function property(node, name) { return node.localProperties.find((item) => item.property === name)?.value; }
 function fieldName(node) { return `view_${javaIdentifier(node.id)}`; }
+function viewType(node) {
+  if (node.role === 'container') return node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
+  return ROLE_TO_VIEW[node.role];
+}
 
 function emitJavaExpr(expr, snapshot = 'snapshot', event = 'event') {
   if (expr.kind === 'literal') return javaLiteral(expr.value);
@@ -56,14 +60,11 @@ function applyStyle(node, variable, lines, indent) {
   if (node.accessibility.label) lines.push(`${indent}${variable}.setContentDescription(${javaString(node.accessibility.label)});`);
 }
 
-function emitNode(node, lines, indent = '    ') {
+function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
   const variable = fieldName(node);
-  const bound = node.bindings.length > 0;
-  let type;
-  if (node.role === 'container') {
-    type = node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
-  } else type = ROLE_TO_VIEW[node.role];
-  lines.push(`${indent}${bound ? `this.${variable}` : `${type} ${variable}`} = new ${type}(this);`);
+  const fieldBacked = fieldNodeIds.has(node.id);
+  const type = viewType(node);
+  lines.push(`${indent}${fieldBacked ? `this.${variable}` : `${type} ${variable}`} = new ${type}(this);`);
   if (node.role === 'container') {
     if (type === 'LinearLayout') lines.push(`${indent}${variable}.setOrientation(LinearLayout.${node.layout.mode === 'horizontal' ? 'HORIZONTAL' : 'VERTICAL'});`);
     if (type === 'GridLayout') lines.push(`${indent}${variable}.setColumnCount(${node.layout.columns});`);
@@ -93,7 +94,7 @@ function emitNode(node, lines, indent = '    ') {
   }
   applyStyle(node, variable, lines, indent);
   for (const child of node.children) {
-    const childVariable = emitNode(child, lines, indent);
+    const childVariable = emitNode(child, lines, fieldNodeIds, indent);
     const paramsName = `params_${javaIdentifier(node.id)}_${javaIdentifier(child.id)}`;
     const width = javaDimension(child.layout.width);
     const height = javaDimension(child.layout.height);
@@ -126,6 +127,7 @@ function emitRuntimeHelpers() {
 function emitEventMethods(ui) {
   const methods = [];
   const dispatch = [];
+  const routeLog = ui.extensionPoints.navigation ? ' + " route=" + currentRoute' : '';
   for (const node of collectNodes(ui.viewTree)) for (const handler of node.events) {
     const method = `event_${javaIdentifier(node.id)}_${javaIdentifier(handler.type)}`;
     dispatch.push(`    if (${javaString(node.id)}.equals(nodeId) && ${javaString(handler.type)}.equals(type)) { ${method}(event); return; }`);
@@ -137,8 +139,14 @@ function emitEventMethods(ui) {
       lines.push(`    throw new IllegalStateException(${javaString(`RCL_UI_ANDROID_REALITY_GATEWAY_REQUIRED:${node.id}:${handler.type}`)});`);
     } else {
       lines.push('    Map<String,Object> before = new LinkedHashMap<>(state);', '    Map<String,Object> proposed = new LinkedHashMap<>(before);');
-      for (const statement of handler.statements) lines.push(`    proposed.put(${javaString(statement.target)}, ${emitJavaExpr(statement.expression, 'before', 'event')});`);
-      lines.push('    state.clear(); state.putAll(proposed);', `    history.add(${javaString(`${node.id}:${handler.type}`)});`, `    Log.i(RCL_UI_LOG_TAG, "event node=${node.id} type=${handler.type} before=" + before.toString() + " after=" + state.toString());`, '    render();');
+      if (ui.extensionPoints.navigation) lines.push('    String proposedRoute = currentRoute;');
+      for (const statement of handler.statements) {
+        if (statement.kind === 'navigate') lines.push(`    proposedRoute = ${javaString(statement.route)};`);
+        else lines.push(`    proposed.put(${javaString(statement.target)}, ${emitJavaExpr(statement.expression, 'before', 'event')});`);
+      }
+      lines.push('    state.clear(); state.putAll(proposed);');
+      if (ui.extensionPoints.navigation) lines.push('    currentRoute = proposedRoute;');
+      lines.push(`    history.add(${javaString(`${node.id}:${handler.type}`)});`, `    Log.i(RCL_UI_LOG_TAG, "event node=${node.id} type=${handler.type} before=" + before.toString() + " after=" + state.toString()${routeLog});`, '    render();');
     }
     lines.push('  }');
     methods.push(lines.join('\n'));
@@ -161,8 +169,20 @@ function emitRender(ui) {
     if (node.role === 'input' && binding.property === 'value') lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
     else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
   }
+  if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   lines.push('    rendering = false;', '  }');
   return lines.join('\n');
+}
+
+function emitNavigation(ui) {
+  const navigation = ui.extensionPoints.navigation;
+  if (!navigation) return { field: '', method: '' };
+  const lines = ['  private void applyNavigation() {'];
+  for (const route of navigation.routes) {
+    lines.push(`    ${fieldName({ id: route.target })}.setVisibility(${javaString(route.id)}.equals(currentRoute) ? View.VISIBLE : View.GONE);`);
+  }
+  lines.push('  }');
+  return { field: `  private String currentRoute = ${javaString(navigation.initialRoute)};`, method: lines.join('\n') };
 }
 
 function emitLifecycle(ui) {
@@ -204,6 +224,7 @@ export function lowerNativeUiToAndroid(ui, target = {}) {
     },
     nodeMappings: collectNodes(ui.viewTree).map((node) => ({ nodeId: node.id, canonicalRole: node.role, target: ROLE_TO_VIEW[node.role] })),
     eventMappings: ui.eventGraph.events.map((event) => ({ nodeId: event.nodeId, canonicalEvent: event.type, targetEvent: EVENT_TO_ANDROID[event.type] ?? 'custom-event gateway' })),
+    navigationMapping: ui.extensionPoints.navigation ? { strategy: 'View.VISIBLE_OR_GONE', routes: ui.extensionPoints.navigation.routes } : null,
     layoutMapping: { vertical: 'LinearLayout.VERTICAL', horizontal: 'LinearLayout.HORIZONTAL', overlay: 'FrameLayout', grid: 'GridLayout' },
     lifecycleMapping: { create: 'Activity.onCreate', activate: 'Activity.onStart', suspend: 'Activity.onPause', resume: 'Activity.onResume', destroy: 'Activity.onDestroy' },
     coverage: { semantic: 'native-ui-ir', visualFidelity: 'structural-v0.1', runtime: 'android-view-project' },
@@ -214,12 +235,15 @@ export function lowerNativeUiToAndroid(ui, target = {}) {
 export function emitNativeUiAndroidActivity(manifest) {
   if (manifest.schema !== RCL_NATIVE_UI_ANDROID_FORMAT) throw new Error('RCL_UI_ANDROID_MANIFEST_FORMAT');
   const ui = manifest.ui;
-  const boundNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0);
-  const fields = boundNodes.map((node) => `  private ${node.role === 'input' ? 'EditText' : node.role === 'action' ? 'Button' : 'TextView'} ${fieldName(node)};`).join('\n');
+  const navigationTargetIds = new Set(ui.extensionPoints.navigation?.routes.map((route) => route.target) ?? []);
+  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || navigationTargetIds.has(node.id));
+  const fieldNodeIds = new Set(fieldNodes.map((node) => node.id));
+  const fields = fieldNodes.map((node) => `  private ${viewType(node)} ${fieldName(node)};`).join('\n');
   const uiLines = [];
-  const root = emitNode(ui.viewTree, uiLines);
+  const root = emitNode(ui.viewTree, uiLines, fieldNodeIds);
   const events = emitEventMethods(ui);
   const lifecycle = emitLifecycle(ui);
+  const navigation = emitNavigation(ui);
   return `package ${manifest.application.applicationId};
 
 import android.app.Activity;
@@ -229,6 +253,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -248,6 +273,7 @@ public final class ${manifest.application.activity} extends Activity {
   private final List<String> history = new ArrayList<>();
   private final List<String> lifecycleTrace = new ArrayList<>();
   private boolean rendering = false;
+${navigation.field}
 ${fields}
 
   @Override protected void onCreate(Bundle savedState) { super.onCreate(savedState); initializeState(); restoreState(savedState); buildUi(); render(); lifecycleTrace.add("create"); Log.i(RCL_UI_LOG_TAG, "lifecycle create uiRoot=" + RCL_UI_PROGRAM_ROOT + " state=" + state.toString()); }
@@ -263,6 +289,7 @@ ${emitDerived(ui)}
 ${events.dispatch}
 ${events.methods}
 ${emitRender(ui)}
+${navigation.method}
 
   private void restoreState(Bundle savedState) { if (savedState == null) return;\n${lifecycle.restore}\n  }
   @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState);\n${lifecycle.save}\n  }
@@ -275,7 +302,7 @@ export function simulateNativeUiAndroidApplication(manifest, events = []) {
   const runtime = createNativeUiRuntime(manifest.ui);
   runtime.lifecycle('create'); runtime.lifecycle('resume');
   for (const event of events) runtime.dispatch(event.nodeId, event.type, event.payload ?? {});
-  return { state: runtime.snapshot(), rendered: runtime.projection().rendered, history: structuredClone(runtime.trace) };
+  return { state: runtime.snapshot(), rendered: runtime.projection().rendered, history: structuredClone(runtime.trace), ...(manifest.ui.extensionPoints.navigation ? { currentRoute: runtime.currentRoute() } : {}) };
 }
 
 export function traceNativeUiAndroidApplication(manifest, events = []) {

@@ -21,6 +21,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const RCL_PATH = path.join(ROOT, 'examples/native-ui/counter.rcl');
 const SOURCE = fs.readFileSync(RCL_PATH, 'utf8');
 const FIXED_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/selfhost-core/native-ui-fixed.rcl'), 'utf8');
+const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
 const EVENTS = [
   { nodeId: 'IncrementButton', type: 'activate' },
   { nodeId: 'IncrementButton', type: 'activate' },
@@ -73,6 +74,36 @@ test('fixed-size layout lowers from one canonical root to Web CSS and Android La
   const java = emitNativeAndroidActivity(android);
   assert.match(html, /\[data-rcl-node="Panel"\]\{[^}]*width:320px;[^}]*height:180px/u);
   assert.match(java, /LinearLayout\.LayoutParams params_Root_Panel = new LinearLayout\.LayoutParams\(320, 180\)/u);
+});
+
+test('navigation lowers from one canonical root to Web visibility and Android native View visibility', () => {
+  const events = [
+    { nodeId: 'OpenSettings', type: 'activate' },
+    { nodeId: 'BackHome', type: 'activate' },
+  ];
+  const web = compileRclWebApplication(NAVIGATION_SOURCE, { schema: 'rcl.native-ui.web-target.v0.1' });
+  const android = compileRclAndroidApplication(NAVIGATION_SOURCE, {
+    schema: 'rcl.native-ui.android-target.v0.1',
+    applicationId: 'com.taowind.rcl.navigationui',
+  });
+  assert.equal(web.uiProgramRoot, android.uiProgramRoot);
+  assert.deepEqual(web.ui.extensionPoints.navigation, android.ui.extensionPoints.navigation);
+  const html = emitStandaloneRclWebHtml(web);
+  const java = emitNativeAndroidActivity(android);
+  assert.match(html, /data-rcl-route="home"/u);
+  assert.match(html, /data-rcl-route="settings"/u);
+  assert.match(html, /el\.hidden=el\.dataset\.rclRoute!==currentRoute/u);
+  assert.match(java, /private String currentRoute = "home"/u);
+  assert.match(java, /View\.VISIBLE : View\.GONE/u);
+  assert.match(java, /String proposedRoute = currentRoute/u);
+
+  const webTrace = traceNativeUiWebApplication(web, events);
+  const androidTrace = traceNativeUiAndroidApplication(android, events);
+  assert.deepEqual(webTrace.events, androidTrace.events);
+  assert.deepEqual(webTrace.initialNavigation, { currentRoute: 'home', target: 'HomeScreen' });
+  assert.deepEqual(webTrace.finalNavigation, { currentRoute: 'home', target: 'HomeScreen' });
+  assert.deepEqual(webTrace.initialNavigation, androidTrace.initialNavigation);
+  assert.deepEqual(webTrace.finalNavigation, androidTrace.finalNavigation);
 });
 
 test('both native UI backends generate inspectable standalone project artifacts', () => {

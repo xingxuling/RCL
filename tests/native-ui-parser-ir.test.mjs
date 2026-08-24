@@ -9,6 +9,7 @@ import { validateCanonicalNativeUi } from '../src/ui/ui-validator.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/counter.rcl'), 'utf8');
+const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
 
 test('native UI syntax is owned by the RCL parser and lowers to a rooted canonical UI IR', () => {
   const compiled = compileReality(SOURCE);
@@ -49,6 +50,22 @@ test('semantic roots ignore diagnostic locations but bind semantic genome mutati
     () => deserializeNativeUiProgram(JSON.stringify(tampered), validateCanonicalNativeUi),
     /RCL_UI_SEMANTIC_ROOT_MISMATCH/u,
   );
+});
+
+test('canonical navigation participates in semantic identity and stable serialization', () => {
+  const original = compileReality(NAVIGATION_SOURCE).nativeUis[0];
+  const relocated = compileReality(`\n${NAVIGATION_SOURCE}`).nativeUis[0];
+  const changedInitial = compileReality(NAVIGATION_SOURCE.replace('initial home', 'initial settings')).nativeUis[0];
+  const changedTarget = compileReality(NAVIGATION_SOURCE
+    .replace('route home -> HomeScreen', 'route home -> SettingsScreen')
+    .replace('route settings -> SettingsScreen', 'route settings -> HomeScreen')).nativeUis[0];
+  assert.equal(relocated.semanticRoot, original.semanticRoot);
+  assert.notEqual(changedInitial.semanticRoot, original.semanticRoot);
+  assert.notEqual(changedTarget.semanticRoot, original.semanticRoot);
+  const serialized = serializeNativeUiProgram(original);
+  const restored = deserializeNativeUiProgram(serialized, validateCanonicalNativeUi);
+  assert.deepEqual(restored.extensionPoints.navigation, original.extensionPoints.navigation);
+  assert.equal(restored.semanticRoot, original.semanticRoot);
 });
 
 test('programs without UI preserve the governed pre-UI IR shape and program root', () => {

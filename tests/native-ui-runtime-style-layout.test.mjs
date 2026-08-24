@@ -8,6 +8,7 @@ import { createNativeUiRuntime } from '../src/ui/ui-event.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/counter.rcl'), 'utf8');
+const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
 
 test('state to binding to event to state to binding closes reactively', () => {
   const ui = compileNativeUiProgram(SOURCE);
@@ -85,4 +86,55 @@ test('lifecycle restore is explicit and restores only declared local UI state', 
   assert.deepEqual(runtime.lifecycleTrace.map((item) => item.stage), ['create']);
   const invalid = createNativeUiRuntime(ui);
   assert.throws(() => invalid.lifecycle('create', { count: 'seven' }), /RCL_UI_RESTORE_TYPE/u);
+});
+
+test('canonical navigation and local state commit atomically inside one UI-local event', () => {
+  const ui = compileNativeUiProgram(NAVIGATION_SOURCE);
+  assert.deepEqual(ui.extensionPoints.navigation, {
+    format: 'rcl.native-ui.navigation.v0.1',
+    initialRoute: 'home',
+    routes: [
+      { id: 'home', target: 'HomeScreen' },
+      { id: 'settings', target: 'SettingsScreen' },
+    ],
+  });
+  const runtime = createNativeUiRuntime(ui);
+  runtime.lifecycle('create');
+  assert.deepEqual(runtime.projection().navigation, { currentRoute: 'home', target: 'HomeScreen' });
+  runtime.dispatch('OpenSettings', 'activate');
+  assert.equal(runtime.state.visits, 1);
+  assert.deepEqual(runtime.projection().navigation, { currentRoute: 'settings', target: 'SettingsScreen' });
+  assert.deepEqual(runtime.trace[0], {
+    sequence: 1,
+    event: { nodeId: 'OpenSettings', type: 'activate', payload: {}, authority: 'ui-local' },
+    beforeState: { visits: 0 },
+    afterState: { visits: 1 },
+    renderedSemanticState: {
+      Root: {}, HomeScreen: {}, OpenSettings: {}, SettingsScreen: {}, BackHome: {},
+    },
+    beforeRoute: 'home',
+    afterRoute: 'settings',
+  });
+  runtime.dispatch('BackHome', 'activate');
+  assert.equal(runtime.currentRoute(), 'home');
+});
+
+test('navigation references and handler cardinality fail closed', () => {
+  const missingNavigation = NAVIGATION_SOURCE.replace(/\s+navigation \{[\s\S]*?\n\s+\}\n\n\s+view Root/u, '\n    view Root');
+  assert.throws(() => compileNativeUiProgram(missingNavigation), /RCL_UI_NAVIGATION_REQUIRED/u);
+
+  const duplicateRoute = NAVIGATION_SOURCE.replace('route settings -> SettingsScreen', 'route home -> SettingsScreen');
+  assert.throws(() => compileNativeUiProgram(duplicateRoute), /RCL_UI_NAVIGATION_ROUTE_DUPLICATE:home/u);
+
+  const duplicateTarget = NAVIGATION_SOURCE.replace('route settings -> SettingsScreen', 'route settings -> HomeScreen');
+  assert.throws(() => compileNativeUiProgram(duplicateTarget), /RCL_UI_NAVIGATION_TARGET_DUPLICATE:HomeScreen/u);
+
+  const unknownTarget = NAVIGATION_SOURCE.replace('route settings -> SettingsScreen', 'route settings -> MissingScreen');
+  assert.throws(() => compileNativeUiProgram(unknownTarget), /RCL_UI_NAVIGATION_TARGET_UNKNOWN:settings:MissingScreen/u);
+
+  const unknownRoute = NAVIGATION_SOURCE.replace('navigate settings', 'navigate missing');
+  assert.throws(() => compileNativeUiProgram(unknownRoute), /RCL_UI_NAVIGATION_ROUTE_UNKNOWN:OpenSettings:activate:missing/u);
+
+  const multipleNavigation = NAVIGATION_SOURCE.replace('navigate settings', 'navigate settings navigate home');
+  assert.throws(() => compileNativeUiProgram(multipleNavigation), /RCL_UI_EVENT_MULTIPLE_NAVIGATION:OpenSettings:activate/u);
 });

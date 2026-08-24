@@ -23,6 +23,9 @@ export function createNativeUiRuntime(program, options = {}) {
   const trace = [];
   const lifecycleTrace = [];
   const gateway = options.realityGateway ?? null;
+  const navigation = program.extensionPoints?.navigation ?? null;
+  let currentRoute = navigation?.initialRoute ?? null;
+  const routeTarget = (route) => navigation?.routes.find((item) => item.id === route)?.target ?? null;
 
   const projection = (event = {}) => {
     const derivedCache = new Map();
@@ -43,7 +46,10 @@ export function createNativeUiRuntime(program, options = {}) {
         evaluateUiExpression(binding.expression, { state, event, derived }),
       ]));
     }
-    return { state: cloneState(state), derived: values, rendered };
+    return {
+      state: cloneState(state), derived: values, rendered,
+      ...(navigation ? { navigation: { currentRoute, target: routeTarget(currentRoute) } } : {}),
+    };
   };
 
   const lifecycle = (stage, snapshot = null) => {
@@ -72,6 +78,7 @@ export function createNativeUiRuntime(program, options = {}) {
       if (!matchesUiType(payload[parameter.id], parameter.valueType)) throw new Error(`RCL_UI_EVENT_PARAMETER_RUNTIME_TYPE:${nodeId}:${eventType}:${parameter.id}:${parameter.valueType}`);
     }
     const before = cloneState(state);
+    const beforeRoute = currentRoute;
     const derived = (id) => {
       const decl = program.derivedState.find((item) => item.id === id);
       if (!decl) throw new Error(`RCL_UI_DERIVED_MISSING:${id}`);
@@ -82,14 +89,21 @@ export function createNativeUiRuntime(program, options = {}) {
       for (const statement of handler.statements) gateway({ kind: 'CandidateReality', rule: statement.rule, nodeId, eventType, payload: cloneState(payload) });
     } else {
       const proposed = cloneState(before);
+      let proposedRoute = beforeRoute;
       for (const statement of handler.statements) {
-        const next = evaluateUiExpression(statement.expression, { state: before, event: payload, derived });
-        const declaration = program.state.find((item) => item.id === statement.target);
-        if (!matchesUiType(next, declaration.valueType)) throw new Error(`RCL_UI_EVENT_MUTATION_RUNTIME_TYPE:${statement.target}:${declaration.valueType}`);
-        proposed[statement.target] = next;
+        if (statement.kind === 'navigate') {
+          if (!navigation || routeTarget(statement.route) === null) throw new Error(`RCL_UI_NAVIGATION_ROUTE_RUNTIME_UNKNOWN:${statement.route}`);
+          proposedRoute = statement.route;
+        } else {
+          const next = evaluateUiExpression(statement.expression, { state: before, event: payload, derived });
+          const declaration = program.state.find((item) => item.id === statement.target);
+          if (!matchesUiType(next, declaration.valueType)) throw new Error(`RCL_UI_EVENT_MUTATION_RUNTIME_TYPE:${statement.target}:${declaration.valueType}`);
+          proposed[statement.target] = next;
+        }
       }
       Object.keys(state).forEach((key) => delete state[key]);
       Object.assign(state, proposed);
+      currentRoute = proposedRoute;
     }
     const afterProjection = projection(payload);
     const record = {
@@ -98,6 +112,7 @@ export function createNativeUiRuntime(program, options = {}) {
       beforeState: before,
       afterState: cloneState(state),
       renderedSemanticState: afterProjection.rendered,
+      ...(navigation ? { beforeRoute, afterRoute: currentRoute } : {}),
     };
     trace.push(record);
     return record;
@@ -111,6 +126,7 @@ export function createNativeUiRuntime(program, options = {}) {
     dispatch,
     lifecycle,
     projection,
+    currentRoute: () => currentRoute,
     snapshot: () => cloneState(state),
   });
 }
@@ -124,6 +140,7 @@ export function runNativeUiSemanticTrace(program, events, platform = 'canonical'
   for (const event of events) runtime.dispatch(event.nodeId, event.type, event.payload ?? {});
   runtime.lifecycle('suspend');
   runtime.lifecycle('destroy');
+  const final = runtime.projection();
   return {
     format: 'rcl.native-ui.semantic-trace.v0.1',
     platform,
@@ -132,7 +149,8 @@ export function runNativeUiSemanticTrace(program, events, platform = 'canonical'
     initialRenderedSemanticState: initial.rendered,
     events: cloneState(runtime.trace),
     finalState: runtime.snapshot(),
-    finalRenderedSemanticState: runtime.projection().rendered,
+    finalRenderedSemanticState: final.rendered,
     lifecycle: cloneState(runtime.lifecycleTrace),
+    ...(initial.navigation ? { initialNavigation: initial.navigation, finalNavigation: final.navigation } : {}),
   };
 }

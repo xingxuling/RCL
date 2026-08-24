@@ -334,6 +334,7 @@ test('self-hosted C1 matches JS RBC for core and rule fixtures', { timeout: 300_
     'examples/whole-language-parser-target.rcl',
     'examples/selfhost-core/dynamic-provider-v12.rcl',
     'examples/selfhost-core/native-ui-minimal.rcl',
+    'examples/native-ui/navigation.rcl',
   ];
 
   for (const fixture of fixtures) {
@@ -481,6 +482,47 @@ test('self-hosted compiler owns minimal, Counter, parameterized, governed and fi
     assert.throws(() => compileRealityToBytecode(invalidSource));
     assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
       'invalid fixed sizes and size modes must fail closed in both compilers');
+  }
+
+  const navigationSource = read('examples/native-ui/navigation.rcl');
+  const navigationOracle = compileRealityToBytecode(navigationSource);
+  const navigationSelfHosted = runCompilerArtifact(c1, navigationSource).output;
+  assertRbcEqual(navigationSelfHosted, navigationOracle,
+    'canonical navigation RBC and semantic root must match JS exactly');
+  const navigationProgram = compileReality(navigationSource);
+  assert.deepEqual(navigationProgram.nativeUis[0].extensionPoints.navigation, {
+    format: 'rcl.native-ui.navigation.v0.1',
+    initialRoute: 'home',
+    routes: [
+      { id: 'home', target: 'HomeScreen' },
+      { id: 'settings', target: 'SettingsScreen' },
+    ],
+  });
+
+  const changedNavigationSource = navigationSource.replace('initial home', 'initial settings');
+  assertRbcEqual(
+    runCompilerArtifact(c1, changedNavigationSource).output,
+    compileRealityToBytecode(changedNavigationSource),
+    'navigation initial-route mutation must remain byte-identical',
+  );
+  assert.notEqual(
+    compileReality(changedNavigationSource).nativeUis[0].semanticRoot,
+    navigationProgram.nativeUis[0].semanticRoot,
+    'navigation initial-route mutation must change the Native UI semantic root',
+  );
+
+  const invalidNavigationSources = [
+    navigationSource.replace(/\s+navigation \{[\s\S]*?\n\s+\}\n\n\s+view Root/u, '\n    view Root'),
+    navigationSource.replace('route settings -> SettingsScreen', 'route home -> SettingsScreen'),
+    navigationSource.replace('route settings -> SettingsScreen', 'route settings -> HomeScreen'),
+    navigationSource.replace('route settings -> SettingsScreen', 'route settings -> MissingScreen'),
+    navigationSource.replace('navigate settings', 'navigate missing'),
+    navigationSource.replace('navigate settings', 'navigate settings navigate home'),
+  ];
+  for (const invalidSource of invalidNavigationSources) {
+    assert.throws(() => compileRealityToBytecode(invalidSource));
+    assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
+      'invalid navigation declarations and statements must fail closed in both compilers');
   }
 });
 

@@ -1,0 +1,41 @@
+reality NavigationUI {
+  ui Navigator {
+    state visits : Number = 0
+
+    navigation {
+      initial home
+      route home -> HomeScreen
+      route settings -> SettingsScreen
+    }
+
+    view Root {
+      layout vertical {
+        width fill
+        height intrinsic
+        gap 8
+        padding 12
+        align stretch
+        distribute start
+      }
+
+      view HomeScreen {
+        action OpenSettings {
+          label "Open settings"
+          on activate {
+            set visits <- visits + 1
+            navigate settings
+          }
+        }
+      }
+
+      view SettingsScreen {
+        action BackHome {
+          label "Back home"
+          on activate {
+            navigate home
+          }
+        }
+      }
+    }
+  }
+}

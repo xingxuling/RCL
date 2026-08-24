@@ -5,6 +5,7 @@ import { normalizeUiLifecycle } from './ui-lifecycle.mjs';
 import { lowerUiExpression, uiExpressionReferences } from './ui-reactive.mjs';
 import {
   RCL_NATIVE_UI_FORMAT,
+  RCL_NATIVE_UI_NAVIGATION_FORMAT,
   RCL_NATIVE_UI_VERSION,
   UI_BINDABLE_PROPERTIES_BY_ROLE,
   UI_CONTENT_PROPERTIES_BY_ROLE,
@@ -106,6 +107,7 @@ function compileNode(node, context, path = []) {
     }
     let localCount = 0;
     let realityCount = 0;
+    let navigateCount = 0;
     const statements = event.statements.map((statement) => {
       if (statement.kind === 'UISetState') {
         localCount += 1;
@@ -124,9 +126,15 @@ function compileNode(node, context, path = []) {
         if (!context.realityRules.has(statement.rule)) throw new Error(`RCL_UI_REALITY_RULE_UNKNOWN:${node.id}:${statement.rule}`);
         return { kind: 'realize-reality', rule: statement.rule };
       }
+      if (statement.kind === 'UINavigate') {
+        localCount += 1;
+        navigateCount += 1;
+        return { kind: 'navigate', route: statement.route };
+      }
       throw new Error(`RCL_UI_EVENT_STATEMENT:${statement.kind}`);
     });
     if (localCount > 0 && realityCount > 0) throw new Error(`RCL_UI_EVENT_MIXED_AUTHORITY:${node.id}:${event.eventType}`);
+    if (navigateCount > 1) throw new Error(`RCL_UI_EVENT_MULTIPLE_NAVIGATION:${node.id}:${event.eventType}`);
     return {
       id: `${node.id}.event.${event.eventType}.${eventIndex}`,
       type: event.eventType,
@@ -163,6 +171,35 @@ function compileNode(node, context, path = []) {
   return canonical;
 }
 
+function compileNavigation(declaration, viewTree) {
+  const events = collectUiNodes(viewTree).flatMap((node) => node.events.map((event) => ({ nodeId: node.id, ...event })));
+  const navigationStatements = events.flatMap((event) => event.statements
+    .filter((statement) => statement.kind === 'navigate')
+    .map((statement) => ({ nodeId: event.nodeId, eventType: event.type, route: statement.route })));
+  if (!declaration) {
+    if (navigationStatements.length > 0) throw new Error(`RCL_UI_NAVIGATION_REQUIRED:${navigationStatements[0].nodeId}:${navigationStatements[0].eventType}`);
+    return null;
+  }
+  if (declaration.initial === null) throw new Error('RCL_UI_NAVIGATION_INITIAL_REQUIRED');
+  if (declaration.routes.length === 0) throw new Error('RCL_UI_NAVIGATION_ROUTE_REQUIRED');
+  const routeIds = new Set();
+  const routeTargets = new Set();
+  const directTargets = new Set(viewTree.children.map((node) => node.id));
+  const routes = declaration.routes.map((route) => {
+    if (routeIds.has(route.id)) throw new Error(`RCL_UI_NAVIGATION_ROUTE_DUPLICATE:${route.id}`);
+    if (routeTargets.has(route.target)) throw new Error(`RCL_UI_NAVIGATION_TARGET_DUPLICATE:${route.target}`);
+    if (!directTargets.has(route.target)) throw new Error(`RCL_UI_NAVIGATION_TARGET_UNKNOWN:${route.id}:${route.target}`);
+    routeIds.add(route.id);
+    routeTargets.add(route.target);
+    return { id: route.id, target: route.target };
+  });
+  if (!routeIds.has(declaration.initial)) throw new Error(`RCL_UI_NAVIGATION_INITIAL_UNKNOWN:${declaration.initial}`);
+  for (const statement of navigationStatements) {
+    if (!routeIds.has(statement.route)) throw new Error(`RCL_UI_NAVIGATION_ROUTE_UNKNOWN:${statement.nodeId}:${statement.eventType}:${statement.route}`);
+  }
+  return Object.freeze({ format: RCL_NATIVE_UI_NAVIGATION_FORMAT, initialRoute: declaration.initial, routes });
+}
+
 function compileOne(realityProgram, uiDecl) {
   if (uiDecl.viewTrees.length !== 1) throw new Error(`RCL_UI_VIEW_TREE_COUNT:${uiDecl.name}:${uiDecl.viewTrees.length}`);
   const stateIds = assertUnique(uiDecl.states, 'STATE');
@@ -193,6 +230,7 @@ function compileOne(realityProgram, uiDecl) {
     if (rule.selector.kind === 'class' && !context.classes.has(rule.selector.value)) throw new Error(`RCL_UI_STYLE_CLASS_UNKNOWN:${rule.selector.value}`);
   }
   viewTree = resolveUiStyles(viewTree, styleSheet);
+  const navigation = compileNavigation(uiDecl.navigation, viewTree);
   const lifecycle = normalizeUiLifecycle(uiDecl.lifecycle, stateIds);
   const draft = {
     format: RCL_NATIVE_UI_FORMAT,
@@ -210,7 +248,7 @@ function compileOne(realityProgram, uiDecl) {
       format: 'rcl.native-ui.event-graph.v0.1',
       events: collectUiNodes(viewTree).flatMap((node) => node.events.map((event) => ({ nodeId: node.id, ...event }))),
     },
-    extensionPoints: { navigation: null, resources: [], deviceAdaptation: null },
+    extensionPoints: { navigation, resources: [], deviceAdaptation: null },
     source: uiDecl.location ?? null,
   };
   const sealed = sealNativeUiProgram(draft);

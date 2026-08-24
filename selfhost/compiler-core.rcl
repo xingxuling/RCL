@@ -99,37 +99,45 @@ reality RCLGeneralSelfHostCompiler {
   reckon is_two_symbol(value : Text) -> Truth =
     either(value == "<-", either(value == "->", either(value == "==", either(value == "!=", either(value == "<=", value == ">=")))))
 
-  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
-    choose(index >= length(source), sequence_append(output, make_token_node("EOF", "<eof>", line, column)),
+  reckon concat_token_chunks(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      concat_token_chunks(items, index + 1, sequence_concat(output, sequence_get(items, index))))
+
+  reckon tokenize_emit(source : Text, index : Number, line : Number, column : Number, chunks : Sequence, chunk : Sequence, token : Sequence) -> Sequence =
+    choose(length(chunk) >= 127,
+      tokenize_from(source, index, line, column, sequence_append(chunks, chunk),
+        sequence_append(empty_sequence(), token)),
+      tokenize_from(source, index, line, column, chunks, sequence_append(chunk, token)))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, chunks : Sequence, chunk : Sequence) -> Sequence =
+    choose(index >= length(source),
+      concat_token_chunks(sequence_append(chunks, sequence_append(chunk, make_token_node("EOF", "<eof>", line, column))), 0, empty_sequence()),
       choose(is_whitespace(char_at(source, index)),
         choose(char_at(source, index) == "\n",
-          tokenize_from(source, index + 1, line + 1, 1, output),
-          tokenize_from(source, index + 1, line, column + 1, output)),
+          tokenize_from(source, index + 1, line + 1, 1, chunks, chunk),
+          tokenize_from(source, index + 1, line, column + 1, chunks, chunk)),
         choose(either(char_at(source, index) == char_at("#", 0), slice_text(source, index, 2) == "//"),
-          tokenize_from(source, scan_comment_end(source, index), line, column + scan_comment_end(source, index) - index, output),
+          tokenize_from(source, scan_comment_end(source, index), line, column + scan_comment_end(source, index) - index, chunks, chunk),
           choose(is_identifier_start(char_at(source, index)),
-            tokenize_from(source, scan_identifier_end(source, index + 1), line,
+            tokenize_emit(source, scan_identifier_end(source, index + 1), line,
               column + scan_identifier_end(source, index + 1) - index,
-              sequence_append(output,
-                make_token_node("IDENT", slice_text(source, index, scan_identifier_end(source, index + 1) - index), line, column))),
+              chunks, chunk, make_token_node("IDENT", slice_text(source, index, scan_identifier_end(source, index + 1) - index), line, column)),
             choose(is_digit(char_at(source, index)),
-              tokenize_from(source, scan_number_end(source, index + 1, false), line,
+              tokenize_emit(source, scan_number_end(source, index + 1, false), line,
                 column + scan_number_end(source, index + 1, false) - index,
-                sequence_append(output,
-                  make_token_node("NUMBER", slice_text(source, index, scan_number_end(source, index + 1, false) - index), line, column))),
+                chunks, chunk, make_token_node("NUMBER", slice_text(source, index, scan_number_end(source, index + 1, false) - index), line, column)),
               choose(char_at(source, index) == char_at("\"", 0),
-                tokenize_from(source, scan_string_end(source, index + 1, false) + 1,
+                tokenize_emit(source, scan_string_end(source, index + 1, false) + 1,
                   sequence_get(position_after(source, index, scan_string_end(source, index + 1, false) + 1, line, column), 0),
                   sequence_get(position_after(source, index, scan_string_end(source, index + 1, false) + 1, line, column), 1),
-                  sequence_append(output,
-                    make_token_node("STRING", decode_string_from(source, index + 1, scan_string_end(source, index + 1, false), ""), line, column))),
+                  chunks, chunk, make_token_node("STRING", decode_string_from(source, index + 1, scan_string_end(source, index + 1, false), ""), line, column)),
                 choose(is_two_symbol(slice_text(source, index, 2)),
-                  tokenize_from(source, index + 2, line, column + 2,
-                    sequence_append(output, make_token_node("SYMBOL", slice_text(source, index, 2), line, column))),
-                  tokenize_from(source, index + 1, line, column + 1,
-                    sequence_append(output, make_token_node("SYMBOL", char_at(source, index), line, column))))))))))
+                  tokenize_emit(source, index + 2, line, column + 2, chunks, chunk,
+                    make_token_node("SYMBOL", slice_text(source, index, 2), line, column)),
+                  tokenize_emit(source, index + 1, line, column + 1, chunks, chunk,
+                    make_token_node("SYMBOL", char_at(source, index), line, column)))))))))
 
-  reckon tokenize(source : Text) -> Sequence = tokenize_from(source, 0, 1, 1, empty_sequence())
+  reckon tokenize(source : Text) -> Sequence = tokenize_from(source, 0, 1, 1, empty_sequence(), empty_sequence())
 
   reckon parse_path_tail(tokens : Sequence, index : Number, value : Text) -> Sequence =
     choose(token_text_at(tokens, index) == ".",
@@ -878,21 +886,17 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_event_statements(node : Sequence) -> Sequence = sequence_get(node, 2)
   reckon make_ui_set(target : Text, expression : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), "set-state"), target), expression)
-  reckon make_ui_realize(rule : Text) -> Sequence = sequence_append(sequence_append(empty_sequence(), "realize-reality"), rule)
   reckon ui_statement_kind(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_set_target(node : Sequence) -> Text = sequence_get(node, 1)
   reckon ui_set_expression(node : Sequence) -> Sequence = sequence_get(node, 2)
-  reckon ui_realize_rule(node : Sequence) -> Text = sequence_get(node, 1)
 
   reckon ui_statements_have_kind(items : Sequence, index : Number, kind : Text) -> Truth =
     choose(index >= length(items), false,
       ui_statement_kind(sequence_get(items, index)) == kind or ui_statements_have_kind(items, index + 1, kind))
 
-  reckon ui_event_authority(statements : Sequence) -> Text =
-    choose(ui_statements_have_kind(statements, 0, "realize-reality"), "reality-transaction", "ui-local")
-
   reckon finish_ui_event(index : Number, event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
-    choose(semantic_check(not (ui_statements_have_kind(statements, 0, "set-state")
+      choose(semantic_check(not ((ui_statements_have_kind(statements, 0, "set-state")
+          or ui_statements_have_kind(statements, 0, "navigate"))
         and ui_statements_have_kind(statements, 0, "realize-reality")),
         "RCL_UI_EVENT_MIXED_AUTHORITY", event_type),
       make_node_state(index, make_ui_event(event_type, parameters, statements)), empty_sequence())
@@ -913,8 +917,16 @@ reality RCLGeneralSelfHostCompiler {
         choose(token_text_at(tokens, index) == "realize",
           choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_REALITY_RULE"),
             parse_ui_event_body(tokens, index + 2, event_type, parameters,
-              sequence_append(statements, make_ui_realize(token_text_at(tokens, index + 1)))), empty_sequence()),
-          syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT"))))
+              sequence_append(statements,
+                sequence_append(sequence_append(empty_sequence(), "realize-reality"), token_text_at(tokens, index + 1)))), empty_sequence()),
+          choose(token_text_at(tokens, index) == "navigate",
+            choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_ROUTE"),
+              choose(semantic_check(not ui_statements_have_kind(statements, 0, "navigate"),
+                  "RCL_UI_EVENT_MULTIPLE_NAVIGATION", event_type),
+                parse_ui_event_body(tokens, index + 2, event_type, parameters,
+                  sequence_append(statements,
+                    sequence_append(sequence_append(empty_sequence(), "navigate"), token_text_at(tokens, index + 1)))), empty_sequence()), empty_sequence()),
+            syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT")))))
 
   reckon parse_ui_event_parameter_finish(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text, declared_type : Text) -> Sequence =
     choose(semantic_check(find_ui_parameter_type(parameters, 0, name) == "", "RCL_UI_EVENT_PARAMETER_DUPLICATE", name),
@@ -985,9 +997,6 @@ reality RCLGeneralSelfHostCompiler {
     parse_ui_view_body(tokens, state_index(event_state), id, role, classes, properties, bindings,
       sequence_append(events, state_node(event_state)), layout, children)
 
-  reckon ui_role_for(keyword : Text) -> Text =
-    choose(keyword == "view", "container", choose(keyword == "text", "text", choose(keyword == "action", "action", "input")))
-
   reckon is_ui_view_keyword(keyword : Text) -> Truth =
     keyword == "view" or keyword == "text" or keyword == "action" or keyword == "input"
 
@@ -1023,12 +1032,37 @@ reality RCLGeneralSelfHostCompiler {
   reckon parse_ui_view(tokens : Sequence, index : Number) -> Sequence =
     choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NODE_ID"),
       choose(require_token(tokens, index + 2, "{", "RCL_UI_NODE_OPEN"),
-        parse_ui_view_body(tokens, index + 3, token_text_at(tokens, index + 1), ui_role_for(token_text_at(tokens, index)),
+        parse_ui_view_body(tokens, index + 3, token_text_at(tokens, index + 1),
+          choose(token_text_at(tokens, index) == "view", "container",
+            choose(token_text_at(tokens, index) == "text", "text", choose(token_text_at(tokens, index) == "action", "action", "input"))),
           empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), default_ui_layout(), empty_sequence()),
         empty_sequence()), empty_sequence())
 
-  reckon make_ui(name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence) -> Sequence =
-    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), states), derived), stages), restore), themes), styles), views)
+  reckon parse_ui_navigation_body(tokens : Sequence, index : Number, initial : Text, route_ids : Sequence, route_targets : Sequence) -> Sequence =
+    choose(token_text_at(tokens, index) == "}",
+      choose(semantic_check(initial != "", "RCL_UI_NAVIGATION_INITIAL_REQUIRED", "navigation"),
+        choose(semantic_check(length(route_ids) > 0, "RCL_UI_NAVIGATION_ROUTE_REQUIRED", "navigation"),
+          make_node_state(index + 1, sequence_append(sequence_append(sequence_append(empty_sequence(), initial), route_ids), route_targets)), empty_sequence()), empty_sequence()),
+      choose(token_text_at(tokens, index) == "initial",
+        choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_INITIAL"),
+          choose(semantic_check(initial == "", "RCL_UI_NAVIGATION_INITIAL_DUPLICATE", token_text_at(tokens, index + 1)),
+            parse_ui_navigation_body(tokens, index + 2, token_text_at(tokens, index + 1), route_ids, route_targets), empty_sequence()), empty_sequence()),
+        choose(token_text_at(tokens, index) == "route",
+          choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_ROUTE"),
+            choose(require_token(tokens, index + 2, "->", "RCL_UI_NAVIGATION_TARGET"),
+              choose(require_kind(tokens, index + 3, "IDENT", "RCL_UI_NAVIGATION_TARGET"),
+                choose(semantic_check(find_text(route_ids, 0, token_text_at(tokens, index + 1)) < 0,
+                    "RCL_UI_NAVIGATION_ROUTE_DUPLICATE", token_text_at(tokens, index + 1)),
+                  choose(semantic_check(find_text(route_targets, 0, token_text_at(tokens, index + 3)) < 0,
+                      "RCL_UI_NAVIGATION_TARGET_DUPLICATE", token_text_at(tokens, index + 3)),
+                    parse_ui_navigation_body(tokens, index + 4, initial,
+                      sequence_append(route_ids, token_text_at(tokens, index + 1)),
+                      sequence_append(route_targets, token_text_at(tokens, index + 3))),
+                    empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()),
+          syntax_failure(tokens, index, "RCL_UI_NAVIGATION_CLAUSE"))))
+
+  reckon make_ui(name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), states), derived), stages), restore), themes), styles), navigation), views)
 
   reckon ui_name(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_states(node : Sequence) -> Sequence = sequence_get(node, 1)
@@ -1037,7 +1071,8 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_restore(node : Sequence) -> Sequence = sequence_get(node, 4)
   reckon ui_themes(node : Sequence) -> Sequence = sequence_get(node, 5)
   reckon ui_styles(node : Sequence) -> Sequence = sequence_get(node, 6)
-  reckon ui_views(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon ui_navigation(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon ui_views(node : Sequence) -> Sequence = sequence_get(node, 8)
 
   reckon parse_ui_lifecycle_body(tokens : Sequence, index : Number, stages : Sequence, restore : Sequence) -> Sequence =
     choose(token_text_at(tokens, index) == "}",
@@ -1046,61 +1081,65 @@ reality RCLGeneralSelfHostCompiler {
         parse_ui_lifecycle_body(tokens, index + 2, stages, sequence_append(restore, token_text_at(tokens, index + 1))),
         parse_ui_lifecycle_body(tokens, index + 1, sequence_append(stages, token_text_at(tokens, index)), restore)))
 
-  reckon parse_ui_lifecycle(tokens : Sequence, index : Number) -> Sequence =
-    choose(require_token(tokens, index + 1, "{", "RCL_UI_LIFECYCLE_OPEN"),
-      parse_ui_lifecycle_body(tokens, index + 2, empty_sequence(), empty_sequence()), empty_sequence())
-
-  reckon parse_ui_body_after_state(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence, derived_state : Truth, item_state : Sequence) -> Sequence =
+  reckon parse_ui_body_after_state(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence, derived_state : Truth, item_state : Sequence) -> Sequence =
     parse_ui_body(tokens, state_index(item_state), name,
       choose(derived_state, states, sequence_append(states, state_node(item_state))),
-      choose(derived_state, sequence_append(derived, state_node(item_state)), derived), stages, restore, themes, styles, views)
+      choose(derived_state, sequence_append(derived, state_node(item_state)), derived), stages, restore, themes, styles, navigation, views)
 
-  reckon parse_ui_body_after_theme(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
+  reckon parse_ui_body_after_theme(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
     parse_ui_body(tokens, state_index(item_state), name, states, derived, stages, restore,
-      sequence_append(themes, state_node(item_state)), styles, views)
+      sequence_append(themes, state_node(item_state)), styles, navigation, views)
 
-  reckon parse_ui_body_after_style(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
+  reckon parse_ui_body_after_style(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
     parse_ui_body(tokens, state_index(item_state), name, states, derived, stages, restore, themes,
-      sequence_append(styles, state_node(item_state)), views)
+      sequence_append(styles, state_node(item_state)), navigation, views)
 
-  reckon parse_ui_body_after_view(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
-    parse_ui_body(tokens, state_index(item_state), name, states, derived, stages, restore, themes, styles,
+  reckon parse_ui_body_after_view(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
+    parse_ui_body(tokens, state_index(item_state), name, states, derived, stages, restore, themes, styles, navigation,
       sequence_append(views, state_node(item_state)))
 
-  reckon parse_ui_body_after_lifecycle(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, themes : Sequence, styles : Sequence, views : Sequence, item_state : Sequence) -> Sequence =
+  reckon parse_ui_body_after_structure(tokens : Sequence, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence, navigation_state : Truth, item_state : Sequence) -> Sequence =
     parse_ui_body(tokens, state_index(item_state), name, states, derived,
-      sequence_get(state_node(item_state), 0), sequence_get(state_node(item_state), 1), themes, styles, views)
+      choose(navigation_state, stages, sequence_get(state_node(item_state), 0)),
+      choose(navigation_state, restore, sequence_get(state_node(item_state), 1)), themes, styles,
+      choose(navigation_state, state_node(item_state), navigation), views)
 
-  reckon parse_ui_body(tokens : Sequence, index : Number, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, views : Sequence) -> Sequence =
+  reckon parse_ui_body(tokens : Sequence, index : Number, name : Text, states : Sequence, derived : Sequence, stages : Sequence, restore : Sequence, themes : Sequence, styles : Sequence, navigation : Sequence, views : Sequence) -> Sequence =
     choose(token_text_at(tokens, index) == "}",
       choose(semantic_check(length(views) == 1, "RCL_UI_VIEW_TREE_COUNT", name),
         make_node_state(index + 1, make_ui(name, states, derived,
           choose(length(stages) == 0, sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "create"), "activate"), "suspend"), "resume"), "destroy"), stages),
-          restore, themes, styles, views)), empty_sequence()),
+          restore, themes, styles, navigation, views)), empty_sequence()),
       choose(token_text_at(tokens, index) == "state",
-        parse_ui_body_after_state(tokens, name, states, derived, stages, restore, themes, styles, views, false,
+        parse_ui_body_after_state(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, false,
           parse_ui_state(tokens, index)),
         choose(token_text_at(tokens, index) == "derived",
-          parse_ui_body_after_state(tokens, name, states, derived, stages, restore, themes, styles, views, true,
+          parse_ui_body_after_state(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, true,
             parse_ui_state(tokens, index)),
           choose(token_text_at(tokens, index) == "theme",
-            parse_ui_body_after_theme(tokens, name, states, derived, stages, restore, themes, styles, views,
+            parse_ui_body_after_theme(tokens, name, states, derived, stages, restore, themes, styles, navigation, views,
               parse_ui_theme(tokens, index)),
             choose(token_text_at(tokens, index) == "style",
-              parse_ui_body_after_style(tokens, name, states, derived, stages, restore, themes, styles, views,
+              parse_ui_body_after_style(tokens, name, states, derived, stages, restore, themes, styles, navigation, views,
                 parse_ui_style(tokens, index, length(styles))),
               choose(token_text_at(tokens, index) == "lifecycle",
-                parse_ui_body_after_lifecycle(tokens, name, states, derived, themes, styles, views,
-                  parse_ui_lifecycle(tokens, index)),
-                choose(token_text_at(tokens, index) == "view",
-                  parse_ui_body_after_view(tokens, name, states, derived, stages, restore, themes, styles, views,
-                    parse_ui_view(tokens, index)),
-                  syntax_failure(tokens, index, "RCL_UI_DECLARATION"))))))))
+                choose(require_token(tokens, index + 1, "{", "RCL_UI_LIFECYCLE_OPEN"),
+                  parse_ui_body_after_structure(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, false,
+                    parse_ui_lifecycle_body(tokens, index + 2, empty_sequence(), empty_sequence())), empty_sequence()),
+                choose(token_text_at(tokens, index) == "navigation",
+                  choose(semantic_check(length(navigation) == 0, "RCL_UI_NAVIGATION_DUPLICATE", name),
+                    choose(require_token(tokens, index + 1, "{", "RCL_UI_NAVIGATION_OPEN"),
+                      parse_ui_body_after_structure(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, true,
+                        parse_ui_navigation_body(tokens, index + 2, "", empty_sequence(), empty_sequence())), empty_sequence()), empty_sequence()),
+                  choose(token_text_at(tokens, index) == "view",
+                    parse_ui_body_after_view(tokens, name, states, derived, stages, restore, themes, styles, navigation, views,
+                      parse_ui_view(tokens, index)),
+                    syntax_failure(tokens, index, "RCL_UI_DECLARATION")))))))))
 
   reckon pui(tokens : Sequence, index : Number) -> Sequence =
     choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAME"),
       choose(require_token(tokens, index + 2, "{", "RCL_UI_OPEN"),
-        parse_ui_body(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence()),
+        parse_ui_body(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence()),
         empty_sequence()), empty_sequence())
 
   reckon make_extras() -> Sequence =
@@ -1315,12 +1354,14 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon canonical_ui_event_statement(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
     choose(ui_statement_kind(node) == "realize-reality",
-      "{\"kind\":\"realize-reality\",\"rule\":" + json_quote(ui_realize_rule(node)) + "}",
-      choose(semantic_check(find_ui_state_type(states, 0, ui_set_target(node)) != "", "RCL_UI_EVENT_TARGET_UNKNOWN", ui_set_target(node)),
-        choose(semantic_check(ui_expression_type(ui_set_expression(node), states, derived, parameters)
-            == find_ui_state_type(states, 0, ui_set_target(node)), "RCL_UI_EVENT_MUTATION_TYPE", ui_set_target(node)),
-          "{\"expression\":" + canonical_ui_expression(ui_set_expression(node), states, derived, parameters)
-            + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(node)) + "}", ""), ""))
+      "{\"kind\":\"realize-reality\",\"rule\":" + json_quote(sequence_get(node, 1)) + "}",
+      choose(ui_statement_kind(node) == "navigate",
+        "{\"kind\":\"navigate\",\"route\":" + json_quote(sequence_get(node, 1)) + "}",
+        choose(semantic_check(find_ui_state_type(states, 0, ui_set_target(node)) != "", "RCL_UI_EVENT_TARGET_UNKNOWN", ui_set_target(node)),
+          choose(semantic_check(ui_expression_type(ui_set_expression(node), states, derived, parameters)
+              == find_ui_state_type(states, 0, ui_set_target(node)), "RCL_UI_EVENT_MUTATION_TYPE", ui_set_target(node)),
+            "{\"expression\":" + canonical_ui_expression(ui_set_expression(node), states, derived, parameters)
+              + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(node)) + "}", ""), "")))
 
   reckon canonical_ui_event_statements(items : Sequence, index : Number, states : Sequence, derived : Sequence, parameters : Sequence, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1333,7 +1374,8 @@ reality RCLGeneralSelfHostCompiler {
         output + choose(index > 0, ",", "") + "[" + json_quote(node_id + ".event." + ui_event_type(sequence_get(items, index)) + "." + text(index))
           + "," + json_quote(ui_event_type(sequence_get(items, index))) + ","
           + canonical_ui_event_parameters(ui_event_parameters(sequence_get(items, index)), 0, "[") + ","
-          + json_quote(ui_event_authority(ui_event_statements(sequence_get(items, index)))) + ","
+          + json_quote(choose(ui_statements_have_kind(ui_event_statements(sequence_get(items, index)), 0, "realize-reality"),
+            "reality-transaction", "ui-local")) + ","
           + canonical_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, states, derived,
             ui_event_parameters(sequence_get(items, index)), "[") + "]"))
 
@@ -1460,6 +1502,12 @@ reality RCLGeneralSelfHostCompiler {
     "[" + choose(length(themes) > 0, json_quote(ui_theme_name(sequence_get(themes, 0))), "null") + ","
       + canonical_ui_themes(themes, 0, "[") + "," + canonical_ui_styles(styles, 0, "[") + "]"
 
+  reckon canonical_ui_routes(ids : Sequence, targets : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(ids), output + "]",
+      canonical_ui_routes(ids, targets, index + 1,
+        output + choose(index > 0, ",", "") + "{\"id\":" + json_quote(sequence_get(ids, index))
+          + ",\"target\":" + json_quote(sequence_get(targets, index)) + "}"))
+
   reckon cui(node : Sequence, reality : Text) -> Text =
     "[\"rcl.native-ui.semantic-genome.v0.1\",\"rcl.native-ui.program.v0.1\",\"0.1.0\",\"UIProgram\"," + json_quote(ui_name(node))
       + "," + json_quote(reality) + "," + canonical_ui_states(ui_states(node), 0, "[") + ","
@@ -1467,7 +1515,10 @@ reality RCLGeneralSelfHostCompiler {
       + canonical_ui_node(sequence_get(ui_views(node), 0), ui_states(node), ui_derived(node), ui_themes(node), ui_styles(node)) + ","
       + canonical_ui_style_sheet(ui_themes(node), ui_styles(node)) + ",["
       + canonical_ui_texts(ui_stages(node), 0, "[") + "," + canonical_ui_texts(ui_restore(node), 0, "[")
-      + "],[null,[],null]]"
+      + "],[" + choose(length(ui_navigation(node)) == 0, "null",
+        "{\"format\":\"rcl.native-ui.navigation.v0.1\",\"initialRoute\":"
+          + json_quote(sequence_get(ui_navigation(node), 0)) + ",\"routes\":"
+          + canonical_ui_routes(sequence_get(ui_navigation(node), 1), sequence_get(ui_navigation(node), 2), 0, "[") + "}") + ",[],null]]"
 
   reckon cuis(items : Sequence, index : Number, reality : Text, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1815,7 +1866,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon find_reckon_index(items : Sequence, index : Number, name : Text) -> Number =
     choose(index >= length(items), -1,
-      choose(reckon_name(sequence_get(items, index)) == name, index, find_reckon_index(items, index + 1, name)))
+      choose(sequence_get(sequence_get(items, index), 0) == name, index, find_reckon_index(items, index + 1, name)))
 
   reckon validate_expression_array(items : Sequence, index : Number, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -1880,31 +1931,58 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= length(items), -1,
       choose(rule_name(sequence_get(items, index)) == name, index, find_ui_rule_index(items, index + 1, name)))
 
-  reckon validate_ui_event_statements(items : Sequence, index : Number, node_id : Text, rules : Sequence) -> Truth =
+  reckon validate_ui_event_statements(items : Sequence, index : Number, node_id : Text, event_type : Text, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
       choose(ui_statement_kind(sequence_get(items, index)) == "realize-reality",
-        choose(semantic_check(find_ui_rule_index(rules, 0, ui_realize_rule(sequence_get(items, index))) >= 0,
-            "RCL_UI_REALITY_RULE_UNKNOWN", node_id + ":" + ui_realize_rule(sequence_get(items, index))),
-          validate_ui_event_statements(items, index + 1, node_id, rules), false),
-        validate_ui_event_statements(items, index + 1, node_id, rules)))
+        choose(semantic_check(find_ui_rule_index(rules, 0, sequence_get(sequence_get(items, index), 1)) >= 0,
+            "RCL_UI_REALITY_RULE_UNKNOWN", node_id + ":" + sequence_get(sequence_get(items, index), 1)),
+          validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation), false),
+        choose(ui_statement_kind(sequence_get(items, index)) == "navigate",
+          choose(semantic_check(length(navigation) > 0, "RCL_UI_NAVIGATION_REQUIRED", node_id + ":" + event_type),
+            choose(semantic_check(find_text(sequence_get(navigation, 1), 0,
+                  sequence_get(sequence_get(items, index), 1)) >= 0,
+                "RCL_UI_NAVIGATION_ROUTE_UNKNOWN", node_id + ":" + event_type + ":" + sequence_get(sequence_get(items, index), 1)),
+              validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation), false), false),
+          validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation))))
 
-  reckon validate_ui_events(items : Sequence, index : Number, node_id : Text, rules : Sequence) -> Truth =
+  reckon validate_ui_events(items : Sequence, index : Number, node_id : Text, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(validate_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, node_id, rules),
-        validate_ui_events(items, index + 1, node_id, rules), false))
+      choose(validate_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, node_id,
+          ui_event_type(sequence_get(items, index)), rules, navigation),
+        validate_ui_events(items, index + 1, node_id, rules, navigation), false))
 
-  reckon validate_ui_node(node : Sequence, rules : Sequence) -> Truth =
-    choose(validate_ui_events(ui_view_events(node), 0, ui_view_id(node), rules),
-      validate_ui_nodes(ui_view_children(node), 0, rules), false)
+  reckon validate_ui_node(node : Sequence, rules : Sequence, navigation : Sequence) -> Truth =
+    choose(validate_ui_events(ui_view_events(node), 0, ui_view_id(node), rules, navigation),
+      validate_ui_nodes(ui_view_children(node), 0, rules, navigation), false)
 
-  reckon validate_ui_nodes(items : Sequence, index : Number, rules : Sequence) -> Truth =
+  reckon validate_ui_nodes(items : Sequence, index : Number, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(validate_ui_node(sequence_get(items, index), rules), validate_ui_nodes(items, index + 1, rules), false))
+      choose(validate_ui_node(sequence_get(items, index), rules, navigation),
+        validate_ui_nodes(items, index + 1, rules, navigation), false))
+
+  reckon find_ui_direct_child(items : Sequence, index : Number, id : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(ui_view_id(sequence_get(items, index)) == id, index, find_ui_direct_child(items, index + 1, id)))
+
+  reckon validate_ui_route_targets(ids : Sequence, targets : Sequence, index : Number, root : Sequence) -> Truth =
+    choose(index >= length(ids), true,
+      choose(semantic_check(find_ui_direct_child(ui_view_children(root), 0,
+            sequence_get(targets, index)) >= 0,
+          "RCL_UI_NAVIGATION_TARGET_UNKNOWN", sequence_get(ids, index) + ":" + sequence_get(targets, index)),
+        validate_ui_route_targets(ids, targets, index + 1, root), false))
 
   reckon validate_uis(items : Sequence, index : Number, rules : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules),
-        validate_uis(items, index + 1, rules), false))
+      choose(length(ui_navigation(sequence_get(items, index))) == 0,
+        choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index))),
+          validate_uis(items, index + 1, rules), false),
+        choose(semantic_check(find_text(sequence_get(ui_navigation(sequence_get(items, index)), 1), 0,
+              sequence_get(ui_navigation(sequence_get(items, index)), 0)) >= 0,
+            "RCL_UI_NAVIGATION_INITIAL_UNKNOWN", sequence_get(ui_navigation(sequence_get(items, index)), 0)),
+          choose(validate_ui_route_targets(sequence_get(ui_navigation(sequence_get(items, index)), 1),
+              sequence_get(ui_navigation(sequence_get(items, index)), 2), 0, sequence_get(ui_views(sequence_get(items, index)), 0)),
+            choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index))),
+              validate_uis(items, index + 1, rules), false), false), false)))
 
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),

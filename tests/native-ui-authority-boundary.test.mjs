@@ -43,3 +43,12 @@ test('mixed local mutation and reality dispatch in one handler is rejected', () 
   assert.match(result.diagnostics[0].message, /RCL_UI_EVENT_MIXED_AUTHORITY/u);
 });
 
+test('in-app navigation cannot be combined with Reality authority in one handler', () => {
+  const mixedNavigation = REALITY_ACTION
+    .replace('ui Console {', `ui Console {
+    navigation { initial home route home -> Root }`)
+    .replace('on activate { realize publish }', 'on activate { navigate home realize publish }');
+  const result = tryCompileReality(mixedNavigation);
+  assert.equal(result.ok, false);
+  assert.match(result.diagnostics[0].message, /RCL_UI_EVENT_MIXED_AUTHORITY:PublishButton:activate/u);
+});
