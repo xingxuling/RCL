@@ -1,14 +1,21 @@
+<div align="center">
+
 # RCL — Reality Compiler Language
 
-> A self-hosting language and compiler for expressing, validating, and lowering governed state transitions into executable software.
+**A self-hosting programming language and compiler for governed state transitions, evidence-bound execution, and cross-platform software lowering.**
+
+[English](README.md) · [简体中文](README.zh-CN.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Package](https://img.shields.io/badge/package-v0.94.0--alpha.1-orange.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
+[![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
-**RCL** is an evidence-bearing, permission-constrained programming language, compiler, native VM, provider runtime, and verification toolchain.
+</div>
 
-It is designed around a simple idea:
+> RCL is an evidence-bearing, permission-constrained programming language, compiler, native VM, provider runtime, and verification toolchain.
+
+It is designed around one core idea:
 
 ```text
 intent
@@ -20,12 +27,25 @@ intent
 → governed result
 ```
 
+```mermaid
+flowchart LR
+    A[Intent] --> B[RCL Source]
+    B --> C[Parser / Type / IR]
+    C --> D[Governed Semantics]
+    D --> E{Execution Path}
+    E --> F[Native RBC / VM]
+    E --> G[Web Lowering]
+    E --> H[Android Lowering]
+    F --> I[Evidence]
+    G --> I
+    H --> I
+    I --> J[Governed Result]
+```
+
 RCL currently has a self-hosted native-core compiler path, a native VM, Web and Android lowering paths, a platform-neutral Native UI semantic model, and a permanent cross-environment stress harness.
 
 It does **not** claim to be a universal programming language today. The repository instead defines a falsifiable process for testing how far that objective can be pushed.
 
-**Website / playground:** https://rcl-rncs-mcp.vercel.app  
-**Current authority snapshot:** [`CURRENT-STATUS.md`](CURRENT-STATUS.md)  
 **Machine-readable capability contract:** [`VERSION-CONTRACT.json`](VERSION-CONTRACT.json)
 
 ---
@@ -129,17 +149,14 @@ Current candidate semantics include:
 
 The same rooted UI program can lower into Web and Android backends.
 
-```text
-.rcl source
-    ↓
-canonical Native UI IR
-    ↓
-semantic root
-   ┌───────────────┐
-   ↓               ↓
- Web backend    Android backend
-   ↓               ↓
-HTML/CSS/JS      Java Views / Gradle
+```mermaid
+flowchart TD
+    A[.rcl source] --> B[Canonical Native UI IR]
+    B --> C[Semantic Root]
+    C --> D[Web Backend]
+    C --> E[Android Backend]
+    D --> F[HTML / CSS / JS]
+    E --> G[Java Views / Gradle]
 ```
 
 A real Chrome run has verified width-profile adaptation for the current candidate, and the Android backend has produced a real Gradle debug APK build from the same semantic root.
@@ -167,13 +184,13 @@ UI-local event
 
 A governed reality action follows a different path:
 
-```text
-UI intent
-→ CandidateReality
-→ external governed Gateway
-→ authority / validation
-→ execution
-→ evidence
+```mermaid
+flowchart LR
+    A[UI Intent] --> B[CandidateReality]
+    B --> C[Governed Gateway]
+    C --> D[Authority / Validation]
+    D --> E[Execution]
+    E --> F[Evidence]
 ```
 
 The UI layer cannot directly commit external reality. Unknown rule references and mixed-authority handlers fail closed in the verified candidate slices.
@@ -245,17 +262,17 @@ RCL also contains an experimental Frontier research line for turning unknown-law
 
 The current structure includes:
 
-```text
-unknown question
-→ machine-readable hypothesis
-→ design grammar
-→ preregistration
-→ instrument / observation contract
-→ independent acquisition
-→ scorer
-→ evidence ledger
-→ candidate tournament
-→ evidence court
+```mermaid
+flowchart LR
+    A[Unknown Question] --> B[Machine-readable Hypothesis]
+    B --> C[Design Grammar]
+    C --> D[Preregistration]
+    D --> E[Instrument / Observation Contract]
+    E --> F[Independent Acquisition]
+    F --> G[Scorer]
+    G --> H[Evidence Ledger]
+    H --> I[Candidate Tournament]
+    I --> J[Evidence Court]
 ```
 
 This stack is deliberately conservative about claims. Sandbox success validates protocol behavior under constructed worlds; it does **not** establish new physics, external information channels, or other unsupported real-world conclusions.
@@ -266,27 +283,23 @@ Relevant material is under [`docs/`](docs/) with the `FRONTIER_` prefix.
 
 ## Architecture
 
-```text
-                    RCL source
-                        │
-                parser / type / IR
-                        │
-              governed semantics
-                        │
-        ┌───────────────┼────────────────┐
-        │               │                │
-        ▼               ▼                ▼
-   native RBC       Web lowering    Android lowering
-        │               │                │
-        ▼               ▼                ▼
- native VM/runtime   browser host    Android host
-        │               │                │
-        └───────────────┼────────────────┘
-                        ▼
-                   evidence
-                        │
-                        ▼
-                 governed result
+```mermaid
+flowchart TD
+    A[RCL Source] --> B[Parser / Type / IR]
+    B --> C[Governed Semantics]
+    C --> D1[Native RBC]
+    C --> D2[Web Lowering]
+    C --> D3[Android Lowering]
+    C --> D4[Provider Bridges]
+    D1 --> E1[Native VM / Runtime]
+    D2 --> E2[Browser Host]
+    D3 --> E3[Android Host]
+    D4 --> E4[External Capability]
+    E1 --> F[Evidence]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    F --> G[Governed Result]
 ```
 
 Foundation semantics, provider bridges, Native UI, RNCS bindings, and research organs sit around this core while retaining explicit capability boundaries.
