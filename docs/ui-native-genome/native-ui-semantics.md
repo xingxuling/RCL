@@ -36,6 +36,10 @@ Navigation is a canonical `rcl.native-ui.navigation.v0.1` extension. A route has
 
 Canonical stages are `create`, `activate`, `suspend`, `resume` and `destroy`. Restore declarations identify the local state entries that may be restored from a host snapshot. Undeclared snapshot keys are ignored.
 
+## Device adaptation
+
+Device adaptation is the canonical `rcl.native-ui.device-adaptation.v0.1` extension. It uses the `available-width` axis in `dp`, declares one default profile, and maps non-overlapping width ranges to stable profile identities. A container may retain its base `vertical` or `horizontal` layout or declare a profile-specific override. Runtime projection selects the profile and resolved layout deterministically. Missing declarations, duplicate or unknown profiles, overlapping ranges, invalid bounds and unsupported layout overrides fail closed.
+
 ## Non-claims
 
-This candidate does not implement asynchronous effects, focus traversal, general accessibility trees, animation, image/media resources, list virtualization, a layout constraint solver, device adaptation or platform pixel equivalence. Navigation evidence is structural/semantic and does not claim real Android-device behavior.
+This candidate does not implement asynchronous effects, focus traversal, general accessibility trees, animation, image/media resources, list virtualization, a layout constraint solver, adaptation axes beyond available width, or platform pixel equivalence. Navigation and adaptation evidence is structural/semantic; Chrome width behavior is verified, but Android-device behavior is not.

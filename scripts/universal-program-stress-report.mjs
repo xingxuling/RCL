@@ -12,8 +12,8 @@ import {
   buildUniversalStressMatrix,
   classifyUniversalMaturity,
   evaluateStressCell,
-  evidenceRoot,
   findUnabsorbedAdvantages,
+  reportEvidenceRoot,
 } from '../src/universal-program-stress.mjs';
 
 const inputPath = process.argv[2] ?? 'examples/universal-stress/v0.1-baseline-evidence.json';
@@ -120,7 +120,7 @@ const fullReportWithoutRoot = {
 
 const fullReport = {
   ...fullReportWithoutRoot,
-  reportRoot: evidenceRoot(fullReportWithoutRoot),
+  reportRoot: reportEvidenceRoot(fullReportWithoutRoot),
 };
 
 ensureDir(outputDir);

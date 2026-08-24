@@ -37,8 +37,8 @@ Direct evidence supports:
 
 - RCL-authored general compiler;
 - byte-identical native fixed point `C0 == C1 == C2`;
-- current candidate fixed-point RBC size `249,866` bytes;
-- current candidate fixed-point SHA-256 `836fd9dd246915411a7ccc4f0b09be59591c1a63de90d6a01b1425098aef079b`;
+- current candidate fixed-point RBC size `265,286` bytes;
+- current candidate fixed-point SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`;
 - representative differential parity against the JS bootstrap oracle;
 - malformed/unsupported negative-source rejection;
 - native execution and measured performance within the declared campaign budget.
@@ -95,7 +95,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 - Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
 - Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
 - Android installation/device interaction is not verified.
-- Canonical self-host compiler ownership is verified for the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, typed or standard-inferred UI-local parameters, governed `reality-transaction` declarations, fixed width/height intent and canonical in-app navigation with byte-identical JS/native fixed-point, mutation, normalization and negative-control evidence. Unknown rule references, mixed-authority handlers, invalid fixed sizes/routes/targets and multiple route transitions fail closed; execution still requires an external Gateway that emits only `CandidateReality`. Resources, device adaptation, full accessibility and Android device execution remain absent/unverified, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
+- Canonical self-host compiler ownership is verified for the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, typed or standard-inferred UI-local parameters, governed `reality-transaction` declarations, fixed width/height intent, canonical in-app navigation, and non-overlapping available-width profiles with adaptive layout direction. The same rooted adaptation lowers to real Chrome media-query behavior and Android `screenWidthDp` orientation logic. Unknown rule references, mixed-authority handlers, invalid fixed sizes/routes/targets, multiple route transitions, overlapping ranges and unknown profiles fail closed; execution still requires an external Gateway that emits only `CandidateReality`. Resources, adaptation beyond width-profile layout direction, full accessibility and Android device execution remain absent/unverified, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
 
 Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 

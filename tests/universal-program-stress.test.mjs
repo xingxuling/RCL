@@ -17,6 +17,7 @@ import {
   evaluateStressCell,
   evidenceRoot,
   findUnabsorbedAdvantages,
+  reportEvidenceRoot,
 } from '../src/universal-program-stress.mjs';
 
 function passGates() {
@@ -40,6 +41,14 @@ function passingCell(overrides = {}) {
 test('canonical evidence root is key-order independent', () => {
   assert.equal(canonicalJson({ b: 2, a: 1 }), canonicalJson({ a: 1, b: 2 }));
   assert.equal(evidenceRoot({ b: 2, a: 1 }), evidenceRoot({ a: 1, b: 2 }));
+});
+
+test('report evidence root excludes volatile generation time and an existing root', () => {
+  const report = { schema: 'rcl.universal-stress.report.v0.1', generatedAt: '2026-08-24T00:00:00.000Z', claims: [{ id: 'a' }] };
+  const first = reportEvidenceRoot(report);
+  assert.equal(reportEvidenceRoot({ ...report, generatedAt: '2026-08-25T00:00:00.000Z' }), first);
+  assert.equal(reportEvidenceRoot({ ...report, reportRoot: 'stale' }), first);
+  assert.notEqual(reportEvidenceRoot({ ...report, claims: [{ id: 'b' }] }), first);
 });
 
 test('universal matrix is permanently 20 x 20 = 400 cells', () => {

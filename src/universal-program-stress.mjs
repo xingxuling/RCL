@@ -108,6 +108,11 @@ export function evidenceRoot(value) {
   return createHash('sha256').update(canonicalJson(value)).digest('hex');
 }
 
+export function reportEvidenceRoot(report) {
+  const { generatedAt: _generatedAt, reportRoot: _reportRoot, ...stableReport } = report ?? {};
+  return evidenceRoot(stableReport);
+}
+
 function normalizeGateResult(gate, raw) {
   if (typeof raw === 'string') {
     return { gate, status: raw, evidence: [] };

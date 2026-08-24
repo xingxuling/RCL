@@ -39,7 +39,7 @@ try {
   const runCompiler = (compiler, sourcePath, outputPath) => {
     const startedAt = performance.now();
     const result = runNativeCompiler(compiler, sourcePath, outputPath, {
-      outputState: 'compiler.output', timeout: 120_000, maxBuffer: 64 * 1024 * 1024,
+      outputState: 'compiler.output', timeout: 150_000, maxBuffer: 64 * 1024 * 1024,
     });
     return { ...result, elapsedMs: performance.now() - startedAt };
   };
