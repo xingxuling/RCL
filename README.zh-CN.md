@@ -85,6 +85,150 @@ reality Counter {
 
 ---
 
+## 程序员建议从这些示例开始
+
+如果你第一次打开这个仓库，**不建议从目录和架构文档一路往下啃**。按下面顺序看，十几分钟内会更容易理解 RCL 到底在做什么：
+
+| 示例 | 主要展示 | 源文件 |
+|---|---|---|
+| 受治理状态变化 | state、authority、guard、mutation、invariant、evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
+| Native UI 计数器 | state、derived、binding、layout、style、event | [`examples/native-ui/counter.rcl`](examples/native-ui/counter.rcl) |
+| 应用内导航 | route 与原子化 UI-local navigation | [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl) |
+| 设备自适应 | width profile 与跨平台自适应布局意图 | [`examples/native-ui/device-adaptation.rcl`](examples/native-ui/device-adaptation.rcl) |
+| Android 垂直切片 | 受治理应用状态如何 Lower 到 Android 路径 | [`examples/universal-stress/k03-native-android-app.rcl`](examples/universal-stress/k03-native-android-app.rcl) |
+
+### 示例 1：一个更像真实程序的状态变化
+
+K02 Web 示例虽然很小，但已经能把 RCL 的核心结构看清楚：
+
+```rcl
+reality K02CompleteWebApp {
+  facet app.todo_count : Number = 0
+  facet app.todo_input : Text = ""
+  facet app.last_action : Text = "boot"
+
+  subject user {
+    warrant app.write on app
+  }
+
+  emergence addTodo {
+    cause user
+    when app.todo_input != ""
+    needs app.write on app
+    alter app.todo_count <- app.todo_count + 1
+    alter app.last_action <- app.todo_input
+    alter app.todo_input <- ""
+    preserve app.todo_count >= 0
+    witness "rcl:k02:add-todo"
+  }
+}
+```
+
+可以直接把它理解成：
+
+```text
+状态
++ 谁在操作
++ 他有什么权限
++ 什么条件下能操作
++ 候选状态怎么改
++ 哪些条件必须始终成立
++ 用什么证据记录这次变化
+```
+
+这就是很多更大 RCL 程序不断复用的母结构。
+
+### 示例 2：UI 不只是外挂壳，而是语义的一部分
+
+Native UI Counter 直接在 RCL 里维护状态、派生值、绑定和交互：
+
+```rcl
+reality NativeUICounter {
+  ui CounterApp {
+    state count : Number = 0
+    derived count_label : Text = "计数：" + count
+
+    view Root {
+      layout vertical {
+        width fill
+        height intrinsic
+        gap 12
+        padding 24
+        align stretch
+        distribute start
+      }
+
+      text CounterText {
+        bind value <- count_label
+      }
+
+      action IncrementButton {
+        label "增加"
+        on activate {
+          set count <- count + 1
+        }
+      }
+    }
+  }
+}
+```
+
+完整文件里还有 lifecycle、theme、style、accessibility label 和 reset 行为。当前候选实现会让同一份 rooted UI semantics Lower 到 Web 和 Android 后端。
+
+### 示例 3：导航也是 RCL 语义
+
+```rcl
+navigation {
+  initial home
+  route home -> HomeScreen
+  route settings -> SettingsScreen
+}
+
+on activate {
+  set visits <- visits + 1
+  navigate settings
+}
+```
+
+完整文件：[`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl)。
+
+### 示例 4：同一个 UI 意图，根据设备宽度改变布局
+
+```rcl
+adaptation {
+  default compact
+  profile compact min_width 0 max_width 599
+  profile expanded min_width 600
+}
+
+view Root {
+  layout vertical {
+    width fill
+    height intrinsic
+  }
+
+  adapt expanded layout horizontal
+}
+```
+
+当前候选实现会把这份语义分别 Lower 成 Web width-profile 行为，以及 Android 基于 `screenWidthDp` 的布局选择。
+
+### 推荐阅读顺序
+
+```text
+最小 Counter
+→ K02 Web 状态变化
+→ Native UI Counter
+→ Navigation
+→ Device Adaptation
+→ K03 Android 垂直切片
+→ selfhost/compiler-core.rcl
+```
+
+更多可运行示例和 Evidence Fixtures 都在 [`examples/`](examples/) 目录。
+
+---
+
 ## 当前已经验证到什么程度？
 
 当前 package 基线仍为 **`v0.94.0-alpha.1`**。最准确的实时证据边界请查看 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
