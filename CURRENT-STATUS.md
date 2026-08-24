@@ -37,8 +37,8 @@ Direct evidence supports:
 
 - RCL-authored general compiler;
 - byte-identical native fixed point `C0 == C1 == C2`;
-- current candidate fixed-point RBC size `231,618` bytes;
-- current candidate fixed-point SHA-256 `88366fc710677adc7cc4eb636e63d92b2d8f2b49f19e027b86d6301f528a8be5`;
+- current candidate fixed-point RBC size `236,640` bytes;
+- current candidate fixed-point SHA-256 `bc93e44b55b5803b1c3e6d65b1d41a832ab22caddde057a7eac74abbeb83b73d`;
 - representative differential parity against the JS bootstrap oracle;
 - malformed/unsupported negative-source rejection;
 - native execution and measured performance within the declared campaign budget.
@@ -95,7 +95,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 - Web and Android consume the same UI semantic root for `examples/native-ui/counter.rcl`.
 - Real Chrome Counter interaction and a real Gradle debug APK build are evidenced.
 - Android installation/device interaction is not verified.
-- Canonical self-host compiler ownership is verified for the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, and typed or standard-inferred UI-local event parameters with byte-identical JS/native fixed-point, mutation and negative-control evidence. Reality-transaction UI events, fixed sizing and wider forms remain fail-closed/reference-only, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
+- Canonical self-host compiler ownership is verified for the minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, typed or standard-inferred UI-local parameters, and governed `reality-transaction` event declarations with byte-identical JS/native fixed-point, mutation and negative-control evidence. Unknown rule references and mixed-authority handlers fail closed; execution still requires an external Gateway that emits only `CandidateReality`. Fixed sizing and wider forms remain fail-closed/reference-only, so repository-wide UI stays `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`.
 
 Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 

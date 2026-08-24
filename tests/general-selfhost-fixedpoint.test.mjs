@@ -364,7 +364,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
   }
 });
 
-test('self-hosted compiler owns the minimal, Counter and typed UI-event semantic-root slices', { timeout: 300_000 }, () => {
+test('self-hosted compiler owns minimal, Counter, parameterized and governed UI semantic-root slices', { timeout: 300_000 }, () => {
   const { c1 } = getFixedPointEvidence();
   const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
   const selfHosted = runCompilerArtifact(c1, minimalSource).output;
@@ -413,19 +413,35 @@ test('self-hosted compiler owns the minimal, Counter and typed UI-event semantic
       'invalid event parameters must fail closed in both compilers');
   }
 
-  const realityTransactionUi = `reality GovernedUI {
-    facet app.published : Truth = false
-    subject user { warrant app.publish on app }
-    emergence publish { cause user when app.published == false needs app.publish on app alter app.published <- true preserve app.published == true witness "ui:publish" }
-    ui Console {
-      view Root {
-        action PublishButton { label "Publish" on activate { realize publish } }
-      }
-    }
-  }`;
-  assert.doesNotThrow(() => compileRealityToBytecode(realityTransactionUi));
-  assert.throws(() => runCompilerArtifact(c1, realityTransactionUi), undefined,
-    'reality-transaction UI events remain fail-closed until their governed semantic slice is self-hosted');
+  const governedSource = read('examples/selfhost-core/native-ui-governed.rcl');
+  const governedOracle = compileRealityToBytecode(governedSource);
+  const governedSelfHosted = runCompilerArtifact(c1, governedSource).output;
+  assertRbcEqual(governedSelfHosted, governedOracle,
+    'reality-transaction UI event RBC and semantic root must match JS exactly');
+  const governedProgram = compileReality(governedSource);
+  assert.equal(governedProgram.nativeUis[0].eventGraph.events[0].authority, 'reality-transaction');
+
+  const renamedRuleSource = governedSource
+    .replace('emergence publish {', 'emergence publish_v2 {')
+    .replace('realize publish', 'realize publish_v2');
+  const renamedOracle = compileRealityToBytecode(renamedRuleSource);
+  const renamedSelfHosted = runCompilerArtifact(c1, renamedRuleSource).output;
+  assertRbcEqual(renamedSelfHosted, renamedOracle, 'governed rule mutation must remain byte-identical');
+  assert.notEqual(
+    compileReality(renamedRuleSource).nativeUis[0].semanticRoot,
+    governedProgram.nativeUis[0].semanticRoot,
+    'governed event rule mutation must change the Native UI semantic root',
+  );
+
+  const unknownRule = governedSource.replace('realize publish', 'realize missing_rule');
+  const mixedAuthority = governedSource
+    .replace('ui Console {', 'ui Console { state local : Truth = false')
+    .replace('realize publish', 'set local <- true realize publish');
+  for (const invalidSource of [unknownRule, mixedAuthority]) {
+    assert.throws(() => compileRealityToBytecode(invalidSource));
+    assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
+      'unknown reality rules and mixed-authority handlers must fail closed in both compilers');
+  }
 });
 
 test('dynamic provider lowering is exact RBC v1.2 with expression operands', { timeout: 300_000 }, () => {

@@ -1,0 +1,27 @@
+reality GovernedUI {
+  facet app.published : Truth = false
+
+  subject user {
+    warrant app.publish on app
+  }
+
+  emergence publish {
+    cause user
+    when app.published == false
+    needs app.publish on app
+    alter app.published <- true
+    preserve app.published == true
+    witness "ui:publish"
+  }
+
+  ui Console {
+    view Root {
+      action PublishButton {
+        label "Publish"
+        on activate {
+          realize publish
+        }
+      }
+    }
+  }
+}

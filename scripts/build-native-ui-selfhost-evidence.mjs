@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { compileReality } from '../src/compiler.mjs';
 import { compileRealityToBytecode, decodeBytecode } from '../src/bytecode.mjs';
 import { runNativeCompiler } from '../src/native-vm.mjs';
+import { createNativeUiRuntime } from '../src/ui/ui-event.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = (relative) => fs.readFileSync(path.join(ROOT, relative), 'utf8');
@@ -16,6 +17,7 @@ const compilerSource = `${read('selfhost/compiler-core.rcl')}\n${read('selfhost/
 const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
 const expandedSource = read('examples/native-ui/counter.rcl');
 const parameterizedSource = read('examples/selfhost-core/native-ui-parameterized.rcl');
+const governedSource = read('examples/selfhost-core/native-ui-governed.rcl');
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-native-ui-selfhost-'));
 const minimumInstructionHeadroom = 180_000_000;
 
@@ -30,12 +32,15 @@ try {
   const expandedOutputPath = path.join(tempDir, 'native-ui-expanded.rbc');
   const parameterizedPath = path.join(tempDir, 'native-ui-parameterized.rcl');
   const parameterizedOutputPath = path.join(tempDir, 'native-ui-parameterized.rbc');
+  const governedPath = path.join(tempDir, 'native-ui-governed.rcl');
+  const governedOutputPath = path.join(tempDir, 'native-ui-governed.rbc');
   const c0 = compileRealityToBytecode(compilerSource);
   fs.writeFileSync(compilerSourcePath, compilerSource);
   fs.writeFileSync(c0Path, c0);
   fs.writeFileSync(minimalPath, minimalSource);
   fs.writeFileSync(expandedPath, expandedSource);
   fs.writeFileSync(parameterizedPath, parameterizedSource);
+  fs.writeFileSync(governedPath, governedSource);
 
   const runCompiler = (compiler, source, output) => {
     const startedAt = performance.now();
@@ -121,25 +126,78 @@ try {
     return { id, jsRejects: true, selfhostRejects: true, failure };
   });
 
-  const unsupportedRealityTransaction = `reality GovernedUI {
-    facet app.published : Truth = false
-    subject user { warrant app.publish on app }
-    emergence publish { cause user when app.published == false needs app.publish on app alter app.published <- true preserve app.published == true witness "ui:publish" }
-    ui Console { view Root { action PublishButton { label "Publish" on activate { realize publish } } } }
-  }`;
-  compileRealityToBytecode(unsupportedRealityTransaction);
-  const unsupportedSourcePath = path.join(tempDir, 'unsupported-reality-transaction-ui.rcl');
-  const unsupportedOutputPath = path.join(tempDir, 'unsupported-reality-transaction-ui.rbc');
-  fs.writeFileSync(unsupportedSourcePath, unsupportedRealityTransaction);
+  const jsGoverned = compileRealityToBytecode(governedSource);
+  const nativeGoverned = runCompiler(c1Path, governedPath, governedOutputPath);
+  if (!nativeGoverned.bytecode.equals(jsGoverned)) throw new Error('RCL_UI_SELFHOST_GOVERNED_DIFFERENTIAL_MISMATCH');
+  const governedProgram = compileReality(governedSource);
+  const governedUi = governedProgram.nativeUis[0];
+  const governedEvent = governedUi.eventGraph.events[0];
+  if (governedEvent.authority !== 'reality-transaction') throw new Error('RCL_UI_SELFHOST_GOVERNED_AUTHORITY');
+
+  const renamedRuleSource = governedSource
+    .replace('emergence publish {', 'emergence publish_v2 {')
+    .replace('realize publish', 'realize publish_v2');
+  const renamedRulePath = path.join(tempDir, 'native-ui-governed-renamed.rcl');
+  const renamedRuleOutputPath = path.join(tempDir, 'native-ui-governed-renamed.rbc');
+  fs.writeFileSync(renamedRulePath, renamedRuleSource);
+  const jsRenamedRule = compileRealityToBytecode(renamedRuleSource);
+  const nativeRenamedRule = runCompiler(c1Path, renamedRulePath, renamedRuleOutputPath);
+  if (!nativeRenamedRule.bytecode.equals(jsRenamedRule)) throw new Error('RCL_UI_SELFHOST_GOVERNED_MUTATION_DIFFERENTIAL');
+  const renamedRuleProgram = compileReality(renamedRuleSource);
+  if (renamedRuleProgram.nativeUis[0].semanticRoot === governedUi.semanticRoot) {
+    throw new Error('RCL_UI_SELFHOST_GOVERNED_MUTATION_ROOT');
+  }
+
+  const invalidGovernedSpecs = [
+    ['unknown-rule', governedSource.replace('realize publish', 'realize missing_rule')],
+    ['mixed-authority', governedSource
+      .replace('ui Console {', 'ui Console { state local : Truth = false')
+      .replace('realize publish', 'set local <- true realize publish')],
+  ];
+  const invalidGovernedEvidence = invalidGovernedSpecs.map(([id, source]) => {
+    let jsRejects = false;
+    try { compileRealityToBytecode(source); } catch { jsRejects = true; }
+    if (!jsRejects) throw new Error(`RCL_UI_SELFHOST_INVALID_GOVERNED_JS_ACCEPTED:${id}`);
+    const sourcePath = path.join(tempDir, `invalid-governed-${id}.rcl`);
+    const outputPath = path.join(tempDir, `invalid-governed-${id}.rbc`);
+    fs.writeFileSync(sourcePath, source);
+    let failure = null;
+    try { runCompiler(c1Path, sourcePath, outputPath); }
+    catch (error) { failure = { code: error.code ?? 'ERROR', message: error.message }; }
+    if (!failure) throw new Error(`RCL_UI_SELFHOST_INVALID_GOVERNED_ACCEPTED:${id}`);
+    return { id, jsRejects: true, selfhostRejects: true, failure };
+  });
+
+  const deniedRuntime = createNativeUiRuntime(governedUi);
+  deniedRuntime.lifecycle('create');
+  let missingGatewayFailure = null;
+  try { deniedRuntime.dispatch('PublishButton', 'activate'); }
+  catch (error) { missingGatewayFailure = { name: error.name, message: error.message }; }
+  if (!missingGatewayFailure?.message.includes('RCL_UI_REALITY_GATEWAY_REQUIRED')) {
+    throw new Error('RCL_UI_SELFHOST_GOVERNED_GATEWAY_MUST_FAIL_CLOSED');
+  }
+  const candidates = [];
+  const governedRuntime = createNativeUiRuntime(governedUi, { realityGateway: (candidate) => candidates.push(candidate) });
+  governedRuntime.lifecycle('create');
+  governedRuntime.dispatch('PublishButton', 'activate');
+  if (candidates.length !== 1 || candidates[0].kind !== 'CandidateReality' || candidates[0].rule !== 'publish') {
+    throw new Error('RCL_UI_SELFHOST_GOVERNED_CANDIDATE_REALITY');
+  }
+
+  const unsupportedFixedSizing = expandedSource.replace('width fill', 'width fixed 320');
+  compileRealityToBytecode(unsupportedFixedSizing);
+  const unsupportedSourcePath = path.join(tempDir, 'unsupported-fixed-sizing-ui.rcl');
+  const unsupportedOutputPath = path.join(tempDir, 'unsupported-fixed-sizing-ui.rbc');
+  fs.writeFileSync(unsupportedSourcePath, unsupportedFixedSizing);
   let unsupportedFailure = null;
   try { runCompiler(c1Path, unsupportedSourcePath, unsupportedOutputPath); }
   catch (error) { unsupportedFailure = { code: error.code ?? 'ERROR', message: error.message }; }
-  if (!unsupportedFailure) throw new Error('RCL_UI_SELFHOST_REALITY_TRANSACTION_MUST_FAIL_CLOSED');
+  if (!unsupportedFailure) throw new Error('RCL_UI_SELFHOST_FIXED_SIZING_MUST_FAIL_CLOSED');
 
   const report = {
-    format: 'rcl.native-ui.selfhost-parameterized-evidence.v0.3',
+    format: 'rcl.native-ui.selfhost-governed-evidence.v0.4',
     date: '2026-08-24',
-    status: 'CANDIDATE_PARAMETERIZED_UI_SELFHOST_SLICE_VERIFIED',
+    status: 'CANDIDATE_GOVERNED_UI_SELFHOST_SLICE_VERIFIED',
     compiler: {
       sourceSha256: sha256(compilerSource),
       sourceBytes: Buffer.byteLength(compilerSource),
@@ -206,8 +264,37 @@ try {
       inferredNativeElapsedMs: nativeInferredParameterized.elapsedMs,
     },
     invalidParameterEvidence,
+    governedFixture: {
+      source: 'examples/selfhost-core/native-ui-governed.rcl',
+      sourceSha256: sha256(governedSource),
+      uiProgramRoot: governedUi.semanticRoot,
+      realityProgramRoot: governedProgram.programRoot,
+      rbcSha256: sha256(jsGoverned),
+      rbcBytes: jsGoverned.length,
+      decodedSourceRoot: decodeBytecode(jsGoverned).sourceRoot,
+      jsSelfhostByteIdentical: true,
+      authority: governedEvent.authority,
+      statement: governedEvent.statements[0],
+      nativeElapsedMs: nativeGoverned.elapsedMs,
+    },
+    governedMutationEvidence: {
+      id: 'realized-rule-rename',
+      uiProgramRoot: renamedRuleProgram.nativeUis[0].semanticRoot,
+      realityProgramRoot: renamedRuleProgram.programRoot,
+      rbcSha256: sha256(jsRenamedRule),
+      jsSelfhostByteIdentical: true,
+      changesUiProgramRoot: true,
+    },
+    invalidGovernedEvidence,
+    authorityBoundary: {
+      missingGatewayRejects: true,
+      missingGatewayFailure,
+      gatewayEmitsCandidateReality: true,
+      candidate: candidates[0],
+      directRealityCommitOwnedByUi: false,
+    },
     failClosedBoundary: {
-      feature: 'reality-transaction UI events',
+      feature: 'fixed UI sizing',
       jsReferenceAccepts: true,
       selfhostRejects: true,
       failure: unsupportedFailure,
@@ -218,11 +305,13 @@ try {
       nativeExecution: 'PASS',
       counterNativeUiParity: 'PASS',
       parameterizedUiParity: 'PASS',
+      governedUiParity: 'PASS',
+      authorityBoundary: 'PASS',
       aiGenerate: 'UNVERIFIED',
     },
-    boundary: 'This verifies the exact Counter slice plus typed and standard-inferred ui-local event parameters, including event-scope expression roots and invalid-parameter rejection. Reality-transaction UI events and other unsupported grammar remain fail-closed; this is not repository-wide Native UI parity, Android-device evidence or canonical promotion.',
+    boundary: 'This verifies the Counter and parameterized slices plus governed reality-transaction event compilation, rule-reference validation, mixed-authority rejection and external Candidate Reality gateway enforcement. The self-host compiler does not own direct reality commit authority. Fixed sizing and other unsupported grammar remain fail-closed; this is not repository-wide Native UI parity, Android-device evidence or canonical promotion.',
   };
-  const outputPath = path.join(ROOT, 'examples', 'native-ui', 'evidence', 'selfhost-parameterized-result.json');
+  const outputPath = path.join(ROOT, 'examples', 'native-ui', 'evidence', 'selfhost-governed-result.json');
   fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify(report, null, 2));
 } finally {

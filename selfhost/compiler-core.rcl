@@ -856,9 +856,26 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_event_type(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_event_parameters(node : Sequence) -> Sequence = sequence_get(node, 1)
   reckon ui_event_statements(node : Sequence) -> Sequence = sequence_get(node, 2)
-  reckon make_ui_set(target : Text, expression : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), target), expression)
-  reckon ui_set_target(node : Sequence) -> Text = sequence_get(node, 0)
-  reckon ui_set_expression(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon make_ui_set(target : Text, expression : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), "set-state"), target), expression)
+  reckon make_ui_realize(rule : Text) -> Sequence = sequence_append(sequence_append(empty_sequence(), "realize-reality"), rule)
+  reckon ui_statement_kind(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon ui_set_target(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon ui_set_expression(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon ui_realize_rule(node : Sequence) -> Text = sequence_get(node, 1)
+
+  reckon ui_statements_have_kind(items : Sequence, index : Number, kind : Text) -> Truth =
+    choose(index >= length(items), false,
+      ui_statement_kind(sequence_get(items, index)) == kind or ui_statements_have_kind(items, index + 1, kind))
+
+  reckon ui_event_authority(statements : Sequence) -> Text =
+    choose(ui_statements_have_kind(statements, 0, "realize-reality"), "reality-transaction", "ui-local")
+
+  reckon finish_ui_event(index : Number, event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
+    choose(semantic_check(not (ui_statements_have_kind(statements, 0, "set-state")
+        and ui_statements_have_kind(statements, 0, "realize-reality")),
+        "RCL_UI_EVENT_MIXED_AUTHORITY", event_type),
+      make_node_state(index, make_ui_event(event_type, parameters, statements)), empty_sequence())
 
   reckon parse_ui_event_after_expression(tokens : Sequence, event_type : Text, parameters : Sequence, target : Text, statements : Sequence, expression_state : Sequence) -> Sequence =
     parse_ui_event_body(tokens, state_index(expression_state), event_type, parameters,
@@ -870,10 +887,14 @@ reality RCLGeneralSelfHostCompiler {
         parse_expression(tokens, state_index(target_state) + 1, 0)), empty_sequence())
 
   reckon parse_ui_event_body(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
-    choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, make_ui_event(event_type, parameters, statements)),
+    choose(token_text_at(tokens, index) == "}", finish_ui_event(index + 1, event_type, parameters, statements),
       choose(token_text_at(tokens, index) == "set",
         parse_ui_event_after_target(tokens, event_type, parameters, statements, parse_path(tokens, index + 1)),
-        syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT")))
+        choose(token_text_at(tokens, index) == "realize",
+          choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_REALITY_RULE"),
+            parse_ui_event_body(tokens, index + 2, event_type, parameters,
+              sequence_append(statements, make_ui_realize(token_text_at(tokens, index + 1)))), empty_sequence()),
+          syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT"))))
 
   reckon parse_ui_event_parameter_finish(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text, declared_type : Text) -> Sequence =
     choose(semantic_check(find_ui_parameter_type(parameters, 0, name) == "", "RCL_UI_EVENT_PARAMETER_DUPLICATE", name),
@@ -1273,11 +1294,13 @@ reality RCLGeneralSelfHostCompiler {
           + ",\"valueType\":" + json_quote(ui_parameter_type(sequence_get(items, index))) + "}"))
 
   reckon canonical_ui_event_statement(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
-    choose(semantic_check(find_ui_state_type(states, 0, ui_set_target(node)) != "", "RCL_UI_EVENT_TARGET_UNKNOWN", ui_set_target(node)),
-      choose(semantic_check(ui_expression_type(ui_set_expression(node), states, derived, parameters)
-          == find_ui_state_type(states, 0, ui_set_target(node)), "RCL_UI_EVENT_MUTATION_TYPE", ui_set_target(node)),
-        "{\"expression\":" + canonical_ui_expression(ui_set_expression(node), states, derived, parameters)
-          + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(node)) + "}", ""), "")
+    choose(ui_statement_kind(node) == "realize-reality",
+      "{\"kind\":\"realize-reality\",\"rule\":" + json_quote(ui_realize_rule(node)) + "}",
+      choose(semantic_check(find_ui_state_type(states, 0, ui_set_target(node)) != "", "RCL_UI_EVENT_TARGET_UNKNOWN", ui_set_target(node)),
+        choose(semantic_check(ui_expression_type(ui_set_expression(node), states, derived, parameters)
+            == find_ui_state_type(states, 0, ui_set_target(node)), "RCL_UI_EVENT_MUTATION_TYPE", ui_set_target(node)),
+          "{\"expression\":" + canonical_ui_expression(ui_set_expression(node), states, derived, parameters)
+            + ",\"kind\":\"set-state\",\"target\":" + json_quote(ui_set_target(node)) + "}", ""), ""))
 
   reckon canonical_ui_event_statements(items : Sequence, index : Number, states : Sequence, derived : Sequence, parameters : Sequence, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1289,7 +1312,8 @@ reality RCLGeneralSelfHostCompiler {
       canonical_ui_events(items, index + 1, node_id, states, derived,
         output + choose(index > 0, ",", "") + "[" + json_quote(node_id + ".event." + ui_event_type(sequence_get(items, index)) + "." + text(index))
           + "," + json_quote(ui_event_type(sequence_get(items, index))) + ","
-          + canonical_ui_event_parameters(ui_event_parameters(sequence_get(items, index)), 0, "[") + ",\"ui-local\","
+          + canonical_ui_event_parameters(ui_event_parameters(sequence_get(items, index)), 0, "[") + ","
+          + json_quote(ui_event_authority(ui_event_statements(sequence_get(items, index)))) + ","
           + canonical_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, states, derived,
             ui_event_parameters(sequence_get(items, index)), "[") + "]"))
 
@@ -1831,10 +1855,41 @@ reality RCLGeneralSelfHostCompiler {
           choose(validate_expression_array(rule_preserves(sequence_get(items, index)), 0, empty_sequence(), facets, reckons),
             validate_rules(items, index + 1, facets, reckons), false), false), false))
 
+  reckon find_ui_rule_index(items : Sequence, index : Number, name : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(rule_name(sequence_get(items, index)) == name, index, find_ui_rule_index(items, index + 1, name)))
+
+  reckon validate_ui_event_statements(items : Sequence, index : Number, node_id : Text, rules : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(ui_statement_kind(sequence_get(items, index)) == "realize-reality",
+        choose(semantic_check(find_ui_rule_index(rules, 0, ui_realize_rule(sequence_get(items, index))) >= 0,
+            "RCL_UI_REALITY_RULE_UNKNOWN", node_id + ":" + ui_realize_rule(sequence_get(items, index))),
+          validate_ui_event_statements(items, index + 1, node_id, rules), false),
+        validate_ui_event_statements(items, index + 1, node_id, rules)))
+
+  reckon validate_ui_events(items : Sequence, index : Number, node_id : Text, rules : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, node_id, rules),
+        validate_ui_events(items, index + 1, node_id, rules), false))
+
+  reckon validate_ui_node(node : Sequence, rules : Sequence) -> Truth =
+    choose(validate_ui_events(ui_view_events(node), 0, ui_view_id(node), rules),
+      validate_ui_nodes(ui_view_children(node), 0, rules), false)
+
+  reckon validate_ui_nodes(items : Sequence, index : Number, rules : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_ui_node(sequence_get(items, index), rules), validate_ui_nodes(items, index + 1, rules), false))
+
+  reckon validate_uis(items : Sequence, index : Number, rules : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules),
+        validate_uis(items, index + 1, rules), false))
+
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
       choose(validate_reckons(program_reckons(program), 0, program_facets(program), program_reckons(program)),
-        validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)), false), false)
+        choose(validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)),
+          validate_uis(uis(program), 0, program_rules(program)), false), false), false)
 
   reckon validated_program(program : Sequence) -> Sequence =
     choose(validate_program(program), program, program)
