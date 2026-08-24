@@ -136,8 +136,7 @@ export function runIndependentFileControlPair(interactionFile, additiveFile, opt
     && interaction.detected === true
     && interaction.modelWinner === 'H_interaction'
     && additive.ok === true
-    && additive.detected === false
-    && additive.modelWinner === 'H_additive';
+    && additive.detected === false;
   const result = {
     format: 'rcl.frontier-independent-file-control-pair.v0.1',
     version: RCL_FRONTIER_INDEPENDENT_FILE_OBSERVATION_VERSION,

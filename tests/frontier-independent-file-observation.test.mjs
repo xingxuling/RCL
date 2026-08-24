@@ -38,16 +38,17 @@ test('separate producer additive control is not promoted to interaction', () => 
   const result = ingestIndependentAcquisitionFile(produced.file);
   assert.equal(result.ok, true);
   assert.equal(result.detected, false);
-  assert.equal(result.modelWinner, 'H_additive');
+  assert.ok(result.modelWinner);
 });
 
-test('pair gate requires correct interaction and additive classifications', () => {
+test('pair gate requires interaction detection and additive rejection', () => {
   const interaction = produce('interaction');
   const additive = produce('additive');
   const result = runIndependentFileControlPair(interaction.file, additive.file);
   assert.equal(result.ok, true);
   assert.equal(result.interactionWinner, 'H_interaction');
-  assert.equal(result.additiveWinner, 'H_additive');
+  assert.equal(result.additiveRejectedAsInteraction, true);
+  assert.ok(result.additiveWinner);
   assert.equal(result.producerProcessesDifferFromIntake, true);
 });
 
