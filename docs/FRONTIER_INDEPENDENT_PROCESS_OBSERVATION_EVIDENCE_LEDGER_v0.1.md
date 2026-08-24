@@ -62,6 +62,17 @@ Combined selected checks this turn: **48/48 PASS**.
 
 One aggregate `npm run test:frontier` invocation exceeded the assistant execution time limit after already reporting passing tests; every suite was then rerun individually and all 29 frontier tests passed. This timeout is recorded as an execution-limit event, not silently relabeled as an aggregate PASS.
 
+## 2026-08-24 Windows main integration verification
+
+- Windows absolute output paths are resolved before conversion to file URLs, closing the duplicated drive-letter failure;
+- the independent producer records and applies `timingScale=16` on Windows so the engineered interaction is not erased by sub-16ms wait quantization;
+- the scorer thresholds and interaction/additive success gates remain unchanged;
+- independent-file suite passed `5/5` twice consecutively;
+- current Frontier suite passed `96/96`;
+- full repository regression passed `826 tests / 825 pass / 0 fail / 1 skip`.
+
+The first full repository attempt encountered a transient Windows `EPERM` rename in an RCLApp store test. The exact RCLApp kernel file then passed `3/3`, and an unchanged second full run passed cleanly. This is retained as execution evidence rather than hidden. No external-reality or independent-device claim is promoted.
+
 ## Sealed Phase1C run
 
 ```text

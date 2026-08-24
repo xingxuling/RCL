@@ -18,14 +18,23 @@
 - analysis policy root sealed before score: PASS
 - design mutation rejected pre-score: PASS
 - payload mutation rejected pre-score: PASS
-- unsupported design cannot seal: PASS
+- continuous-field registered route seals and executes: PASS
+- unsupported design family cannot seal: PASS
 - route mismatch/fallback forbidden: PASS
 
 ## Tests
 
 ```text
-new Phase1F: 5/5 PASS
-Phase1D + Phase1E + Phase1F selected regression: 14/14 PASS
+Phase1F: 5/5 PASS
+continuous scorer + preregistration selected regression: 10/10 PASS
 ```
+
+## 2026-08-24 Windows main integration verification
+
+- added `preregistered_continuous_field_kernel_v0_1` to the sealed route map;
+- replaced the stale unsupported-continuous-field expectation with a sealed, executed positive case;
+- unregistered families, including repeated-measures, remain rejected before score;
+- Frontier suite: `96/96 PASS`;
+- full repository regression: `826 tests / 825 pass / 0 fail / 1 skip`.
 
 No new physical or natural-law evidence is claimed. The result is an analysis-governance proof obligation closure.

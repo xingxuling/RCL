@@ -2,7 +2,7 @@
 
 **状态**：`PASS / Phase1C separate-process preexisting-file boundary`  
 **RCL 基线**：v0.94.0-alpha.1 + Frontier Phase0/0.5/1A/1B  
-**日期**：2026-08-11
+**日期**：2026-08-11（2026-08-24 Windows main integration 复核）
 
 ## 0. 目标裁决
 
@@ -29,7 +29,8 @@ standalone producer process (Node built-ins only; no RCL import)
 - 不 import 任意 RCL `src/` 模块；
 - 使用独立 PID；
 - 完成 acquisition 后把 JSON 写入磁盘并退出；
-- response 来自 `Atomics.wait` + `process.hrtime.bigint()` 的实际测量；
+- response 来自 `Atomics.wait` + `process.hrtime.bigint()` 的实际测量；Windows producer 使用已记录的 `timingScale=16` 跨过子 16ms 等待量化区间；
+- 输出路径先解析为平台原生绝对路径，再用 `pathToFileURL` 写入，避免 Windows drive-letter 被重复拼接；
 - 输出 producer PID、host fingerprint、开始/结束时间与 file root。
 
 ## 2. Intake gate

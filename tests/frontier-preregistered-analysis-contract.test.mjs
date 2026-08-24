@@ -9,10 +9,12 @@ import {
 import {
   buildNistCeramicDesignGrammar,
   buildSimple2x2DesignGrammar,
-  normalizeFrontierDesignGrammar,
-  FRONTIER_DESIGN_FAMILIES,
 } from '../src/frontier-design-grammar-router.mjs';
 import { buildKnownSoftwareInteractionControl } from '../src/frontier-external-observation-contract.mjs';
+import {
+  AETHER_CONTINUOUS_FIELD_GRAMMAR,
+  buildAetherContinuousFieldSandboxPayload,
+} from '../src/frontier-aether-continuous-field-sandbox-surrogate.mjs';
 
 const nist = JSON.parse(fs.readFileSync('data/frontier-public-datasets/nist-ceramic-2pow5.json', 'utf8'));
 
@@ -67,14 +69,20 @@ test('payload mutation after seal is rejected before scoring', () => {
   assert.ok(result.validation.failures.includes('payload_root_mismatch'));
 });
 
-test('unsupported design family cannot be sealed and never reaches a scorer', () => {
-  const grammar = normalizeFrontierDesignGrammar({
-    family: FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD,
-    factors: ['x', 't'],
-    response: 'field',
+test('continuous-field study seals and executes only its preregistered scorer route', () => {
+  const built = buildAetherContinuousFieldSandboxPayload('injected_preregistered_kernel');
+  const sealed = sealFrontierPreregisteredAnalysisContract({
+    studyId: 'aether_continuous_field_preregistered_kernel',
+    designGrammar: AETHER_CONTINUOUS_FIELD_GRAMMAR,
+    payload: built.payload,
+    analysisPlan: { primaryTargets: ['preregistered_transfer_kernel'] },
   });
-  const sealed = sealFrontierPreregisteredAnalysisContract({ designGrammar: grammar, payload: null });
-  assert.equal(sealed.ok, false);
-  assert.equal(sealed.status, 'BLOCKED');
-  assert.ok(sealed.failures.includes('continuous_field_scorer_not_implemented'));
+  assert.equal(sealed.ok, true);
+  assert.equal(sealed.registeredRoute, 'preregistered_continuous_field_kernel_v0_1');
+  const result = runFrontierPreregisteredAnalysis(sealed);
+  assert.equal(result.ok, true);
+  assert.equal(result.routeMatches, true);
+  assert.equal(result.fallbackUsed, false);
+  assert.equal(result.executedRoute, 'preregistered_continuous_field_kernel_v0_1');
+  assert.equal(result.routed.score.detected, true);
 });

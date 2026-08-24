@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import process from 'node:process';
 import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 
 function sortKeys(value) {
   if (Array.isArray(value)) return value.map(sortKeys);
@@ -23,11 +25,17 @@ function stableRank(seed, cell, replicate) {
 }
 
 const sleeper = new Int32Array(new SharedArrayBuffer(4));
+const timingScale = process.platform === 'win32' ? 16 : 1;
+
+function waitForDelay(delayMs) {
+  Atomics.wait(sleeper, 0, 0, delayMs * timingScale);
+}
+
 function measure(delayMs, repeats) {
   const xs = [];
   for (let i = 0; i < repeats; i += 1) {
     const start = process.hrtime.bigint();
-    Atomics.wait(sleeper, 0, 0, delayMs);
+    waitForDelay(delayMs);
     xs.push(Number(process.hrtime.bigint() - start) / 1e6);
   }
   return xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -43,10 +51,11 @@ if (!['interaction', 'additive'].includes(mode)) {
   console.error(`Unsupported mode: ${mode}`);
   process.exit(2);
 }
+const resolvedOutputPath = path.resolve(outputPath);
 
 const seed = 20260811;
 const samplesPerCell = 10;
-const repeats = 2;
+const repeats = 1;
 const baseDelayMs = 1;
 const symbolDelayMs = 3;
 const geometryDelayMs = 5;
@@ -101,6 +110,7 @@ const payload = {
     seed,
     samplesPerCell,
     repeats,
+    timingScale,
     baseDelayMs,
     symbolDelayMs,
     geometryDelayMs,
@@ -109,11 +119,11 @@ const payload = {
   },
   provenance: {
     sourceType: 'software_control',
-    sourceUri: `file://${outputPath}`,
+    sourceUri: pathToFileURL(resolvedOutputPath).href,
     collector: 'standalone acquisition producer (not RCL runtime)',
     acquiredAt: startedAt,
     licenseOrPermission: 'local-process-measurement-authorized',
-    acquisitionMethod: 'separate Node process; Atomics.wait timing observed by process.hrtime.bigint; output file completed before RCL intake',
+    acquisitionMethod: `separate Node process; Atomics.wait timing observed by process.hrtime.bigint; platform timing scale=${timingScale}; output file completed before RCL intake`,
   },
   calibration: {
     status: 'valid',
@@ -126,6 +136,6 @@ const payload = {
   rows,
 };
 payload.fileRoot = sha256({ ...payload, fileRoot: undefined });
-fs.mkdirSync(new URL('.', `file://${outputPath}`).pathname, { recursive: true });
-fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ outputPath, mode, observationCount: rows.length, fileRoot: payload.fileRoot, producerProcessId: process.pid }, null, 2));
+fs.mkdirSync(path.dirname(resolvedOutputPath), { recursive: true });
+fs.writeFileSync(resolvedOutputPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+console.log(JSON.stringify({ outputPath: resolvedOutputPath, mode, observationCount: rows.length, fileRoot: payload.fileRoot, producerProcessId: process.pid }, null, 2));

@@ -13,6 +13,7 @@ export const RCL_FRONTIER_PREREG_RESULT_FORMAT = 'rcl.frontier-preregistered-ana
 function routeNameForFamily(family) {
   if (family === FRONTIER_DESIGN_FAMILIES.SIMPLE_2X2) return 'frontier_symbolic_geometry_blind_2x2';
   if (family === FRONTIER_DESIGN_FAMILIES.FULL_FACTORIAL_2POWK) return 'orthogonal_full_factorial_2powk';
+  if (family === FRONTIER_DESIGN_FAMILIES.CONTINUOUS_FIELD) return 'preregistered_continuous_field_kernel_v0_1';
   return null;
 }
 

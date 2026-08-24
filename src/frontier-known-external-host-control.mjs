@@ -25,12 +25,25 @@ function stableSchedule(rows, seed) {
 }
 
 const SLEEPER = new Int32Array(new SharedArrayBuffer(4));
+const USES_WINDOWS_HIGH_RESOLUTION_DELAY = process.platform === 'win32';
+
+function waitForDelay(delayMs) {
+  if (USES_WINDOWS_HIGH_RESOLUTION_DELAY && delayMs > 0 && delayMs < 16) {
+    const startedAt = process.hrtime.bigint();
+    const targetNanoseconds = BigInt(Math.ceil(delayMs * 1e6));
+    while (process.hrtime.bigint() - startedAt < targetNanoseconds) {
+      // Intentional high-resolution known software control below the Windows wait quantum.
+    }
+    return;
+  }
+  Atomics.wait(SLEEPER, 0, 0, delayMs);
+}
 
 function measureWait(delayMs, repeats = 1) {
   const measurements = [];
   for (let repeat = 0; repeat < repeats; repeat += 1) {
     const start = process.hrtime.bigint();
-    Atomics.wait(SLEEPER, 0, 0, delayMs);
+    waitForDelay(delayMs);
     const end = process.hrtime.bigint();
     measurements.push(Number(end - start) / 1e6);
   }
@@ -97,7 +110,7 @@ export function acquireKnownExternalHostTimingContract(options = {}) {
       collector: 'RCL Frontier Known External Host Control v0.1',
       acquiredAt: acquisitionStart,
       licenseOrPermission: 'local-process-measurement-authorized',
-      acquisitionMethod: `randomized 2x2 Atomics.wait timing measured by process.hrtime.bigint; repeats=${repeats}; acquisitionEnd=${acquisitionEnd}; hostFingerprint=${hostFingerprint}; witness=${witnessAccumulator}`,
+      acquisitionMethod: `randomized 2x2 ${USES_WINDOWS_HIGH_RESOLUTION_DELAY ? 'hrtime high-resolution delay below 16ms and Atomics.wait otherwise' : 'Atomics.wait delay'} measured by process.hrtime.bigint; repeats=${repeats}; acquisitionEnd=${acquisitionEnd}; hostFingerprint=${hostFingerprint}; witness=${witnessAccumulator}`,
     },
     calibration: {
       status: 'valid',

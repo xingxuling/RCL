@@ -1,7 +1,7 @@
 # Frontier Preregistered Analysis Contract v0.1
 
 **状态**：`PASS / Phase1F sealed design + scorer + payload analysis plan`  
-**日期**：2026-08-11
+**日期**：2026-08-11（2026-08-24 Windows main integration 复核）
 
 ## 0. 目标裁决
 
@@ -48,9 +48,9 @@ Analysis plan 固定：primary targets、decision policy、holdout policy、rand
 - NIST `2^5`：seal → registered factorial scorer → speed×rate SS 约 `4872.57`，PASS。
 - design tamper：评分前拒绝，PASS。
 - payload tamper：评分前拒绝，PASS。
-- continuous-field unsupported：不能 seal，PASS。
+- continuous-field：seal → registered continuous-field kernel → detected，PASS。
 
-新测试 `5/5 PASS`；与 Phase1D/1E 联合选择性回归 `14/14 PASS`。
+Phase1F 测试 `5/5 PASS`；continuous scorer 与 preregistration 联合回归 `10/10 PASS`。
 
 ## 4. 多文明联邦裁决
 
@@ -60,7 +60,7 @@ Analysis plan 固定：primary targets、decision policy、holdout policy、rand
 - **产品文明**：研究者看到的是 Seal → Run → Result，不需要手工维护散落配置。
 - **UX / 设计文明**：tamper 与 unsupported 直接显示 `REJECTED_BEFORE_SCORE / BLOCKED`。
 - **工程文明**：复用 Phase1E router，不复制 scorer。
-- **测试文明**：正例、NIST、design tamper、payload tamper、unsupported 全覆盖。
+- **测试文明**：2×2、factorial、continuous-field、design tamper 与 payload tamper 全覆盖；未注册 family 仍 fail-closed。
 - **Integration Court**：只有 registered route 与 executed route 完全一致且 fallback=false 才能 PASS。
 
 ## 5. 边界
