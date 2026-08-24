@@ -1,0 +1,24 @@
+reality AdaptiveUI {
+  ui AdaptiveShell {
+    adaptation {
+      default compact
+      profile compact min_width 0 max_width 599
+      profile expanded min_width 600
+    }
+
+    view Root {
+      layout vertical {
+        width fill
+        height intrinsic
+        gap 8
+        padding 12
+        align stretch
+        distribute start
+      }
+      adapt expanded layout horizontal
+
+      text Primary { value "Primary" }
+      text Secondary { value "Secondary" }
+    }
+  }
+}

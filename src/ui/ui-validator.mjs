@@ -1,5 +1,6 @@
 import {
   RCL_NATIVE_UI_FORMAT,
+  RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT,
   RCL_NATIVE_UI_NAVIGATION_FORMAT,
   UI_BINDABLE_PROPERTIES_BY_ROLE,
   UI_EVENT_TYPES,
@@ -29,6 +30,7 @@ export function validateCanonicalNativeUi(program) {
   }
   const nodeIds = new Set();
   const navigationStatements = [];
+  const adaptiveLayouts = [];
   const walk = (node, identityPath = node.id) => {
     assert(typeof node.id === 'string' && node.id.length > 0, 'RCL_UI_NODE_ID_REQUIRED');
     assert(!nodeIds.has(node.id), `RCL_UI_NODE_ID_DUPLICATE:${node.id}`);
@@ -38,7 +40,9 @@ export function validateCanonicalNativeUi(program) {
     assert(Array.isArray(node.bindings), `RCL_UI_NODE_BINDINGS:${node.id}`);
     assert(Array.isArray(node.events), `RCL_UI_NODE_EVENTS:${node.id}`);
     assert(Array.isArray(node.children), `RCL_UI_NODE_CHILDREN:${node.id}`);
+    assert(Array.isArray(node.adaptiveLayouts), `RCL_UI_DEVICE_ADAPTATION_LAYOUTS:${node.id}`);
     nodeIds.add(node.id);
+    for (const override of node.adaptiveLayouts) adaptiveLayouts.push({ nodeId: node.id, role: node.role, baseMode: node.layout?.mode, ...override });
     for (const property of node.localProperties) {
       assert(UI_PROPERTY_TYPES[property.property] === property.valueType, `RCL_UI_SCHEMA_PROPERTY_TYPE:${node.id}:${property.property}`);
     }
@@ -97,6 +101,35 @@ export function validateCanonicalNativeUi(program) {
     }
     assert(routeIds.has(navigation.initialRoute), `RCL_UI_NAVIGATION_INITIAL_UNKNOWN:${navigation.initialRoute}`);
     for (const statement of navigationStatements) assert(routeIds.has(statement.route), `RCL_UI_NAVIGATION_ROUTE_UNKNOWN:${statement.nodeId}:${statement.eventType}:${statement.route}`);
+  }
+  const deviceAdaptation = program.extensionPoints?.deviceAdaptation ?? null;
+  if (deviceAdaptation === null) assert(adaptiveLayouts.length === 0, 'RCL_UI_DEVICE_ADAPTATION_REQUIRED');
+  else {
+    assert(deviceAdaptation.format === RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT, 'RCL_UI_DEVICE_ADAPTATION_FORMAT');
+    assert(deviceAdaptation.axis === 'available-width' && deviceAdaptation.unit === 'dp', 'RCL_UI_DEVICE_ADAPTATION_AXIS');
+    assert(Array.isArray(deviceAdaptation.profiles) && deviceAdaptation.profiles.length > 0, 'RCL_UI_DEVICE_ADAPTATION_PROFILE_REQUIRED');
+    const profileIds = new Set();
+    for (const profile of deviceAdaptation.profiles) {
+      assert(typeof profile.id === 'string' && profile.id.length > 0, 'RCL_UI_DEVICE_ADAPTATION_PROFILE_ID');
+      assert(!profileIds.has(profile.id), `RCL_UI_DEVICE_ADAPTATION_PROFILE_DUPLICATE:${profile.id}`);
+      assert(Number.isInteger(profile.minWidth) && profile.minWidth >= 0, `RCL_UI_DEVICE_ADAPTATION_MIN_WIDTH:${profile.id}`);
+      assert(profile.maxWidth === null || (Number.isInteger(profile.maxWidth) && profile.maxWidth >= profile.minWidth), `RCL_UI_DEVICE_ADAPTATION_MAX_WIDTH:${profile.id}`);
+      for (const prior of deviceAdaptation.profiles.filter((item) => profileIds.has(item.id))) {
+        const priorMax = prior.maxWidth ?? Number.POSITIVE_INFINITY;
+        const currentMax = profile.maxWidth ?? Number.POSITIVE_INFINITY;
+        assert(!(prior.minWidth <= currentMax && profile.minWidth <= priorMax), `RCL_UI_DEVICE_ADAPTATION_PROFILE_OVERLAP:${prior.id}:${profile.id}`);
+      }
+      profileIds.add(profile.id);
+    }
+    assert(profileIds.has(deviceAdaptation.defaultProfile), `RCL_UI_DEVICE_ADAPTATION_DEFAULT_UNKNOWN:${deviceAdaptation.defaultProfile}`);
+    const perNode = new Set();
+    for (const override of adaptiveLayouts) {
+      assert(profileIds.has(override.profile), `RCL_UI_DEVICE_ADAPTATION_PROFILE_UNKNOWN:${override.nodeId}:${override.profile}`);
+      const key = `${override.nodeId}:${override.profile}`;
+      assert(!perNode.has(key), `RCL_UI_DEVICE_ADAPTATION_LAYOUT_DUPLICATE:${key}`);
+      assert(override.role === 'container' && ['vertical', 'horizontal'].includes(override.baseMode) && ['vertical', 'horizontal'].includes(override.mode), `RCL_UI_DEVICE_ADAPTATION_LAYOUT_MODE:${override.nodeId}:${override.mode}`);
+      perNode.add(key);
+    }
   }
   assert(typeof program.semanticRoot === 'string' && /^[0-9a-f]{64}$/u.test(program.semanticRoot), 'RCL_UI_SCHEMA_ROOT');
   const draft = structuredClone(program);

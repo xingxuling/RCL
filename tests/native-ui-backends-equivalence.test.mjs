@@ -22,6 +22,7 @@ const RCL_PATH = path.join(ROOT, 'examples/native-ui/counter.rcl');
 const SOURCE = fs.readFileSync(RCL_PATH, 'utf8');
 const FIXED_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/selfhost-core/native-ui-fixed.rcl'), 'utf8');
 const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
+const ADAPTATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/device-adaptation.rcl'), 'utf8');
 const EVENTS = [
   { nodeId: 'IncrementButton', type: 'activate' },
   { nodeId: 'IncrementButton', type: 'activate' },
@@ -104,6 +105,33 @@ test('navigation lowers from one canonical root to Web visibility and Android na
   assert.deepEqual(webTrace.finalNavigation, { currentRoute: 'home', target: 'HomeScreen' });
   assert.deepEqual(webTrace.initialNavigation, androidTrace.initialNavigation);
   assert.deepEqual(webTrace.finalNavigation, androidTrace.finalNavigation);
+});
+
+test('device adaptation lowers from one canonical root to Web media queries and Android width profiles', () => {
+  const web = compileRclWebApplication(ADAPTATION_SOURCE, { schema: 'rcl.native-ui.web-target.v0.1' });
+  const android = compileRclAndroidApplication(ADAPTATION_SOURCE, {
+    schema: 'rcl.native-ui.android-target.v0.1',
+    applicationId: 'com.taowind.rcl.adaptiveui',
+  });
+  assert.equal(web.uiProgramRoot, android.uiProgramRoot);
+  assert.deepEqual(web.ui.extensionPoints.deviceAdaptation, android.ui.extensionPoints.deviceAdaptation);
+  const html = emitStandaloneRclWebHtml(web);
+  const java = emitNativeAndroidActivity(android);
+  assert.match(html, /@media \(min-width:600px\)\{\[data-rcl-node="Root"\]\{display:flex;flex-direction:row\}\}/u);
+  assert.match(html, /window\.addEventListener\('resize',\(\)=>render\(\)\)/u);
+  assert.match(html, /dataset\.rclDeviceProfile=deviceProfile\(\)/u);
+  assert.match(java, /selectDeviceProfile\(int widthDp\)/u);
+  assert.match(java, /getConfiguration\(\)\.screenWidthDp/u);
+  assert.match(java, /"expanded"\.equals\(currentDeviceProfile\).*LinearLayout\.HORIZONTAL/u);
+
+  const compactWeb = traceNativeUiWebApplication(web, [], { availableWidth: 320 });
+  const compactAndroid = traceNativeUiAndroidApplication(android, [], { availableWidth: 320 });
+  const expandedWeb = traceNativeUiWebApplication(web, [], { availableWidth: 840 });
+  const expandedAndroid = traceNativeUiAndroidApplication(android, [], { availableWidth: 840 });
+  assert.deepEqual(compactWeb.initialDeviceAdaptation, compactAndroid.initialDeviceAdaptation);
+  assert.deepEqual(expandedWeb.initialDeviceAdaptation, expandedAndroid.initialDeviceAdaptation);
+  assert.equal(compactWeb.initialDeviceAdaptation.layouts.Root.mode, 'vertical');
+  assert.equal(expandedWeb.initialDeviceAdaptation.layouts.Root.mode, 'horizontal');
 });
 
 test('both native UI backends generate inspectable standalone project artifacts', () => {

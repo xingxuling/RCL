@@ -28,6 +28,7 @@ function semanticNode(node) {
     bindings: node.bindings,
     events: node.events.map(semanticEvent),
     layout: node.layout,
+    adaptiveLayouts: node.adaptiveLayouts,
     accessibility: node.accessibility,
     resolvedStyle: node.resolvedStyle,
     children: node.children.map(semanticNode),
@@ -88,6 +89,7 @@ export function nativeUiSemanticGenome(program) {
       node.layout.overflow,
       node.layout.columns,
     ],
+    node.adaptiveLayouts.map((item) => [item.profile, item.mode]),
     [node.resolvedStyle.values, node.resolvedStyle.provenance],
     node.children.map(nodeGenome),
   ];

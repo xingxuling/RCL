@@ -1,4 +1,5 @@
 import { evaluateUiExpression } from './ui-reactive.mjs';
+import { projectUiAdaptiveLayouts, selectUiDeviceProfile } from './ui-device-adaptation.mjs';
 
 function cloneState(value) {
   return structuredClone(value);
@@ -24,8 +25,15 @@ export function createNativeUiRuntime(program, options = {}) {
   const lifecycleTrace = [];
   const gateway = options.realityGateway ?? null;
   const navigation = program.extensionPoints?.navigation ?? null;
+  const deviceAdaptation = program.extensionPoints?.deviceAdaptation ?? null;
+  let availableWidth = options.availableWidth ?? null;
   let currentRoute = navigation?.initialRoute ?? null;
   const routeTarget = (route) => navigation?.routes.find((item) => item.id === route)?.target ?? null;
+  const deviceProjection = () => {
+    if (!deviceAdaptation) return null;
+    const profile = selectUiDeviceProfile(deviceAdaptation, availableWidth);
+    return { availableWidth, profile, layouts: projectUiAdaptiveLayouts(program.viewTree, profile) };
+  };
 
   const projection = (event = {}) => {
     const derivedCache = new Map();
@@ -49,6 +57,7 @@ export function createNativeUiRuntime(program, options = {}) {
     return {
       state: cloneState(state), derived: values, rendered,
       ...(navigation ? { navigation: { currentRoute, target: routeTarget(currentRoute) } } : {}),
+      ...(deviceAdaptation ? { deviceAdaptation: deviceProjection() } : {}),
     };
   };
 
@@ -127,12 +136,14 @@ export function createNativeUiRuntime(program, options = {}) {
     lifecycle,
     projection,
     currentRoute: () => currentRoute,
+    adapt: (width) => { availableWidth = width; return deviceProjection(); },
+    currentDeviceProfile: () => deviceProjection()?.profile ?? null,
     snapshot: () => cloneState(state),
   });
 }
 
-export function runNativeUiSemanticTrace(program, events, platform = 'canonical') {
-  const runtime = createNativeUiRuntime(program);
+export function runNativeUiSemanticTrace(program, events, platform = 'canonical', options = {}) {
+  const runtime = createNativeUiRuntime(program, options);
   runtime.lifecycle('create');
   runtime.lifecycle('activate');
   const initial = runtime.projection();
@@ -152,5 +163,6 @@ export function runNativeUiSemanticTrace(program, events, platform = 'canonical'
     finalRenderedSemanticState: final.rendered,
     lifecycle: cloneState(runtime.lifecycleTrace),
     ...(initial.navigation ? { initialNavigation: initial.navigation, finalNavigation: final.navigation } : {}),
+    ...(initial.deviceAdaptation ? { initialDeviceAdaptation: initial.deviceAdaptation, finalDeviceAdaptation: final.deviceAdaptation } : {}),
   };
 }

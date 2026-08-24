@@ -5,6 +5,7 @@ import { normalizeUiLifecycle } from './ui-lifecycle.mjs';
 import { lowerUiExpression, uiExpressionReferences } from './ui-reactive.mjs';
 import {
   RCL_NATIVE_UI_FORMAT,
+  RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT,
   RCL_NATIVE_UI_NAVIGATION_FORMAT,
   RCL_NATIVE_UI_VERSION,
   UI_BINDABLE_PROPERTIES_BY_ROLE,
@@ -162,6 +163,7 @@ function compileNode(node, context, path = []) {
     bindings,
     events,
     layout: normalizeUILayout(node.layout),
+    adaptiveLayouts: node.adaptiveLayouts.map((item) => ({ profile: item.profile, mode: item.mode })),
     accessibility: {
       label: localProperties.find((item) => item.property === 'accessibility_label')?.value ?? null,
     },
@@ -169,6 +171,52 @@ function compileNode(node, context, path = []) {
     children: node.children.map((child) => compileNode(child, context, [...path, node.id])),
   };
   return canonical;
+}
+
+function compileDeviceAdaptation(declaration, viewTree) {
+  const overrides = collectUiNodes(viewTree).flatMap((node) => node.adaptiveLayouts.map((item) => ({ nodeId: node.id, ...item })));
+  if (!declaration) {
+    if (overrides.length > 0) throw new Error(`RCL_UI_DEVICE_ADAPTATION_REQUIRED:${overrides[0].nodeId}:${overrides[0].profile}`);
+    return null;
+  }
+  if (declaration.defaultProfile === null) throw new Error('RCL_UI_DEVICE_ADAPTATION_DEFAULT_REQUIRED');
+  if (declaration.profiles.length === 0) throw new Error('RCL_UI_DEVICE_ADAPTATION_PROFILE_REQUIRED');
+  const ids = new Set();
+  const profiles = declaration.profiles.map((profile) => {
+    if (ids.has(profile.id)) throw new Error(`RCL_UI_DEVICE_ADAPTATION_PROFILE_DUPLICATE:${profile.id}`);
+    const minWidth = profile.minWidth ?? 0;
+    const maxWidth = profile.maxWidth ?? null;
+    if (!Number.isInteger(minWidth) || minWidth < 0) throw new Error(`RCL_UI_DEVICE_ADAPTATION_MIN_WIDTH:${profile.id}`);
+    if (maxWidth !== null && (!Number.isInteger(maxWidth) || maxWidth < minWidth)) throw new Error(`RCL_UI_DEVICE_ADAPTATION_MAX_WIDTH:${profile.id}`);
+    ids.add(profile.id);
+    return { id: profile.id, minWidth, maxWidth };
+  });
+  if (!ids.has(declaration.defaultProfile)) throw new Error(`RCL_UI_DEVICE_ADAPTATION_DEFAULT_UNKNOWN:${declaration.defaultProfile}`);
+  for (let left = 0; left < profiles.length; left += 1) for (let right = left + 1; right < profiles.length; right += 1) {
+    const a = profiles[left];
+    const b = profiles[right];
+    const aMax = a.maxWidth ?? Number.POSITIVE_INFINITY;
+    const bMax = b.maxWidth ?? Number.POSITIVE_INFINITY;
+    if (a.minWidth <= bMax && b.minWidth <= aMax) throw new Error(`RCL_UI_DEVICE_ADAPTATION_PROFILE_OVERLAP:${a.id}:${b.id}`);
+  }
+  for (const node of collectUiNodes(viewTree)) {
+    const seen = new Set();
+    for (const override of node.adaptiveLayouts) {
+      if (!ids.has(override.profile)) throw new Error(`RCL_UI_DEVICE_ADAPTATION_PROFILE_UNKNOWN:${node.id}:${override.profile}`);
+      if (seen.has(override.profile)) throw new Error(`RCL_UI_DEVICE_ADAPTATION_LAYOUT_DUPLICATE:${node.id}:${override.profile}`);
+      if (node.role !== 'container' || !['vertical', 'horizontal'].includes(node.layout.mode) || !['vertical', 'horizontal'].includes(override.mode)) {
+        throw new Error(`RCL_UI_DEVICE_ADAPTATION_LAYOUT_MODE:${node.id}:${override.mode}`);
+      }
+      seen.add(override.profile);
+    }
+  }
+  return Object.freeze({
+    format: RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT,
+    axis: 'available-width',
+    unit: 'dp',
+    defaultProfile: declaration.defaultProfile,
+    profiles,
+  });
 }
 
 function compileNavigation(declaration, viewTree) {
@@ -231,6 +279,7 @@ function compileOne(realityProgram, uiDecl) {
   }
   viewTree = resolveUiStyles(viewTree, styleSheet);
   const navigation = compileNavigation(uiDecl.navigation, viewTree);
+  const deviceAdaptation = compileDeviceAdaptation(uiDecl.deviceAdaptation, viewTree);
   const lifecycle = normalizeUiLifecycle(uiDecl.lifecycle, stateIds);
   const draft = {
     format: RCL_NATIVE_UI_FORMAT,
@@ -248,7 +297,7 @@ function compileOne(realityProgram, uiDecl) {
       format: 'rcl.native-ui.event-graph.v0.1',
       events: collectUiNodes(viewTree).flatMap((node) => node.events.map((event) => ({ nodeId: node.id, ...event }))),
     },
-    extensionPoints: { navigation, resources: [], deviceAdaptation: null },
+    extensionPoints: { navigation, resources: [], deviceAdaptation },
     source: uiDecl.location ?? null,
   };
   const sealed = sealNativeUiProgram(draft);

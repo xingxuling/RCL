@@ -3,6 +3,7 @@ export const RCL_NATIVE_UI_FORMAT = 'rcl.native-ui.program.v0.1';
 export const RCL_NATIVE_UI_WEB_FORMAT = 'rcl.native-ui.web-lowering.v0.1';
 export const RCL_NATIVE_UI_ANDROID_FORMAT = 'rcl.native-ui.android-lowering.v0.1';
 export const RCL_NATIVE_UI_NAVIGATION_FORMAT = 'rcl.native-ui.navigation.v0.1';
+export const RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT = 'rcl.native-ui.device-adaptation.v0.1';
 
 export const UI_ROLES = Object.freeze(['container', 'text', 'action', 'input']);
 export const UI_EVENT_TYPES = Object.freeze([

@@ -9,6 +9,7 @@ import { createNativeUiRuntime } from '../src/ui/ui-event.mjs';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/counter.rcl'), 'utf8');
 const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
+const ADAPTATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/device-adaptation.rcl'), 'utf8');
 
 test('state to binding to event to state to binding closes reactively', () => {
   const ui = compileNativeUiProgram(SOURCE);
@@ -137,4 +138,30 @@ test('navigation references and handler cardinality fail closed', () => {
 
   const multipleNavigation = NAVIGATION_SOURCE.replace('navigate settings', 'navigate settings navigate home');
   assert.throws(() => compileNativeUiProgram(multipleNavigation), /RCL_UI_EVENT_MULTIPLE_NAVIGATION:OpenSettings:activate/u);
+});
+
+test('device width profiles select canonical adaptive layouts deterministically', () => {
+  const ui = compileNativeUiProgram(ADAPTATION_SOURCE);
+  const compact = createNativeUiRuntime(ui, { availableWidth: 320 });
+  const expanded = createNativeUiRuntime(ui, { availableWidth: 840 });
+  assert.equal(compact.projection().deviceAdaptation.profile, 'compact');
+  assert.equal(compact.projection().deviceAdaptation.layouts.Root.mode, 'vertical');
+  assert.equal(expanded.projection().deviceAdaptation.profile, 'expanded');
+  assert.equal(expanded.projection().deviceAdaptation.layouts.Root.mode, 'horizontal');
+  assert.equal(compact.adapt(600).profile, 'expanded');
+  assert.equal(compact.projection().deviceAdaptation.layouts.Root.mode, 'horizontal');
+  assert.throws(() => compact.adapt(-1), /RCL_UI_DEVICE_ADAPTATION_AVAILABLE_WIDTH/u);
+});
+
+test('device adaptation declarations and layout references fail closed', () => {
+  const missing = ADAPTATION_SOURCE.replace(/\s+adaptation \{[\s\S]*?\n\s+\}\n\n\s+view Root/u, '\n    view Root');
+  assert.throws(() => compileNativeUiProgram(missing), /RCL_UI_DEVICE_ADAPTATION_REQUIRED/u);
+  const unknown = ADAPTATION_SOURCE.replace('adapt expanded layout horizontal', 'adapt missing layout horizontal');
+  assert.throws(() => compileNativeUiProgram(unknown), /RCL_UI_DEVICE_ADAPTATION_PROFILE_UNKNOWN:Root:missing/u);
+  const duplicate = ADAPTATION_SOURCE.replace('adapt expanded layout horizontal', 'adapt expanded layout horizontal\n      adapt expanded layout vertical');
+  assert.throws(() => compileNativeUiProgram(duplicate), /RCL_UI_DEVICE_ADAPTATION_LAYOUT_DUPLICATE:Root:expanded/u);
+  const overlap = ADAPTATION_SOURCE.replace('profile expanded min_width 600', 'profile expanded min_width 599');
+  assert.throws(() => compileNativeUiProgram(overlap), /RCL_UI_DEVICE_ADAPTATION_PROFILE_OVERLAP:compact:expanded/u);
+  const unknownDefault = ADAPTATION_SOURCE.replace('default compact', 'default missing');
+  assert.throws(() => compileNativeUiProgram(unknownDefault), /RCL_UI_DEVICE_ADAPTATION_DEFAULT_UNKNOWN:missing/u);
 });

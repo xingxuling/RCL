@@ -10,6 +10,7 @@ import { validateCanonicalNativeUi } from '../src/ui/ui-validator.mjs';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/counter.rcl'), 'utf8');
 const NAVIGATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/navigation.rcl'), 'utf8');
+const ADAPTATION_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/native-ui/device-adaptation.rcl'), 'utf8');
 
 test('native UI syntax is owned by the RCL parser and lowers to a rooted canonical UI IR', () => {
   const compiled = compileReality(SOURCE);
@@ -66,6 +67,30 @@ test('canonical navigation participates in semantic identity and stable serializ
   const restored = deserializeNativeUiProgram(serialized, validateCanonicalNativeUi);
   assert.deepEqual(restored.extensionPoints.navigation, original.extensionPoints.navigation);
   assert.equal(restored.semanticRoot, original.semanticRoot);
+});
+
+test('canonical device adaptation participates in semantic identity and stable serialization', () => {
+  const original = compileReality(ADAPTATION_SOURCE).nativeUis[0];
+  const relocated = compileReality(`\n${ADAPTATION_SOURCE}`).nativeUis[0];
+  const changedBoundary = compileReality(ADAPTATION_SOURCE.replace('max_width 599', 'max_width 598')).nativeUis[0];
+  const changedLayout = compileReality(ADAPTATION_SOURCE.replace('adapt expanded layout horizontal', 'adapt expanded layout vertical')).nativeUis[0];
+  assert.equal(relocated.semanticRoot, original.semanticRoot);
+  assert.notEqual(changedBoundary.semanticRoot, original.semanticRoot);
+  assert.notEqual(changedLayout.semanticRoot, original.semanticRoot);
+  assert.deepEqual(original.extensionPoints.deviceAdaptation, {
+    format: 'rcl.native-ui.device-adaptation.v0.1',
+    axis: 'available-width',
+    unit: 'dp',
+    defaultProfile: 'compact',
+    profiles: [
+      { id: 'compact', minWidth: 0, maxWidth: 599 },
+      { id: 'expanded', minWidth: 600, maxWidth: null },
+    ],
+  });
+  const serialized = serializeNativeUiProgram(original);
+  const restored = deserializeNativeUiProgram(serialized, validateCanonicalNativeUi);
+  assert.equal(restored.semanticRoot, original.semanticRoot);
+  assert.deepEqual(restored.viewTree.adaptiveLayouts, [{ profile: 'expanded', mode: 'horizontal' }]);
 });
 
 test('programs without UI preserve the governed pre-UI IR shape and program root', () => {

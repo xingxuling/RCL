@@ -170,6 +170,7 @@ function emitRender(ui) {
     else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
   }
   if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
+  if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
   lines.push('    rendering = false;', '  }');
   return lines.join('\n');
 }
@@ -183,6 +184,30 @@ function emitNavigation(ui) {
   }
   lines.push('  }');
   return { field: `  private String currentRoute = ${javaString(navigation.initialRoute)};`, method: lines.join('\n') };
+}
+
+function emitDeviceAdaptation(ui) {
+  const adaptation = ui.extensionPoints.deviceAdaptation;
+  if (!adaptation) return { field: '', method: '' };
+  const profileLines = adaptation.profiles.map((profile) => {
+    const upper = profile.maxWidth === null ? '' : ` && widthDp <= ${profile.maxWidth}`;
+    return `    if (widthDp >= ${profile.minWidth}${upper}) return ${javaString(profile.id)};`;
+  });
+  const layoutLines = [];
+  for (const node of collectNodes(ui.viewTree).filter((item) => item.adaptiveLayouts.length > 0)) {
+    const name = javaIdentifier(node.id);
+    const orientation = node.layout.mode === 'horizontal' ? 'LinearLayout.HORIZONTAL' : 'LinearLayout.VERTICAL';
+    layoutLines.push(`    int orientation_${name} = ${orientation};`);
+    for (const override of node.adaptiveLayouts) {
+      const target = override.mode === 'horizontal' ? 'LinearLayout.HORIZONTAL' : 'LinearLayout.VERTICAL';
+      layoutLines.push(`    if (${javaString(override.profile)}.equals(currentDeviceProfile)) orientation_${name} = ${target};`);
+    }
+    layoutLines.push(`    ${fieldName(node)}.setOrientation(orientation_${name});`);
+  }
+  return {
+    field: `  private String currentDeviceProfile = ${javaString(adaptation.defaultProfile)};`,
+    method: `  private String selectDeviceProfile(int widthDp) {\n${profileLines.join('\n')}\n    return ${javaString(adaptation.defaultProfile)};\n  }\n  private void applyDeviceAdaptation() {\n    currentDeviceProfile = selectDeviceProfile(getResources().getConfiguration().screenWidthDp);\n${layoutLines.join('\n')}\n  }`,
+  };
 }
 
 function emitLifecycle(ui) {
@@ -225,6 +250,7 @@ export function lowerNativeUiToAndroid(ui, target = {}) {
     nodeMappings: collectNodes(ui.viewTree).map((node) => ({ nodeId: node.id, canonicalRole: node.role, target: ROLE_TO_VIEW[node.role] })),
     eventMappings: ui.eventGraph.events.map((event) => ({ nodeId: event.nodeId, canonicalEvent: event.type, targetEvent: EVENT_TO_ANDROID[event.type] ?? 'custom-event gateway' })),
     navigationMapping: ui.extensionPoints.navigation ? { strategy: 'View.VISIBLE_OR_GONE', routes: ui.extensionPoints.navigation.routes } : null,
+    deviceAdaptationMapping: ui.extensionPoints.deviceAdaptation ? { axis: 'Configuration.screenWidthDp', strategy: 'activity-recreation-plus-linear-layout-orientation', profiles: ui.extensionPoints.deviceAdaptation.profiles } : null,
     layoutMapping: { vertical: 'LinearLayout.VERTICAL', horizontal: 'LinearLayout.HORIZONTAL', overlay: 'FrameLayout', grid: 'GridLayout' },
     lifecycleMapping: { create: 'Activity.onCreate', activate: 'Activity.onStart', suspend: 'Activity.onPause', resume: 'Activity.onResume', destroy: 'Activity.onDestroy' },
     coverage: { semantic: 'native-ui-ir', visualFidelity: 'structural-v0.1', runtime: 'android-view-project' },
@@ -236,7 +262,7 @@ export function emitNativeUiAndroidActivity(manifest) {
   if (manifest.schema !== RCL_NATIVE_UI_ANDROID_FORMAT) throw new Error('RCL_UI_ANDROID_MANIFEST_FORMAT');
   const ui = manifest.ui;
   const navigationTargetIds = new Set(ui.extensionPoints.navigation?.routes.map((route) => route.target) ?? []);
-  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || navigationTargetIds.has(node.id));
+  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || navigationTargetIds.has(node.id) || node.adaptiveLayouts.length > 0);
   const fieldNodeIds = new Set(fieldNodes.map((node) => node.id));
   const fields = fieldNodes.map((node) => `  private ${viewType(node)} ${fieldName(node)};`).join('\n');
   const uiLines = [];
@@ -244,6 +270,7 @@ export function emitNativeUiAndroidActivity(manifest) {
   const events = emitEventMethods(ui);
   const lifecycle = emitLifecycle(ui);
   const navigation = emitNavigation(ui);
+  const adaptation = emitDeviceAdaptation(ui);
   return `package ${manifest.application.applicationId};
 
 import android.app.Activity;
@@ -274,6 +301,7 @@ public final class ${manifest.application.activity} extends Activity {
   private final List<String> lifecycleTrace = new ArrayList<>();
   private boolean rendering = false;
 ${navigation.field}
+${adaptation.field}
 ${fields}
 
   @Override protected void onCreate(Bundle savedState) { super.onCreate(savedState); initializeState(); restoreState(savedState); buildUi(); render(); lifecycleTrace.add("create"); Log.i(RCL_UI_LOG_TAG, "lifecycle create uiRoot=" + RCL_UI_PROGRAM_ROOT + " state=" + state.toString()); }
@@ -290,6 +318,7 @@ ${events.dispatch}
 ${events.methods}
 ${emitRender(ui)}
 ${navigation.method}
+${adaptation.method}
 
   private void restoreState(Bundle savedState) { if (savedState == null) return;\n${lifecycle.restore}\n  }
   @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState);\n${lifecycle.save}\n  }
@@ -305,6 +334,6 @@ export function simulateNativeUiAndroidApplication(manifest, events = []) {
   return { state: runtime.snapshot(), rendered: runtime.projection().rendered, history: structuredClone(runtime.trace), ...(manifest.ui.extensionPoints.navigation ? { currentRoute: runtime.currentRoute() } : {}) };
 }
 
-export function traceNativeUiAndroidApplication(manifest, events = []) {
-  return runNativeUiSemanticTrace(manifest.ui, events, 'android');
+export function traceNativeUiAndroidApplication(manifest, events = [], options = {}) {
+  return runNativeUiSemanticTrace(manifest.ui, events, 'android', options);
 }

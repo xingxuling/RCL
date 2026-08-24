@@ -907,6 +907,38 @@ class Parser {
     return node;
   }
 
+  parseUIDeviceAdaptation() {
+    const start = this.expect('adaptation');
+    const node = { kind: 'UIDeviceAdaptationDecl', defaultProfile: null, profiles: [], location: { line: start.line, column: start.column } };
+    this.expect('{');
+    while (!this.at('}')) {
+      if (this.at('default')) {
+        this.advance();
+        if (node.defaultProfile !== null) throw new RCLSyntaxError('Native UI device adaptation may declare default only once', this.current());
+        node.defaultProfile = this.expectType('IDENT', 'Expected default device profile identity').value;
+      } else if (this.at('profile')) {
+        this.advance();
+        const id = this.expectType('IDENT', 'Expected device profile identity').value;
+        let minWidth = null;
+        let maxWidth = null;
+        while (this.at('min_width') || this.at('max_width')) {
+          const bound = this.advance().value;
+          const value = this.parseNumberLiteral(`Expected numeric ${bound} device profile bound`);
+          if (bound === 'min_width') {
+            if (minWidth !== null) throw new RCLSyntaxError(`Device profile '${id}' repeats min_width`, this.current());
+            minWidth = value;
+          } else {
+            if (maxWidth !== null) throw new RCLSyntaxError(`Device profile '${id}' repeats max_width`, this.current());
+            maxWidth = value;
+          }
+        }
+        node.profiles.push({ id, minWidth, maxWidth });
+      } else throw new RCLSyntaxError(`Unknown UI device adaptation clause '${this.current().value}'`, this.current());
+    }
+    this.expect('}');
+    return node;
+  }
+
   parseUIEvent() {
     const start = this.expect('on');
     const eventType = this.expectType('IDENT', 'Expected canonical UI event type').value;
@@ -952,7 +984,7 @@ class Parser {
     const roleByDeclaration = { view: 'container', text: 'text', action: 'action', input: 'input' };
     const node = {
       kind: 'UIViewNodeDecl', id, role: roleByDeclaration[declaration], classes: [],
-      properties: [], bindings: [], events: [], children: [], layout: null,
+      properties: [], bindings: [], events: [], children: [], layout: null, adaptiveLayouts: [],
       location: { line: start.line, column: start.column },
     };
     this.expect('{');
@@ -960,7 +992,16 @@ class Parser {
       const keyword = this.current().value;
       if (['view', 'text', 'action', 'input'].includes(keyword)) node.children.push(this.parseUIViewNode());
       else if (keyword === 'role') { this.advance(); node.role = this.expectType('IDENT', 'Expected canonical UI role').value; }
-      else if (keyword === 'layout') node.layout = this.parseUILayout();
+      else if (keyword === 'layout') {
+        if (node.layout) throw new RCLSyntaxError(`Native UI node '${id}' may declare layout only once`, this.current());
+        node.layout = this.parseUILayout();
+      } else if (keyword === 'adapt') {
+        this.advance();
+        const profile = this.expectType('IDENT', 'Expected device profile identity after adapt').value;
+        this.expect('layout', 'Expected layout after device profile identity');
+        const mode = this.expectType('IDENT', 'Expected adaptive UI layout mode').value;
+        node.adaptiveLayouts.push({ profile, mode });
+      }
       else if (keyword === 'class') { this.advance(); node.classes.push(this.expectType('IDENT', 'Expected UI style class').value); }
       else if (keyword === 'property') node.properties.push(this.parseUIProperty(false));
       else if (['value', 'label', 'placeholder', 'accessibility_label'].includes(keyword)) {
@@ -995,7 +1036,7 @@ class Parser {
     const name = this.expectType('IDENT', 'Expected native UI program identity').value;
     const node = {
       kind: 'NativeUIDecl', name, states: [], derivedStates: [], themes: [], styles: [],
-      viewTrees: [], lifecycle: null, navigation: null, location: { line: start.line, column: start.column },
+      viewTrees: [], lifecycle: null, navigation: null, deviceAdaptation: null, location: { line: start.line, column: start.column },
     };
     this.expect('{');
     while (!this.at('}')) {
@@ -1010,6 +1051,9 @@ class Parser {
       } else if (keyword === 'navigation') {
         if (node.navigation) throw new RCLSyntaxError('Native UI may declare navigation only once', this.current());
         node.navigation = this.parseUINavigation();
+      } else if (keyword === 'adaptation') {
+        if (node.deviceAdaptation) throw new RCLSyntaxError('Native UI may declare device adaptation only once', this.current());
+        node.deviceAdaptation = this.parseUIDeviceAdaptation();
       } else if (keyword === 'view') node.viewTrees.push(this.parseUIViewNode());
       else throw new RCLSyntaxError(`Unknown native UI declaration '${keyword}'`, this.current());
     }
