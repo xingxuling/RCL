@@ -1,16 +1,16 @@
 # K08-B Native AI Integration Court
 
-**Court state:** `ADMIT_AI_N2_CANDIDATE_GITHUB_REPLAY_REQUIRED`
+**Court state:** `ADMIT_K233_PASS_GITHUB_AUTHORITY_BOUND`
 
 **Canonical owner:** RCL
 
 **Execution path:** `.rcl -> native rclc/compiler.rbc -> RBC -> native rclvm`
 
-**Independent AI receipt:** `3/3 LOCAL CANDIDATE`, not yet repository-authoritative
+**Independent AI receipt:** `3/3 LOCAL + GITHUB HOSTED REPLAY PASS`
 
 ## Decision
 
-Admit the bounded two-Dense-layer General MLP profile as an RCL-owned AI-N2 candidate. Do not promote K233 or start Tensor Genome promotion until the saved independent-generator edits pass the GitHub-hosted replay step.
+Admit the bounded two-Dense-layer General MLP profile as RCL-owned AI-N2 evidence and promote K233 on the integration candidate. The three saved independent-generator edits passed the bound GitHub-hosted replay step. Tensor Genome begins as a separate candidate and inherits no K233 authority.
 
 The admitted semantics are:
 
@@ -38,7 +38,7 @@ No Tensor, arbitrary computation graph, Autodiff, Adam/AdamW, Transformer, accel
 | Test | Can errors fail closed? | Added invalid-shape, invalid-dataset, deterministic, resume, differential and second-task checks. |
 | Security | Can the generator alter the authority repo or tests? | Independent Codex sessions run ephemeral/read-only and return only Schema-bounded exact edits. |
 | Release | Can CI replay without model credentials? | Saved candidates and rooted receipts replay through native RCL without network or AI access. |
-| Integration Court | Is promotion non-compensatory? | AI-N2 candidate admitted; K233 stays blocked until GitHub replay. |
+| Integration Court | Is promotion non-compensatory? | All nine gates passed; K233 admission is limited to the bounded AI-N2 profile. |
 | Evidence Ledger | Can every claim be traced? | Roots bind source, contract, datasets, model definitions, checkpoints, native state and three generator sessions. |
 
 ## Donor and ownership decision
@@ -59,3 +59,5 @@ No package dependency, copied donor implementation or external dataset was added
 3. Full repository regression remains green.
 4. The GitHub run URL, run ID and commit SHA are bound into the final receipt.
 5. K400 evidence is regenerated only after gates 1-4.
+
+All five gates are satisfied by GitHub Actions run `32780097954`, focused job `97600047380`, source commit `4686184d6790ec08b213a0176279f646a0919beb`, full local regression `844 / 843 pass / 0 fail / 1 skip`, and K400 report root `95377f2e33c7e4e794412d7912172cf4c53a715ca50b2bf11b3d24bbad615003`.

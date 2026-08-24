@@ -265,10 +265,10 @@ It does **not** claim that any of the twelve killer tasks already pass.
 `examples/universal-stress/k400-current-evidence.json` consolidates the current Native UI generation with the historical K02 and K03 direct receipts without upgrading their dates or gates. The generated report currently records:
 
 ```text
-PASS       0
-BLOCKED    8
+PASS       1
+BLOCKED    7
 UNTESTED 392
 VERDICT    INCOMPLETE
 ```
 
-The nearest evidence closures are `K064 browser::web`, `K233 ai-runtime::machine-learning` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. K233 now has local AI-N2 evidence for a bounded configurable two-Dense-layer General MLP profile through native compilation and execution. Three independent read-only repair sessions passed local receipt replay, but GitHub-hosted replay and authority binding remain mandatory before `AI_GENERATE` or K233 can pass. Tensor Genome, general Autodiff, AdamW, Transformer and accelerated-backend claims remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
+The nearest evidence closures are `K064 browser::web` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. K233 is the first PASS: its bounded configurable two-Dense-layer General MLP profile executes through native compilation/runtime, and three independent read-only repair sessions passed the bound GitHub-hosted replay. Tensor Genome, general Autodiff, AdamW, Transformer and accelerated-backend claims remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.

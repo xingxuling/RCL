@@ -8,7 +8,7 @@ No workaround below may be silently counted as RCL-native capability.
 | `RCL_GAP_AI_002` | General computation graph and reverse-mode Autodiff | Bounded analytic two-layer backprop; JS only checks differential parity | Canonical Semantic Gap | cross-model | Autodiff Genome after Tensor | K233 |
 | `RCL_GAP_AI_003` | Adam/AdamW state and update semantics | Batch SGD only | Canonical Semantic Gap | cross-model | Optimizer Genome | K233 |
 | `RCL_GAP_AI_004` | Native peak RSS telemetry | Explicitly `UNMEASURED`; runtime/instruction/stack metrics recorded | Tooling Gap | cross-runtime | add native process telemetry ABI | PERFORMANCE evidence depth |
-| `RCL_GAP_AI_005` | Optimized CPU Tensor kernels | Recursive scalar/Sequence execution; JS oracle is `71.914x` faster locally | Backend / Performance Gap | cross-model | BLAS/Rust/C++ organ after Tensor IR | K233 PERFORMANCE competitiveness |
+| `RCL_GAP_AI_005` | Optimized CPU Tensor kernels | Recursive scalar/Sequence execution; JS oracle is `118.300x` faster in the final authority-bound local run | Backend / Performance Gap | cross-model | BLAS/Rust/C++ organ after Tensor IR | K233 PERFORMANCE competitiveness |
 | `RCL_GAP_AI_006` | RCL-owned checkpoint file serialization and atomic persistence | Host runner serializes rooted native checkpoint state | Backend / Tooling Gap | cross-model | checkpoint storage lowering profile | K233 model lifecycle |
 | `RCL_GAP_AI_007` | Independent model generation available without hosted credentials | Ephemeral Codex CLI generator; frozen candidates replay offline | Auxiliary Organ | evidence-only | remain external verification organ | K233 AI_GENERATE |
 

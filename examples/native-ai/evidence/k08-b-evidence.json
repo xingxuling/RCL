@@ -1,14 +1,14 @@
 {
   "format": "rcl.k08-b-general-mlp-evidence.v0.1",
-  "generatedAt": "2026-08-24T20:54:56.588Z",
+  "generatedAt": "2026-08-24T21:37:25.302Z",
   "verificationDate": "2026-08-25",
-  "verdict": "RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED_LOCAL_AI_GENERATE_UNVERIFIED",
+  "verdict": "RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED",
   "maturity": "AI-N2",
   "k400Cell": {
     "id": "ai-runtime::machine-learning",
     "campaignId": "K233",
     "killerTask": "K08",
-    "status": "BLOCKED_AI_GENERATE"
+    "status": "PASS"
   },
   "evidenceBoundary": "This contract can establish AI-N2 only for the bounded two-dense-layer General MLP profile. It does not close independent AI_GENERATE by itself and does not prove Tensor, Autodiff, Transformer, LM, accelerator or distributed infrastructure.",
   "pureExecutionPath": {
@@ -51,7 +51,7 @@
     }
   },
   "compiler": {
-    "runtimeMs": 990.8953,
+    "runtimeMs": 919.8502000000001,
     "executedInstructions": 6911223,
     "targetBytes": 24499,
     "targetInstructions": 1432,
@@ -146,13 +146,13 @@
   "performance": {
     "classification": "MEASURED_LOCAL_NATIVE_NO_COMPETITIVE_PARITY_CLAIM",
     "runtimesMs": [
-      1404.889,
-      1299.8294,
-      1376.6351999999997
+      1488.8786999999998,
+      1346.4752000000003,
+      1369.6862999999998
     ],
-    "medianRuntimeMs": 1376.6351999999997,
-    "referenceOracleRuntimeMs": 19.142800000000534,
-    "nativeToOracleRuntimeRatio": 71.91399377311372,
+    "medianRuntimeMs": 1369.6862999999998,
+    "referenceOracleRuntimeMs": 11.578099999999722,
+    "nativeToOracleRuntimeRatio": 118.2997469360286,
     "executedInstructions": 109205579,
     "peakStackDepth": 109,
     "peakCallFrames": 16,
@@ -171,6 +171,17 @@
     "robust": true,
     "performance": true,
     "differential": true
+  },
+  "githubAuthority": {
+    "admitted": true,
+    "status": "PASS_GITHUB_HOSTED_REPLAY_BOUND",
+    "authorityPath": "C:\\Users\\User\\Documents\\RCL\\_worktrees\\rcl-main-integration\\examples\\native-ai\\evidence\\k233-ai-generate\\github-replay.json",
+    "sourceCommit": "4686184d6790ec08b213a0176279f646a0919beb",
+    "runId": 32780097954,
+    "runUrl": "https://github.com/xingxuling/RCL/actions/runs/32780097954",
+    "jobId": 97600047380,
+    "jobUrl": "https://github.com/xingxuling/RCL/actions/runs/32780097954/job/97600047380",
+    "authorityRoot": "bb42598a6d656aab0d19da52491e820c24145aeb0233d3299abca6b171ea6b82"
   },
   "gates": {
     "EXPRESS": {
@@ -246,11 +257,13 @@
       ]
     },
     "AI_GENERATE": {
-      "status": "UNVERIFIED",
+      "status": "PASS",
       "evidence": [
-        "examples/native-ai/k233-ai-generation-contract.v0.1.json"
+        "examples/native-ai/k233-ai-generation-contract.v0.1.json",
+        "examples/native-ai/evidence/k233-ai-generate/receipt.json",
+        "examples/native-ai/evidence/k233-ai-generate/github-replay.json"
       ],
-      "note": "The implementation session cannot self-sign an independent AI_GENERATE receipt."
+      "note": "Three independent repair receipts replayed successfully in the bound GitHub-hosted focused-verification job."
     }
   },
   "artifactRoots": {
@@ -717,5 +730,5 @@
     },
     "root": "06b5f3db5cc458df41df37ee3e474ec997fb061fdb509f5d6646a62e89d38944"
   },
-  "reportRoot": "30109639721ced8e0afb1e0edd6b5f44d76de9e94016ad82dc3ce4d33e83c330"
+  "reportRoot": "1335a812fd5162511f32fae054d945c5deaf2bd63026aec8495a6a21611de9b2"
 }

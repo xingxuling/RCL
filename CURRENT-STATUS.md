@@ -92,7 +92,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K08 — RCL-Native AI
 
-Current native-learning result: `AI-N2 VERIFIED_LOCAL` for a bounded, configurable two-Dense-layer General MLP profile.
+Current native-learning result: `AI-N2 VERIFIED` for a bounded, configurable two-Dense-layer General MLP profile; K233 is the first evidence-complete K400 cell on the integration candidate.
 
 Direct local evidence supports:
 
@@ -100,9 +100,9 @@ Direct local evidence supports:
 - the same generic native training path for XOR `2-2-1` and Majority-3 `3-3-1`;
 - analytic backpropagation and Batch SGD without an ML provider or task-specific VM opcode;
 - exact checkpoint resume, shape/dataset negative controls, three deterministic native replays and JS differential parity;
-- three separate read-only AI repair sessions whose frozen candidates replay locally.
+- three separate read-only AI repair sessions whose frozen candidates replay locally and in GitHub-hosted CI.
 
-K233 remains `BLOCKED` until the independent AI repair receipts pass GitHub-hosted replay and that run is bound into the authoritative evidence. Tensor, general Autodiff, AdamW, Transformer, LM, accelerator and distributed claims remain unverified.
+K233 `AI_GENERATE` is bound to GitHub Actions run `32780097954`, focused job `97600047380`, source commit `4686184d6790ec08b213a0176279f646a0919beb`, and rooted authority receipt `bb42598a6d656aab0d19da52491e820c24145aeb0233d3299abca6b171ea6b82`. Tensor, general Autodiff, AdamW, Transformer, LM, accelerator and distributed claims remain unverified.
 
 Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-ai/evidence-ledger.md`.
 

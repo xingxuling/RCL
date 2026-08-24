@@ -12,6 +12,7 @@ import {
   runNativeCompiler,
 } from '../src/native-vm.mjs';
 import { canonicalJson, evidenceRoot } from '../src/universal-program-stress.mjs';
+import { verifyGithubAuthorityBinding } from './verify-k233-ai-generation-receipt.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_SOURCE_PATH = path.join(ROOT, 'examples', 'native-ai', 'general-mlp.rcl');
@@ -330,6 +331,7 @@ export function runGeneralMlpCampaign(options = {}) {
       && task.maximumPredictionDrift <= contract.thresholds.maximumOracleDrift),
   };
   const passEvidence = Object.values(checks).every(Boolean);
+  const githubAuthority = verifyGithubAuthorityBinding();
   const evidenceRefs = [
     'examples/native-ai/general-mlp.rcl',
     'examples/native-ai/general-mlp-contract.v0.1.json',
@@ -341,9 +343,17 @@ export function runGeneralMlpCampaign(options = {}) {
     evidence: evidenceRefs,
   }]));
   gates.AI_GENERATE = {
-    status: 'UNVERIFIED',
-    evidence: ['examples/native-ai/k233-ai-generation-contract.v0.1.json'],
-    note: 'The implementation session cannot self-sign an independent AI_GENERATE receipt.',
+    status: githubAuthority.admitted ? 'PASS' : 'UNVERIFIED',
+    evidence: githubAuthority.admitted
+      ? [
+        'examples/native-ai/k233-ai-generation-contract.v0.1.json',
+        'examples/native-ai/evidence/k233-ai-generate/receipt.json',
+        'examples/native-ai/evidence/k233-ai-generate/github-replay.json',
+      ]
+      : ['examples/native-ai/k233-ai-generation-contract.v0.1.json'],
+    note: githubAuthority.admitted
+      ? 'Three independent repair receipts replayed successfully in the bound GitHub-hosted focused-verification job.'
+      : 'The implementation session cannot self-sign an independent AI_GENERATE receipt.',
   };
 
   const artifactRoots = {
@@ -360,13 +370,15 @@ export function runGeneralMlpCampaign(options = {}) {
     format: 'rcl.k08-b-general-mlp-evidence.v0.1',
     generatedAt: new Date().toISOString(),
     verificationDate: String(contract.frozenAt).slice(0, 10),
-    verdict: passEvidence ? 'RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED_LOCAL_AI_GENERATE_UNVERIFIED' : 'FAIL_K08_B_GENERAL_MLP',
+    verdict: passEvidence
+      ? (githubAuthority.admitted ? 'RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED' : 'RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED_LOCAL_AI_GENERATE_UNVERIFIED')
+      : 'FAIL_K08_B_GENERAL_MLP',
     maturity: passEvidence ? 'AI-N2' : 'AI-N1',
     k400Cell: {
       id: 'ai-runtime::machine-learning',
       campaignId: 'K233',
       killerTask: 'K08',
-      status: passEvidence ? 'BLOCKED_AI_GENERATE' : 'FAIL',
+      status: passEvidence ? (githubAuthority.admitted ? 'PASS' : 'BLOCKED_AI_GENERATE') : 'FAIL',
     },
     evidenceBoundary: contract.evidenceBoundary,
     pureExecutionPath: {
@@ -409,6 +421,7 @@ export function runGeneralMlpCampaign(options = {}) {
       unabsorbedAdvantage: 'The JavaScript oracle remains faster. RCL owns semantics while optimized CPU tensor execution remains a future backend organ.',
     },
     checks,
+    githubAuthority,
     gates,
     artifactRoots,
     oracle,

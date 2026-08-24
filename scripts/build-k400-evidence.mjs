@@ -16,6 +16,8 @@ const k03Path = 'examples/universal-stress/k03-direct-evidence-2026-08-08.json';
 const browserPerformanceContractPath = 'examples/native-ui/browser-performance-contract.v0.1.json';
 const browserRuntimePath = 'examples/native-ui/evidence/browser-runtime-result.json';
 const k08Path = 'examples/native-ai/evidence/k08-b-evidence.json';
+const k233ReceiptPath = 'examples/native-ai/evidence/k233-ai-generate/receipt.json';
+const k233GithubReplayPath = 'examples/native-ai/evidence/k233-ai-generate/github-replay.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -84,7 +86,7 @@ const directClaims = [
       k08.evidenceBoundary,
       'The result proves a bounded configurable two-Dense-layer General MLP profile; Tensor, general Autodiff, AdamW, Transformer and accelerated backends remain future gates.',
       'Peak native memory is not yet emitted by rclvm and remains an explicit performance-telemetry gap.',
-      'Three independent AI repair receipts pass locally but remain candidate evidence until GitHub-hosted replay is bound into the receipt.',
+      'K233 AI_GENERATE is limited to three independent repair receipts and their bound GitHub-hosted replay; it grants no Tensor, Autodiff, optimizer or accelerator claim.',
     ],
     relatedKillerTasks: ['K08'],
     requiredGenes: ['native-numeric-reckon', 'immutable-sequence-algebra', 'recursive-training-loop', 'evidence-native-model-lifecycle'],
@@ -115,12 +117,12 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
     'Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.',
-    'K08-B closes every ai-runtime::machine-learning gate except GitHub-authoritative AI_GENERATE; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.',
+    'K08-B closes K233 through a GitHub-bound 3/3 independent repair receipt; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.',
     ...(nativeUi.notes ?? []),
   ],
 };

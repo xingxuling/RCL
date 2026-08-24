@@ -13,6 +13,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_CONTRACT_PATH = path.join(ROOT, 'examples', 'native-ai', 'k233-ai-generation-contract.v0.1.json');
 const DEFAULT_SOURCE_PATH = path.join(ROOT, 'examples', 'native-ai', 'pure-rcl-xor.rcl');
 const DEFAULT_RECEIPT_DIR = path.join(ROOT, 'examples', 'native-ai', 'evidence', 'k233-ai-generate');
+const DEFAULT_AUTHORITY_PATH = path.join(DEFAULT_RECEIPT_DIR, 'github-replay.json');
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -31,6 +32,51 @@ function replaceExactlyOnce(source, oldText, newText, code) {
 function assertRootedReceipt(receipt, trialId) {
   const expected = evidenceRoot({ ...receipt, receiptRoot: undefined });
   if (receipt.receiptRoot !== expected) throw new Error(`RCL_K233_TRIAL_RECEIPT_ROOT_MISMATCH:${trialId}`);
+}
+
+export function verifyGithubAuthorityBinding(options = {}) {
+  const authorityPath = path.resolve(options.authorityPath ?? DEFAULT_AUTHORITY_PATH);
+  if (!fs.existsSync(authorityPath)) {
+    return { admitted: false, status: 'GITHUB_AUTHORITY_RECEIPT_MISSING', authorityPath };
+  }
+  const contractPath = path.resolve(options.contractPath ?? DEFAULT_CONTRACT_PATH);
+  const receiptDir = path.resolve(options.receiptDir ?? DEFAULT_RECEIPT_DIR);
+  const authority = readJson(authorityPath);
+  const contract = readJson(contractPath);
+  const localReport = readJson(path.join(receiptDir, 'receipt.json'));
+  const expectedRoot = evidenceRoot({ ...authority, authorityRoot: undefined });
+  if (authority.authorityRoot !== expectedRoot) throw new Error('RCL_K233_GITHUB_AUTHORITY_ROOT_MISMATCH');
+  if (authority.format !== 'rcl.k233.github-replay-authority.v0.1'
+    || authority.authority !== 'GITHUB_HOSTED_ACTIONS'
+    || authority.workflow?.name !== 'RCL Universal Program Stress v0.1'
+    || authority.workflow?.event !== 'push'
+    || authority.job?.name !== 'focused-verification'
+    || authority.job?.conclusion !== 'success'
+    || authority.step?.name !== 'K233 independent AI generation receipt replay'
+    || authority.step?.conclusion !== 'success') {
+    throw new Error('RCL_K233_GITHUB_AUTHORITY_INVALID');
+  }
+  if (!/^[0-9a-f]{40}$/.test(authority.sourceCommit)
+    || authority.run?.headSha !== authority.sourceCommit
+    || !Number.isSafeInteger(authority.run?.id)
+    || !Number.isSafeInteger(authority.job?.id)) {
+    throw new Error('RCL_K233_GITHUB_AUTHORITY_IDENTITY_INVALID');
+  }
+  if (authority.contractRoot !== evidenceRoot(contract)
+    || authority.localReceiptReportRoot !== localReport.reportRoot) {
+    throw new Error('RCL_K233_GITHUB_AUTHORITY_EVIDENCE_MISMATCH');
+  }
+  return {
+    admitted: true,
+    status: 'PASS_GITHUB_HOSTED_REPLAY_BOUND',
+    authorityPath,
+    sourceCommit: authority.sourceCommit,
+    runId: authority.run.id,
+    runUrl: authority.run.url,
+    jobId: authority.job.id,
+    jobUrl: authority.job.url,
+    authorityRoot: authority.authorityRoot,
+  };
 }
 
 export function verifyK233AiGenerationReceipt(options = {}) {
@@ -102,15 +148,23 @@ export function verifyK233AiGenerationReceipt(options = {}) {
   const passed = results.length === contract.admission.requiredSuccessfulTrials
     && results.every((result) => result.successful)
     && uniqueSessions === contract.requiredTrials;
+  const githubAuthority = passed ? verifyGithubAuthorityBinding({ contractPath, receiptDir }) : {
+    admitted: false,
+    status: 'LOCAL_REPLAY_FAILED',
+  };
+  const admitted = passed && githubAuthority.admitted;
   return {
     format: 'rcl.k233.ai-generation-replay-verification.v0.1',
-    verdict: passed ? 'PASS_RECEIPT_REPLAY_READY_FOR_GITHUB_AUTHORITY' : 'FAIL_RECEIPT_REPLAY',
-    aiGenerateAdmission: passed ? 'CANDIDATE_GITHUB_AUTHORITY_REQUIRED' : 'UNVERIFIED',
+    verdict: admitted
+      ? 'PASS_RECEIPT_REPLAY_GITHUB_AUTHORITY_BOUND'
+      : (passed ? 'PASS_RECEIPT_REPLAY_READY_FOR_GITHUB_AUTHORITY' : 'FAIL_RECEIPT_REPLAY'),
+    aiGenerateAdmission: admitted ? 'PASS' : (passed ? 'CANDIDATE_GITHUB_AUTHORITY_REQUIRED' : 'UNVERIFIED'),
     contractRoot: evidenceRoot(contract),
     sourceSha256: sha256(canonicalSource),
     localReceiptReportRoot: report.reportRoot,
     successfulTrials: results.length,
     uniqueGeneratorSessions: uniqueSessions,
+    githubAuthority,
     results,
     verificationRoot: evidenceRoot(results),
   };

@@ -1,9 +1,9 @@
 # K08 RCL-Native AI Campaign v0.1
 
-**Native-learning milestone:** `PASS_LOCAL_WINDOWS_NATIVE_AI_N2`
-**K400 cell:** `K233 ai-runtime::machine-learning = BLOCKED_GITHUB_AI_GENERATE_REPLAY`
+**Native-learning milestone:** `PASS_NATIVE_AI_N2_GITHUB_AI_GENERATE_BOUND`
+**K400 cell:** `K233 ai-runtime::machine-learning = PASS`
 **Maturity:** `AI-N2` for the bounded two-Dense-layer General MLP profile
-**Evidence report root:** `30109639721ced8e0afb1e0edd6b5f44d76de9e94016ad82dc3ce4d33e83c330`
+**Evidence report root:** `1335a812fd5162511f32fae054d945c5deaf2bd63026aec8495a6a21611de9b2`
 **Date:** 2026-08-25
 
 ## 1. Audit boundary
@@ -59,7 +59,7 @@ The local Windows receipt records:
 
 Native peak RSS is not emitted by the current VM and remains explicitly `UNMEASURED`. The JavaScript oracle remains faster and is recorded as an `UNABSORBED_ADVANTAGE`; K08-A proves `Can Compute`, not competitive performance.
 
-The post-change full repository regression passed `834 tests / 833 pass / 0 fail / 1 skip` in `493,017.7984 ms`. The single skip is the existing external DLL import-library load check when Zig is unavailable; the checked Windows native distribution remains source/hash-manifest verified.
+The post-change full repository regression passed `844 tests / 843 pass / 0 fail / 1 skip` in `467,206.9122 ms`. The single skip is the existing external DLL import-library load check when Zig is unavailable; the checked Windows native distribution remains source/hash-manifest verified.
 
 ## 4. Gate verdict
 
@@ -109,7 +109,7 @@ The accepted local native receipt records:
 - maximum parameter drift below `5.4e-15`;
 - zero provider opcode and no task-specific VM opcode.
 
-Three independent, read-only Codex sessions also repaired three distinct hidden K08-A semantic mutations. Their exact edits restore canonical source bytes and replay locally, but they remain `CANDIDATE` until GitHub-hosted verification succeeds.
+Three independent, read-only Codex sessions also repaired three distinct hidden K08-A semantic mutations. Their exact edits restore canonical source bytes and replay locally. GitHub Actions focused verification replayed all three successfully at source commit `4686184d6790ec08b213a0176279f646a0919beb`; run `32780097954`, job `97600047380`, and authority root `bb42598a6d656aab0d19da52491e820c24145aeb0233d3299abca6b171ea6b82` bind the external replay.
 
 Evidence and decisions: `docs/native-ai/evidence-ledger.md`, `docs/native-ai/integration-court.md`, and `docs/native-ai/rcl-gap-register.md`.
 
@@ -117,8 +117,7 @@ Evidence and decisions: `docs/native-ai/evidence-ledger.md`, `docs/native-ai/int
 
 K08-B has removed XOR-specific topology assumptions without adding an `xor_special` primitive. The current highest-value sequence is:
 
-1. complete the GitHub-hosted replay and bind the run SHA/URL into the independent receipt;
-2. regenerate K400 evidence only after that external replay;
-3. begin Tensor Genome with shape/dtype/layout and fail-closed broadcast/matmul semantics;
-4. add native peak-memory telemetry;
-5. preserve the JavaScript performance gap as a donor advantage until a CPU Tensor backend absorbs it.
+1. begin Tensor Genome with shape/dtype/layout and fail-closed broadcast/matmul semantics;
+2. add a scalar CPU reference lowering and differential corpus before optimized backends;
+3. add native peak-memory telemetry;
+4. preserve the JavaScript performance gap as a donor advantage until a CPU Tensor backend absorbs it.

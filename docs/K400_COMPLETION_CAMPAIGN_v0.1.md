@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `0 PASS / 8 BLOCKED / 392 UNTESTED`
+**Current evidence:** `1 PASS / 7 BLOCKED / 392 UNTESTED`
 **Maturity:** `U0`
-**Report root:** `1f01d864dc6f5330bf032b254786b275d122bee2cc2cc6f45def38c7c5e3ac84`
+**Report root:** `95377f2e33c7e4e794412d7912172cf4c53a715ca50b2bf11b3d24bbad615003`
 **Date:** 2026-08-25
 
 ## 1. Completion contract
@@ -46,7 +46,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K339` | `compiler-runtime::self-hosting` | `BLOCKED` | `AI_GENERATE` |
 | `K063` | `browser::gui` | `BLOCKED` | `AI_GENERATE` |
 | `K078` | `browser::reactive` | `BLOCKED` | `AI_GENERATE` |
-| `K233` | `ai-runtime::machine-learning` | `BLOCKED` | GitHub-hosted replay of the 3/3 independent AI repair receipt; AI-N2 General MLP is locally verified |
+| `K233` | `ai-runtime::machine-learning` | `PASS` | none for the bounded AI-N2 General MLP profile; broader Tensor/Autodiff/Transformer work is separate |
 | `K083` | `android::gui` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
 | `K085` | `android::mobile` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
 | `K098` | `android::reactive` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
@@ -55,7 +55,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 
 ## 4. Closure order
 
-1. Close `K064`, `K233` and `K339` through separately executed, receipt-bound AI generation/repair contracts.
+1. Close `K064` and `K339` through separately executed, receipt-bound AI generation/repair contracts.
 2. Acquire emulator or device installation, interaction, correctness and timing receipts for `K083`, `K085` and `K098`.
 3. Add reusable campaign adapters for the remaining killer tasks before expanding into adjacent matrix cells.
 4. Rerun regression and regenerate the complete 400-cell report after every evidence generation.
@@ -74,7 +74,7 @@ The first Windows CI receipt passed native execution, fixed point and 40 later s
 
 `pure-rcl-xor.rcl` owns the frozen dataset, nine parameters, Softsign-01 activation, forward pass, mean half-squared loss, manual gradients, backward propagation, Batch SGD, 512-epoch training loop, prediction and evaluation. Native `rclc` compiled it through `selfhost/compiler.rbc`; native `rclvm` executed 13,965,818 instructions and reached 100% XOR accuracy with loss `0.0157034488743931`. Three replays produced the same semantic state root, while the JS differential oracle had maximum parameter drift `4.44e-15` and did not supply native parameters.
 
-K08-B extends this to a bounded configurable two-Dense-layer General MLP profile. The same RCL Model/Layer/Parameter/Dataset/SGD/Checkpoint semantics train XOR `2-2-1` and Majority-3 `3-3-1`, with shape/data negatives, exact resume, deterministic native replay and differential parity. Three separate read-only Codex sessions repaired activation-gradient, target-binding and parameter-gradient-routing mutations; their saved candidates restore canonical source and pass local native replay. `K233` remains `BLOCKED` until GitHub-hosted replay is bound into the receipt. Tensor, general Autodiff, AdamW and accelerated backends are not implied. See `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
+K08-B extends this to a bounded configurable two-Dense-layer General MLP profile. The same RCL Model/Layer/Parameter/Dataset/SGD/Checkpoint semantics train XOR `2-2-1` and Majority-3 `3-3-1`, with shape/data negatives, exact resume, deterministic native replay and differential parity. Three separate read-only Codex sessions repaired activation-gradient, target-binding and parameter-gradient-routing mutations; their saved candidates restore canonical source and passed GitHub-hosted replay in run `32780097954`, focused job `97600047380`. K233 now passes all nine gates for this bounded profile. Tensor, general Autodiff, AdamW and accelerated backends are not implied. See `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
 
 ## 7. Browser performance contract chronology
 

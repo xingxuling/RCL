@@ -12,7 +12,7 @@ test('K08-B trains two distinct supervised tasks through one native General MLP 
 
   assert.equal(report.maturity, 'AI-N2');
   assert.equal(report.k400Cell.campaignId, 'K233');
-  assert.equal(report.k400Cell.status, 'BLOCKED_AI_GENERATE');
+  assert.equal(report.k400Cell.status, 'PASS');
   assert.equal(report.pureExecutionPath.javascriptTrainerParticipated, false);
   assert.equal(report.pureExecutionPath.referenceOracleParticipatedInNativeParameters, false);
   assert.equal(report.pureExecutionPath.dependencyAudit.ok, true);
@@ -32,7 +32,8 @@ test('K08-B trains two distinct supervised tasks through one native General MLP 
   assert.equal(report.robustness.replayCount, 3);
   assert.equal(report.robustness.identicalSemanticStateRoots, true);
   assert.equal(report.robustness.exactReplayStates, true);
-  assert.equal(report.gates.AI_GENERATE.status, 'UNVERIFIED');
+  assert.equal(report.gates.AI_GENERATE.status, 'PASS');
+  assert.equal(report.githubAuthority.admitted, true);
   for (const gate of ['EXPRESS', 'COMPILE', 'LOWER', 'EXECUTE', 'CORRECT', 'ROBUST', 'PERFORMANCE', 'EVIDENCE']) {
     assert.equal(report.gates[gate].status, 'PASS', gate);
   }
