@@ -2,9 +2,9 @@
 
 # RCL — Reality Compiler Language
 
-**一门用于表达、验证并向真实软件环境降级受治理状态变化的自举编程语言与现实编译器。**
+**一门用于表达、验证并向真实软件环境 Lower 受治理状态变化的自举编程语言与现实编译器。**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [网站 / Playground](https://rcl-rncs-mcp.vercel.app) · [当前状态](CURRENT-STATUS.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [5 分钟上手](GETTING_STARTED.zh-CN.md) · [网站 / Playground](https://rcl-rncs-mcp.vercel.app) · [当前状态](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Package](https://img.shields.io/badge/package-v0.94.0--alpha.1-orange.svg)](package.json)
@@ -15,7 +15,7 @@
 
 > RCL 是一套带证据、受权限约束的编程语言、编译器、Native VM、Provider Runtime 与验证工具链。
 
-RCL 的核心思路是：**把状态变化本身变成一等对象，而不是只把“调用函数”当成程序的中心。**
+RCL 的核心不是“多几个关键字”，而是把一次状态变化完整写成：
 
 ```text
 意图
@@ -42,15 +42,101 @@ flowchart LR
     I --> J[受治理结果]
 ```
 
-当前 RCL 已拥有 Native-Core 自举编译器路径、Native VM、Web / Android lowering、平台中立的 Native UI 语义模型，以及长期维护的 Universal Program Stress 验证矩阵。
+当前 RCL 已拥有 Native-Core 自举编译器路径、Native VM、Web / Android Lowering、平台中立 Native UI 语义模型，以及长期维护的 Universal Program Stress 验证矩阵。
 
-RCL **当前不宣称已经成为通用/万能编程语言**。仓库的目标，是用可反证、可重复、非补偿式证据逐步测试它的真实能力上限。
+RCL **当前不宣称已经成为万能/通用编程语言**。仓库的目标，是把“能不能做到”变成可测试、可反证、可重复的工程问题。
+
+---
+
+# 如果你是程序员，先从这里开始
+
+第一次打开仓库觉得抽象，不要先啃架构文档。先跑。
+
+## 1. 克隆并安装
+
+```bash
+git clone https://github.com/xingxuling/RCL.git
+cd RCL
+npm install
+```
+
+JavaScript / Reference Toolchain 需要 Node.js 22+。
+
+## 2. 跑最小的真实程序
+
+```bash
+npm run demo
+```
+
+这个命令运行 [`examples/hello-reality.rcl`](examples/hello-reality.rcl)：
+
+```rcl
+reality FirstLight {
+  facet world.greeting : Text = "unformed"
+
+  subject founder {
+    facet awareness : Number = 0
+    warrant world.write on world
+  }
+
+  emergence hello {
+    cause founder
+    when world.greeting == "unformed"
+    needs world.write on world
+    alter world.greeting <- "Hello, reality."
+    alter founder.awareness <- founder.awareness + 1
+    preserve founder.awareness >= 0
+    witness "rcl:first-light"
+  }
+
+  foresee hello
+  realize hello
+}
+```
+
+先把它理解成：
+
+```text
+初始状态
++ 谁在操作
++ 他有什么权限
++ 什么条件下能操作
++ 候选状态怎么改变
++ 哪些条件必须始终保持
++ 用什么 witness / evidence 记录
++ commit
+```
+
+重点不是那句 Hello，而是：**谁能改什么、什么时候能改、改完必须保证什么，都写进程序里。**
+
+## 3. 跑 Native Path
+
+```bash
+npm run build:native
+npm run demo:native
+```
+
+再看 Bytecode → Native Execution：
+
+```bash
+npm run demo:bytecode
+```
+
+## 4. 完整 5 分钟路线
+
+Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
+
+**→ [`GETTING_STARTED.zh-CN.md`](GETTING_STARTED.zh-CN.md)**
+
+英文版：
+
+**→ [`GETTING_STARTED.md`](GETTING_STARTED.md)**
 
 ---
 
 ## 为什么是 RCL？
 
-传统程序通常从“执行操作”开始：调用函数、修改变量、发送请求。
+传统程序通常从操作开始：调用函数、改变量、发请求。
 
 RCL 则显式要求回答：
 
@@ -59,9 +145,9 @@ RCL 则显式要求回答：
 - **什么状态**允许改变？
 - **哪些不变量**必须保持？
 - **什么证据**证明这次变化发生过？
-- 验证失败后，系统应该**拒绝、保留还是回滚**？
+- 验证失败后应该拒绝、保留还是回滚？
 
-### 最小示例
+最小结构：
 
 ```rcl
 reality Counter {
@@ -81,66 +167,22 @@ reality Counter {
 }
 ```
 
-这段程序不仅表示“把数字加一”，还声明了主体、授权、候选状态变化、不变量和证据。
+这段程序不仅表示“数字加一”，还声明了主体、授权、候选状态变化、不变量和证据。
 
 ---
 
-## 程序员建议从这些示例开始
-
-如果你第一次打开这个仓库，**不建议从目录和架构文档一路往下啃**。按下面顺序看，十几分钟内会更容易理解 RCL 到底在做什么：
+## 程序员建议按这些示例看
 
 | 示例 | 主要展示 | 源文件 |
 |---|---|---|
-| 受治理状态变化 | state、authority、guard、mutation、invariant、evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
+| First Light | 最小状态 + 权威 + 状态变化 | [`examples/hello-reality.rcl`](examples/hello-reality.rcl) |
+| 受治理 Web 状态 | guard、mutation、invariant、evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
 | Native UI 计数器 | state、derived、binding、layout、style、event | [`examples/native-ui/counter.rcl`](examples/native-ui/counter.rcl) |
 | 应用内导航 | route 与原子化 UI-local navigation | [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl) |
 | 设备自适应 | width profile 与跨平台自适应布局意图 | [`examples/native-ui/device-adaptation.rcl`](examples/native-ui/device-adaptation.rcl) |
-| Android 垂直切片 | 受治理应用状态如何 Lower 到 Android 路径 | [`examples/universal-stress/k03-native-android-app.rcl`](examples/universal-stress/k03-native-android-app.rcl) |
+| Android 垂直切片 | 受治理应用状态如何 Lower 到 Android | [`examples/universal-stress/k03-native-android-app.rcl`](examples/universal-stress/k03-native-android-app.rcl) |
 
-### 示例 1：一个更像真实程序的状态变化
-
-K02 Web 示例虽然很小，但已经能把 RCL 的核心结构看清楚：
-
-```rcl
-reality K02CompleteWebApp {
-  facet app.todo_count : Number = 0
-  facet app.todo_input : Text = ""
-  facet app.last_action : Text = "boot"
-
-  subject user {
-    warrant app.write on app
-  }
-
-  emergence addTodo {
-    cause user
-    when app.todo_input != ""
-    needs app.write on app
-    alter app.todo_count <- app.todo_count + 1
-    alter app.last_action <- app.todo_input
-    alter app.todo_input <- ""
-    preserve app.todo_count >= 0
-    witness "rcl:k02:add-todo"
-  }
-}
-```
-
-可以直接把它理解成：
-
-```text
-状态
-+ 谁在操作
-+ 他有什么权限
-+ 什么条件下能操作
-+ 候选状态怎么改
-+ 哪些条件必须始终成立
-+ 用什么证据记录这次变化
-```
-
-这就是很多更大 RCL 程序不断复用的母结构。
-
-### 示例 2：UI 不只是外挂壳，而是语义的一部分
-
-Native UI Counter 直接在 RCL 里维护状态、派生值、绑定和交互：
+### Native UI 示例
 
 ```rcl
 reality NativeUICounter {
@@ -173,9 +215,9 @@ reality NativeUICounter {
 }
 ```
 
-完整文件里还有 lifecycle、theme、style、accessibility label 和 reset 行为。当前候选实现会让同一份 rooted UI semantics Lower 到 Web 和 Android 后端。
+完整文件还有 lifecycle、theme、style、accessibility label 和 reset 行为。
 
-### 示例 3：导航也是 RCL 语义
+### Navigation 示例
 
 ```rcl
 navigation {
@@ -190,9 +232,7 @@ on activate {
 }
 ```
 
-完整文件：[`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl)。
-
-### 示例 4：同一个 UI 意图，根据设备宽度改变布局
+### Device Adaptation 示例
 
 ```rcl
 adaptation {
@@ -211,21 +251,22 @@ view Root {
 }
 ```
 
-当前候选实现会把这份语义分别 Lower 成 Web width-profile 行为，以及 Android 基于 `screenWidthDp` 的布局选择。
+当前候选实现会把同一份语义 Lower 成 Web width-profile 行为，以及 Android 基于 `screenWidthDp` 的布局选择。
 
-### 推荐阅读顺序
+推荐阅读顺序：
 
 ```text
-最小 Counter
+hello-reality.rcl
 → K02 Web 状态变化
 → Native UI Counter
 → Navigation
 → Device Adaptation
 → K03 Android 垂直切片
 → selfhost/compiler-core.rcl
+→ CURRENT-STATUS.md
 ```
 
-更多可运行示例和 Evidence Fixtures 都在 [`examples/`](examples/) 目录。
+更多可运行示例与 Evidence Fixtures 都在 [`examples/`](examples/) 目录。
 
 ---
 
@@ -246,11 +287,7 @@ view Root {
 | Native UI Navigation + 宽度自适应 | **候选状态，自举切片已验证** |
 | Universal Program Stress | **持续运行，大部分 400 格仍保持 UNKNOWN** |
 
----
-
-## 自举编译器
-
-RCL 包含一个用 RCL 自身编写的编译器，以及 Native Compiler / VM 路径。
+### 自举编译器
 
 ```text
 RCL 编译器源码
@@ -268,7 +305,7 @@ RCL 编译器源码
 C0 == C1 == C2
 ```
 
-这里必须区分：
+必须区分：
 
 - **Native-Core Self-Hosting：已验证**
 - **Whole-Language Runtime Self-Hosting：未宣称**
@@ -277,9 +314,9 @@ C0 == C1 == C2
 
 ## Native UI Genome
 
-RCL 正在把 UI 作为语言语义的一部分，而不是把 Web 和 Android 当成两个完全独立的前端。
+RCL 正在把 UI 作为语言语义的一部分，而不是把 Web 和 Android 当成两个毫无关系的前端。
 
-当前候选语义已经包括：
+当前候选语义包括：
 
 - state / derived expressions；
 - lifecycle / restore；
@@ -302,15 +339,15 @@ flowchart TD
     E --> G[Java Views / Gradle]
 ```
 
-真实 Chrome 已验证当前 width-profile adaptation；Android backend 也已经从同一 semantic root 生成并构建真实 Debug APK。
+真实 Chrome 已验证当前 width-profile adaptation；Android Backend 也已经从同一 semantic root 生成并构建真实 Debug APK。
 
-但要注意：**Android 真机安装、配置变化、真实交互与性能目前仍未在正式 campaign 中闭合。**
+但：**Android 真机安装、配置变化、真实交互与性能目前仍未在正式 campaign 中闭合。**
 
 ---
 
 ## UI 与现实治理
 
-RCL 明确区分：
+RCL 明确区分本地 UI 状态变化：
 
 ```text
 UI-local event
@@ -319,7 +356,7 @@ UI-local event
 → local commit
 ```
 
-和：
+和现实动作：
 
 ```mermaid
 flowchart LR
@@ -336,7 +373,7 @@ UI 本身不能直接提交外部现实变化。未知规则、混合 authority 
 
 ## Universal Program Stress
 
-RCL 当前的长期验证主线是一张固定的：
+RCL 当前长期验证主线是一张固定的：
 
 ```text
 20 个环境族 × 20 个程序族 = 400 个长期验证格
@@ -354,7 +391,7 @@ RCL 当前的长期验证主线是一张固定的：
 8. `AI_GENERATE`
 9. `EVIDENCE`
 
-缺一个必要 Gate 就是 BLOCKED；某个必要 Gate 失败就是 FAIL，不能用其它高分抵消。
+缺一个必要 Gate 就是 BLOCKED；必要 Gate 失败就是 FAIL，不能靠其它高分抵消。
 
 ### 当前 Killer Tasks
 
@@ -369,15 +406,13 @@ RCL 当前的长期验证主线是一张固定的：
 
 ## 三种能力模式
 
-RCL 明确区分：
-
 ### `native-semantic`
 
 RCL 自己拥有相关计算语义。
 
 ### `lowered-execution`
 
-RCL 拥有语义，但有意把执行 Lower 到浏览器、Android、SQL、GPU 或其它 backend organ。
+RCL 拥有语义，但有意把执行 Lower 到浏览器、Android、SQL、GPU 或其它 Backend Organ。
 
 ### `opaque-delegation`
 
@@ -388,8 +423,6 @@ Opaque delegation 可以很有用，但**不能冒充 RCL 原生能力**。
 ---
 
 ## Frontier：把未知问题编译成实验
-
-RCL 还有一条实验性的 Frontier Research 线，目标不是“宣布发现未知规律”，而是把未知问题编译成可反证实验。
 
 ```mermaid
 flowchart LR
@@ -408,43 +441,43 @@ flowchart LR
 
 ---
 
-## 快速开始
+## 架构
 
-### 环境
+```mermaid
+flowchart TD
+    A[RCL Source] --> B[Parser / Type / IR]
+    B --> C[Governed Semantics]
+    C --> D1[Native RBC]
+    C --> D2[Web Lowering]
+    C --> D3[Android Lowering]
+    C --> D4[Provider Bridges]
+    D1 --> E1[Native VM / Runtime]
+    D2 --> E2[Browser Host]
+    D3 --> E3[Android Host]
+    D4 --> E4[External Capability]
+    E1 --> F[Evidence]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    F --> G[Governed Result]
+```
 
-- Node.js 22+
-- Native 构建需要受支持的 C/C++ toolchain
-- Android 目标需要 Android 构建环境
+---
 
-### 安装和测试
+## 常用命令
 
 ```bash
 npm install
-npm test
-```
-
-### 运行一个示例
-
-```bash
-node src/cli.mjs run examples/hello-reality.rcl
-```
-
-### 构建并验证 Native Toolchain
-
-```bash
+npm run demo
 npm run build:native
+npm run demo:native
+npm run demo:bytecode
 npm run build:selfhost-compiler
 npm run verify:selfhost-fixedpoint
 npm run verify:selfhost-examples
 ```
 
-### 运行 Universal Program Stress
-
-```bash
-node --test tests/universal-program-stress.test.mjs
-node scripts/universal-program-stress-report.mjs
-node scripts/run-universal-stress-k01.mjs
-```
+逐步解释见 [`GETTING_STARTED.zh-CN.md`](GETTING_STARTED.zh-CN.md)。
 
 ---
 
@@ -465,38 +498,16 @@ COMPONENT-VERSIONS.json      受治理 Component Identity
 
 ---
 
-## 开发原则
-
-RCL 不是靠不断添加功能来“看起来更通用”，而是沿着：
-
-```text
-Stress
-→ Failure
-→ Missing Primitive / Unabsorbed Advantage
-→ Candidate Design
-→ Semantic + Execution Tests
-→ Regression
-→ Evidence
-→ Selection
-→ Inheritance
-→ Full Matrix Rerun
-```
-
-失败实验本身也是结果，因为它暴露了语言真正尚未拥有的能力。
-
----
-
 ## 欢迎贡献
 
 适合外部贡献的方向包括：
 
 - 当前语义的最小可复现失败案例；
 - Universal Program Stress 暴露出的 missing primitive；
-- 保持 RCL-owned semantics 的 backend lowering；
+- 保持 RCL-owned semantics 的 Backend Lowering；
 - Reference / Self-host / Native 路径差分测试；
 - Self-host Compiler / VM 性能优化；
 - Native UI resources、accessibility、真机验证；
-- Evidence boundary 文档；
 - K01 / K02 独立 AI generation / repair evaluation。
 
 **更强的 claim 必须来自更强的 evidence，而不是更强的措辞。**
@@ -508,10 +519,10 @@ Stress
 本仓库当前**不宣称**：
 
 - RCL 已经能写所有程序；
-- Whole-language runtime 已完全自举；
-- 所有 Foundation domain 都是 native；
+- Whole-Language Runtime 已完全自举；
+- 所有 Foundation Domain 都是 Native；
 - Android 真机执行已经完成正式验证；
-- 生成 artifact 等于真实运行成功；
+- 生成 Artifact 等于真实运行成功；
 - Frontier 沙箱实验已经证明新的自然规律或现实外部效应。
 
 项目的意义恰恰是：把这些边界变成显式、可测试、可反证的工程对象。
