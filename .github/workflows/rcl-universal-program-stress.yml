@@ -46,8 +46,6 @@ jobs:
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
         run: npm run evidence:k400
-      - name: K01 self-hosting compiler campaign
-        run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
       - name: Upload evidence report
         uses: actions/upload-artifact@v4
         with:
@@ -56,3 +54,25 @@ jobs:
             output/universal-stress-v0.1
             output/universal-stress-k400
           if-no-files-found: error
+
+  k01-windows-verification:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build or verify Windows native artifacts
+        run: npm run build:native
+      - name: K01 Windows self-hosting compiler campaign
+        run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
+      - name: Upload K01 evidence and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcl-universal-stress-k01-windows
+          path: |
+            output/universal-stress-v0.1/K01
+            output/selfhost
+          if-no-files-found: warn
