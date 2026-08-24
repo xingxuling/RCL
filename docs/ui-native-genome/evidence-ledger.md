@@ -11,7 +11,7 @@
 - Counter-selfhost implementation SHA: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
 - Parameterized-event implementation SHA: `3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90`
 - Governed-event implementation SHA: `6a2061bf7724530914a75b99a2d6e0e05616ee0b`
-- Fixed-sizing implementation SHA: pending implementation commit
+- Fixed-sizing implementation SHA: `035c0599e137e14442f175f8a7104505634ee9bc`
 - Evidence-seal SHA: the follow-up commit containing the SHA-bound matrix receipt; reported in the generation handoff because a commit cannot self-bind its own SHA
 - Rollback point: base SHA above
 
@@ -70,7 +70,7 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Selfhost/fixed point | PASS — 6/6; minimal UI, Counter, parameterized UI-local events, governed reality-transaction declarations and fixed sizes are JS/self-host/native byte-identical; valid mutations change roots; equivalent fixed-number spellings normalize; invalid parameters, rules, authority mixtures, sizes and modes fail closed |
 | Instruction headroom | PASS — 79,350,203 executed per native generation; 220,649,797 remain against the 300 million cap; minimum gate 180 million. The evidence pair took 153,367.8976 ms against the 240,000 ms gate |
 | Full regression | PASS — optimized fixed-sizing generation: 719 tests, 718 pass, 0 fail, 1 skip; 372,067.7334 ms on this machine. A pre-optimization fixed-sizing run was rejected after the self-host child exhausted the Node heap; the optimized complete rerun passed cleanly |
-| K400 / Integration Court | BLOCKED — governed-event generation has 5 evidence-bearing cells BLOCKED, 395 UNTESTED, 0 PASS; maturity `U0`; report root `619190511a5103d018010020e40b78eb63220c42012ce415c1c14fd5a08f383d` |
+| K400 / Integration Court | BLOCKED — fixed-sizing generation has 5 evidence-bearing cells BLOCKED, 395 UNTESTED, 0 PASS; maturity `U0`; report root `87bc86a54d5eb2c4f76db73f8223d723dac1b5a8df1b8a91403ae6de0a793ecf` |
 
 The first fixed-sizing parser prototype added three helper `reckon`s and was rejected after the ordinary-Node self-host suite exhausted its approximately 4 GiB heap near 47 seconds. A one-axis parser then passed focused tests but later reproduced heap exhaustion in an extended full-suite run, so it was not accepted alone. The final implementation also replaces repeated user-call symbol-table scans with one indexed validation and bypasses scans for builtins/special calls: `find_reckon_index` fell from about 35.9 million to 8.5 million steps, native work fell from 113,179,072 to 79,350,203 instructions per generation, and the unmodified focused suite passed 6/6. Increasing the Node heap was not used as a substitute for the resource gate.
 
@@ -96,7 +96,7 @@ The first fixed-sizing parser prototype added three helper `reckon`s and was rej
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
-The current sealed SHA-bound report still evaluates predecessor `native-ui-genome-v0.1-candidate-5-selfhost-governed`; a fixed-sizing matrix will be generated only after the implementation commit exists so every evidence cell binds the actual implementation SHA. The non-compensatory blockers remain independent: compiler self-hosting lacks `AI_GENERATE`; browser claims lack performance and `AI_GENERATE`; Android claims lack device execution/correctness/performance and `AI_GENERATE` (with robustness gaps where declared).
+The SHA-bound report evaluates `native-ui-genome-v0.1-candidate-6-selfhost-fixed` against implementation `035c0599e137e14442f175f8a7104505634ee9bc`: compiler self-hosting is blocked only by independent `AI_GENERATE`; browser claims remain blocked by performance and `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE` (with robustness gaps where declared). These gates do not compensate for one another.
 
 ## License and diff audit
 

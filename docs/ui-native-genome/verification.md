@@ -36,4 +36,4 @@ The evidence generator compiles `examples/native-ui/counter.rcl`, asserts one sh
 
 Full repository regression results are also recorded in `evidence-ledger.md`; a missing or historically failing test is reported as blocked/fail rather than silently omitted.
 
-The SHA-bound Integration Court report for `native-ui-genome-v0.1-candidate-5-selfhost-governed` records 5 `BLOCKED`, 395 `UNTESTED`, 0 `PASS` and maturity `U0`, with report root `619190511a5103d018010020e40b78eb63220c42012ce415c1c14fd5a08f383d`. The governed compiler evidence does not compensate for the independent browser-performance, Android-device or `AI_GENERATE` gaps.
+The SHA-bound Integration Court report for `native-ui-genome-v0.1-candidate-6-selfhost-fixed` records 5 `BLOCKED`, 395 `UNTESTED`, 0 `PASS` and maturity `U0`, with report root `87bc86a54d5eb2c4f76db73f8223d723dac1b5a8df1b8a91403ae6de0a793ecf`. Fixed-sizing and compiler-performance evidence do not compensate for the independent browser-performance, Android-device or `AI_GENERATE` gaps.
