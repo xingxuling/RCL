@@ -1,0 +1,58 @@
+{
+  "format": "taowind.language-federation.result.v0.1",
+  "version": "0.1.0",
+  "status": "CANDIDATE",
+  "locale": "zh-CN",
+  "surfaceAst": {
+    "format": "taowind.rsl.surface-ast.v0.1",
+    "locale": "zh-CN",
+    "type": "RslZhCnVerbObjectCommand",
+    "verb": "建立",
+    "object": "项目",
+    "projectId": "federation_demo",
+    "root": "f603b03ac006cc9fad508af6dbdcf5e49db8ad7e88c1e77c57eb6fb5f8c1202f"
+  },
+  "meaningRoot": "2fe8784cd70c98b2ff30e1b319f42612fb736452febf99a61e50c76b71008803",
+  "semantic": {
+    "format": "taowind.asil.programming-profile.v0.1",
+    "profile": "programming",
+    "frameType": "TaskFrame",
+    "W": {
+      "speech_act": "request",
+      "literal_goal": "create-project"
+    },
+    "B": {
+      "entity": "project",
+      "relation": "create",
+      "project_id": "federation_demo",
+      "negation": false,
+      "scope": "named-project"
+    },
+    "G": {
+      "action": "propose-project-creation",
+      "permission": "candidate-only",
+      "effect": "no-reality-commit"
+    },
+    "E": {
+      "epistemic_status": "candidate",
+      "evidence": [
+        "federation:rsl-corpus:v0.1"
+      ],
+      "uncertainty": "none-within-frozen-subset"
+    },
+    "M": {
+      "version": "0.1.0",
+      "artifact": "rcl-candidate-program"
+    }
+  },
+  "rclSource": "reality FederationProject_federation_demo {\n  facet project.id : Text = \"federation_demo\"\n  facet project.status : Text = \"candidate\"\n\n  subject requester {\n    warrant project.propose on project\n  }\n\n  emergence propose {\n    cause requester\n    when project.status == \"candidate\"\n    needs project.propose on project\n    alter project.status <- \"proposed\"\n    preserve project.status == \"proposed\"\n    witness \"language-federation:rsl-to-asil-to-rcl:v0.1\"\n  }\n\n  foresee propose\n}\n",
+  "rclProgramRoot": "f7dea431819e62b166dba4246ffaa64dd2d26138aa821c24ab5c15f89418a3e6",
+  "authorityGranted": false,
+  "realityCommitRequested": false,
+  "canonicalPath": [
+    "rsl-candidate",
+    "asil-programming-profile",
+    "rcl"
+  ],
+  "root": "71c1ea627d9e99140281e1720a6ad630f472380e1e97b35d66e3f76c7a639cc8"
+}

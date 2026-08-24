@@ -1696,3 +1696,20 @@ export {
   verifyFoundationNativeBatchEExecution,
   runFoundationNativeBatchE,
 } from './foundation-native-batch-e.mjs';
+
+export {
+  LANGUAGE_FEDERATION_VERSION,
+  LANGUAGE_FEDERATION_FORMAT,
+  ASIL_PROGRAMMING_PROFILE_FORMAT,
+  RSL_SURFACE_AST_FORMAT,
+  loadLanguageFederationRegistry,
+  validateLanguageFederationRegistry,
+  detectDuplicateSemanticOwners,
+  parseRslSurface,
+  rslAstToAsilProgrammingProfile,
+  renderRslSurface,
+  renderAsilProgrammingProfileToRcl,
+  compileRslSurfaceToRcl,
+  runRslFederationBenchmark,
+  buildLanguageFederationEvidence,
+} from './auxiliary-language-federation.mjs';

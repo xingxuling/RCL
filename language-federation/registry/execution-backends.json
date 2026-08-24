@@ -1,0 +1,11 @@
+{
+  "format": "taowind.language-federation.execution-backends.v0.1",
+  "version": "0.1.0",
+  "backends": [
+    {"id": "rcl-native-c", "language": "C", "target_capability": "RBC execution", "semantic_subset": "RCL native-core", "lowering_contract": "RCL source -> RBC -> rclvm", "runtime": "native/rclvm.c", "evidence_adapter": "native result and semantic roots", "error_mapping": "RCL native diagnostics", "status": "VERIFIED"},
+    {"id": "rcl-node-reference", "language": "JavaScript", "target_capability": "reference compile and runtime", "semantic_subset": "current RCL reference semantics", "lowering_contract": "RCL source -> semantic program", "runtime": "Node.js", "evidence_adapter": "program roots and test receipts", "error_mapping": "RCL diagnostics", "status": "VERIFIED"},
+    {"id": "rcl-web", "language": "HTML/CSS/JavaScript", "target_capability": "web UI", "semantic_subset": "Native UI candidate IR", "lowering_contract": "RCL UI IR -> Web manifest", "runtime": "browser", "evidence_adapter": "UI roots and browser traces", "error_mapping": "backend diagnostics", "status": "CANDIDATE"},
+    {"id": "rcl-android", "language": "Java/Android", "target_capability": "Android UI and application", "semantic_subset": "Native UI and application candidate IR", "lowering_contract": "RCL UI/application IR -> Android project", "runtime": "Android", "evidence_adapter": "project hashes and Android receipts", "error_mapping": "backend diagnostics", "status": "CANDIDATE"},
+    {"id": "unregistered-specialists", "language": "Rust/Zig/C++/Python/TypeScript/Kotlin/SQL/CUDA/GLSL/Shell", "target_capability": "specialized execution", "semantic_subset": "not frozen", "lowering_contract": "not registered", "runtime": "external specialized runtimes", "evidence_adapter": "required per adapter", "error_mapping": "required per adapter", "status": "UNKNOWN"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "format": "taowind.language-federation.translators.v0.1",
+  "version": "0.1.0",
+  "translators": [
+    {"id": "rsl-to-asil-programming", "source": "rsl", "target": "asil", "profile": "programming", "status": "CANDIDATE", "direction": "forward", "lossiness": "LOSSLESS_WITHIN_FROZEN_CREATE_PROJECT_SUBSET", "implementation": "src/auxiliary-language-federation.mjs"},
+    {"id": "asil-programming-to-rsl", "source": "asil", "target": "rsl", "profile": "programming", "status": "CANDIDATE", "direction": "reverse", "lossiness": "LOSSLESS_WITHIN_FROZEN_CREATE_PROJECT_SUBSET", "implementation": "src/auxiliary-language-federation.mjs"},
+    {"id": "asil-programming-to-rcl", "source": "asil", "target": "rcl", "profile": "programming", "status": "CANDIDATE", "direction": "forward", "lossiness": "PRESERVES_FROZEN_FIELDS; SURFACE_PROVENANCE_REMAINS_IN_RECEIPT", "implementation": "src/auxiliary-language-federation.mjs"},
+    {"id": "ial-to-asil", "source": "ial", "target": "asil", "profile": "governance", "status": "UNKNOWN", "direction": "bidirectional-candidate", "lossiness": "UNKNOWN", "blocked_by": ["no-frozen-field-map", "no-roundtrip-corpus", "no-authority-preservation-proof"]},
+    {"id": "snll-to-asil", "source": "snll", "target": "asil", "profile": "social-living", "status": "UNKNOWN", "direction": "forward-candidate", "lossiness": "UNKNOWN", "blocked_by": ["snll-currently-emits-own-semantic-ir-and-rncs-proposal", "no-asil-adapter"]},
+    {"id": "csl-to-asil", "source": "csl", "target": "asil", "profile": "structural-domain", "status": "UNKNOWN", "direction": "forward-candidate", "lossiness": "UNKNOWN", "blocked_by": ["csl-currently-targets-own-ir-ose-and-projections", "no-asil-adapter"]},
+    {"id": "e-lang-ir-to-asil-lineage", "source": "e-lang-ir", "target": "asil", "profile": "general-meaning", "status": "SUPERSEDED", "direction": "historical-lineage", "lossiness": "UNMEASURED", "implementation": null}
+  ]
+}

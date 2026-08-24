@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taowind.invalid/schemas/language-federation/translation-contract.v0.1.json",
+  "title": "TaoWind Translation Contract",
+  "type": "object",
+  "required": ["id", "source", "target", "profile", "status", "direction", "lossiness"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "source": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "profile": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "direction": {"type": "string", "minLength": 1},
+    "lossiness": {"type": "string", "minLength": 1},
+    "implementation": {"type": ["string", "null"]},
+    "blocked_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "additionalProperties": false
+}

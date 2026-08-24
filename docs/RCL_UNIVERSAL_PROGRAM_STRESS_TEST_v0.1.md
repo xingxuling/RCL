@@ -162,12 +162,15 @@ Stress
 → Full matrix rerun
 ```
 
-A donor feature has four possible outcomes:
+A donor feature has five possible outcomes:
 
 - `REJECT`
 - `ORGAN_ONLY`
+- `AUXILIARY_LANGUAGE`
 - `EXPERIMENTAL_GENOME`
 - `CANONICAL_RCL_GENOME`
+
+`AUXILIARY_LANGUAGE` is reserved for a verified local optimum that keeps its own surface or domain implementation while explicitly declining canonical RCL semantic ownership. It is not opaque provider credit and it does not bypass regression, evidence, or identity-genome gates.
 
 Language Genomics supplies variation. Universal Stress supplies selection pressure.
 

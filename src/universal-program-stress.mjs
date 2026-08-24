@@ -464,6 +464,8 @@ export function decideGenomeAdmission({
   semanticNovelty = false,
   capabilityGain = false,
   implementationAdvantage = false,
+  auxiliaryLanguageFit = false,
+  claimsCanonicalSemantics = false,
   usesOpaqueDelegation = false,
   stressReports = [],
   regression = { status: STRESS_STATUS.UNVERIFIED },
@@ -478,5 +480,6 @@ export function decideGenomeAdmission({
     stressReports.length > 0 &&
     stressReports.every((report) => report.status === STRESS_STATUS.PASS && report.universalGrowthEligible === true);
   if (!allStressPassed || !evidenceSufficient) return 'EXPERIMENTAL_GENOME';
+  if (auxiliaryLanguageFit && !claimsCanonicalSemantics && !usesOpaqueDelegation) return 'AUXILIARY_LANGUAGE';
   return 'CANONICAL_RCL_GENOME';
 }

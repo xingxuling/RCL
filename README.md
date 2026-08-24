@@ -46,6 +46,8 @@ flowchart LR
 
 RCL currently has a self-hosted native-core compiler path, a native VM, Web and Android lowering paths, a platform-neutral Native UI semantic model, and a permanent cross-environment stress harness.
 
+The [TaoWind Auxiliary Language Federation v0.1](docs/language-federation/federation-architecture.md) is a candidate shared contract/registry layer. It keeps RCL as the canonical reality IR owner while testing bounded ASIL profiles and independent RSL, IAL, SNLL and CSL language organs without granting them execution authority.
+
 It does **not** claim to be a universal programming language today. The repository instead defines a falsifiable process for testing how far that objective can be pushed.
 
 ---

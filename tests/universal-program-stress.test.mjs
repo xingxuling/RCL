@@ -209,13 +209,25 @@ test('persistent donor advantage becomes an UNABSORBED_ADVANTAGE', () => {
   assert.equal(gaps[0].classification, 'UNABSORBED_ADVANTAGE');
 });
 
-test('genome admission has four explicit outcomes', () => {
+test('genome admission has five explicit outcomes including auxiliary language', () => {
   const pass = passingCell();
 
   assert.equal(decideGenomeAdmission({}), 'REJECT');
   assert.equal(
     decideGenomeAdmission({ implementationAdvantage: true, usesOpaqueDelegation: true, identityGenomePreserved: true }),
     'ORGAN_ONLY',
+  );
+  assert.equal(
+    decideGenomeAdmission({
+      implementationAdvantage: true,
+      auxiliaryLanguageFit: true,
+      claimsCanonicalSemantics: false,
+      identityGenomePreserved: true,
+      stressReports: [pass],
+      regression: { status: STRESS_STATUS.PASS },
+      evidenceSufficient: true,
+    }),
+    'AUXILIARY_LANGUAGE',
   );
   assert.equal(
     decideGenomeAdmission({

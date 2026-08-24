@@ -14,6 +14,8 @@
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "test:language-federation": "node --test --test-concurrency=1 tests/auxiliary-language-federation.test.mjs tests/universal-program-stress.test.mjs",
+    "evidence:language-federation": "node scripts/build-language-federation-evidence.mjs",
     "mcp": "node src/rcl-mcp-server.mjs",
     "test:v0.91": "node --test --test-concurrency=1 tests/blue-sky-cosmogenic-projection-trial.test.mjs",
     "demo": "node src/cli.mjs run examples/hello-reality.rcl",

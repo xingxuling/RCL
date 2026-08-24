@@ -1,0 +1,19 @@
+reality FederationProject_federation_demo {
+  facet project.id : Text = "federation_demo"
+  facet project.status : Text = "candidate"
+
+  subject requester {
+    warrant project.propose on project
+  }
+
+  emergence propose {
+    cause requester
+    when project.status == "candidate"
+    needs project.propose on project
+    alter project.status <- "proposed"
+    preserve project.status == "proposed"
+    witness "language-federation:rsl-to-asil-to-rcl:v0.1"
+  }
+
+  foresee propose
+}

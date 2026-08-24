@@ -1,0 +1,43 @@
+{
+  "format": "taowind.language-federation.rsl-corpus.v0.1",
+  "version": "0.1.0",
+  "scope": "frozen-create-project-subset",
+  "cases": [
+    {"id": "create-01", "meaning": "create-project:project_01", "surfaces": {"zh-CN": "建立项目 project_01", "en-US": "create project project_01"}},
+    {"id": "create-02", "meaning": "create-project:project_02", "surfaces": {"zh-CN": "建立项目 project_02", "en-US": "create project project_02"}},
+    {"id": "create-03", "meaning": "create-project:project_03", "surfaces": {"zh-CN": "建立项目 project_03", "en-US": "create project project_03"}},
+    {"id": "create-04", "meaning": "create-project:project_04", "surfaces": {"zh-CN": "建立项目 project_04", "en-US": "create project project_04"}},
+    {"id": "create-05", "meaning": "create-project:project_05", "surfaces": {"zh-CN": "建立项目 project_05", "en-US": "create project project_05"}},
+    {"id": "create-06", "meaning": "create-project:project_06", "surfaces": {"zh-CN": "建立项目 project_06", "en-US": "create project project_06"}},
+    {"id": "create-07", "meaning": "create-project:project_07", "surfaces": {"zh-CN": "建立项目 project_07", "en-US": "create project project_07"}},
+    {"id": "create-08", "meaning": "create-project:project_08", "surfaces": {"zh-CN": "建立项目 project_08", "en-US": "create project project_08"}},
+    {"id": "create-09", "meaning": "create-project:project_09", "surfaces": {"zh-CN": "建立项目 project_09", "en-US": "create project project_09"}},
+    {"id": "create-10", "meaning": "create-project:project_10", "surfaces": {"zh-CN": "建立项目 project_10", "en-US": "create project project_10"}},
+    {"id": "create-11", "meaning": "create-project:project_11", "surfaces": {"zh-CN": "建立项目 project_11", "en-US": "create project project_11"}},
+    {"id": "create-12", "meaning": "create-project:project_12", "surfaces": {"zh-CN": "建立项目 project_12", "en-US": "create project project_12"}},
+    {"id": "create-13", "meaning": "create-project:project_13", "surfaces": {"zh-CN": "建立项目 project_13", "en-US": "create project project_13"}},
+    {"id": "create-14", "meaning": "create-project:project_14", "surfaces": {"zh-CN": "建立项目 project_14", "en-US": "create project project_14"}},
+    {"id": "create-15", "meaning": "create-project:project_15", "surfaces": {"zh-CN": "建立项目 project_15", "en-US": "create project project_15"}},
+    {"id": "create-16", "meaning": "create-project:project_16", "surfaces": {"zh-CN": "建立项目 project_16", "en-US": "create project project_16"}},
+    {"id": "create-17", "meaning": "create-project:project_17", "surfaces": {"zh-CN": "建立项目 project_17", "en-US": "create project project_17"}},
+    {"id": "create-18", "meaning": "create-project:project_18", "surfaces": {"zh-CN": "建立项目 project_18", "en-US": "create project project_18"}},
+    {"id": "create-19", "meaning": "create-project:project_19", "surfaces": {"zh-CN": "建立项目 project_19", "en-US": "create project project_19"}},
+    {"id": "create-20", "meaning": "create-project:project_20", "surfaces": {"zh-CN": "建立项目 project_20", "en-US": "create project project_20"}},
+    {"id": "create-21", "meaning": "create-project:project_21", "surfaces": {"zh-CN": "建立项目 project_21", "en-US": "create project project_21"}},
+    {"id": "create-22", "meaning": "create-project:project_22", "surfaces": {"zh-CN": "建立项目 project_22", "en-US": "create project project_22"}},
+    {"id": "create-23", "meaning": "create-project:project_23", "surfaces": {"zh-CN": "建立项目 project_23", "en-US": "create project project_23"}},
+    {"id": "create-24", "meaning": "create-project:project_24", "surfaces": {"zh-CN": "建立项目 project_24", "en-US": "create project project_24"}},
+    {"id": "create-25", "meaning": "create-project:project_25", "surfaces": {"zh-CN": "建立项目 project_25", "en-US": "create project project_25"}}
+  ],
+  "negative_cases": [
+    {"id": "ambiguous-zh", "locale": "zh-CN", "surface": "建立 project_01", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "ambiguous-en", "locale": "en-US", "surface": "create project_01", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "negation-zh", "locale": "zh-CN", "surface": "不要建立项目 project_01", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "negation-en", "locale": "en-US", "surface": "do not create project project_01", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "missing-id-zh", "locale": "zh-CN", "surface": "建立项目", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "missing-id-en", "locale": "en-US", "surface": "create project", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "invalid-id-en", "locale": "en-US", "surface": "create project 01", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "unsupported-locale", "locale": "ja-JP", "surface": "project_01 を作成", "expected_status": "CLARIFICATION_REQUIRED"},
+    {"id": "authority-shaped-command", "locale": "en-US", "surface": "sudo create project project_01", "expected_status": "CLARIFICATION_REQUIRED"}
+  ]
+}

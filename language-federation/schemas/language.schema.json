@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taowind.invalid/schemas/language-federation/language.v0.1.json",
+  "title": "TaoWind Auxiliary Language Record",
+  "type": "object",
+  "required": ["id", "name", "version", "role", "status", "canonical_owner_of", "does_not_own", "input", "output", "compiler_target", "runtime", "authority_model", "evidence_model", "lifecycle", "source_repository", "source_revision", "source_paths", "tests", "verification"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "name": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "role": {"type": "string", "minLength": 1},
+    "status": {"enum": ["IDEA", "HISTORICAL", "SPECIFIED", "FORMALIZED", "EXECUTABLE", "CANDIDATE", "READY", "VERIFIED", "SUPERSEDED", "ARCHIVED", "UNKNOWN"]},
+    "canonical_owner_of": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "does_not_own": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "input": {"type": "array", "items": {"type": "string"}},
+    "output": {"type": "array", "items": {"type": "string"}},
+    "compiler_target": {"type": "array", "items": {"type": "string"}},
+    "runtime": {"type": "array", "items": {"type": "string"}},
+    "source_paths": {"type": "array", "items": {"type": "string"}},
+    "tests": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

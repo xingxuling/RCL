@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taowind.invalid/schemas/language-federation/semantic-profile.v0.1.json",
+  "title": "TaoWind Semantic Profile",
+  "type": "object",
+  "required": ["id", "owner", "status", "required_atoms"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "owner": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "surface_languages": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "required_atoms": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true}
+  },
+  "additionalProperties": false
+}

@@ -46,6 +46,8 @@ flowchart LR
 
 当前 RCL 已拥有 Native-Core 自举编译器路径、Native VM、Web / Android Lowering、平台中立 Native UI 语义模型，以及长期维护的 Universal Program Stress 验证矩阵。
 
+[TaoWind 辅助语言联邦 v0.1](docs/language-federation/federation-architecture.md) 是候选共享契约与注册层：RCL 继续拥有唯一 Canonical Reality IR，同时以有界 ASIL Profile 联邦 RSL、IAL、SNLL 与 CSL 等独立语言器官，且翻译本身不授予执行权。
+
 RCL **当前不宣称已经成为万能/通用编程语言**。仓库的目标，是把“能不能做到”变成可测试、可反证、可重复的工程问题。
 
 ---
