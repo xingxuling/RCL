@@ -791,12 +791,32 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_layout_with_height(node : Sequence, mode : Text, value : Text) -> Sequence =
     make_ui_layout(ui_layout_mode(node), ui_layout_width_mode(node), ui_layout_width_value(node), mode, value, ui_layout_gap(node), ui_layout_padding(node), ui_layout_alignment(node), ui_layout_distribution(node), ui_layout_overflow(node), ui_layout_columns(node))
 
+  reckon parse_ui_layout_size(tokens : Sequence, index : Number, node : Sequence, axis : Text) -> Sequence =
+    choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_LAYOUT_WIDTH_MODE"),
+      choose(semantic_check(token_text_at(tokens, index + 1) == "fill"
+          or token_text_at(tokens, index + 1) == "intrinsic" or token_text_at(tokens, index + 1) == "fixed",
+          "RCL_UI_LAYOUT_SIZE_MODE", axis + ":" + token_text_at(tokens, index + 1)),
+        choose(token_text_at(tokens, index + 1) == "fixed",
+          choose(require_kind(tokens, index + 2, "NUMBER", "RCL_UI_LAYOUT_FIXED_SIZE"),
+            choose(semantic_check(number_from_text(token_text_at(tokens, index + 2)) >= 0,
+                "RCL_UI_LAYOUT_FIXED_SIZE", axis),
+              parse_ui_layout_body(tokens, index + 3,
+                choose(axis == "width",
+                  ui_layout_with_width(node, "fixed", text(number_from_text(token_text_at(tokens, index + 2)))),
+                  ui_layout_with_height(node, "fixed", text(number_from_text(token_text_at(tokens, index + 2)))))),
+              empty_sequence()), empty_sequence()),
+          parse_ui_layout_body(tokens, index + 2,
+            choose(axis == "width",
+              ui_layout_with_width(node, token_text_at(tokens, index + 1), ""),
+              ui_layout_with_height(node, token_text_at(tokens, index + 1), "")))),
+        empty_sequence()), empty_sequence())
+
   reckon parse_ui_layout_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
     choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
       choose(token_text_at(tokens, index) == "width",
-        parse_ui_layout_body(tokens, index + 2, ui_layout_with_width(node, token_text_at(tokens, index + 1), "")),
+        parse_ui_layout_size(tokens, index, node, "width"),
         choose(token_text_at(tokens, index) == "height",
-          parse_ui_layout_body(tokens, index + 2, ui_layout_with_height(node, token_text_at(tokens, index + 1), "")),
+          parse_ui_layout_size(tokens, index, node, "height"),
           choose(token_text_at(tokens, index) == "gap",
             parse_ui_layout_body(tokens, index + 2,
               make_ui_layout(ui_layout_mode(node), ui_layout_width_mode(node), ui_layout_width_value(node), ui_layout_height_mode(node), ui_layout_height_value(node), number_from_text(token_text_at(tokens, index + 1)), ui_layout_padding(node), ui_layout_alignment(node), ui_layout_distribution(node), ui_layout_overflow(node), ui_layout_columns(node))),
@@ -1802,17 +1822,11 @@ reality RCLGeneralSelfHostCompiler {
       choose(validate_expression(sequence_get(items, index), locals, facets, reckons),
         validate_expression_array(items, index + 1, locals, facets, reckons), false))
 
-  reckon call_is_known(name : Text, reckons : Sequence) -> Truth =
-    builtin_id(name) > 0 or name == "provider_call" or name == "choose"
-      or name == "typed_ref" or name == "typed_deref" or name == "typed_ref_id"
-      or find_reckon_index(reckons, 0, name) >= 0
-
-  reckon call_arity_valid(node : Sequence, reckons : Sequence) -> Truth =
-    choose(expr_text(node) == "provider_call" or expr_text(node) == "choose", length(expr_args(node)) == 3,
-      choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id",
-        length(expr_args(node)) == 1,
-        choose(find_reckon_index(reckons, 0, expr_text(node)) >= 0,
-          length(expr_args(node)) == length(reckon_params(sequence_get(reckons, find_reckon_index(reckons, 0, expr_text(node))))), true)))
+  reckon validate_user_call(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence, reckon_index : Number) -> Truth =
+    choose(semantic_check(reckon_index >= 0, "RCL_SEMANTIC_UNKNOWN_CALL", expr_text(node)),
+      choose(semantic_check(length(expr_args(node)) == length(reckon_params(sequence_get(reckons, reckon_index))),
+          "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+        validate_expression_array(expr_args(node), 0, locals, facets, reckons), false), false)
 
   reckon validate_expression(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(expr_kind(node) == "LiteralExpr", true,
@@ -1823,9 +1837,16 @@ reality RCLGeneralSelfHostCompiler {
           choose(expr_kind(node) == "BinaryExpr",
             choose(validate_expression(expr_left(node), locals, facets, reckons),
               validate_expression(expr_right(node), locals, facets, reckons), false),
-            choose(semantic_check(call_is_known(expr_text(node), reckons), "RCL_SEMANTIC_UNKNOWN_CALL", expr_text(node)),
-              choose(semantic_check(call_arity_valid(node, reckons), "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
-                validate_expression_array(expr_args(node), 0, locals, facets, reckons), false), false)))))
+            choose(builtin_id(expr_text(node)) > 0,
+              validate_expression_array(expr_args(node), 0, locals, facets, reckons),
+              choose(expr_text(node) == "provider_call" or expr_text(node) == "choose",
+                choose(semantic_check(length(expr_args(node)) == 3, "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+                  validate_expression_array(expr_args(node), 0, locals, facets, reckons), false),
+                choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id",
+                  choose(semantic_check(length(expr_args(node)) == 1, "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+                    validate_expression_array(expr_args(node), 0, locals, facets, reckons), false),
+                  validate_user_call(node, locals, facets, reckons,
+                    find_reckon_index(reckons, 0, expr_text(node))))))))))
 
   reckon validate_facets(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,

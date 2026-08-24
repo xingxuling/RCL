@@ -7,13 +7,14 @@ Generation base: `f64c214bc38295f05b6e8174afb2f4a843834508`<br>
 Counter-selfhost implementation: `c442f054b1007c9dab878b57f104e77bd1ffb47d`
 Parameterized-event implementation: `3f1aabbbd5b46fe6eb54fb986bb5f38c1b2bcc90`
 Governed-event implementation: `6a2061bf7724530914a75b99a2d6e0e05616ee0b`
+Fixed-sizing implementation: pending implementation commit
 
 ## Classification
 
 | Capability | Before this candidate | Candidate state | Evidence boundary |
 |---|---|---|---|
-| `.rcl` native UI syntax | `MISSING` | `PARTIAL` | The canonical self-host compiler owns the complete Counter slice, typed and standard-inferred UI-local parameters, and governed `reality-transaction` event declarations; fixed sizing and other wider v0.1 forms remain reference-only. |
-| Canonical Native UI IR | `MISSING` | `PARTIAL` | Versioned, rooted, serializable and validated in `src/ui`; the Counter, parameterized UI-local and governed-event genomes are self-hosted, while repository-wide grammar/IR ownership is not. |
+| `.rcl` native UI syntax | `MISSING` | `PARTIAL` | The canonical self-host compiler owns the complete Counter slice, typed and standard-inferred UI-local parameters, governed `reality-transaction` declarations and fixed width/height intent; navigation/resource/device-adaptation extensions remain absent. |
+| Canonical Native UI IR | `MISSING` | `PARTIAL` | Versioned, rooted, serializable and validated in `src/ui`; the Counter, parameterized UI-local, governed-event and fixed-sizing genomes are self-hosted, while extension semantics and repository-wide ownership are not. |
 | Reactive state/binding/event | `LOWERED_ONLY` | `EXISTING` in candidate | Same IR and trace evaluator feed both candidate backends. |
 | Platform-neutral layout | `MISSING` | `PARTIAL` | Vertical, horizontal, overlay and grid-like modes; no general constraint solver. |
 | Style/cascade | `RESEARCH_ONLY` / Web-local | `PARTIAL` | Theme, role/class/node selector, priority, specificity and inheritance are canonical; not CSS conformance. |
@@ -38,4 +39,4 @@ No shared Reality Markup, DOM, CSS cascade or Android UI kernel existed that cou
 
 ## Canonical-source warning
 
-`VERSION-CONTRACT.json` names `selfhost/compiler-core.rcl` and `selfhost/compiler-main.rcl` as the canonical compiler sources and marks `src/compiler.mjs` as reference-only. The minimal UI, complete Counter slice, typed/custom UI-local parameters, standard signature inference, event-scope expressions and governed `reality-transaction` declarations now reach canonical self-host fixed-point and RBC differential parity. Unknown rule references and handlers mixing local mutation with reality actions fail closed. Runtime execution remains outside compiler/UI authority: an explicit Gateway may receive `CandidateReality`, but the UI cannot commit reality directly. Fixed sizing and other wider UI forms remain fail-closed, so this still does **not** justify repository-wide promotion from `lowered-execution` to `native-semantic`.
+`VERSION-CONTRACT.json` names `selfhost/compiler-core.rcl` and `selfhost/compiler-main.rcl` as the canonical compiler sources and marks `src/compiler.mjs` as reference-only. The minimal UI, complete Counter slice, typed/custom UI-local parameters, standard signature inference, event-scope expressions, governed `reality-transaction` declarations and fixed width/height intent now reach canonical self-host fixed-point and RBC differential parity. Unknown rule references, mixed-authority handlers, invalid fixed values and unknown size modes fail closed. Runtime execution remains outside compiler/UI authority: an explicit Gateway may receive `CandidateReality`, but the UI cannot commit reality directly. Navigation, resources and device adaptation remain unimplemented extension points, so this still does **not** justify repository-wide promotion from `lowered-execution` to `native-semantic`.

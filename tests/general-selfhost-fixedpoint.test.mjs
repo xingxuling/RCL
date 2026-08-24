@@ -364,7 +364,7 @@ test('self-hosted compiler rejects the native-core sources rejected by JS', { ti
   }
 });
 
-test('self-hosted compiler owns minimal, Counter, parameterized and governed UI semantic-root slices', { timeout: 300_000 }, () => {
+test('self-hosted compiler owns minimal, Counter, parameterized, governed and fixed-size UI semantic-root slices', { timeout: 300_000 }, () => {
   const { c1 } = getFixedPointEvidence();
   const minimalSource = read('examples/selfhost-core/native-ui-minimal.rcl');
   const selfHosted = runCompilerArtifact(c1, minimalSource).output;
@@ -441,6 +441,46 @@ test('self-hosted compiler owns minimal, Counter, parameterized and governed UI 
     assert.throws(() => compileRealityToBytecode(invalidSource));
     assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
       'unknown reality rules and mixed-authority handlers must fail closed in both compilers');
+  }
+
+  const fixedSource = read('examples/selfhost-core/native-ui-fixed.rcl');
+  const fixedOracle = compileRealityToBytecode(fixedSource);
+  const fixedSelfHosted = runCompilerArtifact(c1, fixedSource).output;
+  assertRbcEqual(fixedSelfHosted, fixedOracle, 'fixed width/height RBC and semantic root must match JS exactly');
+  const fixedProgram = compileReality(fixedSource);
+  const fixedPanel = fixedProgram.nativeUis[0].viewTree.children[0];
+  assert.deepEqual(fixedPanel.layout.width, { mode: 'fixed', value: 320 });
+  assert.deepEqual(fixedPanel.layout.height, { mode: 'fixed', value: 180 });
+
+  const changedFixedSource = fixedSource.replace('width fixed 320', 'width fixed 321');
+  assertRbcEqual(
+    runCompilerArtifact(c1, changedFixedSource).output,
+    compileRealityToBytecode(changedFixedSource),
+    'fixed-size mutation must remain byte-identical',
+  );
+  assert.notEqual(
+    compileReality(changedFixedSource).nativeUis[0].semanticRoot,
+    fixedProgram.nativeUis[0].semanticRoot,
+    'fixed-size mutation must change the Native UI semantic root',
+  );
+
+  const normalizedFixedSource = fixedSource.replace('width fixed 320', 'width fixed 320.0');
+  assertRbcEqual(
+    runCompilerArtifact(c1, normalizedFixedSource).output,
+    fixedOracle,
+    'equivalent fixed-size number spelling must normalize to the same RBC',
+  );
+
+  const invalidFixedSources = [
+    fixedSource.replace('width fixed 320', 'width fixed -1'),
+    fixedSource.replace('width fixed 320', 'width fixed true'),
+    fixedSource.replace('width fixed 320', 'width elastic'),
+    fixedSource.replace('height fixed 180', 'height fixed app.size'),
+  ];
+  for (const invalidSource of invalidFixedSources) {
+    assert.throws(() => compileRealityToBytecode(invalidSource));
+    assert.throws(() => runCompilerArtifact(c1, invalidSource), undefined,
+      'invalid fixed sizes and size modes must fail closed in both compilers');
   }
 });
 

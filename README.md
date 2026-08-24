@@ -93,9 +93,9 @@ Detailed campaign records:
 
 ### Native UI Genome v0.1 candidate
 
-An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build. The minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, typed or standard-inferred UI-local event parameters, and governed `reality-transaction` event declarations now reach the canonical RCL-authored compiler with byte-identical C0/C1/C2 and JS/self-host RBC evidence.
+An isolated candidate now compiles native `.rcl` UI declarations into one rooted, platform-neutral UI IR and lowers that same root to Web and Android. The Counter vertical slice has a verified real-browser event loop and a verified Android Gradle APK build. The minimal UI, exact Counter state/derived/lifecycle/theme/style/tree/binding/layout/local-event slice, typed or standard-inferred UI-local event parameters, governed `reality-transaction` declarations, and fixed width/height layout intent now reach the canonical RCL-authored compiler with byte-identical C0/C1/C2 and JS/self-host RBC evidence.
 
-This remains `CANDIDATE`, not promoted repository-wide `native-semantic`: governed events can only emit `CandidateReality` through an external Gateway, fixed sizing and wider UI forms remain reference-only/fail-closed, and Android device execution is not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md), [`docs/ui-native-genome/selfhost-minimal-slice.md`](docs/ui-native-genome/selfhost-minimal-slice.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
+This remains `CANDIDATE`, not promoted repository-wide `native-semantic`: governed events can only emit `CandidateReality` through an external Gateway; navigation, resources and device adaptation remain absent/fail-closed; and Android device execution is not verified. See [`docs/ui-native-genome/current-state-audit.md`](docs/ui-native-genome/current-state-audit.md), [`docs/ui-native-genome/selfhost-minimal-slice.md`](docs/ui-native-genome/selfhost-minimal-slice.md) and [`docs/ui-native-genome/evidence-ledger.md`](docs/ui-native-genome/evidence-ledger.md).
 
 ### K01 — self-hosting compiler
 
@@ -103,8 +103,8 @@ RCL has a general compiler written in RCL, a checked-in fixed-point compiler art
 
 ```text
 C0 == C1 == C2
-Current candidate RBC bytes: 236,640
-Current candidate SHA-256: bc93e44b55b5803b1c3e6d65b1d41a832ab22caddde057a7eac74abbeb83b73d
+Current candidate RBC bytes: 238,435
+Current candidate SHA-256: 32e3e380608428eeb097f9629bd73649a5ed4ad7562b60ccea8623bdec5a9643
 ```
 
 Representative source fixtures match the bootstrap oracle byte-for-byte; malformed/unsupported negative controls are rejected. K01 remains blocked only because the AI-era gate requires independent, reproducible compiler-evolution/repair evidence.

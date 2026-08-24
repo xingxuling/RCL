@@ -20,6 +20,7 @@ import {
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const RCL_PATH = path.join(ROOT, 'examples/native-ui/counter.rcl');
 const SOURCE = fs.readFileSync(RCL_PATH, 'utf8');
+const FIXED_SOURCE = fs.readFileSync(path.join(ROOT, 'examples/selfhost-core/native-ui-fixed.rcl'), 'utf8');
 const EVENTS = [
   { nodeId: 'IncrementButton', type: 'activate' },
   { nodeId: 'IncrementButton', type: 'activate' },
@@ -59,6 +60,19 @@ test('Android lowering emits native Views/lifecycle from canonical UI and reject
   assert.match(java, /onSaveInstanceState/u);
   assert.match(java, /onStart\(\)/u);
   assert.throws(() => compileRclAndroidApplication(SOURCE, { schema: 'rcl.native-ui.android-target.v0.1', applicationId: 'com.taowind.rcl.nativeui', screen: {} }), /MORPHOLOGY_FORBIDDEN/u);
+});
+
+test('fixed-size layout lowers from one canonical root to Web CSS and Android LayoutParams', () => {
+  const web = compileRclWebApplication(FIXED_SOURCE, { schema: 'rcl.native-ui.web-target.v0.1' });
+  const android = compileRclAndroidApplication(FIXED_SOURCE, {
+    schema: 'rcl.native-ui.android-target.v0.1',
+    applicationId: 'com.taowind.rcl.fixedui',
+  });
+  assert.equal(web.uiProgramRoot, android.uiProgramRoot);
+  const html = emitStandaloneRclWebHtml(web);
+  const java = emitNativeAndroidActivity(android);
+  assert.match(html, /\[data-rcl-node="Panel"\]\{[^}]*width:320px;[^}]*height:180px/u);
+  assert.match(java, /LinearLayout\.LayoutParams params_Root_Panel = new LinearLayout\.LayoutParams\(320, 180\)/u);
 });
 
 test('both native UI backends generate inspectable standalone project artifacts', () => {
