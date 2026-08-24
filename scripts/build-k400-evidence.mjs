@@ -15,6 +15,7 @@ const k02Path = 'examples/universal-stress/k02-direct-evidence-2026-08-08.json';
 const k03Path = 'examples/universal-stress/k03-direct-evidence-2026-08-08.json';
 const browserPerformanceContractPath = 'examples/native-ui/browser-performance-contract.v0.1.json';
 const browserRuntimePath = 'examples/native-ui/evidence/browser-runtime-result.json';
+const k08Path = 'examples/native-ai/evidence/k08-a-evidence.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -32,6 +33,7 @@ function directGates(receipt, receiptPath, notes = {}) {
 const nativeUi = readJson(nativeUiPath);
 const k02 = readJson(k02Path);
 const k03 = readJson(k03Path);
+const k08 = readJson(k08Path);
 
 const directClaims = [
   {
@@ -73,6 +75,33 @@ const directClaims = [
       justification: 'Platform-neutral application and UI semantics lower through explicit target backends while preserving authority boundaries.',
     }],
   },
+  {
+    id: 'ai-runtime::machine-learning',
+    campaignId: 'K233',
+    coverageMode: COVERAGE_MODE.NATIVE_SEMANTIC,
+    lastVerifiedDate: k08.verificationDate,
+    knownLimits: [
+      k08.evidenceBoundary,
+      'The result proves a frozen 2-2-1 XOR MLP only; general MLP, Tensor, Autodiff, optimizer genomes and accelerated backends remain future gates.',
+      'Peak native memory is not yet emitted by rclvm and remains an explicit performance-telemetry gap.',
+      'AI_GENERATE remains independently unverified and blocks whole-cell PASS.',
+    ],
+    relatedKillerTasks: ['K08'],
+    requiredGenes: ['native-numeric-reckon', 'immutable-sequence-algebra', 'recursive-training-loop', 'evidence-native-model-lifecycle'],
+    donorAdvantages: [{
+      donor: 'JavaScript reference oracle',
+      capability: 'faster training execution and richer host telemetry',
+      status: 'UNABSORBED_ADVANTAGE',
+    }],
+    gates: k08.gates,
+    changes: [{
+      id: 'pure-rcl-minimal-mlp-learning-proof',
+      kind: 'candidate-organ-evidence',
+      scope: ['ai-runtime'],
+      generalPrimitive: false,
+      justification: 'A frozen XOR dataset, forward pass, loss, manual backpropagation, Batch SGD, training loop and inference execute from RCL source through native rclc/RBC/rclvm without a trainer provider or new ML-special-case primitive.',
+    }],
+  },
 ];
 
 const claimsById = new Map(nativeUi.claims.map((claim) => [claim.id, claim]));
@@ -86,11 +115,12 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
     'Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.',
+    'K08-A closes every ai-runtime::machine-learning gate except independently verified AI_GENERATE; it proves only minimal native XOR learning, not a general ML stack.',
     ...(nativeUi.notes ?? []),
   ],
 };

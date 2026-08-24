@@ -396,7 +396,7 @@ Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
 A missing required gate blocks the cell. A failed required gate fails the cell. No weighted score can hide a missing hard requirement.
 
-Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. Current audited coverage is `0 PASS / 7 BLOCKED / 393 UNTESTED`, so K400 remains `INCOMPLETE`.
+Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. Current audited coverage is `0 PASS / 8 BLOCKED / 392 UNTESTED`, so K400 remains `INCOMPLETE`. K08-A now proves a frozen Pure RCL XOR MLP through native `rclc -> RBC -> rclvm`; `K233` remains blocked on independently verified `AI_GENERATE` and does not imply a general ML stack.
 
 ### Current killer-task frontier
 
@@ -407,7 +407,7 @@ Every permanent cell also has a stable campaign identity from `K001` through `K4
 | **K03** | Native Android application | lowered execution | `BLOCKED` |
 | **K04** | 2D game | next campaign | not yet claimed |
 
-See [`docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md`](docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md) and the current [`K400 completion campaign`](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
+See [`docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md`](docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md), the current [`K400 completion campaign`](docs/K400_COMPLETION_CAMPAIGN_v0.1.md), and the [`K08 RCL-Native AI campaign`](docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md).
 
 ---
 

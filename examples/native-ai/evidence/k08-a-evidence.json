@@ -1,0 +1,310 @@
+{
+  "format": "rcl.k08-a-pure-rcl-xor-evidence.v0.1",
+  "generatedAt": "2026-08-24T17:54:27.718Z",
+  "verificationDate": "2026-08-25",
+  "verdict": "RCL_NATIVE_LEARNING_PROVEN_AT_MINIMAL_MLP_SCALE_LOCAL_NATIVE_AI_GENERATE_UNVERIFIED",
+  "nativeLearningMilestone": "PASS",
+  "k400Cell": {
+    "id": "ai-runtime::machine-learning",
+    "campaignId": "K233",
+    "killerTask": "K08",
+    "status": "BLOCKED_AI_GENERATE"
+  },
+  "evidenceBoundary": "minimal_mlp_native_learning_only_not_general_mlp_tensor_autodiff_or_ai_generation",
+  "pureExecutionPath": {
+    "stages": [
+      "RCL source",
+      "native rclc",
+      "selfhost/compiler.rbc",
+      "RBC",
+      "native rclvm",
+      "native state"
+    ],
+    "javascriptTrainerParticipated": false,
+    "referenceOracleParticipatedInNativeParameters": false,
+    "dependencyAudit": {
+      "ok": true,
+      "forbiddenMatches": [],
+      "missingSemantics": [],
+      "providerOpcodeCount": 0,
+      "requiredSemantics": [
+        "xor_dataset",
+        "initial_parameters",
+        "activate",
+        "predict",
+        "sample_loss",
+        "sample_gradient",
+        "output_delta",
+        "hidden_one_delta",
+        "hidden_two_delta",
+        "update_parameters",
+        "train",
+        "dataset_accuracy",
+        "loss_trace"
+      ]
+    }
+  },
+  "contractRoot": "9c460707c12ced48c9f026f0022c6f71012299a82ba33dc84f8f38db58e71f3a",
+  "compiler": {
+    "path": "native/rclc.exe",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "runtimeMs": 201.2685,
+    "executedInstructions": 3122333,
+    "targetBytes": 11640,
+    "targetInstructions": 671,
+    "bytecodeParityWithJsReferenceCompiler": true
+  },
+  "evaluation": {
+    "outputs": [
+      0.182865866168747,
+      0.825711465001895,
+      0.825716853507831,
+      0.177303574139108
+    ],
+    "predicted": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "expected": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "accuracy": 1,
+    "loss": 0.0157034488743931,
+    "xorCorrect": true,
+    "thresholdsPass": true,
+    "maximumAbsolutePredictionError": 0.182865866168747,
+    "maximumParameterDrift": 4.440892098500626e-15,
+    "maximumPredictionDrift": 3.3306690738754696e-16,
+    "maximumTraceDrift": 3.7470027081099033e-16
+  },
+  "robustness": {
+    "replayCount": 3,
+    "semanticStateRoots": [
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2"
+    ],
+    "identicalSemanticStateRoots": true,
+    "exactReplayStates": true
+  },
+  "performance": {
+    "classification": "MEASURED_LOCAL_NATIVE_NOT_COMPETITIVE_PARITY",
+    "runtimesMs": [
+      222.3059,
+      188.70479999999998,
+      186.31939999999997
+    ],
+    "medianRuntimeMs": 188.70479999999998,
+    "referenceOracleRuntimeMs": 2.0575000000000045,
+    "nativeToOracleRuntimeRatio": 91.71557715674341,
+    "executedInstructions": 13965818,
+    "peakStackDepth": 52,
+    "peakCallFrames": 10,
+    "memoryComparison": "UNMEASURED_NATIVE_VM_DOES_NOT_YET_EMIT_PEAK_RSS",
+    "unabsorbedAdvantage": "JavaScript reference execution remains faster; the first K08-A gate proves native semantics, not competitive performance."
+  },
+  "oracle": {
+    "role": "REFERENCE_ORACLE_ONLY_NOT_PURE_EXECUTION",
+    "implementation": "javascript_same_frozen_math",
+    "finalParameters": [
+      2.8284842688193716,
+      2.8282583154436742,
+      3.9583230005202,
+      3.9575613554890245,
+      -4.366125296977719,
+      -1.5315148505864278,
+      -7.195407511916374,
+      6.62587666061014,
+      -2.3724755598633838
+    ],
+    "lossTrace": [
+      0,
+      0.14195815333363393,
+      64,
+      0.11455320145772738,
+      128,
+      0.05463695963159372,
+      192,
+      0.03572164689678868,
+      256,
+      0.027339070022575063,
+      320,
+      0.022600930363274013,
+      384,
+      0.01952242302517073,
+      448,
+      0.017341427423282714,
+      512,
+      0.015703448874393084
+    ],
+    "predictions": [
+      {
+        "input": [
+          0,
+          0
+        ],
+        "target": 0,
+        "output": 0.18286586616874706,
+        "predicted": 0
+      },
+      {
+        "input": [
+          0,
+          1
+        ],
+        "target": 1,
+        "output": 0.8257114650018953,
+        "predicted": 1
+      },
+      {
+        "input": [
+          1,
+          0
+        ],
+        "target": 1,
+        "output": 0.8257168535078312,
+        "predicted": 1
+      },
+      {
+        "input": [
+          1,
+          1
+        ],
+        "target": 0,
+        "output": 0.17730357413910813,
+        "predicted": 0
+      }
+    ],
+    "loss": 0.015703448874393084,
+    "accuracy": 1,
+    "root": "b273e078c4d1e434045f0caffd95bce8cdab50ffa7d84cad4de9a52cc903204b"
+  },
+  "checks": {
+    "express": true,
+    "compile": true,
+    "lower": true,
+    "execute": true,
+    "correct": true,
+    "robust": true,
+    "performance": true,
+    "differential": true
+  },
+  "artifactRoots": {
+    "datasetRoot": "e967ddf0bba38e076a221b7652b3b712c6111c6b1ce3601628fe24704d70f119",
+    "modelDefinitionRoot": "f4ac3ddad00ac76fb0631e3ff6ab5532b4f7b2543f5ec844c6dd604e2172bb4f",
+    "initialParameterRoot": "9e98e1f69dd3762f333688e752c18454551516a3d9a19c5579b786c8377d11d7",
+    "trainingConfigurationRoot": "84b8bf8fddd2f6d31f54f0d82db34905184370835f8019119b34eb25fd0e480a",
+    "trainingTraceRoot": "40c16adbbbc3985ea898841d4d05602a5b5a47a5dddba29d086899397465815a",
+    "finalParameterRoot": "ad42d7d82c19d1c4b34c0deda3109f8ae431eb49a303716926f37725a6aba753",
+    "checkpointRoot": "0b9aca32ef48d0246559ef6c8a56c04b8559d7a318e5ee9a8b3b69f012a57231",
+    "evaluationRoot": "bb2d427ef3479c866d7b1ba7d517bd2f0fa0efe158c20e1a17aad3581144fe58",
+    "sourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "targetRbcSha256": "d23b04b391932910f5dfa89ee03f17177c3df22e5281eed92ff6926e7db1a496"
+  },
+  "gates": {
+    "EXPRESS": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "COMPILE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "LOWER": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "EXECUTE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "CORRECT": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "ROBUST": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "PERFORMANCE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "EVIDENCE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/pure-rcl-xor.rcl",
+        "examples/native-ai/pure-rcl-xor-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-a-evidence.json",
+        "tests/k08-pure-rcl-xor.test.mjs"
+      ]
+    },
+    "AI_GENERATE": {
+      "status": "UNVERIFIED",
+      "evidence": [],
+      "note": "K08-A native learning does not self-certify an independent AI generation receipt."
+    }
+  },
+  "trainingTrace": [
+    0,
+    0.141958153333634,
+    64,
+    0.114553201457727,
+    128,
+    0.0546369596315937,
+    192,
+    0.0357216468967887,
+    256,
+    0.0273390700225751,
+    320,
+    0.022600930363274,
+    384,
+    0.0195224230251707,
+    448,
+    0.0173414274232827,
+    512,
+    0.0157034488743931
+  ],
+  "reportRoot": "d7f33073c484cae7dec818e6628bc49444956254ce1d13f2246164a3d7e4526c"
+}

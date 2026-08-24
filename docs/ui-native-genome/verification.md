@@ -39,4 +39,4 @@ The evidence generator compiles `examples/native-ui/counter.rcl`, asserts one sh
 
 Full repository regression results are also recorded in `evidence-ledger.md`; a missing or historically failing test is reported as blocked/fail rather than silently omitted.
 
-The consolidated K400 report records 7 `BLOCKED`, 393 `UNTESTED`, 0 `PASS` and maturity `U0`. Browser performance now passes for the declared local workload, but independent `AI_GENERATE` still blocks all browser claims; Android device gates remain separate and non-compensatory.
+The consolidated K400 report records 8 `BLOCKED`, 392 `UNTESTED`, 0 `PASS` and maturity `U0` after adding the separate K08-A native XOR receipt. Browser performance now passes for the declared local workload, but independent `AI_GENERATE` still blocks all browser claims; Android device gates remain separate and non-compensatory.

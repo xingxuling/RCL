@@ -1,0 +1,186 @@
+# K08-A: the complete trainer below is RCL source. No provider call participates.
+reality PureRclXorNativeLearning {
+  reckon row(x1 : Number, x2 : Number, target : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), x1), x2), target)
+
+  reckon xor_dataset() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), row(0, 0, 0)),
+          row(0, 1, 1)),
+        row(1, 0, 1)),
+      row(1, 1, 0))
+
+  reckon initial_parameters() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(empty_sequence(), 0.161766003072),
+                    -0.082735105604),
+                  0.563945269585),
+                0.271574466303),
+              -0.520297762007),
+            0.042548067495),
+          -0.362835209072),
+        0.199591446295),
+      0.584759437293)
+
+  reckon absolute(value : Number) -> Number =
+    choose(value >= 0, value, -value)
+
+  reckon activate(value : Number) -> Number =
+    0.5 + 0.5 * value / (1 + absolute(value))
+
+  reckon activate_derivative(value : Number) -> Number =
+    0.5 / ((1 + absolute(value)) * (1 + absolute(value)))
+
+  reckon hidden_one_pre(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    sequence_get(parameters, 0) * x1 + sequence_get(parameters, 1) * x2 + sequence_get(parameters, 4)
+
+  reckon hidden_two_pre(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    sequence_get(parameters, 2) * x1 + sequence_get(parameters, 3) * x2 + sequence_get(parameters, 5)
+
+  reckon hidden_one(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    activate(hidden_one_pre(parameters, x1, x2))
+
+  reckon hidden_two(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    activate(hidden_two_pre(parameters, x1, x2))
+
+  reckon output_pre(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    sequence_get(parameters, 6) * hidden_one(parameters, x1, x2) + sequence_get(parameters, 7) * hidden_two(parameters, x1, x2) + sequence_get(parameters, 8)
+
+  reckon predict(parameters : Sequence, x1 : Number, x2 : Number) -> Number =
+    activate(output_pre(parameters, x1, x2))
+
+  reckon output_delta(parameters : Sequence, sample : Sequence) -> Number =
+    (predict(parameters, sequence_get(sample, 0), sequence_get(sample, 1)) - sequence_get(sample, 2))
+      * activate_derivative(output_pre(parameters, sequence_get(sample, 0), sequence_get(sample, 1)))
+
+  reckon hidden_one_delta(parameters : Sequence, sample : Sequence) -> Number =
+    output_delta(parameters, sample) * sequence_get(parameters, 6)
+      * activate_derivative(hidden_one_pre(parameters, sequence_get(sample, 0), sequence_get(sample, 1)))
+
+  reckon hidden_two_delta(parameters : Sequence, sample : Sequence) -> Number =
+    output_delta(parameters, sample) * sequence_get(parameters, 7)
+      * activate_derivative(hidden_two_pre(parameters, sequence_get(sample, 0), sequence_get(sample, 1)))
+
+  reckon sample_gradient(parameters : Sequence, sample : Sequence, parameter_index : Number) -> Number =
+    choose(parameter_index == 0, hidden_one_delta(parameters, sample) * sequence_get(sample, 0),
+      choose(parameter_index == 1, hidden_one_delta(parameters, sample) * sequence_get(sample, 1),
+        choose(parameter_index == 2, hidden_two_delta(parameters, sample) * sequence_get(sample, 0),
+          choose(parameter_index == 3, hidden_two_delta(parameters, sample) * sequence_get(sample, 1),
+            choose(parameter_index == 4, hidden_one_delta(parameters, sample),
+              choose(parameter_index == 5, hidden_two_delta(parameters, sample),
+                choose(parameter_index == 6, output_delta(parameters, sample) * hidden_one(parameters, sequence_get(sample, 0), sequence_get(sample, 1)),
+                  choose(parameter_index == 7, output_delta(parameters, sample) * hidden_two(parameters, sequence_get(sample, 0), sequence_get(sample, 1)),
+                    output_delta(parameters, sample)))))))))
+
+  reckon dataset_gradient(parameters : Sequence, dataset : Sequence, parameter_index : Number, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= length(dataset),
+      accumulated / length(dataset),
+      dataset_gradient(
+        parameters,
+        dataset,
+        parameter_index,
+        row_index + 1,
+        accumulated + sample_gradient(parameters, sequence_get(dataset, row_index), parameter_index)))
+
+  reckon update_parameters(parameters : Sequence, dataset : Sequence, parameter_index : Number, output : Sequence, learning_rate : Number) -> Sequence =
+    choose(parameter_index >= length(parameters),
+      output,
+      update_parameters(
+        parameters,
+        dataset,
+        parameter_index + 1,
+        sequence_append(
+          output,
+          sequence_get(parameters, parameter_index) - learning_rate * dataset_gradient(parameters, dataset, parameter_index, 0, 0)),
+        learning_rate))
+
+  reckon train(parameters : Sequence, dataset : Sequence, epoch : Number, epochs : Number, learning_rate : Number) -> Sequence =
+    choose(epoch >= epochs,
+      parameters,
+      train(update_parameters(parameters, dataset, 0, empty_sequence(), learning_rate), dataset, epoch + 1, epochs, learning_rate))
+
+  reckon sample_loss(parameters : Sequence, sample : Sequence) -> Number =
+    0.5
+      * (predict(parameters, sequence_get(sample, 0), sequence_get(sample, 1)) - sequence_get(sample, 2))
+      * (predict(parameters, sequence_get(sample, 0), sequence_get(sample, 1)) - sequence_get(sample, 2))
+
+  reckon dataset_loss_sum(parameters : Sequence, dataset : Sequence, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= length(dataset),
+      accumulated,
+      dataset_loss_sum(parameters, dataset, row_index + 1, accumulated + sample_loss(parameters, sequence_get(dataset, row_index))))
+
+  reckon dataset_loss(parameters : Sequence, dataset : Sequence) -> Number =
+    dataset_loss_sum(parameters, dataset, 0, 0) / length(dataset)
+
+  reckon classification(output : Number) -> Number =
+    choose(output >= 0.5, 1, 0)
+
+  reckon correct_count(parameters : Sequence, dataset : Sequence, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= length(dataset),
+      accumulated,
+      correct_count(
+        parameters,
+        dataset,
+        row_index + 1,
+        accumulated + choose(
+          classification(predict(parameters, sequence_get(sequence_get(dataset, row_index), 0), sequence_get(sequence_get(dataset, row_index), 1))) == sequence_get(sequence_get(dataset, row_index), 2),
+          1,
+          0)))
+
+  reckon dataset_accuracy(parameters : Sequence, dataset : Sequence) -> Number =
+    correct_count(parameters, dataset, 0, 0) / length(dataset)
+
+  reckon append_trace(parameters : Sequence, dataset : Sequence, epoch : Number, stride : Number, trace : Sequence) -> Sequence =
+    choose(epoch % stride == 0,
+      sequence_append(sequence_append(trace, epoch), dataset_loss(parameters, dataset)),
+      trace)
+
+  reckon loss_trace(parameters : Sequence, dataset : Sequence, epoch : Number, epochs : Number, stride : Number, trace : Sequence, learning_rate : Number) -> Sequence =
+    choose(epoch >= epochs,
+      sequence_append(sequence_append(trace, epoch), dataset_loss(parameters, dataset)),
+      loss_trace(
+        update_parameters(parameters, dataset, 0, empty_sequence(), learning_rate),
+        dataset,
+        epoch + 1,
+        epochs,
+        stride,
+        append_trace(parameters, dataset, epoch, stride, trace),
+        learning_rate))
+
+  facet contract.id : Text = "k08-a-pure-rcl-xor-v0.1"
+  facet contract.seed : Number = 42
+  facet contract.epochs : Number = 512
+  facet contract.learning_rate : Number = 4
+  facet contract.loss_threshold : Number = 0.03
+  facet contract.accuracy_threshold : Number = 1
+  facet training.dataset : Sequence = xor_dataset()
+  facet training.initial_parameters : Sequence = initial_parameters()
+  facet training.final_parameters : Sequence = train(training.initial_parameters, training.dataset, 0, contract.epochs, contract.learning_rate)
+  facet training.loss_trace : Sequence = loss_trace(training.initial_parameters, training.dataset, 0, contract.epochs, 64, empty_sequence(), contract.learning_rate)
+  facet inference.output_00 : Number = predict(training.final_parameters, 0, 0)
+  facet inference.output_01 : Number = predict(training.final_parameters, 0, 1)
+  facet inference.output_10 : Number = predict(training.final_parameters, 1, 0)
+  facet inference.output_11 : Number = predict(training.final_parameters, 1, 1)
+  facet evaluation.loss : Number = dataset_loss(training.final_parameters, training.dataset)
+  facet evaluation.accuracy : Number = dataset_accuracy(training.final_parameters, training.dataset)
+  facet evaluation.xor_correct : Truth =
+    classification(inference.output_00) == 0 and
+    classification(inference.output_01) == 1 and
+    classification(inference.output_10) == 1 and
+    classification(inference.output_11) == 0
+  facet evaluation.thresholds_pass : Truth =
+    evaluation.xor_correct and
+    evaluation.accuracy >= contract.accuracy_threshold and
+    evaluation.loss <= contract.loss_threshold
+  facet evidence.execution_path : Text = "RCL_SOURCE_TO_RBC_TO_NATIVE_VM_NO_EXTERNAL_TRAINER"
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}

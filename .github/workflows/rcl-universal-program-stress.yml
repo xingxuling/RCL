@@ -17,13 +17,16 @@ on:
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
+      - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
       - 'native/**'
       - 'examples/native-ui/**'
+      - 'examples/native-ai/**'
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
+      - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
   pull_request:
@@ -38,13 +41,16 @@ on:
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
+      - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
       - 'native/**'
       - 'examples/native-ui/**'
+      - 'examples/native-ai/**'
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
+      - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
 
@@ -60,8 +66,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Build native compiler and VM
+        run: npm run build:native
       - name: Universal stress unit tests
         run: node --test tests/universal*stress*.test.mjs
+      - name: K08 Pure RCL XOR native learning campaign
+        run: npm run evidence:k08-native-ai
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
@@ -73,6 +83,7 @@ jobs:
           path: |
             output/universal-stress-v0.1
             output/universal-stress-k400
+            output/k08-pure-rcl-xor-v0.1
           if-no-files-found: error
 
   k01-windows-verification:

@@ -263,9 +263,9 @@ It does **not** claim that any of the twelve killer tasks already pass.
 
 ```text
 PASS       0
-BLOCKED    7
-UNTESTED 393
+BLOCKED    8
+UNTESTED 392
 VERDICT    INCOMPLETE
 ```
 
-The nearest evidence closures are `K064 browser::web` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. This development process cannot self-certify that independent gate. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` for the closure order and evidence boundary.
+The nearest evidence closures are `K064 browser::web`, `K233 ai-runtime::machine-learning` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. K233 now proves a minimal Pure RCL XOR MLP through native compilation and execution, but it does not imply general ML. This development process cannot self-certify the independent generation gate. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
