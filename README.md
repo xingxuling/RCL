@@ -89,6 +89,150 @@ This says more than “increment a number”. It declares a subject, authority, 
 
 ---
 
+## Learn RCL by example
+
+If you are a programmer opening this repository for the first time, **do not read the repository top-down**. Start with these examples in order:
+
+| Example | What it shows | Source |
+|---|---|---|
+| Governed state transition | state, authority, guards, mutation, invariants, evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
+| Native UI counter | state, derived values, bindings, layout, styles, events | [`examples/native-ui/counter.rcl`](examples/native-ui/counter.rcl) |
+| In-app navigation | routes and atomic UI-local navigation | [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl) |
+| Device adaptation | width profiles and cross-platform adaptive layout intent | [`examples/native-ui/device-adaptation.rcl`](examples/native-ui/device-adaptation.rcl) |
+| Android vertical slice | governed application state lowered toward Android | [`examples/universal-stress/k03-native-android-app.rcl`](examples/universal-stress/k03-native-android-app.rcl) |
+
+### Example 1 — a real state transition
+
+The Web stress example is intentionally small, but it already shows the core RCL model:
+
+```rcl
+reality K02CompleteWebApp {
+  facet app.todo_count : Number = 0
+  facet app.todo_input : Text = ""
+  facet app.last_action : Text = "boot"
+
+  subject user {
+    warrant app.write on app
+  }
+
+  emergence addTodo {
+    cause user
+    when app.todo_input != ""
+    needs app.write on app
+    alter app.todo_count <- app.todo_count + 1
+    alter app.last_action <- app.todo_input
+    alter app.todo_input <- ""
+    preserve app.todo_count >= 0
+    witness "rcl:k02:add-todo"
+  }
+}
+```
+
+Read it as:
+
+```text
+state
++ actor
++ authority
++ precondition
++ proposed mutations
++ invariant
++ evidence
+```
+
+That structure is the recurring pattern behind larger RCL programs.
+
+### Example 2 — Native UI is part of the semantic model
+
+The Native UI counter keeps state and UI behavior inside RCL rather than treating the frontend as an unrelated shell:
+
+```rcl
+reality NativeUICounter {
+  ui CounterApp {
+    state count : Number = 0
+    derived count_label : Text = "计数：" + count
+
+    view Root {
+      layout vertical {
+        width fill
+        height intrinsic
+        gap 12
+        padding 24
+        align stretch
+        distribute start
+      }
+
+      text CounterText {
+        bind value <- count_label
+      }
+
+      action IncrementButton {
+        label "增加"
+        on activate {
+          set count <- count + 1
+        }
+      }
+    }
+  }
+}
+```
+
+The full example also contains lifecycle, themes, styles, accessibility labels and reset behavior. The same rooted UI semantics can lower into Web and Android candidate backends.
+
+### Example 3 — navigation is declared, not hidden in host code
+
+```rcl
+navigation {
+  initial home
+  route home -> HomeScreen
+  route settings -> SettingsScreen
+}
+
+on activate {
+  set visits <- visits + 1
+  navigate settings
+}
+```
+
+See the complete file: [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl).
+
+### Example 4 — one UI intent, different device layouts
+
+```rcl
+adaptation {
+  default compact
+  profile compact min_width 0 max_width 599
+  profile expanded min_width 600
+}
+
+view Root {
+  layout vertical {
+    width fill
+    height intrinsic
+  }
+
+  adapt expanded layout horizontal
+}
+```
+
+The current candidate maps this same semantic intent to Web width-profile behavior and Android `screenWidthDp`-based layout selection.
+
+### Suggested reading path
+
+```text
+minimal Counter
+→ K02 governed Web state
+→ Native UI Counter
+→ Navigation
+→ Device Adaptation
+→ K03 Android vertical slice
+→ selfhost/compiler-core.rcl
+```
+
+Browse all runnable and evidence-bearing examples under [`examples/`](examples/).
+
+---
+
 ## What is verified today?
 
 The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
