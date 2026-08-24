@@ -1,6 +1,6 @@
 <div align="center">
 
-# RCL — Reality Compiler Language
+# RCL v0.94.0-alpha.1 — Reality Compiler Language
 
 **A self-hosting programming language and compiler for governed state transitions, evidence-bound execution, and cross-platform software lowering.**
 
@@ -12,6 +12,8 @@
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
+
+Canonical source: `xingxuling/RCL@main`
 
 > RCL is an evidence-bearing, permission-constrained programming language, compiler, native VM, provider runtime, and verification toolchain.
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# RCL — Reality Compiler Language
+# RCL v0.94.0-alpha.1 — Reality Compiler Language
 
 **一门用于表达、验证并向真实软件环境 Lower 受治理状态变化的自举编程语言与现实编译器。**
 
@@ -12,6 +12,8 @@
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
+
+Canonical source：`xingxuling/RCL@main`
 
 > RCL 是一套带证据、受权限约束的编程语言、编译器、Native VM、Provider Runtime 与验证工具链。
 
