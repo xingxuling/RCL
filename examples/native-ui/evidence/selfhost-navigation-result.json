@@ -1,0 +1,306 @@
+{
+  "format": "rcl.native-ui.selfhost-navigation-evidence.v0.1",
+  "date": "2026-08-24",
+  "status": "CANDIDATE_CANONICAL_NAVIGATION_SELFHOST_SLICE_VERIFIED",
+  "compiler": {
+    "sourceSha256": "df0243d7e77fdef3043cdc89a01a12b3e3477dd1c294dde9560df71f98a72e5e",
+    "sourceBytes": 193607,
+    "artifactSha256": "836fd9dd246915411a7ccc4f0b09be59591c1a63de90d6a01b1425098aef079b",
+    "artifactBytes": 249866,
+    "instructionBudgetPerRun": 300000000,
+    "minimumInstructionHeadroom": 180000000,
+    "c0ToC1ExecutedInstructions": 82329281,
+    "c1ToC2ExecutedInstructions": 82329281,
+    "c0ToC1InstructionHeadroom": 217670719,
+    "c1ToC2InstructionHeadroom": 217670719,
+    "declaredFixedPointBudgetMs": 240000,
+    "fixedPointElapsedMs": 223935.1262,
+    "withinFixedPointBudget": true,
+    "c0ToC1": {
+      "elapsedMs": 113071.7066,
+      "outputSha256": "836fd9dd246915411a7ccc4f0b09be59591c1a63de90d6a01b1425098aef079b",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    },
+    "c1ToC2": {
+      "elapsedMs": 110863.4196,
+      "outputSha256": "836fd9dd246915411a7ccc4f0b09be59591c1a63de90d6a01b1425098aef079b",
+      "byteIdentical": true,
+      "peakStackDepth": 880,
+      "peakCallFrames": 217
+    }
+  },
+  "navigationFixture": {
+    "source": "examples/native-ui/navigation.rcl",
+    "sourceSha256": "8b63fd4c994d55a3ea28581cf52e03d117bca175efb1c289c3ecd66ce799598d",
+    "uiProgramRoot": "638638519e6b56f5268777cc548c01c1927e69d21300d2cee6aa196e1f7d129d",
+    "realityProgramRoot": "e03e50e60f98eeac855cb26952fd82684b466dc55124108c36edcb5ab918801d",
+    "rbcSha256": "a4d14bb1961ccffce99fb3be0ec7c93e47b8000cbbd088c75bb6c1761e4022a9",
+    "rbcBytes": 136,
+    "decodedSourceRoot": "e03e50e60f98eeac855cb26952fd82684b466dc55124108c36edcb5ab918801d",
+    "jsSelfhostByteIdentical": true,
+    "nativeElapsedMs": 38.15249999999651,
+    "navigation": {
+      "format": "rcl.native-ui.navigation.v0.1",
+      "initialRoute": "home",
+      "routes": [
+        {
+          "id": "home",
+          "target": "HomeScreen"
+        },
+        {
+          "id": "settings",
+          "target": "SettingsScreen"
+        }
+      ]
+    }
+  },
+  "runtimeEvidence": {
+    "stateAndNavigationCommitAtomically": true,
+    "initialNavigation": {
+      "currentRoute": "home",
+      "target": "HomeScreen"
+    },
+    "afterForward": {
+      "currentRoute": "settings",
+      "target": "SettingsScreen"
+    },
+    "finalNavigation": {
+      "currentRoute": "home",
+      "target": "HomeScreen"
+    },
+    "finalState": {
+      "visits": 1
+    },
+    "trace": [
+      {
+        "sequence": 1,
+        "event": {
+          "nodeId": "OpenSettings",
+          "type": "activate",
+          "payload": {},
+          "authority": "ui-local"
+        },
+        "beforeState": {
+          "visits": 0
+        },
+        "afterState": {
+          "visits": 1
+        },
+        "renderedSemanticState": {
+          "Root": {},
+          "HomeScreen": {},
+          "OpenSettings": {},
+          "SettingsScreen": {},
+          "BackHome": {}
+        },
+        "beforeRoute": "home",
+        "afterRoute": "settings"
+      },
+      {
+        "sequence": 2,
+        "event": {
+          "nodeId": "BackHome",
+          "type": "activate",
+          "payload": {},
+          "authority": "ui-local"
+        },
+        "beforeState": {
+          "visits": 1
+        },
+        "afterState": {
+          "visits": 1
+        },
+        "renderedSemanticState": {
+          "Root": {},
+          "HomeScreen": {},
+          "OpenSettings": {},
+          "SettingsScreen": {},
+          "BackHome": {}
+        },
+        "beforeRoute": "settings",
+        "afterRoute": "home"
+      }
+    ],
+    "directRealityCommitOwnedByUi": false
+  },
+  "mutationEvidence": [
+    {
+      "id": "initial-route",
+      "uiProgramRoot": "2cf0ca2a2a3939e7af4080deb2e64c3d94b4cfa4dc3f383fdb99df0aefe6090e",
+      "realityProgramRoot": "2b30a851880cf90becf63d56ca93eba82c8cebc429cbdfa08347845973ffab36",
+      "rbcSha256": "b5110fb3326d0c0923e4f3d32bc86cb9f26dabd0b327644b6fca1c9b63ac4b13",
+      "jsSelfhostByteIdentical": true,
+      "changesUiProgramRoot": true
+    },
+    {
+      "id": "route-identity",
+      "uiProgramRoot": "a51f3916eb094887a2f987052cc643d5f7f8ee0d57ed2abcccba599d9dd90e3c",
+      "realityProgramRoot": "f558089152a920f057d9b41d0080a20a7b668092df43d1a47d9d9975a86b3af5",
+      "rbcSha256": "29d5e5479c0cbf2abc8437a8965ea655e73960a1722f364f86e0a1d8b7d66b9b",
+      "jsSelfhostByteIdentical": true,
+      "changesUiProgramRoot": true
+    },
+    {
+      "id": "route-target-swap",
+      "uiProgramRoot": "f7c0a0c122fe5c4eecefcc53a9a4552cb5a0e716c0ed398de0afe711fa992d52",
+      "realityProgramRoot": "e6858ed3de2b09af2e375e355ceb7d5838561842af9b6e2bdecc5c858382ffdf",
+      "rbcSha256": "6a5ebab071185d4e2dcfb664d7d865ad616e432ca98155b29af7887e6922081c",
+      "jsSelfhostByteIdentical": true,
+      "changesUiProgramRoot": true
+    }
+  ],
+  "invalidEvidence": [
+    {
+      "id": "missing-navigation",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_NAVIGATION_REQUIRED:OpenSettings:activate"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: OpenSettings:activate at 1:1"
+      }
+    },
+    {
+      "id": "duplicate-route",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_NAVIGATION_ROUTE_DUPLICATE:home"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: home at 1:1"
+      }
+    },
+    {
+      "id": "duplicate-target",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_NAVIGATION_TARGET_DUPLICATE:HomeScreen"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: HomeScreen at 1:1"
+      }
+    },
+    {
+      "id": "unknown-target",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_NAVIGATION_TARGET_UNKNOWN:settings:MissingScreen"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: settings:MissingScreen at 1:1"
+      }
+    },
+    {
+      "id": "unknown-route",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_NAVIGATION_ROUTE_UNKNOWN:OpenSettings:activate:missing"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: OpenSettings:activate:missing at 1:1"
+      }
+    },
+    {
+      "id": "multiple-navigation",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_EVENT_MULTIPLE_NAVIGATION:OpenSettings:activate"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: activate at 1:1"
+      }
+    },
+    {
+      "id": "mixed-reality-authority",
+      "jsRejects": true,
+      "selfhostRejects": true,
+      "jsFailure": {
+        "name": "RCLCompileError",
+        "message": "RCL_COMPILE_ERROR: RCL_UI_EVENT_MIXED_AUTHORITY:OpenSettings:activate"
+      },
+      "selfhostFailure": {
+        "code": "RCLC_COMPILER_FAILURE",
+        "message": "RCL_SEMANTIC_ASSERT: activate at 1:1"
+      }
+    }
+  ],
+  "dualBackendEvidence": {
+    "sharedUiProgramRoot": "638638519e6b56f5268777cc548c01c1927e69d21300d2cee6aa196e1f7d129d",
+    "webLoweringRoot": "2a080ab350703ba1726975e48ed65efff6e72d0dbf2043e6f0ae0d7f326b53cd",
+    "androidLoweringRoot": "febf00f673fa78ef36b1cdc74a8abb680e6c6ce001b5aa7029b91fe88ee21e73",
+    "semanticTracesMatch": true,
+    "webMapsRoutes": true,
+    "androidMapsRoutes": true,
+    "initialNavigation": {
+      "currentRoute": "home",
+      "target": "HomeScreen"
+    },
+    "finalNavigation": {
+      "currentRoute": "home",
+      "target": "HomeScreen"
+    }
+  },
+  "failClosedBoundary": {
+    "feature": "device adaptation declarations",
+    "id": "device-adaptation-extension",
+    "jsRejects": true,
+    "selfhostRejects": true,
+    "jsFailure": {
+      "name": "RCLCompileError",
+      "message": "RCL_COMPILE_ERROR: RCL_SYNTAX_ERROR: Unknown native UI declaration 'device'"
+    },
+    "selfhostFailure": {
+      "code": "RCLC_COMPILER_FAILURE",
+      "message": "RCL_SEMANTIC_ASSERT: device at 2:18"
+    }
+  },
+  "failedPrototypes": [
+    {
+      "id": "navigation-selfhost-uncompressed-helpers",
+      "result": "FAIL",
+      "evidence": "JS bootstrap OOM near 4GB heap"
+    },
+    {
+      "id": "navigation-selfhost-zero-new-reckons-with-linear-token-buffer",
+      "result": "FAIL",
+      "evidence": "JS bootstrap OOM near 4GB heap"
+    },
+    {
+      "id": "chunked-tokenizer-127",
+      "result": "PASS",
+      "evidence": "JS and native fixed point complete without raising Node heap"
+    }
+  ],
+  "gates": {
+    "fixedPoint": "PASS",
+    "jsDifferential": "PASS",
+    "nativeExecution": "PASS",
+    "navigationSchemaAndValidation": "PASS",
+    "atomicRuntimeNavigation": "PASS",
+    "authorityBoundary": "PASS",
+    "webLowering": "PASS",
+    "androidLowering": "PASS",
+    "aiGenerate": "UNVERIFIED"
+  },
+  "boundary": "This verifies canonical in-app navigation parsing, semantic identity, self-host differential parity, atomic UI-local route transitions, fail-closed authority separation, and structural Web/Android lowering from one UI root. It is not browser performance evidence, Android-device evidence, AI_GENERATE evidence, K400 promotion, or U5 evidence. Device adaptation and accessibility remain separate generations."
+}

@@ -13,8 +13,8 @@ declared state
 → derived evaluation
 → bound semantic properties
 → canonical event
-→ proposed local state
-→ atomic local replacement
+→ proposed local state + proposed route
+→ atomic UI-local replacement
 → new semantic projection + trace
 ```
 
@@ -26,9 +26,11 @@ State, derived expressions, bound properties, style values, event parameters and
 
 Content properties are role-scoped: text binds `value`, action binds `label`, and input binds `value`. `placeholder` is input-only and `accessibility_label` is available where declared by the role contract. Style properties use a separate allowlist. Unknown, duplicated or role-invalid properties fail closed.
 
-## Events
+## Events and navigation
 
-The canonical vocabulary includes `activate`, `input`, `change`, `submit`, `focus`, `blur`, `navigate`, lifecycle events and `custom`. v0.1 exercises `activate` and `change`; the remaining names are schema capacity rather than fully verified behavioral coverage.
+The canonical vocabulary includes `activate`, `input`, `change`, `submit`, `focus`, `blur`, lifecycle events and `custom`. v0.1 exercises `activate` and `change`; the remaining names are schema capacity rather than fully verified behavioral coverage.
+
+Navigation is a canonical `rcl.native-ui.navigation.v0.1` extension. A route has a stable route identity and targets one direct child of the root view, allowing non-route shell nodes to remain shared. One event may issue at most one `navigate route`; `set` and `navigate` may commit together because both are UI-local. `navigate` and `realize` may not coexist in one handler because Reality authority is external. Missing declarations, duplicate routes or targets, unknown initial/routes/targets and multiple transitions fail closed.
 
 ## Lifecycle
 
@@ -36,4 +38,4 @@ Canonical stages are `create`, `activate`, `suspend`, `resume` and `destroy`. Re
 
 ## Non-claims
 
-This candidate does not implement navigation, asynchronous effects, focus traversal, general accessibility trees, animation, image/media resources, list virtualization, a layout constraint solver or platform pixel equivalence.
+This candidate does not implement asynchronous effects, focus traversal, general accessibility trees, animation, image/media resources, list virtualization, a layout constraint solver, device adaptation or platform pixel equivalence. Navigation evidence is structural/semantic and does not claim real Android-device behavior.

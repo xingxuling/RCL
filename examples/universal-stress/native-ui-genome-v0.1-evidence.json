@@ -1,49 +1,51 @@
 {
   "schema": "rcl.universal-stress.evidence.v0.1",
-  "generation": "native-ui-genome-v0.1-candidate-6-selfhost-fixed",
+  "generation": "native-ui-genome-v0.1-candidate-7-selfhost-navigation",
   "claims": [
     {
       "id": "compiler-runtime::self-hosting",
       "coverageMode": "native-semantic",
-      "lastVerifiedSha": "035c0599e137e14442f175f8a7104505634ee9bc",
+      "lastVerifiedSha": "2915e37cc7dcbed52dfffb7d954404cde2fc93f1",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, governed reality-transaction declarations, and fixed width/height intent",
-        "navigation, resource and device-adaptation extensions remain absent and fail closed",
+        "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, governed reality-transaction declarations, fixed width/height intent, and canonical in-app navigation",
+        "resource and device-adaptation extensions remain absent and fail closed",
         "runtime reality execution remains external to the self-host compiler and UI; only CandidateReality may cross the Gateway",
         "AI_GENERATE remains independently unverified"
       ],
       "relatedKillerTasks": ["K01"],
       "requiredGenes": ["self-host-ui-parser", "semantic-genome-root", "fixed-point-differential"],
       "donorAdvantages": [
-        { "donor": "Web and Android platform frameworks", "capability": "navigation, resource, accessibility and device-adaptation semantics beyond the fixed Native UI v0.1 slice", "status": "PARTIAL_UNABSORBED" }
+        { "donor": "Web and Android platform frameworks", "capability": "resource, full accessibility and device-adaptation semantics beyond the canonical navigation slice", "status": "PARTIAL_UNABSORBED" }
       ],
       "gates": {
-        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-parameterized.rcl", "examples/selfhost-core/native-ui-governed.rcl", "examples/selfhost-core/native-ui-fixed.rcl", "examples/selfhost-core/native-ui-minimal.rcl"] },
-        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-fixed-result.json"] },
-        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-fixed-result.json"] },
-        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-fixed-result.json"] },
-        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "tests/native-ui-backends-equivalence.test.mjs", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-parameterized.rcl", "examples/selfhost-core/native-ui-governed.rcl", "examples/selfhost-core/native-ui-fixed.rcl", "examples/selfhost-core/native-ui-minimal.rcl", "examples/native-ui/navigation.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-navigation-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-navigation-result.json"] },
+        "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-navigation-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs", "tests/native-ui-backends-equivalence.test.mjs", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/general-selfhost-fixedpoint.test.mjs"] },
-        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-fixed-result.json"], "note": "each native generation executes 79,350,203 instructions with 220,649,797 headroom; the evidence generations completed in 153,367.8976 ms on this machine" },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-navigation-result.json"], "note": "each native generation executes 82,329,281 instructions with 217,670,719 headroom; the evidence generations completed in 223,935.1262 ms on this machine, within the predeclared 240,000 ms cap" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": ["examples/universal-stress/k01-ai-generation-contract.json"], "note": "this development session cannot self-certify an independent AI-generation trial" },
-        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-fixed-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
+        "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/selfhost-navigation-result.json", "docs/ui-native-genome/evidence-ledger.md"] }
       },
       "changes": [
         { "id": "selfhost-native-ui-fixed-sizing", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "canonical self-host compiler parses, normalizes, roots and byte-lowers platform-neutral fixed width/height intent; one shared root lowers to Web CSS and Android LayoutParams, with invalid sizes failing closed" },
-        { "id": "selfhost-call-validation-index", "kind": "performance-gene", "scope": ["compiler-runtime"], "generalPrimitive": true, "justification": "builtin and special calls bypass user-symbol scans while user-call validation resolves its reckon index once, preserving errors and fixed-point bytes while increasing instruction headroom" }
+        { "id": "selfhost-call-validation-index", "kind": "performance-gene", "scope": ["compiler-runtime"], "generalPrimitive": true, "justification": "builtin and special calls bypass user-symbol scans while user-call validation resolves its reckon index once, preserving errors and fixed-point bytes while increasing instruction headroom" },
+        { "id": "canonical-native-ui-navigation", "kind": "candidate-gene", "scope": ["compiler-runtime", "browser", "android"], "generalPrimitive": true, "justification": "platform-neutral route identities target direct root children; one UI-local event may atomically combine state mutation and one route transition, while mixed Reality authority fails closed" },
+        { "id": "chunked-selfhost-tokenizer", "kind": "performance-gene", "scope": ["compiler-runtime"], "generalPrimitive": true, "justification": "tokens are accumulated in bounded 127-token chunks and flattened without changing token order, restoring JS bootstrap under the existing heap boundary without increasing the heap limit" }
       ]
     },
     {
       "id": "browser::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "035c0599e137e14442f175f8a7104505634ee9bc",
+      "lastVerifiedSha": "2915e37cc7dcbed52dfffb7d954404cde2fc93f1",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": [
-        "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event and fixed-sizing surfaces; navigation/resource/device-adaptation semantics remain absent",
+        "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing and in-app navigation surfaces; resource/device-adaptation semantics remain absent",
         "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
         "visual fidelity is structural v0.1 rather than pixel parity",
-        "navigation, focus traversal and full accessibility tree are not implemented",
+        "focus traversal and the full accessibility tree are not implemented",
         "AI_GENERATE is not independently evidenced"
       ],
       "relatedKillerTasks": ["K02"],
@@ -52,11 +54,11 @@
         { "donor": "Web platform", "capability": "complete DOM/CSS/accessibility/navigation semantics", "status": "PARTIAL_UNABSORBED" }
       ],
       "gates": {
-        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-fixed.rcl", "tests/native-ui-parser-ir.test.mjs"] },
-        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
-        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/web-lowering-report.json", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-fixed.rcl", "examples/native-ui/navigation.rcl", "tests/native-ui-parser-ir.test.mjs"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/web-lowering-report.json", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
         "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json"] },
-        "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json", "tests/native-ui-backends-equivalence.test.mjs", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
+        "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json", "tests/native-ui-backends-equivalence.test.mjs", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-authority-boundary.test.mjs", "tests/native-ui-parser-ir.test.mjs"] },
         "PERFORMANCE": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/performance-result.json"], "note": "measured against a plain DOM/JavaScript Counter, but no pre-registered acceptance budget exists and a large donor advantage remains" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [], "note": "same development run cannot self-certify independent generation" },
@@ -69,7 +71,7 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "035c0599e137e14442f175f8a7104505634ee9bc",
+      "lastVerifiedSha": "2915e37cc7dcbed52dfffb7d954404cde2fc93f1",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
       "relatedKillerTasks": ["K02"],
@@ -93,18 +95,18 @@
     {
       "id": "android::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "035c0599e137e14442f175f8a7104505634ee9bc",
+      "lastVerifiedSha": "2915e37cc7dcbed52dfffb7d954404cde2fc93f1",
       "lastVerifiedDate": "2026-08-24",
-      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event and fixed-sizing surfaces; navigation/resource/device-adaptation semantics remain absent", "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority", "device adaptation and full accessibility are missing"],
+      "knownLimits": ["APK install and device/emulator interaction are unverified", "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing and in-app navigation surfaces; resource/device-adaptation semantics remain absent", "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority", "device adaptation and full accessibility are missing"],
       "relatedKillerTasks": ["K03"],
       "requiredGenes": ["view-tree", "reactive-state", "event-graph", "layout-algebra", "style-cascade", "lifecycle", "device-adaptation"],
       "donorAdvantages": [
         { "donor": "Android framework", "capability": "device adaptation, focus/accessibility and device runtime", "status": "UNABSORBED" }
       ],
       "gates": {
-        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-fixed.rcl"] },
-        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
-        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-lowering-report.json", "examples/native-ui/evidence/selfhost-fixed-result.json"] },
+        "EXPRESS": { "status": "PASS", "evidence": ["examples/native-ui/counter.rcl", "examples/selfhost-core/native-ui-fixed.rcl", "examples/native-ui/navigation.rcl"] },
+        "COMPILE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/canonical-ui-ir.json", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
+        "LOWER": { "status": "PASS", "evidence": ["examples/native-ui/evidence/android-lowering-report.json", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
         "EXECUTE": { "status": "UNVERIFIED", "evidence": [], "note": "real APK built but no device was available" },
         "CORRECT": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/semantic-trace-android.json"], "note": "host trace is not device correctness" },
         "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-authority-boundary.test.mjs", "examples/native-ui/evidence/android-build-result.json"] },
@@ -119,7 +121,7 @@
     {
       "id": "android::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "035c0599e137e14442f175f8a7104505634ee9bc",
+      "lastVerifiedSha": "2915e37cc7dcbed52dfffb7d954404cde2fc93f1",
       "lastVerifiedDate": "2026-08-24",
       "knownLimits": ["device execution and performance are unverified", "AI_GENERATE is unverified"],
       "relatedKillerTasks": ["K03"],
@@ -150,8 +152,9 @@
   "kernelChangesForNovelTasks": 1,
   "notes": [
     "Five affected cells are evidence-bearing but remain BLOCKED; no cell is promoted to PASS.",
-    "The exact Counter, parameterized UI-local, governed-event and fixed-sizing self-host compiler slices are native-semantic, while the Web and Android claims remain lowered-execution and navigation/resource/device-adaptation extensions remain absent.",
-    "Fixed 320 and 320.0 normalize to one RBC; changing the size changes the UI root; invalid sizes and modes fail closed; one root maps to Web CSS and Android LayoutParams.",
+    "The exact Counter, parameterized UI-local, governed-event, fixed-sizing and canonical-navigation self-host compiler slices are native-semantic, while Web and Android remain lowered-execution and resource/device-adaptation extensions remain absent.",
+    "Fixed 320 and 320.0 normalize to one RBC; canonical routes and targets bind the UI root; invalid sizes, routes, targets, handler cardinality and mixed navigation/Reality authority fail closed.",
+    "One navigation root maps to Web hidden-route DOM and Android View.VISIBLE/View.GONE while host semantic traces remain identical; this is not real browser or Android-device navigation evidence.",
     "Governed UI events preserve authority: missing gateways, unknown rules and mixed-authority handlers fail closed, and successful dispatch emits CandidateReality rather than committing reality.",
     "The Android APK build is real, but build evidence is not device execution evidence."
   ]
