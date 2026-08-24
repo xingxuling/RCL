@@ -1,8 +1,8 @@
 # K400 Completion Campaign v0.1
 
-**Verdict:** `INCOMPLETE`  
-**Current evidence:** `0 PASS / 7 BLOCKED / 393 UNTESTED`  
-**Maturity:** `U0`  
+**Verdict:** `INCOMPLETE`
+**Current evidence:** `0 PASS / 7 BLOCKED / 393 UNTESTED`
+**Maturity:** `U0`
 **Date:** 2026-08-25
 
 ## 1. Completion contract
@@ -64,3 +64,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 The report runner rejects duplicate claims, unknown coordinates, conflicting environment/program metadata, unknown gates, invalid statuses and malformed source SHA/date fields. Missing gates remain `BLOCKED`; unclaimed cells remain `UNTESTED`.
 
 The report root excludes volatile generation time but includes semantic report content. It is evidence integrity, not proof that the underlying external execution occurred.
+
+## 6. Browser performance contract chronology
+
+Commit `955e6cef527f74a926538d5f8d2b93404add245b` froze the numeric browser budgets before the new acquisition. The first acquisition met every numeric budget but failed the UI-root precondition because the checked-in Counter evidence was stale relative to the device-adaptation IR fields. Revision 2 corrects only that identity precondition to the freshly regenerated canonical root; it does not change either numeric threshold. A new acquisition must occur after the revision-2 commit before `K063` or `K078` performance can be promoted.

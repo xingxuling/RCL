@@ -1,12 +1,14 @@
 {
   "schema": "rcl.native-ui.browser-performance-contract.v0.1",
+  "revision": 2,
   "frozenDate": "2026-08-25",
   "scope": [
     "K063 browser::gui",
     "K078 browser::reactive"
   ],
   "program": "examples/native-ui/counter.rcl",
-  "uiProgramRoot": "04f9c8b26bd97cf0d315d866a0f6b770b8646e3de59ecd46a643b361f5a1028f",
+  "sourceSha256": "8b5322e3596a9028d226427f7216efa54c696369f71239a975d79104eef62613",
+  "uiProgramRoot": "4bbffe93f271ffdc8c93b82cd40176b56fa553c8b087effc5100d309c6b60622",
   "workload": {
     "minimumIterations": 50,
     "eventsPerIteration": 3,
@@ -20,6 +22,7 @@
     "maxRclPerSequenceMs": 1.5,
     "maxHostBrowserProcessElapsedMs": 5000
   },
-  "calibrationBoundary": "The absolute budgets were frozen prospectively for the next acquisition after reviewing the 2026-08-23 candidate measurement. This is baseline-calibrated regression evidence, not blind competitive parity.",
+  "budgetOriginCommit": "955e6cef527f74a926538d5f8d2b93404add245b",
+  "calibrationBoundary": "The absolute budgets were frozen prospectively in budgetOriginCommit after reviewing the 2026-08-23 candidate measurement. Revision 2 changes only the stale uiProgramRoot precondition discovered by the first post-freeze acquisition; both numeric budgets are byte-identical to revision 1. This is baseline-calibrated regression evidence, not blind competitive parity.",
   "authorityBoundary": "Passing this contract closes only the local browser performance gate for the declared Counter workload. It does not close AI_GENERATE, Android device performance, production scale or cross-machine performance."
 }
