@@ -13,6 +13,8 @@ const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
 const k02Path = 'examples/universal-stress/k02-direct-evidence-2026-08-08.json';
 const k03Path = 'examples/universal-stress/k03-direct-evidence-2026-08-08.json';
+const browserPerformanceContractPath = 'examples/native-ui/browser-performance-contract.v0.1.json';
+const browserRuntimePath = 'examples/native-ui/evidence/browser-runtime-result.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -84,7 +86,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',

@@ -5,8 +5,8 @@
     {
       "id": "compiler-runtime::self-hosting",
       "coverageMode": "native-semantic",
-      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
-      "lastVerifiedDate": "2026-08-24",
+      "lastVerifiedSha": "9621358307cc89a2a981c7fd2a9f8d5285539858",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
         "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, governed reality-transaction declarations, fixed width/height intent, canonical in-app navigation, and available-width device profiles with adaptive layout direction",
         "resource and full accessibility extensions remain absent or partial",
@@ -62,7 +62,7 @@
         "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/device-adaptation-browser-result.json"] },
         "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json", "tests/native-ui-backends-equivalence.test.mjs", "examples/native-ui/evidence/selfhost-navigation-result.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-authority-boundary.test.mjs", "tests/native-ui-parser-ir.test.mjs"] },
-        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/performance-result.json"], "note": "measured against a plain DOM/JavaScript Counter, but no pre-registered acceptance budget exists and a large donor advantage remains" },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/browser-performance-contract.v0.1.json", "examples/native-ui/evidence/browser-runtime-result.json"], "note": "real Chrome completed the frozen Counter workload at 0.884 ms per three-event sequence against a 1.5 ms absolute budget; this is local regression evidence, not plain-DOM parity" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [], "note": "same development run cannot self-certify independent generation" },
         "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/evidence-summary.json", "docs/ui-native-genome/evidence-ledger.md"] }
       },
@@ -73,9 +73,9 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
-      "lastVerifiedDate": "2026-08-24",
-      "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE and reference performance are unverified"],
+      "lastVerifiedSha": "9621358307cc89a2a981c7fd2a9f8d5285539858",
+      "lastVerifiedDate": "2026-08-25",
+      "knownLimits": ["async effects and scheduling are outside Native UI v0.1", "AI_GENERATE is unverified", "the browser performance gate is local workload regression evidence rather than reference parity"],
       "relatedKillerTasks": ["K02"],
       "requiredGenes": ["reactive-state", "derived-binding", "event-graph"],
       "donorAdvantages": [],
@@ -86,7 +86,7 @@
         "EXECUTE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json"] },
         "CORRECT": { "status": "PASS", "evidence": ["examples/native-ui/evidence/semantic-trace-web.json"] },
         "ROBUST": { "status": "PASS", "evidence": ["tests/native-ui-runtime-style-layout.test.mjs"] },
-        "PERFORMANCE": { "status": "UNVERIFIED", "evidence": ["examples/native-ui/evidence/browser-runtime-result.json", "examples/native-ui/evidence/performance-result.json"], "note": "measured residual is not yet an accepted performance gate" },
+        "PERFORMANCE": { "status": "PASS", "evidence": ["examples/native-ui/browser-performance-contract.v0.1.json", "examples/native-ui/evidence/browser-runtime-result.json"], "note": "real Chrome completed the frozen Counter workload at 0.884 ms per three-event sequence against a 1.5 ms absolute budget" },
         "AI_GENERATE": { "status": "UNVERIFIED", "evidence": [] },
         "EVIDENCE": { "status": "PASS", "evidence": ["examples/native-ui/evidence/evidence-summary.json"] }
       },

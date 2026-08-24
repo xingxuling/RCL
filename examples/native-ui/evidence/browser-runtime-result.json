@@ -1,10 +1,10 @@
 {
-  "format": "rcl.native-ui.browser-runtime-evidence.v0.1",
+  "format": "rcl.native-ui.browser-runtime-evidence.v0.2",
   "status": "PASS",
   "browser": "chrome.exe",
   "browserVersion": "151.0.7922.173",
   "mode": "headless-real-browser-dom-events",
-  "uiProgramRoot": "04f9c8b26bd97cf0d315d866a0f6b770b8646e3de59ecd46a643b361f5a1028f",
+  "uiProgramRoot": "4bbffe93f271ffdc8c93b82cd40176b56fa553c8b087effc5100d309c6b60622",
   "eventCount": 3,
   "finalState": {
     "count": 0
@@ -89,10 +89,34 @@
   "performance": {
     "iterations": 50,
     "eventsPerIteration": 3,
-    "rclDurationMs": 28.099999994039536,
-    "referenceDurationMs": 0.5,
-    "slowdown": 56.19999998807907,
-    "hostBrowserProcessElapsedMs": 911.7133,
+    "rclDurationMs": 44.19999998807907,
+    "referenceDurationMs": 0.9000000357627869,
+    "slowdown": 49.11110914636549,
+    "hostBrowserProcessElapsedMs": 1037.3439,
     "reference": "same-process plain DOM button counter"
-  }
+  },
+  "performanceContract": {
+    "schema": "rcl.native-ui.browser-performance-verdict.v0.1",
+    "contractRoot": "e517e2fadca2585c0f200a71ae77128afe0f9f89caf69235db132263b8f46f60",
+    "status": "PASS",
+    "checks": {
+      "iterations": true,
+      "eventsPerIteration": true,
+      "rclPerSequenceMs": true,
+      "hostBrowserProcessElapsedMs": true,
+      "uiProgramRoot": true
+    },
+    "metrics": {
+      "iterations": 50,
+      "eventsPerIteration": 3,
+      "rclDurationMs": 44.19999998807907,
+      "rclPerSequenceMs": 0.8839999997615814,
+      "hostBrowserProcessElapsedMs": 1037.3439
+    },
+    "acceptance": {
+      "maxRclPerSequenceMs": 1.5,
+      "maxHostBrowserProcessElapsedMs": 5000
+    }
+  },
+  "boundary": "Passing this contract closes only the local browser performance gate for the declared Counter workload. It does not close AI_GENERATE, Android device performance, production scale or cross-machine performance."
 }

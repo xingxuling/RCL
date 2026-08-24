@@ -112,7 +112,7 @@ The final K400 seal also found that `generatedAt` had been included in the repor
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
-The SHA-bound report evaluates `native-ui-genome-v0.1-candidate-8-selfhost-device-adaptation` against implementation `f8f3eca982dd7b76a10c38f66045d99516c1c910`: compiler self-hosting is blocked only by independent `AI_GENERATE`; browser claims remain blocked by performance and `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE`. These gates do not compensate for one another.
+The consolidated report preserves the device-adaptation evidence and adds a post-contract real Chrome performance PASS for the declared Counter workload. Compiler self-hosting and browser claims are now blocked only by independent `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE`. These gates do not compensate for one another.
 
 ## License and diff audit
 
@@ -120,4 +120,4 @@ The candidate implementation reuses repository interfaces and independently impl
 
 ## Matrix impact
 
-The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI, but the cells remain `BLOCKED` through independent non-compensatory gates: K01 still lacks independent AI generation; browser performance and AI generation remain unverified; Android still lacks device execute/correct/performance and AI evidence. No K001–K400 PASS is inferred from this receipt.
+The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI. Browser performance passes only for the frozen local Counter budget; compiler and browser cells still lack independent AI generation, while Android still lacks device execute/correct/performance and AI evidence. No K001–K400 PASS is inferred from this receipt.

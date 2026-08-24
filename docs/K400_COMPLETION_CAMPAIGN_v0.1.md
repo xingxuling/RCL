@@ -3,6 +3,7 @@
 **Verdict:** `INCOMPLETE`
 **Current evidence:** `0 PASS / 7 BLOCKED / 393 UNTESTED`
 **Maturity:** `U0`
+**Report root:** `01dbe8019f3decae0f47df55401bbe3d57184e9fe6cc2807ef1fd6d0348c2941`
 **Date:** 2026-08-25
 
 ## 1. Completion contract
@@ -43,8 +44,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 |---|---|---|---|
 | `K064` | `browser::web` | `BLOCKED` | `AI_GENERATE` |
 | `K339` | `compiler-runtime::self-hosting` | `BLOCKED` | `AI_GENERATE` |
-| `K063` | `browser::gui` | `BLOCKED` | `PERFORMANCE`, `AI_GENERATE` |
-| `K078` | `browser::reactive` | `BLOCKED` | `PERFORMANCE`, `AI_GENERATE` |
+| `K063` | `browser::gui` | `BLOCKED` | `AI_GENERATE` |
+| `K078` | `browser::reactive` | `BLOCKED` | `AI_GENERATE` |
 | `K083` | `android::gui` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
 | `K085` | `android::mobile` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
 | `K098` | `android::reactive` | `BLOCKED` | device `EXECUTE`, `CORRECT`, `PERFORMANCE`, `AI_GENERATE` |
@@ -54,10 +55,9 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 ## 4. Closure order
 
 1. Close `K064` and `K339` through a separately executed, receipt-bound AI generation/repair contract.
-2. Pre-register browser performance budgets and rerun real-browser trials for `K063` and `K078`.
-3. Acquire emulator or device installation, interaction, correctness and timing receipts for `K083`, `K085` and `K098`.
-4. Add reusable campaign adapters for the remaining killer tasks before expanding into adjacent matrix cells.
-5. Rerun regression and regenerate the complete 400-cell report after every evidence generation.
+2. Acquire emulator or device installation, interaction, correctness and timing receipts for `K083`, `K085` and `K098`.
+3. Add reusable campaign adapters for the remaining killer tasks before expanding into adjacent matrix cells.
+4. Rerun regression and regenerate the complete 400-cell report after every evidence generation.
 
 ## 5. Evidence integrity
 
@@ -67,4 +67,4 @@ The report root excludes volatile generation time but includes semantic report c
 
 ## 6. Browser performance contract chronology
 
-Commit `955e6cef527f74a926538d5f8d2b93404add245b` froze the numeric browser budgets before the new acquisition. The first acquisition met every numeric budget but failed the UI-root precondition because the checked-in Counter evidence was stale relative to the device-adaptation IR fields. Revision 2 corrects only that identity precondition to the freshly regenerated canonical root; it does not change either numeric threshold. A new acquisition must occur after the revision-2 commit before `K063` or `K078` performance can be promoted.
+Commit `955e6cef527f74a926538d5f8d2b93404add245b` froze the numeric browser budgets before the new acquisition. The first acquisition met every numeric budget but failed the UI-root precondition because the checked-in Counter evidence was stale relative to the device-adaptation IR fields. Revision 2 corrected only that identity precondition to the freshly regenerated canonical root and did not change either numeric threshold. The post-revision real Chrome acquisition passed all checks at `0.884 ms` per three-event sequence against the `1.5 ms` limit and `1037.344 ms` host-process elapsed time against the `5000 ms` limit. This closes only the declared local performance gate; the roughly `49.1×` plain-DOM slowdown remains an observed donor advantage rather than a parity claim.
