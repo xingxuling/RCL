@@ -90,6 +90,22 @@ The recorded campaign does **not** yet prove real APK installation/device or emu
 
 Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 
+### K08 — RCL-Native AI
+
+Current native-learning result: `AI-N2 VERIFIED_LOCAL` for a bounded, configurable two-Dense-layer General MLP profile.
+
+Direct local evidence supports:
+
+- RCL-owned tagged Model/Layer/Parameter/Activation/Loss/Optimizer/Dataset/Checkpoint semantics;
+- the same generic native training path for XOR `2-2-1` and Majority-3 `3-3-1`;
+- analytic backpropagation and Batch SGD without an ML provider or task-specific VM opcode;
+- exact checkpoint resume, shape/dataset negative controls, three deterministic native replays and JS differential parity;
+- three separate read-only AI repair sessions whose frozen candidates replay locally.
+
+K233 remains `BLOCKED` until the independent AI repair receipts pass GitHub-hosted replay and that run is bound into the authoritative evidence. Tensor, general Autodiff, AdamW, Transformer, LM, accelerator and distributed claims remain unverified.
+
+Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-ai/evidence-ledger.md`.
+
 ### Native UI Genome v0.1 candidate
 
 - `.rcl` reference-parser syntax, rooted Canonical Native UI IR, reactive state/binding/events, layout, style/cascade and lifecycle are implemented on an isolated candidate branch.

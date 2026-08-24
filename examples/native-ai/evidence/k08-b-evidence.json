@@ -1,0 +1,721 @@
+{
+  "format": "rcl.k08-b-general-mlp-evidence.v0.1",
+  "generatedAt": "2026-08-24T20:54:56.588Z",
+  "verificationDate": "2026-08-25",
+  "verdict": "RCL_NATIVE_GENERAL_MLP_AI_N2_VERIFIED_LOCAL_AI_GENERATE_UNVERIFIED",
+  "maturity": "AI-N2",
+  "k400Cell": {
+    "id": "ai-runtime::machine-learning",
+    "campaignId": "K233",
+    "killerTask": "K08",
+    "status": "BLOCKED_AI_GENERATE"
+  },
+  "evidenceBoundary": "This contract can establish AI-N2 only for the bounded two-dense-layer General MLP profile. It does not close independent AI_GENERATE by itself and does not prove Tensor, Autodiff, Transformer, LM, accelerator or distributed infrastructure.",
+  "pureExecutionPath": {
+    "stages": [
+      "RCL source",
+      "native rclc",
+      "selfhost/compiler.rbc",
+      "RBC",
+      "native rclvm",
+      "native state"
+    ],
+    "javascriptTrainerParticipated": false,
+    "referenceOracleParticipatedInNativeParameters": false,
+    "dependencyAudit": {
+      "ok": true,
+      "forbiddenMatches": [],
+      "missingSemantics": [],
+      "providerOpcodeCount": 0,
+      "requiredSemantics": [
+        "make_parameter",
+        "make_layer",
+        "make_model",
+        "make_loss",
+        "make_optimizer",
+        "make_sample",
+        "make_dataset",
+        "make_checkpoint",
+        "model_valid",
+        "dataset_valid_for_model",
+        "layer_forward",
+        "model_forward",
+        "dataset_loss",
+        "unit_delta",
+        "train_step",
+        "train_model",
+        "train_checkpoint",
+        "resume_checkpoint"
+      ],
+      "boundedProfile": "TWO_CONFIGURABLE_DENSE_LAYERS"
+    }
+  },
+  "compiler": {
+    "runtimeMs": 990.8953,
+    "executedInstructions": 6911223,
+    "targetBytes": 24499,
+    "targetInstructions": 1432,
+    "bytecodeParityWithJsReferenceCompiler": true
+  },
+  "tasks": {
+    "xor": {
+      "architecture": [
+        2,
+        2,
+        1
+      ],
+      "parameterCount": 9,
+      "initialLoss": 0.141958153333634,
+      "loss": 0.0157034488743931,
+      "absoluteLossReduction": 0.12625470445924092,
+      "accuracy": 1,
+      "outputs": [
+        0.182865866168747,
+        0.825711465001895,
+        0.825716853507831,
+        0.177303574139108
+      ],
+      "expected": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "maximumParameterDrift": 5.329070518200751e-15,
+      "maximumPredictionDrift": 3.3306690738754696e-16,
+      "passed": true
+    },
+    "majority3": {
+      "architecture": [
+        3,
+        3,
+        1
+      ],
+      "parameterCount": 16,
+      "initialLoss": 0.123537948296156,
+      "loss": 0.0111015956287353,
+      "absoluteLossReduction": 0.11243635266742069,
+      "accuracy": 1,
+      "outputs": [
+        0.100978356346793,
+        0.161107772961369,
+        0.152943151021949,
+        0.836916313506027,
+        0.152885694625118,
+        0.836911015500456,
+        0.834614645528926,
+        0.881000323966469
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "maximumParameterDrift": 3.9968028886505635e-15,
+      "maximumPredictionDrift": 5.551115123125783e-16,
+      "passed": true
+    }
+  },
+  "checkpoint": {
+    "directEpoch": 32,
+    "resumedEpoch": 32,
+    "exactResumeParity": true,
+    "directRoot": "9767484d555148b927dd4e6b65d3f113b7054ee372af50a2bb84e41e0c3d8d78",
+    "resumedRoot": "9767484d555148b927dd4e6b65d3f113b7054ee372af50a2bb84e41e0c3d8d78",
+    "serializedBytes": 302
+  },
+  "negativeControls": {
+    "invalidShapeRejected": true,
+    "invalidDatasetRejected": true
+  },
+  "robustness": {
+    "replayCount": 3,
+    "semanticStateRoots": [
+      "890691f699db1d1166b3b3aa3f5744976a0c93acd3bac96f4331a8878149571e",
+      "890691f699db1d1166b3b3aa3f5744976a0c93acd3bac96f4331a8878149571e",
+      "890691f699db1d1166b3b3aa3f5744976a0c93acd3bac96f4331a8878149571e"
+    ],
+    "identicalSemanticStateRoots": true,
+    "exactReplayStates": true
+  },
+  "performance": {
+    "classification": "MEASURED_LOCAL_NATIVE_NO_COMPETITIVE_PARITY_CLAIM",
+    "runtimesMs": [
+      1404.889,
+      1299.8294,
+      1376.6351999999997
+    ],
+    "medianRuntimeMs": 1376.6351999999997,
+    "referenceOracleRuntimeMs": 19.142800000000534,
+    "nativeToOracleRuntimeRatio": 71.91399377311372,
+    "executedInstructions": 109205579,
+    "peakStackDepth": 109,
+    "peakCallFrames": 16,
+    "totalParameterCount": 25,
+    "checkpointBytes": 302,
+    "peakMemory": "UNMEASURED_NATIVE_VM_TELEMETRY_GAP",
+    "unabsorbedAdvantage": "The JavaScript oracle remains faster. RCL owns semantics while optimized CPU tensor execution remains a future backend organ."
+  },
+  "checks": {
+    "express": true,
+    "compile": true,
+    "lower": true,
+    "execute": true,
+    "correct": true,
+    "negative": true,
+    "robust": true,
+    "performance": true,
+    "differential": true
+  },
+  "gates": {
+    "EXPRESS": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "COMPILE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "LOWER": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "EXECUTE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "CORRECT": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "ROBUST": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "PERFORMANCE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "EVIDENCE": {
+      "status": "PASS",
+      "evidence": [
+        "examples/native-ai/general-mlp.rcl",
+        "examples/native-ai/general-mlp-contract.v0.1.json",
+        "examples/native-ai/evidence/k08-b-evidence.json",
+        "tests/k08-general-mlp.test.mjs"
+      ]
+    },
+    "AI_GENERATE": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "examples/native-ai/k233-ai-generation-contract.v0.1.json"
+      ],
+      "note": "The implementation session cannot self-sign an independent AI_GENERATE receipt."
+    }
+  },
+  "artifactRoots": {
+    "contractRoot": "fb2524725b1450e3e7570e2898bd6e7cdc141fa10f54dd3b03cf21366b184182",
+    "sourceSha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "targetRbcSha256": "fe69d9a21d31159a1c571ec1fc9f69321ca700090ebb268e7d6fb54c49e46828",
+    "datasetRoots": {
+      "xor": "1ce5780cda9c330fa6096e79d36bd5e05470ee4796cc2f088aa2b98b7f1d8f88",
+      "majority3": "c5abec6bad2582d89bcc842ec9f12cdd25207ef7cea274a9deec3d21b4a19049"
+    },
+    "modelDefinitionRoots": {
+      "xor": "f840ec7fbaf63046fe5d93353c7871cf854df41337d425911ff26b9f9188dd8a",
+      "majority3": "937838099d6a98dbebcb86c5869c4079e7ce04b1800267d12403c228c5faaf57"
+    },
+    "checkpointRoot": "6a9f8378f36101e24c22d140e2d21e72f840a3784d549a1521cc475256044dd4",
+    "evaluationRoot": "3f23c3325e578918f8dfb6ef4de891c6edf961be0365fe219a589d2177c610c2"
+  },
+  "oracle": {
+    "role": "REFERENCE_ORACLE_ONLY_NOT_NATIVE_EXECUTION",
+    "implementation": "javascript_generic_dense_backprop_sgd",
+    "tasks": {
+      "xor": {
+        "role": "REFERENCE_ORACLE_ONLY_NOT_NATIVE_EXECUTION",
+        "initial": {
+          "predictions": [
+            {
+              "input": [
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.6813861332349189
+              ]
+            },
+            {
+              "input": [
+                0,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.6865672328686379
+              ]
+            },
+            {
+              "input": [
+                1,
+                0
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.6852755266635464
+              ]
+            },
+            {
+              "input": [
+                1,
+                1
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.6885394472909349
+              ]
+            }
+          ],
+          "outputs": [
+            0.6813861332349189,
+            0.6865672328686379,
+            0.6852755266635464,
+            0.6885394472909349
+          ],
+          "loss": 0.14195815333363393,
+          "accuracy": 0.5
+        },
+        "final": {
+          "predictions": [
+            {
+              "input": [
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.182865866168747
+              ]
+            },
+            {
+              "input": [
+                0,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8257114650018953
+              ]
+            },
+            {
+              "input": [
+                1,
+                0
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8257168535078311
+              ]
+            },
+            {
+              "input": [
+                1,
+                1
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.17730357413910808
+              ]
+            }
+          ],
+          "outputs": [
+            0.182865866168747,
+            0.8257114650018953,
+            0.8257168535078311,
+            0.17730357413910808
+          ],
+          "loss": 0.015703448874393084,
+          "accuracy": 1
+        },
+        "finalModel": {
+          "layers": [
+            {
+              "inputSize": 2,
+              "outputSize": 2,
+              "activation": "softsign01",
+              "weights": [
+                2.828484268819373,
+                2.828258315443675,
+                3.9583230005202004,
+                3.957561355489024
+              ],
+              "biases": [
+                -4.366125296977721,
+                -1.5315148505864278
+              ]
+            },
+            {
+              "inputSize": 2,
+              "outputSize": 1,
+              "activation": "softsign01",
+              "weights": [
+                -7.195407511916374,
+                6.625876660610141
+              ],
+              "biases": [
+                -2.372475559863385
+              ]
+            }
+          ]
+        },
+        "parameterCount": 9
+      },
+      "majority3": {
+        "role": "REFERENCE_ORACLE_ONLY_NOT_NATIVE_EXECUTION",
+        "initial": {
+          "predictions": [
+            {
+              "input": [
+                0,
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.45352511209322083
+              ]
+            },
+            {
+              "input": [
+                0,
+                0,
+                1
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.4485207256284279
+              ]
+            },
+            {
+              "input": [
+                0,
+                1,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.4667572311612564
+              ]
+            },
+            {
+              "input": [
+                0,
+                1,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.4620177206343731
+              ]
+            },
+            {
+              "input": [
+                1,
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.4633779491863595
+              ]
+            },
+            {
+              "input": [
+                1,
+                0,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.45518611927320296
+              ]
+            },
+            {
+              "input": [
+                1,
+                1,
+                0
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.4814906807449347
+              ]
+            },
+            {
+              "input": [
+                1,
+                1,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.46889656771093674
+              ]
+            }
+          ],
+          "outputs": [
+            0.45352511209322083,
+            0.4485207256284279,
+            0.4667572311612564,
+            0.4620177206343731,
+            0.4633779491863595,
+            0.45518611927320296,
+            0.4814906807449347,
+            0.46889656771093674
+          ],
+          "loss": 0.12353794829615636,
+          "accuracy": 0.5
+        },
+        "final": {
+          "predictions": [
+            {
+              "input": [
+                0,
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.10097835634679292
+              ]
+            },
+            {
+              "input": [
+                0,
+                0,
+                1
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.1611077729613692
+              ]
+            },
+            {
+              "input": [
+                0,
+                1,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.1529431510219489
+              ]
+            },
+            {
+              "input": [
+                0,
+                1,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8369163135060271
+              ]
+            },
+            {
+              "input": [
+                1,
+                0,
+                0
+              ],
+              "target": [
+                0
+              ],
+              "output": [
+                0.15288569462511825
+              ]
+            },
+            {
+              "input": [
+                1,
+                0,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8369110155004564
+              ]
+            },
+            {
+              "input": [
+                1,
+                1,
+                0
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8346146455289264
+              ]
+            },
+            {
+              "input": [
+                1,
+                1,
+                1
+              ],
+              "target": [
+                1
+              ],
+              "output": [
+                0.8810003239664684
+              ]
+            }
+          ],
+          "outputs": [
+            0.10097835634679292,
+            0.1611077729613692,
+            0.1529431510219489,
+            0.8369163135060271,
+            0.15288569462511825,
+            0.8369110155004564,
+            0.8346146455289264,
+            0.8810003239664684
+          ],
+          "loss": 0.01110159562873528,
+          "accuracy": 1
+        },
+        "finalModel": {
+          "layers": [
+            {
+              "inputSize": 3,
+              "outputSize": 3,
+              "activation": "softsign01",
+              "weights": [
+                -1.1088621462969497,
+                -1.1061873292741837,
+                -0.910493596891519,
+                -2.063255408734412,
+                -2.0590206788628076,
+                -1.9045219143818872,
+                0.7613456384525065,
+                0.7706743396822558,
+                1.167747318189183
+              ],
+              "biases": [
+                1.387061107393888,
+                2.787774527873306,
+                -1.1009512703889592
+              ]
+            },
+            {
+              "inputSize": 3,
+              "outputSize": 1,
+              "activation": "softsign01",
+              "weights": [
+                -2.4804083980660776,
+                -5.457551113791756,
+                2.724400673585058
+              ],
+              "biases": [
+                2.0980609109981967
+              ]
+            }
+          ]
+        },
+        "parameterCount": 16
+      }
+    },
+    "checkpoint": {
+      "exactResumeParity": true,
+      "maximumParameterDrift": 0
+    },
+    "root": "06b5f3db5cc458df41df37ee3e474ec997fb061fdb509f5d6646a62e89d38944"
+  },
+  "reportRoot": "30109639721ced8e0afb1e0edd6b5f44d76de9e94016ad82dc3ce4d33e83c330"
+}

@@ -1,0 +1,105 @@
+{
+  "format": "rcl.k233.ai-generation-trial-receipt.v0.1",
+  "trialId": "K233-AI-REPAIR-02",
+  "mutationClass": "TARGET_BINDING_SEMANTICS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0359c-258d-7f11-ae43-edab19b672d6",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "effectiveFilesystem": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oraclePatchVisibleToGenerator": false,
+    "canonicalSourceVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedSourceOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "old": "reckon output_delta(parameters : Sequence, sample : Sequence) -> Number =\n    (predict(parameters, sequence_get(sample, 0), sequence_get(sample, 1)) - sequence_get(sample, 1))\n      * activate_derivative(output_pre(parameters, sequence_get(sample, 0), sequence_get(sample, 1)))",
+    "new": "reckon output_delta(parameters : Sequence, sample : Sequence) -> Number =\n    (predict(parameters, sequence_get(sample, 0), sequence_get(sample, 1)) - sequence_get(sample, 2))\n      * activate_derivative(output_pre(parameters, sequence_get(sample, 0), sequence_get(sample, 1)))",
+    "diagnosis": "The output gradient currently subtracts sample index 1, which is x2, so learning is trained toward the second input coordinate. Since each sample is [x1, x2, target], the supervised error term must subtract sample index 2."
+  },
+  "promptRoot": "2fe2b8c9784a655d7b034016f0c17d89f27bb9219998a6aca8ae823d4deb46db",
+  "mutatedSourceSha256": "32eeee5071b18415461337bb07ce4e2222b2fda4ad428a90f70da8504827681f",
+  "candidateSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "canonicalSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "candidateRestoredCanonicalBytes": true,
+  "generatorEventLogSha256": "af8a026954bc7a674da3ed20db4830d80d80f915f8268a2e7ba3fa4efba20de4",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0359c-258d-7f11-ae43-edab19b672d6"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "da2c81c2ae991596006523ea9e75163ea822b27839e7a7b1f01317798021d86a"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "1ce8051c0f49a0e4b4a93e1e3df6af2b19a280ae4f54631e7e5a91207fc261eb"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 43324,
+        "cached_input_tokens": 22272,
+        "output_tokens": 625,
+        "reasoning_output_tokens": 168
+      }
+    }
+  ],
+  "finalMessageSha256": "1ce8051c0f49a0e4b4a93e1e3df6af2b19a280ae4f54631e7e5a91207fc261eb",
+  "verification": {
+    "successful": true,
+    "verdict": "RCL_NATIVE_LEARNING_PROVEN_AT_MINIMAL_MLP_SCALE_LOCAL_NATIVE_AI_GENERATE_UNVERIFIED",
+    "reportRoot": "3c45c2ca085b1db7a3285fb58d1629bdcfd16d2be7a2f1d17f2d3e20154fb64b",
+    "semanticStateRoots": [
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2"
+    ],
+    "maximumParameterDrift": 4.440892098500626e-15,
+    "maximumPredictionDrift": 3.3306690738754696e-16
+  },
+  "receiptRoot": "38d95b55e5f9b3af5292da4f25ef408627d8c50bee02a226ad4d1fc451417631"
+}

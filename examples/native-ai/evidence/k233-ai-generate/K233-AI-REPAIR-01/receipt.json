@@ -1,0 +1,105 @@
+{
+  "format": "rcl.k233.ai-generation-trial-receipt.v0.1",
+  "trialId": "K233-AI-REPAIR-01",
+  "mutationClass": "ACTIVATION_GRADIENT_SEMANTICS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0359a-b43e-7781-9229-d320332a5f7b",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "effectiveFilesystem": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oraclePatchVisibleToGenerator": false,
+    "canonicalSourceVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedSourceOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "old": "  reckon activate_derivative(value : Number) -> Number =\n    0.5 / (1 + absolute(value))",
+    "new": "  reckon activate_derivative(value : Number) -> Number =\n    0.5 / ((1 + absolute(value)) * (1 + absolute(value)))",
+    "diagnosis": "The activation derivative is missing the squared denominator. For activate(value) = 0.5 + 0.5 * value / (1 + abs(value)), the derivative is 0.5 / (1 + abs(value))^2 on both sides of zero."
+  },
+  "promptRoot": "00987b56c9a601a9db30fc1a4702e0c97152e816fbf1922f35b9ca8c5d14ded4",
+  "mutatedSourceSha256": "1737f49aab5988371bf70d7c2c06e8d6607ca167585815a9cb1fa9fb40ba3c80",
+  "candidateSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "canonicalSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "candidateRestoredCanonicalBytes": true,
+  "generatorEventLogSha256": "0059f6bd124b90aaa929ab42e6c537d7ee6622b57bb7362342c4bb42b1a15d8a",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0359a-b43e-7781-9229-d320332a5f7b"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "6967068c6577fae5e710b3d7bc14f7c0443be555133dbc2fad3e5080a9991345"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "a450701a6a8a36a0e8ea1a5ae3d8dc80809f3afb5f54170d131c7059f796c5b7"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39002,
+        "cached_input_tokens": 20224,
+        "output_tokens": 544,
+        "reasoning_output_tokens": 156
+      }
+    }
+  ],
+  "finalMessageSha256": "a450701a6a8a36a0e8ea1a5ae3d8dc80809f3afb5f54170d131c7059f796c5b7",
+  "verification": {
+    "successful": true,
+    "verdict": "RCL_NATIVE_LEARNING_PROVEN_AT_MINIMAL_MLP_SCALE_LOCAL_NATIVE_AI_GENERATE_UNVERIFIED",
+    "reportRoot": "55f5377e769229fabc13c95a82c2c5025b0c2ecb6b2e9368c5eff3104b066e99",
+    "semanticStateRoots": [
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2"
+    ],
+    "maximumParameterDrift": 4.440892098500626e-15,
+    "maximumPredictionDrift": 3.3306690738754696e-16
+  },
+  "receiptRoot": "3d72feac02a62eeed87e9b08efee12b39250b86e8112453249b9f25166744741"
+}

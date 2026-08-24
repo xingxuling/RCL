@@ -18,6 +18,9 @@ on:
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'scripts/run-k08-pure-rcl-xor.mjs'
+      - 'scripts/run-k08-general-mlp.mjs'
+      - 'scripts/run-k233-independent-ai-generation.mjs'
+      - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -42,6 +45,9 @@ on:
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'scripts/run-k08-pure-rcl-xor.mjs'
+      - 'scripts/run-k08-general-mlp.mjs'
+      - 'scripts/run-k233-independent-ai-generation.mjs'
+      - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -72,6 +78,10 @@ jobs:
         run: node --test tests/universal*stress*.test.mjs
       - name: K08 Pure RCL XOR native learning campaign
         run: npm run evidence:k08-native-ai
+      - name: K08 General MLP native learning campaign
+        run: npm run evidence:k08-native-ai:general-mlp
+      - name: K233 independent AI generation receipt replay
+        run: npm run verify:k233-ai-generate
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
@@ -84,6 +94,7 @@ jobs:
             output/universal-stress-v0.1
             output/universal-stress-k400
             output/k08-pure-rcl-xor-v0.1
+            output/k08-general-mlp-v0.1
           if-no-files-found: error
 
   k01-windows-verification:

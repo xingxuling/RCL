@@ -1,0 +1,117 @@
+{
+  "format": "rcl.k233.ai-generation-trial-receipt.v0.1",
+  "trialId": "K233-AI-REPAIR-03",
+  "mutationClass": "PARAMETER_GRADIENT_ROUTING",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0359d-cea3-76b0-9d19-2bc10e379932",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "effectiveFilesystem": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oraclePatchVisibleToGenerator": false,
+    "canonicalSourceVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedSourceOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "old": "choose(parameter_index == 7, output_delta(parameters, sample) * hidden_one(parameters, sequence_get(sample, 0), sequence_get(sample, 1)),",
+    "new": "choose(parameter_index == 7, output_delta(parameters, sample) * hidden_two(parameters, sequence_get(sample, 0), sequence_get(sample, 1)),",
+    "diagnosis": "Parameter index 7 is the second hidden-to-output weight in output_pre, where it multiplies hidden_two. Its sample_gradient branch incorrectly uses hidden_one, so the gradient for that parameter is routed through the wrong activation."
+  },
+  "promptRoot": "0c4fb8ac6adc3dd819dfd3e9add9d0277d4440b5481a6ad426f94fbd44c87a55",
+  "mutatedSourceSha256": "027c0196126f9cc078ae171e608e13503b59ec359b3b770b407c98648beedbfd",
+  "candidateSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "canonicalSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "candidateRestoredCanonicalBytes": true,
+  "generatorEventLogSha256": "4c49f8f2406fa80a2ada6be54b8bd849ff0ee95990f0cf6e3c135ab9aacdb267",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0359d-cea3-76b0-9d19-2bc10e379932"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "50118013eefa020a639513c658b1530406583f1a8f7b0985c1c5becda3fa8db6"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "50118013eefa020a639513c658b1530406583f1a8f7b0985c1c5becda3fa8db6"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "50118013eefa020a639513c658b1530406583f1a8f7b0985c1c5becda3fa8db6"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "4c7fa37764aa6144a3af3355be2cda44bb4e10f9b96dbce8856a747c890c00bc"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 84086,
+        "cached_input_tokens": 55424,
+        "output_tokens": 940,
+        "reasoning_output_tokens": 246
+      }
+    }
+  ],
+  "finalMessageSha256": "4c7fa37764aa6144a3af3355be2cda44bb4e10f9b96dbce8856a747c890c00bc",
+  "verification": {
+    "successful": true,
+    "verdict": "RCL_NATIVE_LEARNING_PROVEN_AT_MINIMAL_MLP_SCALE_LOCAL_NATIVE_AI_GENERATE_UNVERIFIED",
+    "reportRoot": "60f3ba1742aaf2f93c143151479303ef5b8879fd000afd9b8b9006a7baf83eaf",
+    "semanticStateRoots": [
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2",
+      "9d395b42a0c93c5fbe29174aa8308e1cabd6d346c1543a5aa65d185741f321c2"
+    ],
+    "maximumParameterDrift": 4.440892098500626e-15,
+    "maximumPredictionDrift": 3.3306690738754696e-16
+  },
+  "receiptRoot": "25da29921ec9ace27a8edcc31b80aa005caf265d4a16664d813697c8fea8ee30"
+}

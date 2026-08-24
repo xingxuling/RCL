@@ -1,0 +1,91 @@
+{
+  "format": "rcl.k233.ai-generation-contract.v0.1",
+  "taskId": "K233",
+  "killerTask": "K08",
+  "status": "REFROZEN_AFTER_UNIQUE_MUTATION_ANCHOR_PROBE_PENDING_INDEPENDENT_TRIALS",
+  "frozenAt": "2026-08-25T05:35:00+08:00",
+  "baseCommit": "d942154c3191ae2f85a801013b68247a16604a7f",
+  "canonicalSource": "examples/native-ai/pure-rcl-xor.rcl",
+  "canonicalSourceSha256": "933093ca0168d0e54900d57d2f58ab924454c3f8b1582605ab0427610aeb4685",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "requiredCli": "codex-cli",
+    "minimumCliVersion": "0.135.0",
+    "requiredIsolation": ["fresh temporary workspace", "ephemeral session", "ignore user config", "ignore rules", "read-only sandbox", "JSON Schema constrained edit response"],
+    "networkRequired": true
+  },
+  "generatorAvailabilityAudit": {
+    "auditedAt": "2026-08-25T05:45:00+08:00",
+    "rejectedCandidates": [
+      {
+        "id": "qwen3.5:latest",
+        "reason": "MANIFEST_PRESENT_MODEL_BLOB_MISSING",
+        "modelBlobDigest": "sha256:dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c"
+      },
+      {
+        "id": "tinyllama:latest",
+        "reason": "TWO_STRUCTURED_DERIVATIVE_REPAIR_PROBES_RETURNED_SEMANTICALLY_INCORRECT_EDITS",
+        "modelDigest": "2644915ede352ea7bdfaff0bfac0be74c719d5d5202acb63a6fb095b52f394a4"
+      }
+    ],
+    "thresholdsRelaxed": false
+  },
+  "sandboxProbe": {
+    "acceptedAsTrial": false,
+    "result": "GENERATOR_DIAGNOSIS_CORRECT_BUT_WORKSPACE_WRITE_BLOCKED_BY_EFFECTIVE_READ_ONLY_POLICY",
+    "protocolChange": "The independent generator now returns a JSON Schema constrained exact-text edit from a read-only sandbox; the evaluator applies that response mechanically before native verification.",
+    "oraclePatchAddedToPrompt": false,
+    "thresholdsRelaxed": false
+  },
+  "mutationAnchorProbe": {
+    "acceptedAsTrialSet": false,
+    "result": "TRIAL_01_PASSED_BUT_TRIAL_02_MUTATION_ANCHOR_WAS_NON_UNIQUE",
+    "protocolChange": "Trial 02 now binds the complete output_delta local expression instead of a repeated target-access substring; Trial 01 will be regenerated in the final three-session set.",
+    "semanticMutationChanged": false,
+    "oraclePatchAddedToPrompt": false,
+    "thresholdsRelaxed": false
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that a separately executed AI model can repair bounded RCL-owned machine-learning semantics from mutated source and observed failure evidence without access to the oracle patch.",
+  "rules": [
+    "The generating model receives only the mutated RCL source in a fresh temporary workspace, frozen contract summary, observed failure evidence and editing rules.",
+    "The generating model does not receive the canonical source, canonical patch, mutation implementation or expected edit.",
+    "The development agent may orchestrate and deterministically evaluate the trial but cannot author or modify the generator edit response.",
+    "Each generator session is ephemeral, ignores user configuration and project rules, runs read-only, and receives no writable path to the authoritative repository.",
+    "The evaluator may only apply the exact old/new edit returned under the frozen JSON Schema; it cannot repair or reinterpret a failed response.",
+    "Each repaired candidate must compile through native rclc/compiler.rbc and execute through native rclvm.",
+    "Every non-AI K233 gate, differential tolerance and deterministic replay requirement must pass without changing the frozen task contract or tests.",
+    "The verifier rejects provider delegation, threshold edits, test edits, missing model provenance, malformed responses and partial trial sets.",
+    "A GitHub-hosted replay of the saved model edits is required before repository status may promote AI_GENERATE to PASS."
+  ],
+  "trials": [
+    {
+      "id": "K233-AI-REPAIR-01",
+      "mutationClass": "ACTIVATION_GRADIENT_SEMANTICS",
+      "intent": "Repair the analytic activation derivative so the frozen native-learning task regains differential and correctness evidence.",
+      "oraclePatchVisibleToGenerator": false
+    },
+    {
+      "id": "K233-AI-REPAIR-02",
+      "mutationClass": "TARGET_BINDING_SEMANTICS",
+      "intent": "Repair target binding in the output gradient so supervised labels, rather than an input coordinate, govern learning.",
+      "oraclePatchVisibleToGenerator": false
+    },
+    {
+      "id": "K233-AI-REPAIR-03",
+      "mutationClass": "PARAMETER_GRADIENT_ROUTING",
+      "intent": "Repair a hidden-to-output parameter gradient route while preserving the general native execution path and all frozen evidence gates.",
+      "oraclePatchVisibleToGenerator": false
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredIndependentGenerator": true,
+    "requiredNativeExecution": true,
+    "requiredDifferentialOracle": true,
+    "requiredDeterministicReplays": 3,
+    "requiredGitHubReplay": true,
+    "selfIssuedPassForbidden": true
+  },
+  "evidenceBoundary": "A complete receipt proves reproducible bounded AI repair of RCL-owned minimal MLP semantics. It does not prove autonomous model invention, general code generation, model scale, Tensor, Autodiff, Transformer or production AI safety."
+}

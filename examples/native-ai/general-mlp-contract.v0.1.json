@@ -1,0 +1,120 @@
+{
+  "format": "rcl.native-ai.general-mlp-contract.v0.1",
+  "id": "k08-b-general-mlp-v0.1",
+  "status": "REFROZEN_AFTER_FAILED_LOWERING_PROBE_BEFORE_ACCEPTED_EVIDENCE_RUN",
+  "frozenAt": "2026-08-25T05:05:00+08:00",
+  "refrozenAt": "2026-08-25T05:24:00+08:00",
+  "preEvidenceProbe": {
+    "accepted": false,
+    "failure": "SELFHOST_AND_REFERENCE_PROGRAM_ROOT_DIVERGED_WHILE_INSTRUCTIONS_CONSTANTS_AND_FUNCTIONS_MATCHED",
+    "onlyContractChange": "Majority initialization literals were normalized to the same 12-decimal portability envelope already used by K08-A; thresholds were not changed."
+  },
+  "profile": {
+    "id": "AI-N2-TWO-DENSE-LAYER-GENERAL-MLP",
+    "scope": "Two configurable dense layers with generic widths, parameters, activation, loss, Batch SGD, dataset and checkpoint semantics owned by RCL.",
+    "futureBoundary": "Arbitrary computation graphs, native autodiff, Tensor Genome, Adam, Transformer and accelerators are not implied."
+  },
+  "loss": {
+    "kind": "mean_half_squared"
+  },
+  "optimizer": {
+    "kind": "batch_sgd",
+    "learningRate": 4
+  },
+  "tasks": [
+    {
+      "id": "xor",
+      "kind": "binary_classification",
+      "epochs": 512,
+      "architecture": [2, 2, 1],
+      "dataset": [
+        { "input": [0, 0], "target": [0] },
+        { "input": [0, 1], "target": [1] },
+        { "input": [1, 0], "target": [1] },
+        { "input": [1, 1], "target": [0] }
+      ],
+      "initialModel": {
+        "layers": [
+          {
+            "inputSize": 2,
+            "outputSize": 2,
+            "activation": "softsign01",
+            "weights": [0.161766003072, -0.082735105604, 0.563945269585, 0.271574466303],
+            "biases": [-0.520297762007, 0.042548067495]
+          },
+          {
+            "inputSize": 2,
+            "outputSize": 1,
+            "activation": "softsign01",
+            "weights": [-0.362835209072, 0.199591446295],
+            "biases": [0.584759437293]
+          }
+        ]
+      },
+      "thresholds": {
+        "minimumAccuracy": 1,
+        "maximumLoss": 0.03,
+        "minimumAbsoluteLossReduction": 0.1
+      }
+    },
+    {
+      "id": "majority3",
+      "kind": "binary_classification",
+      "epochs": 256,
+      "architecture": [3, 3, 1],
+      "dataset": [
+        { "input": [0, 0, 0], "target": [0] },
+        { "input": [0, 0, 1], "target": [0] },
+        { "input": [0, 1, 0], "target": [0] },
+        { "input": [0, 1, 1], "target": [1] },
+        { "input": [1, 0, 0], "target": [0] },
+        { "input": [1, 0, 1], "target": [1] },
+        { "input": [1, 1, 0], "target": [1] },
+        { "input": [1, 1, 1], "target": [1] }
+      ],
+      "initialModel": {
+        "layers": [
+          {
+            "inputSize": 3,
+            "outputSize": 3,
+            "activation": "softsign01",
+            "weights": [-0.270677204244, -0.290112408344, 0.126783265918, -0.201015452575, -0.162915732153, 0.174219994526, -0.580329449102, -0.192985409405, 0.444691572525],
+            "biases": [-0.276961910818, 0.258677615225, 0.0407644850202]
+          },
+          {
+            "inputSize": 3,
+            "outputSize": 1,
+            "activation": "softsign01",
+            "weights": [-0.212290200032, -0.461927186418, 0.133308605477],
+            "biases": [0.189813526813]
+          }
+        ]
+      },
+      "thresholds": {
+        "minimumAccuracy": 1,
+        "maximumLoss": 0.03,
+        "minimumAbsoluteLossReduction": 0.1
+      }
+    }
+  ],
+  "checkpoint": {
+    "directEpochs": 32,
+    "firstSegmentEpochs": 16,
+    "secondSegmentEpochs": 16,
+    "requireExactResumeParity": true
+  },
+  "thresholds": {
+    "requiredDeterministicNativeReplays": 3,
+    "maximumOracleDrift": 1e-9,
+    "maximumMedianNativeRuntimeMs": 10000
+  },
+  "forbidden": [
+    "xor_special",
+    "majority_special",
+    "mlp_2_2_1_special",
+    "task-specific VM opcode",
+    "external trainer",
+    "provider_call"
+  ],
+  "evidenceBoundary": "This contract can establish AI-N2 only for the bounded two-dense-layer General MLP profile. It does not close independent AI_GENERATE by itself and does not prove Tensor, Autodiff, Transformer, LM, accelerator or distributed infrastructure."
+}

@@ -1,0 +1,479 @@
+# K08-B: configurable dense MLP semantics owned and executed by RCL.
+# The bounded AI-N2 profile has two configurable dense layers. It adds no ML VM opcode.
+reality GeneralMlpNativeLearning {
+  reckon one(value : Number) -> Sequence =
+    sequence_append(empty_sequence(), value)
+
+  reckon two(first : Number, second : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), first), second)
+
+  reckon three(first : Number, second : Number, third : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), first), second), third)
+
+  reckon make_parameter(weights : Sequence, biases : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), "Parameter"), weights), biases)
+
+  reckon parameter_weights(parameter : Sequence) -> Sequence = sequence_get(parameter, 1)
+  reckon parameter_biases(parameter : Sequence) -> Sequence = sequence_get(parameter, 2)
+
+  reckon make_layer(input_size : Number, output_size : Number, activation : Text, parameter : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), "Layer"),
+            input_size),
+          output_size),
+        activation),
+      parameter)
+
+  reckon layer_input_size(layer : Sequence) -> Number = sequence_get(layer, 1)
+  reckon layer_output_size(layer : Sequence) -> Number = sequence_get(layer, 2)
+  reckon layer_activation(layer : Sequence) -> Text = sequence_get(layer, 3)
+  reckon layer_parameter(layer : Sequence) -> Sequence = sequence_get(layer, 4)
+  reckon layer_weights(layer : Sequence) -> Sequence = parameter_weights(layer_parameter(layer))
+  reckon layer_biases(layer : Sequence) -> Sequence = parameter_biases(layer_parameter(layer))
+
+  reckon make_model(first_layer : Sequence, second_layer : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Model"),
+        first_layer),
+      second_layer)
+
+  reckon model_first_layer(model : Sequence) -> Sequence = sequence_get(model, 1)
+  reckon model_second_layer(model : Sequence) -> Sequence = sequence_get(model, 2)
+
+  reckon make_loss(kind : Text) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "Loss"), kind)
+
+  reckon make_optimizer(kind : Text, learning_rate : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Optimizer"),
+        kind),
+      learning_rate)
+
+  reckon optimizer_kind(optimizer : Sequence) -> Text = sequence_get(optimizer, 1)
+  reckon optimizer_learning_rate(optimizer : Sequence) -> Number = sequence_get(optimizer, 2)
+
+  reckon make_sample(features : Sequence, targets : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Sample"),
+        features),
+      targets)
+
+  reckon sample_features(sample : Sequence) -> Sequence = sequence_get(sample, 1)
+  reckon sample_targets(sample : Sequence) -> Sequence = sequence_get(sample, 2)
+
+  reckon make_dataset(samples : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "Dataset"), samples)
+
+  reckon dataset_samples(dataset : Sequence) -> Sequence = sequence_get(dataset, 1)
+  reckon dataset_length(dataset : Sequence) -> Number = length(dataset_samples(dataset))
+  reckon dataset_sample(dataset : Sequence, index : Number) -> Sequence = sequence_get(dataset_samples(dataset), index)
+
+  reckon make_checkpoint(epoch : Number, model : Sequence, optimizer : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), "Checkpoint"),
+          epoch),
+        model),
+      optimizer)
+
+  reckon checkpoint_epoch(checkpoint : Sequence) -> Number = sequence_get(checkpoint, 1)
+  reckon checkpoint_model(checkpoint : Sequence) -> Sequence = sequence_get(checkpoint, 2)
+  reckon checkpoint_optimizer(checkpoint : Sequence) -> Sequence = sequence_get(checkpoint, 3)
+
+  reckon absolute(value : Number) -> Number = choose(value >= 0, value, -value)
+
+  reckon activate(kind : Text, value : Number) -> Number =
+    choose(kind == "linear", value, 0.5 + 0.5 * value / (1 + absolute(value)))
+
+  reckon activation_derivative(kind : Text, value : Number) -> Number =
+    choose(kind == "linear", 1, 0.5 / ((1 + absolute(value)) * (1 + absolute(value))))
+
+  reckon activation_valid(kind : Text) -> Truth = kind == "softsign01" or kind == "linear"
+
+  reckon layer_valid(layer : Sequence) -> Truth =
+    length(layer) == 5 and
+    sequence_get(layer, 0) == "Layer" and
+    layer_input_size(layer) >= 1 and
+    layer_output_size(layer) >= 1 and
+    activation_valid(layer_activation(layer)) and
+    length(layer_parameter(layer)) == 3 and
+    sequence_get(layer_parameter(layer), 0) == "Parameter" and
+    length(layer_weights(layer)) == layer_input_size(layer) * layer_output_size(layer) and
+    length(layer_biases(layer)) == layer_output_size(layer)
+
+  reckon model_valid(model : Sequence) -> Truth =
+    length(model) == 3 and
+    sequence_get(model, 0) == "Model" and
+    layer_valid(model_first_layer(model)) and
+    layer_valid(model_second_layer(model)) and
+    layer_output_size(model_first_layer(model)) == layer_input_size(model_second_layer(model))
+
+  reckon sample_valid(sample : Sequence, input_size : Number, output_size : Number) -> Truth =
+    length(sample) == 3 and
+    sequence_get(sample, 0) == "Sample" and
+    length(sample_features(sample)) == input_size and
+    length(sample_targets(sample)) == output_size
+
+  reckon dataset_rows_valid(dataset : Sequence, input_size : Number, output_size : Number, row_index : Number) -> Truth =
+    choose(row_index >= dataset_length(dataset),
+      true,
+      sample_valid(dataset_sample(dataset, row_index), input_size, output_size) and
+        dataset_rows_valid(dataset, input_size, output_size, row_index + 1))
+
+  reckon dataset_valid_for_model(dataset : Sequence, model : Sequence) -> Truth =
+    length(dataset) == 2 and
+    sequence_get(dataset, 0) == "Dataset" and
+    dataset_length(dataset) >= 1 and
+    dataset_rows_valid(
+      dataset,
+      layer_input_size(model_first_layer(model)),
+      layer_output_size(model_second_layer(model)),
+      0)
+
+  reckon weighted_input_sum(layer : Sequence, input : Sequence, output_index : Number, input_index : Number, accumulated : Number) -> Number =
+    choose(input_index >= layer_input_size(layer),
+      accumulated + sequence_get(layer_biases(layer), output_index),
+      weighted_input_sum(
+        layer,
+        input,
+        output_index,
+        input_index + 1,
+        accumulated + sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) * sequence_get(input, input_index)))
+
+  reckon unit_pre_activation(layer : Sequence, input : Sequence, output_index : Number) -> Number =
+    weighted_input_sum(layer, input, output_index, 0, 0)
+
+  reckon unit_output(layer : Sequence, input : Sequence, output_index : Number) -> Number =
+    activate(layer_activation(layer), unit_pre_activation(layer, input, output_index))
+
+  reckon layer_forward_units(layer : Sequence, input : Sequence, output_index : Number, output : Sequence) -> Sequence =
+    choose(output_index >= layer_output_size(layer),
+      output,
+      layer_forward_units(
+        layer,
+        input,
+        output_index + 1,
+        sequence_append(output, unit_output(layer, input, output_index))))
+
+  reckon layer_forward(layer : Sequence, input : Sequence) -> Sequence =
+    layer_forward_units(layer, input, 0, empty_sequence())
+
+  reckon model_hidden(model : Sequence, input : Sequence) -> Sequence =
+    layer_forward(model_first_layer(model), input)
+
+  reckon model_forward(model : Sequence, input : Sequence) -> Sequence =
+    layer_forward(model_second_layer(model), model_hidden(model, input))
+
+  reckon sample_loss_units(model : Sequence, sample : Sequence, output_index : Number, accumulated : Number) -> Number =
+    choose(output_index >= length(sample_targets(sample)),
+      accumulated / length(sample_targets(sample)),
+      sample_loss_units(
+        model,
+        sample,
+        output_index + 1,
+        accumulated + 0.5
+          * (sequence_get(model_forward(model, sample_features(sample)), output_index) - sequence_get(sample_targets(sample), output_index))
+          * (sequence_get(model_forward(model, sample_features(sample)), output_index) - sequence_get(sample_targets(sample), output_index))))
+
+  reckon sample_loss(model : Sequence, sample : Sequence) -> Number = sample_loss_units(model, sample, 0, 0)
+
+  reckon dataset_loss_rows(model : Sequence, dataset : Sequence, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= dataset_length(dataset),
+      accumulated / dataset_length(dataset),
+      dataset_loss_rows(model, dataset, row_index + 1, accumulated + sample_loss(model, dataset_sample(dataset, row_index))))
+
+  reckon dataset_loss(model : Sequence, dataset : Sequence) -> Number = dataset_loss_rows(model, dataset, 0, 0)
+
+  reckon output_delta(model : Sequence, input : Sequence, target : Sequence, unit_index : Number) -> Number =
+    (sequence_get(model_forward(model, input), unit_index) - sequence_get(target, unit_index))
+      * activation_derivative(
+        layer_activation(model_second_layer(model)),
+        unit_pre_activation(model_second_layer(model), model_hidden(model, input), unit_index))
+
+  reckon hidden_downstream_delta_sum(model : Sequence, input : Sequence, target : Sequence, hidden_index : Number, output_index : Number, accumulated : Number) -> Number =
+    choose(output_index >= layer_output_size(model_second_layer(model)),
+      accumulated,
+      hidden_downstream_delta_sum(
+        model,
+        input,
+        target,
+        hidden_index,
+        output_index + 1,
+        accumulated
+          + output_delta(model, input, target, output_index)
+          * sequence_get(
+              layer_weights(model_second_layer(model)),
+              output_index * layer_input_size(model_second_layer(model)) + hidden_index)))
+
+  reckon hidden_delta(model : Sequence, input : Sequence, target : Sequence, hidden_index : Number) -> Number =
+    hidden_downstream_delta_sum(model, input, target, hidden_index, 0, 0)
+      * activation_derivative(
+        layer_activation(model_first_layer(model)),
+        unit_pre_activation(model_first_layer(model), input, hidden_index))
+
+  reckon unit_delta(model : Sequence, input : Sequence, target : Sequence, layer_index : Number, output_index : Number) -> Number =
+    choose(layer_index == 0,
+      hidden_delta(model, input, target, output_index),
+      output_delta(model, input, target, output_index))
+
+  reckon layer_training_input(model : Sequence, input : Sequence, layer_index : Number) -> Sequence =
+    choose(layer_index == 0, input, model_hidden(model, input))
+
+  reckon sample_weight_gradient(model : Sequence, sample : Sequence, layer_index : Number, output_index : Number, input_index : Number) -> Number =
+    unit_delta(model, sample_features(sample), sample_targets(sample), layer_index, output_index)
+      * sequence_get(layer_training_input(model, sample_features(sample), layer_index), input_index)
+
+  reckon sample_bias_gradient(model : Sequence, sample : Sequence, layer_index : Number, output_index : Number) -> Number =
+    unit_delta(model, sample_features(sample), sample_targets(sample), layer_index, output_index)
+
+  reckon dataset_weight_gradient_rows(model : Sequence, dataset : Sequence, layer_index : Number, output_index : Number, input_index : Number, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= dataset_length(dataset),
+      accumulated / dataset_length(dataset),
+      dataset_weight_gradient_rows(
+        model,
+        dataset,
+        layer_index,
+        output_index,
+        input_index,
+        row_index + 1,
+        accumulated + sample_weight_gradient(model, dataset_sample(dataset, row_index), layer_index, output_index, input_index)))
+
+  reckon dataset_bias_gradient_rows(model : Sequence, dataset : Sequence, layer_index : Number, output_index : Number, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= dataset_length(dataset),
+      accumulated / dataset_length(dataset),
+      dataset_bias_gradient_rows(
+        model,
+        dataset,
+        layer_index,
+        output_index,
+        row_index + 1,
+        accumulated + sample_bias_gradient(model, dataset_sample(dataset, row_index), layer_index, output_index)))
+
+  reckon update_layer_weights(model : Sequence, dataset : Sequence, optimizer : Sequence, layer : Sequence, layer_index : Number, output_index : Number, input_index : Number, output : Sequence) -> Sequence =
+    choose(output_index >= layer_output_size(layer),
+      output,
+      choose(input_index >= layer_input_size(layer),
+        update_layer_weights(model, dataset, optimizer, layer, layer_index, output_index + 1, 0, output),
+        update_layer_weights(
+          model,
+          dataset,
+          optimizer,
+          layer,
+          layer_index,
+          output_index,
+          input_index + 1,
+          sequence_append(
+            output,
+            sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index)
+              - optimizer_learning_rate(optimizer)
+              * dataset_weight_gradient_rows(model, dataset, layer_index, output_index, input_index, 0, 0)))))
+
+  reckon update_layer_biases(model : Sequence, dataset : Sequence, optimizer : Sequence, layer : Sequence, layer_index : Number, output_index : Number, output : Sequence) -> Sequence =
+    choose(output_index >= layer_output_size(layer),
+      output,
+      update_layer_biases(
+        model,
+        dataset,
+        optimizer,
+        layer,
+        layer_index,
+        output_index + 1,
+        sequence_append(
+          output,
+          sequence_get(layer_biases(layer), output_index)
+            - optimizer_learning_rate(optimizer)
+            * dataset_bias_gradient_rows(model, dataset, layer_index, output_index, 0, 0))))
+
+  reckon update_layer(model : Sequence, dataset : Sequence, optimizer : Sequence, layer : Sequence, layer_index : Number) -> Sequence =
+    make_layer(
+      layer_input_size(layer),
+      layer_output_size(layer),
+      layer_activation(layer),
+      make_parameter(
+        update_layer_weights(model, dataset, optimizer, layer, layer_index, 0, 0, empty_sequence()),
+        update_layer_biases(model, dataset, optimizer, layer, layer_index, 0, empty_sequence())))
+
+  reckon train_step(model : Sequence, dataset : Sequence, optimizer : Sequence) -> Sequence =
+    make_model(
+      update_layer(model, dataset, optimizer, model_first_layer(model), 0),
+      update_layer(model, dataset, optimizer, model_second_layer(model), 1))
+
+  reckon train_model(model : Sequence, dataset : Sequence, optimizer : Sequence, completed : Number, epochs : Number) -> Sequence =
+    choose(completed >= epochs,
+      model,
+      train_model(train_step(model, dataset, optimizer), dataset, optimizer, completed + 1, epochs))
+
+  reckon train_checkpoint(model : Sequence, dataset : Sequence, optimizer : Sequence, start_epoch : Number, epochs : Number) -> Sequence =
+    make_checkpoint(start_epoch + epochs, train_model(model, dataset, optimizer, 0, epochs), optimizer)
+
+  reckon resume_checkpoint(checkpoint : Sequence, dataset : Sequence, additional_epochs : Number) -> Sequence =
+    train_checkpoint(
+      checkpoint_model(checkpoint),
+      dataset,
+      checkpoint_optimizer(checkpoint),
+      checkpoint_epoch(checkpoint),
+      additional_epochs)
+
+  reckon prediction_rows(model : Sequence, dataset : Sequence, row_index : Number, output : Sequence) -> Sequence =
+    choose(row_index >= dataset_length(dataset),
+      output,
+      prediction_rows(
+        model,
+        dataset,
+        row_index + 1,
+        sequence_append(output, sequence_get(model_forward(model, sample_features(dataset_sample(dataset, row_index))), 0))))
+
+  reckon dataset_predictions(model : Sequence, dataset : Sequence) -> Sequence =
+    prediction_rows(model, dataset, 0, empty_sequence())
+
+  reckon classification(value : Number) -> Number = choose(value >= 0.5, 1, 0)
+
+  reckon correct_rows(model : Sequence, dataset : Sequence, row_index : Number, accumulated : Number) -> Number =
+    choose(row_index >= dataset_length(dataset),
+      accumulated,
+      correct_rows(
+        model,
+        dataset,
+        row_index + 1,
+        accumulated + choose(
+          classification(sequence_get(model_forward(model, sample_features(dataset_sample(dataset, row_index))), 0))
+            == sequence_get(sample_targets(dataset_sample(dataset, row_index)), 0),
+          1,
+          0)))
+
+  reckon dataset_accuracy(model : Sequence, dataset : Sequence) -> Number =
+    correct_rows(model, dataset, 0, 0) / dataset_length(dataset)
+
+  reckon xor_samples() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), make_sample(two(0, 0), one(0))),
+          make_sample(two(0, 1), one(1))),
+        make_sample(two(1, 0), one(1))),
+      make_sample(two(1, 1), one(0)))
+
+  reckon xor_dataset() -> Sequence = make_dataset(xor_samples())
+
+  reckon xor_initial_model() -> Sequence =
+    make_model(
+      make_layer(
+        2,
+        2,
+        "softsign01",
+        make_parameter(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), 0.161766003072),
+                -0.082735105604),
+              0.563945269585),
+            0.271574466303),
+          two(-0.520297762007, 0.042548067495))),
+      make_layer(
+        2,
+        1,
+        "softsign01",
+        make_parameter(two(-0.362835209072, 0.199591446295), one(0.584759437293))))
+
+  reckon majority_samples() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(empty_sequence(), make_sample(three(0, 0, 0), one(0))),
+                  make_sample(three(0, 0, 1), one(0))),
+                make_sample(three(0, 1, 0), one(0))),
+              make_sample(three(0, 1, 1), one(1))),
+            make_sample(three(1, 0, 0), one(0))),
+          make_sample(three(1, 0, 1), one(1))),
+        make_sample(three(1, 1, 0), one(1))),
+      make_sample(three(1, 1, 1), one(1)))
+
+  reckon majority_dataset() -> Sequence = make_dataset(majority_samples())
+
+  reckon majority_initial_model() -> Sequence =
+    make_model(
+      make_layer(
+        3,
+        3,
+        "softsign01",
+        make_parameter(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(
+                    sequence_append(
+                      sequence_append(
+                        sequence_append(
+                          sequence_append(empty_sequence(), -0.270677204244),
+                          -0.290112408344),
+                        0.126783265918),
+                      -0.201015452575),
+                    -0.162915732153),
+                  0.174219994526),
+                -0.580329449102),
+              -0.192985409405),
+            0.444691572525),
+          three(-0.276961910818, 0.258677615225, 0.0407644850202))),
+      make_layer(
+        3,
+        1,
+        "softsign01",
+        make_parameter(
+          three(-0.212290200032, -0.461927186418, 0.133308605477),
+          one(0.189813526813))))
+
+  reckon invalid_shape_model() -> Sequence =
+    make_model(
+      make_layer(2, 2, "softsign01", make_parameter(two(0, 0), two(0, 0))),
+      make_layer(3, 1, "softsign01", make_parameter(three(0, 0, 0), one(0))))
+
+  reckon invalid_dataset() -> Sequence =
+    make_dataset(sequence_append(empty_sequence(), make_sample(one(0), one(0))))
+
+  facet contract.id : Text = "k08-b-general-mlp-v0.1"
+  facet contract.profile : Text = "AI-N2-TWO-DENSE-LAYER-GENERAL-MLP"
+  facet contract.loss : Sequence = make_loss("mean_half_squared")
+  facet training.optimizer : Sequence = make_optimizer("batch_sgd", 4)
+  facet training.xor_dataset : Sequence = xor_dataset()
+  facet training.majority_dataset : Sequence = majority_dataset()
+  facet training.xor_initial_model : Sequence = xor_initial_model()
+  facet training.majority_initial_model : Sequence = majority_initial_model()
+  facet training.xor_initial_loss : Number = dataset_loss(training.xor_initial_model, training.xor_dataset)
+  facet training.majority_initial_loss : Number = dataset_loss(training.majority_initial_model, training.majority_dataset)
+  facet training.xor_checkpoint : Sequence = train_checkpoint(training.xor_initial_model, training.xor_dataset, training.optimizer, 0, 512)
+  facet training.majority_checkpoint : Sequence = train_checkpoint(training.majority_initial_model, training.majority_dataset, training.optimizer, 0, 256)
+  facet training.xor_final_model : Sequence = checkpoint_model(training.xor_checkpoint)
+  facet training.majority_final_model : Sequence = checkpoint_model(training.majority_checkpoint)
+  facet inference.xor_outputs : Sequence = dataset_predictions(training.xor_final_model, training.xor_dataset)
+  facet inference.majority_outputs : Sequence = dataset_predictions(training.majority_final_model, training.majority_dataset)
+  facet evaluation.xor_loss : Number = dataset_loss(training.xor_final_model, training.xor_dataset)
+  facet evaluation.majority_loss : Number = dataset_loss(training.majority_final_model, training.majority_dataset)
+  facet evaluation.xor_accuracy : Number = dataset_accuracy(training.xor_final_model, training.xor_dataset)
+  facet evaluation.majority_accuracy : Number = dataset_accuracy(training.majority_final_model, training.majority_dataset)
+  facet evaluation.xor_pass : Truth = evaluation.xor_accuracy == 1 and evaluation.xor_loss <= 0.03
+  facet evaluation.majority_pass : Truth = evaluation.majority_accuracy == 1 and evaluation.majority_loss <= 0.03
+  facet evaluation.models_valid : Truth = model_valid(training.xor_initial_model) and model_valid(training.majority_initial_model)
+  facet evaluation.datasets_valid : Truth =
+    dataset_valid_for_model(training.xor_dataset, training.xor_initial_model) and
+    dataset_valid_for_model(training.majority_dataset, training.majority_initial_model)
+  facet evaluation.invalid_shape_rejected : Truth = model_valid(invalid_shape_model()) == false
+  facet evaluation.invalid_dataset_rejected : Truth = dataset_valid_for_model(invalid_dataset(), training.xor_initial_model) == false
+  facet checkpoint.direct_32 : Sequence = train_checkpoint(training.xor_initial_model, training.xor_dataset, training.optimizer, 0, 32)
+  facet checkpoint.first_16 : Sequence = train_checkpoint(training.xor_initial_model, training.xor_dataset, training.optimizer, 0, 16)
+  facet checkpoint.resumed_16_plus_16 : Sequence = resume_checkpoint(checkpoint.first_16, training.xor_dataset, 16)
+  facet evidence.execution_path : Text = "RCL_MODEL_DATASET_BACKPROP_SGD_CHECKPOINT_TO_RBC_TO_NATIVE_VM"
+  facet evidence.ai_generate : Text = "REQUIRES_INDEPENDENT_RECEIPT"
+}

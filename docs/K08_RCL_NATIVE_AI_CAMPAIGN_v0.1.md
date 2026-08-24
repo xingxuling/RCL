@@ -1,9 +1,9 @@
 # K08 RCL-Native AI Campaign v0.1
 
-**Native-learning milestone:** `PASS_LOCAL_WINDOWS_NATIVE`
-**K400 cell:** `K233 ai-runtime::machine-learning = BLOCKED_AI_GENERATE`
-**Maturity:** `AI-N1` at the frozen minimal-MLP scope only
-**Evidence report root:** `d7f33073c484cae7dec818e6628bc49444956254ce1d13f2246164a3d7e4526c`
+**Native-learning milestone:** `PASS_LOCAL_WINDOWS_NATIVE_AI_N2`
+**K400 cell:** `K233 ai-runtime::machine-learning = BLOCKED_GITHUB_AI_GENERATE_REPLAY`
+**Maturity:** `AI-N2` for the bounded two-Dense-layer General MLP profile
+**Evidence report root:** `30109639721ced8e0afb1e0edd6b5f44d76de9e94016ad82dc3ce4d33e83c330`
 **Date:** 2026-08-25
 
 ## 1. Audit boundary
@@ -81,7 +81,7 @@ This permits the scoped statement:
 RCL Native Learning: PROVEN AT MINIMAL MLP SCALE
 ```
 
-It does not permit claims of a general MLP, Tensor Genome, native autodiff, general optimizer genome, Transformer, language model, GPU/NPU lowering, production model lifecycle or self-generating RCL.
+K08-A alone does not permit claims of a general MLP, Tensor Genome, native autodiff, general optimizer genome, Transformer, language model, GPU/NPU lowering, production model lifecycle or self-generating RCL. K08-B below separately establishes only its bounded AI-N2 General MLP profile.
 
 ## 5. Reproduction
 
@@ -94,12 +94,31 @@ npm run evidence:k400
 
 Tracked receipt files live under `examples/native-ai/evidence/`. CI reruns the native campaign and uploads its generated evidence separately.
 
-## 6. Next gate
+## 6. K08-B General MLP closure
 
-K08-B must remove XOR-specific topology assumptions and introduce a configurable general MLP without adding an `xor_special` primitive. The current highest-value sequence is:
+K08-B now represents `Model`, `Layer`, `Parameter`, `Activation`, `Loss`, `Optimizer`, `Dataset` and `Checkpoint` as tagged RCL semantic values. One generic-width two-Dense-layer profile trains both the original XOR task and a structurally different three-input Majority task.
 
-1. obtain independent `AI_GENERATE` evidence for K233 without reusing this implementation session as its own judge;
-2. define a configurable layer/model representation and model save/load contract;
-3. rerun XOR through that general representation;
-4. test the same primitives on at least one non-XOR task before considering any Tensor Genome promotion;
-5. add native peak-memory telemetry and preserve the JavaScript performance gap as a donor advantage until absorbed.
+The accepted local native receipt records:
+
+- XOR `2-2-1`: accuracy `1`, loss `0.0157034488743931`;
+- Majority-3 `3-3-1`: accuracy `1`, loss `0.0111015956287353`;
+- exact `32 == 16 + resume(16)` checkpoint parity;
+- invalid adjacent layer width and invalid dataset width rejected;
+- three identical native state roots;
+- native/self-host and JS reference RBC byte parity;
+- maximum parameter drift below `5.4e-15`;
+- zero provider opcode and no task-specific VM opcode.
+
+Three independent, read-only Codex sessions also repaired three distinct hidden K08-A semantic mutations. Their exact edits restore canonical source bytes and replay locally, but they remain `CANDIDATE` until GitHub-hosted verification succeeds.
+
+Evidence and decisions: `docs/native-ai/evidence-ledger.md`, `docs/native-ai/integration-court.md`, and `docs/native-ai/rcl-gap-register.md`.
+
+## 7. Next gate
+
+K08-B has removed XOR-specific topology assumptions without adding an `xor_special` primitive. The current highest-value sequence is:
+
+1. complete the GitHub-hosted replay and bind the run SHA/URL into the independent receipt;
+2. regenerate K400 evidence only after that external replay;
+3. begin Tensor Genome with shape/dtype/layout and fail-closed broadcast/matmul semantics;
+4. add native peak-memory telemetry;
+5. preserve the JavaScript performance gap as a donor advantage until a CPU Tensor backend absorbs it.
