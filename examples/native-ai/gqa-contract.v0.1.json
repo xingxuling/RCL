@@ -1,0 +1,68 @@
+{
+  "format": "rcl.k08-o.gqa-contract.v0.1",
+  "status": "GQA_GENOME_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "profile": "PARAMETRIC_MULTI_HEAD_GQA_WITH_ROPE_F64_CANDIDATE",
+  "semantics": {
+    "queryHeadsMustBeDivisibleByKvHeads": true,
+    "headDimensionMustBePositiveEven": true,
+    "hiddenWidth": "queryHeads * headDimension",
+    "kvWidth": "kvHeads * headDimension",
+    "queryToKvMapping": "floor(queryHead / (queryHeads / kvHeads))",
+    "headExtraction": "generic matmul selector",
+    "headMerge": "generic matmul embedder plus add",
+    "rope": "apply K08-N position-frame semantics independently inside each Q/K head before score matmul"
+  },
+  "frozenEvidenceProfiles": [
+    {
+      "name": "GQA-2Q-1KV",
+      "sequenceLength": 3,
+      "hiddenSize": 4,
+      "queryHeads": 2,
+      "kvHeads": 1,
+      "headDimension": 2
+    },
+    {
+      "name": "MHA-2Q-2KV-STRUCTURAL",
+      "sequenceLength": 3,
+      "hiddenSize": 4,
+      "queryHeads": 2,
+      "kvHeads": 2,
+      "headDimension": 2
+    }
+  ],
+  "rcl1bTargetCompatibility": {
+    "queryHeads": 16,
+    "kvHeads": 4,
+    "headDimension": 128,
+    "hiddenSize": 2048,
+    "queriesPerKv": 4
+  },
+  "requiredEvidence": [
+    "selfhost-rbc-parity-and-native-semantic-root",
+    "gqa-forward-vs-independent-oracle",
+    "rope-applied-per-qk-head",
+    "causal-attention-per-query-head",
+    "kv-sharing-mapping-correct",
+    "all-projection-parameters-receive-finite-gradients",
+    "selected-gradients-vs-finite-difference",
+    "mha-structural-profile-valid",
+    "invalid-head-count-fails-closed",
+    "odd-head-dimension-fails-closed",
+    "model-special-opcode-injection-fails-closed"
+  ],
+  "claimsGrantedOnAdmission": [
+    "MULTI_HEAD_ATTENTION",
+    "GQA_COMPOSITION",
+    "ROPE_PER_HEAD_INTEGRATION"
+  ],
+  "claimsNotGranted": [
+    "MULTI_BLOCK_LM",
+    "RCL_10M",
+    "BF16",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
