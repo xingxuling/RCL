@@ -1177,6 +1177,7 @@ test('native Provider ABI v1 invokes a registered provider from RCL bytecode', (
   const decoded = decodeBytecode(bytecode);
   assert.ok(decoded.instructions.some(instruction => instruction.name === 'CALL_PROVIDER'));
   const buildPath = path.join(PACKAGE_ROOT, 'build', 'provider-abi-test.rbc');
+  fs.mkdirSync(path.dirname(buildPath), { recursive: true });
   fs.writeFileSync(buildPath, bytecode);
   const providerDemo = process.platform === 'win32' ? 'provider_demo.exe' : 'provider_demo';
   const run = spawnSync(path.join(PACKAGE_ROOT, 'native', providerDemo), [buildPath], { encoding: 'utf8' });

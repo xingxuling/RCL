@@ -1,0 +1,22 @@
+reality NativeProviderHostCall {
+  facet provider.reply : Text = "none"
+
+  subject operator {
+    warrant computer.invoke on echo
+  }
+
+  host echo {
+    offers text -> Text
+  }
+
+  emergence observe {
+    cause operator
+    when provider.reply == "none"
+    needs computer.invoke on echo
+    call echo.text("{\"message\":\"hello-provider-host-call\"}") -> provider.reply
+    preserve length(provider.reply) > 0
+    witness "rcl:native-provider-host-call"
+  }
+
+  realize observe
+}
