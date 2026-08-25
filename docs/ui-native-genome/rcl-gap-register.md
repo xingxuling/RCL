@@ -21,3 +21,5 @@ No workaround below may be silently counted as canonical RCL capability.
 ## Next absorption order
 
 `K339 compiler-source AI repair -> Android emulator/device gates -> reusable K04+ campaign adapters -> adjacent K400 cells`.
+
+K339 now has a `3/3` independent local repair candidate plus a byte-identical shared native compiler fixed point. It remains blocked until one GitHub push run binds the focused Linux receipt replay and Windows native self-hosting job; this is an evidence/authority gap, not a compiler semantic bypass.

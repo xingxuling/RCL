@@ -1,0 +1,591 @@
+{
+  "format": "rcl.k01.ai-generation-receipt.v0.2",
+  "generatedAt": "2026-08-25T16:01:49.962Z",
+  "contractRoot": "9d147a87713d4ea962a1de02b01bc381f48d7d0c6a4d8290f093b7b31bcfc8f9",
+  "contractStatus": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K339"
+  ],
+  "sharedNativeFixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "sourceSha256": "9e33abe58d47e825ba28378e7fd8cde89a8be81eac37b32924ed45a177a58f46",
+    "artifactSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bytes": 265286,
+    "byteIdentical": true,
+    "generations": {
+      "c0": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+      "c1": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+      "c2": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+    }
+  },
+  "trials": [
+    {
+      "format": "rcl.k01.ai-generation-trial-receipt.v0.2",
+      "trialId": "K01-AI-REPAIR-01",
+      "mutationClass": "ARITHMETIC_OPCODE_LOWERING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039a2-ee68-71f2-b98b-09a0408cda6a",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(operator == \"+\", 16,",
+        "new": "choose(operator == \"+\", 6,",
+        "diagnosis": "The binary opcode lowering table is otherwise intact, but the addition branch maps '+' to opcode 16. The declared compiler invariant requires ADD to be opcode 6, while the surrounding subtract/multiply/divide/comparison mappings already match the observed checks. This one-token numeric edit preserves the existing RCL-owned binary lowering path and repairs only the ADD opcode assignment."
+      },
+      "promptRoot": "9cfc7e252ee1cc0ae16e6e368c9954f151dbfe1a0203e31d7daa4bb7923c7ec5",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "8d9c88a5d1d5b03461a1fee9392471f79fbbab8d122689916aa1e5ce6d7b285f",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "7b899f2da17846607379868ed67b99cdc3ea089d74be74a66c1a51f741ca0150",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039a2-ee68-71f2-b98b-09a0408cda6a"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "a6d3c2dd1fe0441861633b96fbffe1587cfc24b2e289e978f66a275f7a82eb41"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "3a21acf7c0c1af1a976fa48086b2e71768aa06cba9392179bd4e38cc161880db"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 1,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "915d330f11ca4fc72974c6c42cf5d756c3964ca9526e2e0d17c322ef3477a499"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 183416,
+            "cached_input_tokens": 144256,
+            "output_tokens": 912,
+            "reasoning_output_tokens": 125
+          }
+        }
+      ],
+      "finalMessageSha256": "915d330f11ca4fc72974c6c42cf5d756c3964ca9526e2e0d17c322ef3477a499",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "93b8916c97c889b0834d7063086a9c940030cb5c26668043079ae7054a4ef03b",
+        "failedChecks": [
+          "add-opcode"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "8dd29c3737807616c7f0bd329cc3772318f5cc0a27444f1e2dba7da109f63ad6",
+        "checks": {
+          "single-binary-opcode-definition": {
+            "pass": true
+          },
+          "add-opcode": {
+            "pass": true
+          },
+          "subtract-opcode": {
+            "pass": true
+          },
+          "multiply-opcode": {
+            "pass": true
+          },
+          "divide-opcode": {
+            "pass": true
+          },
+          "equal-opcode": {
+            "pass": true
+          },
+          "not-equal-opcode": {
+            "pass": true
+          },
+          "less-opcode": {
+            "pass": true
+          },
+          "less-equal-opcode": {
+            "pass": true
+          },
+          "greater-opcode": {
+            "pass": true
+          },
+          "greater-equal-and-fallback": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          }
+        }
+      },
+      "receiptRoot": "2cc4849b99ce0a806b329f9c863ba3e1cdb80124e1813d210e98406baaf7888c"
+    },
+    {
+      "format": "rcl.k01.ai-generation-trial-receipt.v0.2",
+      "trialId": "K01-AI-REPAIR-02",
+      "mutationClass": "COMPARISON_OPCODE_LOWERING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039a3-c0b1-7063-98f8-e8b6a47a6c70",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(operator == \"<=\", 14,",
+        "new": "choose(operator == \"<=\", 13,",
+        "diagnosis": "binary_opcode maps <= to 14, colliding with the distinct > opcode. Changing only the <= arm to 13 repairs the declared invariant while preserving the existing comparison mapping structure."
+      },
+      "promptRoot": "0b0ddfeee08d6e497aea936ca13761c934fde8ac71872dc649862493476e947e",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "ff21da11e3e44b4098a927a37e2d86f0c17bc99e31aec996a3e5c941eed915bf",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "eba76b0aaf1816ebd1880763583c0fd6b198daf44a8362c3211e7f561ec22a2d",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039a3-c0b1-7063-98f8-e8b6a47a6c70"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "d3fa9f0386703b3298498ffc33e24aa8f236b4788a94bb6dedb174282c6c004e"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "5037da3a9311545750c9887dfbe628422a7545a0b3ec37c8bda7ad834ce8a19a"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "44cab89b1e40ef0654d2da089a5c6ee24a1b62e4d96391df09bfd657f8c2d6fe"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 90341,
+            "cached_input_tokens": 60544,
+            "output_tokens": 728,
+            "reasoning_output_tokens": 146
+          }
+        }
+      ],
+      "finalMessageSha256": "44cab89b1e40ef0654d2da089a5c6ee24a1b62e4d96391df09bfd657f8c2d6fe",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "09c46c8db8c7eb9f066e1b9c39e973a63a2662047d268ce46be9e4485e3b410a",
+        "failedChecks": [
+          "less-equal-opcode"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "8dd29c3737807616c7f0bd329cc3772318f5cc0a27444f1e2dba7da109f63ad6",
+        "checks": {
+          "single-binary-opcode-definition": {
+            "pass": true
+          },
+          "add-opcode": {
+            "pass": true
+          },
+          "subtract-opcode": {
+            "pass": true
+          },
+          "multiply-opcode": {
+            "pass": true
+          },
+          "divide-opcode": {
+            "pass": true
+          },
+          "equal-opcode": {
+            "pass": true
+          },
+          "not-equal-opcode": {
+            "pass": true
+          },
+          "less-opcode": {
+            "pass": true
+          },
+          "less-equal-opcode": {
+            "pass": true
+          },
+          "greater-opcode": {
+            "pass": true
+          },
+          "greater-equal-and-fallback": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          }
+        }
+      },
+      "receiptRoot": "f71b95223e98ee3fafae34a47fc5b95f962ef5d1d1199dc5edf096dd5b6c7b00"
+    },
+    {
+      "format": "rcl.k01.ai-generation-trial-receipt.v0.2",
+      "trialId": "K01-AI-REPAIR-03",
+      "mutationClass": "COMPARISON_DEFAULT_BOUNDARY",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039a4-50bd-7072-b437-8ff5a874ca41",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(operator == \">=\", 5, 15)",
+        "new": "choose(operator == \">=\", 15, 44)",
+        "diagnosis": "In binary_opcode, the final branch assigns >= to opcode 5 and uses opcode 15 as the fallback. The invariant requires >= to compile to opcode 15 while preserving the explicit unknown-operator fallback boundary at opcode 44."
+      },
+      "promptRoot": "2a0ad4334da3b331f94fe1a7576c9207bd653792d3414888d6f25219393dbea6",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "1931a776b6fa13ed0711a8b849415ab352ee9a63f85a85c86fc8e70166467f5d",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "da2b22c1ce545cad7e00fb09c3704c459634417a4d220738cf1f2167105e2628",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039a4-50bd-7072-b437-8ff5a874ca41"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "7bcaf10d2a9daea7d8e2204d32b7e978c85d19bcedd94d5f5b1e30e0239bb317"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "17473dd17e710ae90621c595a6c9b84523573eb77cb09c82a6b311a43ade14b6"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "90eb2641425ca9f6a9c8a9fc5d38dccebbaf51e5ed514304ca4b7f55761793ee"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 184783,
+            "cached_input_tokens": 150784,
+            "output_tokens": 1234,
+            "reasoning_output_tokens": 286
+          }
+        }
+      ],
+      "finalMessageSha256": "90eb2641425ca9f6a9c8a9fc5d38dccebbaf51e5ed514304ca4b7f55761793ee",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "0773f385e61ca6b442ae85fb769ce25d42e2195170c2fdd3f9a0f6199d83cf8f",
+        "failedChecks": [
+          "greater-equal-and-fallback"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "8dd29c3737807616c7f0bd329cc3772318f5cc0a27444f1e2dba7da109f63ad6",
+        "checks": {
+          "single-binary-opcode-definition": {
+            "pass": true
+          },
+          "add-opcode": {
+            "pass": true
+          },
+          "subtract-opcode": {
+            "pass": true
+          },
+          "multiply-opcode": {
+            "pass": true
+          },
+          "divide-opcode": {
+            "pass": true
+          },
+          "equal-opcode": {
+            "pass": true
+          },
+          "not-equal-opcode": {
+            "pass": true
+          },
+          "less-opcode": {
+            "pass": true
+          },
+          "less-equal-opcode": {
+            "pass": true
+          },
+          "greater-opcode": {
+            "pass": true
+          },
+          "greater-equal-and-fallback": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          }
+        }
+      },
+      "receiptRoot": "a852682faeca71df083ff5ae7e3a4f14f7020931f789c3ae9d7601a2491216f2"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_FIXED_POINT_GITHUB_REPLAY_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves bounded independent repair of three checked-in RCL compiler opcode-lowering mutations plus a shared native compiler fixed point. It does not prove arbitrary compiler evolution, whole-runtime self-hosting, unrelated K400 cells or K400 completion.",
+  "reportRoot": "45fdf969b54a300b63f1b2de441e133101c3c135d1faa03d246bde8934b3c85a"
+}
+

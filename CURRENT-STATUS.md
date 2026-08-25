@@ -48,6 +48,8 @@ Direct evidence supports:
 
 Remaining blocker: independent reproducible `AI_GENERATE` compiler-evolution/repair evidence.
 
+The frozen K01 v0.2 campaign now has a local candidate: three unique ephemeral read-only generator sessions repaired three effective RCL compiler opcode-lowering mutations, restored exact canonical compiler bytes, and shared one native byte-identical `C0 == C1 == C2` fixed point. Local receipt root is `45fdf969b54a300b63f1b2de441e133101c3c135d1faa03d246bde8934b3c85a`. K339 remains BLOCKED until a GitHub push binds both the focused Linux receipt replay and Windows native self-hosting job; no local session may self-promote it.
+
 Authority document: `docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K02 — Complete Web application

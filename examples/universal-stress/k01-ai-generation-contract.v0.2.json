@@ -1,0 +1,58 @@
+{
+  "format": "rcl.k01.ai-generation-contract.v0.2",
+  "status": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "minimumCliVersion": "0.135.0",
+    "sandbox": "read-only",
+    "network": "not-required"
+  },
+  "canonical": {
+    "corePath": "selfhost/compiler-core.rcl",
+    "coreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+    "mainPath": "selfhost/compiler-main.rcl",
+    "mainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e"
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that separately executed AI sessions can repair bounded RCL-owned compiler lowering semantics from hidden mutations without seeing canonical compiler files or oracle edits.",
+  "rules": [
+    "Each generator receives only mutated RCL compiler candidates, the semantic invariant and observed verifier result.",
+    "Canonical compiler files, mutation implementation and oracle edits are absent from the generator workspace.",
+    "Each trial runs in a fresh ephemeral read-only session that ignores project rules and user configuration.",
+    "The evaluator applies only the exact file/old/new edit returned through the frozen JSON Schema.",
+    "The generator cannot edit tests, thresholds, evidence, authority policy or the authoritative repository.",
+    "Every saved repair must restore byte-identical canonical RCL compiler sources and pass compiler semantic replay.",
+    "The three canonically restored candidates share one native C0/C1/C2 fixed-point witness because their input bytes are identical.",
+    "Three unique generator sessions, three successful deterministic replays and a GitHub-hosted Linux plus Windows replay are required."
+  ],
+  "trials": [
+    {
+      "id": "K01-AI-REPAIR-01",
+      "mutationClass": "ARITHMETIC_OPCODE_LOWERING",
+      "intent": "Repair binary expression lowering so addition emits the canonical ADD opcode while preserving the general compiler path.",
+      "candidateFiles": ["candidate-core.rcl", "candidate-main.rcl"]
+    },
+    {
+      "id": "K01-AI-REPAIR-02",
+      "mutationClass": "COMPARISON_OPCODE_LOWERING",
+      "intent": "Repair binary expression lowering so less-than-or-equal emits its distinct canonical opcode without weakening comparison coverage.",
+      "candidateFiles": ["candidate-core.rcl", "candidate-main.rcl"]
+    },
+    {
+      "id": "K01-AI-REPAIR-03",
+      "mutationClass": "COMPARISON_DEFAULT_BOUNDARY",
+      "intent": "Repair the final greater-than-or-equal branch while preserving the explicit unknown-operator fallback boundary.",
+      "candidateFiles": ["candidate-core.rcl", "candidate-main.rcl"]
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "candidateMustRestoreCanonicalBytes": true,
+    "requiredSharedNativeFixedPoint": true,
+    "requiredGitHubJobs": ["focused-verification", "k01-windows-verification"],
+    "selfIssuedPassForbidden": true,
+    "eligibleCells": ["K339"]
+  },
+  "evidenceBoundary": "This contract proves bounded independent repair of three checked-in RCL compiler opcode-lowering mutations plus a shared native compiler fixed point. It does not prove arbitrary compiler evolution, whole-runtime self-hosting, unrelated K400 cells or K400 completion."
+}
