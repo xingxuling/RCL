@@ -98,6 +98,25 @@ test('K08-C evidence root binds the current Tensor semantics, provider and Rust 
   assert.equal(evidence.artifactHashes.rustBackend, artifactHash(['native/tensor-engine/Cargo.toml', 'native/tensor-engine/Cargo.lock', 'native/tensor-engine/src/lib.rs', 'native/tensor-engine/src/main.rs', 'native/tensor-engine/src/rclvm_provider.rs']));
 });
 
+test('K08-C GitHub replay receipt binds the exact implementation and local evidence root', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(root, 'examples', 'native-ai', 'evidence', 'tensor-cpu-v0.1', 'github-replay.json'), 'utf8'));
+  const authorityRoot = receipt.authorityRoot;
+  delete receipt.authorityRoot;
+  assert.equal(sha256(receipt), authorityRoot);
+  assert.equal(receipt.status, 'PASS_GITHUB_HOSTED_REPLAY_BOUND');
+  assert.equal(receipt.sourceCommit, 'e5c3124bb759e5d5c2ec8bbf3e668aabc6a0b080');
+  assert.equal(receipt.runId, 32804405376);
+  assert.equal(receipt.runConclusion, 'success');
+  assert.deepEqual(receipt.jobs.map(({ platform, conclusion }) => [platform, conclusion]), [
+    ['ubuntu-latest', 'success'],
+    ['windows-latest', 'success'],
+  ]);
+  const evidence = JSON.parse(fs.readFileSync(path.join(root, 'examples', 'native-ai', 'evidence', 'tensor-cpu-v0.1', 'k08-c-tensor-cpu-evidence.json'), 'utf8'));
+  assert.equal(receipt.localEvidenceReportRoot, evidence.reportRoot);
+  assert.ok(receipt.claimsNotGranted.includes('K400_PASS'));
+  assert.ok(receipt.claimsNotGranted.includes('GENERAL_MLP_118X_GAP_CLOSED'));
+});
+
 test('K08-C optimized CPU backend covers Tensor kernel set and fails closed', { timeout: 180_000 }, () => {
   buildEngine();
   const a = descriptor('a', [2, 3], 'storage:a');

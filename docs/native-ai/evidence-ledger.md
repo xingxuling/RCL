@@ -62,7 +62,7 @@ The ledger proves the bounded General MLP AI-N2 stack and the independently repl
 
 ## K08-C Tensor / CPU Engine candidate
 
-Status: `ENGINE_E1_CANDIDATE_LOCAL_WINDOWS`. Authority remains candidate-only and separate from K233.
+Status: `ENGINE_E1_CANDIDATE_GITHUB_REPLAY_BOUND`. Authority remains candidate-only and separate from K233.
 
 | Evidence | Result |
 |---|---:|
@@ -76,10 +76,14 @@ Status: `ENGINE_E1_CANDIDATE_LOCAL_WINDOWS`. Authority remains candidate-only an
 | 192-cubed kernel median | scalar `7.229 ms`; optimized `2.362 ms`; `3.061x` |
 | Replays | `7` scalar roots / `7` provider storage identities, one unique value each |
 | Evidence report root | `890180d14c8585875d7122c0b38369ab8f8a01b592d6af80f127ebae070b3271` |
+| GitHub run / source commit | `32804405376 / e5c3124bb759e5d5c2ec8bbf3e668aabc6a0b080` |
+| GitHub Ubuntu / Windows jobs | `97671555187 / 97671555356`, both success |
 
 Positive, negative, boundary and differential coverage includes valid kernels, invalid shape/broadcast/MatMul, dtype/device mismatch, divide-by-zero/log/sqrt domains, storage mismatch, unsupported layout/storage, rank/input/element caps, native self-host/JS compiler byte parity and native VM provider execution.
 
 The evidence intentionally does not relabel the former `118.300x` General MLP Native/JS ratio. The MLP still uses scalar recursive operations and has not been lowered to the new backend. A floating generated-matrix probe also exposed scientific-notation number canonicalization drift between the native state root and the JS verifier; the accepted performance corpus uses integer values and records that unresolved evidence gap rather than disabling strict state-root verification.
+
+The GitHub-hosted replay receipt is `examples/native-ai/evidence/tensor-cpu-v0.1/github-replay.json`. It binds the exact implementation commit, Ubuntu portable test, Windows native Provider test and Windows performance-evidence step; it grants no K400 promotion.
 
 Reproduction:
 

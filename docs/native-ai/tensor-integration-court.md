@@ -1,6 +1,6 @@
 # K08-C Tensor / CPU Engine Integration Court
 
-**Court state:** `ADMIT_ENGINE_E1_CANDIDATE_LOCAL_EVIDENCE_ONLY`
+**Court state:** `ADMIT_ENGINE_E1_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 **Canonical owner:** RCL typed Tensor and operation semantics
 
@@ -8,7 +8,7 @@
 
 ## Decision
 
-Admit the bounded f64 CPU Tensor engine as candidate evidence. Do not merge its evidence into K233 authority and do not claim the General MLP `118.300x` gap is closed until K08-B is actually lowered and rerun.
+Admit the bounded f64 CPU Tensor engine as candidate evidence. GitHub run `32804405376` independently replayed the portable suite on Ubuntu and the real native Provider/performance path on Windows for implementation commit `e5c3124bb759e5d5c2ec8bbf3e668aabc6a0b080`. Do not merge its evidence into K233 authority and do not claim the General MLP `118.300x` gap is closed until K08-B is actually lowered and rerun.
 
 The provider boundary wins over a new VM opcode in this stage: the existing general `CALL_PROVIDER` ABI preserves portability and self-hosted RBC execution while cache blocking, auto-vectorization, buffer ownership and future threading/BLAS remain backend concerns. A future generic Tensor opcode is not prohibited, but it needs evidence that provider dispatch or IR serialization is the dominant bottleneck. Model-specific opcodes remain rejected.
 
@@ -35,12 +35,11 @@ The organ is original repository code. Cargo is locked. Direct dependencies are 
 
 ## Remaining gates
 
-1. GitHub Windows replay for the exact candidate commit.
-2. General MLP lowering and full checkpoint/determinism/differential rerun.
-3. Cross-platform provider host or equivalent ABI integration.
-4. Peak RSS/buffer-plan evidence.
-5. Typed self-host compiler lowering.
-6. Scientific-notation semantic-root canonicalization closure.
+1. General MLP lowering and full checkpoint/determinism/differential rerun.
+2. Cross-platform provider host or equivalent ABI integration.
+3. Peak RSS/buffer-plan evidence.
+4. Typed self-host compiler lowering.
+5. Scientific-notation semantic-root canonicalization closure.
 
 ## Local regression
 
