@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k04.server-ai-generation-contract.v0.1",
+  "status": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "minimumCliVersion": "0.135.0",
+    "sandbox": "read-only",
+    "network": "not-required"
+  },
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k02-complete-web-app.rcl",
+    "sourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+    "specPath": "examples/universal-stress/k02-complete-web-app.web.json",
+    "specSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599"
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that separate AI sessions can repair bounded RCL-owned server transaction, authority and reactive-state semantics without inheriting the browser-only K02 eligible-cell authority.",
+  "rules": [
+    "Each generator sees only mutated candidates, server intent and deterministic loopback failure diagnostics.",
+    "Canonical files, mutation implementation and oracle edits are absent from the generator workspace.",
+    "Each session is fresh, ephemeral and read-only and cannot edit the authoritative repository, tests, thresholds or evidence.",
+    "The evaluator applies only the exact file/old/new edit returned under the frozen JSON Schema.",
+    "Every repair must restore exact canonical bytes and pass real loopback state, observe, governed rule and negative-route replay.",
+    "Three unique sessions, the separately frozen 20-round server runtime receipt and GitHub-hosted replay are required."
+  ],
+  "trials": [
+    {
+      "id": "K04-SERVER-REPAIR-01",
+      "mutationClass": "SERVER_REACTIVE_TRANSITION",
+      "intent": "Repair addTodo so one accepted loopback transaction increments the server state exactly once."
+    },
+    {
+      "id": "K04-SERVER-REPAIR-02",
+      "mutationClass": "SERVER_AUTHORITY_BINDING",
+      "intent": "Repair addTodo so its required capability matches the declared app.write warrant without weakening authority."
+    },
+    {
+      "id": "K04-SERVER-REPAIR-03",
+      "mutationClass": "SERVER_RESET_STATE",
+      "intent": "Repair resetTodos so the loopback server returns count zero and canonical last_action reset."
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "candidateMustRestoreCanonicalBytes": true,
+    "requiredRuntimeReceipt": "examples/universal-stress/evidence/k04-server-runtime-v0.1.json",
+    "requiredGithubReplay": true,
+    "eligibleCells": ["K124", "K138"]
+  },
+  "evidenceBoundary": "This proves three bounded independent repairs plus local loopback execution for the frozen generated server. It does not prove public-network deployment, production scale, distributed service semantics, arbitrary server generation or K400 completion."
+}

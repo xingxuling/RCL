@@ -1,0 +1,431 @@
+{
+  "format": "rcl.k04.server-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-25T17:12:37.649Z",
+  "contractRoot": "de195656c5db3e8a50841987ec344d818c5bd7f6241d50bfd88401a4eab9f3d2",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K124",
+    "K138"
+  ],
+  "runtimeReportRoot": "e0f4f5eaec5407564bc0a53358987d3208c768a0c4eb35698d0fbf8b4c47fe10",
+  "trials": [
+    {
+      "format": "rcl.k04.server-ai-generation-trial-receipt.v0.1",
+      "trialId": "K04-SERVER-REPAIR-01",
+      "mutationClass": "SERVER_REACTIVE_TRANSITION",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039e7-97f5-7f52-b79d-d95dbef55aa7",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "alter app.todo_count <- app.todo_count + 2",
+        "new": "alter app.todo_count <- app.todo_count + 1",
+        "diagnosis": "RCL remains the canonical semantic owner. The failing add-transaction check is caused by addTodo incrementing app.todo_count by 2, violating the invariant that one accepted loopback addTodo transaction increments exactly once. Minimal repair changes only the RCL state transition delta from +2 to +1."
+      },
+      "promptRoot": "faf7a473f5bab20162e5a7aa43ee12e9f04e0f4be386c17626a8fa47dd638ba3",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "4e21ea4c4c4e926e225eeaf8b6b754ea5bbfef2b2a00be0393c8812a5b4d605d",
+      "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "3141d5db6138894d567c86b8ddfdf2c0e90baabb4c90c6cab828af4a4f531ec7",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039e7-97f5-7f52-b79d-d95dbef55aa7"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "79fb0a38200bb46df0e16ffec0da21cc05411abd82bcbac6c4ff0d5d5fa5e439"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "7a2adeab9172a6fce76804438f3fd242d53c12d683766ccec44a07deeacf99ef"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55661,
+            "cached_input_tokens": 29440,
+            "output_tokens": 436,
+            "reasoning_output_tokens": 59
+          }
+        }
+      ],
+      "finalMessageSha256": "7a2adeab9172a6fce76804438f3fd242d53c12d683766ccec44a07deeacf99ef",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "2a21a05c55dadedbc4239d3bddfb1334b3f7638c8d95ab457fdf822034bf1c6b",
+        "failedChecks": [
+          "add-transaction"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "60950832a927b3e6735d1c338285747eb9c9acc3373fc86f3a46ebacfd0c33b1",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "observe-state": {
+            "pass": true
+          },
+          "add-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          },
+          "unknown-state-rejection": {
+            "pass": true
+          },
+          "unknown-rule-rejection": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "405577a3cc97da01ec5b42547e4a667d96f2136ce5a873cf88a817730800170f"
+    },
+    {
+      "format": "rcl.k04.server-ai-generation-trial-receipt.v0.1",
+      "trialId": "K04-SERVER-REPAIR-02",
+      "mutationClass": "SERVER_AUTHORITY_BINDING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039e8-1e9c-7d33-ab4d-08c8246e98b4",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "    needs app.read on app",
+        "new": "    needs app.write on app",
+        "diagnosis": "addTodo currently requires app.read while the only declared warrant for user is app.write on app. The semantic invariant says addTodo must require the declared app.write warrant without weakening authority, so the smallest repair is to change only the addTodo needs clause from app.read to app.write."
+      },
+      "promptRoot": "69ea9b3f7c097d90e7f24819bb421a3a6ae7a39bfd74f17240c2f8a7526ca48b",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "5c7c3e7ec4fa8996fd42b33f9008c9ad8bbaf3582933e375e80282f7b47beb2e",
+      "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "4016c0d89e54c02c8fd6313857b6dd148adc9b73cbab8bc006411266e5448cb1",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039e8-1e9c-7d33-ab4d-08c8246e98b4"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "8f925925c2541b7d13bc273b451346e19127f5d22d38a4fbf252f1914d414423"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "84c55b41fa4786861e7ad98a62564c0773c1382756a5d42b42a2b828062bfd14"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55953,
+            "cached_input_tokens": 29440,
+            "output_tokens": 413,
+            "reasoning_output_tokens": 49
+          }
+        }
+      ],
+      "finalMessageSha256": "84c55b41fa4786861e7ad98a62564c0773c1382756a5d42b42a2b828062bfd14",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "8784d41cfaa81812b075cc1c5d4cc546ea9a157d50038664755d298db2fa4197",
+        "failedChecks": [],
+        "error": "RCLCompileError: RCL_COMPILE_ERROR: Subject 'user' lacks warrant 'app.read' on 'app' required by 'addTodo'\n    at compileReality (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/src/compiler.mjs:635:25)\n    at compileRclWebApplication (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/src/web-application-compiler.mjs:66:19)\n    at verifyK04ServerCandidate (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/scripts/verify-k04-server-candidate.mjs:33:22)\n    at runIndependentK04ServerAiGeneration (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/scripts/run-k04-independent-ai-generation.mjs:133:32)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/scripts/run-k04-independent-ai-generation.mjs:208:18"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "a269e1f1a5cc6c5b18a49347a316b582a17e7aaa9498fa7b73a89016d4779bda",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "observe-state": {
+            "pass": true
+          },
+          "add-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          },
+          "unknown-state-rejection": {
+            "pass": true
+          },
+          "unknown-rule-rejection": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "67be78572b478b61349f861345973e6d6202afaaecbb85cf5a452196a78b5054"
+    },
+    {
+      "format": "rcl.k04.server-ai-generation-trial-receipt.v0.1",
+      "trialId": "K04-SERVER-REPAIR-03",
+      "mutationClass": "SERVER_RESET_STATE",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039e8-8392-7393-8d6a-0f51ab4e3ffe",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "\"server-reset\"",
+        "new": "\"reset\"",
+        "diagnosis": "reset-transaction fails because RCL canonical resetTodos lowers last_action to server-reset, while the semantic invariant requires canonical last_action reset."
+      },
+      "promptRoot": "e6ec5407c8b1691e2f0c329f160b9e8e401a0c3bc476fba95049b80aa4bfc024",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "6af864a2f4ef9aa58ab1f4137cb0c0165e3a37a50e5e28fea01e9b57ff86da9b",
+      "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "461b28e506abb27a362eb576e67e15d60361ffa88b0c1a7d5d069d0a7f3cf54b",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039e8-8392-7393-8d6a-0f51ab4e3ffe"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "4c6a6ef794f6b2e72dff0397ad21d2964900aa3e39073932029ac9f8171d70ba"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "543ba440748a307245f0bf15574b49965d40df0e7ae1f5c587d23d2b53543dae"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55479,
+            "cached_input_tokens": 28416,
+            "output_tokens": 422,
+            "reasoning_output_tokens": 84
+          }
+        }
+      ],
+      "finalMessageSha256": "543ba440748a307245f0bf15574b49965d40df0e7ae1f5c587d23d2b53543dae",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "c6dca10d3d91f51587e591333d49e67c292ca3d8753fb3d22a3b7ea4076b59aa",
+        "failedChecks": [
+          "reset-transaction"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "782cac782fa6a4a20bcfdaa5c1b5f197be180cc6078ea5dc366c48930e3e6664",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "observe-state": {
+            "pass": true
+          },
+          "add-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          },
+          "unknown-state-rejection": {
+            "pass": true
+          },
+          "unknown-rule-rejection": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "cf5871fedc54ec6e55e83db20297ad8b1a9a33053036189298a3febbf7d46830"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_SERVER_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "evidenceBoundary": "This proves three bounded independent repairs plus local loopback execution for the frozen generated server. It does not prove public-network deployment, production scale, distributed service semantics, arbitrary server generation or K400 completion.",
+  "reportRoot": "053d8705d55ff61171a72e191a07119a246ca70c77410b2b46a4e0d2d085c595"
+}

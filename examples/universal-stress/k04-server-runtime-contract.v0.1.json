@@ -1,0 +1,22 @@
+{
+  "format": "rcl.k04.server-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_ACQUISITION",
+  "sourcePath": "examples/universal-stress/k02-complete-web-app.rcl",
+  "specPath": "examples/universal-stress/k02-complete-web-app.web.json",
+  "requiredRounds": 20,
+  "budgets": {
+    "startupMs": 1000,
+    "transactionP95Ms": 100
+  },
+  "requiredChecks": [
+    "loopback-listen",
+    "initial-state",
+    "observe",
+    "governed-add",
+    "governed-reset",
+    "unknown-state-rejection",
+    "unknown-rule-rejection"
+  ],
+  "eligibleCells": ["K124", "K138"],
+  "evidenceBoundary": "This contract measures one local Node loopback server generated from the frozen K02 RCL application. It is not production scale, distributed deployment, public-network, arbitrary server generation or K400 completion evidence."
+}

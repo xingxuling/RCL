@@ -36,6 +36,11 @@ on:
       - 'scripts/verify-k03-ai-generation-receipt.mjs'
       - 'scripts/verify-k03-android-candidate.mjs'
       - 'scripts/verify-k03-android-emulator-evidence.mjs'
+      - 'scripts/run-k04-server-runtime-evidence.mjs'
+      - 'scripts/verify-k04-server-runtime-evidence.mjs'
+      - 'scripts/verify-k04-server-candidate.mjs'
+      - 'scripts/run-k04-independent-ai-generation.mjs'
+      - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -78,6 +83,11 @@ on:
       - 'scripts/verify-k03-ai-generation-receipt.mjs'
       - 'scripts/verify-k03-android-candidate.mjs'
       - 'scripts/verify-k03-android-emulator-evidence.mjs'
+      - 'scripts/run-k04-server-runtime-evidence.mjs'
+      - 'scripts/verify-k04-server-runtime-evidence.mjs'
+      - 'scripts/verify-k04-server-candidate.mjs'
+      - 'scripts/run-k04-independent-ai-generation.mjs'
+      - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -124,6 +134,8 @@ jobs:
         run: npm run verify:k01-ai-generate
       - name: K03 independent AI generation receipt replay
         run: npm run verify:k03-ai-generate
+      - name: K04 independent Server AI generation receipt replay
+        run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
