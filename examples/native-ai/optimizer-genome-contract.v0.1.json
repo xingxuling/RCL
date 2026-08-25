@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k08-h.optimizer-genome-contract.v0.1",
+  "status": "ENGINE_E3_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "profile": "ENGINE-E3-OPTIMIZER-CANDIDATE-SCALAR-F64",
+  "canonicalOwner": "RCL",
+  "executionBoundary": "scalar native RCL reference semantics; Tensor/accelerator lowering is not claimed",
+  "algorithms": ["sgd", "momentum", "adam", "adamw"],
+  "adamw": {
+    "decoupledWeightDecay": true,
+    "learningRate": 0.01,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8,
+    "weightDecay": 0.1,
+    "gradientClip": 1,
+    "fixture": {
+      "initialParameter": 1,
+      "gradient": 0.5,
+      "step1Parameter": 0.9890000002,
+      "step2Parameter": 0.9780110003998002,
+      "step2FirstMoment": 0.09499999999999997,
+      "step2SecondMoment": 0.0004997500000000004,
+      "step": 2
+    }
+  },
+  "checkpointContract": "two direct AdamW steps must be bit-identical to one step + materialize checkpoint + reload + one step inside the frozen scalar reference profile",
+  "negativeControls": [
+    "learning-rate-must-be-positive",
+    "beta-must-be-in-half-open-unit-interval",
+    "epsilon-must-be-positive",
+    "weight-decay-must-be-nonnegative",
+    "optimizer-state-kind-must-match-config"
+  ],
+  "claimsNotGranted": [
+    "TENSOR_OPTIMIZER_BACKEND",
+    "TRANSFORMER",
+    "TINY_LM",
+    "ACCELERATOR",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ]
+}
