@@ -53,8 +53,9 @@ fn main() {
                 "dtype": ["f64"],
                 "layout": ["row-major"],
                 "deviceIntent": ["cpu"],
-                "requestFormats": ["rcl.tensor-execution-request.v0.1","rcl.tensor-execution-plan.v0.1","rcl.tensor-execution-plan-file.v0.1"],
-                "operations": ["add","sub","mul","div","abs","exp","log","sqrt","transpose","matmul","sum","mean","max","softmax","layer-norm","rms-norm"]
+                "requestFormats": ["rcl.tensor-execution-request.v0.1","rcl.tensor-execution-plan.v0.1","rcl.tensor-execution-plan-file.v0.1","rcl.tensor-autodiff-request.v0.1","rcl.tensor-autodiff-sgd-training-request.v0.1"],
+                "operations": ["add","sub","mul","div","abs","exp","log","sqrt","reshape","broadcast","transpose","matmul","sum","mean","max","softmax","layer-norm","rms-norm","activation","stop-gradient"],
+                "autodiff": {"mode":"reverse","optimizerBoundary":"batch-sgd-v0.1-only","modelSpecialOperations":[]}
             })
         ),
         "benchmark" => {

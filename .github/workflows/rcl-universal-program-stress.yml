@@ -15,6 +15,7 @@ on:
       - 'tests/selfhost*.test.mjs'
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
+      - 'tests/k08-native-autodiff.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
@@ -22,6 +23,7 @@ on:
       - 'scripts/run-k08-general-mlp.mjs'
       - 'scripts/run-k08-tensor-cpu-evidence.mjs'
       - 'scripts/run-k08-general-mlp-tensor-lowering.mjs'
+      - 'scripts/run-k08-native-autodiff.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -45,6 +47,7 @@ on:
       - 'tests/selfhost*.test.mjs'
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
+      - 'tests/k08-native-autodiff.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
@@ -52,6 +55,7 @@ on:
       - 'scripts/run-k08-general-mlp.mjs'
       - 'scripts/run-k08-tensor-cpu-evidence.mjs'
       - 'scripts/run-k08-general-mlp-tensor-lowering.mjs'
+      - 'scripts/run-k08-native-autodiff.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -88,6 +92,10 @@ jobs:
         run: npm run evidence:k08-native-ai:general-mlp
       - name: K08 Tensor correctness and portable CPU engine tests
         run: npm run test:k08-tensor
+      - name: K08 Native Autodiff portable verification
+        run: npm run test:k08-autodiff
+      - name: K08 Native Autodiff portable evidence
+        run: npm run evidence:k08-autodiff
       - name: K233 independent AI generation receipt replay
         run: npm run verify:k233-ai-generate
       - name: Evidence-empty baseline report
@@ -103,6 +111,7 @@ jobs:
             output/universal-stress-k400
             output/k08-pure-rcl-xor-v0.1
             output/k08-general-mlp-v0.1
+            output/k08-native-autodiff-v0.1
           if-no-files-found: error
 
   k01-windows-verification:
@@ -125,6 +134,8 @@ jobs:
         run: npm run evidence:k08-tensor-cpu
       - name: K08 General MLP Tensor lowering evidence
         run: npm run evidence:k08-tensor-mlp
+      - name: K08 Native Autodiff and General MLP migration evidence
+        run: npm run evidence:k08-autodiff
       - name: K08 Tensor borrowed-input and process-memory evidence
         shell: pwsh
         run: |
@@ -144,4 +155,5 @@ jobs:
             output/k08-tensor-cpu-v0.1
             output/k08-general-mlp-tensor-v0.1
             output/k08-tensor-borrowed-input-v0.1
+            output/k08-native-autodiff-v0.1
           if-no-files-found: warn

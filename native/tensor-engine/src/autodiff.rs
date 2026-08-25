@@ -1,0 +1,1010 @@
+use super::*;
+use std::collections::{HashMap, HashSet};
+use std::time::Instant;
+
+pub const AUTODIFF_REQUEST_FORMAT: &str = "rcl.tensor-autodiff-request.v0.1";
+pub const AUTODIFF_RESPONSE_FORMAT: &str = "rcl.tensor-autodiff-result.v0.1";
+pub const AUTODIFF_SGD_TRAINING_REQUEST_FORMAT: &str =
+    "rcl.tensor-autodiff-sgd-training-request.v0.1";
+pub const AUTODIFF_SGD_TRAINING_RESPONSE_FORMAT: &str =
+    "rcl.tensor-autodiff-sgd-training-result.v0.1";
+const MAX_PARAMETERS: usize = 256;
+const MAX_TRAINING_STEPS: usize = 16_384;
+const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
+
+pub type ComputationGraph = ExecutionPlan;
+pub type Operation = PlanNode;
+pub type TensorValue = PlanTensorResult;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Parameter {
+    pub tensor_id: String,
+    pub gradient_identity: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct StopGradient {
+    pub tensor_id: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct AutodiffRequest {
+    pub format: String,
+    pub graph: ComputationGraph,
+    pub loss: String,
+    pub parameters: Vec<Parameter>,
+    #[serde(default)]
+    pub stop_gradients: Vec<StopGradient>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BackwardEdge {
+    pub node_id: String,
+    pub operation: String,
+    pub output: String,
+    pub input: String,
+    pub input_index: usize,
+    pub gradient_identity: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GradientAccumulator {
+    pub tensor_count: usize,
+    pub accumulation_count: usize,
+    pub merge_count: usize,
+    pub accumulated_elements: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GradientTensorResult {
+    pub parameter: Parameter,
+    pub tensor: TensorDescriptor,
+    pub storage: DenseStorage,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AutodiffTelemetry {
+    pub backend: &'static str,
+    pub forward_node_count: usize,
+    pub backward_edge_count: usize,
+    pub forward_nanos: u128,
+    pub backward_nanos: u128,
+    pub parameter_count: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AutodiffResult {
+    pub format: &'static str,
+    pub status: &'static str,
+    pub loss: TensorValue,
+    pub gradients: Vec<GradientTensorResult>,
+    pub backward_edges: Vec<BackwardEdge>,
+    pub accumulator: GradientAccumulator,
+    pub telemetry: AutodiffTelemetry,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct AutodiffSgdTrainingRequest {
+    pub format: String,
+    pub autodiff: AutodiffRequest,
+    pub steps: usize,
+    pub learning_rate: f64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AutodiffSgdTrainingTelemetry {
+    pub backend: &'static str,
+    pub optimizer_semantics: &'static str,
+    pub steps: usize,
+    pub training_nanos: u128,
+    pub parameter_bytes: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AutodiffSgdTrainingResult {
+    pub format: &'static str,
+    pub status: &'static str,
+    pub initial_loss: f64,
+    pub final_loss: f64,
+    pub parameters: Vec<TensorValue>,
+    pub outputs: Vec<TensorValue>,
+    pub telemetry: AutodiffSgdTrainingTelemetry,
+}
+
+#[derive(Clone)]
+struct Gradient {
+    shape: Vec<usize>,
+    data: Vec<f64>,
+}
+
+fn validate_graph(
+    graph: &ComputationGraph,
+) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
+    if graph.nodes.is_empty() || graph.nodes.len() > MAX_PLAN_NODES {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_GRAPH_NODE_LIMIT",
+            format!(
+                "Graph node count {} is outside 1..={MAX_PLAN_NODES}",
+                graph.nodes.len()
+            ),
+        ));
+    }
+    let values = validate_plan_initials(graph)?;
+    let mut node_ids = HashSet::new();
+    let mut defined = values.keys().cloned().collect::<HashSet<_>>();
+    for node in &graph.nodes {
+        if node.id.is_empty() || !node_ids.insert(node.id.as_str()) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_NODE_DUPLICATE",
+                format!("Missing or duplicate graph node {}", node.id),
+            ));
+        }
+        if node.output.id.is_empty() || defined.contains(&node.output.id) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_SSA_VIOLATION",
+                format!(
+                    "Graph output {} is missing or already defined",
+                    node.output.id
+                ),
+            ));
+        }
+        if node.output.gradient_identity.is_empty() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_GRADIENT_IDENTITY",
+                format!("Graph output {} has no GradientIdentity", node.output.id),
+            ));
+        }
+        for input in &node.inputs {
+            if !defined.contains(input) {
+                return Err(EngineError::new(
+                    "RCL_AUTODIFF_INPUT_MISSING",
+                    format!("Node {} references unavailable tensor {input}", node.id),
+                ));
+            }
+        }
+        defined.insert(node.output.id.clone());
+    }
+    for output in &graph.outputs {
+        if !defined.contains(output) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_OUTPUT_MISSING",
+                format!("Graph output {output} is unavailable"),
+            ));
+        }
+    }
+    Ok(values)
+}
+
+fn forward_tape(
+    graph: &ComputationGraph,
+) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
+    let mut values = validate_graph(graph)?;
+    let mut allocated = values
+        .values()
+        .map(|(_, storage)| storage.data.len())
+        .sum::<usize>();
+    for node in &graph.nodes {
+        let mut result = {
+            let inputs = node
+                .inputs
+                .iter()
+                .map(|input| {
+                    let (descriptor, storage) = values.get(input).ok_or_else(|| {
+                        EngineError::new(
+                            "RCL_AUTODIFF_INPUT_MISSING",
+                            format!("Node {} references unavailable tensor {input}", node.id),
+                        )
+                    })?;
+                    Ok(BoundTensor {
+                        descriptor,
+                        data: storage.data.as_slice(),
+                    })
+                })
+                .collect::<Result<Vec<_>, EngineError>>()?;
+            execute_bound(&node.operation, &node.attributes, &inputs)?
+        };
+        if result.tensor.shape != node.output.shape
+            || result.tensor.dtype != node.output.dtype
+            || result.tensor.layout != node.output.layout
+            || result.tensor.device != node.output.device
+        {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_OUTPUT_DESCRIPTOR",
+                format!(
+                    "Node {} does not match declared output {}",
+                    node.id, node.output.id
+                ),
+            ));
+        }
+        result.tensor.id = node.output.id.clone();
+        result.tensor.gradient_identity = node.output.gradient_identity.clone();
+        allocated = allocated
+            .checked_add(result.storage.data.len())
+            .ok_or_else(|| EngineError::new("RCL_AUTODIFF_MEMORY_LIMIT", "Tape size overflowed"))?;
+        if allocated > MAX_PLAN_ALLOCATED_ELEMENTS {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_MEMORY_LIMIT",
+                format!(
+                    "Autodiff tape has {allocated} elements; limit is {MAX_PLAN_ALLOCATED_ELEMENTS}"
+                ),
+            ));
+        }
+        values.insert(node.output.id.clone(), (result.tensor, result.storage));
+    }
+    Ok(values)
+}
+
+fn gradient(shape: &[usize], data: Vec<f64>) -> Result<Gradient, EngineError> {
+    if product(shape)? != data.len() || data.iter().any(|value| !value.is_finite()) {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_NONFINITE_GRADIENT",
+            "Gradient shape mismatch or non-finite value",
+        ));
+    }
+    Ok(Gradient {
+        shape: shape.to_vec(),
+        data,
+    })
+}
+
+fn reduce_to_shape(value: &Gradient, target: &[usize]) -> Result<Gradient, EngineError> {
+    if output_shape_for_broadcast(target, &value.shape)? != value.shape {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_BROADCAST_GRADIENT",
+            format!("Cannot reduce gradient {:?} to {target:?}", value.shape),
+        ));
+    }
+    let mut data = vec![0.0; product(target)?];
+    for (index, cell) in value.data.iter().enumerate() {
+        data[broadcast_offset(index, &value.shape, target)] += cell;
+    }
+    gradient(target, data)
+}
+
+fn elementwise_binary<F>(
+    left: &Gradient,
+    right: &Gradient,
+    shape: &[usize],
+    operation: F,
+) -> Result<Gradient, EngineError>
+where
+    F: Fn(f64, f64) -> f64,
+{
+    gradient(
+        shape,
+        (0..product(shape)?)
+            .map(|index| {
+                operation(
+                    left.data[broadcast_offset(index, shape, &left.shape)],
+                    right.data[broadcast_offset(index, shape, &right.shape)],
+                )
+            })
+            .collect(),
+    )
+}
+
+fn tensor_gradient(value: &(TensorDescriptor, DenseStorage)) -> Gradient {
+    Gradient {
+        shape: value.0.shape.clone(),
+        data: value.1.data.clone(),
+    }
+}
+
+fn transpose_gradient(value: &Gradient, permutation: &[usize]) -> Result<Gradient, EngineError> {
+    let rank = value.shape.len();
+    if permutation.len() != rank {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_TRANSPOSE_PERMUTATION",
+            "Transpose gradient rank mismatch",
+        ));
+    }
+    let mut inverse = vec![0; rank];
+    let mut seen = vec![false; rank];
+    for (output_axis, input_axis) in permutation.iter().copied().enumerate() {
+        if input_axis >= rank || seen[input_axis] {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_TRANSPOSE_PERMUTATION",
+                "Invalid transpose permutation",
+            ));
+        }
+        seen[input_axis] = true;
+        inverse[input_axis] = output_axis;
+    }
+    let output_shape = inverse
+        .iter()
+        .map(|axis| value.shape[*axis])
+        .collect::<Vec<_>>();
+    let output_strides = row_major_strides(&output_shape);
+    let input_strides = row_major_strides(&value.shape);
+    let mut data = vec![0.0; value.data.len()];
+    for (output_index, cell) in data.iter_mut().enumerate() {
+        let mut input_index = 0;
+        for output_axis in 0..rank {
+            let coordinate =
+                (output_index / output_strides[output_axis]) % output_shape[output_axis];
+            input_index += coordinate * input_strides[inverse[output_axis]];
+        }
+        *cell = value.data[input_index];
+    }
+    gradient(&output_shape, data)
+}
+
+fn matmul_gradient(left: &Gradient, right: &Gradient) -> Result<Gradient, EngineError> {
+    if left.shape.len() != 2 || right.shape.len() != 2 || left.shape[1] != right.shape[0] {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_MATMUL_SHAPE",
+            "Autodiff matmul requires compatible rank-2 tensors",
+        ));
+    }
+    let (m, k, n) = (left.shape[0], left.shape[1], right.shape[1]);
+    let mut data = vec![0.0; m * n];
+    for i in 0..m {
+        for inner in 0..k {
+            for j in 0..n {
+                data[i * n + j] += left.data[i * k + inner] * right.data[inner * n + j];
+            }
+        }
+    }
+    gradient(&[m, n], data)
+}
+
+fn transpose_2d(value: &Gradient) -> Result<Gradient, EngineError> {
+    if value.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_MATMUL_SHAPE",
+            "Matmul transpose requires rank 2",
+        ));
+    }
+    let (rows, columns) = (value.shape[0], value.shape[1]);
+    let mut data = vec![0.0; value.data.len()];
+    for row in 0..rows {
+        for column in 0..columns {
+            data[column * rows + row] = value.data[row * columns + column];
+        }
+    }
+    gradient(&[columns, rows], data)
+}
+
+fn reduction_gradient(
+    output_gradient: &Gradient,
+    input_shape: &[usize],
+    axis: usize,
+    scale: f64,
+) -> Result<Gradient, EngineError> {
+    if axis >= input_shape.len() {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_REDUCTION_AXIS",
+            "Reduction axis is outside the input rank",
+        ));
+    }
+    let expected = input_shape
+        .iter()
+        .enumerate()
+        .filter_map(|(index, size)| (index != axis).then_some(*size))
+        .collect::<Vec<_>>();
+    if output_gradient.shape != expected {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_REDUCTION_SHAPE",
+            "Reduction output gradient has an invalid shape",
+        ));
+    }
+    let input_strides = row_major_strides(input_shape);
+    let output_strides = row_major_strides(&expected);
+    let mut data = vec![0.0; product(input_shape)?];
+    for (input_index, cell) in data.iter_mut().enumerate() {
+        let mut output_index = 0;
+        let mut output_axis = 0;
+        for input_axis in 0..input_shape.len() {
+            if input_axis == axis {
+                continue;
+            }
+            let coordinate = (input_index / input_strides[input_axis]) % input_shape[input_axis];
+            output_index += coordinate * output_strides[output_axis];
+            output_axis += 1;
+        }
+        *cell = output_gradient.data[output_index] * scale;
+    }
+    gradient(input_shape, data)
+}
+
+fn node_input_gradients(
+    node: &Operation,
+    output_gradient: &Gradient,
+    tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
+) -> Result<Vec<Gradient>, EngineError> {
+    let inputs = node
+        .inputs
+        .iter()
+        .map(|id| {
+            tape.get(id).map(tensor_gradient).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_AUTODIFF_INPUT_MISSING",
+                    format!("Backward node {} is missing input {id}", node.id),
+                )
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let output = tape
+        .get(&node.output.id)
+        .map(tensor_gradient)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_OUTPUT_MISSING",
+                format!(
+                    "Backward node {} is missing output {}",
+                    node.id, node.output.id
+                ),
+            )
+        })?;
+    let direct = |value: Gradient, shape: &[usize]| reduce_to_shape(&value, shape);
+    match node.operation.as_str() {
+        "add" => Ok(vec![
+            direct(output_gradient.clone(), &inputs[0].shape)?,
+            direct(output_gradient.clone(), &inputs[1].shape)?,
+        ]),
+        "sub" => Ok(vec![
+            direct(output_gradient.clone(), &inputs[0].shape)?,
+            direct(
+                gradient(
+                    &output_gradient.shape,
+                    output_gradient.data.iter().map(|value| -*value).collect(),
+                )?,
+                &inputs[1].shape,
+            )?,
+        ]),
+        "mul" => Ok(vec![
+            direct(
+                elementwise_binary(output_gradient, &inputs[1], &output.shape, |a, b| a * b)?,
+                &inputs[0].shape,
+            )?,
+            direct(
+                elementwise_binary(output_gradient, &inputs[0], &output.shape, |a, b| a * b)?,
+                &inputs[1].shape,
+            )?,
+        ]),
+        "div" => {
+            let left =
+                elementwise_binary(output_gradient, &inputs[1], &output.shape, |a, b| a / b)?;
+            let right = gradient(
+                &output.shape,
+                (0..product(&output.shape)?)
+                    .map(|index| {
+                        let grad = output_gradient.data[index];
+                        let numerator = inputs[0].data
+                            [broadcast_offset(index, &output.shape, &inputs[0].shape)];
+                        let denominator = inputs[1].data
+                            [broadcast_offset(index, &output.shape, &inputs[1].shape)];
+                        -grad * numerator / (denominator * denominator)
+                    })
+                    .collect(),
+            )?;
+            Ok(vec![
+                direct(left, &inputs[0].shape)?,
+                direct(right, &inputs[1].shape)?,
+            ])
+        }
+        "abs" => Ok(vec![gradient(
+            &inputs[0].shape,
+            inputs[0]
+                .data
+                .iter()
+                .zip(&output_gradient.data)
+                .map(|(input, grad)| grad * input.signum())
+                .collect(),
+        )?]),
+        "exp" => Ok(vec![elementwise_binary(
+            output_gradient,
+            &output,
+            &output.shape,
+            |a, b| a * b,
+        )?]),
+        "log" => Ok(vec![elementwise_binary(
+            output_gradient,
+            &inputs[0],
+            &inputs[0].shape,
+            |a, b| a / b,
+        )?]),
+        "sqrt" => Ok(vec![elementwise_binary(
+            output_gradient,
+            &output,
+            &output.shape,
+            |a, b| a / (2.0 * b),
+        )?]),
+        "reshape" => Ok(vec![gradient(
+            &inputs[0].shape,
+            output_gradient.data.clone(),
+        )?]),
+        "broadcast" => Ok(vec![reduce_to_shape(output_gradient, &inputs[0].shape)?]),
+        "transpose" => Ok(vec![transpose_gradient(
+            output_gradient,
+            &attribute_permutation(&node.attributes)?,
+        )?]),
+        "matmul" | "matmul-reference" => Ok(vec![
+            matmul_gradient(output_gradient, &transpose_2d(&inputs[1])?)?,
+            matmul_gradient(&transpose_2d(&inputs[0])?, output_gradient)?,
+        ]),
+        "sum" | "mean" => {
+            let axis = attribute_usize(&node.attributes, "axis")?;
+            let scale = if node.operation == "mean" {
+                1.0 / inputs[0].shape[axis] as f64
+            } else {
+                1.0
+            };
+            Ok(vec![reduction_gradient(
+                output_gradient,
+                &inputs[0].shape,
+                axis,
+                scale,
+            )?])
+        }
+        "softmax" => {
+            let width = *output.shape.last().ok_or_else(|| {
+                EngineError::new("RCL_AUTODIFF_SOFTMAX_RANK", "Softmax requires rank >= 1")
+            })?;
+            let mut data = vec![0.0; output.data.len()];
+            for row in 0..output.data.len() / width {
+                let start = row * width;
+                let dot = (0..width)
+                    .map(|index| output_gradient.data[start + index] * output.data[start + index])
+                    .sum::<f64>();
+                for index in 0..width {
+                    data[start + index] =
+                        output.data[start + index] * (output_gradient.data[start + index] - dot);
+                }
+            }
+            Ok(vec![gradient(&inputs[0].shape, data)?])
+        }
+        "activation" => {
+            let kind = node
+                .attributes
+                .get("kind")
+                .and_then(Value::as_str)
+                .ok_or_else(|| {
+                    EngineError::new("RCL_TENSOR_ATTRIBUTE", "Missing activation kind")
+                })?;
+            let data = inputs[0]
+                .data
+                .iter()
+                .zip(output.data.iter())
+                .zip(output_gradient.data.iter())
+                .map(|((input, activated), grad)| {
+                    let derivative = match kind {
+                        "softsign01" => 0.5 / (1.0 + input.abs()).powi(2),
+                        "relu" => f64::from(*input > 0.0),
+                        "tanh" => 1.0 - activated * activated,
+                        "sigmoid" => activated * (1.0 - activated),
+                        _ => 0.0,
+                    };
+                    grad * derivative
+                })
+                .collect();
+            if !["softsign01", "relu", "tanh", "sigmoid"].contains(&kind) {
+                return Err(EngineError::new(
+                    "RCL_TENSOR_ACTIVATION_UNSUPPORTED",
+                    format!("Unsupported activation {kind}"),
+                ));
+            }
+            Ok(vec![gradient(&inputs[0].shape, data)?])
+        }
+        "stop-gradient" => Ok(Vec::new()),
+        operation => Err(EngineError::new(
+            "RCL_AUTODIFF_OPERATION_UNSUPPORTED",
+            format!("Operation {operation} has no canonical reverse rule"),
+        )),
+    }
+}
+
+fn accumulate(
+    gradients: &mut HashMap<String, Gradient>,
+    id: &str,
+    incoming: Gradient,
+    accumulator: &mut GradientAccumulator,
+) -> Result<(), EngineError> {
+    accumulator.accumulation_count += 1;
+    accumulator.accumulated_elements = accumulator
+        .accumulated_elements
+        .checked_add(incoming.data.len())
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_MEMORY_LIMIT",
+                "Gradient accounting overflowed",
+            )
+        })?;
+    if let Some(existing) = gradients.get_mut(id) {
+        if existing.shape != incoming.shape {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_ACCUMULATOR_SHAPE",
+                format!("GradientAccumulator shape mismatch for {id}"),
+            ));
+        }
+        for (cell, value) in existing.data.iter_mut().zip(incoming.data) {
+            *cell += value;
+        }
+        accumulator.merge_count += 1;
+    } else {
+        gradients.insert(id.into(), incoming);
+    }
+    accumulator.tensor_count = gradients.len();
+    Ok(())
+}
+
+pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError> {
+    if request.format != AUTODIFF_REQUEST_FORMAT {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_FORMAT",
+            format!("Unsupported autodiff format {}", request.format),
+        ));
+    }
+    if request.parameters.is_empty() || request.parameters.len() > MAX_PARAMETERS {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_PARAMETER_LIMIT",
+            format!("Parameter count must be within 1..={MAX_PARAMETERS}"),
+        ));
+    }
+    let forward_started = Instant::now();
+    let tape = forward_tape(&request.graph)?;
+    let forward_nanos = forward_started.elapsed().as_nanos();
+    let loss_value = tape.get(&request.loss).ok_or_else(|| {
+        EngineError::new(
+            "RCL_AUTODIFF_LOSS_MISSING",
+            format!("Loss tensor {} is unavailable", request.loss),
+        )
+    })?;
+    if loss_value.1.data.len() != 1 {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_LOSS_NOT_SCALAR",
+            format!(
+                "Loss tensor {} must contain exactly one element",
+                request.loss
+            ),
+        ));
+    }
+    let stop = request
+        .stop_gradients
+        .iter()
+        .map(|item| item.tensor_id.as_str())
+        .collect::<HashSet<_>>();
+    if stop.iter().any(|id| !tape.contains_key(*id)) {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_STOP_GRADIENT_MISSING",
+            "StopGradient references an unavailable TensorValue",
+        ));
+    }
+    let mut parameter_ids = HashSet::new();
+    let mut gradient_identities = HashSet::new();
+    for parameter in &request.parameters {
+        if !parameter_ids.insert(parameter.tensor_id.as_str())
+            || parameter.gradient_identity.is_empty()
+            || !gradient_identities.insert(parameter.gradient_identity.as_str())
+        {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_PARAMETER_DUPLICATE",
+                "Parameters and GradientIdentity values must be unique and non-empty",
+            ));
+        }
+        let descriptor = request
+            .graph
+            .tensors
+            .iter()
+            .find(|tensor| tensor.id == parameter.tensor_id)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_AUTODIFF_PARAMETER_NOT_INITIAL",
+                    format!(
+                        "Parameter {} must be an initial graph tensor",
+                        parameter.tensor_id
+                    ),
+                )
+            })?;
+        if descriptor.gradient_identity != parameter.gradient_identity {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_GRADIENT_IDENTITY",
+                format!(
+                    "GradientIdentity mismatch for parameter {}",
+                    parameter.tensor_id
+                ),
+            ));
+        }
+        if stop.contains(parameter.tensor_id.as_str()) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_PARAMETER_STOPPED",
+                format!(
+                    "Parameter {} cannot also be StopGradient",
+                    parameter.tensor_id
+                ),
+            ));
+        }
+    }
+
+    let backward_started = Instant::now();
+    let mut gradients = HashMap::new();
+    gradients.insert(
+        request.loss.clone(),
+        gradient(&loss_value.0.shape, vec![1.0])?,
+    );
+    let mut edges = Vec::new();
+    let mut accumulator = GradientAccumulator {
+        tensor_count: 1,
+        accumulation_count: 0,
+        merge_count: 0,
+        accumulated_elements: 1,
+    };
+    for node in request.graph.nodes.iter().rev() {
+        let Some(output_gradient) = gradients.get(&node.output.id).cloned() else {
+            continue;
+        };
+        if stop.contains(node.output.id.as_str()) || node.operation == "stop-gradient" {
+            continue;
+        }
+        let input_gradients = node_input_gradients(node, &output_gradient, &tape)?;
+        for (input_index, incoming) in input_gradients.into_iter().enumerate() {
+            let input = &node.inputs[input_index];
+            if stop.contains(input.as_str()) {
+                continue;
+            }
+            let identity = tape
+                .get(input)
+                .map(|value| value.0.gradient_identity.clone())
+                .unwrap_or_default();
+            accumulate(&mut gradients, input, incoming, &mut accumulator)?;
+            edges.push(BackwardEdge {
+                node_id: node.id.clone(),
+                operation: node.operation.clone(),
+                output: node.output.id.clone(),
+                input: input.clone(),
+                input_index,
+                gradient_identity: identity,
+            });
+        }
+    }
+    let backward_nanos = backward_started.elapsed().as_nanos();
+    let mut results = Vec::with_capacity(request.parameters.len());
+    for parameter in &request.parameters {
+        let value = tape.get(&parameter.tensor_id).unwrap();
+        let derivative = gradients.get(&parameter.tensor_id).ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_PARAMETER_DISCONNECTED",
+                format!(
+                    "Parameter {} is not connected to loss {}",
+                    parameter.tensor_id, request.loss
+                ),
+            )
+        })?;
+        let storage_identity = output_identity("f64", &derivative.shape, &derivative.data);
+        results.push(GradientTensorResult {
+            parameter: parameter.clone(),
+            tensor: TensorDescriptor {
+                id: format!("gradient:{}", parameter.tensor_id),
+                shape: derivative.shape.clone(),
+                dtype: value.0.dtype.clone(),
+                layout: value.0.layout.clone(),
+                device: value.0.device.clone(),
+                gradient_identity: format!(
+                    "gradient:{}:loss:{}",
+                    parameter.gradient_identity, loss_value.0.gradient_identity
+                ),
+                storage_identity: storage_identity.clone(),
+            },
+            storage: DenseStorage {
+                identity: storage_identity,
+                kind: "cpu-dense".into(),
+                data: derivative.data.clone(),
+            },
+        });
+    }
+    Ok(AutodiffResult {
+        format: AUTODIFF_RESPONSE_FORMAT,
+        status: "ok",
+        loss: TensorValue {
+            tensor: loss_value.0.clone(),
+            storage: loss_value.1.clone(),
+        },
+        gradients: results,
+        backward_edges: edges.clone(),
+        accumulator,
+        telemetry: AutodiffTelemetry {
+            backend: "rcl-tensor-autodiff-rust-v0.1",
+            forward_node_count: request.graph.nodes.len(),
+            backward_edge_count: edges.len(),
+            forward_nanos,
+            backward_nanos,
+            parameter_count: request.parameters.len(),
+        },
+    })
+}
+
+fn update_parameters(
+    request: &mut AutodiffRequest,
+    result: &AutodiffResult,
+    learning_rate: f64,
+) -> Result<(), EngineError> {
+    let gradients = result
+        .gradients
+        .iter()
+        .map(|gradient| {
+            (
+                gradient.parameter.tensor_id.as_str(),
+                gradient.storage.data.as_slice(),
+            )
+        })
+        .collect::<HashMap<_, _>>();
+    let mut parameter_storage_ids = HashSet::new();
+    for parameter in &request.parameters {
+        let tensor_index = request
+            .graph
+            .tensors
+            .iter()
+            .position(|tensor| tensor.id == parameter.tensor_id)
+            .unwrap();
+        let old_storage_identity = request.graph.tensors[tensor_index].storage_identity.clone();
+        if !parameter_storage_ids.insert(old_storage_identity.clone()) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_PARAMETER_STORAGE_ALIAS",
+                "Parameters cannot share mutable training storage",
+            ));
+        }
+        let storage_index = request
+            .graph
+            .storages
+            .iter()
+            .position(|storage| storage.identity == old_storage_identity)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_STORAGE_MISSING",
+                    format!("Parameter storage {old_storage_identity} is unavailable"),
+                )
+            })?;
+        let derivative = gradients.get(parameter.tensor_id.as_str()).unwrap();
+        if derivative.len() != request.graph.storages[storage_index].data.len() {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_PARAMETER_SHAPE",
+                format!(
+                    "Gradient shape differs for parameter {}",
+                    parameter.tensor_id
+                ),
+            ));
+        }
+        let updated = request.graph.storages[storage_index]
+            .data
+            .iter()
+            .zip(*derivative)
+            .map(|(value, gradient)| value - learning_rate * gradient)
+            .collect::<Vec<_>>();
+        if updated.iter().any(|value| !value.is_finite()) {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_NONFINITE_PARAMETER",
+                format!(
+                    "Parameter update produced non-finite values for {}",
+                    parameter.tensor_id
+                ),
+            ));
+        }
+        let descriptor = &request.graph.tensors[tensor_index];
+        let new_identity = output_identity(&descriptor.dtype, &descriptor.shape, &updated);
+        request.graph.storages[storage_index].identity = new_identity.clone();
+        request.graph.storages[storage_index].data = updated;
+        request.graph.tensors[tensor_index].storage_identity = new_identity;
+        request
+            .graph
+            .exact_storage_bits
+            .remove(&old_storage_identity);
+    }
+    Ok(())
+}
+
+pub fn train_sgd(
+    training: &AutodiffSgdTrainingRequest,
+) -> Result<AutodiffSgdTrainingResult, EngineError> {
+    if training.format != AUTODIFF_SGD_TRAINING_REQUEST_FORMAT {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_TRAINING_FORMAT",
+            format!("Unsupported training format {}", training.format),
+        ));
+    }
+    if training.steps == 0 || training.steps > MAX_TRAINING_STEPS {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_TRAINING_STEP_LIMIT",
+            format!("Training steps must be within 1..={MAX_TRAINING_STEPS}"),
+        ));
+    }
+    let node_steps = training
+        .autodiff
+        .graph
+        .nodes
+        .len()
+        .checked_mul(training.steps)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_TRAINING_WORK_LIMIT",
+                "Training node-step accounting overflowed",
+            )
+        })?;
+    if node_steps > MAX_TRAINING_NODE_STEPS {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_TRAINING_WORK_LIMIT",
+            format!(
+                "Training requests at most {MAX_TRAINING_NODE_STEPS} node-steps, received {node_steps}"
+            ),
+        ));
+    }
+    if !training.learning_rate.is_finite() || training.learning_rate <= 0.0 {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_LEARNING_RATE",
+            "Learning rate must be finite and positive",
+        ));
+    }
+    let started = Instant::now();
+    let mut request = training.autodiff.clone();
+    // Exact checkpoint bits are part of the canonical initial value. Materialize them
+    // into the mutable training storage before the first update; otherwise validation
+    // would see the exact value while SGD updated the decimal transport approximation.
+    let canonical_initials = validate_plan_initials(&request.graph)?;
+    for tensor in &request.graph.tensors {
+        let canonical_storage = &canonical_initials.get(&tensor.id).unwrap().1;
+        let mutable_storage = request
+            .graph
+            .storages
+            .iter_mut()
+            .find(|storage| storage.identity == tensor.storage_identity)
+            .unwrap();
+        mutable_storage.data.clone_from(&canonical_storage.data);
+    }
+    let initial = backward(&request)?;
+    for _ in 0..training.steps {
+        let result = backward(&request)?;
+        update_parameters(&mut request, &result, training.learning_rate)?;
+    }
+    let final_result = backward(&request)?;
+    let forward = execute_plan(&request.graph)?;
+    let parameters = request
+        .parameters
+        .iter()
+        .map(|parameter| {
+            let tensor = request
+                .graph
+                .tensors
+                .iter()
+                .find(|tensor| tensor.id == parameter.tensor_id)
+                .unwrap()
+                .clone();
+            let storage = request
+                .graph
+                .storages
+                .iter()
+                .find(|storage| storage.identity == tensor.storage_identity)
+                .unwrap()
+                .clone();
+            TensorValue { tensor, storage }
+        })
+        .collect::<Vec<_>>();
+    let parameter_bytes = parameters
+        .iter()
+        .map(|value| value.storage.data.len() * std::mem::size_of::<f64>())
+        .sum();
+    Ok(AutodiffSgdTrainingResult {
+        format: AUTODIFF_SGD_TRAINING_RESPONSE_FORMAT,
+        status: "ok",
+        initial_loss: initial.loss.storage.data[0],
+        final_loss: final_result.loss.storage.data[0],
+        parameters,
+        outputs: forward.outputs,
+        telemetry: AutodiffSgdTrainingTelemetry {
+            backend: "rcl-tensor-autodiff-rust-v0.1",
+            optimizer_semantics: "rcl.batch-sgd.v0.1",
+            steps: training.steps,
+            training_nanos: started.elapsed().as_nanos(),
+            parameter_bytes,
+        },
+    })
+}

@@ -288,10 +288,12 @@
     "evidence:k08-native-ai": "node scripts/run-k08-pure-rcl-xor.mjs output/k08-pure-rcl-xor-v0.1",
     "evidence:k08-native-ai:general-mlp": "node scripts/run-k08-general-mlp.mjs output/k08-general-mlp-v0.1",
     "test:k08-tensor": "cargo test --release --locked --manifest-path native/tensor-engine/Cargo.toml && node --test --test-concurrency=1 tests/k08-tensor-genome.test.mjs tests/k08-tensor-cpu-engine.test.mjs tests/k08-tensor-general-mlp-lowering.test.mjs tests/k08-tensor-plan-liveness.test.mjs tests/k08-tensor-borrowed-input.test.mjs",
+    "test:k08-autodiff": "node --test --test-concurrency=1 tests/k08-native-autodiff.test.mjs",
     "evidence:k08-tensor-cpu": "node scripts/run-k08-tensor-cpu-evidence.mjs output/k08-tensor-cpu-v0.1",
     "evidence:k08-tensor-mlp": "node scripts/run-k08-general-mlp-tensor-lowering.mjs output/k08-general-mlp-tensor-v0.1",
     "evidence:k08-tensor-liveness": "node scripts/run-k08-tensor-plan-liveness-evidence.mjs",
     "evidence:k08-tensor-borrowed-input": "node scripts/run-k08-tensor-borrowed-input-evidence.mjs",
+    "evidence:k08-autodiff": "node scripts/run-k08-native-autodiff.mjs output/k08-native-autodiff-v0.1",
     "evidence:k233-ai-generate": "node scripts/run-k233-independent-ai-generation.mjs output/k233-independent-ai-generation-v0.1",
     "verify:k233-ai-generate": "node scripts/verify-k233-ai-generation-receipt.mjs",
     "evidence:k400": "node scripts/build-k400-evidence.mjs && node scripts/universal-program-stress-report.mjs examples/universal-stress/k400-current-evidence.json output/universal-stress-k400"

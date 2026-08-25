@@ -5,6 +5,9 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::time::Instant;
 
+mod autodiff;
+pub use autodiff::*;
+
 pub const REQUEST_FORMAT: &str = "rcl.tensor-execution-request.v0.1";
 pub const RESPONSE_FORMAT: &str = "rcl.tensor-execution-result.v0.1";
 pub const PLAN_REQUEST_FORMAT: &str = "rcl.tensor-execution-plan.v0.1";
@@ -595,6 +598,51 @@ fn attribute_permutation(attributes: &Value) -> Result<Vec<usize>, EngineError> 
         .collect()
 }
 
+fn attribute_shape(attributes: &Value) -> Result<Vec<usize>, EngineError> {
+    attributes
+        .get("shape")
+        .and_then(Value::as_array)
+        .ok_or_else(|| EngineError::new("RCL_TENSOR_ATTRIBUTE", "Missing shape attribute"))?
+        .iter()
+        .map(|value| {
+            value
+                .as_u64()
+                .and_then(|dimension| usize::try_from(dimension).ok())
+                .ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_TENSOR_ATTRIBUTE",
+                        "Shape dimensions must be usize values",
+                    )
+                })
+        })
+        .collect()
+}
+
+fn activation(
+    input: &BoundTensor<'_>,
+    attributes: &Value,
+) -> Result<(Vec<usize>, Vec<f64>), EngineError> {
+    let kind = attributes
+        .get("kind")
+        .and_then(Value::as_str)
+        .ok_or_else(|| EngineError::new("RCL_TENSOR_ATTRIBUTE", "Missing activation kind"))?;
+    let data = input
+        .data
+        .iter()
+        .map(|value| match kind {
+            "softsign01" => Ok(0.5 * (value / (1.0 + value.abs()) + 1.0)),
+            "relu" => Ok(value.max(0.0)),
+            "tanh" => Ok(value.tanh()),
+            "sigmoid" => Ok(1.0 / (1.0 + (-value).exp())),
+            _ => Err(EngineError::new(
+                "RCL_TENSOR_ACTIVATION_UNSUPPORTED",
+                format!("Unsupported activation {kind}"),
+            )),
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok((input.descriptor.shape.clone(), data))
+}
+
 fn reduction(
     input: &BoundTensor<'_>,
     operation: &str,
@@ -756,6 +804,45 @@ fn execute_bound(
         "abs" | "exp" | "log" | "sqrt" => {
             require_arity(inputs, 1)?;
             unary(&inputs[0], operation)?
+        }
+        "reshape" => {
+            require_arity(inputs, 1)?;
+            let shape = attribute_shape(attributes)?;
+            if product(&shape)? != inputs[0].data.len() {
+                return Err(EngineError::new(
+                    "RCL_TENSOR_RESHAPE_ELEMENTS",
+                    "reshape must preserve the element count",
+                ));
+            }
+            (shape, inputs[0].data.to_vec())
+        }
+        "broadcast" => {
+            require_arity(inputs, 1)?;
+            let shape = attribute_shape(attributes)?;
+            if output_shape_for_broadcast(&inputs[0].descriptor.shape, &shape)? != shape {
+                return Err(EngineError::new(
+                    "RCL_TENSOR_BROADCAST_INVALID",
+                    format!(
+                        "Cannot broadcast {:?} to {shape:?}",
+                        inputs[0].descriptor.shape
+                    ),
+                ));
+            }
+            let count = product(&shape)?;
+            let data = (0..count)
+                .map(|index| {
+                    inputs[0].data[broadcast_offset(index, &shape, &inputs[0].descriptor.shape)]
+                })
+                .collect();
+            (shape, data)
+        }
+        "activation" => {
+            require_arity(inputs, 1)?;
+            activation(&inputs[0], attributes)?
+        }
+        "stop-gradient" => {
+            require_arity(inputs, 1)?;
+            (inputs[0].descriptor.shape.clone(), inputs[0].data.to_vec())
         }
         "transpose" => {
             require_arity(inputs, 1)?;
@@ -1303,6 +1390,24 @@ pub fn execute_json(request_json: &str) -> Result<String, String> {
             execute_plan(&plan).and_then(|result| {
                 serde_json::to_string(&result).map_err(|error| {
                     EngineError::new("RCL_TENSOR_RESPONSE_JSON", error.to_string())
+                })
+            })
+        }
+        AUTODIFF_REQUEST_FORMAT => {
+            let request: AutodiffRequest = serde_json::from_value(value)
+                .map_err(|error| error_json("RCL_AUTODIFF_REQUEST_JSON", error.to_string()))?;
+            backward(&request).and_then(|result| {
+                serde_json::to_string(&result).map_err(|error| {
+                    EngineError::new("RCL_AUTODIFF_RESPONSE_JSON", error.to_string())
+                })
+            })
+        }
+        AUTODIFF_SGD_TRAINING_REQUEST_FORMAT => {
+            let request: AutodiffSgdTrainingRequest = serde_json::from_value(value)
+                .map_err(|error| error_json("RCL_AUTODIFF_REQUEST_JSON", error.to_string()))?;
+            train_sgd(&request).and_then(|result| {
+                serde_json::to_string(&result).map_err(|error| {
+                    EngineError::new("RCL_AUTODIFF_RESPONSE_JSON", error.to_string())
                 })
             })
         }

@@ -1,0 +1,128 @@
+# K08-G: canonical graph and reverse-propagation semantics.
+# Numeric kernels lower to execution organs; this source owns graph, edge,
+# GradientIdentity, StopGradient and accumulation intent.
+reality AutodiffGenomeCandidate {
+  reckon one_text(value : Text) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_text(first : Text, second : Text) -> Sequence = sequence_append(one_text(first), second)
+  reckon two_sequence(first : Sequence, second : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), first), second)
+
+  reckon make_tensor_value(id : Text, gradient_identity : Text) -> Sequence =
+    sequence_append(sequence_append(two_text("TensorValue", id), gradient_identity), "f64")
+
+  reckon tensor_value_id(value : Sequence) -> Text = sequence_get(value, 1)
+  reckon tensor_value_gradient_identity(value : Sequence) -> Text = sequence_get(value, 2)
+
+  reckon make_parameter(value : Sequence) -> Sequence =
+    sequence_append(two_text("Parameter", tensor_value_id(value)), tensor_value_gradient_identity(value))
+
+  reckon make_operation(id : Text, kind : Text, inputs : Sequence, output : Text) -> Sequence =
+    sequence_append(sequence_append(sequence_append(two_text("Operation", id), kind), inputs), output)
+
+  reckon operation_id(operation : Sequence) -> Text = sequence_get(operation, 1)
+  reckon operation_kind(operation : Sequence) -> Text = sequence_get(operation, 2)
+  reckon operation_inputs(operation : Sequence) -> Sequence = sequence_get(operation, 3)
+  reckon operation_output(operation : Sequence) -> Text = sequence_get(operation, 4)
+
+  reckon make_stop_gradient(tensor_id : Text) -> Sequence = two_text("StopGradient", tensor_id)
+  reckon stop_gradient_tensor_id(stop : Sequence) -> Text = sequence_get(stop, 1)
+
+  reckon contains_stop_gradient(stops : Sequence, tensor_id : Text, index : Number) -> Truth =
+    choose(index >= length(stops), false,
+      stop_gradient_tensor_id(sequence_get(stops, index)) == tensor_id or
+      contains_stop_gradient(stops, tensor_id, index + 1))
+
+  reckon operation_differentiable(kind : Text) -> Truth =
+    kind == "add" or kind == "sub" or kind == "mul" or kind == "div" or
+    kind == "matmul" or kind == "transpose" or kind == "reshape" or
+    kind == "broadcast" or kind == "sum" or kind == "mean" or
+    kind == "exp" or kind == "log" or kind == "sqrt" or kind == "abs" or
+    kind == "activation" or kind == "softmax" or kind == "stop-gradient"
+
+  reckon reverse_rule(kind : Text) -> Text =
+    choose(kind == "add", "identity+unbroadcast",
+      choose(kind == "sub", "identity+negate+unbroadcast",
+        choose(kind == "mul", "peer-product+unbroadcast",
+          choose(kind == "div", "quotient-rule+unbroadcast",
+            choose(kind == "matmul", "adjoint-matmul",
+              choose(kind == "transpose", "inverse-permutation",
+                choose(kind == "reshape", "restore-input-shape",
+                  choose(kind == "broadcast", "reduce-to-input-shape",
+                    choose(kind == "sum", "broadcast-to-input-shape",
+                      choose(kind == "mean", "scaled-broadcast-to-input-shape",
+                        choose(kind == "exp", "multiply-forward-output",
+                          choose(kind == "log", "divide-forward-input",
+                            choose(kind == "sqrt", "divide-twice-forward-output",
+                              choose(kind == "abs", "frozen-zero-subgradient-sign",
+                                choose(kind == "activation", "activation-local-derivative",
+                                  choose(kind == "softmax", "jacobian-vector-product", "stop-propagation"))))))))))))))))
+
+  reckon make_backward_edge(operation : Sequence, input_index : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(one_text("BackwardEdge"), operation_id(operation)),
+              operation_kind(operation)),
+            operation_output(operation)),
+          sequence_get(operation_inputs(operation), input_index)),
+        input_index),
+      reverse_rule(operation_kind(operation)))
+
+  reckon operation_backward_edges(operation : Sequence, stops : Sequence, input_index : Number, edges : Sequence) -> Sequence =
+    choose(operation_kind(operation) == "stop-gradient" or input_index >= length(operation_inputs(operation)),
+      edges,
+      choose(contains_stop_gradient(stops, sequence_get(operation_inputs(operation), input_index), 0),
+        operation_backward_edges(operation, stops, input_index + 1, edges),
+        operation_backward_edges(
+          operation,
+          stops,
+          input_index + 1,
+          sequence_append(edges, make_backward_edge(operation, input_index)))))
+
+  reckon backward_edges(operations : Sequence, stops : Sequence, index : Number, edges : Sequence) -> Sequence =
+    choose(index < 0,
+      edges,
+      backward_edges(
+        operations,
+        stops,
+        index - 1,
+        sequence_concat(edges, operation_backward_edges(sequence_get(operations, index), stops, 0, empty_sequence()))))
+
+  reckon backward(operations : Sequence, stops : Sequence) -> Sequence =
+    backward_edges(operations, stops, length(operations) - 1, empty_sequence())
+
+  reckon make_gradient_accumulator(gradient_identity : Text, contributions : Sequence) -> Sequence =
+    sequence_append(sequence_append(two_text("GradientAccumulator", gradient_identity), contributions), length(contributions))
+
+  reckon parameter_x() -> Sequence = make_parameter(make_tensor_value("x", "parameter:x"))
+  reckon parameter_w() -> Sequence = make_parameter(make_tensor_value("w", "parameter:w"))
+  reckon operations() -> Sequence =
+    sequence_append(
+      sequence_append(
+        empty_sequence(),
+        make_operation("matmul", "matmul", two_text("x", "w"), "projected")),
+      make_operation("loss", "mean", one_text("projected"), "loss"))
+
+  reckon stops() -> Sequence = sequence_append(empty_sequence(), make_stop_gradient("target"))
+
+  facet contract.id : Text = "k08-g-autodiff-genome-v0.1"
+  facet contract.profile : Text = "REVERSE_MODE_TENSOR_SSA_CANDIDATE"
+  facet graph.parameters : Sequence = two_sequence(parameter_x(), parameter_w())
+  facet graph.operations : Sequence = operations()
+  facet graph.loss : Text = "loss"
+  facet graph.stop_gradients : Sequence = stops()
+  facet backward.edges : Sequence = backward(graph.operations, graph.stop_gradients)
+  facet backward.edge_count : Number = length(backward.edges)
+  facet backward.first_rule : Text = sequence_get(sequence_get(backward.edges, 0), 6)
+  facet accumulator.example : Sequence = make_gradient_accumulator("parameter:x", two_text("edge:a", "edge:b"))
+  facet evaluation.generic_operations : Truth =
+    operation_differentiable("matmul") and operation_differentiable("softmax") and
+    operation_differentiable("activation") and operation_differentiable("stop-gradient")
+  facet evaluation.backward_edges_exist : Truth = backward.edge_count == 3
+  facet evaluation.stop_gradient_blocks : Truth =
+    length(operation_backward_edges(make_operation("stop", "stop-gradient", one_text("x"), "stopped"), empty_sequence(), 0, empty_sequence())) == 0
+  facet evidence.execution_path : Text = "RCL_AUTODIFF_GRAPH_TO_GENERIC_REVERSE_RULES_TO_RUST_EXECUTION_ORGAN"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_OPTIMIZER_TRANSFORMER_OR_K400_PROMOTION"
+}
