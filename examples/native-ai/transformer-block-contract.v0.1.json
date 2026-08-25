@@ -1,0 +1,50 @@
+{
+  "format": "rcl.k08-i.transformer-block-contract.v0.1",
+  "status": "ENGINE_E4_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "executionBoundary": "generic f64 CPU Tensor + reverse-mode Autodiff; no model-special opcode",
+  "profile": {
+    "sequenceLength": 3,
+    "hiddenSize": 2,
+    "feedForwardSize": 3,
+    "headCount": 1,
+    "preNorm": true,
+    "activation": "silu-composed-from-mul-and-sigmoid",
+    "attention": "scaled-dot-product-causal"
+  },
+  "parameters": ["wq", "wk", "wv", "wo", "w1", "w2"],
+  "requiredGenericOperations": [
+    "add",
+    "sub",
+    "mul",
+    "div",
+    "matmul",
+    "transpose",
+    "reshape",
+    "broadcast",
+    "mean",
+    "sqrt",
+    "activation:sigmoid",
+    "softmax"
+  ],
+  "acceptance": {
+    "selfHostRbcParity": true,
+    "nativeSemanticRoot": true,
+    "causalMask": true,
+    "forwardDifferential": true,
+    "reverseModeGradients": true,
+    "finiteDifferenceProbe": true,
+    "deterministicReplay": true,
+    "modelSpecialOperationCount": 0
+  },
+  "claimsNotGranted": [
+    "MULTI_HEAD_ATTENTION",
+    "CROSS_ENTROPY",
+    "TOKENIZER",
+    "TINY_LM",
+    "TENSOR_ADAMW_BACKEND",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ]
+}
