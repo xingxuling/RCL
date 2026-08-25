@@ -92,7 +92,7 @@ function providerSource(request) {
 }
 
 function buildEngine() {
-  const run = spawnSync('cargo', ['build', '--release', '--manifest-path', manifestPath, '--offline'], { cwd: root, encoding: 'utf8', timeout: 180_000, maxBuffer: 32 * 1024 * 1024 });
+  const run = spawnSync('cargo', ['build', '--release', '--locked', '--manifest-path', manifestPath], { cwd: root, encoding: 'utf8', timeout: 180_000, maxBuffer: 32 * 1024 * 1024 });
   if (run.status !== 0) throw new Error(run.stderr || run.stdout || 'Cargo build failed');
 }
 

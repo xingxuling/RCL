@@ -15,7 +15,7 @@ const manifestPath = path.join(root, 'native', 'tensor-engine', 'Cargo.toml');
 const binaryPath = path.join(root, 'native', 'tensor-engine', 'target', 'release', process.platform === 'win32' ? 'rcl-tensor-engine.exe' : 'rcl-tensor-engine');
 
 function buildEngine() {
-  const build = spawnSync('cargo', ['build', '--release', '--manifest-path', manifestPath, '--offline'], {
+  const build = spawnSync('cargo', ['build', '--release', '--locked', '--manifest-path', manifestPath], {
     cwd: root,
     encoding: 'utf8',
     timeout: 120_000,
