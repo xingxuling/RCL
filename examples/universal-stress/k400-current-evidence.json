@@ -585,6 +585,166 @@
       ]
     },
     {
+      "id": "compiler-runtime::compiler",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "42b77ceb71e1d00f686b41096646fd05a61ad6e9",
+      "lastVerifiedDate": "2026-08-25",
+      "knownLimits": [
+        "The claim covers the current general RCL compiler and three receipt-bound builtin-lowering repairs; arbitrary compiler evolution remains unverified.",
+        "The admitted K01 fixed-point evidence is reused only as compiler runtime evidence; K339 AI_GENERATE authority is not inherited.",
+        "Whole-language runtime self-hosting and the remaining K400 cells are not claimed."
+      ],
+      "relatedKillerTasks": [
+        "K01"
+      ],
+      "requiredGenes": [
+        "general-rcl-compiler",
+        "builtin-lowering-table",
+        "native-compiler-runtime",
+        "fixed-point-differential"
+      ],
+      "donorAdvantages": [
+        {
+          "donor": "Web and Android platform frameworks",
+          "capability": "resource, full accessibility and device-adaptation semantics beyond width-profile layout direction",
+          "status": "PARTIAL_UNABSORBED"
+        }
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/counter.rcl",
+            "examples/selfhost-core/native-ui-parameterized.rcl",
+            "examples/selfhost-core/native-ui-governed.rcl",
+            "examples/selfhost-core/native-ui-fixed.rcl",
+            "examples/selfhost-core/native-ui-minimal.rcl",
+            "examples/native-ui/navigation.rcl",
+            "examples/native-ui/device-adaptation.rcl"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "tests/general-selfhost-fixedpoint.test.mjs",
+            "tests/native-ui-backends-equivalence.test.mjs",
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ]
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "tests/general-selfhost-fixedpoint.test.mjs"
+          ]
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json"
+          ],
+          "note": "each native generation executes 88,744,649 instructions with 211,255,351 headroom; the evidence generations completed in 228,988.5857 ms on this machine, within the predeclared 240,000 ms cap"
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json",
+            "examples/universal-stress/evidence/k01-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k01-ai-generate/github-replay.json"
+          ],
+          "note": "Three new independent builtin-lowering repairs restored canonical compiler bytes; GitHub run 32880432503 bound focused replay plus Windows native fixed point."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/native-ui/evidence/selfhost-device-adaptation-result.json",
+            "docs/ui-native-genome/evidence-ledger.md"
+          ]
+        }
+      },
+      "changes": [
+        {
+          "id": "selfhost-native-ui-fixed-sizing",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "canonical self-host compiler parses, normalizes, roots and byte-lowers platform-neutral fixed width/height intent; one shared root lowers to Web CSS and Android LayoutParams, with invalid sizes failing closed"
+        },
+        {
+          "id": "selfhost-call-validation-index",
+          "kind": "performance-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "builtin and special calls bypass user-symbol scans while user-call validation resolves its reckon index once, preserving errors and fixed-point bytes while increasing instruction headroom"
+        },
+        {
+          "id": "canonical-native-ui-navigation",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "platform-neutral route identities target direct root children; one UI-local event may atomically combine state mutation and one route transition, while mixed Reality authority fails closed"
+        },
+        {
+          "id": "chunked-selfhost-tokenizer",
+          "kind": "performance-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "tokens are accumulated in bounded 127-token chunks and flattened without changing token order, restoring JS bootstrap under the existing heap boundary without increasing the heap limit"
+        },
+        {
+          "id": "canonical-device-width-adaptation",
+          "kind": "candidate-gene",
+          "scope": [
+            "compiler-runtime",
+            "browser",
+            "android"
+          ],
+          "generalPrimitive": true,
+          "justification": "non-overlapping available-width profiles select canonical layout direction overrides; unknown, duplicate and overlapping declarations fail closed while one root lowers to Web and Android"
+        },
+        {
+          "id": "collision-free-nested-choose-labels",
+          "kind": "compiler-correctness-gene",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "assembler-monotonic labels replace instruction-length-derived labels so nested choose lowering cannot collide"
+        }
+      ]
+    },
+    {
       "id": "browser::web",
       "coverageMode": "lowered-execution",
       "lastVerifiedSha": "41a5850178161cb26b80129251cd803598aeceda",
@@ -1140,6 +1300,7 @@
     "examples/universal-stress/evidence/k04-server-ai-generate/github-replay.json",
     "examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json",
     "examples/native-ai/evidence/k08-b-evidence.json",
     "examples/native-ai/evidence/k233-ai-generate/receipt.json",
     "examples/native-ai/evidence/k233-ai-generate/github-replay.json",
@@ -1170,7 +1331,7 @@
     "K03 real emulator receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098; their independent AI_GENERATE receipt is separately admitted.",
     "K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run 32871776578.",
     "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
-    "K327 has a 3/3 local independent compiler builtin-lowering repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.",
+    "K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run 32880432503.",
     "K08-D is candidate-only evidence: a 29980-node generic Tensor Plan measured 5.720x local scalar-to-Tensor speedup and a remaining 15.863x JS ratio; it grants no new K233 gate or K400 cell.",
     "K08-E is candidate-only evidence: last-use reclamation measured a 892.823x logical plan-store reduction and 1.159x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.",
     "K08-F is candidate-only local Windows evidence: 54964 Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured 1.220x runtime speedup and 0.000% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.",

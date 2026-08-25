@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `10 PASS / 0 BLOCKED / 390 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233 and K339.
+Current authoritative matrix: `11 PASS / 0 BLOCKED / 389 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K327 and K339.
 
 Every evidence-bearing cell is evaluated through:
 
@@ -47,6 +47,8 @@ Direct evidence supports:
 - native execution and measured performance within the declared campaign budget.
 
 The frozen K01 v0.2 campaign used three unique ephemeral read-only generator sessions to repair three effective RCL compiler opcode-lowering mutations, restore exact canonical compiler bytes, and share one native byte-identical `C0 == C1 == C2` fixed point. GitHub run `32869858927` bound focused Linux job `97873981605` and Windows native job `97873981286` for source commit `1bdab89cbff822b4d5f4119d009aaab8a07c12f0`; authority root is `ef6f03ca31bd6416f13f2fbab199e692c1111fc5b8db66aef947c463a6e52a43`. This closes K339 only and does not establish arbitrary compiler evolution or whole-runtime self-hosting.
+
+The separate K327 `compiler-runtime::compiler` campaign used three new ephemeral read-only sessions to repair `contains`, `sequence_concat` and `sha256_text` builtin-lowering mutations. Its evaluator restored exact canonical compiler bytes and reused the already admitted fixed-point execution only as a compiler-runtime binding, not as inherited AI authority. GitHub run `32880432503` bound focused job `97908294490` and Windows native job `97908294012` for source commit `42b77ceb71e1d00f686b41096646fd05a61ad6e9`; authority root is `72c0ebe2de859e8585fe1f3325d7240896de25eb42055daeec56a78b33934670`. This closes K327 only and does not broaden K339 or K400.
 
 Authority document: `docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`.
 

@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `10 PASS / 0 BLOCKED / 390 UNTESTED`
+**Current evidence:** `11 PASS / 0 BLOCKED / 389 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `d03784d146a97041688e6c286e736f9c6bb0ba6497efb08e0fbedb634ae9df0f`
+**Report root:** `5fcfa18469fc3f40e9006f5e154a8e8d16bd158807f9dd850f72c07d06571db2`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -43,6 +43,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | Stable cell | Coordinate | Current state | Missing gates |
 |---|---|---|---|
 | `K064` | `browser::web` | `PASS` | none for the bounded K02 RCL Web/Server vertical slice |
+| `K327` | `compiler-runtime::compiler` | `PASS` | none for the bounded three-mutation builtin-lowering repair profile with admitted compiler-runtime binding |
 | `K339` | `compiler-runtime::self-hosting` | `PASS` | none for the bounded three-mutation compiler repair profile |
 | `K063` | `browser::gui` | `PASS` | none for the bounded K02 structural GUI surface |
 | `K078` | `browser::reactive` | `PASS` | none for the bounded K02 reactive state/binding surface |
@@ -86,12 +87,16 @@ The Android campaign installed the rebuilt K03 APK on `Rcl_Aether_API35_ATD`, ex
 
 The Server batch froze its runtime contract before acquisition and ran 20 fresh ephemeral loopback servers. State, observe, governed add/reset transactions and unknown state/rule rejection passed in all 20 rounds. Transaction p95 was `2.782 ms` against `100 ms`; full-replay/startup-proxy p95 was `66.846 ms` against `1000 ms`. Three unique ephemeral read-only sessions independently repaired effective transition, authority and reset mutations, restored canonical bytes, and replayed the same generated HTTP surface. GitHub run `32876898001`, focused job `97896893662`, bound exact source commit `f669460df4e4401e3e2f29b82c0ec35fc295930d`; authority root `5fb9eb94d6575ce9e606fb7c77e30d20f9d531e3cb828d38fc8c7fe028f940d2` closes K124 and K138 only. The `K04-SERVER` filename prefix identifies this evidence batch and does not claim the separate Killer Task K04 2D-game closure.
 
-## 9. K08-A baseline and K08-B General MLP
+## 9. K327 compiler closure
+
+K327 is independently closed by three new ephemeral read-only sessions repairing effective `contains`, `sequence_concat` and `sha256_text` builtin-lowering mutations. Each saved proposal restored the exact canonical compiler sources and reproduced compiler artifact SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`. The campaign binds the already admitted K01 fixed point only as runtime evidence; it does not inherit K339's AI-generation authority. GitHub run `32880432503` bound focused job `97908294490` and Windows job `97908294012` for exact source commit `42b77ceb71e1d00f686b41096646fd05a61ad6e9`; authority root `72c0ebe2de859e8585fe1f3325d7240896de25eb42055daeec56a78b33934670` closes K327 only.
+
+## 10. K08-A baseline and K08-B General MLP
 
 `pure-rcl-xor.rcl` owns the frozen dataset, nine parameters, Softsign-01 activation, forward pass, mean half-squared loss, manual gradients, backward propagation, Batch SGD, 512-epoch training loop, prediction and evaluation. Native `rclc` compiled it through `selfhost/compiler.rbc`; native `rclvm` executed 13,965,818 instructions and reached 100% XOR accuracy with loss `0.0157034488743931`. Three replays produced the same semantic state root, while the JS differential oracle had maximum parameter drift `4.44e-15` and did not supply native parameters.
 
 K08-B extends this to a bounded configurable two-Dense-layer General MLP profile. The same RCL Model/Layer/Parameter/Dataset/SGD/Checkpoint semantics train XOR `2-2-1` and Majority-3 `3-3-1`, with shape/data negatives, exact resume, deterministic native replay and differential parity. Three separate read-only Codex sessions repaired activation-gradient, target-binding and parameter-gradient-routing mutations; their saved candidates restore canonical source and passed GitHub-hosted replay in run `32780097954`, focused job `97600047380`. K233 now passes all nine gates for this bounded profile. Tensor, general Autodiff, AdamW and accelerated backends are not implied. See `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
 
-## 10. Browser performance contract chronology
+## 11. Browser performance contract chronology
 
 Commit `955e6cef527f74a926538d5f8d2b93404add245b` froze the numeric browser budgets before the new acquisition. The first acquisition met every numeric budget but failed the UI-root precondition because the checked-in Counter evidence was stale relative to the device-adaptation IR fields. Revision 2 corrected only that identity precondition to the freshly regenerated canonical root and did not change either numeric threshold. The post-revision real Chrome acquisition passed all checks at `0.884 ms` per three-event sequence against the `1.5 ms` limit and `1037.344 ms` host-process elapsed time against the `5000 ms` limit. This closes only the declared local performance gate; the roughly `49.1×` plain-DOM slowdown remains an observed donor advantage rather than a parity claim.
