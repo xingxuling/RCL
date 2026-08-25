@@ -6,7 +6,7 @@ static int echo_invoke(void *userdata, const char *capability, const char *reque
                        char *response_json, size_t response_capacity,
                        char *error, size_t error_capacity) {
   (void)userdata;
-  if (strcmp(capability, "echo.text") != 0) {
+  if (strcmp(capability, "echo.text") != 0 && strcmp(capability, "text") != 0) {
     snprintf(error, error_capacity, "Unsupported capability: %s", capability);
     return 0;
   }
