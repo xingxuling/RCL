@@ -1,0 +1,59 @@
+{
+  "format": "rcl.k08-m.bpe-tokenizer-contract.v0.1",
+  "status": "BPE_TOKENIZER_GENOME_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "baseTokenizer": "rcl.byte-tokenizer.utf8.v0.1",
+  "normalization": "NONE",
+  "algorithm": {
+    "family": "byte-bpe",
+    "baseVocabularySize": 259,
+    "maximumVocabularySize": 65536,
+    "mergeSelection": "highest-frequency-then-lowest-numeric-pair-left-right",
+    "mergeApplication": "non-overlapping-left-to-right",
+    "byteFallback": true,
+    "minimumFrequencyDefault": 2
+  },
+  "artifact": {
+    "format": "rcl.bpe-tokenizer-artifact.v0.1",
+    "identity": "sha256(canonical artifact body)",
+    "requiredProvenance": [
+      "corpus-sha256",
+      "corpus-byte-count",
+      "target-vocabulary-size",
+      "actual-vocabulary-size",
+      "minimum-frequency",
+      "ordered-merge-table"
+    ]
+  },
+  "requiredEvidence": [
+    "selfhost-rbc-parity-and-native-semantic-root",
+    "deterministic-training-replay",
+    "deterministic-frequency-tie-break",
+    "mixed-zh-en-ja-code-roundtrip",
+    "compression-below-byte-token-count-on-training-fixture",
+    "byte-fallback-for-unseen-text",
+    "artifact-root-tamper-rejection",
+    "invalid-target-fails-closed",
+    "invalid-utf8-corpus-fails-closed",
+    "target-65536-is-accepted-but-not-claimed-unless-actually-reached"
+  ],
+  "claimsGrantedOnAdmission": [
+    "DETERMINISTIC_BYTE_BPE_TRAINER",
+    "ROOTED_LEARNED_VOCABULARY_ARTIFACT",
+    "BYTE_FALLBACK_BPE_ENCODING"
+  ],
+  "claimsNotGranted": [
+    "RCL_64K_VOCABULARY",
+    "PRODUCTION_TOKENIZER_QUALITY",
+    "PRODUCTION_CORPUS_ADMISSION",
+    "ROPE",
+    "MULTI_HEAD_ATTENTION",
+    "MULTI_BLOCK_LM",
+    "RCL_10M",
+    "BF16",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
