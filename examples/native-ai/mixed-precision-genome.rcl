@@ -1,0 +1,31 @@
+# K08-Q: mixed-precision semantic genome for the RCL-1B campaign.
+# RCL owns dtype and accumulation meaning; hardware-specific execution remains an interchangeable organ.
+reality MixedPrecisionGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_width(width : Number) -> Truth = positive(width) and width <= 65536
+  reckon valid_rcl1b(hidden : Number, blocks : Number) -> Truth = hidden == 2048 and blocks == 24
+
+  facet contract.id : Text = "k08-q-mixed-precision-genome-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.profile : Text = "BF16_STORAGE_FP32_ACCUMULATION_CANDIDATE"
+  facet contract.parameter_compute_dtype : Text = "BF16"
+  facet contract.activation_compute_dtype : Text = "BF16"
+  facet contract.matmul_accumulation_dtype : Text = "FP32"
+  facet contract.reduction_accumulation_dtype : Text = "FP32"
+  facet contract.softmax_compute_dtype : Text = "FP32"
+  facet contract.normalization_compute_dtype : Text = "FP32"
+  facet contract.optimizer_state_dtype : Text = "FP32"
+  facet contract.master_weight_dtype : Text = "FP32"
+  facet contract.bf16_rounding : Text = "ROUND_TO_NEAREST_TIES_TO_EVEN"
+  facet contract.non_finite_policy : Text = "FAIL_CLOSED_IN_REFERENCE_PROFILE"
+  facet contract.accelerator_fallback : Text = "NO_SILENT_FALLBACK"
+  facet contract.cpu_reference_is_gpu_claim : Truth = false
+
+  facet evaluation.hidden_2048_valid : Truth = valid_width(2048)
+  facet evaluation.rcl1b_geometry_valid : Truth = valid_rcl1b(2048, 24)
+  facet evaluation.zero_width_rejected : Truth = not valid_width(0)
+  facet evaluation.excess_width_rejected : Truth = not valid_width(65537)
+  facet evaluation.gpu_claim_closed : Truth = not contract.cpu_reference_is_gpu_claim
+
+  facet evidence.authority : Text = "CANDIDATE_REFERENCE_ONLY_NO_GPU_BF16_TRAINING_RCL10M_OR_RCL1B_PROMOTION"
+}
