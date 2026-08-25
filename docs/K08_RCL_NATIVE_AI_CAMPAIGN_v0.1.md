@@ -155,15 +155,14 @@ The same-machine end-to-end measurement excludes compilation but includes native
 
 This reduces the prior measured `118.300x` ratio by a factor of `7.458x`; it does not close the performance gap. Peak process RSS is still unmeasured. The 6.11 MB JSON plan, 29,980-node scalar dispatch and 1.66 MB retained-intermediate upper bound identify compact planning, liveness and buffer reuse as the next performance gate.
 
-K08-D remains `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS` until an exact implementation commit is replayed on GitHub Actions. It grants no Autodiff, AdamW, Transformer, GPU, distributed Tensor or K400 promotion claim.
+K08-D is `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32810795935` replayed portable correctness on Ubuntu and the real Windows Provider, CPU performance and General MLP Tensor evidence paths for exact implementation commit `8b53c60321345fdcc9449c1a5b7b522a3e7939a9`. It grants no Autodiff, AdamW, Transformer, GPU, distributed Tensor or K400 promotion claim.
 
 ## 9. Next gate
 
 The next highest-value sequence is:
 
-1. replay K08-D on GitHub Actions and bind the exact implementation commit without granting promotion authority;
-2. add Tensor Plan liveness, buffer reuse and compact plan lowering, then remeasure the `15.863x` ratio;
-3. add native process peak-memory telemetry;
-4. close the typed-source self-host compiler gap before Tensor promotion;
-5. resolve scientific-notation number canonicalization in semantic-state-root evidence;
-6. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.
+1. add Tensor Plan liveness, buffer reuse and compact plan lowering, then remeasure the `15.863x` ratio;
+2. add native process peak-memory telemetry;
+3. close the typed-source self-host compiler gap before Tensor promotion;
+4. resolve scientific-notation number canonicalization in semantic-state-root evidence;
+5. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.

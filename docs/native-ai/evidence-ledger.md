@@ -94,7 +94,7 @@ npm run evidence:k08-tensor-cpu
 
 ## K08-D General MLP Tensor lowering candidate
 
-Status: `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS`. Authority remains candidate-only and separate from K233.
+Status: `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_GITHUB_REPLAY_BOUND`. Authority remains candidate-only and separate from K233.
 
 | Evidence | Result |
 |---|---:|
@@ -114,10 +114,12 @@ Status: `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS`. Authori
 | Retained allocation upper bound | `1,657,080 bytes`; peak process RSS unmeasured |
 | Plan SHA-256 | `319abf8a601d2f9d8c91928f0cd54135219d732b0d338c9706371c9daeb2a523` |
 | Evidence report root | `f4982380f9d7d05bd85a838fa7b65f37bfee12c2a401abb95a31b0fff677f70d` |
+| GitHub run / source commit | `32810795935 / 8b53c60321345fdcc9449c1a5b7b522a3e7939a9` |
+| GitHub Ubuntu / Windows jobs | `97689609410 / 97689609314`, both success |
 
 The JS auxiliary lowerer owns no model semantics and computes no training result. It binds the RCL source hash and contract root into a generic plan; typed/self-hosted plan construction remains `RCL_GAP_AI_009/011`. Decimal JSON checkpoint values are accompanied by exact finite f64 Storage bits because decimal cross-runtime parsing moved one value by one ULP during the negative probe.
 
-The accepted receipt is `examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json`. It is local same-machine evidence until a separate GitHub replay receipt binds the implementation commit. It grants no native Autodiff, AdamW, Transformer, accelerator, distributed Tensor or K400 promotion claim.
+The accepted local receipt is `examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json`. The separate `github-replay.json` binds the exact implementation commit, Ubuntu portable suite and Windows Provider/performance/evidence steps. It grants no native Autodiff, AdamW, Transformer, accelerator, distributed Tensor or K400 promotion claim.
 
 Reproduction:
 

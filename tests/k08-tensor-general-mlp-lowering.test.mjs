@@ -14,6 +14,11 @@ import { evidenceRoot } from '../src/universal-program-stress.mjs';
 
 const root = path.resolve('.');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'examples', 'native-ai', 'general-mlp-contract.v0.1.json'), 'utf8'));
+const evidenceDirectory = path.join(root, 'examples', 'native-ai', 'evidence', 'general-mlp-tensor-v0.1');
+
+function sha256(value) {
+  return crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
 
 function maximumDifference(left, right) {
   return left.reduce((maximum, value, index) => Math.max(maximum, Math.abs(value - right[index])), 0);
@@ -61,6 +66,25 @@ test('K08-D accepted evidence binds the current lowering organ and Tensor backen
   assert.equal(report.checks.checkpoint, true);
   assert.equal(report.checks.differential, true);
   assert.ok(report.performance.scalarToTensorSpeedup > 1);
+});
+
+test('K08-D GitHub replay receipt binds the exact implementation and accepted evidence root', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(evidenceDirectory, 'github-replay.json'), 'utf8'));
+  const authorityRoot = receipt.authorityRoot;
+  delete receipt.authorityRoot;
+  assert.equal(sha256(receipt), authorityRoot);
+  assert.equal(receipt.status, 'PASS_GITHUB_HOSTED_REPLAY_BOUND');
+  assert.equal(receipt.sourceCommit, '8b53c60321345fdcc9449c1a5b7b522a3e7939a9');
+  assert.equal(receipt.runId, 32810795935);
+  assert.equal(receipt.runConclusion, 'success');
+  assert.deepEqual(receipt.jobs.map(({ platform, conclusion }) => [platform, conclusion]), [
+    ['ubuntu-latest', 'success'],
+    ['windows-latest', 'success'],
+  ]);
+  const evidence = JSON.parse(fs.readFileSync(path.join(evidenceDirectory, 'k08-d-general-mlp-tensor-evidence.json'), 'utf8'));
+  assert.equal(receipt.localEvidenceReportRoot, evidence.reportRoot);
+  assert.ok(receipt.claimsNotGranted.includes('K400_PASS'));
+  assert.ok(receipt.claimsNotGranted.includes('PERFORMANCE_PARITY_WITH_JAVASCRIPT'));
 });
 
 test('K08-D real Windows Provider path reduces the scalar MLP gap and preserves exact checkpoint resume', { timeout: 240_000, skip: process.platform !== 'win32' || process.env.RCL_K08_D_FULL !== '1' }, () => {

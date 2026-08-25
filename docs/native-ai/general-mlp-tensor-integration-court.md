@@ -1,6 +1,6 @@
 # K08-D General MLP Tensor Lowering Integration Court
 
-**Court state:** `ADMIT_ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS`
+**Court state:** `ADMIT_ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 **Canonical owner:** unchanged RCL General MLP model and Tensor operation semantics
 
@@ -10,7 +10,7 @@
 
 ## Decision
 
-Admit the bounded General MLP Tensor lowering as local candidate evidence. The unchanged XOR and Majority-3 model source lowers to a rooted 29,980-node plan using only `abs/add/div/matmul/mul/sub/sum/transpose`. The Rust backend computes every training value; neither the lowerer, VM nor provider adds a model-special operation.
+Admit the bounded General MLP Tensor lowering as GitHub replay-bound candidate evidence. The unchanged XOR and Majority-3 model source lowers to a rooted 29,980-node plan using only `abs/add/div/matmul/mul/sub/sum/transpose`. The Rust backend computes every training value; neither the lowerer, VM nor provider adds a model-special operation. GitHub run `32810795935` replayed the Ubuntu portable suite and Windows Provider/evidence path for exact implementation commit `8b53c60321345fdcc9449c1a5b7b522a3e7939a9`.
 
 The candidate preserves oracle/scalar parity, deterministic roots and exact checkpoint resume across serialization. Its local same-machine median improves from scalar Native RCL `2537.360 ms` to Tensor Plan `443.592 ms`, a `5.720x` speedup. The Native/JS ratio falls from `118.300x` to `15.863x`, so performance remains an open gate. This court grants no K233 relabel, K400 promotion, native Autodiff, AdamW, Transformer, GPU or distributed claim.
 
@@ -27,8 +27,8 @@ The candidate preserves oracle/scalar parity, deterministic roots and exact chec
 | Code | Rejected XOR, Majority, MLP, train and other model-special operations. |
 | Test | Covered two architectures, oracle/scalar differential, determinism, exact resume and negative plans. |
 | Security | Fails closed on hashes, missing/redefined values, descriptor drift, exact-bit errors and resource overflow. |
-| Release | Requires exact-commit GitHub replay before GitHub-bound status. |
-| Integration Court | Admits a local Engine E1 lowering candidate only. |
+| Release | Binds exact-commit Ubuntu and Windows replay; Node action deprecation annotations were non-failing. |
+| Integration Court | Admits a GitHub replay-bound Engine E1 lowering candidate only. |
 | Evidence Ledger | Roots semantics, backend, lowerer, plan, outputs, checkpoint and timing boundaries. |
 
 ## License and diff audit
@@ -37,9 +37,8 @@ The change adds original repository code and no copied donor kernel. The existin
 
 ## Remaining gates
 
-1. Exact-commit GitHub Ubuntu portable and Windows Provider replay.
-2. Tensor Plan liveness, buffer reuse and compact encoding, followed by remeasurement.
-3. Native process peak RSS evidence.
-4. Typed/self-hosted RCL plan lowering.
-5. Scientific-number semantic-state-root closure.
-6. Separate general Autodiff candidate after the execution-plan bottleneck is bounded.
+1. Tensor Plan liveness, buffer reuse and compact encoding, followed by remeasurement.
+2. Native process peak RSS evidence.
+3. Typed/self-hosted RCL plan lowering.
+4. Scientific-number semantic-state-root closure.
+5. Separate general Autodiff candidate after the execution-plan bottleneck is bounded.

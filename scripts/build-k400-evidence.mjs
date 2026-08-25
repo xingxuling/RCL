@@ -19,6 +19,7 @@ const k08Path = 'examples/native-ai/evidence/k08-b-evidence.json';
 const k233ReceiptPath = 'examples/native-ai/evidence/k233-ai-generate/receipt.json';
 const k233GithubReplayPath = 'examples/native-ai/evidence/k233-ai-generate/github-replay.json';
 const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
+const k08TensorMlpGithubReplayPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -119,7 +120,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
