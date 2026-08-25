@@ -35,12 +35,5 @@ jobs:
           node-version: '22'
       - name: Build native compiler and VM
         run: npm run build:native
-      - name: Run byte tokenizer evidence tests
+      - name: Run byte tokenizer evidence tests with frozen Cargo lock
         run: node --test --test-concurrency=1 tests/k08-byte-tokenizer.test.mjs
-      - name: Emit Cargo-generated tokenizer lock for freezing
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          echo '---RCL-TOKENIZER-CARGO-LOCK-BEGIN---'
-          cat native/tokenizer-engine/Cargo.lock
-          echo '---RCL-TOKENIZER-CARGO-LOCK-END---'
