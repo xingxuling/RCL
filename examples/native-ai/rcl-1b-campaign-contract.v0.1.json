@@ -1,0 +1,63 @@
+{
+  "format": "rcl.rcl-1b-campaign-contract.v0.1",
+  "status": "NORTH_STAR_FROZEN",
+  "canonicalOwner": "RCL",
+  "milestone": "RCL_1B_V1_RELEASE_CANDIDATE",
+  "target": {
+    "parameterClass": "approximately-1.2B",
+    "architecture": "decoder-only-transformer",
+    "layers": 24,
+    "hiddenSize": 2048,
+    "attentionHeads": 16,
+    "kvHeads": 4,
+    "contextLength": 8192,
+    "vocabularyTarget": 64000,
+    "trainingPrecisionTarget": "bf16",
+    "optimizer": "adamw",
+    "primaryLanguages": ["zh", "en", "ja", "code"],
+    "initialization": "random"
+  },
+  "scaleLadder": [
+    {"id": "RCL-10M", "role": "correctness-and-architecture-rehearsal"},
+    {"id": "RCL-100M", "role": "accelerator-and-training-pipeline-rehearsal"},
+    {"id": "RCL-300M", "role": "scale-and-resume-rehearsal"},
+    {"id": "RCL-1B", "role": "final-first-generation-model"}
+  ],
+  "pre10MGates": [
+    "GENERAL_TOKENIZER_ARTIFACT",
+    "POSITIONAL_GENOME",
+    "MULTI_HEAD_OR_GQA",
+    "MULTI_BLOCK_PARAMETRIC_MODEL",
+    "TENSOR_ADAMW",
+    "ACCELERATOR_BACKEND",
+    "MIXED_PRECISION",
+    "DATASET_PROVENANCE_PIPELINE",
+    "CHECKPOINT_LINEAGE",
+    "EVALUATION_BASELINE"
+  ],
+  "releaseArtifacts": [
+    "model-weights",
+    "tokenizer",
+    "model-config",
+    "dataset-provenance-summary",
+    "checkpoint-lineage",
+    "training-receipts",
+    "evaluation-report",
+    "inference-runner"
+  ],
+  "antiCheating": [
+    "NO_THIRD_PARTY_CHECKPOINT_AS_INITIAL_MODEL",
+    "NO_SILENT_FRAMEWORK_SEMANTIC_OWNER",
+    "NO_MODEL_SPECIAL_VM_OPCODE",
+    "NO_EXTERNAL_MODEL_GENERATION_MASQUERADING_AS_RCL",
+    "NO_UNROOTED_CHECKPOINT_PROVENANCE",
+    "NO_EARLY_SCALE_RUNG_RELABELED_AS_FINAL"
+  ],
+  "claimsNotGranted": [
+    "FRONTIER_MODEL_QUALITY",
+    "GENERAL_INTELLIGENCE",
+    "PRODUCTION_SCALE_EFFICIENCY",
+    "GPU_BACKEND_ALREADY_VERIFIED",
+    "1B_MODEL_ALREADY_TRAINED"
+  ]
+}
