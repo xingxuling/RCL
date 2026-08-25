@@ -29,6 +29,7 @@
 #define MAX_BYTECODE_BYTES (256u * 1024u * 1024u)
 #define INITIAL_CALL_FRAME_CAPACITY 2048
 #define MAX_PROVIDERS 64
+#define MAX_PROVIDER_CALLS 128
 #define MAX_PROVIDER_RESPONSE (16 * 1024 * 1024)
 #define MAX_TYPED_HEAP_OBJECTS 4096
 
@@ -238,9 +239,16 @@ typedef struct {
 
 typedef struct {
   char *target;
+  char *source;
   Value before;
   Value after;
 } Change;
+
+typedef struct {
+  char *provider_id;
+  char *capability;
+  char *request_json;
+} ProviderCall;
 
 typedef struct {
   int active;
@@ -256,6 +264,8 @@ typedef struct {
   size_t witness_count;
   Need needs[MAX_NEEDS];
   size_t need_count;
+  ProviderCall provider_calls[MAX_PROVIDER_CALLS];
+  size_t provider_call_count;
 } Transaction;
 
 typedef struct {
@@ -271,6 +281,8 @@ typedef struct {
   size_t witness_count;
   Need needs[MAX_NEEDS];
   size_t need_count;
+  ProviderCall provider_calls[MAX_PROVIDER_CALLS];
+  size_t provider_call_count;
   State *projected_state;
 } Record;
 
@@ -1440,10 +1452,11 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
     int32_t c = memory_i32_le(bytes, length, at + 12, &ok);
     if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC instruction operand is truncated");
     if (op > OP_MOD) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
-    if (minor == 1 && (op == OP_MOD || (op == OP_CALL_PROVIDER && (instruction_flags & 1)))) {
+    if (minor == 1 && (op == OP_MOD || ((op == OP_CALL_PROVIDER || op == OP_STAGE_STORE) && (instruction_flags & 1)))) {
       return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.2 feature is encoded under a 1.1 header");
     }
     if (op == OP_CALL_PROVIDER && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "CALL_PROVIDER contains unknown flags");
+    if (op == OP_STAGE_STORE && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "STAGE_STORE contains unknown flags");
 
     int valid = 1;
     switch (op) {
@@ -2146,11 +2159,17 @@ static void transaction_reset(Transaction *tx) {
   if (tx->actor) free(tx->actor);
   for (size_t i = 0; i < tx->change_count; i++) {
     free(tx->changes[i].target);
+    free(tx->changes[i].source);
     value_free(&tx->changes[i].before);
     value_free(&tx->changes[i].after);
   }
   for (size_t i = 0; i < tx->witness_count; i++) free(tx->witnesses[i]);
   for (size_t i = 0; i < tx->need_count; i++) { free(tx->needs[i].capability); free(tx->needs[i].target); }
+  for (size_t i = 0; i < tx->provider_call_count; i++) {
+    free(tx->provider_calls[i].provider_id);
+    free(tx->provider_calls[i].capability);
+    free(tx->provider_calls[i].request_json);
+  }
   memset(tx, 0, sizeof(*tx));
 }
 
@@ -2162,6 +2181,7 @@ static int record_copy_from_tx(Record *record, const Transaction *tx, const char
   record->change_count = tx->change_count;
   for (size_t i = 0; i < tx->change_count; i++) {
     record->changes[i].target = xstrdup(tx->changes[i].target);
+    record->changes[i].source = xstrdup(tx->changes[i].source);
     record->changes[i].before = value_clone(&tx->changes[i].before);
     record->changes[i].after = value_clone(&tx->changes[i].after);
   }
@@ -2169,6 +2189,12 @@ static int record_copy_from_tx(Record *record, const Transaction *tx, const char
   for (size_t i = 0; i < tx->witness_count; i++) record->witnesses[i] = xstrdup(tx->witnesses[i]);
   record->need_count = tx->need_count;
   for (size_t i = 0; i < tx->need_count; i++) { record->needs[i].capability = xstrdup(tx->needs[i].capability); record->needs[i].target = xstrdup(tx->needs[i].target); }
+  record->provider_call_count = tx->provider_call_count;
+  for (size_t i = 0; i < tx->provider_call_count; i++) {
+    record->provider_calls[i].provider_id = xstrdup(tx->provider_calls[i].provider_id);
+    record->provider_calls[i].capability = xstrdup(tx->provider_calls[i].capability);
+    record->provider_calls[i].request_json = xstrdup(tx->provider_calls[i].request_json);
+  }
   if (projected_state) {
     record->projected_state = (State *)calloc(1, sizeof(State));
     if (!record->projected_state || !state_clone_into(record->projected_state, projected_state)) return 0;
@@ -2178,9 +2204,14 @@ static int record_copy_from_tx(Record *record, const Transaction *tx, const char
 
 static void record_free(Record *record) {
   free(record->rule); free(record->actor);
-  for (size_t i = 0; i < record->change_count; i++) { free(record->changes[i].target); value_free(&record->changes[i].before); value_free(&record->changes[i].after); }
+  for (size_t i = 0; i < record->change_count; i++) { free(record->changes[i].target); free(record->changes[i].source); value_free(&record->changes[i].before); value_free(&record->changes[i].after); }
   for (size_t i = 0; i < record->witness_count; i++) free(record->witnesses[i]);
   for (size_t i = 0; i < record->need_count; i++) { free(record->needs[i].capability); free(record->needs[i].target); }
+  for (size_t i = 0; i < record->provider_call_count; i++) {
+    free(record->provider_calls[i].provider_id);
+    free(record->provider_calls[i].capability);
+    free(record->provider_calls[i].request_json);
+  }
   if (record->projected_state) { state_free(record->projected_state); free(record->projected_state); }
   memset(record, 0, sizeof(*record));
 }
@@ -2294,10 +2325,21 @@ static int execute_program(VM *vm) {
       case OP_STAGE_STORE: {
         if (!vm->tx.active) { vm_fail(vm, "RCL_NATIVE_TX_REQUIRED", "STAGE_STORE requires active transaction"); break; }
         const char *target = pool_string(vm, instruction.a); value = stack_pop(vm); Change *change = tx_find_change(&vm->tx, target);
+        char source[512] = "alter";
+        if (instruction.flags & 1) {
+          if (vm->tx.provider_call_count == 0) {
+            value_free(&value);
+            vm_fail(vm, "RCL_NATIVE_PROVIDER_STAGE_MISSING", "Provider response stage has no preceding transaction provider call");
+            break;
+          }
+          const ProviderCall *call = &vm->tx.provider_calls[vm->tx.provider_call_count - 1];
+          snprintf(source, sizeof(source), "host:%s.%s", call->provider_id, call->capability);
+        }
         if (!change) {
           if (vm->tx.change_count >= MAX_TX_CHANGES) { value_free(&value); vm_fail(vm, "RCL_NATIVE_CHANGE_LIMIT", "Native transaction change capacity exceeded"); break; }
-          change = &vm->tx.changes[vm->tx.change_count++]; change->target = xstrdup(target); change->before = state_get(&vm->state, target); change->after = value_null();
+          change = &vm->tx.changes[vm->tx.change_count++]; change->target = xstrdup(target); change->source = NULL; change->before = state_get(&vm->state, target); change->after = value_null();
         }
+        free(change->source); change->source = xstrdup(source);
         value_free(&change->after); change->after = value_clone(&value); value_free(&value); break;
       }
       case OP_SET_PROJECTED_VIEW:
@@ -2372,12 +2414,19 @@ static int execute_program(VM *vm) {
         char provider_error[512]; provider_error[0] = '\0';
         int provider_ok = provider->invoke(provider->userdata, capability, request_json, response, MAX_PROVIDER_RESPONSE, provider_error, sizeof(provider_error));
         response[MAX_PROVIDER_RESPONSE - 1] = '\0';
-        value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
-        if (!provider_ok) {
-          vm_fail(vm, "RCL_NATIVE_PROVIDER_FAILURE", provider_error[0] ? provider_error : "Native provider invocation failed");
-          free(response);
-          break;
+        if (provider_ok && vm->tx.active) {
+          if (vm->tx.provider_call_count >= MAX_PROVIDER_CALLS) {
+            vm_fail(vm, "RCL_NATIVE_PROVIDER_CALL_LIMIT", "Native transaction provider-call capacity exceeded");
+          } else {
+            ProviderCall *recorded = &vm->tx.provider_calls[vm->tx.provider_call_count++];
+            recorded->provider_id = xstrdup(provider_id);
+            recorded->capability = xstrdup(capability);
+            recorded->request_json = xstrdup(request_json);
+          }
         }
+        value_free(&provider_id_value); value_free(&capability_value); value_free(&request_value);
+        if (!provider_ok) vm_fail(vm, "RCL_NATIVE_PROVIDER_FAILURE", provider_error[0] ? provider_error : "Native provider invocation failed");
+        if (vm->error.code) { free(response); break; }
         stack_push(vm, value_string(response));
         free(response);
         break;
@@ -2540,7 +2589,7 @@ static void print_changes(FILE *out, const Record *record) {
     fputs("{\"target\":", out); print_json_string(out, record->changes[i].target);
     fputs(",\"before\":", out); print_value_json(out, &record->changes[i].before);
     fputs(",\"after\":", out); print_value_json(out, &record->changes[i].after);
-    fputs(",\"source\":\"alter\"}", out);
+    fputs(",\"source\":", out); print_json_string(out, record->changes[i].source); fputc('}', out);
   }
   fputc(']', out);
 }
@@ -2571,6 +2620,25 @@ static void print_witnesses(FILE *out, const Record *record) {
   fputc(']', out);
 }
 
+static void print_provider_calls(FILE *out, const Record *record) {
+  fputc('[', out);
+  for (size_t i = 0; i < record->provider_call_count; i++) {
+    if (i) fputc(',', out);
+    const ProviderCall *call = &record->provider_calls[i];
+    unsigned char digest[RCL_SHA256_DIGEST_LENGTH];
+    char request_root[65];
+    rcl_sha256((const unsigned char *)call->request_json, strlen(call->request_json), digest);
+    for (int j = 0; j < RCL_SHA256_DIGEST_LENGTH; j++) snprintf(request_root + j * 2, 3, "%02x", digest[j]);
+    request_root[64] = '\0';
+    fputs("{\"providerId\":", out); print_json_string(out, call->provider_id);
+    fputs(",\"capability\":", out); print_json_string(out, call->capability);
+    fputs(",\"requestJson\":", out); print_json_string(out, call->request_json);
+    fputs(",\"requestRoot\":", out); print_json_string(out, request_root);
+    fputc('}', out);
+  }
+  fputc(']', out);
+}
+
 static void print_record(FILE *out, VM *vm, const Record *record) {
   int projection = record->mode == 0;
   fputs("{\"kind\":", out); print_json_string(out, projection ? "Projection" : "Transition");
@@ -2584,7 +2652,7 @@ static void print_record(FILE *out, VM *vm, const Record *record) {
   fputs(",\"changes\":", out); print_changes(out, record);
   fputs(",\"authority\":", out); print_authority(out, vm, record);
   fputs(",\"witnesses\":", out); print_witnesses(out, record);
-  fputs(",\"hostCalls\":[]", out);
+  fputs(",\"hostCalls\":", out); print_provider_calls(out, record);
   if (record->projected_state) { fputs(",\"projectedState\":", out); print_state_json(out, record->projected_state); }
   fputc('}', out);
 }

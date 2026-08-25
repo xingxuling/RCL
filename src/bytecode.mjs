@@ -241,7 +241,35 @@ function validateNativeSubset(program) {
   }
 
   for (const rule of program.rules) {
-    if (rule.calls?.length) diagnostics.push(diagnostic('RCL_NATIVE_HOST_CALL', 'Native VM v0.1 does not yet execute host calls', { rule: rule.name }));
+    for (const call of rule.calls ?? []) {
+      const separator = call.capability.indexOf('.');
+      if (separator <= 0 || separator === call.capability.length - 1) diagnostics.push(diagnostic(
+        'RCL_NATIVE_HOST_CALL_CAPABILITY',
+        'Native host calls require a provider-qualified capability',
+        { rule: rule.name, capability: call.capability },
+      ));
+      if (call.args.length !== 1) diagnostics.push(diagnostic(
+        'RCL_NATIVE_HOST_CALL_REQUEST',
+        'Native host calls require exactly one Text request payload',
+        { rule: rule.name, capability: call.capability, argumentCount: call.args.length },
+      ));
+      const request = call.args[0];
+      if (request && (request.kind !== 'LiteralExpr' || request.valueType !== 'Text')) diagnostics.push(diagnostic(
+        'RCL_NATIVE_HOST_CALL_REQUEST_TYPE',
+        'Native host-call request payload must be a Text literal',
+        { rule: rule.name, capability: call.capability, expressionKind: request.kind, valueType: request.valueType },
+      ));
+    }
+  }
+
+  const rules = new Map(program.rules.map(rule => [rule.name, rule]));
+  for (const directive of program.directives) {
+    const rule = rules.get(directive.rule);
+    if (directive.kind === 'Foresee' && rule?.calls?.length) diagnostics.push(diagnostic(
+      'RCL_NATIVE_HOST_CALL_FORESEE_UNSUPPORTED',
+      'Native host-call lowering requires realize mode until Provider simulation is explicit',
+      { rule: rule.name },
+    ));
   }
 
   const allowedDirectives = new Set(['Foresee', 'Realize']);
@@ -515,6 +543,14 @@ function compileRuleInvocation(rule, mode, asm, pool, invocationIndex, context =
     compileExpression(alteration.expression, asm, pool, context);
     asm.emit(OPCODES.STAGE_STORE, pool.string(alteration.target));
   }
+  for (const call of rule.calls ?? []) {
+    const separator = call.capability.indexOf('.');
+    const providerId = call.capability.slice(0, separator);
+    const capability = call.capability.slice(separator + 1);
+    const request = call.args[0];
+    asm.emit(OPCODES.CALL_PROVIDER, pool.string(providerId), pool.string(capability), pool.string(request.value));
+    asm.emit(OPCODES.STAGE_STORE, pool.string(call.target), 0, 0, 1);
+  }
   if (rule.preserves.length) {
     asm.emit(OPCODES.SET_PROJECTED_VIEW, 1);
     for (const preserve of rule.preserves) {
@@ -537,6 +573,7 @@ function encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, 
   const minorVersion = instructions.some(instruction => (
     instruction.op === OPCODES.MOD
     || (instruction.op === OPCODES.CALL_PROVIDER && (instruction.flags & 1) === 1)
+    || (instruction.op === OPCODES.STAGE_STORE && (instruction.flags & 1) === 1)
   )) ? RCL_BYTECODE_FEATURE_VERSION.minor : RCL_BYTECODE_VERSION.minor;
   const buffer = Buffer.alloc(headerSize + stringsSize + numbersSize + instructions.length * instructionSize);
   let offset = 0;
