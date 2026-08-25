@@ -1,0 +1,45 @@
+# K08-N: Rotary Position Embedding semantic genome.
+# RCL owns position-frame identity, pair rotation semantics and admissibility.
+# Trigonometric table materialization may be an execution organ; Tensor execution remains generic matmul/mul/add.
+reality RoPEGenomeCandidate {
+  reckon valid_sequence_length(length : Number) -> Truth = length > 0
+  reckon valid_head_dimension(dimension : Number) -> Truth = dimension > 0 and dimension % 2 == 0
+  reckon valid_base(base : Number) -> Truth = base > 1
+  reckon valid_position(position : Number, sequence_length : Number) -> Truth =
+    position >= 0 and position < sequence_length
+  reckon valid_pair_index(pair_index : Number, head_dimension : Number) -> Truth =
+    pair_index >= 0 and pair_index < head_dimension / 2
+
+  reckon pair_even_dimension(pair_index : Number) -> Number = pair_index * 2
+  reckon pair_odd_dimension(pair_index : Number) -> Number = pair_index * 2 + 1
+
+  reckon rotate_even(even_value : Number, odd_value : Number, cosine : Number, sine : Number) -> Number =
+    even_value * cosine - odd_value * sine
+  reckon rotate_odd(even_value : Number, odd_value : Number, cosine : Number, sine : Number) -> Number =
+    even_value * sine + odd_value * cosine
+  reckon squared_norm2(first : Number, second : Number) -> Number = first * first + second * second
+
+  facet contract.id : Text = "k08-n-rope-genome-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.profile : Text = "ROTARY_POSITION_FRAME_PAIRWISE_F64_CANDIDATE"
+  facet contract.angle_formula : Text = "theta(position,pair)=position/base^(2*pair/head_dimension)"
+  facet contract.tensor_lowering : Text = "X_TIMES_COS_PLUS_X_MATMUL_ROTATION_MATRIX_TIMES_SIN"
+  facet contract.execution_boundary : Text = "TRIG_TABLE_MATERIALIZATION_ORGAN_ONLY"
+  facet contract.no_model_special_opcode : Truth = true
+
+  facet evaluation.sequence_valid : Truth = valid_sequence_length(8)
+  facet evaluation.zero_sequence_rejected : Truth = not valid_sequence_length(0)
+  facet evaluation.even_head_dimension_valid : Truth = valid_head_dimension(8)
+  facet evaluation.odd_head_dimension_rejected : Truth = not valid_head_dimension(7)
+  facet evaluation.base_valid : Truth = valid_base(10000)
+  facet evaluation.bad_base_rejected : Truth = not valid_base(1)
+  facet evaluation.position_boundary_valid : Truth = valid_position(7, 8)
+  facet evaluation.position_overflow_rejected : Truth = not valid_position(8, 8)
+  facet evaluation.pair_mapping_correct : Truth = pair_even_dimension(2) == 4 and pair_odd_dimension(2) == 5
+  facet evaluation.position_zero_identity : Truth = rotate_even(3, 4, 1, 0) == 3 and rotate_odd(3, 4, 1, 0) == 4
+  facet evaluation.quarter_turn_fixture : Truth = rotate_even(3, 4, 0, 1) == -4 and rotate_odd(3, 4, 0, 1) == 3
+  facet evaluation.norm_preserved_fixture : Truth =
+    squared_norm2(rotate_even(3, 4, 0, 1), rotate_odd(3, 4, 0, 1)) == squared_norm2(3, 4)
+
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_MULTIHEAD_RCL10M_GPU_OR_RCL1B_PROMOTION"
+}
