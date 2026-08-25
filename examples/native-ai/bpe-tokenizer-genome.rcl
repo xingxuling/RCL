@@ -1,0 +1,45 @@
+# K08-M: deterministic learned-vocabulary / byte-BPE semantic genome.
+# RCL owns tokenizer identity, byte fallback, merge ordering, vocabulary bounds and artifact provenance.
+# The native trainer is an execution organ; this source does not grant a final 64K production vocabulary.
+reality BpeTokenizerGenomeCandidate {
+  reckon base_vocabulary_size() -> Number = 259
+  reckon maximum_vocabulary_size() -> Number = 65536
+  reckon pad_token() -> Number = 256
+  reckon bos_token() -> Number = 257
+  reckon eos_token() -> Number = 258
+
+  reckon valid_target(target : Number) -> Truth =
+    target > base_vocabulary_size() and target <= maximum_vocabulary_size()
+
+  reckon valid_min_frequency(value : Number) -> Truth = value >= 2
+
+  reckon merge_id_for_rank(rank : Number) -> Number = base_vocabulary_size() + rank
+
+  reckon valid_merge_reference(new_id : Number, left : Number, right : Number) -> Truth =
+    left >= 0 and right >= 0 and left < new_id and right < new_id
+
+  reckon deterministic_pair_precedes(left_a : Number, right_a : Number, left_b : Number, right_b : Number) -> Truth =
+    left_a < left_b or (left_a == left_b and right_a < right_b)
+
+  facet contract.id : Text = "k08-m-bpe-tokenizer-genome-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.base_tokenizer : Text = "rcl.byte-tokenizer.utf8.v0.1"
+  facet contract.normalization : Text = "NONE"
+  facet contract.merge_policy : Text = "HIGHEST_FREQUENCY_THEN_LOWEST_NUMERIC_PAIR_LEFT_RIGHT"
+  facet contract.byte_fallback : Truth = true
+  facet contract.artifact_identity : Text = "CORPUS_SHA256_PLUS_MERGE_TABLE_PLUS_CONFIG_TO_ARTIFACT_ROOT"
+
+  facet evaluation.base_vocab_correct : Truth = base_vocabulary_size() == 259
+  facet evaluation.max_vocab_correct : Truth = maximum_vocabulary_size() == 65536
+  facet evaluation.target_320_valid : Truth = valid_target(320)
+  facet evaluation.target_65536_valid : Truth = valid_target(65536)
+  facet evaluation.target_base_rejected : Truth = not valid_target(259)
+  facet evaluation.target_overflow_rejected : Truth = not valid_target(65537)
+  facet evaluation.min_frequency_one_rejected : Truth = not valid_min_frequency(1)
+  facet evaluation.first_merge_id_correct : Truth = merge_id_for_rank(0) == 259
+  facet evaluation.merge_reference_valid : Truth = valid_merge_reference(259, 97, 98)
+  facet evaluation.forward_reference_rejected : Truth = not valid_merge_reference(259, 260, 98)
+  facet evaluation.tie_break_correct : Truth = deterministic_pair_precedes(97, 98, 99, 100)
+
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_FINAL_64K_VOCAB_ROPE_MULTIHEAD_RCL10M_GPU_OR_RCL1B_PROMOTION"
+}
