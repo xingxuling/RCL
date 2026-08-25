@@ -21,14 +21,24 @@ Reason:
 - state ordering follows the RCL parameter order;
 - malformed state fails closed;
 - no model-special optimizer opcode is introduced;
-- Ubuntu and Windows hosted replay both pass.
+- implementation, promoted-contract, and final bound-contract replays all pass on Ubuntu and Windows.
 
 ## Grounding
 
-Hosted replay `32862241167`, source commit `4a4417d974203de3a383ab62c17909ddb9ae80dc`:
+Implementation replay `32862241167`, source commit `4a4417d974203de3a383ab62c17909ddb9ae80dc`:
 
-- Ubuntu job `97848821949`: 8/8 PASS
-- Windows job `97848821657`: 8/8 PASS
+- Ubuntu `97848821949`: 8/8 PASS
+- Windows `97848821657`: 8/8 PASS
+
+Promoted-contract replay `32862691677`, source commit `9b15118a76510a73a6cbe3e28c8a46b98bfb41e2`:
+
+- Ubuntu `97850321833`: 8/8 PASS
+- Windows `97850322009`: 8/8 PASS
+
+Final bound-contract replay `32862875004`, source commit `5bd05f5c8e7d50249f1fba5e432cc78350380ddc`:
+
+- Ubuntu `97850942098`: 8/8 PASS
+- Windows `97850942364`: 8/8 PASS
 
 The diagnostic path is itself material evidence. Earlier replays exposed decimal re-materialization and canonical-order defects. Those defects were repaired rather than tolerated; the acceptance rule remained exact equality.
 
@@ -69,7 +79,8 @@ The bounded acceptance suite proves:
 - direct 4-step training equals 2-step checkpoint + 2-step resume exactly;
 - deterministic repeated replay;
 - malformed optimizer state fails closed;
-- generic Tensor Autodiff + AdamW ownership is preserved.
+- generic Tensor Autodiff + AdamW ownership is preserved;
+- promoted and final replay-bound contracts independently reproduce the same 8/8 hosted result on both supported CI platforms.
 
 Future tests remain mandatory for BF16 backward graphs, FP32 master weights, loss scaling if introduced, larger geometries, real accelerator execution, and distributed training.
 
@@ -104,10 +115,18 @@ Do not grant:
 - optimizer organ: `native/tensor-engine/src/bin/rcl-tensor-adamw.rs`
 - tests: `tests/k08-multiblock-adamw.test.mjs`
 - workflow: `.github/workflows/k08-multiblock-adamw.yml`
-- accepted implementation run: `32862241167`
-- source commit: `4a4417d974203de3a383ab62c17909ddb9ae80dc`
-- Ubuntu job: `97848821949`
-- Windows job: `97848821657`
+- implementation run: `32862241167`
+- implementation source commit: `4a4417d974203de3a383ab62c17909ddb9ae80dc`
+- implementation Ubuntu: `97848821949`
+- implementation Windows: `97848821657`
+- promoted replay: `32862691677`
+- promoted source commit: `9b15118a76510a73a6cbe3e28c8a46b98bfb41e2`
+- promoted Ubuntu: `97850321833`
+- promoted Windows: `97850322009`
+- final bound replay: `32862875004`
+- final source commit: `5bd05f5c8e7d50249f1fba5e432cc78350380ddc`
+- final Ubuntu: `97850942098`
+- final Windows: `97850942364`
 
 ## Next court
 
