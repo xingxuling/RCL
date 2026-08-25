@@ -143,6 +143,12 @@ pub struct PlanTelemetry {
     pub retained_output_bytes: usize,
     pub reclaimed_tensor_count: usize,
     pub reclaimed_elements: usize,
+    pub input_binding_count: usize,
+    pub borrowed_input_binding_count: usize,
+    pub avoided_input_clone_elements: usize,
+    pub avoided_input_clone_bytes: usize,
+    pub cloned_input_elements: usize,
+    pub cloned_input_bytes: usize,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -706,8 +712,26 @@ fn output_identity(dtype: &str, shape: &[usize], data: &[f64]) -> String {
     format!("sha256:{}", hex::encode(hash.finalize()))
 }
 
-pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineError> {
-    let inputs = bind(request)?;
+fn execute_bound(
+    operation: &str,
+    attributes: &Value,
+    inputs: &[BoundTensor<'_>],
+) -> Result<ExecutionResult, EngineError> {
+    if inputs.is_empty() {
+        return Err(EngineError::new(
+            "RCL_TENSOR_INPUT_REQUIRED",
+            "At least one tensor is required",
+        ));
+    }
+    if inputs.len() > MAX_TENSORS {
+        return Err(EngineError::new(
+            "RCL_TENSOR_INPUT_LIMIT",
+            format!(
+                "Received {} tensors; backend limit is {MAX_TENSORS}",
+                inputs.len()
+            ),
+        ));
+    }
     if inputs
         .iter()
         .any(|input| input.descriptor.dtype != inputs[0].descriptor.dtype)
@@ -727,39 +751,34 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
         ));
     }
     let start = Instant::now();
-    let (shape, data) = match request.operation.as_str() {
-        "add" | "sub" | "mul" | "div" => elementwise(&inputs, &request.operation)?,
+    let (shape, data) = match operation {
+        "add" | "sub" | "mul" | "div" => elementwise(inputs, operation)?,
         "abs" | "exp" | "log" | "sqrt" => {
-            require_arity(&inputs, 1)?;
-            unary(&inputs[0], &request.operation)?
+            require_arity(inputs, 1)?;
+            unary(&inputs[0], operation)?
         }
         "transpose" => {
-            require_arity(&inputs, 1)?;
-            transpose(&inputs[0], &attribute_permutation(&request.attributes)?)?
+            require_arity(inputs, 1)?;
+            transpose(&inputs[0], &attribute_permutation(attributes)?)?
         }
-        "matmul" => matmul_optimized(&inputs)?,
-        "matmul-reference" => matmul_reference(&inputs)?,
+        "matmul" => matmul_optimized(inputs)?,
+        "matmul-reference" => matmul_reference(inputs)?,
         "sum" | "mean" | "max" => {
-            require_arity(&inputs, 1)?;
-            reduction(
-                &inputs[0],
-                &request.operation,
-                attribute_usize(&request.attributes, "axis")?,
-            )?
+            require_arity(inputs, 1)?;
+            reduction(&inputs[0], operation, attribute_usize(attributes, "axis")?)?
         }
         "softmax" | "layer-norm" | "rms-norm" => {
-            require_arity(&inputs, 1)?;
-            let epsilon = request
-                .attributes
+            require_arity(inputs, 1)?;
+            let epsilon = attributes
                 .get("epsilon")
                 .and_then(Value::as_f64)
                 .unwrap_or(1e-5);
-            normalized(&inputs[0], &request.operation, epsilon)?
+            normalized(&inputs[0], operation, epsilon)?
         }
         _ => {
             return Err(EngineError::new(
                 "RCL_TENSOR_OPERATION_UNSUPPORTED",
-                format!("Unsupported operation {}", request.operation),
+                format!("Unsupported operation {operation}"),
             ));
         }
     };
@@ -771,10 +790,10 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
         ));
     }
     let storage_identity = output_identity(&inputs[0].descriptor.dtype, &shape, &data);
-    let semantic_operation = if request.operation == "matmul-reference" {
+    let semantic_operation = if operation == "matmul-reference" {
         "matmul"
     } else {
-        request.operation.as_str()
+        operation
     };
     let tensor = TensorDescriptor {
         id: "result".into(),
@@ -797,12 +816,17 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
         },
         telemetry: Telemetry {
             backend: "rcl-tensor-cpu-rust-v0.1",
-            kernel: request.operation.clone(),
+            kernel: operation.into(),
             kernel_nanos,
             element_count,
             allocated_bytes: element_count * std::mem::size_of::<f64>(),
         },
     })
+}
+
+pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineError> {
+    let inputs = bind(request)?;
+    execute_bound(&request.operation, &request.attributes, &inputs)
 }
 
 fn validate_plan_initials(
@@ -1027,6 +1051,8 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
     let mut peak_live_elements = live_elements;
     let mut reclaimed_tensor_count = 0usize;
     let mut reclaimed_elements = 0usize;
+    let mut input_binding_count = 0usize;
+    let mut avoided_input_clone_elements = 0usize;
     let unused_initials = values
         .keys()
         .filter(|id| {
@@ -1043,35 +1069,34 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
     }
 
     for node in &plan.nodes {
-        let mut tensors = Vec::with_capacity(node.inputs.len());
-        let mut storages = Vec::with_capacity(node.inputs.len());
-        let mut input_storage_ids = HashSet::new();
-        for (operand_index, input_id) in node.inputs.iter().enumerate() {
-            let (tensor, storage) = values.get(input_id).ok_or_else(|| {
-                EngineError::new(
-                    "RCL_TENSOR_PLAN_INPUT_MISSING",
-                    format!("Node {} references unavailable tensor {input_id}", node.id),
-                )
-            })?;
-            let mut operand = tensor.clone();
-            if tensors
-                .iter()
-                .any(|existing: &TensorDescriptor| existing.id == operand.id)
-            {
-                operand.id = format!("{}#operand{operand_index}", operand.id);
+        let mut result = {
+            let mut inputs = Vec::with_capacity(node.inputs.len());
+            let mut unique_input_storage_ids = HashSet::new();
+            for input_id in &node.inputs {
+                let (tensor, storage) = values.get(input_id).ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_TENSOR_PLAN_INPUT_MISSING",
+                        format!("Node {} references unavailable tensor {input_id}", node.id),
+                    )
+                })?;
+                input_binding_count += 1;
+                if unique_input_storage_ids.insert(storage.identity.as_str()) {
+                    avoided_input_clone_elements = avoided_input_clone_elements
+                        .checked_add(storage.data.len())
+                        .ok_or_else(|| {
+                            EngineError::new(
+                                "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+                                "Plan avoided-clone accounting overflowed",
+                            )
+                        })?;
+                }
+                inputs.push(BoundTensor {
+                    descriptor: tensor,
+                    data: storage.data.as_slice(),
+                });
             }
-            tensors.push(operand);
-            if input_storage_ids.insert(storage.identity.as_str()) {
-                storages.push(storage.clone());
-            }
-        }
-        let mut result = execute(&ExecutionRequest {
-            format: REQUEST_FORMAT.into(),
-            operation: node.operation.clone(),
-            tensors,
-            storages,
-            attributes: node.attributes.clone(),
-        })?;
+            execute_bound(&node.operation, &node.attributes, &inputs)?
+        };
         if result.tensor.shape != node.output.shape
             || result.tensor.dtype != node.output.dtype
             || result.tensor.layout != node.output.layout
@@ -1202,6 +1227,12 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
             retained_output_bytes: retained_output_elements * element_bytes,
             reclaimed_tensor_count,
             reclaimed_elements,
+            input_binding_count,
+            borrowed_input_binding_count: input_binding_count,
+            avoided_input_clone_elements,
+            avoided_input_clone_bytes: avoided_input_clone_elements * element_bytes,
+            cloned_input_elements: 0,
+            cloned_input_bytes: 0,
         },
     })
 }
@@ -1551,6 +1582,12 @@ mod tests {
         assert_eq!(result.telemetry.retained_output_elements, 9);
         assert_eq!(result.telemetry.reclaimed_tensor_count, 2);
         assert_eq!(result.telemetry.reclaimed_elements, 8);
+        assert_eq!(result.telemetry.input_binding_count, 3);
+        assert_eq!(result.telemetry.borrowed_input_binding_count, 3);
+        assert_eq!(result.telemetry.avoided_input_clone_elements, 14);
+        assert_eq!(result.telemetry.avoided_input_clone_bytes, 112);
+        assert_eq!(result.telemetry.cloned_input_elements, 0);
+        assert_eq!(result.telemetry.cloned_input_bytes, 0);
         assert_eq!(result.bindings["semanticSource"], "fixture");
     }
 
@@ -1602,6 +1639,9 @@ mod tests {
         assert_eq!(result.telemetry.retained_output_elements, 2);
         assert_eq!(result.telemetry.reclaimed_tensor_count, 3);
         assert_eq!(result.telemetry.reclaimed_elements, 5);
+        assert_eq!(result.telemetry.input_binding_count, 3);
+        assert_eq!(result.telemetry.avoided_input_clone_elements, 4);
+        assert_eq!(result.telemetry.cloned_input_elements, 0);
     }
 
     #[test]
@@ -1628,6 +1668,12 @@ mod tests {
         assert_eq!(
             execute_plan(&base).unwrap_err().code,
             "RCL_TENSOR_PLAN_INPUT_MISSING"
+        );
+        let mut empty_inputs = base.clone();
+        empty_inputs.nodes[0].inputs.clear();
+        assert_eq!(
+            execute_plan(&empty_inputs).unwrap_err().code,
+            "RCL_TENSOR_INPUT_REQUIRED"
         );
         let mut shape_drift = base.clone();
         shape_drift.nodes[0].inputs[0] = "x".into();

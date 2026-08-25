@@ -151,3 +151,32 @@ Status: `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE_GITHUB_REPLAY_BOUND`. It chang
 Requested intermediate outputs are pinned through their final downstream use; duplicate SSA definitions remain rejected even after the earlier value would have been reclaimed. The cumulative allocation ceiling is preserved and a separate simultaneous-live ceiling is added, so the change does not weaken the existing resource gate.
 
 The accepted local receipt is `examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json`. The separate `github-replay.json` binds its root to the exact implementation and successful Ubuntu/Windows jobs. It measures the logical plan value store only. Process peak RSS, allocator overhead, transient cloned operands, response serialization, buffer reuse, general workload speedup, Native/JS parity and K400 promotion are not granted.
+
+## K08-F Tensor Plan borrowed-input candidate
+
+Status: `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`. It changes Rust execution ownership only; Tensor Plan and operation semantics remain RCL-owned.
+
+| Evidence | Result |
+|---|---:|
+| Exact baseline | clean detached worktree at `9805956dfd24834d650534a8186ab53eb084f8b5` |
+| Production workload | unchanged `6,112,741-byte / 29,980-node` generic SSA Plan |
+| Borrowed input bindings | `54,964 / 54,964` |
+| Historical storage clone traffic avoided | `314,521 elements / 2,516,168 bytes` |
+| Candidate Plan input clones | `0 elements / 0 bytes` |
+| Controlled Plan medians | `250.081 ms` baseline / `207.332 ms` borrowed |
+| Controlled workload speedup | `1.206x` (`17.094%` runtime reduction) |
+| General MLP peak Working Set medians | `38,400,000 / 37,609,472 bytes`; `2.059%` lower |
+| Clone-stress peak Working Set medians | `20,230,144 / 18,608,128 bytes`; `8.018%` lower |
+| Semantic parity | one output root per workload across all baseline/candidate samples |
+| Evidence report root | `aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276` |
+| GitHub replay | pending |
+
+The tracked sampler reads the exact child process `PeakWorkingSet64` while it is alive. The result includes all child-process memory and is deliberately separate from K08-E logical Plan-store telemetry. The 200,000-element-per-input stress isolates the historical `3,200,000`-byte storage clone boundary; neither result grants portable/general RSS reduction, VRAM reduction, buffer reuse, compact lowering, Autodiff or K400 promotion.
+
+Reproduction:
+
+```text
+npm run test:k08-tensor
+npm run evidence:k08-tensor-mlp
+npm run evidence:k08-tensor-borrowed-input -- --baseline-binary <exact-main-release-binary> --baseline-repository <clean-exact-main-worktree>
+```

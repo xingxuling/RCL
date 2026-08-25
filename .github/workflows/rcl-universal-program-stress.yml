@@ -110,6 +110,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -123,6 +125,14 @@ jobs:
         run: npm run evidence:k08-tensor-cpu
       - name: K08 General MLP Tensor lowering evidence
         run: npm run evidence:k08-tensor-mlp
+      - name: K08 Tensor borrowed-input and process-memory evidence
+        shell: pwsh
+        run: |
+          $baseline = Join-Path $env:RUNNER_TEMP 'rcl-k08-f-baseline'
+          git worktree add --detach $baseline 9805956dfd24834d650534a8186ab53eb084f8b5
+          cargo build --release --locked --manifest-path (Join-Path $baseline 'native/tensor-engine/Cargo.toml')
+          $baselineBinary = Join-Path $baseline 'native/tensor-engine/target/release/rcl-tensor-engine.exe'
+          npm run evidence:k08-tensor-borrowed-input -- --baseline-binary $baselineBinary --baseline-repository $baseline --baseline-commit 9805956dfd24834d650534a8186ab53eb084f8b5 --rounds 5 --rss-rounds 5
       - name: Upload K01 evidence and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -133,4 +143,5 @@ jobs:
             output/selfhost
             output/k08-tensor-cpu-v0.1
             output/k08-general-mlp-tensor-v0.1
+            output/k08-tensor-borrowed-input-v0.1
           if-no-files-found: warn

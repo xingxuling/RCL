@@ -181,12 +181,30 @@ Every baseline and candidate output root was identical. The result is specific t
 
 K08-E is `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32815298348` passed focused Ubuntu job `97702229003` and real Windows job `97702228815` for exact implementation commit `8073482a57cb4ac096cd8545dcd15d01e87c228b`. The hosted replay binds portable liveness semantics, K400 non-promotion, the native Provider, Tensor performance path and General MLP Tensor execution; it does not replace the local controlled A/B timing receipt.
 
-## 10. Next gate
+## 10. K08-F borrowed Tensor Plan inputs and process-memory evidence
+
+K08-F preserves the RCL Tensor Plan, kernel operations, SSA identities, Storage identities and resource gates. The Rust execution organ now constructs borrowed `BoundTensor` views directly from the live-value map. It no longer clones per-node `TensorDescriptor` or `DenseStorage` inputs into an intermediate `ExecutionRequest`; the public Provider request path remains unchanged and validated through the same kernels.
+
+For the unchanged 6,112,741-byte / 29,980-node K08-D Plan, deterministic telemetry records `54,964` borrowed input bindings and avoids the exact historical storage-clone path for `314,521` elements / `2,516,168` bytes of cumulative copy traffic. `clonedInputElements` and `clonedInputBytes` are both zero. This is cumulative avoided copying, not simultaneously resident memory.
+
+A controlled Windows A/B used clean exact-main baseline `9805956dfd24834d650534a8186ab53eb084f8b5`, warm Release binaries and alternating child processes:
+
+| Boundary | Baseline | K08-F | Result |
+|---|---:|---:|---:|
+| unchanged General MLP Plan median | `250.081 ms` | `207.332 ms` | `1.206x`; `17.094%` lower |
+| General MLP child peak Working Set median | `38,400,000 bytes` | `37,609,472 bytes` | `790,528 bytes`; `2.059%` lower |
+| 200,000-element-per-input clone stress peak | `20,230,144 bytes` | `18,608,128 bytes` | `1,622,016 bytes`; `8.018%` lower |
+
+All baseline/candidate roots matched for both workloads. Peak Working Set is sampled from the exact Windows child process while alive, so it includes executable, allocator, JSON plan/input/output and Rust allocations. It is not portable RSS, VRAM, logical Tensor-store size or a general workload claim. Accepted local evidence root: `aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276`.
+
+K08-F is currently `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`; GitHub-hosted replay remains the next admission gate.
+
+## 11. Next gate
 
 The next highest-value sequence is:
 
-1. measure process RSS and remove per-node operand/storage clones;
-2. add buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
+1. replay K08-F portable semantics and Windows process-memory evidence on GitHub;
+2. add liveness-safe output-buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
 3. close the typed-source self-host compiler gap before Tensor promotion;
 4. resolve scientific-notation number canonicalization in semantic-state-root evidence;
 5. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.

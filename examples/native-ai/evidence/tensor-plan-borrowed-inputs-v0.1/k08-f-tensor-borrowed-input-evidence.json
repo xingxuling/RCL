@@ -1,0 +1,132 @@
+{
+  "format": "rcl.k08-f.tensor-borrowed-input-evidence.v0.1",
+  "status": "ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE",
+  "generatedAt": "2026-08-25T06:49:03.314Z",
+  "semanticOwner": "RCL Tensor Plan",
+  "executionOwner": "rcl-tensor-cpu-rust-v0.1",
+  "implementationDecision": "BORROW_PLAN_INPUTS_WITHOUT_STORAGE_OR_DESCRIPTOR_CLONES",
+  "sourceEvidence": {
+    "baselineCommit": "9805956dfd24834d650534a8186ab53eb084f8b5",
+    "baselineWorktreeClean": true
+  },
+  "artifactHashes": {
+    "rustBackend": "e18c2932661bb8b05b8b5ec67bd2eaba7133f06baaf066d2661cc986a789c4cd",
+    "evidenceOrgan": "b4c17818434508e529f054a95c47a6b55ca0740db4cedc8bb68df63a55a49214",
+    "baselineBinarySha256": "f03a19e4c228c7555ac4a6fa68aa6e71e20b3909c140058603ef07a01a5ace30",
+    "borrowedBinarySha256": "e6b6f0d45308c08dcba314f347948f25bf10c357118c57fbd720768a1c3bba7e"
+  },
+  "productionWorkload": {
+    "planSha256": "319abf8a601d2f9d8c91928f0cd54135219d732b0d338c9706371c9daeb2a523",
+    "planBytes": 6112741,
+    "nodes": 29980,
+    "initialTensors": 40,
+    "requestedOutputs": 18,
+    "inputBindingCount": 54964,
+    "avoidedInputCloneElements": 314521,
+    "avoidedInputCloneBytes": 2516168,
+    "clonedInputElements": 0,
+    "clonedInputBytes": 0
+  },
+  "controlledPerformance": {
+    "boundary": "Same Windows host and unchanged 29,980-node plan; warm release binaries; alternating child-process samples include plan hash/load, execution and response serialization.",
+    "rounds": 7,
+    "baselineSamplesMs": [
+      263.13149999999996,
+      261.46450000000004,
+      250.08079999999973,
+      227.82630000000017,
+      226.3783000000003,
+      229.70450000000028,
+      334.60009999999966
+    ],
+    "borrowedSamplesMs": [
+      237.72659999999996,
+      212.0481000000002,
+      207.33179999999993,
+      197.1863000000003,
+      197.98170000000027,
+      188.87750000000005,
+      318.5150999999996
+    ],
+    "baselineMedianMs": 250.08079999999973,
+    "borrowedMedianMs": 207.33179999999993,
+    "speedup": 1.2061864123110868,
+    "runtimeReductionPercent": 17.094075194896952,
+    "improvementObserved": true
+  },
+  "processMemory": {
+    "metric": "Windows Process.PeakWorkingSet64 for the exact child process",
+    "samplerRounds": 5,
+    "production": {
+      "baselineSamplesBytes": [
+        37654528,
+        38436864,
+        38400000,
+        37609472,
+        38465536
+      ],
+      "borrowedSamplesBytes": [
+        37584896,
+        37593088,
+        37609472,
+        38420480,
+        37629952
+      ],
+      "baselineMedianBytes": 38400000,
+      "borrowedMedianBytes": 37609472,
+      "reductionBytes": 790528,
+      "reductionPercent": 2.058666666666664
+    },
+    "cloneStress": {
+      "elementsPerInput": 200000,
+      "historicalInputCloneBytes": 3200000,
+      "baselineSamplesBytes": [
+        20049920,
+        19652608,
+        20275200,
+        20262912,
+        20230144
+      ],
+      "borrowedSamplesBytes": [
+        18612224,
+        18608128,
+        18653184,
+        18591744,
+        18608128
+      ],
+      "baselineMedianBytes": 20230144,
+      "borrowedMedianBytes": 18608128,
+      "reductionBytes": 1622016,
+      "reductionPercent": 8.01781737193764
+    },
+    "boundary": "Peak process Working Set includes executable, allocator, JSON plan/input/output and all Rust process allocations; it is not the logical Tensor-store metric and is not portable RSS/VRAM evidence."
+  },
+  "outputRoots": {
+    "production": "a465e4d116091b1d30bdce0b1cc90c90983446559860f4115b1461e13b68cbcb",
+    "cloneStress": "a14bc09376a28ad6b8f6658b2132f4987c2b2b21b9ed3c280a1d9d4c221262cc"
+  },
+  "checks": {
+    "exactBaselineCommit": true,
+    "baselineClean": true,
+    "productionPlanUnchanged": true,
+    "productionSemanticParity": true,
+    "stressSemanticParity": true,
+    "borrowedBindingsAudited": true,
+    "noPlanInputStorageClones": true,
+    "historicalCloneTrafficAvoided": true,
+    "stressCloneBoundary": true,
+    "peakWorkingSetMeasured": true,
+    "stressPeakWorkingSetReduced": true
+  },
+  "claimsNotGranted": [
+    "GENERAL_TENSOR_MEMORY_REDUCTION",
+    "PORTABLE_RSS_REDUCTION",
+    "BUFFER_REUSE",
+    "COMPACT_PLAN_LOWERING",
+    "PERFORMANCE_PARITY_WITH_JAVASCRIPT",
+    "NATIVE_AUTODIFF",
+    "K400_PROMOTION_FROM_THIS_CANDIDATE"
+  ],
+  "nextGap": "Use liveness intervals for safe output-buffer reuse, then compact the 6.1 MB scalar-dispatch plan.",
+  "reportRoot": "aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276"
+}
