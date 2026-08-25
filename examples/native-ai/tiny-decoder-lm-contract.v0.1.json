@@ -1,6 +1,6 @@
 {
   "format": "rcl.k08-j.tiny-decoder-lm-contract.v0.1",
-  "status": "ENGINE_E5_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "status": "ENGINE_E5_TINY_DECODER_LM_CANDIDATE_GITHUB_REPLAY_BOUND",
   "canonicalOwner": "RCL",
   "executionBoundary": "generic f64 CPU Tensor + reverse-mode Autodiff + bounded Batch SGD",
   "profile": {
@@ -13,11 +13,11 @@
     "tokenizer": "fixed-symbol-token-ids",
     "trainingCorpus": "ABCABC -> BCABCA",
     "optimizer": "rcl.batch-sgd.v0.1",
-    "generation": "greedy-autoregressive"
+    "generation": "greedy-autoregressive",
+    "positionEncoding": "fixed-zero-reference-profile"
   },
   "trainableParameters": [
     "tokenEmbedding",
-    "positionEmbedding",
     "wq",
     "wk",
     "wv",
@@ -46,15 +46,27 @@
     "selfHostRbcParity": true,
     "nativeSemanticRoot": true,
     "crossEntropyComposedFromGenericPrimitives": true,
-    "lossDecreases": true,
-    "allParametersReceiveGradient": true,
+    "lossDecreasesByAtLeast25Percent": true,
+    "finalLossBelow0_55": true,
+    "allTrainableParametersReceiveGradient": true,
     "deterministicTrainingReplay": true,
-    "autoregressiveGeneration": true,
+    "autoregressiveGeneration": "ABCABC -> ABCABC",
     "modelSpecialOperationCount": 0
+  },
+  "hostedEvidence": {
+    "runId": 32840160638,
+    "implementationCommit": "a5bed123175a6255f0dd0fbd503d74543ddaac59",
+    "ubuntuJob": 97777660616,
+    "windowsJob": 97777660514,
+    "ubuntuConclusion": "success",
+    "windowsConclusion": "success",
+    "testCount": 6,
+    "passCount": 6
   },
   "claimsNotGranted": [
     "GENERAL_TOKENIZER",
     "BYTE_PAIR_ENCODING",
+    "LEARNED_OR_ROPE_POSITION_ENCODING",
     "MULTI_HEAD_ATTENTION",
     "TENSOR_ADAMW_BACKEND",
     "LARGE_MODEL_SCALE",
