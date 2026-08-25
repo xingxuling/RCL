@@ -1,0 +1,35 @@
+# K08-O: parametric multi-head / grouped-query attention semantic genome.
+# RCL owns head partition, KV sharing, dimensions and composition. Execution lowers to generic 2D Tensor operations.
+reality GQAGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_head_counts(query_heads : Number, kv_heads : Number) -> Truth =
+    positive(query_heads) and positive(kv_heads) and query_heads >= kv_heads and query_heads % kv_heads == 0
+  reckon valid_head_dimension(head_dimension : Number) -> Truth =
+    positive(head_dimension) and head_dimension % 2 == 0
+  reckon hidden_width(query_heads : Number, head_dimension : Number) -> Number = query_heads * head_dimension
+  reckon kv_width(kv_heads : Number, head_dimension : Number) -> Number = kv_heads * head_dimension
+  reckon queries_per_kv(query_heads : Number, kv_heads : Number) -> Number = query_heads / kv_heads
+  reckon valid_hidden(hidden : Number, query_heads : Number, head_dimension : Number) -> Truth =
+    hidden == hidden_width(query_heads, head_dimension)
+
+  facet contract.id : Text = "k08-o-gqa-genome-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.profile : Text = "PARAMETRIC_MULTI_HEAD_GQA_WITH_ROPE_F64_CANDIDATE"
+  facet contract.query_head_extraction : Text = "GENERIC_MATMUL_WITH_HEAD_SELECTOR"
+  facet contract.kv_sharing : Text = "QUERY_HEAD_GROUPS_MAP_TO_KV_HEADS_IN_CONTIGUOUS_GROUPS"
+  facet contract.head_merge : Text = "GENERIC_MATMUL_WITH_HEAD_EMBEDDER_PLUS_ADD"
+  facet contract.rope : Text = "APPLIED_WITHIN_EACH_Q_AND_K_HEAD_BEFORE_ATTENTION_SCORE"
+  facet contract.no_model_special_opcode : Truth = true
+
+  facet evaluation.mha_2_2_valid : Truth = valid_head_counts(2, 2)
+  facet evaluation.gqa_2_1_valid : Truth = valid_head_counts(2, 1)
+  facet evaluation.rcl1b_16_4_valid : Truth = valid_head_counts(16, 4)
+  facet evaluation.invalid_3_2_rejected : Truth = not valid_head_counts(3, 2)
+  facet evaluation.head_dim_2_valid : Truth = valid_head_dimension(2)
+  facet evaluation.head_dim_3_rejected : Truth = not valid_head_dimension(3)
+  facet evaluation.hidden_4_correct : Truth = hidden_width(2, 2) == 4 and valid_hidden(4, 2, 2)
+  facet evaluation.kv_width_2_correct : Truth = kv_width(1, 2) == 2
+  facet evaluation.rcl1b_queries_per_kv : Truth = queries_per_kv(16, 4) == 4
+
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_MULTI_BLOCK_RCL10M_GPU_OR_RCL1B_PROMOTION"
+}
