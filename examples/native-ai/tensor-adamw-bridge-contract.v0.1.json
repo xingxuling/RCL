@@ -1,0 +1,50 @@
+{
+  "format": "rcl.k08-k.tensor-adamw-bridge-contract.v0.1",
+  "status": "ENGINE_E3_TENSOR_ADAMW_BRIDGE_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL Optimizer Genome",
+  "executionBoundary": "generic Tensor parameters + native reverse-mode Autodiff gradients lowered into a Rust AdamW execution organ",
+  "optimizer": {
+    "kind": "adamw",
+    "decoupledWeightDecay": true,
+    "biasCorrection": true,
+    "gradientClipping": "elementwise symmetric clamp matching Optimizer Genome v0.1",
+    "state": ["step", "firstMoment", "secondMoment"],
+    "defaults": {
+      "learningRate": 0.01,
+      "beta1": 0.9,
+      "beta2": 0.999,
+      "epsilon": 1e-8,
+      "weightDecay": 0.1,
+      "gradientClip": 1
+    }
+  },
+  "requiredEvidence": [
+    "scalar-reference-fixture-parity",
+    "tensor-parameter-update",
+    "optimizer-state-checkpoint-resume-exact-parity",
+    "tiny-decoder-lm-loss-decrease",
+    "all-tiny-lm-parameters-update",
+    "deterministic-replay",
+    "invalid-config-fails-closed",
+    "invalid-state-binding-fails-closed"
+  ],
+  "semanticDependency": [
+    "rcl.k08-h.optimizer-genome-contract.v0.1",
+    "rcl.tensor-autodiff-request.v0.1"
+  ],
+  "claimsGrantedOnAdmission": [
+    "TENSOR_ADAMW_BACKEND"
+  ],
+  "claimsNotGranted": [
+    "GENERAL_TOKENIZER",
+    "ROPE",
+    "MULTI_HEAD_ATTENTION",
+    "MULTI_BLOCK_LM",
+    "RCL_10M",
+    "BF16",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
