@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { compileReality } from '../src/compiler.mjs';
 import {
   DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
   compileSourceSelfHosted,
@@ -44,10 +45,23 @@ for (const filePath of collectRclFiles(examplesRoot).sort()) {
   const relative = path.relative(root, filePath).replaceAll(path.sep, '/');
   const source = fs.readFileSync(filePath, 'utf8');
   let reference;
+  let program;
   try {
-    reference = Buffer.from(compileRealityToBytecode(source));
+    program = compileReality(source);
+    reference = Buffer.from(compileRealityToBytecode(program));
   } catch (error) {
     unsupported.push({ file: relative, code: error.code ?? 'RCL_REFERENCE_REJECTED', message: error.message });
+    continue;
+  }
+
+  const ruleHostCallCount = program.rules.reduce((count, rule) => count + (rule.calls?.length ?? 0), 0);
+  if (ruleHostCallCount > 0) {
+    unsupported.push({
+      file: relative,
+      code: 'RCL_SELFHOST_RULE_HOST_CALL_UNSUPPORTED',
+      message: 'The checked-in self-host compiler does not yet parse or lower rule-level host calls.',
+      ruleHostCallCount,
+    });
     continue;
   }
 

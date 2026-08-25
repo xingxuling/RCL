@@ -14,6 +14,7 @@
 | Focused regression | PASS_LOCAL | 4/4 candidate tests; Stage0 source-truth rebind also passes |
 | Full regression | PASS_LOCAL | 855/855, 0 failed, 0 skipped; 592559.0687 ms; real Zig 0.16.0 native rebuild in pretest |
 | Self-host compiler parity | BLOCKED_SEMANTIC_DRIFT | checked-in `selfhost/compiler.rbc` emits RBC 1.1 with unchanged state and empty `hostCalls` for the candidate example |
+| Example parity routing | PASS_BOUNDARY | rule-level host-call examples are classified `RCL_SELFHOST_RULE_HOST_CALL_UNSUPPORTED` instead of being falsely treated as eligible byte-parity inputs |
 | K400 promotion | BLOCKED | nine non-compensatory gates were not run |
 
 The first full run exposed one transient Windows directory rename `EPERM` and the expected stale Stage0 source hash. The RCLApp test passed on isolated rerun, Stage0 was rebound to the current `src/bytecode.mjs` hash, and the final full run passed 855/855. The interrupted post-audit run is not counted as evidence.
