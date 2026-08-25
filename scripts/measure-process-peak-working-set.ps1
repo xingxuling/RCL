@@ -10,11 +10,14 @@ $ErrorActionPreference = 'Stop'
 
 $resolvedBinary = (Resolve-Path -LiteralPath $Binary).Path
 $resolvedInput = (Resolve-Path -LiteralPath $InputFile).Path
+if ((Get-Item -LiteralPath $resolvedInput).Length -eq 0) {
+  throw "Input request is empty: $resolvedInput"
+}
 $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
 $startInfo.FileName = $resolvedBinary
+$startInfo.Arguments = "execute `"$resolvedInput`""
 $startInfo.UseShellExecute = $false
 $startInfo.CreateNoWindow = $true
-$startInfo.RedirectStandardInput = $true
 $startInfo.RedirectStandardOutput = $true
 $startInfo.RedirectStandardError = $true
 
@@ -26,14 +29,6 @@ if (-not $process.Start()) {
 
 $stdoutTask = $process.StandardOutput.ReadToEndAsync()
 $stderrTask = $process.StandardError.ReadToEndAsync()
-$request = [System.IO.File]::ReadAllText($resolvedInput)
-if ([string]::IsNullOrWhiteSpace($request)) {
-  $process.Kill()
-  throw "Input request is empty: $resolvedInput"
-}
-$process.StandardInput.WriteLine($request.TrimEnd("`r", "`n"))
-$process.StandardInput.Flush()
-$process.StandardInput.Close()
 
 [long]$peakWorkingSetBytes = 0
 do {

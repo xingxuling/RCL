@@ -1,7 +1,7 @@
 {
   "format": "rcl.k08-f.tensor-borrowed-input-evidence.v0.1",
   "status": "ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE",
-  "generatedAt": "2026-08-25T07:13:59.089Z",
+  "generatedAt": "2026-08-25T07:24:33.189Z",
   "semanticOwner": "RCL Tensor Plan",
   "executionOwner": "rcl-tensor-cpu-rust-v0.1",
   "implementationDecision": "BORROW_PLAN_INPUTS_WITHOUT_STORAGE_OR_DESCRIPTOR_CLONES",
@@ -11,7 +11,7 @@
   },
   "artifactHashes": {
     "rustBackend": "e18c2932661bb8b05b8b5ec67bd2eaba7133f06baaf066d2661cc986a789c4cd",
-    "evidenceOrgan": "40afa03446a48ec89e0ef3f302bfdf51d571e59a1af11fab6b87c4fb40bc81d5",
+    "evidenceOrgan": "fa0aff2d36f1b1ebafbf3f6868ff8eab4e6c0aef97a922186b8e755508969a78",
     "baselineBinarySha256": "f03a19e4c228c7555ac4a6fa68aa6e71e20b3909c140058603ef07a01a5ace30",
     "borrowedBinarySha256": "e6b6f0d45308c08dcba314f347948f25bf10c357118c57fbd720768a1c3bba7e"
   },
@@ -31,27 +31,27 @@
     "boundary": "Same Windows host and unchanged 29,980-node plan; warm release binaries; alternating child-process samples include plan hash/load, execution and response serialization.",
     "rounds": 7,
     "baselineSamplesMs": [
-      275.7823000000001,
-      215.2355,
-      205.95019999999977,
-      232.36619999999994,
-      229.7849000000001,
-      211.06010000000015,
-      205.9119999999998
+      300.0443999999999,
+      234.6984,
+      226.02570000000014,
+      208.08820000000014,
+      207.96339999999964,
+      251.76339999999982,
+      241.68110000000024
     ],
     "borrowedSamplesMs": [
-      203.9586999999999,
-      193.19370000000004,
-      210.75099999999975,
-      202.4348,
-      190.13320000000022,
-      174.39670000000024,
-      174.42680000000018
+      221.52530000000002,
+      239.6802,
+      179.0621000000001,
+      178.58309999999983,
+      174.77670000000035,
+      192.42260000000033,
+      197.38749999999982
     ],
-    "baselineMedianMs": 215.2355,
-    "borrowedMedianMs": 193.19370000000004,
-    "speedup": 1.1140917121003426,
-    "runtimeReductionPercent": 10.2407827705002,
+    "baselineMedianMs": 234.6984,
+    "borrowedMedianMs": 192.42260000000033,
+    "speedup": 1.2197028831332681,
+    "runtimeReductionPercent": 18.01281985731461,
     "improvementObserved": true
   },
   "processMemory": {
@@ -59,45 +59,45 @@
     "samplerRounds": 5,
     "production": {
       "baselineSamplesBytes": [
-        38477824,
-        38469632,
-        38440960,
-        38428672,
-        38473728
+        38445056,
+        38449152,
+        38412288,
+        38502400,
+        38371328
       ],
       "borrowedSamplesBytes": [
-        37646336,
-        37638144,
-        37593088,
-        38400000,
-        37621760
+        38481920,
+        38428672,
+        38445056,
+        38457344,
+        38420480
       ],
-      "baselineMedianBytes": 38469632,
-      "borrowedMedianBytes": 37638144,
-      "reductionBytes": 831488,
-      "reductionPercent": 2.1614139693356016
+      "baselineMedianBytes": 38445056,
+      "borrowedMedianBytes": 38445056,
+      "reductionBytes": 0,
+      "reductionPercent": 0
     },
     "cloneStress": {
       "elementsPerInput": 200000,
       "historicalInputCloneBytes": 3200000,
       "baselineSamplesBytes": [
-        19939328,
-        19804160,
         20242432,
-        20234240,
-        20242432
+        19976192,
+        19103744,
+        20254720,
+        20234240
       ],
       "borrowedSamplesBytes": [
-        18599936,
-        18604032,
-        18640896,
-        18640896,
-        18595840
+        18653184,
+        18591744,
+        18571264,
+        18636800,
+        18644992
       ],
       "baselineMedianBytes": 20234240,
-      "borrowedMedianBytes": 18604032,
-      "reductionBytes": 1630208,
-      "reductionPercent": 8.05668016194332
+      "borrowedMedianBytes": 18636800,
+      "reductionBytes": 1597440,
+      "reductionPercent": 7.8947368421052655
     },
     "boundary": "Peak process Working Set includes executable, allocator, JSON plan/input/output and all Rust process allocations; it is not the logical Tensor-store metric and is not portable RSS/VRAM evidence."
   },
@@ -128,5 +128,5 @@
     "K400_PROMOTION_FROM_THIS_CANDIDATE"
   ],
   "nextGap": "Use liveness intervals for safe output-buffer reuse, then compact the 6.1 MB scalar-dispatch plan.",
-  "reportRoot": "687ce73a05f55e890bf46e19947e0fc8a2293b790495180fcffffea56c2e0181"
+  "reportRoot": "9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe"
 }

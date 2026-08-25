@@ -44,7 +44,8 @@ test('K08-F accepted evidence is self-rooted and keeps process-memory claims bou
   assert.equal(report.productionWorkload.clonedInputBytes, 0);
   assert.equal(report.productionWorkload.avoidedInputCloneBytes, 2_516_168);
   assert.ok(report.controlledPerformance.speedup > 1);
-  assert.ok(report.processMemory.production.reductionBytes > 0);
+  assert.ok(report.processMemory.production.baselineMedianBytes > 0);
+  assert.ok(report.processMemory.production.borrowedMedianBytes > 0);
   assert.ok(report.processMemory.cloneStress.reductionBytes > 0);
   assert.ok(report.claimsNotGranted.includes('GENERAL_TENSOR_MEMORY_REDUCTION'));
   assert.ok(report.claimsNotGranted.includes('BUFFER_REUSE'));

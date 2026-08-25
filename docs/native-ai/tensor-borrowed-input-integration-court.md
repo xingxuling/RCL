@@ -30,10 +30,10 @@ Admit borrowed Tensor Plan input binding and Windows peak-process-memory measure
 - The unchanged General MLP Plan binds `54,964` inputs by reference and reports `0` cloned input elements.
 - The exact historical storage-clone path would copy `314,521` elements / `2,516,168` bytes cumulatively on that Plan.
 - Exact-main/candidate output roots match across every controlled production and stress execution.
-- General MLP Plan median fell from `215.236` to `193.194 ms` (`1.114x`).
-- Windows child-process peak Working Set median fell from `38,469,632` to `37,638,144 bytes` on the production Plan.
-- A 200,000-element-per-input stress fell from `20,234,240` to `18,604,032 bytes` while eliminating the historical `3,200,000`-byte input clone.
-- Accepted local evidence root: `687ce73a05f55e890bf46e19947e0fc8a2293b790495180fcffffea56c2e0181`.
+- General MLP Plan median fell from `234.698` to `192.423 ms` (`1.220x`).
+- Windows child-process peak Working Set medians were both `38,445,056 bytes` on the production Plan; no reduction was observed in this run.
+- A 200,000-element-per-input stress fell from `20,234,240` to `18,636,800 bytes` while eliminating the historical `3,200,000`-byte input clone.
+- Accepted local evidence root: `9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe`.
 
 ## Evidence boundary
 
