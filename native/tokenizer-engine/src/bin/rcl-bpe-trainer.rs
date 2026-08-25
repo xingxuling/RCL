@@ -224,7 +224,7 @@ fn train(corpus_path: &Path, artifact_path: &Path, target: u32, minimum_frequenc
 
     let mut sequence: Vec<u32> = corpus.iter().map(|byte| u32::from(*byte)).collect();
     let mut merges = Vec::new();
-    while BASE_VOCAB + merges.len() as u32 < target {
+    while BASE_VOCAB + (merges.len() as u32) < target {
         let Some(((left, right), frequency)) = select_pair(count_pairs(&sequence), minimum_frequency) else {
             break;
         };
