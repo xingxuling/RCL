@@ -75,7 +75,10 @@ const directClaims = [
   {
     id: 'browser::web',
     coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
-    lastVerifiedDate: '2026-08-08',
+    ...(k02AiAdmitted ? {
+      lastVerifiedSha: k02Ai.githubAuthority.sourceCommit,
+      lastVerifiedDate: k02Ai.githubAuthority.verifiedAt.slice(0, 10),
+    } : { lastVerifiedDate: '2026-08-08' }),
     knownLimits: admittedK02Limits(k02.limitations),
     relatedKillerTasks: ['K02'],
     requiredGenes: ['web-application-semantics', 'browser-lowering', 'server-api', 'authority-preservation'],
@@ -152,6 +155,10 @@ for (const id of ['browser::gui', 'browser::reactive']) {
   if (!claim) throw new Error(`RCL_K400_K02_AI_TARGET_MISSING:${id}`);
   claim.gates.AI_GENERATE = k02AiGate(claim.gates.AI_GENERATE);
   claim.knownLimits = admittedK02Limits(claim.knownLimits);
+  if (k02AiAdmitted) {
+    claim.lastVerifiedSha = k02Ai.githubAuthority.sourceCommit;
+    claim.lastVerifiedDate = k02Ai.githubAuthority.verifiedAt.slice(0, 10);
+  }
   claimsById.set(id, claim);
 }
 for (const claim of directClaims) claimsById.set(claim.id, claim);

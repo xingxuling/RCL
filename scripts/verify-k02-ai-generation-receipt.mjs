@@ -68,6 +68,7 @@ export function verifyK02GithubAuthorityBinding(options = {}) {
   return {
     admitted: true,
     status: 'PASS_GITHUB_HOSTED_REPLAY_BOUND',
+    verifiedAt: authority.verifiedAt,
     sourceCommit: authority.sourceCommit,
     runId: authority.run.id,
     runUrl: authority.run.url,

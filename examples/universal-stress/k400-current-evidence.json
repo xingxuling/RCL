@@ -161,14 +161,14 @@
     {
       "id": "browser::gui",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
-      "lastVerifiedDate": "2026-08-24",
+      "lastVerifiedSha": "41a5850178161cb26b80129251cd803598aeceda",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
         "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing, in-app navigation and available-width adaptive-layout surfaces; resource semantics remain absent",
         "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
         "visual fidelity is structural v0.1 rather than pixel parity",
         "focus traversal and the full accessibility tree are not implemented",
-        "AI_GENERATE is not independently evidenced"
+        "AI_GENERATE is limited to the three receipt-bound K02 Web/GUI/reactive repairs; it does not prove arbitrary Web generation."
       ],
       "relatedKillerTasks": [
         "K02"
@@ -245,9 +245,13 @@
           "note": "real Chrome completed the frozen Counter workload at 0.884 ms per three-event sequence against a 1.5 ms absolute budget; this is local regression evidence, not plain-DOM parity"
         },
         "AI_GENERATE": {
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "same development run cannot self-certify independent generation"
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k02-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k02-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent repairs passed deterministic RCL Web/Server replay and GitHub run 32865270251."
         },
         "EVIDENCE": {
           "status": "PASS",
@@ -275,12 +279,12 @@
     {
       "id": "browser::reactive",
       "coverageMode": "lowered-execution",
-      "lastVerifiedSha": "9621358307cc89a2a981c7fd2a9f8d5285539858",
+      "lastVerifiedSha": "41a5850178161cb26b80129251cd803598aeceda",
       "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
         "async effects and scheduling are outside Native UI v0.1",
-        "AI_GENERATE is unverified",
-        "the browser performance gate is local workload regression evidence rather than reference parity"
+        "the browser performance gate is local workload regression evidence rather than reference parity",
+        "AI_GENERATE is limited to the three receipt-bound K02 Web/GUI/reactive repairs; it does not prove arbitrary Web generation."
       ],
       "relatedKillerTasks": [
         "K02"
@@ -337,8 +341,13 @@
           "note": "real Chrome completed the frozen Counter workload at 0.884 ms per three-event sequence against a 1.5 ms absolute budget"
         },
         "AI_GENERATE": {
-          "status": "UNVERIFIED",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k02-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k02-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent repairs passed deterministic RCL Web/Server replay and GitHub run 32865270251."
         },
         "EVIDENCE": {
           "status": "PASS",
@@ -551,12 +560,13 @@
     {
       "id": "browser::web",
       "coverageMode": "lowered-execution",
-      "lastVerifiedDate": "2026-08-08",
+      "lastVerifiedSha": "41a5850178161cb26b80129251cd803598aeceda",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
         "Browser network navigation could not be exercised in this container because administrator policy blocks page navigation; browser runtime and Node HTTP/API runtime were executed independently.",
-        "AI_GENERATE requires an independent reproducible intent-to-web-app generation/repair trial; this development run is not self-certified.",
         "Web morphology is still a companion structured manifest, not native RCL Web syntax.",
-        "This is not a standards-complete browser engine or full WHATWG/W3C conformance claim."
+        "This is not a standards-complete browser engine or full WHATWG/W3C conformance claim.",
+        "AI_GENERATE is limited to the three receipt-bound K02 Web/GUI/reactive repairs; it does not prove arbitrary Web generation."
       ],
       "relatedKillerTasks": [
         "K02"
@@ -611,11 +621,13 @@
           ]
         },
         "AI_GENERATE": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+            "examples/universal-stress/k02-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k02-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k02-ai-generate/github-replay.json"
           ],
-          "note": "Independent reproducible generation or repair receipts are still missing."
+          "note": "Three independent repairs passed deterministic RCL Web/Server replay and GitHub run 32865270251."
         },
         "EVIDENCE": {
           "status": "PASS",
@@ -885,6 +897,7 @@
     "examples/native-ai/evidence/k233-ai-generate/github-replay.json",
     "examples/universal-stress/k02-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k02-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k02-ai-generate/github-replay.json",
     "examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json",
     "examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json",
     "examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json",
@@ -901,7 +914,7 @@
     "Historical K02 and K03 receipts are not relabeled as current execution evidence.",
     "Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.",
     "K08-B closes K233 through a GitHub-bound 3/3 independent repair receipt; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.",
-    "K02 has a 3/3 local independent repair candidate; K063, K064 and K078 remain BLOCKED until GitHub-hosted replay is bound.",
+    "K02 closes K063, K064 and K078 AI_GENERATE through 3/3 independent repairs and GitHub run 32865270251; it proves only the bounded Web/GUI/reactive vertical slice.",
     "K08-D is candidate-only evidence: a 29980-node generic Tensor Plan measured 5.720x local scalar-to-Tensor speedup and a remaining 15.863x JS ratio; it grants no new K233 gate or K400 cell.",
     "K08-E is candidate-only evidence: last-use reclamation measured a 892.823x logical plan-store reduction and 1.159x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.",
     "K08-F is candidate-only local Windows evidence: 54964 Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured 1.220x runtime speedup and 0.000% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.",

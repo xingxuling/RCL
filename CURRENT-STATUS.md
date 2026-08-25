@@ -14,6 +14,8 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
+Current authoritative matrix: `4 PASS / 4 BLOCKED / 392 UNTESTED`; maturity `U0`; K400 verdict `INCOMPLETE`. The four PASS cells are K063, K064, K078 and K233.
+
 Every evidence-bearing cell is evaluated through:
 
 ```text
@@ -50,7 +52,7 @@ Authority document: `docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K02 — Complete Web application
 
-Current result: `BLOCKED (8/9)`.
+Current result: `PASS (9/9)` for the bounded K02 Web vertical slice; coverage remains `lowered-execution`.
 
 Coverage mode: `lowered-execution`.
 
@@ -65,7 +67,7 @@ Direct evidence supports:
 - measured build/load/interaction performance;
 - rooted direct evidence.
 
-Remaining blocker: independent reproducible `AI_GENERATE` evidence.
+`AI_GENERATE` is bound to three separate ephemeral read-only repair sessions covering reactive state transition, authority binding and reactive view binding. All three restored canonical bytes and replayed the rooted Web manifest plus real loopback Node state/observe/rule execution. GitHub Actions run `32865270251`, focused job `97858888422`, exact source commit `41a5850178161cb26b80129251cd803598aeceda`, and authority root `bd266a10f6c5083c9b09875de5ea390693257a61a0f891f08eda702e928698cf` close K064. The same bounded receipt closes K063 and K078 because every repair replay includes structural GUI bindings and reactive execution; it does not grant arbitrary Web generation, native Web semantics, Android gates, compiler self-evolution or K400 completion.
 
 Authority document: `docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md`.
 
@@ -92,7 +94,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K08 — RCL-Native AI
 
-Current native-learning result: `AI-N2 VERIFIED` for a bounded, configurable two-Dense-layer General MLP profile; K233 is the first evidence-complete K400 cell on the integration candidate.
+Current native-learning result: `AI-N2 VERIFIED` for a bounded, configurable two-Dense-layer General MLP profile; K233 remains the machine-learning evidence-complete cell while K063, K064 and K078 are now separately evidence-complete browser cells.
 
 Direct local evidence supports:
 

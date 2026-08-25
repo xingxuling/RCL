@@ -1,7 +1,7 @@
 # K02 — Complete Web Application Stress Campaign v0.1
 
 **Cell:** `browser::web`  
-**Current result:** `BLOCKED (8/9)`  
+**Current result:** `PASS (9/9)` for the bounded vertical slice
 **Coverage mode:** `lowered-execution`
 
 ## Goal
@@ -79,13 +79,15 @@ EXECUTE      PASS
 CORRECT      PASS
 ROBUST       PASS
 PERFORMANCE  PASS
-AI_GENERATE  UNVERIFIED
+AI_GENERATE  PASS
 EVIDENCE     PASS
 
-OVERALL      BLOCKED (8/9)
+OVERALL      PASS (9/9)
 ```
 
-`AI_GENERATE` remains unverified because the same development agent must not self-certify that its own generation proves reproducible AI generation. A separate bounded generation/repair trial is required.
+`AI_GENERATE` is admitted only through the frozen `k02-ai-generation-contract.v0.1` contract. Three separate ephemeral read-only Codex CLI sessions received mutated candidates and failure diagnostics without the canonical files or oracle edits. They repaired reactive state transition, authority binding and reactive view binding; all three saved candidates restored canonical bytes and passed rooted RCL compilation, Web lowering, structural HTML checks and real loopback Node API execution. GitHub run `32865270251`, focused job `97858888422`, replayed those saved candidates for exact source commit `41a5850178161cb26b80129251cd803598aeceda`; authority root is `bd266a10f6c5083c9b09875de5ea390693257a61a0f891f08eda702e928698cf`.
+
+The receipt also covers the exact K063 GUI and K078 reactive surfaces exercised by every trial. It does not prove arbitrary Web generation, standards completeness, native RCL Web morphology, Android execution or compiler self-evolution.
 
 ## Standards boundary
 
@@ -113,7 +115,7 @@ The architecture follows the Web platform's actual separation of concerns: HTML 
 9. modules/workers/WebSocket/streaming;
 10. accessibility tree and browser security model;
 11. differential tests against Web Platform Tests where applicable;
-12. independent AI generation/repair evidence.
+12. general intent-to-Web generation beyond the bounded repair contract.
 
 ## Browser target above K02
 

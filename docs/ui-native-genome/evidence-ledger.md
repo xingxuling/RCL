@@ -78,7 +78,13 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Selfhost/fixed point | PASS — 6/6; minimal UI, Counter, parameterized UI-local events, governed reality-transaction declarations, fixed sizes, navigation and available-width adaptive layout are JS/self-host/native byte-identical; valid mutations change roots; equivalent fixed-number spellings normalize; invalid parameters, rules, authority mixtures, sizes, modes, routes, profile ranges/references and transition cardinality fail closed |
 | Instruction headroom | PASS — 88,744,649 executed per native generation; 211,255,351 remain against the 300 million cap; minimum gate 180 million. The sealed adaptation evidence pair took 228,988.5857 ms against the predeclared 240,000 ms gate; an independent focused reproduction took 232,033 ms |
 | Full regression | PASS — device-adaptation generation: 729 tests, 728 pass, 0 fail, 1 skip; 435,722.8321 ms on this machine. The clean run recorded byte-identical native C0/C1/C2 in 226,921 ms and retained 211,255,351 instruction headroom per generation |
-| K400 / Integration Court | BLOCKED — device-adaptation generation has 5 evidence-bearing cells BLOCKED, 395 UNTESTED, 0 PASS; maturity `U0`; deterministic report root `b23310ad9a03dacf876e972670d9d02ca2cc49281d74fd9d1852b4c8055d58fa` |
+| K400 / Integration Court | INCOMPLETE — K063, K064, K078 and K233 PASS; 4 evidence-bearing cells remain BLOCKED and 392 UNTESTED; maturity `U0`; deterministic report root `fd7d8ca19f1b3aee74a645dd6d2dc6d8e6d019521d3f2e94d7a3dc953cb6bb83` |
+
+## Independent K02 AI_GENERATE closure
+
+Three frozen semantic mutations cover reactive count transition, `app.write` authority binding and input/view state binding. Three unique ephemeral read-only Codex CLI sessions received only mutated candidates and deterministic failure diagnostics. The evaluator applied only their exact Schema responses; all candidates restored canonical bytes, shared one rooted manifest, and passed real loopback Node state/observe/add/reset execution.
+
+GitHub run `32865270251`, focused job `97858888422`, replayed the saved candidates for exact source commit `41a5850178161cb26b80129251cd803598aeceda`. Authority root `bd266a10f6c5083c9b09875de5ea390693257a61a0f891f08eda702e928698cf` admits the missing AI_GENERATE gate for K063, K064 and K078 only. It grants no Android, K339, arbitrary Web generation or K400 completion claim. See `k02-ai-generation-integration-court.md` and `rcl-gap-register.md`.
 
 The first fixed-sizing parser prototype added three helper `reckon`s and was rejected after the ordinary-Node self-host suite exhausted its approximately 4 GiB heap near 47 seconds. A one-axis parser then passed focused tests but later reproduced heap exhaustion in an extended full-suite run, so it was not accepted alone. The final implementation also replaces repeated user-call symbol-table scans with one indexed validation and bypasses scans for builtins/special calls: `find_reckon_index` fell from about 35.9 million to 8.5 million steps, native work fell from 113,179,072 to 79,350,203 instructions per generation, and the unmodified focused suite passed 6/6. Increasing the Node heap was not used as a substitute for the resource gate.
 
@@ -108,11 +114,11 @@ The final K400 seal also found that `generatedAt` had been included in the repor
 - Is platform syntax present in core? **No detected platform widget/layout primitives.**
 - Is Authority/4R preserved? **Yes at the UI boundary; reality actions cannot execute without an external governed gateway.**
 - Is there real execution evidence? **Yes for browser and Android build; no for Android device behavior.**
-- Is regression closed? **Yes for the device-adaptation execution paths: focused Native UI/selfhost checks and a clean full 729-test run are green; the isolated report-root fix then passed its 18/18 focused suite and two-run determinism check. Android device and AI-generation gates remain open.**
+- Is regression closed? **Yes for the declared browser paths: the device-adaptation regression remains green and the three saved K02 repairs passed local plus exact-commit GitHub replay. Android device and Android AI-generation gates remain open.**
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
-The consolidated report preserves the device-adaptation evidence and adds a post-contract real Chrome performance PASS for the declared Counter workload. Compiler self-hosting and browser claims are now blocked only by independent `AI_GENERATE`; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE`. These gates do not compensate for one another.
+The consolidated report preserves the device-adaptation evidence and the post-contract real Chrome performance PASS for the declared Counter workload. K063, K064 and K078 now pass all nine gates through the bounded hosted K02 repair receipt. Compiler self-hosting remains blocked by its distinct compiler-evolution `AI_GENERATE` contract; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE`. These gates do not compensate for one another.
 
 ## License and diff audit
 
@@ -120,4 +126,4 @@ The candidate implementation reuses repository interfaces and independently impl
 
 ## Matrix impact
 
-The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI. Browser performance passes only for the frozen local Counter budget; compiler and browser cells still lack independent AI generation, while Android still lacks device execute/correct/performance and AI evidence. No K001–K400 PASS is inferred from this receipt.
+The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI. Browser performance passes only for the frozen local Counter budget. The separate hosted K02 receipt closes K063, K064 and K078 AI_GENERATE; K339 still needs compiler-source generation/repair, while Android still lacks device execute/correct/performance and AI evidence. No broader matrix PASS is inferred.
