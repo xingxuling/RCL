@@ -8,11 +8,17 @@ This evidence admits bounded CPU-f64 multi-head / grouped-query attention compos
 
 ## Hosted replay
 
-Accepted run: `32847865516`
+Implementation run `32847865516`:
 
 - source commit: `bd6feb5c32ece78e97655360caef52e01ece7963`
 - Ubuntu job `97801676252`: 8/8 PASS
 - Windows job `97801676519`: 8/8 PASS
+
+Promoted-contract replay `32848050472`:
+
+- source commit: `9600bc963fc3ca808b78445af9105c1f0c10ee33`
+- Ubuntu job `97802252376`: 8/8 PASS
+- Windows job `97802252014`: 8/8 PASS
 
 ## Frozen executable profile
 
