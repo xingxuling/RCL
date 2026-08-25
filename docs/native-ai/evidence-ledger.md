@@ -58,7 +58,7 @@ node --test --test-concurrency=1 tests/k08-general-mlp.test.mjs tests/k233-ai-ge
 
 ## Evidence boundary
 
-The ledger proves the bounded General MLP AI-N2 stack and the independently replayed K233 repair evidence. It does not prove Tensor Genome, general Autodiff, AdamW, Transformer, language-model training, accelerator lowering, distributed training, competitive performance or K400 completion.
+The K08-B portion of this ledger proves the bounded General MLP AI-N2 stack and independently replayed K233 repair evidence only. Later sections record separate Tensor and Autodiff candidates; the ledger still does not prove AdamW, Transformer, language-model training, accelerator lowering, distributed training, competitive performance or K400 completion.
 
 ## K08-C Tensor / CPU Engine candidate
 
@@ -183,3 +183,38 @@ npm run test:k08-tensor
 npm run evidence:k08-tensor-mlp
 npm run evidence:k08-tensor-borrowed-input -- --baseline-binary <exact-main-release-binary> --baseline-repository <clean-exact-main-worktree>
 ```
+
+## K08-G Native Reverse-Mode Autodiff candidate
+
+Status: `ENGINE_E2_AUTODIFF_CANDIDATE`. It replaces the General MLP execution dependency on its hand-written backward path; the old implementation remains a reference oracle only.
+
+| Evidence | Result |
+|---|---:|
+| Canonical source | `examples/native-ai/autodiff-genome.rcl` |
+| Graph boundary | generic Tensor SSA `ComputationGraph`; no model-special operation |
+| Reverse semantics | `BackwardEdge`, `GradientIdentity`, shape-checked `GradientAccumulator`, `StopGradient`, `Backward()` |
+| Differential primitive set | add/sub/mul/div, MatMul, transpose, reshape, broadcast, sum/mean, exp/log/sqrt/abs, activation, Softmax |
+| Analytic/manual maximum drift | `0` |
+| Central finite-difference maximum drift | `3.7655e-10` |
+| Deterministic gradient replays | `3/3`, one root |
+| XOR / Majority-3 accuracy | `1 / 1` |
+| XOR / Majority-3 final loss | `0.01570345 / 0.01110160` |
+| Maximum parameter drift vs hand-written oracle | `1.7764e-15` |
+| Checkpoint | exact `32 == 16 + reload + 16`; `0` parameter drift |
+| Accepted source commit | `3132b81d9e0b7b7788aaf4b23457656c559b9793` |
+| Local evidence root | `5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709` |
+
+The first split-checkpoint probe failed exact parity by one ULP because exact Storage bits were applied during validation but the mutable SGD storage still held the decimal transport value. The accepted implementation materializes exact bits into mutable parameter storage before the first resumed update. No tolerance was relaxed.
+
+The RCL Genome self-host compiler and JS bootstrap produce byte-identical RBC, and the resulting Genome executes in the native VM. Rust owns only the CPU execution organ. The bounded training envelope reuses the existing RCL Batch SGD semantics; it is not the ENGINE-E3 Optimizer Genome and contains no Momentum, Adam or AdamW state.
+
+Performance is a local release child-process measurement. The accepted run measured XOR/Majority-3 end-to-end training wall time of `80.882 / 61.359 ms`, including request-file transport, process startup, forward, backward, Batch SGD updates and response serialization. Autodiff peak RSS, portable runtime ratios, accelerator execution and large-graph performance remain unmeasured.
+
+Reproduction:
+
+```text
+npm run test:k08-autodiff
+npm run evidence:k08-autodiff
+```
+
+This candidate grants no ENGINE-E3 Optimizer Genome, AdamW, Transformer, Tiny LM, accelerator, general performance parity or K400 promotion claim. GitHub-hosted replay is required before adding a `_GITHUB_REPLAY_BOUND` suffix.

@@ -24,6 +24,7 @@ const k08TensorLivenessPath = 'examples/native-ai/evidence/tensor-plan-liveness-
 const k08TensorLivenessGithubReplayPath = 'examples/native-ai/evidence/tensor-plan-liveness-v0.1/github-replay.json';
 const k08TensorBorrowedInputPath = 'examples/native-ai/evidence/tensor-plan-borrowed-inputs-v0.1/k08-f-tensor-borrowed-input-evidence.json';
 const k08TensorBorrowedInputGithubReplayPath = 'examples/native-ai/evidence/tensor-plan-borrowed-inputs-v0.1/github-replay.json';
+const k08AutodiffPath = 'examples/native-ai/evidence/native-autodiff-v0.1/k08-g-native-autodiff-evidence.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -45,6 +46,7 @@ const k08 = readJson(k08Path);
 const k08TensorMlp = readJson(k08TensorMlpPath);
 const k08TensorLiveness = readJson(k08TensorLivenessPath);
 const k08TensorBorrowedInput = readJson(k08TensorBorrowedInputPath);
+const k08Autodiff = readJson(k08AutodiffPath);
 
 const directClaims = [
   {
@@ -96,10 +98,11 @@ const directClaims = [
       'The result proves a bounded configurable two-Dense-layer General MLP profile. A separate candidate lowers it to a generic Tensor Plan with 5.720x local speedup, but it grants no K233 promotion or Tensor Genome PASS.',
       `K08-F measures exact Windows child-process peak Working Set on the unchanged Plan (${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% local median delta); portable RSS/VRAM telemetry remains open.`,
       `K08-E reduces the logical plan value-store peak by ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x on the K08-D workload; process RSS and general workload speedup remain unverified.`,
+      `K08-G is an ENGINE_E2 candidate: native reverse-mode gradients match finite difference within ${k08Autodiff.primitive.finiteDifferenceMaximumDrift.toExponential(3)}, while optimizer genome, Transformer, Tiny LM and accelerator gates remain open.`,
       'K233 AI_GENERATE is limited to three independent repair receipts and their bound GitHub-hosted replay; it grants no Tensor, Autodiff, optimizer or accelerator claim.',
     ],
     relatedKillerTasks: ['K08'],
-    requiredGenes: ['native-numeric-reckon', 'immutable-sequence-algebra', 'recursive-training-loop', 'evidence-native-model-lifecycle'],
+    requiredGenes: ['native-numeric-reckon', 'immutable-sequence-algebra', 'recursive-training-loop', 'evidence-native-model-lifecycle', 'reverse-mode-tensor-autodiff-candidate'],
     donorAdvantages: [{
       donor: 'JavaScript reference oracle',
       capability: `faster training execution and richer host telemetry; generic Tensor lowering reduced the measured Native/JS ratio from ${k08TensorMlp.performance.priorNativeToOracleRatio.toFixed(3)}x to ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x`,
@@ -127,7 +130,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
@@ -136,6 +139,7 @@ const evidence = {
     `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     `K08-E is candidate-only evidence: last-use reclamation measured a ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x logical plan-store reduction and ${k08TensorLiveness.controlledPerformance.speedup.toFixed(3)}x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.`,
     `K08-F is candidate-only local Windows evidence: ${k08TensorBorrowedInput.productionWorkload.inputBindingCount} Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured ${k08TensorBorrowedInput.controlledPerformance.speedup.toFixed(3)}x runtime speedup and ${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.`,
+    `K08-G is candidate-only native Autodiff evidence: analytic drift ${k08Autodiff.primitive.analyticManualMaximumDrift}, finite-difference drift ${k08Autodiff.primitive.finiteDifferenceMaximumDrift.toExponential(3)}, XOR/Majority-3 accuracy ${k08Autodiff.generalMlp.tasks.xor.accuracy}/${k08Autodiff.generalMlp.tasks.majority3.accuracy}, and bit-exact 32 == 16+16 checkpoint parity. It grants no new K233 gate or K400 cell.`,
     ...(nativeUi.notes ?? []),
   ],
 };

@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { createHash } from 'node:crypto';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import {
@@ -19,6 +20,12 @@ let campaign;
 function report() {
   campaign ??= runNativeAutodiffCampaign();
   return campaign;
+}
+
+function stable(value) {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
+  return value;
 }
 
 test('K08-G reverse-mode Autodiff agrees with analytic and finite-difference oracles', { timeout: 180_000 }, () => {
@@ -103,4 +110,21 @@ test('K08-G RCL Autodiff Genome compiles with self-host parity and executes nati
   assert.equal(run.state['evaluation.backward_edges_exist'], true);
   assert.equal(run.state['evaluation.stop_gradient_blocks'], true);
   assert.equal(run.state['backward.edge_count'], 3);
+});
+
+test('K08-G accepted receipt is self-rooted and K400 remains non-promoted', () => {
+  const receiptPath = path.join(ROOT, 'examples', 'native-ai', 'evidence', 'native-autodiff-v0.1', 'k08-g-native-autodiff-evidence.json');
+  const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  const rooted = { ...receipt };
+  delete rooted.generatedAt;
+  delete rooted.reportRoot;
+  const actualRoot = createHash('sha256').update(JSON.stringify(stable(rooted))).digest('hex');
+  assert.equal(receipt.reportRoot, actualRoot);
+  assert.equal(receipt.sourceCommit, '3132b81d9e0b7b7788aaf4b23457656c559b9793');
+  assert.equal(Object.values(receipt.checks).every(Boolean), true);
+
+  const k400 = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'universal-stress', 'k400-current-evidence.json'), 'utf8'));
+  assert.equal(k400.sourceReceipts.includes('examples/native-ai/evidence/native-autodiff-v0.1/k08-g-native-autodiff-evidence.json'), true);
+  assert.equal(k400.claims.filter((claim) => claim.campaignId === 'K233').length, 1);
+  assert.match(k400.notes.join('\n'), /grants no new K233 gate or K400 cell/);
 });

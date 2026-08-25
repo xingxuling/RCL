@@ -199,11 +199,32 @@ All baseline/candidate roots matched for both workloads. Peak Working Set is sam
 
 K08-F is `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32821559973` passed focused Ubuntu job `97720582566` and real Windows job `97720582266` for exact source commit `d130a4d91f68159ea7405222ed6658ff2269b459`. The Windows job rebuilt exact baseline `9805956...`, ran the native Provider/General MLP path, and executed the child-process memory A/B. Runs `32819776325` and `32820687027` failed earlier sampler stdin transports and remain recorded rather than overwritten; the admitted run uses the existing CLI request-file path.
 
-## 11. Next gate
+## 11. K08-G Native Reverse-Mode Autodiff candidate
 
-The next highest-value sequence is:
+K08-G adds an RCL-owned Autodiff Genome and a Rust CPU execution organ over the existing generic Tensor SSA graph. The public request names `ComputationGraph`, `Parameter`, `GradientIdentity`, `BackwardEdge`, `GradientAccumulator`, `StopGradient` and scalar loss. Reverse traversal accumulates every reachable contribution and fails closed for identity drift, disconnected parameters, non-scalar loss, unsupported reverse rules, graph/resource overflow and non-finite gradients or updates.
 
-1. add liveness-safe output-buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
-2. close the typed-source self-host compiler gap before Tensor promotion;
-3. resolve scientific-notation number canonicalization in semantic-state-root evidence;
-4. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.
+The reverse-rule corpus covers add/sub/mul/div, MatMul, transpose, reshape, explicit broadcast, sum/mean, exp/log/sqrt/abs, general activation and Softmax. `stop-gradient` is an identity in forward execution and a propagation boundary in reverse execution. There are no `mlp_backward`, task-special, Attention or Transformer backward operations.
+
+The same unchanged General MLP contract is lowered to a compact per-step graph of generic operations. Rust performs forward, reverse accumulation and the already-canonical bounded Batch SGD update. The old RCL/JS hand-written backward implementation is used only as a differential oracle:
+
+| Boundary | XOR | Majority-3 |
+|---|---:|---:|
+| Architecture | `2-2-1` | `3-3-1` |
+| Accuracy | `1` | `1` |
+| Final loss | `0.01570345` | `0.01110160` |
+| Maximum parameter drift vs manual oracle | `1.7764e-15` | `1.7764e-15` |
+| Accepted local training wall time | `80.882 ms` | `61.359 ms` |
+| Parameter bytes | `72` | `128` |
+
+Analytic/manual gradients match exactly, the maximum central finite-difference drift is `3.7655e-10`, and three deterministic gradient replays have one root. Exact f64 checkpoint materialization gives bit-exact `32 == 16 + reload + 16`. An earlier one-ULP split-checkpoint failure was retained as a stress case and fixed without widening tolerance.
+
+The accepted local evidence root is `5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709`, bound to implementation commit `3132b81d9e0b7b7788aaf4b23457656c559b9793`. Status is `ENGINE_E2_AUTODIFF_CANDIDATE`; GitHub replay remains required before hosted-bound admission. Peak RSS and general performance parity are unmeasured. Momentum, Adam, AdamW, Transformer, Tiny LM, GPU and K400 promotion are not granted.
+
+## 12. Next gate
+
+The next highest-value sequence is fixed by the Model Factory campaign:
+
+1. bind K08-G to successful Ubuntu and Windows GitHub-hosted replay;
+2. build ENGINE-E3 Optimizer Genome for SGD, Momentum, Adam and AdamW with unified optimizer state;
+3. prove rooted `train(N) == train(K) -> save -> reload -> train(N-K)` parity including dataset cursor and RNG/seed identity;
+4. only then begin Transformer primitives and the first Decoder-only block.

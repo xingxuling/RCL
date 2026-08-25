@@ -1,0 +1,185 @@
+{
+  "format": "rcl.k08-g.native-autodiff-evidence.v0.1",
+  "status": "ENGINE_E2_AUTODIFF_CANDIDATE",
+  "generatedAt": "2026-08-25T08:33:10.679Z",
+  "semanticOwner": "RCL Tensor and Autodiff Genome",
+  "executionOwner": "rcl-tensor-autodiff-rust-v0.1",
+  "sourceCommit": "3132b81d9e0b7b7788aaf4b23457656c559b9793",
+  "artifactHashes": {
+    "semanticSource": "7fd9747951423b2a19fefd6962a6068b1b17d7fc752547cdbae7b4843f093d4f",
+    "rustExecutionOrgan": "60136a156ae112d5052a85eabe6fef94ced03c818560541056213dfe128b6851",
+    "loweringEvidenceOrgan": "9f0fd0eeede8df3206755654d52c1a835e240352ad1493e5beeae2de2d2b82b5"
+  },
+  "primitive": {
+    "analyticManualMaximumDrift": 0,
+    "finiteDifferenceMaximumDrift": 3.7654987461444023e-10,
+    "externalOracle": "independent-javascript-analytic-and-central-finite-difference",
+    "fixtures": [
+      {
+        "case": "generic-primitives",
+        "operations": [
+          "activation",
+          "add",
+          "broadcast",
+          "matmul",
+          "mean",
+          "mul",
+          "softmax",
+          "sum",
+          "transpose"
+        ],
+        "maximumFiniteDifferenceDrift": 3.981570281808011e-11,
+        "backwardEdges": 11,
+        "accumulatorMerges": 0
+      },
+      {
+        "case": "unary-reshape-reduction",
+        "operations": [
+          "abs",
+          "add",
+          "div",
+          "exp",
+          "log",
+          "reshape",
+          "sqrt",
+          "sub",
+          "sum"
+        ],
+        "maximumFiniteDifferenceDrift": 3.7654987461444023e-10,
+        "backwardEdges": 15,
+        "accumulatorMerges": 2
+      }
+    ],
+    "stopGradient": {
+      "gradient": [
+        0.75,
+        -1.5
+      ],
+      "expected": [
+        0.75,
+        -1.5
+      ],
+      "maximumDrift": 0
+    },
+    "negative": {
+      "code": "RCL_AUTODIFF_PARAMETER_NOT_INITIAL",
+      "parameterMissingRejected": true
+    },
+    "deterministic": {
+      "replayRoots": [
+        "e7d57d101d143e59fb155ca99cf86785db819dac8f4cf7d400d1d452714c863c",
+        "e7d57d101d143e59fb155ca99cf86785db819dac8f4cf7d400d1d452714c863c",
+        "e7d57d101d143e59fb155ca99cf86785db819dac8f4cf7d400d1d452714c863c"
+      ],
+      "uniqueRoots": 1
+    }
+  },
+  "generalMlp": {
+    "semanticBindings": {
+      "semanticOwner": "RCL",
+      "modelSourceSha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0",
+      "contractRoot": "fb2524725b1450e3e7570e2898bd6e7cdc141fa10f54dd3b03cf21366b184182",
+      "autodiffGenomeSha256": "9462e09abdf6256324ce89f0cee375fba05303e44719ef16cb0f6043b5f07d31",
+      "lowering": "generic-tensor-autodiff-graph-v0.1"
+    },
+    "tasks": {
+      "xor": {
+        "architecture": [
+          2,
+          2,
+          1
+        ],
+        "initialLoss": 0.14195815333363393,
+        "finalLoss": 0.015703448874393084,
+        "lossReduction": 0.12625470445924084,
+        "accuracy": 1,
+        "maximumParameterDriftVsManualOracle": 1.7763568394002505e-15,
+        "maximumPredictionDriftVsManualOracle": 1.1102230246251565e-16,
+        "trainingWallMs": 80.88249999999994,
+        "nativeTrainingNanos": 37550700,
+        "parameterBytes": 72,
+        "optimizerSemantics": "rcl.batch-sgd.v0.1",
+        "operations": [
+          "activation",
+          "add",
+          "div",
+          "matmul",
+          "mul",
+          "sub",
+          "sum",
+          "transpose"
+        ],
+        "forbiddenModelSpecialOperations": []
+      },
+      "majority3": {
+        "architecture": [
+          3,
+          3,
+          1
+        ],
+        "initialLoss": 0.12353794829615636,
+        "finalLoss": 0.011101595628735283,
+        "lossReduction": 0.11243635266742108,
+        "accuracy": 1,
+        "maximumParameterDriftVsManualOracle": 1.7763568394002505e-15,
+        "maximumPredictionDriftVsManualOracle": 1.6653345369377348e-16,
+        "trainingWallMs": 61.359100000000126,
+        "nativeTrainingNanos": 24295400,
+        "parameterBytes": 128,
+        "optimizerSemantics": "rcl.batch-sgd.v0.1",
+        "operations": [
+          "activation",
+          "add",
+          "div",
+          "matmul",
+          "mul",
+          "sub",
+          "sum",
+          "transpose"
+        ],
+        "forbiddenModelSpecialOperations": []
+      }
+    },
+    "checkpoint": {
+      "directSteps": 32,
+      "splitSteps": [
+        16,
+        16
+      ],
+      "exactResumeParity": true,
+      "maximumParameterDrift": 0,
+      "checkpointBytes": 353
+    },
+    "manualOracleRoot": "06b5f3db5cc458df41df37ee3e474ec997fb061fdb509f5d6646a62e89d38944"
+  },
+  "performance": {
+    "boundary": "release Rust child process; trainingWallMs includes JSON file transport, process startup, forward, backward, Batch SGD updates and response serialization",
+    "compileTime": "measured separately by CI/build logs; excluded from training samples",
+    "loweringTime": "graph construction is in-process and included only in caller-side setup, not nativeTrainingNanos",
+    "peakRss": "UNMEASURED_FOR_AUTODIFF_REQUEST",
+    "accelerator": "CPU_ONLY"
+  },
+  "checks": {
+    "analyticManual": true,
+    "finiteDifference": true,
+    "stopGradient": true,
+    "negative": true,
+    "deterministic": true,
+    "xor": true,
+    "majority3": true,
+    "manualOracleDifferential": true,
+    "checkpoint": true,
+    "noModelSpecialOperation": true
+  },
+  "claimsNotGranted": [
+    "ENGINE_E3_OPTIMIZER_GENOME",
+    "ADAM",
+    "ADAMW",
+    "TRANSFORMER",
+    "TINY_LM",
+    "GPU",
+    "GENERAL_PERFORMANCE_PARITY",
+    "K400_PROMOTION_FROM_THIS_CANDIDATE"
+  ],
+  "reportRoot": "5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709"
+}
