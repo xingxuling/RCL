@@ -1,0 +1,39 @@
+name: K08 Tensor AdamW Bridge v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-tensor-adamw-v01
+    paths:
+      - 'native/tensor-engine/**'
+      - 'examples/native-ai/tensor-adamw-bridge*'
+      - 'tests/k08-tensor-adamw-bridge.test.mjs'
+      - '.github/workflows/k08-tensor-adamw-bridge.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/**'
+      - 'examples/native-ai/tensor-adamw-bridge*'
+      - 'tests/k08-tensor-adamw-bridge.test.mjs'
+      - '.github/workflows/k08-tensor-adamw-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tensor-adamw-bridge:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run Tensor AdamW bridge evidence tests
+        run: node --test --test-concurrency=1 tests/k08-tensor-adamw-bridge.test.mjs
