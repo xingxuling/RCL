@@ -248,8 +248,18 @@ fn initialize_or_validate_states(
         ));
     }
     let common_step = supplied[0].step;
+    let supplied_by_id = supplied
+        .iter()
+        .map(|state| (state.tensor_id.clone(), state.clone()))
+        .collect::<HashMap<_, _>>();
     let mut result = Vec::with_capacity(supplied.len());
-    for supplied_state in supplied {
+    for parameter in &request.parameters {
+        let supplied_state = supplied_by_id.get(&parameter.tensor_id).ok_or_else(|| {
+            BridgeError::new(
+                "RCL_ADAMW_STATE_BINDING",
+                format!("optimizer state is unavailable for parameter {}", parameter.tensor_id),
+            )
+        })?;
         if supplied_state.step != common_step {
             return Err(BridgeError::new(
                 "RCL_ADAMW_STATE_STEP_MISMATCH",
@@ -299,7 +309,6 @@ fn initialize_or_validate_states(
         }
         result.push(state);
     }
-    result.sort_by(|left, right| left.tensor_id.cmp(&right.tensor_id));
     Ok(result)
 }
 
