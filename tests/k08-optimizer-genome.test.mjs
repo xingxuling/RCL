@@ -57,6 +57,8 @@ test('K08-H Optimizer Genome contract freezes model-agnostic SGD/Momentum/Adam/A
   assert.equal(contract.format, 'rcl.k08-h.optimizer-genome-contract.v0.1');
   assert.deepEqual(contract.algorithms, ['sgd', 'momentum', 'adam', 'adamw']);
   assert.equal(contract.adamw.decoupledWeightDecay, true);
+  assert.equal(contract.adamw.epsilon, 1e-8);
+  assert.equal(contract.adamw.epsilonExpression, '1 / 100000000');
   assert.ok(contract.claimsNotGranted.includes('TRANSFORMER'));
   assert.ok(contract.claimsNotGranted.includes('K400_PROMOTION'));
 });
@@ -76,7 +78,7 @@ test('K08-H RCL Optimizer Genome self-host compiles and executes natively', { ti
 
 test('K08-H numeric fixture agrees with independent JavaScript AdamW oracle', { timeout: 180_000 }, () => {
   const run = runOptimizerGenome();
-  const cfg = { learningRate: 0.01, beta1: 0.9, beta2: 0.999, epsilon: 0.01, weightDecay: 0.1 };
+  const cfg = { learningRate: 0.01, beta1: 0.9, beta2: 0.999, epsilon: 1e-8, weightDecay: 0.1 };
   let parameter = 1;
   let firstMoment = 0;
   let secondMoment = 0;
@@ -100,6 +102,7 @@ test('K08-H source contains no model-special optimizer path', () => {
   assert.match(source, /optimizer_update/);
   assert.match(source, /adamw/);
   assert.match(source, /TrainingCheckpoint/);
+  assert.match(source, /standard_epsilon\(\) -> Number = 1 \/ 100000000/);
   assert.doesNotMatch(source, /xor_special|mlp_special|transformer_special|gpt_special/i);
   assert.match(source, /CANDIDATE_ONLY_NO_TRANSFORMER_TINY_LM_ACCELERATOR_OR_K400_PROMOTION/);
 });
