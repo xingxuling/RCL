@@ -1,0 +1,51 @@
+{
+  "format": "rcl.k08-n.rope-contract.v0.1",
+  "status": "ROPE_GENOME_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "profile": "ROTARY_POSITION_FRAME_PAIRWISE_F64_CANDIDATE",
+  "semantics": {
+    "pairing": "adjacent-even-odd-dimensions",
+    "angle": "position/base^(2*pairIndex/headDimension)",
+    "defaultBase": 10000,
+    "headDimensionMustBeEven": true,
+    "positionZeroIsIdentity": true,
+    "rotationPreservesPairNorm": true,
+    "tensorLowering": "x*cos + matmul(x, fixedPairRotationMatrix)*sin"
+  },
+  "executionBoundary": {
+    "trigTable": "native f64 position-frame organ",
+    "modelGraph": "generic Tensor matmul/mul/add only",
+    "autodiff": "existing RCL reverse-mode Tensor Autodiff",
+    "modelSpecialOperationAllowed": false
+  },
+  "requiredEvidence": [
+    "selfhost-rbc-parity-and-native-semantic-root",
+    "position-zero-identity",
+    "known-angle-differential-vs-independent-oracle",
+    "pair-norm-preservation",
+    "generic-tensor-lowering-only",
+    "reverse-mode-gradient-vs-finite-difference",
+    "qk-attention-integration",
+    "deterministic-position-frame-root",
+    "odd-head-dimension-fails-closed",
+    "invalid-base-fails-closed",
+    "position-overflow-fails-closed",
+    "rope-special-opcode-injection-fails-closed"
+  ],
+  "claimsGrantedOnAdmission": [
+    "ROPE_POSITIONAL_SEMANTICS",
+    "ROOTED_ROPE_POSITION_FRAME",
+    "GENERIC_TENSOR_ROPE_LOWERING"
+  ],
+  "claimsNotGranted": [
+    "MULTI_HEAD_ATTENTION",
+    "GQA",
+    "MULTI_BLOCK_LM",
+    "RCL_10M",
+    "BF16",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
