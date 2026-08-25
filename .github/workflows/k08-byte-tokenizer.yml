@@ -1,0 +1,39 @@
+name: K08 Byte Tokenizer v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-byte-tokenizer-v01
+    paths:
+      - 'native/tokenizer-engine/**'
+      - 'examples/native-ai/byte-tokenizer*'
+      - 'tests/k08-byte-tokenizer.test.mjs'
+      - '.github/workflows/k08-byte-tokenizer.yml'
+  pull_request:
+    paths:
+      - 'native/tokenizer-engine/**'
+      - 'examples/native-ai/byte-tokenizer*'
+      - 'tests/k08-byte-tokenizer.test.mjs'
+      - '.github/workflows/k08-byte-tokenizer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  byte-tokenizer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run byte tokenizer evidence tests
+        run: node --test --test-concurrency=1 tests/k08-byte-tokenizer.test.mjs
