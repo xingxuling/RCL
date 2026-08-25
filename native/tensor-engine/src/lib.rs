@@ -2,15 +2,24 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
+use std::fs;
 use std::time::Instant;
 
 pub const REQUEST_FORMAT: &str = "rcl.tensor-execution-request.v0.1";
 pub const RESPONSE_FORMAT: &str = "rcl.tensor-execution-result.v0.1";
+pub const PLAN_REQUEST_FORMAT: &str = "rcl.tensor-execution-plan.v0.1";
+pub const PLAN_FILE_REQUEST_FORMAT: &str = "rcl.tensor-execution-plan-file.v0.1";
+pub const PLAN_RESPONSE_FORMAT: &str = "rcl.tensor-execution-plan-result.v0.1";
 pub const PROVIDER_ID: &str = "rcl.tensor.cpu";
 pub const CAPABILITY: &str = "tensor.execute";
 const MAX_TENSORS: usize = 8;
 const MAX_RANK: usize = 8;
 const MAX_ELEMENTS: usize = 16_777_216;
+const MAX_PLAN_INITIAL_TENSORS: usize = 256;
+const MAX_PLAN_NODES: usize = 32_768;
+const MAX_PLAN_OUTPUTS: usize = 64;
+const MAX_PLAN_STORED_ELEMENTS: usize = 16_777_216;
+const MAX_PLAN_FILE_BYTES: u64 = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -43,6 +52,50 @@ pub struct ExecutionRequest {
     pub attributes: Value,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PlanOutputDescriptor {
+    pub id: String,
+    pub shape: Vec<usize>,
+    pub dtype: String,
+    pub layout: String,
+    pub device: String,
+    pub gradient_identity: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PlanNode {
+    pub id: String,
+    pub operation: String,
+    pub inputs: Vec<String>,
+    pub output: PlanOutputDescriptor,
+    #[serde(default)]
+    pub attributes: Value,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ExecutionPlan {
+    pub format: String,
+    #[serde(default)]
+    pub bindings: Value,
+    pub tensors: Vec<TensorDescriptor>,
+    pub storages: Vec<DenseStorage>,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub exact_storage_bits: HashMap<String, Vec<String>>,
+    pub nodes: Vec<PlanNode>,
+    pub outputs: Vec<String>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PlanFileRequest {
+    pub format: String,
+    pub path: String,
+    pub sha256: String,
+}
+
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Telemetry {
@@ -61,6 +114,32 @@ pub struct ExecutionResult {
     pub tensor: TensorDescriptor,
     pub storage: DenseStorage,
     pub telemetry: Telemetry,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanTensorResult {
+    pub tensor: TensorDescriptor,
+    pub storage: DenseStorage,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanTelemetry {
+    pub backend: &'static str,
+    pub node_count: usize,
+    pub stored_elements: usize,
+    pub allocated_bytes: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExecutionPlanResult {
+    pub format: &'static str,
+    pub status: &'static str,
+    pub bindings: Value,
+    pub outputs: Vec<PlanTensorResult>,
+    pub telemetry: PlanTelemetry,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -325,6 +404,7 @@ fn unary(input: &BoundTensor<'_>, op: &str) -> Result<(Vec<usize>, Vec<f64>), En
     let mut output = Vec::with_capacity(input.data.len());
     for value in input.data {
         output.push(match op {
+            "abs" => value.abs(),
             "exp" => value.exp(),
             "log" if *value > 0.0 => value.ln(),
             "log" => {
@@ -344,6 +424,50 @@ fn unary(input: &BoundTensor<'_>, op: &str) -> Result<(Vec<usize>, Vec<f64>), En
         });
     }
     Ok((input.descriptor.shape.clone(), output))
+}
+
+fn transpose(
+    input: &BoundTensor<'_>,
+    permutation: &[usize],
+) -> Result<(Vec<usize>, Vec<f64>), EngineError> {
+    let rank = input.descriptor.shape.len();
+    if permutation.len() != rank {
+        return Err(EngineError::new(
+            "RCL_TENSOR_TRANSPOSE_PERMUTATION",
+            format!(
+                "Permutation rank {} differs from tensor rank {rank}",
+                permutation.len()
+            ),
+        ));
+    }
+    let mut seen = vec![false; rank];
+    for axis in permutation {
+        if *axis >= rank || seen[*axis] {
+            return Err(EngineError::new(
+                "RCL_TENSOR_TRANSPOSE_PERMUTATION",
+                format!("Invalid permutation {permutation:?} for rank {rank}"),
+            ));
+        }
+        seen[*axis] = true;
+    }
+    let output_shape = permutation
+        .iter()
+        .map(|axis| input.descriptor.shape[*axis])
+        .collect::<Vec<_>>();
+    let output_count = product(&output_shape)?;
+    let output_strides = row_major_strides(&output_shape);
+    let input_strides = row_major_strides(&input.descriptor.shape);
+    let mut output = vec![0.0; output_count];
+    for (output_index, cell) in output.iter_mut().enumerate() {
+        let mut input_index = 0;
+        for output_axis in 0..rank {
+            let coordinate =
+                (output_index / output_strides[output_axis]) % output_shape[output_axis];
+            input_index += coordinate * input_strides[permutation[output_axis]];
+        }
+        *cell = input.data[input_index];
+    }
+    Ok((output_shape, output))
 }
 
 fn matmul_reference(inputs: &[BoundTensor<'_>]) -> Result<(Vec<usize>, Vec<f64>), EngineError> {
@@ -430,6 +554,26 @@ fn attribute_usize(attributes: &Value, name: &str) -> Result<usize, EngineError>
                 format!("Missing or invalid usize attribute {name}"),
             )
         })
+}
+
+fn attribute_permutation(attributes: &Value) -> Result<Vec<usize>, EngineError> {
+    attributes
+        .get("permutation")
+        .and_then(Value::as_array)
+        .ok_or_else(|| EngineError::new("RCL_TENSOR_ATTRIBUTE", "Missing permutation attribute"))?
+        .iter()
+        .map(|value| {
+            value
+                .as_u64()
+                .and_then(|axis| usize::try_from(axis).ok())
+                .ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_TENSOR_ATTRIBUTE",
+                        "Permutation axes must be usize values",
+                    )
+                })
+        })
+        .collect()
 }
 
 fn reduction(
@@ -572,9 +716,13 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
     let start = Instant::now();
     let (shape, data) = match request.operation.as_str() {
         "add" | "sub" | "mul" | "div" => elementwise(&inputs, &request.operation)?,
-        "exp" | "log" | "sqrt" => {
+        "abs" | "exp" | "log" | "sqrt" => {
             require_arity(&inputs, 1)?;
             unary(&inputs[0], &request.operation)?
+        }
+        "transpose" => {
+            require_arity(&inputs, 1)?;
+            transpose(&inputs[0], &attribute_permutation(&request.attributes)?)?
         }
         "matmul" => matmul_optimized(&inputs)?,
         "matmul-reference" => matmul_reference(&inputs)?,
@@ -644,21 +792,362 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
     })
 }
 
-pub fn execute_json(request_json: &str) -> Result<String, String> {
-    let request: ExecutionRequest = serde_json::from_str(request_json).map_err(|error| {
-        serde_json::to_string(
-            &json!({"status":"error","code":"RCL_TENSOR_REQUEST_JSON","message":error.to_string()}),
-        )
-        .unwrap()
-    })?;
-    execute(&request)
-        .map(|result| serde_json::to_string(&result).unwrap())
-        .map_err(|error| {
-            serde_json::to_string(
-                &json!({"status":"error","code":error.code,"message":error.message}),
+fn validate_plan_initials(
+    plan: &ExecutionPlan,
+) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
+    if plan.format != PLAN_REQUEST_FORMAT {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_FORMAT",
+            format!("Unsupported plan format {}", plan.format),
+        ));
+    }
+    if !plan.bindings.is_object() {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_BINDINGS",
+            "Plan bindings must be a JSON object",
+        ));
+    }
+    if plan.tensors.is_empty() || plan.tensors.len() > MAX_PLAN_INITIAL_TENSORS {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_INITIAL_LIMIT",
+            format!(
+                "Plan initial tensor count {} is outside 1..={MAX_PLAN_INITIAL_TENSORS}",
+                plan.tensors.len()
+            ),
+        ));
+    }
+    let mut storage_ids = HashSet::new();
+    let mut storage_map = HashMap::new();
+    for storage in &plan.storages {
+        if storage.identity.is_empty() || !storage_ids.insert(storage.identity.as_str()) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_STORAGE_DUPLICATE",
+                format!("Missing or duplicate storage identity {}", storage.identity),
+            ));
+        }
+        if storage.kind != "cpu-dense" {
+            return Err(EngineError::new(
+                "RCL_TENSOR_STORAGE_KIND",
+                format!("Unsupported storage kind {}", storage.kind),
+            ));
+        }
+        if storage.data.iter().any(|value| !value.is_finite()) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_NONFINITE_INPUT",
+                format!("Storage {} contains a non-finite value", storage.identity),
+            ));
+        }
+        storage_map.insert(storage.identity.clone(), storage.clone());
+    }
+    for (storage_identity, bit_values) in &plan.exact_storage_bits {
+        let storage = storage_map.get_mut(storage_identity).ok_or_else(|| {
+            EngineError::new(
+                "RCL_TENSOR_EXACT_STORAGE_MISSING",
+                format!("Exact bits reference unavailable storage {storage_identity}"),
             )
-            .unwrap()
-        })
+        })?;
+        if bit_values.len() != storage.data.len() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_EXACT_STORAGE_LENGTH",
+                format!("Exact bits for {storage_identity} do not match storage length"),
+            ));
+        }
+        storage.data = bit_values
+            .iter()
+            .map(|bits| {
+                if bits.len() != 16 {
+                    return Err(EngineError::new(
+                        "RCL_TENSOR_EXACT_STORAGE_BITS",
+                        format!(
+                            "Exact f64 bits must contain 16 hexadecimal digits, received {bits}"
+                        ),
+                    ));
+                }
+                let parsed = u64::from_str_radix(bits, 16).map_err(|_| {
+                    EngineError::new(
+                        "RCL_TENSOR_EXACT_STORAGE_BITS",
+                        format!("Invalid exact f64 bits {bits}"),
+                    )
+                })?;
+                let value = f64::from_bits(parsed);
+                if !value.is_finite() {
+                    return Err(EngineError::new(
+                        "RCL_TENSOR_NONFINITE_INPUT",
+                        format!("Exact bits for {storage_identity} decode to a non-finite value"),
+                    ));
+                }
+                Ok(value)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+    }
+    let mut values = HashMap::new();
+    for tensor in &plan.tensors {
+        if tensor.id.is_empty() || values.contains_key(&tensor.id) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_ID_DUPLICATE",
+                format!("Missing or duplicate tensor id {}", tensor.id),
+            ));
+        }
+        if tensor.dtype != "f64" || tensor.layout != "row-major" || tensor.device != "cpu" {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_DESCRIPTOR",
+                format!(
+                    "Tensor {} is outside the f64/row-major/cpu v0.1 profile",
+                    tensor.id
+                ),
+            ));
+        }
+        if tensor.gradient_identity.is_empty() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_GRADIENT_IDENTITY",
+                format!("Tensor {} has no Gradient Identity", tensor.id),
+            ));
+        }
+        let storage = storage_map
+            .get(tensor.storage_identity.as_str())
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_STORAGE_MISSING",
+                    format!("Storage {} is not present", tensor.storage_identity),
+                )
+            })?;
+        if product(&tensor.shape)? != storage.data.len() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_STORAGE_SHAPE_MISMATCH",
+                format!("Tensor {} shape does not match its storage", tensor.id),
+            ));
+        }
+        values.insert(tensor.id.clone(), (tensor.clone(), storage.clone()));
+    }
+    Ok(values)
+}
+
+pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineError> {
+    if plan.nodes.is_empty() || plan.nodes.len() > MAX_PLAN_NODES {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_NODE_LIMIT",
+            format!(
+                "Plan node count {} is outside 1..={MAX_PLAN_NODES}",
+                plan.nodes.len()
+            ),
+        ));
+    }
+    if plan.outputs.is_empty() || plan.outputs.len() > MAX_PLAN_OUTPUTS {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_OUTPUT_LIMIT",
+            format!(
+                "Plan output count {} is outside 1..={MAX_PLAN_OUTPUTS}",
+                plan.outputs.len()
+            ),
+        ));
+    }
+    let mut values = validate_plan_initials(plan)?;
+    let mut stored_elements = values
+        .values()
+        .map(|(_, storage)| storage.data.len())
+        .sum::<usize>();
+    if stored_elements > MAX_PLAN_STORED_ELEMENTS {
+        return Err(EngineError::new(
+            "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+            "Initial plan storage exceeds the element limit",
+        ));
+    }
+    let mut node_ids = HashSet::new();
+    for node in &plan.nodes {
+        if node.id.is_empty() || !node_ids.insert(node.id.as_str()) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_NODE_DUPLICATE",
+                format!("Missing or duplicate node id {}", node.id),
+            ));
+        }
+        if node.output.id.is_empty() || values.contains_key(&node.output.id) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_SSA_VIOLATION",
+                format!(
+                    "Output tensor id {} is missing or already defined",
+                    node.output.id
+                ),
+            ));
+        }
+        if node.output.gradient_identity.is_empty() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_GRADIENT_IDENTITY",
+                format!("Output tensor {} has no Gradient Identity", node.output.id),
+            ));
+        }
+        let mut tensors = Vec::with_capacity(node.inputs.len());
+        let mut storages = Vec::with_capacity(node.inputs.len());
+        let mut input_storage_ids = HashSet::new();
+        for (operand_index, input_id) in node.inputs.iter().enumerate() {
+            let (tensor, storage) = values.get(input_id).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_INPUT_MISSING",
+                    format!("Node {} references unavailable tensor {input_id}", node.id),
+                )
+            })?;
+            let mut operand = tensor.clone();
+            if tensors
+                .iter()
+                .any(|existing: &TensorDescriptor| existing.id == operand.id)
+            {
+                operand.id = format!("{}#operand{operand_index}", operand.id);
+            }
+            tensors.push(operand);
+            if input_storage_ids.insert(storage.identity.as_str()) {
+                storages.push(storage.clone());
+            }
+        }
+        let mut result = execute(&ExecutionRequest {
+            format: REQUEST_FORMAT.into(),
+            operation: node.operation.clone(),
+            tensors,
+            storages,
+            attributes: node.attributes.clone(),
+        })?;
+        if result.tensor.shape != node.output.shape
+            || result.tensor.dtype != node.output.dtype
+            || result.tensor.layout != node.output.layout
+            || result.tensor.device != node.output.device
+        {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_OUTPUT_DESCRIPTOR",
+                format!(
+                    "Node {} result does not match declared output {}",
+                    node.id, node.output.id
+                ),
+            ));
+        }
+        result.tensor.id = node.output.id.clone();
+        result.tensor.gradient_identity = node.output.gradient_identity.clone();
+        stored_elements = stored_elements
+            .checked_add(result.storage.data.len())
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+                    "Plan element accounting overflowed",
+                )
+            })?;
+        if stored_elements > MAX_PLAN_STORED_ELEMENTS {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+                format!(
+                    "Plan stores {stored_elements} elements; limit is {MAX_PLAN_STORED_ELEMENTS}"
+                ),
+            ));
+        }
+        values.insert(node.output.id.clone(), (result.tensor, result.storage));
+    }
+    let mut output_ids = HashSet::new();
+    let mut outputs = Vec::with_capacity(plan.outputs.len());
+    for output_id in &plan.outputs {
+        if !output_ids.insert(output_id.as_str()) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_OUTPUT_DUPLICATE",
+                format!("Duplicate requested output {output_id}"),
+            ));
+        }
+        let (tensor, storage) = values.get(output_id).ok_or_else(|| {
+            EngineError::new(
+                "RCL_TENSOR_PLAN_OUTPUT_MISSING",
+                format!("Requested output {output_id} is unavailable"),
+            )
+        })?;
+        outputs.push(PlanTensorResult {
+            tensor: tensor.clone(),
+            storage: storage.clone(),
+        });
+    }
+    Ok(ExecutionPlanResult {
+        format: PLAN_RESPONSE_FORMAT,
+        status: "ok",
+        bindings: plan.bindings.clone(),
+        outputs,
+        telemetry: PlanTelemetry {
+            backend: "rcl-tensor-cpu-rust-v0.1",
+            node_count: plan.nodes.len(),
+            stored_elements,
+            allocated_bytes: stored_elements * std::mem::size_of::<f64>(),
+        },
+    })
+}
+
+fn error_json(code: &'static str, message: impl Into<String>) -> String {
+    serde_json::to_string(&json!({"status":"error","code":code,"message":message.into()})).unwrap()
+}
+
+pub fn execute_json(request_json: &str) -> Result<String, String> {
+    let value: Value = serde_json::from_str(request_json)
+        .map_err(|error| error_json("RCL_TENSOR_REQUEST_JSON", error.to_string()))?;
+    let format = value
+        .get("format")
+        .and_then(Value::as_str)
+        .ok_or_else(|| error_json("RCL_TENSOR_REQUEST_FORMAT", "Request format is required"))?;
+    let result = match format {
+        REQUEST_FORMAT => {
+            let request: ExecutionRequest = serde_json::from_value(value)
+                .map_err(|error| error_json("RCL_TENSOR_REQUEST_JSON", error.to_string()))?;
+            execute(&request).and_then(|result| {
+                serde_json::to_string(&result).map_err(|error| {
+                    EngineError::new("RCL_TENSOR_RESPONSE_JSON", error.to_string())
+                })
+            })
+        }
+        PLAN_REQUEST_FORMAT => {
+            let plan: ExecutionPlan = serde_json::from_value(value)
+                .map_err(|error| error_json("RCL_TENSOR_REQUEST_JSON", error.to_string()))?;
+            execute_plan(&plan).and_then(|result| {
+                serde_json::to_string(&result).map_err(|error| {
+                    EngineError::new("RCL_TENSOR_RESPONSE_JSON", error.to_string())
+                })
+            })
+        }
+        PLAN_FILE_REQUEST_FORMAT => {
+            let request: PlanFileRequest = serde_json::from_value(value)
+                .map_err(|error| error_json("RCL_TENSOR_REQUEST_JSON", error.to_string()))?;
+            if request.format != PLAN_FILE_REQUEST_FORMAT {
+                return Err(error_json(
+                    "RCL_TENSOR_PLAN_FILE_FORMAT",
+                    "Unsupported plan file request",
+                ));
+            }
+            let metadata = fs::metadata(&request.path)
+                .map_err(|error| error_json("RCL_TENSOR_PLAN_FILE_IO", error.to_string()))?;
+            if !metadata.is_file() || metadata.len() > MAX_PLAN_FILE_BYTES {
+                return Err(error_json(
+                    "RCL_TENSOR_PLAN_FILE_LIMIT",
+                    format!(
+                        "Plan file must be a regular file no larger than {MAX_PLAN_FILE_BYTES} bytes"
+                    ),
+                ));
+            }
+            let bytes = fs::read(&request.path)
+                .map_err(|error| error_json("RCL_TENSOR_PLAN_FILE_IO", error.to_string()))?;
+            let actual = hex::encode(Sha256::digest(&bytes));
+            if actual != request.sha256 {
+                return Err(error_json(
+                    "RCL_TENSOR_PLAN_FILE_HASH",
+                    format!(
+                        "Plan file hash mismatch: expected {}, received {actual}",
+                        request.sha256
+                    ),
+                ));
+            }
+            let plan: ExecutionPlan = serde_json::from_slice(&bytes)
+                .map_err(|error| error_json("RCL_TENSOR_REQUEST_JSON", error.to_string()))?;
+            execute_plan(&plan).and_then(|result| {
+                serde_json::to_string(&result).map_err(|error| {
+                    EngineError::new("RCL_TENSOR_RESPONSE_JSON", error.to_string())
+                })
+            })
+        }
+        _ => {
+            return Err(error_json(
+                "RCL_TENSOR_REQUEST_FORMAT",
+                format!("Unsupported request format {format}"),
+            ));
+        }
+    };
+    result.map_err(|error| error_json(error.code, error.message))
 }
 
 #[cfg(test)]
@@ -863,6 +1352,115 @@ mod tests {
         assert_eq!(
             execute(&oversized).unwrap_err().code,
             "RCL_TENSOR_ELEMENT_LIMIT"
+        );
+    }
+
+    fn plan_output(id: &str, shape: Vec<usize>) -> PlanOutputDescriptor {
+        PlanOutputDescriptor {
+            id: id.into(),
+            shape,
+            dtype: "f64".into(),
+            layout: "row-major".into(),
+            device: "cpu".into(),
+            gradient_identity: format!("derived:{id}"),
+        }
+    }
+
+    #[test]
+    fn transpose_and_generic_plan_execute_as_declared_ssa() {
+        let plan = ExecutionPlan {
+            format: PLAN_REQUEST_FORMAT.into(),
+            bindings: json!({"semanticSource":"fixture"}),
+            tensors: vec![
+                tensor("x", vec![2, 3], "x"),
+                tensor("column", vec![2, 1], "column"),
+            ],
+            storages: vec![
+                DenseStorage {
+                    identity: "x".into(),
+                    kind: "cpu-dense".into(),
+                    data: vec![1., 2., 3., 4., 5., 6.],
+                },
+                DenseStorage {
+                    identity: "column".into(),
+                    kind: "cpu-dense".into(),
+                    data: vec![10., 20.],
+                },
+            ],
+            exact_storage_bits: HashMap::new(),
+            nodes: vec![
+                PlanNode {
+                    id: "transpose-x".into(),
+                    operation: "transpose".into(),
+                    inputs: vec!["x".into()],
+                    output: plan_output("x-t", vec![3, 2]),
+                    attributes: json!({"permutation":[1,0]}),
+                },
+                PlanNode {
+                    id: "matmul".into(),
+                    operation: "matmul".into(),
+                    inputs: vec!["x-t".into(), "column".into()],
+                    output: plan_output("result", vec![3, 1]),
+                    attributes: json!({}),
+                },
+            ],
+            outputs: vec!["x-t".into(), "result".into()],
+        };
+        let result = execute_plan(&plan).unwrap();
+        assert_eq!(result.outputs[0].storage.data, vec![1., 4., 2., 5., 3., 6.]);
+        assert_eq!(result.outputs[1].storage.data, vec![90., 120., 150.]);
+        assert_eq!(result.telemetry.node_count, 2);
+        assert_eq!(result.bindings["semanticSource"], "fixture");
+    }
+
+    #[test]
+    fn generic_plan_rejects_missing_inputs_shape_drift_and_ssa_redefinition() {
+        let base = ExecutionPlan {
+            format: PLAN_REQUEST_FORMAT.into(),
+            bindings: json!({}),
+            tensors: vec![tensor("x", vec![1], "x")],
+            storages: vec![DenseStorage {
+                identity: "x".into(),
+                kind: "cpu-dense".into(),
+                data: vec![1.],
+            }],
+            exact_storage_bits: HashMap::new(),
+            nodes: vec![PlanNode {
+                id: "abs".into(),
+                operation: "abs".into(),
+                inputs: vec!["missing".into()],
+                output: plan_output("out", vec![1]),
+                attributes: json!({}),
+            }],
+            outputs: vec!["out".into()],
+        };
+        assert_eq!(
+            execute_plan(&base).unwrap_err().code,
+            "RCL_TENSOR_PLAN_INPUT_MISSING"
+        );
+        let mut shape_drift = base.clone();
+        shape_drift.nodes[0].inputs[0] = "x".into();
+        shape_drift.nodes[0].output.shape = vec![2];
+        assert_eq!(
+            execute_plan(&shape_drift).unwrap_err().code,
+            "RCL_TENSOR_PLAN_OUTPUT_DESCRIPTOR"
+        );
+        let mut exact_bits = base.clone();
+        exact_bits.nodes[0].inputs[0] = "x".into();
+        exact_bits
+            .exact_storage_bits
+            .insert("x".into(), vec![format!("{:016x}", (-2.0f64).to_bits())]);
+        assert_eq!(
+            execute_plan(&exact_bits).unwrap().outputs[0].storage.data,
+            vec![2.0]
+        );
+        let mut redefinition = base;
+        redefinition.nodes[0].inputs[0] = "x".into();
+        redefinition.nodes[0].output.id = "x".into();
+        redefinition.outputs[0] = "x".into();
+        assert_eq!(
+            execute_plan(&redefinition).unwrap_err().code,
+            "RCL_TENSOR_PLAN_SSA_VIOLATION"
         );
     }
 }

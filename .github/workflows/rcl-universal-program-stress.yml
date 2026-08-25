@@ -21,6 +21,7 @@ on:
       - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/run-k08-general-mlp.mjs'
       - 'scripts/run-k08-tensor-cpu-evidence.mjs'
+      - 'scripts/run-k08-general-mlp-tensor-lowering.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -50,6 +51,7 @@ on:
       - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/run-k08-general-mlp.mjs'
       - 'scripts/run-k08-tensor-cpu-evidence.mjs'
+      - 'scripts/run-k08-general-mlp-tensor-lowering.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -119,6 +121,8 @@ jobs:
         run: npm run test:k08-tensor
       - name: K08 Tensor Windows performance evidence
         run: npm run evidence:k08-tensor-cpu
+      - name: K08 General MLP Tensor lowering evidence
+        run: npm run evidence:k08-tensor-mlp
       - name: Upload K01 evidence and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -128,4 +132,5 @@ jobs:
             output/universal-stress-v0.1/K01
             output/selfhost
             output/k08-tensor-cpu-v0.1
+            output/k08-general-mlp-tensor-v0.1
           if-no-files-found: warn

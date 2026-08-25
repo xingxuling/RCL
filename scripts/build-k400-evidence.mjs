@@ -18,6 +18,7 @@ const browserRuntimePath = 'examples/native-ui/evidence/browser-runtime-result.j
 const k08Path = 'examples/native-ai/evidence/k08-b-evidence.json';
 const k233ReceiptPath = 'examples/native-ai/evidence/k233-ai-generate/receipt.json';
 const k233GithubReplayPath = 'examples/native-ai/evidence/k233-ai-generate/github-replay.json';
+const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -36,6 +37,7 @@ const nativeUi = readJson(nativeUiPath);
 const k02 = readJson(k02Path);
 const k03 = readJson(k03Path);
 const k08 = readJson(k08Path);
+const k08TensorMlp = readJson(k08TensorMlpPath);
 
 const directClaims = [
   {
@@ -84,7 +86,7 @@ const directClaims = [
     lastVerifiedDate: k08.verificationDate,
     knownLimits: [
       k08.evidenceBoundary,
-      'The result proves a bounded configurable two-Dense-layer General MLP profile; Tensor, general Autodiff, AdamW, Transformer and accelerated backends remain future gates.',
+      'The result proves a bounded configurable two-Dense-layer General MLP profile. A separate candidate lowers it to a generic Tensor Plan with 5.720x local speedup, but it grants no K233 promotion or Tensor Genome PASS.',
       'Peak native memory is not yet emitted by rclvm and remains an explicit performance-telemetry gap.',
       'K233 AI_GENERATE is limited to three independent repair receipts and their bound GitHub-hosted replay; it grants no Tensor, Autodiff, optimizer or accelerator claim.',
     ],
@@ -92,8 +94,8 @@ const directClaims = [
     requiredGenes: ['native-numeric-reckon', 'immutable-sequence-algebra', 'recursive-training-loop', 'evidence-native-model-lifecycle'],
     donorAdvantages: [{
       donor: 'JavaScript reference oracle',
-      capability: 'faster training execution and richer host telemetry',
-      status: 'UNABSORBED_ADVANTAGE',
+      capability: `faster training execution and richer host telemetry; generic Tensor lowering reduced the measured Native/JS ratio from ${k08TensorMlp.performance.priorNativeToOracleRatio.toFixed(3)}x to ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x`,
+      status: 'PARTIALLY_ABSORBED_ADVANTAGE',
     }],
     gates: k08.gates,
     changes: [{
@@ -117,12 +119,13 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
     'Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.',
     'K08-B closes K233 through a GitHub-bound 3/3 independent repair receipt; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.',
+    `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     ...(nativeUi.notes ?? []),
   ],
 };

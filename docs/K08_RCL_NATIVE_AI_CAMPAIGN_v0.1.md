@@ -113,7 +113,7 @@ Three independent, read-only Codex sessions also repaired three distinct hidden 
 
 Evidence and decisions: `docs/native-ai/evidence-ledger.md`, `docs/native-ai/integration-court.md`, and `docs/native-ai/rcl-gap-register.md`.
 
-## 7. Next gate
+## 7. K08-C Tensor / CPU Engine candidate
 
 K08-B removed XOR-specific topology assumptions without adding an `xor_special` primitive. K08-C now begins the Tensor/engine path without granting K233 any new authority:
 
@@ -130,12 +130,40 @@ The first accepted local Windows measurement used exact integer MatMul parity:
 | RCL native scalar vs RCL native provider, 24x24x24, warm process per run | `180.608 ms` | `29.635 ms` | `6.094x` |
 | Rust scalar reference vs blocked CPU kernel, 192x192x192, kernel only | `7.229 ms` | `2.362 ms` | `3.061x` |
 
-Both comparisons have exact output parity for the recorded corpus. Timings are local candidate evidence, not portable thresholds. The original General MLP has not yet been lowered to Tensor IR, so the inherited `118.300x` Native/JS gap remains `UNMEASURED_AFTER_BACKEND_NOT_YET_LOWERED` rather than claimed closed.
+Both comparisons have exact output parity for the recorded corpus. Timings are local candidate evidence, not portable thresholds. K08-C itself did not lower the General MLP and therefore did not relabel the inherited `118.300x` Native/JS gap.
+
+## 8. K08-D General MLP Tensor lowering candidate
+
+K08-D keeps `examples/native-ai/general-mlp.rcl` and its contract as the semantic source. A JS auxiliary compiler organ lowers that unchanged bounded training profile into a rooted generic Tensor SSA Plan. The lowerer computes no training parameters; every forward, backward and update value is executed by the Rust Tensor organ reached through native self-host compilation, RBC, the native VM and `RclVmProviderV1`.
+
+The accepted local Windows receipt records:
+
+- `29,980` SSA nodes, `40` initial tensors and `18` requested outputs;
+- only `abs/add/div/matmul/mul/sub/sum/transpose`; no XOR, Majority, MLP, train or model-special operation;
+- XOR and Majority-3 accuracy `1`, with maximum parameter drift below `4.5e-15` against both the JS oracle and scalar RCL path;
+- three identical output roots and three identical native semantic state roots;
+- exact `32 == save(16) + reload + 16` checkpoint parity, including exact f64 Storage bits across JSON serialization;
+- a missing-input negative control plus fail-closed plan shape, identity, descriptor and resource validation in the backend suite;
+- report root `f4982380f9d7d05bd85a838fa7b65f37bfee12c2a401abb95a31b0fff677f70d`.
+
+The same-machine end-to-end measurement excludes compilation but includes native VM startup, root verification, plan hash/load, Provider dispatch, Tensor Plan execution and response serialization:
+
+| Boundary | Scalar Native median | Tensor Plan median | Result |
+|---|---:|---:|---:|
+| General MLP campaign | `2537.360 ms` | `443.592 ms` | `5.720x` speedup |
+| Tensor Plan vs JS oracle | - | `443.592 / 27.964 ms` | `15.863x` ratio |
+
+This reduces the prior measured `118.300x` ratio by a factor of `7.458x`; it does not close the performance gap. Peak process RSS is still unmeasured. The 6.11 MB JSON plan, 29,980-node scalar dispatch and 1.66 MB retained-intermediate upper bound identify compact planning, liveness and buffer reuse as the next performance gate.
+
+K08-D remains `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS` until an exact implementation commit is replayed on GitHub Actions. It grants no Autodiff, AdamW, Transformer, GPU, distributed Tensor or K400 promotion claim.
+
+## 9. Next gate
 
 The next highest-value sequence is:
 
-1. lower the General MLP forward/backward primitives to the Tensor provider without changing Model source semantics;
-2. rerun its checkpoint/determinism/differential suite and measure the inherited end-to-end gap;
-3. add native process peak-memory telemetry and backend buffer-planning evidence;
+1. replay K08-D on GitHub Actions and bind the exact implementation commit without granting promotion authority;
+2. add Tensor Plan liveness, buffer reuse and compact plan lowering, then remeasure the `15.863x` ratio;
+3. add native process peak-memory telemetry;
 4. close the typed-source self-host compiler gap before Tensor promotion;
-5. resolve scientific-notation number canonicalization in semantic-state-root evidence.
+5. resolve scientific-notation number canonicalization in semantic-state-root evidence;
+6. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.

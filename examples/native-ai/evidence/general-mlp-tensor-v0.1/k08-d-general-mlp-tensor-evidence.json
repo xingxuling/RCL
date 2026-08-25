@@ -1,0 +1,156 @@
+{
+  "format": "rcl.k08-d.general-mlp-tensor-lowering-evidence.v0.1",
+  "status": "ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE",
+  "generatedAt": "2026-08-25T04:36:09.830Z",
+  "semanticOwner": "RCL",
+  "executionOwner": "rcl-tensor-cpu-rust-v0.1",
+  "bindings": {
+    "semanticOwner": "RCL",
+    "modelSourceSha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0",
+    "contractRoot": "fb2524725b1450e3e7570e2898bd6e7cdc141fa10f54dd3b03cf21366b184182",
+    "lowering": "generic-tensor-ssa-plan-v0.1",
+    "backend": "rcl-tensor-cpu-rust-v0.1"
+  },
+  "artifactHashes": {
+    "tensorSemantics": "fc75bd91ff7a00fecb0984859ef892061ce9b55da12b52e5460aa031a23334ee",
+    "generalMlpSemantics": "89626eefa14cf65b37bc5617987d33cfc3c15b04214d81a7289ece8fd71fa4e1",
+    "rustBackend": "0ea4d73374c5e367b8b65c00bacbc3dd1c8a966cb3766f08b987f02907d066f9",
+    "loweringOrgan": "31e3ef7f4ef40cd844a01b17a856137544b5e738d3b1fd1abf807a3cf0ec5d95"
+  },
+  "plan": {
+    "format": "rcl.tensor-execution-plan.v0.1",
+    "sha256": "319abf8a601d2f9d8c91928f0cd54135219d732b0d338c9706371c9daeb2a523",
+    "bytes": 6112741,
+    "nodes": 29980,
+    "initialTensors": 40,
+    "requestedOutputs": 18,
+    "buildMs": 19.912999999998647,
+    "compilerRuntimeMs": 68.86599999999999,
+    "rbcSha256": "76f4bd0e1dd23900bb88c1941dcafb676966b602bf1463cac186644c484134c4",
+    "operations": [
+      "abs",
+      "add",
+      "div",
+      "matmul",
+      "mul",
+      "sub",
+      "sum",
+      "transpose"
+    ],
+    "forbiddenModelSpecialOperations": []
+  },
+  "tasks": {
+    "xor": {
+      "architecture": [
+        2,
+        2,
+        1
+      ],
+      "loss": 0.015703448874393084,
+      "accuracy": 1,
+      "outputs": [
+        0.18286586616874706,
+        0.8257114650018953,
+        0.8257168535078312,
+        0.17730357413910813
+      ],
+      "maximumModelDriftVsOracle": 1.7763568394002505e-15,
+      "maximumModelDriftVsScalarRcl": 4.440892098500626e-15,
+      "maximumPredictionDriftVsOracle": 1.1102230246251565e-16,
+      "passed": true
+    },
+    "majority3": {
+      "architecture": [
+        3,
+        3,
+        1
+      ],
+      "loss": 0.011101595628735283,
+      "accuracy": 1,
+      "outputs": [
+        0.10097835634679292,
+        0.16110777296136936,
+        0.1529431510219489,
+        0.8369163135060271,
+        0.1528856946251182,
+        0.8369110155004564,
+        0.8346146455289263,
+        0.8810003239664685
+      ],
+      "maximumModelDriftVsOracle": 1.7763568394002505e-15,
+      "maximumModelDriftVsScalarRcl": 3.552713678800501e-15,
+      "maximumPredictionDriftVsOracle": 1.6653345369377348e-16,
+      "passed": true
+    }
+  },
+  "checkpoint": {
+    "inPlanExactResumeParity": true,
+    "serializedBoundaryExactResumeParity": true,
+    "maximumBoundaryDrift": 0,
+    "exactStorageBitsPreserved": true,
+    "checkpointBytes": 1064,
+    "checkpointSha256": "4ab2c5cb009b5836b4edfa9b1068b729077ca5009fa5966f596aa579a7c23d8f"
+  },
+  "robustness": {
+    "replayCount": 3,
+    "outputRoots": [
+      "a465e4d116091b1d30bdce0b1cc90c90983446559860f4115b1461e13b68cbcb",
+      "a465e4d116091b1d30bdce0b1cc90c90983446559860f4115b1461e13b68cbcb",
+      "a465e4d116091b1d30bdce0b1cc90c90983446559860f4115b1461e13b68cbcb"
+    ],
+    "semanticStateRoots": [
+      "68823ea520a3fbaade5134f3fc28e4321dabb9d9baac7e2744f33f26dc6366c0",
+      "68823ea520a3fbaade5134f3fc28e4321dabb9d9baac7e2744f33f26dc6366c0",
+      "68823ea520a3fbaade5134f3fc28e4321dabb9d9baac7e2744f33f26dc6366c0"
+    ],
+    "identicalOutputs": true,
+    "identicalSemanticStateRoots": true
+  },
+  "performance": {
+    "boundary": "warm release artifacts; each sample includes native VM startup, root-verified RCL execution, plan file hash/load, Provider dispatch, generic Tensor Plan execution and response serialization; compilation excluded",
+    "scalarNativeSamplesMs": [
+      2926.4716000000003,
+      2441.876,
+      2537.3598
+    ],
+    "scalarNativeMedianMs": 2537.3598,
+    "optimizedTensorSamplesMs": [
+      463.9790000000012,
+      443.59239999999954,
+      335.8230999999996
+    ],
+    "optimizedTensorMedianMs": 443.59239999999954,
+    "scalarToTensorSpeedup": 5.720025410714888,
+    "javascriptOracleRuntimeMs": 27.964099999999235,
+    "optimizedTensorToOracleRatio": 15.862924249305777,
+    "priorNativeToOracleRatio": 118.2997469360286,
+    "gapReductionFactor": 7.45762540858164,
+    "planRetainedAllocationUpperBoundBytes": 1657080,
+    "peakRss": "UNMEASURED_PROCESS_RSS_GAP"
+  },
+  "negativeControls": {
+    "missingInputRejected": true
+  },
+  "checks": {
+    "semanticBinding": true,
+    "genericPlan": true,
+    "compile": true,
+    "execute": true,
+    "correct": true,
+    "differential": true,
+    "checkpoint": true,
+    "deterministic": true,
+    "performance": true,
+    "negative": true
+  },
+  "claimsNotGranted": [
+    "NATIVE_AUTODIFF",
+    "ADAMW",
+    "TRANSFORMER",
+    "GPU",
+    "DISTRIBUTED_TENSOR",
+    "K400_PROMOTION_FROM_THIS_CANDIDATE"
+  ],
+  "gapBoundary": "The JS lowerer is a COMPILER_GAP candidate. It emits rooted generic Tensor SSA and never computes training parameters; typed/self-hosted Tensor lowering remains open.",
+  "reportRoot": "f4982380f9d7d05bd85a838fa7b65f37bfee12c2a401abb95a31b0fff677f70d"
+}

@@ -53,7 +53,8 @@ fn main() {
                 "dtype": ["f64"],
                 "layout": ["row-major"],
                 "deviceIntent": ["cpu"],
-                "operations": ["add","sub","mul","div","exp","log","sqrt","matmul","sum","mean","max","softmax","layer-norm","rms-norm"]
+                "requestFormats": ["rcl.tensor-execution-request.v0.1","rcl.tensor-execution-plan.v0.1","rcl.tensor-execution-plan-file.v0.1"],
+                "operations": ["add","sub","mul","div","abs","exp","log","sqrt","transpose","matmul","sum","mean","max","softmax","layer-norm","rms-norm"]
             })
         ),
         "benchmark" => {

@@ -84,7 +84,7 @@ test('K08-C canonical Tensor is a typed RCL object with separate replaceable Sto
   assert.equal(native.state['contract.storage_is_replaceable'], true);
 });
 
-test('K08-C evidence root binds the current Tensor semantics, provider and Rust backend sources', () => {
+test('K08-C historical evidence root remains bound to its admitted implementation receipt', () => {
   const evidence = JSON.parse(fs.readFileSync(path.join(root, 'examples', 'native-ai', 'evidence', 'tensor-cpu-v0.1', 'k08-c-tensor-cpu-evidence.json'), 'utf8'));
   const reportRoot = evidence.reportRoot;
   delete evidence.reportRoot;
@@ -95,7 +95,6 @@ test('K08-C evidence root binds the current Tensor semantics, provider and Rust 
   assert.equal(evidence.artifactHashes.tensorContract, sha256(contract));
   assert.equal(evidence.artifactHashes.tensorSemantics, artifactHash(['examples/native-ai/tensor-genome.rcl', 'examples/native-ai/tensor-object.rcl', 'examples/native-ai/types/tensor.rcltype']));
   assert.equal(evidence.artifactHashes.providerBoundary, artifactHash(['examples/native-ai/tensor-cpu-provider.rcl', 'examples/native-ai/tensor-cpu-request.v0.1.json']));
-  assert.equal(evidence.artifactHashes.rustBackend, artifactHash(['native/tensor-engine/Cargo.toml', 'native/tensor-engine/Cargo.lock', 'native/tensor-engine/src/lib.rs', 'native/tensor-engine/src/main.rs', 'native/tensor-engine/src/rclvm_provider.rs']));
 });
 
 test('K08-C GitHub replay receipt binds the exact implementation and local evidence root', () => {

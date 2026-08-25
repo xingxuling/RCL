@@ -81,7 +81,7 @@ Status: `ENGINE_E1_CANDIDATE_GITHUB_REPLAY_BOUND`. Authority remains candidate-o
 
 Positive, negative, boundary and differential coverage includes valid kernels, invalid shape/broadcast/MatMul, dtype/device mismatch, divide-by-zero/log/sqrt domains, storage mismatch, unsupported layout/storage, rank/input/element caps, native self-host/JS compiler byte parity and native VM provider execution.
 
-The evidence intentionally does not relabel the former `118.300x` General MLP Native/JS ratio. The MLP still uses scalar recursive operations and has not been lowered to the new backend. A floating generated-matrix probe also exposed scientific-notation number canonicalization drift between the native state root and the JS verifier; the accepted performance corpus uses integer values and records that unresolved evidence gap rather than disabling strict state-root verification.
+K08-C intentionally did not relabel the former `118.300x` General MLP Native/JS ratio because that implementation commit still used scalar recursive operations. K08-D below separately lowers and remeasures the General MLP. A floating generated-matrix probe also exposed scientific-notation number canonicalization drift between the native state root and the JS verifier; the accepted K08-C performance corpus uses integer values and records that unresolved evidence gap rather than disabling strict state-root verification.
 
 The GitHub-hosted replay receipt is `examples/native-ai/evidence/tensor-cpu-v0.1/github-replay.json`. It binds the exact implementation commit, Ubuntu portable test, Windows native Provider test and Windows performance-evidence step; it grants no K400 promotion.
 
@@ -90,4 +90,38 @@ Reproduction:
 ```text
 npm run test:k08-tensor
 npm run evidence:k08-tensor-cpu
+```
+
+## K08-D General MLP Tensor lowering candidate
+
+Status: `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_LOCAL_WINDOWS`. Authority remains candidate-only and separate from K233.
+
+| Evidence | Result |
+|---|---:|
+| Semantic source | unchanged `general-mlp.rcl` + rooted contract |
+| Execution path | self-host compiler -> RBC -> native VM -> `RclVmProviderV1` -> Rust Tensor Plan |
+| Plan | `6,112,741 bytes / 29,980 nodes / 40 initial tensors / 18 outputs` |
+| Generic operations | `abs/add/div/matmul/mul/sub/sum/transpose` |
+| Model-special operations | none |
+| XOR / Majority-3 accuracy | `1 / 1` |
+| Maximum parameter drift | `< 4.5e-15` |
+| Determinism | `3/3` identical output and native semantic state roots |
+| Checkpoint | exact f64 bit parity for direct 32 vs serialized 16+16 |
+| Scalar / Tensor median | `2537.360 ms / 443.592 ms` |
+| Scalar-to-Tensor speedup | `5.720x` |
+| Prior / current Native-to-JS ratio | `118.300x / 15.863x` |
+| Gap reduction factor | `7.458x` |
+| Retained allocation upper bound | `1,657,080 bytes`; peak process RSS unmeasured |
+| Plan SHA-256 | `319abf8a601d2f9d8c91928f0cd54135219d732b0d338c9706371c9daeb2a523` |
+| Evidence report root | `f4982380f9d7d05bd85a838fa7b65f37bfee12c2a401abb95a31b0fff677f70d` |
+
+The JS auxiliary lowerer owns no model semantics and computes no training result. It binds the RCL source hash and contract root into a generic plan; typed/self-hosted plan construction remains `RCL_GAP_AI_009/011`. Decimal JSON checkpoint values are accompanied by exact finite f64 Storage bits because decimal cross-runtime parsing moved one value by one ULP during the negative probe.
+
+The accepted receipt is `examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json`. It is local same-machine evidence until a separate GitHub replay receipt binds the implementation commit. It grants no native Autodiff, AdamW, Transformer, accelerator, distributed Tensor or K400 promotion claim.
+
+Reproduction:
+
+```text
+npm run test:k08-tensor
+npm run evidence:k08-tensor-mlp
 ```
