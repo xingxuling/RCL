@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `8 PASS / 0 BLOCKED / 392 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K233 and K339.
+Current authoritative matrix: `10 PASS / 0 BLOCKED / 390 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233 and K339.
 
 Every evidence-bearing cell is evaluated through:
 
@@ -88,11 +88,19 @@ Implemented evidence supports:
 - lifecycle save/restore;
 - host semantic replay and negative controls.
 
-The rebuilt APK was installed and exercised on the API 35 `Rcl_Aether_API35_ATD` emulator. The rooted receipt covers cold launch, initial state, empty-input guard, five transaction/reset rounds, rotation lifecycle restoration and an ADB/UIAutomator end-to-end p95 of `2981.554 ms` under the frozen `5000 ms` budget. Real execution exposed and drove the fix for Java ternary numeric promotion (`1.0` instead of integer `1`). `EXECUTE`, `CORRECT` and `PERFORMANCE` now pass for K083, K085 and K098 on this bounded vertical slice; independent Android `AI_GENERATE` remains the only missing gate for those three cells.
+The rebuilt APK was installed and exercised on the API 35 `Rcl_Aether_API35_ATD` emulator. The rooted receipt covers cold launch, initial state, empty-input guard, five transaction/reset rounds, rotation lifecycle restoration and an ADB/UIAutomator end-to-end p95 of `2981.554 ms` under the frozen `5000 ms` budget. Real execution exposed and drove the fix for Java ternary numeric promotion (`1.0` instead of integer `1`). `EXECUTE`, `CORRECT` and `PERFORMANCE` pass for K083, K085 and K098 on this bounded vertical slice.
 
 The distinct K03 AI campaign used three unique read-only sessions to repair transaction increment, reactive input observation and lifecycle restoration mutations, restore exact canonical bytes, and replay the rooted Android manifest/Activity/host transaction path while binding the emulator receipt. GitHub run `32871776578`, focused job `97880272426`, exact source commit `b5d72ca19750b9e63e49bd4121ae30f18b42f8f0`, and authority root `14bb5c06cc64c1c1952418bd7765da7758353984c3c6c86d4e6bf30615750276` close `AI_GENERATE` for K083, K085 and K098 only.
 
 Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
+
+### K400 Server Web/Reactive closure
+
+Current result: `PASS (9/9)` for K124 `server::web` and K138 `server::reactive` on the bounded generated Node loopback profile; coverage remains `lowered-execution`.
+
+The pre-acquisition runtime contract required 20 fresh ephemeral `127.0.0.1` server rounds, transaction p95 at most `100 ms`, and full-replay/startup-proxy p95 at most `1000 ms`. All 20 rounds passed state, observe, add/reset, authority and unknown-route rejection checks. Measured transaction p95 was `2.782 ms`; full-replay p95 was `66.846 ms`; runtime receipt root is `e0f4f5eaec5407564bc0a53358987d3208c768a0c4eb35698d0fbf8b4c47fe10`.
+
+Three unique ephemeral read-only generator sessions independently repaired server state transition, authority binding and reset-state mutations and restored canonical bytes. GitHub run `32876898001`, focused job `97896893662`, exact source commit `f669460df4e4401e3e2f29b82c0ec35fc295930d`, and authority root `5fb9eb94d6575ce9e606fb7c77e30d20f9d531e3cb828d38fc8c7fe028f940d2` close K124 and K138 only. The `K04-SERVER` receipt prefix is an evidence-batch identifier and is distinct from Killer Task K04, the 2D game.
 
 ### K08 — RCL-Native AI
 

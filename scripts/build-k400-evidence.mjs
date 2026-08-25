@@ -207,7 +207,7 @@ if (k04ServerAiAdmitted) {
         'Public-network deployment, distributed service semantics, production scale, arbitrary Server generation and general framework parity remain unverified.',
         'RCL owns application state, transition and authority semantics; Node remains a generated execution runtime.',
       ],
-      relatedKillerTasks: ['K04'],
+      relatedKillerTasks: ['K02'],
       requiredGenes: ['web-application-semantics', 'server-api-lowering', 'reactive-state', 'authority-preservation', 'loopback-runtime-evidence'],
       gates,
       changes: [{

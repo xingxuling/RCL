@@ -262,13 +262,13 @@ It does **not** claim that any of the twelve killer tasks already pass.
 
 ## 13. Current K400 campaign state
 
-`examples/universal-stress/k400-current-evidence.json` consolidates the current Native UI generation with the historical K02 and K03 direct receipts without upgrading their dates or gates. The generated report currently records:
+`examples/universal-stress/k400-current-evidence.json` consolidates current Native UI, admitted K01/K02/K03, bounded Server Web/Reactive, and K233 evidence without upgrading historical dates or gates. The generated report currently records:
 
 ```text
-PASS       1
-BLOCKED    7
-UNTESTED 392
+PASS      10
+BLOCKED    0
+UNTESTED 390
 VERDICT    INCOMPLETE
 ```
 
-The nearest evidence closures are `K064 browser::web` and `K339 compiler-runtime::self-hosting`, each blocked only on independent `AI_GENERATE`. K233 is the first PASS: its bounded configurable two-Dense-layer General MLP profile executes through native compilation/runtime, and three independent read-only repair sessions passed the bound GitHub-hosted replay. Tensor Genome, general Autodiff, AdamW, Transformer and accelerated-backend claims remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
+The ten admitted cells are K063, K064, K078, K083, K085, K098, K124, K138, K233 and K339. K124/K138 are limited to the generated Node loopback profile; K233 is limited to the bounded two-Dense-layer General MLP profile. Tensor Genome promotion, optimizer genome, Transformer, accelerated backends, public server deployment and the remaining 390 matrix cells remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.

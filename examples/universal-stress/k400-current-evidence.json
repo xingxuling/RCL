@@ -896,6 +896,212 @@
           "justification": "Reusable Model, Layer, Parameter, Activation, Loss, Optimizer, Dataset and Checkpoint semantics train structurally distinct 2-2-1 and 3-3-1 tasks through native rclc/RBC/rclvm without a trainer provider or ML-special-case primitive."
         }
       ]
+    },
+    {
+      "id": "server::web",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f669460df4e4401e3e2f29b82c0ec35fc295930d",
+      "lastVerifiedDate": "2026-08-25",
+      "knownLimits": [
+        "Evidence is limited to one generated Node HTTP server on 127.0.0.1 with ephemeral ports and the frozen K02 state/rule profile.",
+        "Public-network deployment, distributed service semantics, production scale, arbitrary Server generation and general framework parity remain unverified.",
+        "RCL owns application state, transition and authority semantics; Node remains a generated execution runtime."
+      ],
+      "relatedKillerTasks": [
+        "K02"
+      ],
+      "requiredGenes": [
+        "web-application-semantics",
+        "server-api-lowering",
+        "reactive-state",
+        "authority-preservation",
+        "loopback-runtime-evidence"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Twenty fresh ephemeral Node loopback servers passed; runtime receipt e0f4f5eaec5407564bc0a53358987d3208c768a0c4eb35698d0fbf8b4c47fe10."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "State, observe, add and reset transactions replayed through the generated HTTP surface."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Unknown state and unknown rule routes were rejected in every frozen replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Transaction p95 2.782 ms <= 100 ms; full replay p95 66.846 ms <= 1000 ms."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k04-server-ai-generate/github-replay.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Three independent Server repairs restored canonical bytes; GitHub run 32876898001."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Rooted runtime, independent-generator and hosted-authority receipts bind K124/K138 only."
+        }
+      },
+      "changes": [
+        {
+          "id": "generated-loopback-server-runtime",
+          "kind": "candidate-gene",
+          "scope": [
+            "server",
+            "browser"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL-owned state, rules and warrants lower into an HTTP state/observe/rule surface while unknown routes fail closed."
+        }
+      ]
+    },
+    {
+      "id": "server::reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "f669460df4e4401e3e2f29b82c0ec35fc295930d",
+      "lastVerifiedDate": "2026-08-25",
+      "knownLimits": [
+        "Evidence is limited to one generated Node HTTP server on 127.0.0.1 with ephemeral ports and the frozen K02 state/rule profile.",
+        "Public-network deployment, distributed service semantics, production scale, arbitrary Server generation and general framework parity remain unverified.",
+        "RCL owns application state, transition and authority semantics; Node remains a generated execution runtime."
+      ],
+      "relatedKillerTasks": [
+        "K02"
+      ],
+      "requiredGenes": [
+        "web-application-semantics",
+        "server-api-lowering",
+        "reactive-state",
+        "authority-preservation",
+        "loopback-runtime-evidence"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k02-direct-evidence-2026-08-08.json"
+          ]
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Twenty fresh ephemeral Node loopback servers passed; runtime receipt e0f4f5eaec5407564bc0a53358987d3208c768a0c4eb35698d0fbf8b4c47fe10."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "State, observe, add and reset transactions replayed through the generated HTTP surface."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Unknown state and unknown rule routes were rejected in every frozen replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Transaction p95 2.782 ms <= 100 ms; full replay p95 66.846 ms <= 1000 ms."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k04-server-ai-generate/github-replay.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Three independent Server repairs restored canonical bytes; GitHub run 32876898001."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-server-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-server-runtime-v0.1.json"
+          ],
+          "note": "Rooted runtime, independent-generator and hosted-authority receipts bind K124/K138 only."
+        }
+      },
+      "changes": [
+        {
+          "id": "generated-loopback-server-runtime",
+          "kind": "candidate-gene",
+          "scope": [
+            "server",
+            "browser"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL-owned state, rules and warrants lower into an HTTP state/observe/rule surface while unknown routes fail closed."
+        }
+      ]
     }
   ],
   "competitiveComparisons": [],
@@ -931,6 +1137,7 @@
     "examples/universal-stress/evidence/k04-server-runtime-v0.1.json",
     "examples/universal-stress/k04-server-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k04-server-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k04-server-ai-generate/github-replay.json",
     "examples/native-ai/evidence/k08-b-evidence.json",
     "examples/native-ai/evidence/k233-ai-generate/receipt.json",
     "examples/native-ai/evidence/k233-ai-generate/github-replay.json",
@@ -960,7 +1167,7 @@
     "K01 closes K339 AI_GENERATE through 3/3 independent compiler-source repairs, shared native fixed point and GitHub Linux/Windows run 32869858927.",
     "K03 real emulator receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098; their independent AI_GENERATE receipt is separately admitted.",
     "K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run 32871776578.",
-    "K04 has 20/20 rooted loopback runtime rounds and a 3/3 local independent Server repair candidate; K124 and K138 remain UNTESTED until GitHub-hosted replay is bound.",
+    "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
     "K08-D is candidate-only evidence: a 29980-node generic Tensor Plan measured 5.720x local scalar-to-Tensor speedup and a remaining 15.863x JS ratio; it grants no new K233 gate or K400 cell.",
     "K08-E is candidate-only evidence: last-use reclamation measured a 892.823x logical plan-store reduction and 1.159x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.",
     "K08-F is candidate-only local Windows evidence: 54964 Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured 1.220x runtime speedup and 0.000% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.",

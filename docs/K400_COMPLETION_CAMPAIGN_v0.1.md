@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `8 PASS / 0 BLOCKED / 392 UNTESTED`
+**Current evidence:** `10 PASS / 0 BLOCKED / 390 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `2788a7b31a7b690f3846b08b6e79461e9821e05de4fa3d0a5bd9d6777d0a7799`
+**Report root:** `d03784d146a97041688e6c286e736f9c6bb0ba6497efb08e0fbedb634ae9df0f`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -36,7 +36,7 @@ output/universal-stress-k400/universal-stress-report.json
 output/universal-stress-k400/universal-stress-report.md
 ```
 
-The checked-in input is deterministically rebuilt from the current Native UI evidence, the historical K02/K03 direct receipts and the K08-B General MLP native receipt. K08-A remains the minimal baseline inside that campaign. Historical receipts retain their original verification dates and blockers.
+The checked-in input is deterministically rebuilt from the current Native UI evidence, the historical K02/K03 direct receipts, the rooted Server Web/Reactive batch and the K08-B General MLP native receipt. K08-A remains the minimal baseline inside that campaign. Historical receipts retain their original verification dates and blockers.
 
 ## 3. Nearest closures
 
@@ -50,6 +50,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K083` | `android::gui` | `PASS` | none for the bounded K03 Android GUI slice |
 | `K085` | `android::mobile` | `PASS` | none for the bounded K03 mobile transaction slice |
 | `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
+| `K124` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile |
+| `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 
@@ -80,12 +82,16 @@ K339 is independently closed by three unique read-only compiler-source repair se
 
 The Android campaign installed the rebuilt K03 APK on `Rcl_Aether_API35_ATD`, exercised the initial state, empty-input guard, five increment/reset rounds and activity recreation by rotation, and measured the full ADB/UIAutomator observation path. A real emulator differential exposed integer results rendering as `1.0`; the Java lowering now preserves `Long` without ternary numeric promotion, and the rebuilt APK renders `1`. Receipt root `9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf` records p95 `2981.554 ms` against the frozen `5000 ms` budget. GitHub run `32871776578`, focused job `97880272426`, then bound three independent Android repair sessions to that emulator receipt; authority root `14bb5c06cc64c1c1952418bd7765da7758353984c3c6c86d4e6bf30615750276` closes K083, K085 and K098 for this bounded slice.
 
-## 8. K08-A baseline and K08-B General MLP
+## 8. Server Web/Reactive closure
+
+The Server batch froze its runtime contract before acquisition and ran 20 fresh ephemeral loopback servers. State, observe, governed add/reset transactions and unknown state/rule rejection passed in all 20 rounds. Transaction p95 was `2.782 ms` against `100 ms`; full-replay/startup-proxy p95 was `66.846 ms` against `1000 ms`. Three unique ephemeral read-only sessions independently repaired effective transition, authority and reset mutations, restored canonical bytes, and replayed the same generated HTTP surface. GitHub run `32876898001`, focused job `97896893662`, bound exact source commit `f669460df4e4401e3e2f29b82c0ec35fc295930d`; authority root `5fb9eb94d6575ce9e606fb7c77e30d20f9d531e3cb828d38fc8c7fe028f940d2` closes K124 and K138 only. The `K04-SERVER` filename prefix identifies this evidence batch and does not claim the separate Killer Task K04 2D-game closure.
+
+## 9. K08-A baseline and K08-B General MLP
 
 `pure-rcl-xor.rcl` owns the frozen dataset, nine parameters, Softsign-01 activation, forward pass, mean half-squared loss, manual gradients, backward propagation, Batch SGD, 512-epoch training loop, prediction and evaluation. Native `rclc` compiled it through `selfhost/compiler.rbc`; native `rclvm` executed 13,965,818 instructions and reached 100% XOR accuracy with loss `0.0157034488743931`. Three replays produced the same semantic state root, while the JS differential oracle had maximum parameter drift `4.44e-15` and did not supply native parameters.
 
 K08-B extends this to a bounded configurable two-Dense-layer General MLP profile. The same RCL Model/Layer/Parameter/Dataset/SGD/Checkpoint semantics train XOR `2-2-1` and Majority-3 `3-3-1`, with shape/data negatives, exact resume, deterministic native replay and differential parity. Three separate read-only Codex sessions repaired activation-gradient, target-binding and parameter-gradient-routing mutations; their saved candidates restore canonical source and passed GitHub-hosted replay in run `32780097954`, focused job `97600047380`. K233 now passes all nine gates for this bounded profile. Tensor, general Autodiff, AdamW and accelerated backends are not implied. See `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
 
-## 9. Browser performance contract chronology
+## 10. Browser performance contract chronology
 
 Commit `955e6cef527f74a926538d5f8d2b93404add245b` froze the numeric browser budgets before the new acquisition. The first acquisition met every numeric budget but failed the UI-root precondition because the checked-in Counter evidence was stale relative to the device-adaptation IR fields. Revision 2 corrected only that identity precondition to the freshly regenerated canonical root and did not change either numeric threshold. The post-revision real Chrome acquisition passed all checks at `0.884 ms` per three-event sequence against the `1.5 ms` limit and `1037.344 ms` host-process elapsed time against the `5000 ms` limit. This closes only the declared local performance gate; the roughly `49.1×` plain-DOM slowdown remains an observed donor advantage rather than a parity claim.
