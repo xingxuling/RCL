@@ -191,11 +191,11 @@ A controlled Windows A/B used clean exact-main baseline `9805956dfd24834d650534a
 
 | Boundary | Baseline | K08-F | Result |
 |---|---:|---:|---:|
-| unchanged General MLP Plan median | `250.081 ms` | `207.332 ms` | `1.206x`; `17.094%` lower |
-| General MLP child peak Working Set median | `38,400,000 bytes` | `37,609,472 bytes` | `790,528 bytes`; `2.059%` lower |
-| 200,000-element-per-input clone stress peak | `20,230,144 bytes` | `18,608,128 bytes` | `1,622,016 bytes`; `8.018%` lower |
+| unchanged General MLP Plan median | `215.236 ms` | `193.194 ms` | `1.114x`; `10.241%` lower |
+| General MLP child peak Working Set median | `38,469,632 bytes` | `37,638,144 bytes` | `831,488 bytes`; `2.161%` lower |
+| 200,000-element-per-input clone stress peak | `20,234,240 bytes` | `18,604,032 bytes` | `1,630,208 bytes`; `8.057%` lower |
 
-All baseline/candidate roots matched for both workloads. Peak Working Set is sampled from the exact Windows child process while alive, so it includes executable, allocator, JSON plan/input/output and Rust allocations. It is not portable RSS, VRAM, logical Tensor-store size or a general workload claim. Accepted local evidence root: `aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276`.
+All baseline/candidate roots matched for both workloads. Peak Working Set is sampled from the exact Windows child process while alive, so it includes executable, allocator, JSON plan/input/output and Rust allocations. It is not portable RSS, VRAM, logical Tensor-store size or a general workload claim. Accepted local evidence root: `687ce73a05f55e890bf46e19947e0fc8a2293b790495180fcffffea56c2e0181`.
 
 K08-F is currently `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`; GitHub-hosted replay remains the next admission gate.
 

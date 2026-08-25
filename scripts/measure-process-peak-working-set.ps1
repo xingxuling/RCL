@@ -27,7 +27,12 @@ if (-not $process.Start()) {
 $stdoutTask = $process.StandardOutput.ReadToEndAsync()
 $stderrTask = $process.StandardError.ReadToEndAsync()
 $request = [System.IO.File]::ReadAllText($resolvedInput)
-$process.StandardInput.Write($request)
+if ([string]::IsNullOrWhiteSpace($request)) {
+  $process.Kill()
+  throw "Input request is empty: $resolvedInput"
+}
+$process.StandardInput.WriteLine($request.TrimEnd("`r", "`n"))
+$process.StandardInput.Flush()
 $process.StandardInput.Close()
 
 [long]$peakWorkingSetBytes = 0

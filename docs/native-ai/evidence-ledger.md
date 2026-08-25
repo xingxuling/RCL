@@ -163,12 +163,12 @@ Status: `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`. It changes Ru
 | Borrowed input bindings | `54,964 / 54,964` |
 | Historical storage clone traffic avoided | `314,521 elements / 2,516,168 bytes` |
 | Candidate Plan input clones | `0 elements / 0 bytes` |
-| Controlled Plan medians | `250.081 ms` baseline / `207.332 ms` borrowed |
-| Controlled workload speedup | `1.206x` (`17.094%` runtime reduction) |
-| General MLP peak Working Set medians | `38,400,000 / 37,609,472 bytes`; `2.059%` lower |
-| Clone-stress peak Working Set medians | `20,230,144 / 18,608,128 bytes`; `8.018%` lower |
+| Controlled Plan medians | `215.236 ms` baseline / `193.194 ms` borrowed |
+| Controlled workload speedup | `1.114x` (`10.241%` runtime reduction) |
+| General MLP peak Working Set medians | `38,469,632 / 37,638,144 bytes`; `2.161%` lower |
+| Clone-stress peak Working Set medians | `20,234,240 / 18,604,032 bytes`; `8.057%` lower |
 | Semantic parity | one output root per workload across all baseline/candidate samples |
-| Evidence report root | `aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276` |
+| Evidence report root | `687ce73a05f55e890bf46e19947e0fc8a2293b790495180fcffffea56c2e0181` |
 | GitHub replay | pending |
 
 The tracked sampler reads the exact child process `PeakWorkingSet64` while it is alive. The result includes all child-process memory and is deliberately separate from K08-E logical Plan-store telemetry. The 200,000-element-per-input stress isolates the historical `3,200,000`-byte storage clone boundary; neither result grants portable/general RSS reduction, VRAM reduction, buffer reuse, compact lowering, Autodiff or K400 promotion.

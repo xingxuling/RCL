@@ -1,7 +1,7 @@
 {
   "format": "rcl.k08-f.tensor-borrowed-input-evidence.v0.1",
   "status": "ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE",
-  "generatedAt": "2026-08-25T06:49:03.314Z",
+  "generatedAt": "2026-08-25T07:13:59.089Z",
   "semanticOwner": "RCL Tensor Plan",
   "executionOwner": "rcl-tensor-cpu-rust-v0.1",
   "implementationDecision": "BORROW_PLAN_INPUTS_WITHOUT_STORAGE_OR_DESCRIPTOR_CLONES",
@@ -11,7 +11,7 @@
   },
   "artifactHashes": {
     "rustBackend": "e18c2932661bb8b05b8b5ec67bd2eaba7133f06baaf066d2661cc986a789c4cd",
-    "evidenceOrgan": "b4c17818434508e529f054a95c47a6b55ca0740db4cedc8bb68df63a55a49214",
+    "evidenceOrgan": "40afa03446a48ec89e0ef3f302bfdf51d571e59a1af11fab6b87c4fb40bc81d5",
     "baselineBinarySha256": "f03a19e4c228c7555ac4a6fa68aa6e71e20b3909c140058603ef07a01a5ace30",
     "borrowedBinarySha256": "e6b6f0d45308c08dcba314f347948f25bf10c357118c57fbd720768a1c3bba7e"
   },
@@ -31,27 +31,27 @@
     "boundary": "Same Windows host and unchanged 29,980-node plan; warm release binaries; alternating child-process samples include plan hash/load, execution and response serialization.",
     "rounds": 7,
     "baselineSamplesMs": [
-      263.13149999999996,
-      261.46450000000004,
-      250.08079999999973,
-      227.82630000000017,
-      226.3783000000003,
-      229.70450000000028,
-      334.60009999999966
+      275.7823000000001,
+      215.2355,
+      205.95019999999977,
+      232.36619999999994,
+      229.7849000000001,
+      211.06010000000015,
+      205.9119999999998
     ],
     "borrowedSamplesMs": [
-      237.72659999999996,
-      212.0481000000002,
-      207.33179999999993,
-      197.1863000000003,
-      197.98170000000027,
-      188.87750000000005,
-      318.5150999999996
+      203.9586999999999,
+      193.19370000000004,
+      210.75099999999975,
+      202.4348,
+      190.13320000000022,
+      174.39670000000024,
+      174.42680000000018
     ],
-    "baselineMedianMs": 250.08079999999973,
-    "borrowedMedianMs": 207.33179999999993,
-    "speedup": 1.2061864123110868,
-    "runtimeReductionPercent": 17.094075194896952,
+    "baselineMedianMs": 215.2355,
+    "borrowedMedianMs": 193.19370000000004,
+    "speedup": 1.1140917121003426,
+    "runtimeReductionPercent": 10.2407827705002,
     "improvementObserved": true
   },
   "processMemory": {
@@ -59,45 +59,45 @@
     "samplerRounds": 5,
     "production": {
       "baselineSamplesBytes": [
-        37654528,
-        38436864,
-        38400000,
-        37609472,
-        38465536
+        38477824,
+        38469632,
+        38440960,
+        38428672,
+        38473728
       ],
       "borrowedSamplesBytes": [
-        37584896,
+        37646336,
+        37638144,
         37593088,
-        37609472,
-        38420480,
-        37629952
+        38400000,
+        37621760
       ],
-      "baselineMedianBytes": 38400000,
-      "borrowedMedianBytes": 37609472,
-      "reductionBytes": 790528,
-      "reductionPercent": 2.058666666666664
+      "baselineMedianBytes": 38469632,
+      "borrowedMedianBytes": 37638144,
+      "reductionBytes": 831488,
+      "reductionPercent": 2.1614139693356016
     },
     "cloneStress": {
       "elementsPerInput": 200000,
       "historicalInputCloneBytes": 3200000,
       "baselineSamplesBytes": [
-        20049920,
-        19652608,
-        20275200,
-        20262912,
-        20230144
+        19939328,
+        19804160,
+        20242432,
+        20234240,
+        20242432
       ],
       "borrowedSamplesBytes": [
-        18612224,
-        18608128,
-        18653184,
-        18591744,
-        18608128
+        18599936,
+        18604032,
+        18640896,
+        18640896,
+        18595840
       ],
-      "baselineMedianBytes": 20230144,
-      "borrowedMedianBytes": 18608128,
-      "reductionBytes": 1622016,
-      "reductionPercent": 8.01781737193764
+      "baselineMedianBytes": 20234240,
+      "borrowedMedianBytes": 18604032,
+      "reductionBytes": 1630208,
+      "reductionPercent": 8.05668016194332
     },
     "boundary": "Peak process Working Set includes executable, allocator, JSON plan/input/output and all Rust process allocations; it is not the logical Tensor-store metric and is not portable RSS/VRAM evidence."
   },
@@ -128,5 +128,5 @@
     "K400_PROMOTION_FROM_THIS_CANDIDATE"
   ],
   "nextGap": "Use liveness intervals for safe output-buffer reuse, then compact the 6.1 MB scalar-dispatch plan.",
-  "reportRoot": "aabcb994619b190431d4cf2f012e1c7f89cb29a4156ec6222bf67ea6674c9276"
+  "reportRoot": "687ce73a05f55e890bf46e19947e0fc8a2293b790495180fcffffea56c2e0181"
 }
