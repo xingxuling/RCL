@@ -1,0 +1,178 @@
+# K08-H: canonical Optimizer Genome candidate.
+# RCL owns optimizer identity, hyperparameters, state, checkpoint intent and update semantics.
+# This scalar f64 reference profile is deliberately model-agnostic; optimized Tensor execution may lower to organs later.
+reality OptimizerGenomeCandidate {
+  reckon absolute(value : Number) -> Number = choose(value < 0, 0 - value, value)
+
+  reckon power_integer(base : Number, exponent : Number, accumulator : Number) -> Number =
+    choose(exponent <= 0, accumulator, power_integer(base, exponent - 1, accumulator * base))
+
+  reckon power(base : Number, exponent : Number) -> Number = power_integer(base, exponent, 1)
+
+  reckon sqrt_newton(value : Number, guess : Number, remaining : Number) -> Number =
+    choose(value == 0, 0,
+      choose(remaining <= 0, guess,
+        sqrt_newton(value, (guess + value / guess) / 2, remaining - 1)))
+
+  reckon sqrt_reference(value : Number) -> Number =
+    sqrt_newton(value, choose(value > 1, value, 1), 24)
+
+  reckon make_config(kind : Text, learning_rate : Number, beta1 : Number, beta2 : Number, epsilon : Number, weight_decay : Number, gradient_clip : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), "OptimizerConfig"), kind),
+              learning_rate),
+            beta1),
+          beta2),
+        epsilon),
+      sequence_append(sequence_append(empty_sequence(), weight_decay), gradient_clip))
+
+  reckon config_kind(config : Sequence) -> Text = sequence_get(config, 1)
+  reckon config_learning_rate(config : Sequence) -> Number = sequence_get(config, 2)
+  reckon config_beta1(config : Sequence) -> Number = sequence_get(config, 3)
+  reckon config_beta2(config : Sequence) -> Number = sequence_get(config, 4)
+  reckon config_epsilon(config : Sequence) -> Number = sequence_get(config, 5)
+  reckon config_weight_decay(config : Sequence) -> Number = sequence_get(sequence_get(config, 6), 0)
+  reckon config_gradient_clip(config : Sequence) -> Number = sequence_get(sequence_get(config, 6), 1)
+
+  reckon optimizer_kind_valid(kind : Text) -> Truth =
+    kind == "sgd" or kind == "momentum" or kind == "adam" or kind == "adamw"
+
+  reckon config_valid(config : Sequence) -> Truth =
+    length(config) == 7 and sequence_get(config, 0) == "OptimizerConfig" and
+    optimizer_kind_valid(config_kind(config)) and
+    config_learning_rate(config) > 0 and
+    config_beta1(config) >= 0 and config_beta1(config) < 1 and
+    config_beta2(config) >= 0 and config_beta2(config) < 1 and
+    config_epsilon(config) > 0 and
+    config_weight_decay(config) >= 0 and
+    config_gradient_clip(config) > 0
+
+  reckon make_state(kind : Text, step : Number, first_moment : Number, second_moment : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), "OptimizerState"), kind),
+        step),
+      sequence_append(sequence_append(empty_sequence(), first_moment), second_moment))
+
+  reckon state_kind(state : Sequence) -> Text = sequence_get(state, 1)
+  reckon state_step(state : Sequence) -> Number = sequence_get(state, 2)
+  reckon state_first_moment(state : Sequence) -> Number = sequence_get(sequence_get(state, 3), 0)
+  reckon state_second_moment(state : Sequence) -> Number = sequence_get(sequence_get(state, 3), 1)
+
+  reckon state_valid(state : Sequence, config : Sequence) -> Truth =
+    length(state) == 4 and sequence_get(state, 0) == "OptimizerState" and
+    state_kind(state) == config_kind(config) and state_step(state) >= 0
+
+  reckon clip_gradient(gradient : Number, limit : Number) -> Number =
+    choose(gradient > limit, limit, choose(gradient < 0 - limit, 0 - limit, gradient))
+
+  reckon next_first_moment(kind : Text, previous : Number, gradient : Number, beta1 : Number) -> Number =
+    choose(kind == "sgd", previous,
+      beta1 * previous + (1 - beta1) * gradient)
+
+  reckon next_second_moment(kind : Text, previous : Number, gradient : Number, beta2 : Number) -> Number =
+    choose(kind == "adam" or kind == "adamw",
+      beta2 * previous + (1 - beta2) * gradient * gradient,
+      previous)
+
+  reckon adam_direction(first_moment : Number, second_moment : Number, step : Number, config : Sequence) -> Number =
+    (first_moment / (1 - power(config_beta1(config), step))) /
+    (sqrt_reference(second_moment / (1 - power(config_beta2(config), step))) + config_epsilon(config))
+
+  reckon update_parameter(kind : Text, parameter : Number, gradient : Number, next_step : Number, next_m : Number, next_v : Number, config : Sequence) -> Number =
+    choose(kind == "sgd",
+      parameter - config_learning_rate(config) * gradient,
+      choose(kind == "momentum",
+        parameter - config_learning_rate(config) * next_m,
+        choose(kind == "adam",
+          parameter - config_learning_rate(config) * adam_direction(next_m, next_v, next_step, config),
+          parameter * (1 - config_learning_rate(config) * config_weight_decay(config)) -
+            config_learning_rate(config) * adam_direction(next_m, next_v, next_step, config))))
+
+  reckon make_update(parameter : Number, state : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "OptimizerUpdate"), sequence_append(sequence_append(empty_sequence(), parameter), state))
+
+  reckon update_parameter_value(update : Sequence) -> Number = sequence_get(sequence_get(update, 1), 0)
+  reckon update_state(update : Sequence) -> Sequence = sequence_get(sequence_get(update, 1), 1)
+
+  reckon optimizer_update(parameter : Number, raw_gradient : Number, state : Sequence, config : Sequence) -> Sequence =
+    make_update(
+      update_parameter(
+        config_kind(config),
+        parameter,
+        clip_gradient(raw_gradient, config_gradient_clip(config)),
+        state_step(state) + 1,
+        next_first_moment(config_kind(config), state_first_moment(state), clip_gradient(raw_gradient, config_gradient_clip(config)), config_beta1(config)),
+        next_second_moment(config_kind(config), state_second_moment(state), clip_gradient(raw_gradient, config_gradient_clip(config)), config_beta2(config)),
+        config),
+      make_state(
+        config_kind(config),
+        state_step(state) + 1,
+        next_first_moment(config_kind(config), state_first_moment(state), clip_gradient(raw_gradient, config_gradient_clip(config)), config_beta1(config)),
+        next_second_moment(config_kind(config), state_second_moment(state), clip_gradient(raw_gradient, config_gradient_clip(config)), config_beta2(config))))
+
+  reckon make_checkpoint(parameter : Number, state : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "TrainingCheckpoint"), sequence_append(sequence_append(empty_sequence(), parameter), state))
+
+  reckon checkpoint_parameter(checkpoint : Sequence) -> Number = sequence_get(sequence_get(checkpoint, 1), 0)
+  reckon checkpoint_state(checkpoint : Sequence) -> Sequence = sequence_get(sequence_get(checkpoint, 1), 1)
+
+  reckon approximately(left : Number, right : Number, tolerance : Number) -> Truth = absolute(left - right) <= tolerance
+
+  reckon config_sgd() -> Sequence = make_config("sgd", 0.01, 0.9, 0.999, 0.00000001, 0.1, 1)
+  reckon config_momentum() -> Sequence = make_config("momentum", 0.01, 0.9, 0.999, 0.00000001, 0.1, 1)
+  reckon config_adam() -> Sequence = make_config("adam", 0.01, 0.9, 0.999, 0.00000001, 0.1, 1)
+  reckon config_adamw() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0.00000001, 0.1, 1)
+
+  reckon initial_state(kind : Text) -> Sequence = make_state(kind, 0, 0, 0)
+
+  reckon sgd_step() -> Sequence = optimizer_update(1, 0.5, initial_state("sgd"), config_sgd())
+  reckon momentum_step() -> Sequence = optimizer_update(1, 0.5, initial_state("momentum"), config_momentum())
+  reckon adam_step() -> Sequence = optimizer_update(1, 0.5, initial_state("adam"), config_adam())
+  reckon adamw_step_one() -> Sequence = optimizer_update(1, 0.5, initial_state("adamw"), config_adamw())
+  reckon adamw_checkpoint_one() -> Sequence = make_checkpoint(update_parameter_value(adamw_step_one()), update_state(adamw_step_one()))
+  reckon adamw_step_two_direct() -> Sequence = optimizer_update(update_parameter_value(adamw_step_one()), 0.5, update_state(adamw_step_one()), config_adamw())
+  reckon adamw_step_two_resumed() -> Sequence = optimizer_update(checkpoint_parameter(adamw_checkpoint_one()), 0.5, checkpoint_state(adamw_checkpoint_one()), config_adamw())
+
+  reckon invalid_learning_rate() -> Sequence = make_config("adamw", 0, 0.9, 0.999, 0.00000001, 0.1, 1)
+  reckon invalid_beta() -> Sequence = make_config("adamw", 0.01, 1, 0.999, 0.00000001, 0.1, 1)
+  reckon invalid_epsilon() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0, 0.1, 1)
+  reckon invalid_weight_decay() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0.00000001, 0 - 0.1, 1)
+
+  facet contract.id : Text = "k08-h-optimizer-genome-v0.1"
+  facet contract.profile : Text = "ENGINE-E3-OPTIMIZER-CANDIDATE-SCALAR-F64"
+  facet contract.algorithms : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "sgd"), "momentum"), "adam"), "adamw")
+
+  facet fixture.sgd.parameter : Number = update_parameter_value(sgd_step())
+  facet fixture.momentum.parameter : Number = update_parameter_value(momentum_step())
+  facet fixture.adam.parameter : Number = update_parameter_value(adam_step())
+  facet fixture.adamw.step1.parameter : Number = update_parameter_value(adamw_step_one())
+  facet fixture.adamw.step2.parameter : Number = update_parameter_value(adamw_step_two_direct())
+  facet fixture.adamw.step2.first_moment : Number = state_first_moment(update_state(adamw_step_two_direct()))
+  facet fixture.adamw.step2.second_moment : Number = state_second_moment(update_state(adamw_step_two_direct()))
+  facet fixture.adamw.step2.step : Number = state_step(update_state(adamw_step_two_direct()))
+
+  facet evaluation.sgd_correct : Truth = approximately(fixture.sgd.parameter, 0.995, 0.000000000001)
+  facet evaluation.momentum_correct : Truth = approximately(fixture.momentum.parameter, 0.9995, 0.000000000001)
+  facet evaluation.adam_correct : Truth = approximately(fixture.adam.parameter, 0.9900000002, 0.000000001)
+  facet evaluation.adamw_correct : Truth = approximately(fixture.adamw.step1.parameter, 0.9890000002, 0.000000001)
+  facet evaluation.adamw_second_correct : Truth = approximately(fixture.adamw.step2.parameter, 0.9780110003998002, 0.000000001)
+  facet evaluation.checkpoint_resume_exact : Truth =
+    update_parameter_value(adamw_step_two_direct()) == update_parameter_value(adamw_step_two_resumed()) and
+    state_step(update_state(adamw_step_two_direct())) == state_step(update_state(adamw_step_two_resumed())) and
+    state_first_moment(update_state(adamw_step_two_direct())) == state_first_moment(update_state(adamw_step_two_resumed())) and
+    state_second_moment(update_state(adamw_step_two_direct())) == state_second_moment(update_state(adamw_step_two_resumed()))
+  facet evaluation.invalid_configs_rejected : Truth =
+    not config_valid(invalid_learning_rate()) and not config_valid(invalid_beta()) and
+    not config_valid(invalid_epsilon()) and not config_valid(invalid_weight_decay())
+  facet evaluation.state_binding_valid : Truth = state_valid(initial_state("adamw"), config_adamw())
+
+  facet evidence.execution_path : Text = "RCL_OPTIMIZER_SEMANTICS_TO_NATIVE_RCL_REFERENCE_EXECUTION"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_TRANSFORMER_TINY_LM_ACCELERATOR_OR_K400_PROMOTION"
+}
