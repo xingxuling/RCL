@@ -8,14 +8,24 @@ This milestone admits bounded two-block GQA+RoPE next-token training through the
 
 It does **not** grant BF16 Autodiff training, mixed-precision multi-block training, GPU/CUDA/Vulkan/Metal execution, RCL-10M, DistributedTensor, RCL-1B completion, or K400 promotion.
 
-## Hosted implementation replay
+## Hosted replay chain
 
-Run `32862241167`, source commit `4a4417d974203de3a383ab62c17909ddb9ae80dc`:
+Implementation replay `32862241167`, source commit `4a4417d974203de3a383ab62c17909ddb9ae80dc`:
 
 - Ubuntu job `97848821949`: 8/8 PASS
 - Windows job `97848821657`: 8/8 PASS
 
-The hosted replay followed three failed diagnostic rounds that exposed and closed two distinct checkpoint authority defects:
+Promoted-contract replay `32862691677`, source commit `9b15118a76510a73a6cbe3e28c8a46b98bfb41e2`:
+
+- Ubuntu job `97850321833`: 8/8 PASS
+- Windows job `97850322009`: 8/8 PASS
+
+Final bound-contract replay `32862875004`, source commit `5bd05f5c8e7d50249f1fba5e432cc78350380ddc`:
+
+- Ubuntu job `97850942098`: 8/8 PASS
+- Windows job `97850942364`: 8/8 PASS
+
+The hosted replay chain followed three failed diagnostic rounds that exposed and closed two distinct checkpoint authority defects:
 
 1. ordinary JSON decimal materialization was insufficient as continuation authority for f64 parameters and AdamW moments, so exact f64 bit payloads were introduced;
 2. resume validation reordered optimizer states lexicographically while fresh training preserved the RCL parameter order, so state order was rebound to the canonical `request.parameters` order.
@@ -54,6 +64,7 @@ No acceptance threshold was weakened during repair.
 9. Repeated frozen CPU-f64 training is deterministic.
 10. Malformed optimizer-state shape/binding fails closed.
 11. No model-special optimizer opcode is introduced; training remains generic Tensor Autodiff + AdamW.
+12. The promoted contract and the replay-bound contract both independently reproduce 8/8 PASS on Ubuntu and Windows.
 
 ## Canonical continuation authority
 
@@ -96,9 +107,17 @@ This closes the multi-block optimizer lifecycle for the frozen CPU-f64 model cha
 - tests: `tests/k08-multiblock-adamw.test.mjs`
 - workflow: `.github/workflows/k08-multiblock-adamw.yml`
 - implementation run: `32862241167`
-- source commit: `4a4417d974203de3a383ab62c17909ddb9ae80dc`
-- Ubuntu job: `97848821949`
-- Windows job: `97848821657`
+- implementation source commit: `4a4417d974203de3a383ab62c17909ddb9ae80dc`
+- implementation Ubuntu job: `97848821949`
+- implementation Windows job: `97848821657`
+- promoted-contract replay: `32862691677`
+- promoted source commit: `9b15118a76510a73a6cbe3e28c8a46b98bfb41e2`
+- promoted Ubuntu job: `97850321833`
+- promoted Windows job: `97850322009`
+- final bound-contract replay: `32862875004`
+- final source commit: `5bd05f5c8e7d50249f1fba5e432cc78350380ddc`
+- final Ubuntu job: `97850942098`
+- final Windows job: `97850942364`
 
 ## Next
 
