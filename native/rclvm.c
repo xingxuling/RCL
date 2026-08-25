@@ -4,6 +4,8 @@
 #include <inttypes.h>
 #include <math.h>
 #ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
 #include <windows.h>
 #include <bcrypt.h>
 #define RCL_SHA256_DIGEST_LENGTH 32
@@ -2921,20 +2923,35 @@ void rclvm_free_string(char *value) { free(value); }
 void rclvm_free_bytes(uint8_t *value) { free(value); }
 
 #ifndef RCLVM_EMBEDDED_ONLY
+static int configure_cli_binary_streams(void) {
+#ifdef _WIN32
+  return _setmode(_fileno(stdout), _O_BINARY) != -1 && _setmode(_fileno(stderr), _O_BINARY) != -1;
+#else
+  return 1;
+#endif
+}
+
 int main(int argc, char **argv) {
+  if (!configure_cli_binary_streams()) return 2;
   if (argc != 2) { fprintf(stderr, "Usage: rclvm <program.rbc>\n"); return 2; }
   RclVmInstance *instance = rclvm_instance_create();
   if (!instance) { fprintf(stderr, "Out of memory\n"); return 2; }
   char error[512]; error[0] = '\0';
   if (!rclvm_instance_load_file(instance, argv[1], error, sizeof(error))) {
-    fprintf(stderr, "{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"%s\"}\n", error);
+    fputs("{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":", stderr);
+    print_json_string(stderr, error);
+    fputs("}\n", stderr);
     rclvm_instance_destroy(instance); return 1;
   }
   char *json = NULL;
   int ok = rclvm_instance_run(instance, 1, &json, error, sizeof(error));
   FILE *out = ok ? stdout : stderr;
   if (json) { fputs(json, out); rclvm_free_string(json); }
-  else fprintf(out, "{\"status\":\"error\",\"code\":\"RCL_NATIVE_OUTPUT\",\"message\":\"%s\"}\n", error);
+  else {
+    fputs("{\"status\":\"error\",\"code\":\"RCL_NATIVE_OUTPUT\",\"message\":", out);
+    print_json_string(out, error);
+    fputs("}\n", out);
+  }
   rclvm_instance_destroy(instance);
   return ok ? 0 : 1;
 }
