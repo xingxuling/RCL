@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -50,4 +51,29 @@ test('K08-E accepted local receipt is self-rooted and keeps claims bounded', () 
   assert.ok(report.claimsNotGranted.includes('PROCESS_RSS_REDUCTION'));
   assert.ok(report.claimsNotGranted.includes('GENERAL_TENSOR_WORKLOAD_SPEEDUP'));
   assert.ok(report.claimsNotGranted.includes('K400_PROMOTION_FROM_THIS_CANDIDATE'));
+});
+
+test('K08-E GitHub receipt binds the exact implementation and both hosted platforms', () => {
+  const receipt = JSON.parse(fs.readFileSync(
+    path.join(path.dirname(acceptedEvidencePath), 'github-replay.json'),
+    'utf8',
+  ));
+  const authorityRoot = receipt.authorityRoot;
+  delete receipt.authorityRoot;
+  assert.equal(
+    crypto.createHash('sha256').update(JSON.stringify(receipt)).digest('hex'),
+    authorityRoot,
+  );
+  assert.equal(receipt.status, 'PASS_GITHUB_HOSTED_REPLAY_BOUND');
+  assert.equal(receipt.sourceCommit, '8073482a57cb4ac096cd8545dcd15d01e87c228b');
+  assert.equal(receipt.runId, 32815298348);
+  assert.equal(receipt.runConclusion, 'success');
+  assert.deepEqual(receipt.jobs.map(({ platform, conclusion }) => [platform, conclusion]), [
+    ['ubuntu-latest', 'success'],
+    ['windows-latest', 'success'],
+  ]);
+  const evidence = JSON.parse(fs.readFileSync(acceptedEvidencePath, 'utf8'));
+  assert.equal(receipt.localEvidenceReportRoot, evidence.reportRoot);
+  assert.ok(receipt.claimsNotGranted.includes('PROCESS_RSS_REDUCTION'));
+  assert.ok(receipt.claimsNotGranted.includes('K400_PASS'));
 });

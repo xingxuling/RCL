@@ -130,7 +130,7 @@ npm run evidence:k08-tensor-mlp
 
 ## K08-E Tensor Plan liveness candidate
 
-Status: `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE`. It changes execution storage policy, not Tensor or model semantics.
+Status: `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE_GITHUB_REPLAY_BOUND`. It changes execution storage policy, not Tensor or model semantics.
 
 | Evidence | Result |
 |---|---:|
@@ -145,7 +145,9 @@ Status: `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE`. It changes execution storage
 | Controlled workload speedup | `1.159x` (`13.729%` runtime reduction) |
 | Exact baseline | clean detached worktree at `ccfab80217a76d8ad5ab923e891cb8e8fbd538d7` |
 | Evidence report root | `0db5ef574caad46d22549c64e0f695d6e423bc9642965a85ca25b3d8cdf52629` |
+| GitHub run / source commit | `32815298348 / 8073482a57cb4ac096cd8545dcd15d01e87c228b` |
+| GitHub Ubuntu / Windows jobs | `97702229003 / 97702228815`, both success |
 
 Requested intermediate outputs are pinned through their final downstream use; duplicate SSA definitions remain rejected even after the earlier value would have been reclaimed. The cumulative allocation ceiling is preserved and a separate simultaneous-live ceiling is added, so the change does not weaken the existing resource gate.
 
-The accepted receipt is `examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json`. It measures the logical plan value store only. Process peak RSS, allocator overhead, transient cloned operands, response serialization, buffer reuse, general workload speedup, Native/JS parity and K400 promotion are not granted.
+The accepted local receipt is `examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json`. The separate `github-replay.json` binds its root to the exact implementation and successful Ubuntu/Windows jobs. It measures the logical plan value store only. Process peak RSS, allocator overhead, transient cloned operands, response serialization, buffer reuse, general workload speedup, Native/JS parity and K400 promotion are not granted.

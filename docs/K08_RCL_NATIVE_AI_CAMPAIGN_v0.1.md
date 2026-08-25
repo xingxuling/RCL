@@ -179,6 +179,8 @@ The logical peak reduction factor is `892.823x`. This excludes allocator overhea
 
 Every baseline and candidate output root was identical. The result is specific to this General MLP plan and does not establish general Tensor-workload speedup. Local evidence root: `0db5ef574caad46d22549c64e0f695d6e423bc9642965a85ca25b3d8cdf52629`.
 
+K08-E is `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32815298348` passed focused Ubuntu job `97702229003` and real Windows job `97702228815` for exact implementation commit `8073482a57cb4ac096cd8545dcd15d01e87c228b`. The hosted replay binds portable liveness semantics, K400 non-promotion, the native Provider, Tensor performance path and General MLP Tensor execution; it does not replace the local controlled A/B timing receipt.
+
 ## 10. Next gate
 
 The next highest-value sequence is:

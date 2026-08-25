@@ -2,7 +2,7 @@
 
 ## Decision
 
-Admit last-use reclamation and plan-store telemetry as an `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE`. Do not promote Tensor, K233 or any K400 cell from this receipt.
+Admit last-use reclamation and plan-store telemetry as an `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE_GITHUB_REPLAY_BOUND`. Do not promote Tensor, K233 or any K400 cell from this receipt.
 
 ## Canonical ownership
 
@@ -21,6 +21,7 @@ Admit last-use reclamation and plan-store telemetry as an `ENGINE_E1_TENSOR_PLAN
 - Rust tests, portable K08 execution and the unchanged General MLP differential/checkpoint campaign pass.
 - The exact K08-D workload preserved one output root across 14 alternating old/new executions.
 - Logical plan-store peak fell from `1,657,080` to `1,856` bytes; controlled median fell from `331.937` to `286.367 ms` (`1.159x`) on this workload.
+- GitHub run `32815298348` passed Ubuntu `97702229003` and Windows `97702228815` for exact implementation commit `8073482a57cb4ac096cd8545dcd15d01e87c228b`.
 
 ## Evidence boundary
 
