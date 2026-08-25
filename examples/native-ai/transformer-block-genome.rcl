@@ -30,6 +30,6 @@ reality TransformerBlockGenomeCandidate {
   facet evaluation.head_width_valid : Truth = model.head_width == 2
 
   facet evidence.allowed_primitives : Text = "ADD_SUB_MUL_DIV_MATMUL_TRANSPOSE_RESHAPE_BROADCAST_MEAN_SQRT_SIGMOID_SOFTMAX"
-  facet evidence.forbidden_specialization : Text = "NO_TRANSFORMER_SPECIAL_NO_GPT_SPECIAL_NO_ATTENTION_MODEL_OPCODE"
+  facet evidence.forbidden_specialization : Text = "NO_MODEL_SPECIALIZED_TENSOR_OR_VM_OPCODE"
   facet evidence.authority : Text = "CANDIDATE_ONLY_NO_TINY_LM_ACCELERATOR_DISTRIBUTED_OR_K400_PROMOTION"
 }
