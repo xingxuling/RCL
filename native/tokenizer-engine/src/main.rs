@@ -295,7 +295,7 @@ fn read_request(argument: Option<&String>) -> Result<String, TokenizerError> {
     }
 }
 
-fn fail(error: TokenizerError) -> ! {
+fn fail<T>(error: TokenizerError) -> T {
     eprintln!(
         "{}",
         json!({"status":"error","code":error.code,"message":error.message})
