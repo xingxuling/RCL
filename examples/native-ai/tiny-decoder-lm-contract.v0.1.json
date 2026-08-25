@@ -1,0 +1,65 @@
+{
+  "format": "rcl.k08-j.tiny-decoder-lm-contract.v0.1",
+  "status": "ENGINE_E5_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "executionBoundary": "generic f64 CPU Tensor + reverse-mode Autodiff + bounded Batch SGD",
+  "profile": {
+    "vocabSize": 3,
+    "contextLength": 6,
+    "hiddenSize": 3,
+    "feedForwardSize": 4,
+    "headCount": 1,
+    "blockCount": 1,
+    "tokenizer": "fixed-symbol-token-ids",
+    "trainingCorpus": "ABCABC -> BCABCA",
+    "optimizer": "rcl.batch-sgd.v0.1",
+    "generation": "greedy-autoregressive"
+  },
+  "trainableParameters": [
+    "tokenEmbedding",
+    "positionEmbedding",
+    "wq",
+    "wk",
+    "wv",
+    "wo",
+    "w1",
+    "w2",
+    "lmHead"
+  ],
+  "requiredGenericOperations": [
+    "matmul",
+    "add",
+    "sub",
+    "mul",
+    "div",
+    "transpose",
+    "reshape",
+    "broadcast",
+    "mean",
+    "sum",
+    "sqrt",
+    "activation:sigmoid",
+    "softmax",
+    "log"
+  ],
+  "acceptance": {
+    "selfHostRbcParity": true,
+    "nativeSemanticRoot": true,
+    "crossEntropyComposedFromGenericPrimitives": true,
+    "lossDecreases": true,
+    "allParametersReceiveGradient": true,
+    "deterministicTrainingReplay": true,
+    "autoregressiveGeneration": true,
+    "modelSpecialOperationCount": 0
+  },
+  "claimsNotGranted": [
+    "GENERAL_TOKENIZER",
+    "BYTE_PAIR_ENCODING",
+    "MULTI_HEAD_ATTENTION",
+    "TENSOR_ADAMW_BACKEND",
+    "LARGE_MODEL_SCALE",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ]
+}
