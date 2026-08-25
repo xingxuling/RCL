@@ -1,0 +1,26 @@
+# K08-R: multi-block AdamW training lifecycle semantic genome.
+# RCL owns parameter identities, optimizer-state binding, continuation identity and evidence boundaries.
+reality MultiBlockAdamWGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_block_count(blocks : Number) -> Truth = positive(blocks) and blocks <= 64
+  reckon parameter_groups(blocks : Number) -> Number = 2 + blocks * 6
+  reckon valid_parameter_groups(blocks : Number, groups : Number) -> Truth =
+    valid_block_count(blocks) and groups == parameter_groups(blocks)
+
+  facet contract.id : Text = "k08-r-multiblock-adamw-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.optimizer_semantics : Text = "RCL_ADAMW_V0_1"
+  facet contract.parameter_identity : Text = "MODEL_SHARED_PLUS_BLOCK_INDEX_SCOPED"
+  facet contract.optimizer_state_identity : Text = "ONE_STATE_PER_PARAMETER_IDENTITY"
+  facet contract.resume_identity : Text = "DIRECT_N_EQUALS_CHECKPOINT_K_PLUS_RESUME_N_MINUS_K"
+  facet contract.no_model_special_optimizer : Truth = true
+
+  facet evaluation.one_block_groups : Truth = parameter_groups(1) == 8
+  facet evaluation.two_block_groups : Truth = parameter_groups(2) == 14
+  facet evaluation.two_block_valid : Truth = valid_parameter_groups(2, 14)
+  facet evaluation.wrong_group_count_rejected : Truth = not valid_parameter_groups(2, 13)
+  facet evaluation.zero_blocks_rejected : Truth = not valid_block_count(0)
+  facet evaluation.rcl1b_groups : Truth = parameter_groups(24) == 146
+
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_BF16_GPU_RCL10M_OR_RCL1B_PROMOTION"
+}

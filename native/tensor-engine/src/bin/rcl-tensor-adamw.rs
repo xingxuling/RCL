@@ -32,6 +32,10 @@ struct ParameterOptimizerState {
     step: usize,
     first_moment: Vec<f64>,
     second_moment: Vec<f64>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    exact_first_moment_bits: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    exact_second_moment_bits: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -116,6 +120,48 @@ fn output_identity(dtype: &str, shape: &[usize], data: &[f64]) -> String {
     format!("sha256:{}", hex::encode(hash.finalize()))
 }
 
+fn exact_f64_bits(values: &[f64]) -> Vec<String> {
+    values.iter().map(|value| format!("{:016x}", value.to_bits())).collect()
+}
+
+fn decode_exact_f64_bits(
+    values: &[String],
+    expected_len: usize,
+    length_code: &'static str,
+    bits_code: &'static str,
+    nonfinite_code: &'static str,
+    label: &str,
+) -> Result<Vec<f64>, BridgeError> {
+    if values.len() != expected_len {
+        return Err(BridgeError::new(
+            length_code,
+            format!("exact f64 bits length mismatch for {label}: expected {expected_len}, received {}", values.len()),
+        ));
+    }
+    values
+        .iter()
+        .map(|bits| {
+            if bits.len() != 16 {
+                return Err(BridgeError::new(
+                    bits_code,
+                    format!("exact f64 bits must contain 16 hex digits for {label}, received {bits}"),
+                ));
+            }
+            let parsed = u64::from_str_radix(bits, 16).map_err(|_| {
+                BridgeError::new(bits_code, format!("invalid exact f64 bits for {label}: {bits}"))
+            })?;
+            let value = f64::from_bits(parsed);
+            if !value.is_finite() {
+                return Err(BridgeError::new(
+                    nonfinite_code,
+                    format!("exact f64 bits for {label} decode to non-finite value"),
+                ));
+            }
+            Ok(value)
+        })
+        .collect()
+}
+
 fn materialize_exact_storage_bits(request: &mut AutodiffRequest) -> Result<(), BridgeError> {
     let exact = request.graph.exact_storage_bits.clone();
     for (storage_identity, bit_values) in exact {
@@ -128,34 +174,14 @@ fn materialize_exact_storage_bits(request: &mut AutodiffRequest) -> Result<(), B
                 "RCL_ADAMW_EXACT_STORAGE_MISSING",
                 format!("exact storage bits reference unavailable storage {storage_identity}"),
             ))?;
-        if storage.data.len() != bit_values.len() {
-            return Err(BridgeError::new(
-                "RCL_ADAMW_EXACT_STORAGE_LENGTH",
-                format!("exact storage bits length mismatch for {storage_identity}"),
-            ));
-        }
-        storage.data = bit_values
-            .iter()
-            .map(|bits| {
-                if bits.len() != 16 {
-                    return Err(BridgeError::new(
-                        "RCL_ADAMW_EXACT_STORAGE_BITS",
-                        format!("exact f64 bits must contain 16 hex digits, received {bits}"),
-                    ));
-                }
-                let parsed = u64::from_str_radix(bits, 16).map_err(|_| {
-                    BridgeError::new("RCL_ADAMW_EXACT_STORAGE_BITS", format!("invalid exact f64 bits {bits}"))
-                })?;
-                let value = f64::from_bits(parsed);
-                if !value.is_finite() {
-                    return Err(BridgeError::new(
-                        "RCL_ADAMW_NONFINITE_PARAMETER",
-                        format!("exact storage bits for {storage_identity} decode to non-finite value"),
-                    ));
-                }
-                Ok(value)
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        storage.data = decode_exact_f64_bits(
+            &bit_values,
+            storage.data.len(),
+            "RCL_ADAMW_EXACT_STORAGE_LENGTH",
+            "RCL_ADAMW_EXACT_STORAGE_BITS",
+            "RCL_ADAMW_NONFINITE_PARAMETER",
+            &storage_identity,
+        )?;
     }
     Ok(())
 }
@@ -200,6 +226,8 @@ fn initialize_or_validate_states(
                     step: 0,
                     first_moment: vec![0.0; storage.data.len()],
                     second_moment: vec![0.0; storage.data.len()],
+                    exact_first_moment_bits: Vec::new(),
+                    exact_second_moment_bits: Vec::new(),
                 })
             })
             .collect();
@@ -220,21 +248,58 @@ fn initialize_or_validate_states(
         ));
     }
     let common_step = supplied[0].step;
+    let supplied_by_id = supplied
+        .iter()
+        .map(|state| (state.tensor_id.clone(), state.clone()))
+        .collect::<HashMap<_, _>>();
     let mut result = Vec::with_capacity(supplied.len());
-    for state in supplied {
-        if state.step != common_step {
+    for parameter in &request.parameters {
+        let supplied_state = supplied_by_id.get(&parameter.tensor_id).ok_or_else(|| {
+            BridgeError::new(
+                "RCL_ADAMW_STATE_BINDING",
+                format!("optimizer state is unavailable for parameter {}", parameter.tensor_id),
+            )
+        })?;
+        if supplied_state.step != common_step {
             return Err(BridgeError::new(
                 "RCL_ADAMW_STATE_STEP_MISMATCH",
                 "all parameter optimizer states must share the same step",
             ));
         }
-        let descriptor = parameter_descriptor(request, &state.tensor_id)?;
+        let descriptor = parameter_descriptor(request, &supplied_state.tensor_id)?;
         let storage = parameter_storage(request, descriptor)?;
+        let mut state = supplied_state.clone();
         if state.first_moment.len() != storage.data.len() || state.second_moment.len() != storage.data.len() {
             return Err(BridgeError::new(
                 "RCL_ADAMW_STATE_SHAPE",
                 format!("optimizer state shape mismatch for {}", state.tensor_id),
             ));
+        }
+        let has_exact_first = !state.exact_first_moment_bits.is_empty();
+        let has_exact_second = !state.exact_second_moment_bits.is_empty();
+        if has_exact_first != has_exact_second {
+            return Err(BridgeError::new(
+                "RCL_ADAMW_STATE_EXACT_BINDING",
+                format!("exact optimizer-state bits must provide both moments for {}", state.tensor_id),
+            ));
+        }
+        if has_exact_first {
+            state.first_moment = decode_exact_f64_bits(
+                &state.exact_first_moment_bits,
+                storage.data.len(),
+                "RCL_ADAMW_STATE_EXACT_LENGTH",
+                "RCL_ADAMW_STATE_EXACT_BITS",
+                "RCL_ADAMW_STATE_NONFINITE",
+                &format!("{}.firstMoment", state.tensor_id),
+            )?;
+            state.second_moment = decode_exact_f64_bits(
+                &state.exact_second_moment_bits,
+                storage.data.len(),
+                "RCL_ADAMW_STATE_EXACT_LENGTH",
+                "RCL_ADAMW_STATE_EXACT_BITS",
+                "RCL_ADAMW_STATE_NONFINITE",
+                &format!("{}.secondMoment", state.tensor_id),
+            )?;
         }
         if state.first_moment.iter().chain(&state.second_moment).any(|value| !value.is_finite()) {
             return Err(BridgeError::new(
@@ -242,9 +307,8 @@ fn initialize_or_validate_states(
                 format!("optimizer state contains non-finite values for {}", state.tensor_id),
             ));
         }
-        result.push(state.clone());
+        result.push(state);
     }
-    result.sort_by(|left, right| left.tensor_id.cmp(&right.tensor_id));
     Ok(result)
 }
 
@@ -327,6 +391,8 @@ fn apply_adamw_step(
             updated.push(next_parameter);
         }
         state.step = next_step;
+        state.exact_first_moment_bits = exact_f64_bits(&state.first_moment);
+        state.exact_second_moment_bits = exact_f64_bits(&state.second_moment);
 
         let new_identity = output_identity(&descriptor.dtype, &descriptor.shape, &updated);
         request.graph.storages[storage_index].identity = new_identity.clone();
