@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import {
+  buildEngine,
   buildAnalyticFixture,
   executeRequest,
   primitiveEvidence,
@@ -16,6 +17,10 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 let campaign;
+
+test.before(() => {
+  buildEngine();
+});
 
 function report() {
   campaign ??= runNativeAutodiffCampaign();

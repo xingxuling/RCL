@@ -99,10 +99,17 @@ function executeRequest(request, expectSuccess = true) {
     maxBuffer: 64 * 1024 * 1024,
   });
   fs.rmSync(directory, { recursive: true, force: true });
+  if (run.error) {
+    throw new Error(`RCL_K08_G_EXECUTION_SPAWN: ${run.error.message}`);
+  }
   if ((run.status === 0) !== expectSuccess) {
     throw new Error(run.stderr || run.stdout || 'RCL_K08_G_EXECUTION_STATUS');
   }
-  return JSON.parse((expectSuccess ? run.stdout : run.stderr).trim());
+  const response = expectSuccess ? run.stdout : run.stderr;
+  if (!response?.trim()) {
+    throw new Error('RCL_K08_G_EXECUTION_EMPTY_RESPONSE');
+  }
+  return JSON.parse(response.trim());
 }
 
 class GraphBuilder {
@@ -490,6 +497,7 @@ export function runNativeAutodiffCampaign(options = {}) {
 }
 
 export {
+  buildEngine,
   buildAnalyticFixture,
   buildMlpGraph,
   buildPrimitiveFixture,
