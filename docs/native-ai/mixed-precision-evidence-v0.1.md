@@ -8,11 +8,20 @@ This milestone admits bounded canonical BF16 storage/compute semantics with FP32
 
 ## Hosted replay
 
-Accepted run: `32850137410`
+Implementation run `32850137410`, source commit `8fb85604a15973708fe91f5886672773bfa11825`:
 
-- source commit: `8fb85604a15973708fe91f5886672773bfa11825`
 - Ubuntu job `97808869047`: 10/10 PASS
 - Windows job `97808868747`: 10/10 PASS
+
+Promoted-contract replay `32852499964`, source commit `bc55205b58bbb25c3da09b778ab44ab2492d43dd`:
+
+- Ubuntu job `97816495373`: 10/10 PASS
+- Windows job `97816495343`: 10/10 PASS
+
+Final bound-contract replay `32852655930`, source commit `b73fb4c5b33f72aa4c9d5177ba97d79ebef5dadd`:
+
+- Ubuntu job `97817006839`: 10/10 PASS
+- Windows job `97817006577`: 10/10 PASS
 
 ## Frozen mixed-precision policy
 
