@@ -3,6 +3,7 @@
 # This bridge binds generic Tensor parameters and reverse-mode gradients to that state/update contract.
 reality TensorAdamWBridgeCandidate {
   reckon valid_beta(beta : Number) -> Truth = beta >= 0 and beta < 1
+  reckon standard_epsilon() -> Number = 1 / 100000000
   reckon valid_config(learning_rate : Number, beta1 : Number, beta2 : Number, epsilon : Number, weight_decay : Number, gradient_clip : Number) -> Truth =
     learning_rate > 0 and valid_beta(beta1) and valid_beta(beta2) and epsilon > 0 and weight_decay >= 0 and gradient_clip > 0
   reckon valid_state(step : Number, parameter_elements : Number, first_moment_elements : Number, second_moment_elements : Number) -> Truth =
@@ -20,13 +21,13 @@ reality TensorAdamWBridgeCandidate {
   facet optimizer.learning_rate : Number = 0.01
   facet optimizer.beta1 : Number = 0.9
   facet optimizer.beta2 : Number = 0.999
-  facet optimizer.epsilon : Number = 1 / 100000000
+  facet optimizer.epsilon_expression : Text = "1/100000000"
   facet optimizer.weight_decay : Number = 0.1
   facet optimizer.gradient_clip : Number = 1
   facet optimizer.decoupled_weight_decay : Truth = true
   facet optimizer.bias_correction : Truth = true
 
-  facet evaluation.config_valid : Truth = valid_config(optimizer.learning_rate, optimizer.beta1, optimizer.beta2, optimizer.epsilon, optimizer.weight_decay, optimizer.gradient_clip)
+  facet evaluation.config_valid : Truth = valid_config(optimizer.learning_rate, optimizer.beta1, optimizer.beta2, standard_epsilon(), optimizer.weight_decay, optimizer.gradient_clip)
   facet evaluation.state_shape_valid : Truth = valid_state(0, 4, 4, 4)
   facet evaluation.state_shape_invalid_rejected : Truth = not valid_state(0, 4, 3, 4)
   facet evaluation.decay_factor_correct : Truth = decoupled_decay_factor(0.01, 0.1) == 0.999
@@ -34,6 +35,7 @@ reality TensorAdamWBridgeCandidate {
 
   facet evidence.parameter_binding : Text = "TENSOR_IDENTITY_TO_GRADIENT_IDENTITY_TO_ADAMW_STATE"
   facet evidence.checkpoint_identity : Text = "PARAMETER_STORAGE_PLUS_STEP_PLUS_FIRST_MOMENT_PLUS_SECOND_MOMENT"
+  facet evidence.numeric_root_boundary : Text = "EPSILON_VALUE_IS_EXECUTION_SEMANTIC_NOT_EXPORTED_STATE_FACET_UNTIL_CANONICAL_F64_ROOT_GAP_CLOSES"
   facet evidence.no_model_specialization : Text = "GENERIC_PARAMETER_GRADIENT_STATE_TUPLES_ONLY"
   facet evidence.authority : Text = "CANDIDATE_ONLY_NO_TOKENIZER_ROPE_MULTIHEAD_GPU_RCL10M_OR_K400_PROMOTION"
 }
