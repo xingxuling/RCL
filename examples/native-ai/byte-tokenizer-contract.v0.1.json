@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k08-l.byte-tokenizer-contract.v0.1",
+  "status": "BYTE_TOKENIZER_SUBSTRATE_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "executionBoundary": "native Rust UTF-8 byte conversion and governed token-stream file materialization",
+  "tokenizer": {
+    "id": "rcl.byte-tokenizer.utf8.v0.1",
+    "encoding": "utf-8",
+    "normalization": "NONE",
+    "byteTokenRange": [0, 255],
+    "specialTokens": {
+      "pad": 256,
+      "bos": 257,
+      "eos": 258
+    },
+    "vocabSize": 259,
+    "tokenStreamEncoding": "u32-le"
+  },
+  "requiredEvidence": [
+    "ascii-byte-identity",
+    "chinese-utf8-byte-identity",
+    "japanese-utf8-byte-identity",
+    "emoji-utf8-byte-identity",
+    "mixed-zh-en-ja-code-roundtrip",
+    "normalization-none-distinguishes-nfc-and-decomposed-text",
+    "bos-eos-boundary",
+    "invalid-token-fails-closed",
+    "invalid-utf8-decode-fails-closed",
+    "deterministic-tokenizer-root",
+    "deterministic-token-stream-file-and-receipt",
+    "source-and-token-stream-sha256-provenance",
+    "selfhost-rbc-parity-and-native-semantic-root"
+  ],
+  "claimsGrantedOnAdmission": [
+    "LOSSLESS_UTF8_BYTE_TOKENIZER_SUBSTRATE",
+    "GOVERNED_U32_TOKEN_STREAM_ARTIFACT"
+  ],
+  "claimsNotGranted": [
+    "BPE",
+    "SENTENCEPIECE",
+    "RCL_64K_VOCABULARY",
+    "TOKENIZER_TRAINING",
+    "ROPE",
+    "MULTI_HEAD_ATTENTION",
+    "RCL_10M",
+    "BF16",
+    "GPU",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
