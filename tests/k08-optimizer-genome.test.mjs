@@ -4,13 +4,21 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { compileRealityToBytecode, decodeBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = path.join(ROOT, 'examples', 'native-ai', 'optimizer-genome.rcl');
 const CONTRACT = path.join(ROOT, 'examples', 'native-ai', 'optimizer-genome-contract.v0.1.json');
 let nativeRun;
+
+function firstMismatch(left, right) {
+  const limit = Math.max(left.length, right.length);
+  for (let index = 0; index < limit; index += 1) {
+    if (JSON.stringify(left[index]) !== JSON.stringify(right[index])) return { index, left: left[index], right: right[index] };
+  }
+  return null;
+}
 
 function runOptimizerGenome() {
   if (nativeRun) return nativeRun;
@@ -24,7 +32,18 @@ function runOptimizerGenome() {
   const source = fs.readFileSync(SOURCE, 'utf8');
   const nativeRbc = fs.readFileSync(rbcPath);
   const bootstrapRbc = Buffer.from(compileRealityToBytecode(source));
-  assert.equal(nativeRbc.equals(bootstrapRbc), true, 'self-host and bootstrap RBC must be byte-identical');
+  if (!nativeRbc.equals(bootstrapRbc)) {
+    const nativeDecoded = decodeBytecode(nativeRbc);
+    const bootstrapDecoded = decodeBytecode(bootstrapRbc);
+    throw new Error(`self-host/bootstrap RBC drift: ${JSON.stringify({
+      byteLength: [nativeRbc.length, bootstrapRbc.length],
+      sourceRoot: [nativeDecoded.sourceRoot, bootstrapDecoded.sourceRoot],
+      stringMismatch: firstMismatch(nativeDecoded.strings, bootstrapDecoded.strings),
+      numberMismatch: firstMismatch(nativeDecoded.numbers, bootstrapDecoded.numbers),
+      instructionMismatch: firstMismatch(nativeDecoded.instructions, bootstrapDecoded.instructions),
+      instructionCount: [nativeDecoded.instructions.length, bootstrapDecoded.instructions.length],
+    })}`);
+  }
   nativeRun = runNativeBytecode(rbcPath, {
     timeout: 120_000,
     maxBuffer: 64 * 1024 * 1024,
