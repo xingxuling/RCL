@@ -1,0 +1,216 @@
+# K08-C: canonical Tensor semantic object with a scalar CPU reference lowering.
+# Storage remains an explicit backend concern; no Tensor or ML VM opcode is added.
+reality TensorGenomeCandidate {
+  reckon one(value : Number) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two(first : Number, second : Number) -> Sequence = sequence_append(one(first), second)
+  reckon three(first : Number, second : Number, third : Number) -> Sequence = sequence_append(two(first, second), third)
+  reckon six(a : Number, b : Number, c : Number, d : Number, e : Number, f : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(three(a, b, c), d), e), f)
+
+  reckon shape_product_from(shape : Sequence, index : Number, product : Number) -> Number =
+    choose(index >= length(shape), product, shape_product_from(shape, index + 1, product * sequence_get(shape, index)))
+
+  reckon shape_product(shape : Sequence) -> Number = shape_product_from(shape, 0, 1)
+
+  reckon integer_quotient(value : Number, divisor : Number, quotient : Number) -> Number =
+    choose(value < divisor, quotient, integer_quotient(value - divisor, divisor, quotient + 1))
+
+  reckon integer_remainder(value : Number, divisor : Number) -> Number =
+    value - integer_quotient(value, divisor, 0) * divisor
+
+  reckon shape_dimensions_valid(shape : Sequence, index : Number) -> Truth =
+    choose(index >= length(shape), true,
+      sequence_get(shape, index) >= 1 and shape_dimensions_valid(shape, index + 1))
+
+  reckon suffix_product(shape : Sequence, index : Number) -> Number =
+    choose(index >= length(shape), 1, sequence_get(shape, index) * suffix_product(shape, index + 1))
+
+  reckon row_major_strides_from(shape : Sequence, index : Number, strides : Sequence) -> Sequence =
+    choose(index >= length(shape), strides,
+      row_major_strides_from(shape, index + 1, sequence_append(strides, suffix_product(shape, index + 1))))
+
+  reckon row_major_strides(shape : Sequence) -> Sequence = row_major_strides_from(shape, 0, empty_sequence())
+
+  reckon make_tensor(shape : Sequence, dtype : Text, layout : Text, device : Text, gradient_identity : Text, data : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(empty_sequence(), "Tensor"),
+                  shape),
+                dtype),
+              row_major_strides(shape)),
+            layout),
+          device),
+        gradient_identity),
+      data)
+
+  reckon tensor_shape(tensor : Sequence) -> Sequence = sequence_get(tensor, 1)
+  reckon tensor_dtype(tensor : Sequence) -> Text = sequence_get(tensor, 2)
+  reckon tensor_strides(tensor : Sequence) -> Sequence = sequence_get(tensor, 3)
+  reckon tensor_layout(tensor : Sequence) -> Text = sequence_get(tensor, 4)
+  reckon tensor_device(tensor : Sequence) -> Text = sequence_get(tensor, 5)
+  reckon tensor_gradient_identity(tensor : Sequence) -> Text = sequence_get(tensor, 6)
+  reckon tensor_data(tensor : Sequence) -> Sequence = sequence_get(tensor, 7)
+  reckon tensor_rank(tensor : Sequence) -> Number = length(tensor_shape(tensor))
+
+  reckon same_sequence(left : Sequence, right : Sequence, index : Number) -> Truth =
+    choose(length(left) != length(right), false,
+      choose(index >= length(left), true,
+        sequence_get(left, index) == sequence_get(right, index) and same_sequence(left, right, index + 1)))
+
+  reckon tensor_valid(tensor : Sequence) -> Truth =
+    length(tensor) == 8 and
+    sequence_get(tensor, 0) == "Tensor" and
+    tensor_dtype(tensor) == "f64" and
+    tensor_layout(tensor) == "row-major" and
+    tensor_device(tensor) == "cpu:scalar" and
+    shape_dimensions_valid(tensor_shape(tensor), 0) and
+    same_sequence(tensor_strides(tensor), row_major_strides(tensor_shape(tensor)), 0) and
+    length(tensor_data(tensor)) == shape_product(tensor_shape(tensor))
+
+  reckon tensor_at_2(tensor : Sequence, row : Number, column : Number) -> Number =
+    sequence_get(tensor_data(tensor), row * sequence_get(tensor_shape(tensor), 1) + column)
+
+  reckon rank2_shape_compatible(left : Sequence, right : Sequence) -> Truth =
+    tensor_rank(left) == 2 and tensor_rank(right) == 2 and
+    sequence_get(tensor_shape(left), 0) == sequence_get(tensor_shape(right), 0) and
+    sequence_get(tensor_shape(left), 1) == sequence_get(tensor_shape(right), 1)
+
+  reckon broadcast_dimension(left : Number, right : Number) -> Number = choose(left >= right, left, right)
+  reckon broadcast_dimension_valid(left : Number, right : Number) -> Truth = left == right or left == 1 or right == 1
+
+  reckon broadcast_valid(left : Sequence, right : Sequence) -> Truth =
+    tensor_valid(left) and tensor_valid(right) and tensor_rank(left) == 2 and tensor_rank(right) == 2 and
+    tensor_dtype(left) == tensor_dtype(right) and tensor_device(left) == tensor_device(right) and
+    broadcast_dimension_valid(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)) and
+    broadcast_dimension_valid(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1))
+
+  reckon broadcast_value(tensor : Sequence, row : Number, column : Number) -> Number =
+    tensor_at_2(
+      tensor,
+      choose(sequence_get(tensor_shape(tensor), 0) == 1, 0, row),
+      choose(sequence_get(tensor_shape(tensor), 1) == 1, 0, column))
+
+  reckon broadcast_add_data(left : Sequence, right : Sequence, rows : Number, columns : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= rows * columns, output,
+      broadcast_add_data(
+        left, right, rows, columns, index + 1,
+        sequence_append(output,
+          broadcast_value(left, integer_quotient(index, columns, 0), integer_remainder(index, columns)) +
+          broadcast_value(right, integer_quotient(index, columns, 0), integer_remainder(index, columns)))))
+
+  reckon broadcast_add(left : Sequence, right : Sequence) -> Sequence =
+    make_tensor(
+      two(
+        broadcast_dimension(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)),
+        broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1))),
+      tensor_dtype(left), "row-major", tensor_device(left), "derived:broadcast_add",
+      broadcast_add_data(
+        left, right,
+        broadcast_dimension(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)),
+        broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1)),
+        0, empty_sequence()))
+
+  reckon matmul_valid(left : Sequence, right : Sequence) -> Truth =
+    tensor_valid(left) and tensor_valid(right) and tensor_rank(left) == 2 and tensor_rank(right) == 2 and
+    tensor_dtype(left) == tensor_dtype(right) and tensor_device(left) == tensor_device(right) and
+    sequence_get(tensor_shape(left), 1) == sequence_get(tensor_shape(right), 0)
+
+  reckon matmul_cell(left : Sequence, right : Sequence, row : Number, column : Number, inner : Number, accumulated : Number) -> Number =
+    choose(inner >= sequence_get(tensor_shape(left), 1), accumulated,
+      matmul_cell(left, right, row, column, inner + 1,
+        accumulated + tensor_at_2(left, row, inner) * tensor_at_2(right, inner, column)))
+
+  reckon matmul_data(left : Sequence, right : Sequence, columns : Number, index : Number, count : Number, output : Sequence) -> Sequence =
+    choose(index >= count, output,
+      matmul_data(left, right, columns, index + 1, count,
+        sequence_append(output,
+          matmul_cell(left, right, integer_quotient(index, columns, 0), integer_remainder(index, columns), 0, 0))))
+
+  reckon matmul(left : Sequence, right : Sequence) -> Sequence =
+    make_tensor(
+      two(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 1)),
+      tensor_dtype(left), "row-major", tensor_device(left), "derived:matmul",
+      matmul_data(left, right, sequence_get(tensor_shape(right), 1), 0,
+        sequence_get(tensor_shape(left), 0) * sequence_get(tensor_shape(right), 1), empty_sequence()))
+
+  reckon reshape_valid(tensor : Sequence, new_shape : Sequence) -> Truth =
+    tensor_valid(tensor) and shape_dimensions_valid(new_shape, 0) and shape_product(new_shape) == length(tensor_data(tensor))
+
+  reckon reshape(tensor : Sequence, new_shape : Sequence) -> Sequence =
+    make_tensor(new_shape, tensor_dtype(tensor), "row-major", tensor_device(tensor), tensor_gradient_identity(tensor), tensor_data(tensor))
+
+  reckon transpose_data(tensor : Sequence, rows : Number, columns : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= rows * columns, output,
+      transpose_data(tensor, rows, columns, index + 1,
+        sequence_append(output, tensor_at_2(tensor, integer_remainder(index, rows), integer_quotient(index, rows, 0)))))
+
+  reckon transpose_2(tensor : Sequence) -> Sequence =
+    make_tensor(two(sequence_get(tensor_shape(tensor), 1), sequence_get(tensor_shape(tensor), 0)),
+      tensor_dtype(tensor), "row-major", tensor_device(tensor), tensor_gradient_identity(tensor),
+      transpose_data(tensor, sequence_get(tensor_shape(tensor), 0), sequence_get(tensor_shape(tensor), 1), 0, empty_sequence()))
+
+  reckon reduce_axis_data(tensor : Sequence, axis : Number, output_index : Number, inner : Number, accumulated : Number, output : Sequence) -> Sequence =
+    choose(axis == 0,
+      choose(output_index >= sequence_get(tensor_shape(tensor), 1), output,
+        choose(inner >= sequence_get(tensor_shape(tensor), 0),
+          reduce_axis_data(tensor, axis, output_index + 1, 0, 0, sequence_append(output, accumulated)),
+          reduce_axis_data(tensor, axis, output_index, inner + 1, accumulated + tensor_at_2(tensor, inner, output_index), output))),
+      choose(output_index >= sequence_get(tensor_shape(tensor), 0), output,
+        choose(inner >= sequence_get(tensor_shape(tensor), 1),
+          reduce_axis_data(tensor, axis, output_index + 1, 0, 0, sequence_append(output, accumulated)),
+          reduce_axis_data(tensor, axis, output_index, inner + 1, accumulated + tensor_at_2(tensor, output_index, inner), output))))
+
+  reckon reduce_sum(tensor : Sequence, axis : Number) -> Sequence =
+    make_tensor(
+      one(choose(axis == 0, sequence_get(tensor_shape(tensor), 1), sequence_get(tensor_shape(tensor), 0))),
+      tensor_dtype(tensor), "row-major", tensor_device(tensor), "derived:reduce_sum",
+      reduce_axis_data(tensor, axis, 0, 0, 0, empty_sequence()))
+
+  reckon slice_valid(tensor : Sequence, row_start : Number, row_end : Number, column_start : Number, column_end : Number) -> Truth =
+    tensor_valid(tensor) and tensor_rank(tensor) == 2 and
+    row_start >= 0 and column_start >= 0 and row_end > row_start and column_end > column_start and
+    row_end <= sequence_get(tensor_shape(tensor), 0) and column_end <= sequence_get(tensor_shape(tensor), 1)
+
+  reckon slice_data(tensor : Sequence, row_start : Number, column_start : Number, rows : Number, columns : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= rows * columns, output,
+      slice_data(tensor, row_start, column_start, rows, columns, index + 1,
+        sequence_append(output, tensor_at_2(tensor, row_start + integer_quotient(index, columns, 0), column_start + integer_remainder(index, columns)))))
+
+  reckon slice_2(tensor : Sequence, row_start : Number, row_end : Number, column_start : Number, column_end : Number) -> Sequence =
+    make_tensor(two(row_end - row_start, column_end - column_start), tensor_dtype(tensor), "row-major", tensor_device(tensor), tensor_gradient_identity(tensor),
+      slice_data(tensor, row_start, column_start, row_end - row_start, column_end - column_start, 0, empty_sequence()))
+
+  reckon tensor_a() -> Sequence = make_tensor(two(2, 3), "f64", "row-major", "cpu:scalar", "parameter:a", six(1, 2, 3, 4, 5, 6))
+  reckon tensor_b() -> Sequence = make_tensor(two(1, 3), "f64", "row-major", "cpu:scalar", "parameter:b", three(10, 20, 30))
+  reckon tensor_c() -> Sequence = make_tensor(two(3, 2), "f64", "row-major", "cpu:scalar", "parameter:c", six(7, 8, 9, 10, 11, 12))
+  reckon invalid_broadcast() -> Sequence = make_tensor(two(2, 2), "f64", "row-major", "cpu:scalar", "parameter:invalid", sequence_append(sequence_append(two(1, 2), 3), 4))
+
+  facet contract.id : Text = "k08-c-tensor-genome-v0.1"
+  facet contract.profile : Text = "L2-TENSOR-CANDIDATE-SCALAR-CPU"
+  facet tensor.a : Sequence = tensor_a()
+  facet tensor.scalar : Sequence = make_tensor(empty_sequence(), "f64", "row-major", "cpu:scalar", "constant", one(42))
+  facet tensor.broadcast_add : Sequence = broadcast_add(tensor.a, tensor_b())
+  facet tensor.matmul : Sequence = matmul(tensor.a, tensor_c())
+  facet tensor.reshape : Sequence = reshape(tensor.a, two(3, 2))
+  facet tensor.transpose : Sequence = transpose_2(tensor.a)
+  facet tensor.reduce_axis0 : Sequence = reduce_sum(tensor.a, 0)
+  facet tensor.reduce_axis1 : Sequence = reduce_sum(tensor.a, 1)
+  facet tensor.slice : Sequence = slice_2(tensor.a, 0, 2, 1, 3)
+  facet evaluation.scalar_valid : Truth = tensor_valid(tensor.scalar)
+  facet evaluation.tensor_valid : Truth = tensor_valid(tensor.a)
+  facet evaluation.broadcast_valid : Truth = broadcast_valid(tensor.a, tensor_b())
+  facet evaluation.invalid_broadcast_rejected : Truth = broadcast_valid(tensor.a, invalid_broadcast()) == false
+  facet evaluation.matmul_valid : Truth = matmul_valid(tensor.a, tensor_c())
+  facet evaluation.invalid_matmul_rejected : Truth = matmul_valid(tensor.a, invalid_broadcast()) == false
+  facet evaluation.reshape_valid : Truth = reshape_valid(tensor.a, two(3, 2))
+  facet evaluation.invalid_reshape_rejected : Truth = reshape_valid(tensor.a, two(4, 2)) == false
+  facet evaluation.slice_valid : Truth = slice_valid(tensor.a, 0, 2, 1, 3)
+  facet evaluation.invalid_slice_rejected : Truth = slice_valid(tensor.a, 0, 3, 1, 3) == false
+  facet evidence.execution_path : Text = "RCL_TENSOR_SEMANTICS_TO_SCALAR_CPU_SEQUENCE_LOWERING_TO_RBC_TO_NATIVE_VM"
+  facet evidence.backend_boundary : Text = "SEQUENCE_IS_SCALAR_CPU_REFERENCE_STORAGE_NOT_CANONICAL_TENSOR_IDENTITY"
+}
