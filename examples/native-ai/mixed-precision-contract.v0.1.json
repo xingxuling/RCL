@@ -1,0 +1,60 @@
+{
+  "format": "rcl.k08-q.mixed-precision-contract.v0.1",
+  "status": "MIXED_PRECISION_REFERENCE_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "profile": "BF16_STORAGE_FP32_ACCUMULATION_CANDIDATE",
+  "policy": {
+    "parameterComputeDtype": "bf16",
+    "activationComputeDtype": "bf16",
+    "matmulAccumulationDtype": "f32",
+    "reductionAccumulationDtype": "f32",
+    "softmaxComputeDtype": "f32",
+    "normalizationComputeDtype": "f32",
+    "optimizerStateDtype": "f32",
+    "masterWeightDtype": "f32",
+    "bf16Rounding": "round-to-nearest-ties-to-even",
+    "nonFiniteReferencePolicy": "fail-closed",
+    "silentAcceleratorFallbackAllowed": false
+  },
+  "referenceExecution": {
+    "backend": "cpu-reference",
+    "storageIdentity": "sha256(shape + bf16-bits + policy)",
+    "operations": ["quantize", "matmul", "add", "mul"],
+    "purpose": "portable correctness oracle for later accelerator backends"
+  },
+  "acceleratorBoundary": {
+    "cuda": "UNVERIFIED_NO_CURRENT_HARDWARE_RUNNER",
+    "vulkan": "UNVERIFIED_NO_CURRENT_HARDWARE_RUNNER",
+    "metal": "UNVERIFIED_NO_CURRENT_HARDWARE_RUNNER",
+    "cpuReferenceMayNotSatisfyGpuClaim": true
+  },
+  "requiredEvidence": [
+    "selfhost-rbc-parity-and-native-semantic-root",
+    "known-bf16-bit-patterns",
+    "round-to-nearest-ties-to-even",
+    "deterministic-bf16-storage-root",
+    "bf16-matmul-fp32-accumulation-vs-independent-oracle",
+    "bf16-add-mul-vs-independent-oracle",
+    "bounded-error-vs-f64-reference",
+    "non-finite-input-fails-closed",
+    "invalid-shape-fails-closed",
+    "unsupported-backend-fails-closed-without-cpu-fallback"
+  ],
+  "claimsGrantedOnAdmission": [
+    "BF16_CANONICAL_ROUNDING_SEMANTICS",
+    "BF16_CPU_REFERENCE_EXECUTION",
+    "FP32_ACCUMULATION_POLICY",
+    "NO_SILENT_ACCELERATOR_FALLBACK"
+  ],
+  "claimsNotGranted": [
+    "GPU",
+    "CUDA",
+    "VULKAN_GPU",
+    "BF16_AUTODIFF_TRAINING",
+    "MULTI_BLOCK_BF16_TRAINING",
+    "RCL_10M",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
