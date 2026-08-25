@@ -1347,32 +1347,6 @@ static void state_root(const State *state, char output[65]) {
   free(sb.data);
 }
 
-static int read_exact(FILE *file, void *target, size_t length) { return fread(target, 1, length, file) == length; }
-
-static uint16_t read_u16_le(FILE *file, int *ok) {
-  unsigned char bytes[2];
-  if (!read_exact(file, bytes, 2)) { *ok = 0; return 0; }
-  return (uint16_t)(bytes[0] | ((uint16_t)bytes[1] << 8));
-}
-
-static uint32_t read_u32_le(FILE *file, int *ok) {
-  unsigned char bytes[4];
-  if (!read_exact(file, bytes, 4)) { *ok = 0; return 0; }
-  return (uint32_t)bytes[0] | ((uint32_t)bytes[1] << 8) | ((uint32_t)bytes[2] << 16) | ((uint32_t)bytes[3] << 24);
-}
-
-static int32_t read_i32_le(FILE *file, int *ok) { return (int32_t)read_u32_le(file, ok); }
-
-static double read_f64_le(FILE *file, int *ok) {
-  unsigned char bytes[8];
-  if (!read_exact(file, bytes, 8)) { *ok = 0; return 0; }
-  uint64_t bits = 0;
-  for (int i = 0; i < 8; i++) bits |= ((uint64_t)bytes[i]) << (8 * i);
-  double value;
-  memcpy(&value, &bits, sizeof(value));
-  return value;
-}
-
 static uint16_t memory_u16_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
   if (offset > length || length - offset < 2) { *ok = 0; return 0; }
   return (uint16_t)(bytes[offset] | ((uint16_t)bytes[offset + 1] << 8));
@@ -1388,6 +1362,15 @@ static uint32_t memory_u32_le(const uint8_t *bytes, size_t length, size_t offset
 
 static int32_t memory_i32_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
   return (int32_t)memory_u32_le(bytes, length, offset, ok);
+}
+
+static double memory_f64_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
+  if (offset > length || length - offset < 8) { *ok = 0; return 0; }
+  uint64_t bits = 0;
+  for (int i = 0; i < 8; i++) bits |= ((uint64_t)bytes[offset + (size_t)i]) << (8 * i);
+  double value;
+  memcpy(&value, &bits, sizeof(value));
+  return value;
 }
 
 static int validation_fail(VmError *error, const char *code, const char *message) {
@@ -1500,7 +1483,9 @@ int rclvm_validate_bytecode(const uint8_t *bytes, size_t length, char *error, si
   return valid;
 }
 
-static int validate_bytecode_file(const char *path, VmError *error) {
+static int read_bytecode_snapshot(const char *path, uint8_t **bytes_out, size_t *length_out, VmError *error) {
+  *bytes_out = NULL;
+  *length_out = 0;
   FILE *file = fopen(path, "rb");
   if (!file) { error->code = "RCL_NATIVE_OPEN_FAILED"; snprintf(error->message, sizeof(error->message), "Cannot open bytecode '%s': %s", path, strerror(errno)); return 0; }
   if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return validation_fail(error, "RCL_NATIVE_OPEN_FAILED", "Cannot seek RBC file"); }
@@ -1511,64 +1496,73 @@ static int validate_bytecode_file(const char *path, VmError *error) {
   }
   size_t length = (size_t)file_length;
   uint8_t *bytes = (uint8_t *)malloc(length ? length : 1);
-  if (!bytes) { fclose(file); return validation_fail(error, "RCL_NATIVE_OOM", "Unable to allocate RBC validation buffer"); }
-  size_t read = fread(bytes, 1, length, file);
+  if (!bytes) { fclose(file); return validation_fail(error, "RCL_NATIVE_OOM", "Unable to allocate RBC snapshot buffer"); }
+  size_t read = 0;
+  while (read < length) {
+    size_t chunk = fread(bytes + read, 1, length - read, file);
+    if (chunk == 0) break;
+    read += chunk;
+  }
   int read_ok = read == length && !ferror(file);
   fclose(file);
   if (!read_ok) { free(bytes); return validation_fail(error, "RCL_NATIVE_TRUNCATED", "Cannot read complete RBC file"); }
-  int valid = validate_bytecode_bytes(bytes, length, error);
-  free(bytes);
-  return valid;
+  *bytes_out = bytes;
+  *length_out = length;
+  return 1;
 }
 
-static int load_program(const char *path, Program *program, VmError *error) {
+static int load_program_snapshot(const uint8_t *bytes, size_t length, Program *program, VmError *error) {
   memset(program, 0, sizeof(*program));
-  if (!validate_bytecode_file(path, error)) return 0;
-  FILE *file = fopen(path, "rb");
-  if (!file) { error->code = "RCL_NATIVE_OPEN_FAILED"; snprintf(error->message, sizeof(error->message), "Cannot open bytecode '%s': %s", path, strerror(errno)); return 0; }
-  char magic[4];
+  if (!validate_bytecode_bytes(bytes, length, error)) return 0;
   int ok = 1;
-  if (!read_exact(file, magic, 4) || memcmp(magic, "RCLB", 4) != 0) { error->code = "RCL_NATIVE_BAD_MAGIC"; snprintf(error->message, sizeof(error->message), "Invalid RCL bytecode magic"); fclose(file); return 0; }
-  program->major = read_u16_le(file, &ok);
-  program->minor = read_u16_le(file, &ok);
-  program->flags = read_u32_le(file, &ok);
-  program->program_name_index = read_u32_le(file, &ok);
-  program->source_root_index = read_u32_le(file, &ok);
-  program->string_count = read_u32_le(file, &ok);
-  program->number_count = read_u32_le(file, &ok);
-  program->instruction_count = read_u32_le(file, &ok);
-  (void)read_u32_le(file, &ok);
-  if (!ok || program->major != 1 || program->minor < 1 || program->minor > 2 || program->string_count > 100000 || program->number_count > 100000 || program->instruction_count > MAX_INSTRUCTIONS) {
-    error->code = "RCL_NATIVE_BAD_HEADER"; snprintf(error->message, sizeof(error->message), "Unsupported or corrupt RCL bytecode header"); fclose(file); return 0;
-  }
+  program->major = memory_u16_le(bytes, length, 4, &ok);
+  program->minor = memory_u16_le(bytes, length, 6, &ok);
+  program->flags = memory_u32_le(bytes, length, 8, &ok);
+  program->program_name_index = memory_u32_le(bytes, length, 12, &ok);
+  program->source_root_index = memory_u32_le(bytes, length, 16, &ok);
+  program->string_count = memory_u32_le(bytes, length, 20, &ok);
+  program->number_count = memory_u32_le(bytes, length, 24, &ok);
+  program->instruction_count = memory_u32_le(bytes, length, 28, &ok);
   program->strings = (char **)calloc(program->string_count ? program->string_count : 1, sizeof(char *));
   program->numbers = (double *)calloc(program->number_count ? program->number_count : 1, sizeof(double));
   program->instructions = (Instruction *)calloc(program->instruction_count ? program->instruction_count : 1, sizeof(Instruction));
-  if (!program->strings || !program->numbers || !program->instructions) { error->code = "RCL_NATIVE_OOM"; snprintf(error->message, sizeof(error->message), "Out of memory while loading bytecode"); fclose(file); return 0; }
+  if (!program->strings || !program->numbers || !program->instructions) {
+    free(program->strings);
+    free(program->numbers);
+    free(program->instructions);
+    memset(program, 0, sizeof(*program));
+    return validation_fail(error, "RCL_NATIVE_OOM", "Out of memory while loading bytecode");
+  }
+  size_t offset = 36;
   for (uint32_t i = 0; i < program->string_count; i++) {
-    uint32_t length = read_u32_le(file, &ok);
-    if (!ok || length > 16 * 1024 * 1024) { ok = 0; break; }
-    char *text = (char *)malloc((size_t)length + 1);
-    if (!text || !read_exact(file, text, length)) { free(text); ok = 0; break; }
-    text[length] = '\0';
-    program->strings[i] = shared_string_create(text);
-    free(text);
+    uint32_t string_length = memory_u32_le(bytes, length, offset, &ok);
+    offset += 4;
+    program->strings[i] = shared_string_create_n((const char *)bytes + offset, string_length);
+    offset += string_length;
   }
-  for (uint32_t i = 0; ok && i < program->number_count; i++) program->numbers[i] = read_f64_le(file, &ok);
-  for (uint32_t i = 0; ok && i < program->instruction_count; i++) {
-    unsigned char prefix[4];
-    if (!read_exact(file, prefix, 4)) { ok = 0; break; }
-    program->instructions[i].op = prefix[0];
-    program->instructions[i].flags = prefix[1];
-    program->instructions[i].a = read_i32_le(file, &ok);
-    program->instructions[i].b = read_i32_le(file, &ok);
-    program->instructions[i].c = read_i32_le(file, &ok);
+  for (uint32_t i = 0; i < program->number_count; i++) {
+    program->numbers[i] = memory_f64_le(bytes, length, offset, &ok);
+    offset += 8;
   }
-  fclose(file);
-  if (!ok || program->program_name_index >= program->string_count || program->source_root_index >= program->string_count) {
-    error->code = "RCL_NATIVE_TRUNCATED"; snprintf(error->message, sizeof(error->message), "RCL bytecode is truncated or contains invalid pool references"); return 0;
+  for (uint32_t i = 0; i < program->instruction_count; i++) {
+    program->instructions[i].op = bytes[offset];
+    program->instructions[i].flags = bytes[offset + 1];
+    program->instructions[i].a = memory_i32_le(bytes, length, offset + 4, &ok);
+    program->instructions[i].b = memory_i32_le(bytes, length, offset + 8, &ok);
+    program->instructions[i].c = memory_i32_le(bytes, length, offset + 12, &ok);
+    offset += 16;
   }
+  if (!ok || offset != length) return validation_fail(error, "RCL_NATIVE_LOAD_INVARIANT", "Validated RBC snapshot could not be loaded consistently");
   return 1;
+}
+
+static int load_program(const char *path, Program *program, VmError *error) {
+  uint8_t *bytes = NULL;
+  size_t length = 0;
+  if (!read_bytecode_snapshot(path, &bytes, &length, error)) return 0;
+  int loaded = load_program_snapshot(bytes, length, program, error);
+  free(bytes);
+  return loaded;
 }
 
 static void free_program(Program *program) {
