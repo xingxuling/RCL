@@ -1,0 +1,35 @@
+# K08-I: first decoder Transformer Block semantic genome candidate.
+# RCL owns the block topology and invariants; generic Tensor/Autodiff organs execute the math.
+reality TransformerBlockGenomeCandidate {
+  reckon dimensions_valid(sequence_length : Number, hidden_size : Number, feed_forward_size : Number, head_count : Number) -> Truth =
+    sequence_length > 0 and hidden_size > 0 and feed_forward_size > 0 and head_count > 0 and hidden_size % head_count == 0
+
+  reckon head_width(hidden_size : Number, head_count : Number) -> Number = hidden_size / head_count
+  reckon causal_visible(query_index : Number, key_index : Number) -> Truth = key_index <= query_index
+
+  facet contract.id : Text = "k08-i-transformer-block-genome-v0.1"
+  facet contract.profile : Text = "ENGINE-E4-DECODER-BLOCK-CANDIDATE-F64-CPU"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.execution_owner : Text = "GENERIC_TENSOR_AUTODIFF_ORGANS"
+
+  facet model.sequence_length : Number = 3
+  facet model.hidden_size : Number = 2
+  facet model.feed_forward_size : Number = 3
+  facet model.head_count : Number = 1
+  facet model.head_width : Number = head_width(model.hidden_size, model.head_count)
+
+  facet topology.pre_norm : Text = "RMSNORM_ATTENTION_RESIDUAL_RMSNORM_SILU_FFN_RESIDUAL"
+  facet topology.attention : Text = "Q_K_V_LINEAR_SCALED_DOT_PRODUCT_CAUSAL_SOFTMAX_OUTPUT_PROJECTION"
+  facet topology.ffn : Text = "LINEAR_SILU_LINEAR"
+  facet topology.loss : Text = "SCALAR_MEAN_SQUARED_DIFFERENTIAL_FIXTURE"
+
+  facet evaluation.dimensions_valid : Truth = dimensions_valid(model.sequence_length, model.hidden_size, model.feed_forward_size, model.head_count)
+  facet evaluation.causal_self_visible : Truth = causal_visible(2, 2)
+  facet evaluation.causal_past_visible : Truth = causal_visible(2, 0)
+  facet evaluation.causal_future_blocked : Truth = not causal_visible(0, 2)
+  facet evaluation.head_width_valid : Truth = model.head_width == 2
+
+  facet evidence.allowed_primitives : Text = "ADD_SUB_MUL_DIV_MATMUL_TRANSPOSE_RESHAPE_BROADCAST_MEAN_SQRT_SIGMOID_SOFTMAX"
+  facet evidence.forbidden_specialization : Text = "NO_TRANSFORMER_SPECIAL_NO_GPT_SPECIAL_NO_ATTENTION_MODEL_OPCODE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_TINY_LM_ACCELERATOR_DISTRIBUTED_OR_K400_PROMOTION"
+}
