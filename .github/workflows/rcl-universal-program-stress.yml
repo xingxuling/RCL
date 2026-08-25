@@ -41,6 +41,9 @@ on:
       - 'scripts/verify-k04-server-candidate.mjs'
       - 'scripts/run-k04-independent-ai-generation.mjs'
       - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
+      - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
+      - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
+      - 'scripts/verify-k327-compiler-candidate.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -88,6 +91,9 @@ on:
       - 'scripts/verify-k04-server-candidate.mjs'
       - 'scripts/run-k04-independent-ai-generation.mjs'
       - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
+      - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
+      - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
+      - 'scripts/verify-k327-compiler-candidate.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -136,6 +142,8 @@ jobs:
         run: npm run verify:k03-ai-generate
       - name: K04 independent Server AI generation receipt replay
         run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
+      - name: K327 independent Compiler AI generation receipt replay
+        run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report

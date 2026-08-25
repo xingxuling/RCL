@@ -1,0 +1,559 @@
+{
+  "format": "rcl.k327.compiler-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-25T17:48:28.712Z",
+  "contractRoot": "bbb6fb4c7bb29be06024ef4192d9e3d4f3efa0218bd78e19fe20ff34bdc842af",
+  "contractStatus": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K327"
+  ],
+  "compilerRuntimeBinding": {
+    "localReceiptReportRoot": "45fdf969b54a300b63f1b2de441e133101c3c135d1faa03d246bde8934b3c85a",
+    "githubAuthorityRoot": "ef6f03ca31bd6416f13f2fbab199e692c1111fc5b8db66aef947c463a6e52a43",
+    "fixedPointSourceSha256": "9e33abe58d47e825ba28378e7fd8cde89a8be81eac37b32924ed45a177a58f46",
+    "fixedPointArtifactSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+  },
+  "trials": [
+    {
+      "format": "rcl.k327.compiler-ai-generation-trial-receipt.v0.1",
+      "trialId": "K327-COMPILER-REPAIR-01",
+      "mutationClass": "TEXT_BUILTIN_LOWERING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03a07-760c-7ca3-ab65-462ecb6237ad",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(name == \"contains\", 2,",
+        "new": "choose(name == \"contains\", 1,",
+        "diagnosis": "The declared invariant fails because builtin_id maps contains to 2. Changing only that unique mapping assigns contains the canonical builtin id 1 while leaving starts_with and all other builtin ids unchanged."
+      },
+      "promptRoot": "1566102739bcece76610fafd0e783e85c7caecc80965862b150e5ba24778dd71",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "e973cee99bec074bdfaea3a698efe503aaa315c57bf75872e50dbf319637c017",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "699b25226fda6ffd227c4da0a93e8d8c2f1cc6a14bcab557435726d6241a380b",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03a07-760c-7ca3-ab65-462ecb6237ad"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "8ed32277be4254911ad4e27ce2c3984ad8f9d2a463a862fb9193209dd45a044b"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "3b3a1916c07d9e8b67e0144282a4e312c68911388340386121f0e521e2526a46"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "1c5076bbe440fab66df60a5ec2aaae4f372bbc596bb6ab99ee89c6078dc02762"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 147652,
+            "cached_input_tokens": 105984,
+            "output_tokens": 860,
+            "reasoning_output_tokens": 177
+          }
+        }
+      ],
+      "finalMessageSha256": "1c5076bbe440fab66df60a5ec2aaae4f372bbc596bb6ab99ee89c6078dc02762",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "79c19543eb869a739ea9a109e60fd082bec7cdef38ad5f4a088aeccdf5e57929",
+        "failedChecks": [
+          "contains-builtin-id",
+          "compiler-artifact-identity"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "abe8a57b1bf5faca6b9a401c9156033eaad8745d9e1e15c2342ded92b022040d",
+        "checks": {
+          "single-builtin-id-definition": {
+            "pass": true
+          },
+          "contains-builtin-id": {
+            "pass": true
+          },
+          "sequence-concat-builtin-id": {
+            "pass": true
+          },
+          "utf8-bytes-builtin-id": {
+            "pass": true
+          },
+          "sha256-and-unknown-boundary": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          },
+          "compiler-artifact-identity": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "f065489043c2ee02c583538dab025d5f9aafe8c39d98d7ef897f1285ccd12f21"
+    },
+    {
+      "format": "rcl.k327.compiler-ai-generation-trial-receipt.v0.1",
+      "trialId": "K327-COMPILER-REPAIR-02",
+      "mutationClass": "SEQUENCE_BUILTIN_LOWERING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03a08-2346-73e2-8d6c-7af0a4f77f0f",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(name == \"sequence_concat\", 61,",
+        "new": "choose(name == \"sequence_concat\", 62,",
+        "diagnosis": "`builtin_id` currently assigns both `ir_span` and `sequence_concat` to canonical builtin id 61. The declared invariant requires `sequence_concat` to emit canonical builtin id 62, leaving `ir_span` at 61 and preserving the surrounding builtin id ladder."
+      },
+      "promptRoot": "8e1b6150f56c948c1d38e7cd37aa811253cf0e5ec1b9b873dd24d0648ad1ac0f",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "2aa093f8d25ff53871b47f9c62f607277c1f24d9a6f7d10123c8cccbc4fe3c92",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "56411be0d277a604c217501f263b6aacd47edb58ed8e3c773cc80753735de7e6",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03a08-2346-73e2-8d6c-7af0a4f77f0f"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "e2f96d42a09c5a00645105b8e581845a7d020b90e93cc8db79b2699da212e48b"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "1acd62fc04e5b478450bb22b1fcbeed5385ada1a0c95b802ad9abf23681b5133"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 1,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "e268b156feba60bbe18b8edc8277ddbf1c4f4856495fea450ffdb05c10fb4a16"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 153158,
+            "cached_input_tokens": 144256,
+            "output_tokens": 1236,
+            "reasoning_output_tokens": 309
+          }
+        }
+      ],
+      "finalMessageSha256": "e268b156feba60bbe18b8edc8277ddbf1c4f4856495fea450ffdb05c10fb4a16",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "89185a242e004c5ad75e3b8663e522f96accc8b7b641fe711171df44d6f5a1b9",
+        "failedChecks": [
+          "sequence-concat-builtin-id",
+          "compiler-artifact-identity"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "abe8a57b1bf5faca6b9a401c9156033eaad8745d9e1e15c2342ded92b022040d",
+        "checks": {
+          "single-builtin-id-definition": {
+            "pass": true
+          },
+          "contains-builtin-id": {
+            "pass": true
+          },
+          "sequence-concat-builtin-id": {
+            "pass": true
+          },
+          "utf8-bytes-builtin-id": {
+            "pass": true
+          },
+          "sha256-and-unknown-boundary": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          },
+          "compiler-artifact-identity": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "18655944ac6d76c3d2e872a74c930bbf50552ae2b01d4dad7dcf1c54b3ebdb04"
+    },
+    {
+      "format": "rcl.k327.compiler-ai-generation-trial-receipt.v0.1",
+      "trialId": "K327-COMPILER-REPAIR-03",
+      "mutationClass": "HASH_BUILTIN_BOUNDARY",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03a08-f764-77b0-b04d-3535a796660b",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate-core.rcl",
+        "old": "choose(name == \"sha256_text\", 69, 70)",
+        "new": "choose(name == \"sha256_text\", 70, 0)",
+        "diagnosis": "builtin_id currently assigns sha256_text to 69 and uses 70 as the final fallback. The invariant requires sha256_text id 70 and unknown builtins fallback id 0."
+      },
+      "promptRoot": "83927ed7cf315cb82fbe08ceb6c7925f9bde0271201da0794783a91c74a775ba",
+      "mutatedFile": "candidate-core.rcl",
+      "mutatedCoreSha256": "98c7d7898e449dceeb29202637a0bc9190ced9a211af0d08bd14116d3efdab54",
+      "mutatedMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "candidateCoreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+      "candidateMainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "95655fbf855e7a9e117f3ec778a2f6066ee19878b74f4780464450f7f0262ec7",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03a08-f764-77b0-b04d-3535a796660b"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "52037b5ae78f1d08db70c4a47056e32194a95cb859829ab859f1167dc7f97db3"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "ecc2484e171f3c8f7647b3727b8ccb85f338812166c19d69fe9934b016ec57d6"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": -1,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "cfae5313640b93f5971da24f53ce644a2b8dbb04cd3f46e65efe59b19b29a1bd"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 185315,
+            "cached_input_tokens": 144256,
+            "output_tokens": 1097,
+            "reasoning_output_tokens": 288
+          }
+        }
+      ],
+      "finalMessageSha256": "cfae5313640b93f5971da24f53ce644a2b8dbb04cd3f46e65efe59b19b29a1bd",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "8533056498a55fe602ce35f62000b9a6d138ddbcf748639ecefc8d307bbf6bec",
+        "failedChecks": [
+          "sha256-and-unknown-boundary",
+          "compiler-artifact-identity"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "abe8a57b1bf5faca6b9a401c9156033eaad8745d9e1e15c2342ded92b022040d",
+        "checks": {
+          "single-builtin-id-definition": {
+            "pass": true
+          },
+          "contains-builtin-id": {
+            "pass": true
+          },
+          "sequence-concat-builtin-id": {
+            "pass": true
+          },
+          "utf8-bytes-builtin-id": {
+            "pass": true
+          },
+          "sha256-and-unknown-boundary": {
+            "pass": true
+          },
+          "main-entrypoint": {
+            "pass": true
+          },
+          "compiler-artifact-emitted": {
+            "pass": true,
+            "detail": 265286
+          },
+          "compiler-artifact-identity": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "8d08687f1ee41d3e28ad3600f8d45fcfed09af60c8d1992fc1f18dd6a8878de4"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_COMPILER_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This proves three bounded independent repairs of compiler builtin lowering plus reuse of the separately admitted compiler fixed point. It grants only K327, not K339, whole-runtime self-hosting, arbitrary compiler evolution or K400 completion.",
+  "reportRoot": "4f4d9f89902481d3a07c05bc9837d05cd55a73118431a54d57fd3a620a29c414"
+}

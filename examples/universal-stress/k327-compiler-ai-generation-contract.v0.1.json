@@ -1,0 +1,53 @@
+{
+  "format": "rcl.k327.compiler-ai-generation-contract.v0.1",
+  "status": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "minimumCliVersion": "0.135.0",
+    "sandbox": "read-only",
+    "network": "not-required"
+  },
+  "canonical": {
+    "corePath": "selfhost/compiler-core.rcl",
+    "coreSha256": "f7750c3d6d97bdfa767c0fb5a0a381ff77695cbc4991f3722decd4445a76ceab",
+    "mainPath": "selfhost/compiler-main.rcl",
+    "mainSha256": "486c70a534d63f90868dcfeade65de170ea1a2f0d6df64c2cdcb33662dbeb55e"
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that separate AI sessions can repair bounded RCL-owned general compiler builtin-lowering semantics without inheriting K339 self-hosting AI authority.",
+  "rules": [
+    "Each generator receives only mutated compiler candidates, the semantic invariant and observed verifier diagnostics.",
+    "Canonical compiler files, mutation implementation and oracle edits are absent from the generator workspace.",
+    "Each trial uses a fresh ephemeral read-only session with project rules and user configuration ignored.",
+    "The evaluator applies only the exact Schema-bounded edit and requires byte-identical canonical source restoration.",
+    "The existing admitted compiler fixed-point receipt may be reused only as runtime evidence; its K339 AI_GENERATE authority is not inherited.",
+    "Three unique new sessions plus GitHub focused and Windows replay are required for K327."
+  ],
+  "trials": [
+    {
+      "id": "K327-COMPILER-REPAIR-01",
+      "mutationClass": "TEXT_BUILTIN_LOWERING",
+      "intent": "Repair contains so the general compiler emits canonical builtin id 1 without changing other text builtins."
+    },
+    {
+      "id": "K327-COMPILER-REPAIR-02",
+      "mutationClass": "SEQUENCE_BUILTIN_LOWERING",
+      "intent": "Repair sequence_concat so the general compiler emits canonical builtin id 62 without colliding with IR span access."
+    },
+    {
+      "id": "K327-COMPILER-REPAIR-03",
+      "mutationClass": "HASH_BUILTIN_BOUNDARY",
+      "intent": "Repair sha256_text id 70 while preserving unknown builtin fallback id 0."
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "candidateMustRestoreCanonicalBytes": true,
+    "requiredCompilerRuntimeReceipt": "examples/universal-stress/evidence/k01-ai-generate/receipt.json",
+    "requiredCompilerAuthorityReceipt": "examples/universal-stress/evidence/k01-ai-generate/github-replay.json",
+    "requiredGitHubJobs": ["focused-verification", "k01-windows-verification"],
+    "eligibleCells": ["K327"]
+  },
+  "evidenceBoundary": "This proves three bounded independent repairs of compiler builtin lowering plus reuse of the separately admitted compiler fixed point. It grants only K327, not K339, whole-runtime self-hosting, arbitrary compiler evolution or K400 completion."
+}
