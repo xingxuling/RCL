@@ -127,3 +127,25 @@ Reproduction:
 npm run test:k08-tensor
 npm run evidence:k08-tensor-mlp
 ```
+
+## K08-E Tensor Plan liveness candidate
+
+Status: `ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE`. It changes execution storage policy, not Tensor or model semantics.
+
+| Evidence | Result |
+|---|---:|
+| Workload | unchanged K08-D `6,112,741-byte / 29,980-node` generic SSA plan |
+| Semantic parity | all 14 controlled baseline/candidate output roots identical |
+| Cumulative allocation | `207,135 elements / 1,657,080 bytes`, unchanged |
+| Peak logical plan store | `232 elements / 1,856 bytes` |
+| Retained requested outputs | `55 elements / 440 bytes` |
+| Reclaimed values / elements | `30,002 / 207,080` |
+| Logical plan-store reduction | `892.823x` |
+| Controlled A/B medians | `331.937 ms` pre-liveness / `286.367 ms` liveness |
+| Controlled workload speedup | `1.159x` (`13.729%` runtime reduction) |
+| Exact baseline | clean detached worktree at `ccfab80217a76d8ad5ab923e891cb8e8fbd538d7` |
+| Evidence report root | `0db5ef574caad46d22549c64e0f695d6e423bc9642965a85ca25b3d8cdf52629` |
+
+Requested intermediate outputs are pinned through their final downstream use; duplicate SSA definitions remain rejected even after the earlier value would have been reclaimed. The cumulative allocation ceiling is preserved and a separate simultaneous-live ceiling is added, so the change does not weaken the existing resource gate.
+
+The accepted receipt is `examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json`. It measures the logical plan value store only. Process peak RSS, allocator overhead, transient cloned operands, response serialization, buffer reuse, general workload speedup, Native/JS parity and K400 promotion are not granted.

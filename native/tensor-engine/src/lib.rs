@@ -18,7 +18,8 @@ const MAX_ELEMENTS: usize = 16_777_216;
 const MAX_PLAN_INITIAL_TENSORS: usize = 256;
 const MAX_PLAN_NODES: usize = 32_768;
 const MAX_PLAN_OUTPUTS: usize = 64;
-const MAX_PLAN_STORED_ELEMENTS: usize = 16_777_216;
+const MAX_PLAN_ALLOCATED_ELEMENTS: usize = 16_777_216;
+const MAX_PLAN_LIVE_ELEMENTS: usize = 16_777_216;
 const MAX_PLAN_FILE_BYTES: u64 = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -128,8 +129,20 @@ pub struct PlanTensorResult {
 pub struct PlanTelemetry {
     pub backend: &'static str,
     pub node_count: usize,
+    /// Backward-compatible alias for cumulative_allocated_elements.
     pub stored_elements: usize,
+    /// Backward-compatible alias for cumulative_allocated_bytes.
     pub allocated_bytes: usize,
+    pub cumulative_allocated_elements: usize,
+    pub cumulative_allocated_bytes: usize,
+    pub live_elements: usize,
+    pub live_bytes: usize,
+    pub peak_live_elements: usize,
+    pub peak_live_bytes: usize,
+    pub retained_output_elements: usize,
+    pub retained_output_bytes: usize,
+    pub reclaimed_tensor_count: usize,
+    pub reclaimed_elements: usize,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -942,17 +955,32 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
         ));
     }
     let mut values = validate_plan_initials(plan)?;
-    let mut stored_elements = values
+    let mut cumulative_allocated_elements = values
         .values()
         .map(|(_, storage)| storage.data.len())
         .sum::<usize>();
-    if stored_elements > MAX_PLAN_STORED_ELEMENTS {
+    if cumulative_allocated_elements > MAX_PLAN_ALLOCATED_ELEMENTS {
         return Err(EngineError::new(
             "RCL_TENSOR_PLAN_MEMORY_LIMIT",
             "Initial plan storage exceeds the element limit",
         ));
     }
+
+    let mut requested_output_ids = HashSet::new();
+    for output_id in &plan.outputs {
+        if !requested_output_ids.insert(output_id.as_str()) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_OUTPUT_DUPLICATE",
+                format!("Duplicate requested output {output_id}"),
+            ));
+        }
+    }
+
+    // Validate the complete SSA graph before execution. This separate definition set is
+    // required because dead values may be reclaimed from `values` during execution.
     let mut node_ids = HashSet::new();
+    let mut defined_ids = values.keys().cloned().collect::<HashSet<_>>();
+    let mut remaining_uses = HashMap::<String, usize>::new();
     for node in &plan.nodes {
         if node.id.is_empty() || !node_ids.insert(node.id.as_str()) {
             return Err(EngineError::new(
@@ -960,7 +988,7 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
                 format!("Missing or duplicate node id {}", node.id),
             ));
         }
-        if node.output.id.is_empty() || values.contains_key(&node.output.id) {
+        if node.output.id.is_empty() || defined_ids.contains(&node.output.id) {
             return Err(EngineError::new(
                 "RCL_TENSOR_PLAN_SSA_VIOLATION",
                 format!(
@@ -975,6 +1003,46 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
                 format!("Output tensor {} has no Gradient Identity", node.output.id),
             ));
         }
+        for input_id in &node.inputs {
+            if !defined_ids.contains(input_id) {
+                return Err(EngineError::new(
+                    "RCL_TENSOR_PLAN_INPUT_MISSING",
+                    format!("Node {} references unavailable tensor {input_id}", node.id),
+                ));
+            }
+            *remaining_uses.entry(input_id.clone()).or_default() += 1;
+        }
+        defined_ids.insert(node.output.id.clone());
+    }
+    for output_id in &plan.outputs {
+        if !defined_ids.contains(output_id) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_PLAN_OUTPUT_MISSING",
+                format!("Requested output {output_id} is unavailable"),
+            ));
+        }
+    }
+
+    let mut live_elements = cumulative_allocated_elements;
+    let mut peak_live_elements = live_elements;
+    let mut reclaimed_tensor_count = 0usize;
+    let mut reclaimed_elements = 0usize;
+    let unused_initials = values
+        .keys()
+        .filter(|id| {
+            !remaining_uses.contains_key(id.as_str()) && !requested_output_ids.contains(id.as_str())
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+    for id in unused_initials {
+        if let Some((_, storage)) = values.remove(&id) {
+            live_elements -= storage.data.len();
+            reclaimed_elements += storage.data.len();
+            reclaimed_tensor_count += 1;
+        }
+    }
+
+    for node in &plan.nodes {
         let mut tensors = Vec::with_capacity(node.inputs.len());
         let mut storages = Vec::with_capacity(node.inputs.len());
         let mut input_storage_ids = HashSet::new();
@@ -1019,7 +1087,8 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
         }
         result.tensor.id = node.output.id.clone();
         result.tensor.gradient_identity = node.output.gradient_identity.clone();
-        stored_elements = stored_elements
+        let output_elements = result.storage.data.len();
+        cumulative_allocated_elements = cumulative_allocated_elements
             .checked_add(result.storage.data.len())
             .ok_or_else(|| {
                 EngineError::new(
@@ -1027,25 +1096,75 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
                     "Plan element accounting overflowed",
                 )
             })?;
-        if stored_elements > MAX_PLAN_STORED_ELEMENTS {
+        if cumulative_allocated_elements > MAX_PLAN_ALLOCATED_ELEMENTS {
             return Err(EngineError::new(
                 "RCL_TENSOR_PLAN_MEMORY_LIMIT",
                 format!(
-                    "Plan stores {stored_elements} elements; limit is {MAX_PLAN_STORED_ELEMENTS}"
+                    "Plan cumulatively allocates {cumulative_allocated_elements} elements; limit is {MAX_PLAN_ALLOCATED_ELEMENTS}"
                 ),
             ));
         }
-        values.insert(node.output.id.clone(), (result.tensor, result.storage));
-    }
-    let mut output_ids = HashSet::new();
-    let mut outputs = Vec::with_capacity(plan.outputs.len());
-    for output_id in &plan.outputs {
-        if !output_ids.insert(output_id.as_str()) {
+
+        let transient_live_elements =
+            live_elements.checked_add(output_elements).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+                    "Plan live element accounting overflowed",
+                )
+            })?;
+        peak_live_elements = peak_live_elements.max(transient_live_elements);
+        if transient_live_elements > MAX_PLAN_LIVE_ELEMENTS {
             return Err(EngineError::new(
-                "RCL_TENSOR_PLAN_OUTPUT_DUPLICATE",
-                format!("Duplicate requested output {output_id}"),
+                "RCL_TENSOR_PLAN_LIVE_MEMORY_LIMIT",
+                format!(
+                    "Plan has {transient_live_elements} simultaneously live elements; limit is {MAX_PLAN_LIVE_ELEMENTS}"
+                ),
             ));
         }
+
+        let mut reclaim_inputs = Vec::new();
+        for input_id in &node.inputs {
+            let remaining = remaining_uses.get_mut(input_id).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_LIVENESS_INVALID",
+                    format!("Node {} has no liveness entry for {input_id}", node.id),
+                )
+            })?;
+            *remaining = remaining.checked_sub(1).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_LIVENESS_INVALID",
+                    format!("Node {} over-consumes tensor {input_id}", node.id),
+                )
+            })?;
+            if *remaining == 0 && !requested_output_ids.contains(input_id.as_str()) {
+                reclaim_inputs.push(input_id.clone());
+            }
+        }
+        for input_id in reclaim_inputs {
+            if let Some((_, storage)) = values.remove(&input_id) {
+                live_elements -= storage.data.len();
+                reclaimed_elements += storage.data.len();
+                reclaimed_tensor_count += 1;
+            }
+        }
+
+        if remaining_uses.contains_key(&node.output.id)
+            || requested_output_ids.contains(node.output.id.as_str())
+        {
+            live_elements = live_elements.checked_add(output_elements).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_TENSOR_PLAN_MEMORY_LIMIT",
+                    "Plan live element accounting overflowed",
+                )
+            })?;
+            values.insert(node.output.id.clone(), (result.tensor, result.storage));
+        } else {
+            reclaimed_elements += output_elements;
+            reclaimed_tensor_count += 1;
+        }
+    }
+    let mut outputs = Vec::with_capacity(plan.outputs.len());
+    for output_id in &plan.outputs {
         let (tensor, storage) = values.get(output_id).ok_or_else(|| {
             EngineError::new(
                 "RCL_TENSOR_PLAN_OUTPUT_MISSING",
@@ -1057,6 +1176,12 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
             storage: storage.clone(),
         });
     }
+    let retained_output_elements = outputs
+        .iter()
+        .map(|output| output.storage.data.len())
+        .sum::<usize>();
+    debug_assert_eq!(live_elements, retained_output_elements);
+    let element_bytes = std::mem::size_of::<f64>();
     Ok(ExecutionPlanResult {
         format: PLAN_RESPONSE_FORMAT,
         status: "ok",
@@ -1065,8 +1190,18 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
         telemetry: PlanTelemetry {
             backend: "rcl-tensor-cpu-rust-v0.1",
             node_count: plan.nodes.len(),
-            stored_elements,
-            allocated_bytes: stored_elements * std::mem::size_of::<f64>(),
+            stored_elements: cumulative_allocated_elements,
+            allocated_bytes: cumulative_allocated_elements * element_bytes,
+            cumulative_allocated_elements,
+            cumulative_allocated_bytes: cumulative_allocated_elements * element_bytes,
+            live_elements,
+            live_bytes: live_elements * element_bytes,
+            peak_live_elements,
+            peak_live_bytes: peak_live_elements * element_bytes,
+            retained_output_elements,
+            retained_output_bytes: retained_output_elements * element_bytes,
+            reclaimed_tensor_count,
+            reclaimed_elements,
         },
     })
 }
@@ -1410,7 +1545,63 @@ mod tests {
         assert_eq!(result.outputs[0].storage.data, vec![1., 4., 2., 5., 3., 6.]);
         assert_eq!(result.outputs[1].storage.data, vec![90., 120., 150.]);
         assert_eq!(result.telemetry.node_count, 2);
+        assert_eq!(result.telemetry.cumulative_allocated_elements, 17);
+        assert_eq!(result.telemetry.peak_live_elements, 14);
+        assert_eq!(result.telemetry.live_elements, 9);
+        assert_eq!(result.telemetry.retained_output_elements, 9);
+        assert_eq!(result.telemetry.reclaimed_tensor_count, 2);
+        assert_eq!(result.telemetry.reclaimed_elements, 8);
         assert_eq!(result.bindings["semanticSource"], "fixture");
+    }
+
+    #[test]
+    fn generic_plan_reclaims_dead_values_but_pins_requested_intermediates() {
+        let plan = ExecutionPlan {
+            format: PLAN_REQUEST_FORMAT.into(),
+            bindings: json!({}),
+            tensors: vec![
+                tensor("x", vec![2], "x"),
+                tensor("unused", vec![1], "unused"),
+            ],
+            storages: vec![
+                DenseStorage {
+                    identity: "x".into(),
+                    kind: "cpu-dense".into(),
+                    data: vec![-2., 3.],
+                },
+                DenseStorage {
+                    identity: "unused".into(),
+                    kind: "cpu-dense".into(),
+                    data: vec![99.],
+                },
+            ],
+            exact_storage_bits: HashMap::new(),
+            nodes: vec![
+                PlanNode {
+                    id: "double".into(),
+                    operation: "add".into(),
+                    inputs: vec!["x".into(), "x".into()],
+                    output: plan_output("doubled", vec![2]),
+                    attributes: json!({}),
+                },
+                PlanNode {
+                    id: "dead".into(),
+                    operation: "abs".into(),
+                    inputs: vec!["doubled".into()],
+                    output: plan_output("dead-output", vec![2]),
+                    attributes: json!({}),
+                },
+            ],
+            outputs: vec!["doubled".into()],
+        };
+        let result = execute_plan(&plan).unwrap();
+        assert_eq!(result.outputs[0].storage.data, vec![-4., 6.]);
+        assert_eq!(result.telemetry.cumulative_allocated_elements, 7);
+        assert_eq!(result.telemetry.peak_live_elements, 4);
+        assert_eq!(result.telemetry.live_elements, 2);
+        assert_eq!(result.telemetry.retained_output_elements, 2);
+        assert_eq!(result.telemetry.reclaimed_tensor_count, 3);
+        assert_eq!(result.telemetry.reclaimed_elements, 5);
     }
 
     #[test]
@@ -1460,6 +1651,19 @@ mod tests {
         redefinition.outputs[0] = "x".into();
         assert_eq!(
             execute_plan(&redefinition).unwrap_err().code,
+            "RCL_TENSOR_PLAN_SSA_VIOLATION"
+        );
+
+        let mut reclaimed_redefinition = exact_bits;
+        reclaimed_redefinition.nodes.push(PlanNode {
+            id: "reuse".into(),
+            operation: "abs".into(),
+            inputs: vec!["out".into()],
+            output: plan_output("out", vec![1]),
+            attributes: json!({}),
+        });
+        assert_eq!(
+            execute_plan(&reclaimed_redefinition).unwrap_err().code,
             "RCL_TENSOR_PLAN_SSA_VIOLATION"
         );
     }

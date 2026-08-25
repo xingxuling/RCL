@@ -153,16 +153,38 @@ The same-machine end-to-end measurement excludes compilation but includes native
 | General MLP campaign | `2537.360 ms` | `443.592 ms` | `5.720x` speedup |
 | Tensor Plan vs JS oracle | - | `443.592 / 27.964 ms` | `15.863x` ratio |
 
-This reduces the prior measured `118.300x` ratio by a factor of `7.458x`; it does not close the performance gap. Peak process RSS is still unmeasured. The 6.11 MB JSON plan, 29,980-node scalar dispatch and 1.66 MB retained-intermediate upper bound identify compact planning, liveness and buffer reuse as the next performance gate.
+This reduces the prior measured `118.300x` ratio by a factor of `7.458x`; it does not close the performance gap. Peak process RSS is still unmeasured. The 6.11 MB JSON plan and 29,980-node scalar dispatch identify compact planning and operand/buffer reuse as remaining performance gates; K08-E below separately addresses logical plan-value liveness.
 
 K08-D is `ENGINE_E1_GENERAL_MLP_TENSOR_LOWERING_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32810795935` replayed portable correctness on Ubuntu and the real Windows Provider, CPU performance and General MLP Tensor evidence paths for exact implementation commit `8b53c60321345fdcc9449c1a5b7b522a3e7939a9`. It grants no Autodiff, AdamW, Transformer, GPU, distributed Tensor or K400 promotion claim.
 
-## 9. Next gate
+## 9. K08-E Tensor Plan liveness candidate
+
+K08-E preserves the K08-D generic plan and Tensor operation semantics. It adds whole-plan SSA definition/use validation, last-use reclamation, requested-intermediate pinning, cumulative-allocation compatibility telemetry, and separate peak-live plan-store telemetry. The old cumulative resource ceiling remains fail-closed, and a peak-live ceiling is additive rather than a weaker replacement.
+
+For the exact 6,112,741-byte / 29,980-node K08-D plan:
+
+| Plan-store boundary | Pre-liveness retained | K08-E |
+|---|---:|---:|
+| Cumulative allocated | `1,657,080 bytes` | `1,657,080 bytes` |
+| Logical peak live | `1,657,080 bytes` | `1,856 bytes` |
+| Final requested outputs | included in all retained values | `440 bytes` |
+| Reclaimed values / elements | `0 / 0` | `30,002 / 207,080` |
+
+The logical peak reduction factor is `892.823x`. This excludes allocator overhead, transient operand clones, serialization buffers and process RSS. A controlled Windows A/B used the same plan, warm release binaries and alternating process-level execution for seven rounds:
+
+| Exact backend | Median | Result |
+|---|---:|---:|
+| pre-liveness commit `ccfab802...` | `331.937 ms` | baseline |
+| K08-E liveness candidate | `286.367 ms` | `1.159x`, `13.729%` lower runtime |
+
+Every baseline and candidate output root was identical. The result is specific to this General MLP plan and does not establish general Tensor-workload speedup. Local evidence root: `0db5ef574caad46d22549c64e0f695d6e423bc9642965a85ca25b3d8cdf52629`.
+
+## 10. Next gate
 
 The next highest-value sequence is:
 
-1. add Tensor Plan liveness, buffer reuse and compact plan lowering, then remeasure the `15.863x` ratio;
-2. add native process peak-memory telemetry;
+1. measure process RSS and remove per-node operand/storage clones;
+2. add buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
 3. close the typed-source self-host compiler gap before Tensor promotion;
 4. resolve scientific-notation number canonicalization in semantic-state-root evidence;
 5. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.

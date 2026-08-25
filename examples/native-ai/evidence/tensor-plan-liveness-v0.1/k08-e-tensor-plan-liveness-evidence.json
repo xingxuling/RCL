@@ -1,0 +1,100 @@
+{
+  "format": "rcl.k08-e.tensor-plan-liveness-evidence.v0.1",
+  "status": "ENGINE_E1_TENSOR_PLAN_LIVENESS_CANDIDATE",
+  "generatedAt": "2026-08-25T05:40:09.130Z",
+  "semanticOwner": "RCL Tensor Plan",
+  "executionOwner": "rcl-tensor-cpu-rust-v0.1",
+  "sourceEvidence": {
+    "k08dReportRoot": "f4982380f9d7d05bd85a838fa7b65f37bfee12c2a401abb95a31b0fff677f70d",
+    "baselineCommit": "ccfab80217a76d8ad5ab923e891cb8e8fbd538d7",
+    "baselineWorktreeClean": true
+  },
+  "artifactHashes": {
+    "rustBackend": "3511315da3dd45739c7cf5d73d97b8805cfc59fe05b82f9ca2cdafc9090db693",
+    "evidenceOrgan": "fc0ff07850b566838e4f967f128709a50a212e88faf93ae9aaf3b06def5207c1",
+    "loweringOrgan": "31e3ef7f4ef40cd844a01b17a856137544b5e738d3b1fd1abf807a3cf0ec5d95",
+    "baselineBinarySha256": "02fb0561ea1d6e50b30ac0d35bf5a08322ffdb4d64c6cf00eba8749095a66957",
+    "livenessBinarySha256": "868e59e38d87868b3fc600b75c120e5daad2c66e39bee498847f9ce5c6683e8e"
+  },
+  "workload": {
+    "planFormat": "rcl.tensor-execution-plan.v0.1",
+    "planSha256": "319abf8a601d2f9d8c91928f0cd54135219d732b0d338c9706371c9daeb2a523",
+    "planBytes": 6112741,
+    "nodes": 29980,
+    "initialTensors": 40,
+    "requestedOutputs": 18,
+    "operations": [
+      "abs",
+      "add",
+      "div",
+      "matmul",
+      "mul",
+      "sub",
+      "sum",
+      "transpose"
+    ]
+  },
+  "planStore": {
+    "baselineRetainedElements": 207135,
+    "baselineRetainedBytes": 1657080,
+    "cumulativeAllocatedElements": 207135,
+    "cumulativeAllocatedBytes": 1657080,
+    "peakLiveElements": 232,
+    "peakLiveBytes": 1856,
+    "retainedOutputElements": 55,
+    "retainedOutputBytes": 440,
+    "reclaimedTensorCount": 30002,
+    "reclaimedElements": 207080,
+    "peakPlanStoreReductionFactor": 892.823275862069,
+    "boundary": "Logical Tensor Plan value-store accounting only; allocator overhead, transient operand clones, serialization buffers and process peak RSS are excluded."
+  },
+  "controlledPerformance": {
+    "boundary": "Same Windows host, same 6.1 MB plan, warm release binaries, alternating process-level samples; each sample includes plan hash/load, execution and response serialization.",
+    "rounds": 7,
+    "baselineSamplesMs": [
+      290.9755,
+      360.2505000000001,
+      402.34320000000025,
+      407.6907000000001,
+      331.9368999999997,
+      320.15250000000015,
+      309.90490000000045
+    ],
+    "livenessSamplesMs": [
+      259.1836999999998,
+      242.56579999999985,
+      339.3699999999999,
+      269.50160000000005,
+      288.0039000000006,
+      286.3665000000001,
+      339.3632000000007
+    ],
+    "baselineMedianMs": 331.9368999999997,
+    "livenessMedianMs": 286.3665000000001,
+    "speedup": 1.1591331388273405,
+    "runtimeReductionPercent": 13.728633363750653
+  },
+  "outputRoot": "a465e4d116091b1d30bdce0b1cc90c90983446559860f4115b1461e13b68cbcb",
+  "checks": {
+    "exactBaselineCommit": true,
+    "baselineClean": true,
+    "samePlan": true,
+    "semanticParity": true,
+    "deterministic": true,
+    "cumulativeAccountingPreserved": true,
+    "livenessReclaimsDeadValues": true,
+    "requestedOutputsRetained": true,
+    "peakPlanStoreReduced": true,
+    "controlledRuntimeImproved": true
+  },
+  "claimsNotGranted": [
+    "PROCESS_RSS_REDUCTION",
+    "GENERAL_TENSOR_WORKLOAD_SPEEDUP",
+    "PERFORMANCE_PARITY_WITH_JAVASCRIPT",
+    "BUFFER_REUSE",
+    "NATIVE_AUTODIFF",
+    "K400_PROMOTION_FROM_THIS_CANDIDATE"
+  ],
+  "nextGap": "Measure process RSS, eliminate per-node operand/storage clones, then evaluate compact lowering and typed self-host ownership.",
+  "reportRoot": "0db5ef574caad46d22549c64e0f695d6e423bc9642965a85ca25b3d8cdf52629"
+}
