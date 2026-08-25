@@ -9,7 +9,7 @@
 | Focused regression | PASS_LOCAL | 6/6 across canonical-output and native Provider host-call suites |
 | Native rebuild | PASS_LOCAL | real Zig 0.16.0 Windows rebuild; `rclvm.exe` 316,416 bytes, SHA-256 `d3d8cffdd611051c828dac7fcb35c66ec114a807aca1df02529130c690cb699e` |
 | Full regression | PASS_LOCAL | 857/857, 0 failed/skipped; 663640.0033 ms; pretest rebuilt native artifacts with real Zig 0.16.0 |
-| Hosted checks | PENDING | run after pull request |
+| Hosted checks | PASS | PR #62 implementation head `cf004ee`: Authority run `32813347030`; Canonical run `32813347005` (7m25s); push/PR stress runs `32813341427` and `32813347084` with both Linux focused and Windows K01 jobs passing; Vercel passed |
 | Multi-target generality | BLOCKED | one Aether portable vector is stress evidence, not arbitrary-target parity |
 | K400 promotion | BLOCKED | nine non-compensatory gates were not completed |
 
