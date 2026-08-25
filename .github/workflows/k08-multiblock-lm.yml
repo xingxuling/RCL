@@ -1,0 +1,45 @@
+name: K08 Multi-Block LM v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-multiblock-v01
+    paths:
+      - 'examples/native-ai/multiblock-lm-*'
+      - 'examples/native-ai/gqa-*'
+      - 'examples/native-ai/rope-*'
+      - 'native/tensor-engine/**'
+      - 'scripts/run-k08-native-autodiff.mjs'
+      - 'tests/k08-multiblock-lm.test.mjs'
+      - '.github/workflows/k08-multiblock-lm.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/multiblock-lm-*'
+      - 'examples/native-ai/gqa-*'
+      - 'examples/native-ai/rope-*'
+      - 'native/tensor-engine/**'
+      - 'scripts/run-k08-native-autodiff.mjs'
+      - 'tests/k08-multiblock-lm.test.mjs'
+      - '.github/workflows/k08-multiblock-lm.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  multiblock-lm:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08-P multi-block LM evidence tests
+        run: node --test --test-concurrency=1 tests/k08-multiblock-lm.test.mjs
