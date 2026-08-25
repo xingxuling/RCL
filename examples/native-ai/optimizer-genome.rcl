@@ -124,11 +124,12 @@ reality OptimizerGenomeCandidate {
   reckon checkpoint_state(checkpoint : Sequence) -> Sequence = sequence_get(sequence_get(checkpoint, 1), 1)
 
   reckon approximately(left : Number, right : Number, tolerance : Number) -> Truth = absolute(left - right) <= tolerance
+  reckon standard_epsilon() -> Number = 1 / 100000000
 
-  reckon config_sgd() -> Sequence = make_config("sgd", 0.01, 0.9, 0.999, 0.01, 0.1, 1)
-  reckon config_momentum() -> Sequence = make_config("momentum", 0.01, 0.9, 0.999, 0.01, 0.1, 1)
-  reckon config_adam() -> Sequence = make_config("adam", 0.01, 0.9, 0.999, 0.01, 0.1, 1)
-  reckon config_adamw() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0.01, 0.1, 1)
+  reckon config_sgd() -> Sequence = make_config("sgd", 0.01, 0.9, 0.999, standard_epsilon(), 0.1, 1)
+  reckon config_momentum() -> Sequence = make_config("momentum", 0.01, 0.9, 0.999, standard_epsilon(), 0.1, 1)
+  reckon config_adam() -> Sequence = make_config("adam", 0.01, 0.9, 0.999, standard_epsilon(), 0.1, 1)
+  reckon config_adamw() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, standard_epsilon(), 0.1, 1)
 
   reckon initial_state(kind : Text) -> Sequence = make_state(kind, 0, 0, 0)
 
@@ -140,10 +141,10 @@ reality OptimizerGenomeCandidate {
   reckon adamw_step_two_direct() -> Sequence = optimizer_update(update_parameter_value(adamw_step_one()), 0.5, update_state(adamw_step_one()), config_adamw())
   reckon adamw_step_two_resumed() -> Sequence = optimizer_update(checkpoint_parameter(adamw_checkpoint_one()), 0.5, checkpoint_state(adamw_checkpoint_one()), config_adamw())
 
-  reckon invalid_learning_rate() -> Sequence = make_config("adamw", 0, 0.9, 0.999, 0.01, 0.1, 1)
-  reckon invalid_beta() -> Sequence = make_config("adamw", 0.01, 1, 0.999, 0.01, 0.1, 1)
+  reckon invalid_learning_rate() -> Sequence = make_config("adamw", 0, 0.9, 0.999, standard_epsilon(), 0.1, 1)
+  reckon invalid_beta() -> Sequence = make_config("adamw", 0.01, 1, 0.999, standard_epsilon(), 0.1, 1)
   reckon invalid_epsilon() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0, 0.1, 1)
-  reckon invalid_weight_decay() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, 0.01, 0 - 0.1, 1)
+  reckon invalid_weight_decay() -> Sequence = make_config("adamw", 0.01, 0.9, 0.999, standard_epsilon(), 0 - 0.1, 1)
 
   facet contract.id : Text = "k08-h-optimizer-genome-v0.1"
   facet contract.profile : Text = "ENGINE-E3-OPTIMIZER-CANDIDATE-SCALAR-F64"
@@ -160,9 +161,9 @@ reality OptimizerGenomeCandidate {
 
   facet evaluation.sgd_correct : Truth = approximately(fixture.sgd.parameter, 0.995, 0.000001)
   facet evaluation.momentum_correct : Truth = approximately(fixture.momentum.parameter, 0.9995, 0.000001)
-  facet evaluation.adam_correct : Truth = approximately(fixture.adam.parameter, 0.9901960784, 0.000001)
-  facet evaluation.adamw_correct : Truth = approximately(fixture.adamw.step1.parameter, 0.9891960784, 0.000001)
-  facet evaluation.adamw_second_correct : Truth = approximately(fixture.adamw.step2.parameter, 0.9784029608, 0.000001)
+  facet evaluation.adam_correct : Truth = approximately(fixture.adam.parameter, 0.9900000002, 0.000001)
+  facet evaluation.adamw_correct : Truth = approximately(fixture.adamw.step1.parameter, 0.9890000002, 0.000001)
+  facet evaluation.adamw_second_correct : Truth = approximately(fixture.adamw.step2.parameter, 0.9780110004, 0.000001)
   facet evaluation.checkpoint_resume_exact : Truth =
     update_parameter_value(adamw_step_two_direct()) == update_parameter_value(adamw_step_two_resumed()) and
     state_step(update_state(adamw_step_two_direct())) == state_step(update_state(adamw_step_two_resumed())) and
