@@ -1,0 +1,31 @@
+# K08-P: parametric multi-block decoder language-model semantic genome.
+# RCL owns ordered block composition, per-block parameter identity and topology. Execution remains generic Tensor/Autodiff.
+reality MultiBlockLMGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_block_count(blocks : Number) -> Truth = positive(blocks) and blocks <= 64
+  reckon valid_gqa(query_heads : Number, kv_heads : Number, head_dimension : Number, hidden : Number) -> Truth =
+    positive(query_heads) and positive(kv_heads) and query_heads >= kv_heads and query_heads % kv_heads == 0 and
+    positive(head_dimension) and head_dimension % 2 == 0 and hidden == query_heads * head_dimension
+  reckon parameters_per_block() -> Number = 6
+  reckon block_parameter_count(blocks : Number) -> Number = blocks * parameters_per_block()
+  reckon total_parameter_groups(blocks : Number) -> Number = block_parameter_count(blocks) + 2
+
+  facet contract.id : Text = "k08-p-multiblock-lm-genome-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.profile : Text = "PARAMETRIC_ORDERED_MULTI_BLOCK_GQA_ROPE_LM_F64_CANDIDATE"
+  facet contract.block_order : Text = "STRICT_SEQUENTIAL_RESIDUAL_COMPOSITION"
+  facet contract.parameter_identity : Text = "BLOCK_INDEX_SCOPED_UNIQUE_PARAMETER_IDS"
+  facet contract.gradient_requirement : Text = "LOSS_GRADIENT_MUST_CROSS_LATER_BLOCKS_TO_EARLIER_BLOCK_PARAMETERS"
+  facet contract.no_model_special_opcode : Truth = true
+
+  facet evaluation.one_block_valid : Truth = valid_block_count(1)
+  facet evaluation.two_blocks_valid : Truth = valid_block_count(2)
+  facet evaluation.zero_blocks_rejected : Truth = not valid_block_count(0)
+  facet evaluation.sixty_five_blocks_rejected : Truth = not valid_block_count(65)
+  facet evaluation.gqa_2_1_2_4_valid : Truth = valid_gqa(2, 1, 2, 4)
+  facet evaluation.rcl1b_gqa_valid : Truth = valid_gqa(16, 4, 128, 2048)
+  facet evaluation.two_block_parameter_groups : Truth = total_parameter_groups(2) == 14
+  facet evaluation.twenty_four_block_parameter_groups : Truth = total_parameter_groups(24) == 146
+
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_RCL10M_GPU_DISTRIBUTED_OR_RCL1B_PROMOTION"
+}

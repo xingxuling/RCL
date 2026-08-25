@@ -1,0 +1,39 @@
+name: K08 Mixed Precision v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-mixed-precision-v01
+    paths:
+      - 'examples/native-ai/mixed-precision-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-mixed-precision.test.mjs'
+      - '.github/workflows/k08-mixed-precision.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/mixed-precision-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-mixed-precision.test.mjs'
+      - '.github/workflows/k08-mixed-precision.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mixed-precision:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08-Q mixed-precision evidence tests
+        run: node --test --test-concurrency=1 tests/k08-mixed-precision.test.mjs

@@ -1,0 +1,37 @@
+# K08-L: lossless UTF-8 byte tokenizer semantic genome.
+# RCL owns token identity, special-token boundaries, normalization policy and provenance intent.
+# The native Rust organ performs byte conversion, hashing and token-stream materialization.
+reality ByteTokenizerGenomeCandidate {
+  reckon byte_token_valid(token : Number) -> Truth = token >= 0 and token <= 255
+  reckon special_token_valid(token : Number) -> Truth = token == 256 or token == 257 or token == 258
+  reckon token_valid(token : Number) -> Truth = byte_token_valid(token) or special_token_valid(token)
+  reckon byte_identity(byte_value : Number) -> Number = byte_value
+  reckon vocab_size() -> Number = 259
+
+  facet contract.id : Text = "k08-l-byte-tokenizer-genome-v0.1"
+  facet contract.profile : Text = "LOSSLESS-UTF8-BYTE-TOKENIZER-CANDIDATE"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.execution_owner : Text = "RCL_TOKENIZER_RUST_ORGAN"
+
+  facet encoding.name : Text = "UTF-8"
+  facet normalization.policy : Text = "NONE"
+  facet token.byte_min : Number = 0
+  facet token.byte_max : Number = 255
+  facet token.pad : Number = 256
+  facet token.bos : Number = 257
+  facet token.eos : Number = 258
+  facet token.vocab_size : Number = vocab_size()
+  facet token.stream_encoding : Text = "U32_LITTLE_ENDIAN"
+
+  facet evaluation.ascii_a_identity : Truth = byte_identity(65) == 65
+  facet evaluation.byte_zero_valid : Truth = token_valid(0)
+  facet evaluation.byte_255_valid : Truth = token_valid(255)
+  facet evaluation.specials_valid : Truth = token_valid(token.pad) and token_valid(token.bos) and token_valid(token.eos)
+  facet evaluation.out_of_range_rejected : Truth = not token_valid(259)
+  facet evaluation.vocab_size_correct : Truth = token.vocab_size == 259
+
+  facet evidence.roundtrip_rule : Text = "VALID_UTF8_TEXT_TO_EXACT_UTF8_BYTES_TO_SAME_TEXT"
+  facet evidence.normalization_rule : Text = "NO_UNICODE_NORMALIZATION_OR_CASE_FOLDING"
+  facet evidence.provenance : Text = "SOURCE_SHA256_PLUS_TOKEN_STREAM_SHA256_PLUS_TOKENIZER_ROOT"
+  facet evidence.authority : Text = "BYTE_SUBSTRATE_ONLY_NO_BPE_64K_ROPE_MULTIHEAD_GPU_RCL10M_OR_K400_PROMOTION"
+}

@@ -1,0 +1,39 @@
+name: K08 Transformer Block v0.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'codex/k08-transformer-block-v01'
+    paths:
+      - 'examples/native-ai/transformer-block-genome.rcl'
+      - 'examples/native-ai/transformer-block-contract.v0.1.json'
+      - 'tests/k08-transformer-block.test.mjs'
+      - '.github/workflows/k08-transformer-block.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/transformer-block-genome.rcl'
+      - 'examples/native-ai/transformer-block-contract.v0.1.json'
+      - 'tests/k08-transformer-block.test.mjs'
+      - '.github/workflows/k08-transformer-block.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  transformer-block:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08 Transformer Block tests
+        run: node --test --test-concurrency=1 tests/k08-transformer-block.test.mjs

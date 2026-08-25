@@ -1,0 +1,39 @@
+name: K08 Tiny Decoder LM v0.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'codex/k08-tiny-decoder-lm-v01'
+    paths:
+      - 'examples/native-ai/tiny-decoder-lm-genome.rcl'
+      - 'examples/native-ai/tiny-decoder-lm-contract.v0.1.json'
+      - 'tests/k08-tiny-decoder-lm.test.mjs'
+      - '.github/workflows/k08-tiny-decoder-lm.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/tiny-decoder-lm-genome.rcl'
+      - 'examples/native-ai/tiny-decoder-lm-contract.v0.1.json'
+      - 'tests/k08-tiny-decoder-lm.test.mjs'
+      - '.github/workflows/k08-tiny-decoder-lm.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tiny-decoder-lm:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08 Tiny Decoder LM tests
+        run: node --test --test-concurrency=1 tests/k08-tiny-decoder-lm.test.mjs

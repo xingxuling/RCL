@@ -1,0 +1,43 @@
+name: K08 Optimizer Genome v0.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'codex/k08-optimizer-genome-v01'
+    paths:
+      - 'examples/native-ai/optimizer-genome.rcl'
+      - 'examples/native-ai/optimizer-genome-contract.v0.1.json'
+      - 'tests/k08-optimizer-genome.test.mjs'
+      - 'tests/k08-selfhost-root-drift-diagnostic.test.mjs'
+      - '.github/workflows/k08-optimizer-genome.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/optimizer-genome.rcl'
+      - 'examples/native-ai/optimizer-genome-contract.v0.1.json'
+      - 'tests/k08-optimizer-genome.test.mjs'
+      - 'tests/k08-selfhost-root-drift-diagnostic.test.mjs'
+      - '.github/workflows/k08-optimizer-genome.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  optimizer-genome:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Diagnose self-host canonical source-root parity
+        run: node --test --test-concurrency=1 tests/k08-selfhost-root-drift-diagnostic.test.mjs
+      - name: Run K08 Optimizer Genome tests
+        run: node --test --test-concurrency=1 tests/k08-optimizer-genome.test.mjs

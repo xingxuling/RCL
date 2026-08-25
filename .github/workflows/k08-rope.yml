@@ -1,0 +1,39 @@
+name: K08 RoPE v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-rope-v01
+    paths:
+      - 'native/tensor-engine/**'
+      - 'examples/native-ai/rope*'
+      - 'tests/k08-rope.test.mjs'
+      - '.github/workflows/k08-rope.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/**'
+      - 'examples/native-ai/rope*'
+      - 'tests/k08-rope.test.mjs'
+      - '.github/workflows/k08-rope.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rope:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08-N RoPE evidence tests
+        run: node --test --test-concurrency=1 tests/k08-rope.test.mjs

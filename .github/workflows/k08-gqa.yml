@@ -1,0 +1,43 @@
+name: K08 GQA v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-gqa-v01
+    paths:
+      - 'examples/native-ai/gqa-*'
+      - 'examples/native-ai/rope-*'
+      - 'native/tensor-engine/**'
+      - 'scripts/run-k08-native-autodiff.mjs'
+      - 'tests/k08-gqa.test.mjs'
+      - '.github/workflows/k08-gqa.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/gqa-*'
+      - 'examples/native-ai/rope-*'
+      - 'native/tensor-engine/**'
+      - 'scripts/run-k08-native-autodiff.mjs'
+      - 'tests/k08-gqa.test.mjs'
+      - '.github/workflows/k08-gqa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gqa:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and VM
+        run: npm run build:native
+      - name: Run K08-O GQA evidence tests
+        run: node --test --test-concurrency=1 tests/k08-gqa.test.mjs
