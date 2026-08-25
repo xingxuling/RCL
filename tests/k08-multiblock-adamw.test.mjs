@@ -237,6 +237,15 @@ function adamwRequest(graph, ids, steps, optimizerStates = []) {
   return { format: 'rcl.tensor-autodiff-adamw-training-request.v0.1', autodiff: autodiffRequest(graph, ids), steps, config: CONFIG, optimizerStates };
 }
 
+function exactF64Bits(values) {
+  const buffer = new ArrayBuffer(8);
+  const view = new DataView(buffer);
+  return values.map((value) => {
+    view.setFloat64(0, value, false);
+    return view.getBigUint64(0, false).toString(16).padStart(16, '0');
+  });
+}
+
 function applyParameters(graph, parameters) {
   const copy = structuredClone(graph);
   for (const trained of parameters) {
@@ -249,6 +258,7 @@ function applyParameters(graph, parameters) {
     storage.data = [...trained.storage.data];
     tensor.storageIdentity = trained.storage.identity;
     delete copy.exactStorageBits[oldIdentity];
+    copy.exactStorageBits[trained.storage.identity] = exactF64Bits(trained.storage.data);
   }
   return copy;
 }
@@ -335,7 +345,8 @@ test('K08-R frozen CPU-f64 multi-block AdamW replay is deterministic', { timeout
 });
 
 test('K08-R malformed optimizer state fails closed instead of rebinding silently', () => {
-  const invalid = [{ tensorId: 'tokenEmbedding', step: 0, firstMoment: [], secondMoment: new Array(weights.tokenEmbedding.length).fill(0) }];
+  const invalid = ids.map((tensorId) => ({ tensorId, step: 0, firstMoment: new Array(weights[tensorId].length).fill(0), secondMoment: new Array(weights[tensorId].length).fill(0) }));
+  invalid.find((state) => state.tensorId === 'tokenEmbedding').firstMoment = [];
   const result = executeAdamW(adamwRequest(graph, ids, 1, invalid), false);
   assert.equal(result.code, 'RCL_ADAMW_STATE_SHAPE');
 });
