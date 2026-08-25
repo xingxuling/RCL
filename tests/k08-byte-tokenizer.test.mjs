@@ -28,7 +28,7 @@ function sha256(buffer) {
 }
 
 function buildEngine() {
-  const run = spawnSync('cargo', ['build', '--release', '--manifest-path', MANIFEST], {
+  const run = spawnSync('cargo', ['build', '--release', '--locked', '--manifest-path', MANIFEST], {
     cwd: ROOT,
     encoding: 'utf8',
     timeout: 180_000,
