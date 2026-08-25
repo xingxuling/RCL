@@ -1,6 +1,6 @@
 {
   "format": "rcl.k08-p.multiblock-lm-contract.v0.1",
-  "status": "MULTI_BLOCK_LM_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "status": "MULTI_BLOCK_LM_CANDIDATE_GITHUB_REPLAY_BOUND",
   "canonicalOwner": "RCL",
   "profile": "PARAMETRIC_ORDERED_MULTI_BLOCK_GQA_ROPE_LM_F64_CANDIDATE",
   "composition": {
@@ -44,6 +44,13 @@
     "kvHeads": 4,
     "headDimension": 128
   },
+  "hostedEvidence": {
+    "implementationRun": 32848996210,
+    "sourceCommit": "e702514c833f3c4dea314c7ec565f2233def9e7a",
+    "ubuntuJob": 97805250272,
+    "windowsJob": 97805250421,
+    "result": "PASS_BOTH_PLATFORMS_9_OF_9"
+  },
   "requiredEvidence": [
     "selfhost-rbc-parity-and-native-semantic-root",
     "same-builder-supports-one-and-two-blocks",
@@ -63,6 +70,7 @@
     "MULTI_BLOCK_LM_FORWARD_LOSS"
   ],
   "claimsNotGranted": [
+    "MULTI_BLOCK_ADAMW_TRAINING_REPLAY",
     "PRODUCTION_64K_VOCABULARY",
     "RCL_10M",
     "BF16",
