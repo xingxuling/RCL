@@ -76,7 +76,7 @@ test('K08-H RCL Optimizer Genome self-host compiles and executes natively', { ti
 
 test('K08-H numeric fixture agrees with independent JavaScript AdamW oracle', { timeout: 180_000 }, () => {
   const run = runOptimizerGenome();
-  const cfg = { learningRate: 0.01, beta1: 0.9, beta2: 0.999, epsilon: 1e-8, weightDecay: 0.1 };
+  const cfg = { learningRate: 0.01, beta1: 0.9, beta2: 0.999, epsilon: 0.01, weightDecay: 0.1 };
   let parameter = 1;
   let firstMoment = 0;
   let secondMoment = 0;
