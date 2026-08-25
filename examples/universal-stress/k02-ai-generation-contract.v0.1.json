@@ -1,0 +1,57 @@
+{
+  "format": "rcl.k02.ai-generation-contract.v0.1",
+  "status": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "minimumCliVersion": "0.135.0",
+    "sandbox": "read-only",
+    "network": "not-required"
+  },
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k02-complete-web-app.rcl",
+    "sourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+    "specPath": "examples/universal-stress/k02-complete-web-app.web.json",
+    "specSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599"
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that separately executed AI sessions can repair bounded RCL-owned Web, GUI and reactive semantics from mutated candidates and observed failures without seeing the canonical source or oracle edit.",
+  "rules": [
+    "Each generator receives only the mutated RCL/Web candidate, observed verifier result and the frozen semantic intent.",
+    "The canonical files, mutation implementation and oracle edit are not present in the generator workspace.",
+    "Each trial runs in a fresh ephemeral read-only session that ignores project rules and user configuration.",
+    "The evaluator applies only the exact file/old/new edit returned through the frozen JSON Schema.",
+    "The generator cannot edit tests, thresholds, evidence, authority policy or the authoritative repository.",
+    "A repaired candidate must restore RCL compilation, rooted Web lowering, reactive HTML bindings and real loopback Node API execution.",
+    "Three unique generator sessions and three successful deterministic replays are required.",
+    "A GitHub-hosted replay of saved candidates is required before any K400 AI_GENERATE gate may become PASS."
+  ],
+  "trials": [
+    {
+      "id": "K02-AI-REPAIR-01",
+      "mutationClass": "REACTIVE_STATE_TRANSITION",
+      "intent": "Repair the addTodo transition so one accepted Todo increments the reactive count exactly once while preserving the generic transaction path.",
+      "candidateFiles": ["candidate.rcl", "candidate.web.json"]
+    },
+    {
+      "id": "K02-AI-REPAIR-02",
+      "mutationClass": "AUTHORITY_BINDING",
+      "intent": "Repair the addTodo authority requirement so the declared user warrant authorizes the rule without weakening or removing the capability check.",
+      "candidateFiles": ["candidate.rcl", "candidate.web.json"]
+    },
+    {
+      "id": "K02-AI-REPAIR-03",
+      "mutationClass": "REACTIVE_VIEW_BINDING",
+      "intent": "Repair the Todo input morphology so the same input state is displayed and observed through the generated browser binding.",
+      "candidateFiles": ["candidate.rcl", "candidate.web.json"]
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "candidateMustRestoreCanonicalBytes": true,
+    "requiredGitHubReplay": true,
+    "selfIssuedPassForbidden": true,
+    "eligibleCells": ["K063", "K064", "K078"]
+  },
+  "evidenceBoundary": "This contract proves bounded independent repair of the checked-in K02 RCL Web/GUI/reactive vertical slice. It does not prove arbitrary Web generation, browser-engine conformance, Android execution, compiler self-evolution or K400 completion."
+}

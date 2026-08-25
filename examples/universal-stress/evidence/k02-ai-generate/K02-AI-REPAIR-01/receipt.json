@@ -1,0 +1,150 @@
+{
+  "format": "rcl.k02.ai-generation-trial-receipt.v0.1",
+  "trialId": "K02-AI-REPAIR-01",
+  "mutationClass": "REACTIVE_STATE_TRANSITION",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0397d-f6f3-7903-84ca-ccfef0dfbaed",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "    alter app.todo_count <- app.todo_count + 2",
+    "new": "    alter app.todo_count <- app.todo_count + 1",
+    "diagnosis": "server-add-rule fails because addTodo currently increments app.todo_count by 2. The invariant requires one accepted addTodo transaction to increment the count exactly once while preserving the existing generic transaction path, authority check, acceptance guard, and web binding."
+  },
+  "promptRoot": "93c5a2483db7e1fa18c1229e83643bf0351a83831ece42ea8c334b12c224d707",
+  "mutatedFile": "candidate.rcl",
+  "mutatedSourceSha256": "4e21ea4c4c4e926e225eeaf8b6b754ea5bbfef2b2a00be0393c8812a5b4d605d",
+  "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+  "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+  "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "b39fc2a004bbd91066601301428e3430e2d666d3e3fdc8ff7f61da46c306fcfe",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0397d-f6f3-7903-84ca-ccfef0dfbaed"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "7854351df718516a646a5105a652e99d89984e4f464903e530c913d72f142fca"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "c2195676477a0a7bcf25ad3eefaa9f1712ec6b4f9633664650f1f7af13f45aa4"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 56017,
+        "cached_input_tokens": 29440,
+        "output_tokens": 482,
+        "reasoning_output_tokens": 55
+      }
+    }
+  ],
+  "finalMessageSha256": "c2195676477a0a7bcf25ad3eefaa9f1712ec6b4f9633664650f1f7af13f45aa4",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "c472ff85ddb6320df05353339c0d8fedeff500f244042366fb0ba76f5a51e861",
+    "failedChecks": [
+      "server-add-rule"
+    ],
+    "error": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "144b97989cd1cb91e74bb0316184d5aa568c6732fb3ae120f75f01eac86d53d0",
+    "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+    "checks": {
+      "program-identity": {
+        "pass": true
+      },
+      "initial-state": {
+        "pass": true
+      },
+      "authority-binding": {
+        "pass": true
+      },
+      "reactive-html-binding": {
+        "pass": true
+      },
+      "rule-html-binding": {
+        "pass": true
+      },
+      "server-surface": {
+        "pass": true
+      },
+      "server-initial-state": {
+        "pass": true
+      },
+      "server-observe": {
+        "pass": true
+      },
+      "server-add-rule": {
+        "pass": true
+      },
+      "server-reset-rule": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "99f361be96fdd737a77cbf3c90d4ceccf7e12d60d426fc7fe70d5b0e7559781e"
+}

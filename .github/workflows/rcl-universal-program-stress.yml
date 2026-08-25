@@ -26,6 +26,9 @@ on:
       - 'scripts/run-k08-native-autodiff.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
+      - 'scripts/run-k02-independent-ai-generation.mjs'
+      - 'scripts/verify-k02-ai-generation-receipt.mjs'
+      - 'scripts/verify-k02-web-candidate.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -58,6 +61,9 @@ on:
       - 'scripts/run-k08-native-autodiff.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
+      - 'scripts/run-k02-independent-ai-generation.mjs'
+      - 'scripts/verify-k02-ai-generation-receipt.mjs'
+      - 'scripts/verify-k02-web-candidate.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -98,6 +104,8 @@ jobs:
         run: npm run evidence:k08-autodiff
       - name: K233 independent AI generation receipt replay
         run: npm run verify:k233-ai-generate
+      - name: K02 independent AI generation receipt replay
+        run: npm run verify:k02-ai-generate
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report

@@ -1,0 +1,141 @@
+{
+  "format": "rcl.k02.ai-generation-trial-receipt.v0.1",
+  "trialId": "K02-AI-REPAIR-03",
+  "mutationClass": "REACTIVE_VIEW_BINDING",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0397f-ac06-7fc2-b2e6-771a43bdd229",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.web.json",
+    "old": "{\"tag\": \"input\", \"attrs\": {\"aria-label\": \"todo\", \"placeholder\": \"输入一个 Todo\"}, \"valueState\": \"app.todo_input\", \"observeState\": \"app.last_action\"}",
+    "new": "{\"tag\": \"input\", \"attrs\": {\"aria-label\": \"todo\", \"placeholder\": \"输入一个 Todo\"}, \"valueState\": \"app.todo_input\", \"observeState\": \"app.todo_input\"}",
+    "diagnosis": "reactive-html-binding fails because the Todo input displays app.todo_input via valueState but observes app.last_action, splitting display and reactive observation. Change observeState to app.todo_input so the generated browser binding uses one canonical state facet."
+  },
+  "promptRoot": "b014472a44cd8d2f2ccd520033c9f1aae7fa8955e512463ff7986aef48e93ad8",
+  "mutatedFile": "candidate.web.json",
+  "mutatedSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+  "mutatedSpecSha256": "f14eb548c048dc8f09bea7d1512aadf9a062bf934e67977ae97e361a47c13fbe",
+  "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+  "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "5dd12cbd12bdb65cd4e24a73246092f6cb2f60c9b301cef3f4b9e18bbbbda3b9",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0397f-ac06-7fc2-b2e6-771a43bdd229"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "6d88bc28e2553dd80048eb556fa5334c9f3cfabf4ae340f910c1b8ba1df76fe8"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "5618325a2a882f4ad1bf6e827331e517f1705503f514f137de49cc0490ab0378"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 55817,
+        "cached_input_tokens": 51968,
+        "output_tokens": 530,
+        "reasoning_output_tokens": 91
+      }
+    }
+  ],
+  "finalMessageSha256": "5618325a2a882f4ad1bf6e827331e517f1705503f514f137de49cc0490ab0378",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "c2a0c44bb107377caf92d94288308336066684a0af6e2525d6c2855d7971592b",
+    "failedChecks": [
+      "reactive-html-binding"
+    ],
+    "error": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "144b97989cd1cb91e74bb0316184d5aa568c6732fb3ae120f75f01eac86d53d0",
+    "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+    "checks": {
+      "program-identity": {
+        "pass": true
+      },
+      "initial-state": {
+        "pass": true
+      },
+      "authority-binding": {
+        "pass": true
+      },
+      "reactive-html-binding": {
+        "pass": true
+      },
+      "rule-html-binding": {
+        "pass": true
+      },
+      "server-surface": {
+        "pass": true
+      },
+      "server-initial-state": {
+        "pass": true
+      },
+      "server-observe": {
+        "pass": true
+      },
+      "server-add-rule": {
+        "pass": true
+      },
+      "server-reset-rule": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "bf361e5239f370305a44415965085e69eefeb3ce2f3c04a15d3ecfec9b512361"
+}

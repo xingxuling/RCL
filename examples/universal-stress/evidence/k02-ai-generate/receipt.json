@@ -1,0 +1,476 @@
+{
+  "format": "rcl.k02.ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-25T15:18:12.926Z",
+  "contractRoot": "3a00d8b54e4b2a18fa80a501f75a3246350a10d32e463c1c34dc896aa75cba0d",
+  "contractStatus": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generatorKind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K063",
+    "K064",
+    "K078"
+  ],
+  "trials": [
+    {
+      "format": "rcl.k02.ai-generation-trial-receipt.v0.1",
+      "trialId": "K02-AI-REPAIR-01",
+      "mutationClass": "REACTIVE_STATE_TRANSITION",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0397d-f6f3-7903-84ca-ccfef0dfbaed",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "    alter app.todo_count <- app.todo_count + 2",
+        "new": "    alter app.todo_count <- app.todo_count + 1",
+        "diagnosis": "server-add-rule fails because addTodo currently increments app.todo_count by 2. The invariant requires one accepted addTodo transaction to increment the count exactly once while preserving the existing generic transaction path, authority check, acceptance guard, and web binding."
+      },
+      "promptRoot": "93c5a2483db7e1fa18c1229e83643bf0351a83831ece42ea8c334b12c224d707",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "4e21ea4c4c4e926e225eeaf8b6b754ea5bbfef2b2a00be0393c8812a5b4d605d",
+      "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "b39fc2a004bbd91066601301428e3430e2d666d3e3fdc8ff7f61da46c306fcfe",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0397d-f6f3-7903-84ca-ccfef0dfbaed"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "7854351df718516a646a5105a652e99d89984e4f464903e530c913d72f142fca"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "c2195676477a0a7bcf25ad3eefaa9f1712ec6b4f9633664650f1f7af13f45aa4"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 56017,
+            "cached_input_tokens": 29440,
+            "output_tokens": 482,
+            "reasoning_output_tokens": 55
+          }
+        }
+      ],
+      "finalMessageSha256": "c2195676477a0a7bcf25ad3eefaa9f1712ec6b4f9633664650f1f7af13f45aa4",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "c472ff85ddb6320df05353339c0d8fedeff500f244042366fb0ba76f5a51e861",
+        "failedChecks": [
+          "server-add-rule"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "144b97989cd1cb91e74bb0316184d5aa568c6732fb3ae120f75f01eac86d53d0",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-html-binding": {
+            "pass": true
+          },
+          "rule-html-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "server-initial-state": {
+            "pass": true
+          },
+          "server-observe": {
+            "pass": true
+          },
+          "server-add-rule": {
+            "pass": true
+          },
+          "server-reset-rule": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "99f361be96fdd737a77cbf3c90d4ceccf7e12d60d426fc7fe70d5b0e7559781e"
+    },
+    {
+      "format": "rcl.k02.ai-generation-trial-receipt.v0.1",
+      "trialId": "K02-AI-REPAIR-02",
+      "mutationClass": "AUTHORITY_BINDING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0397e-a424-7390-b5ea-f64aa7337014",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "    needs app.read on app",
+        "new": "    needs app.write on app",
+        "diagnosis": "addTodo currently requires app.read, but the declared user warrant is app.write. Changing only addTodo's needs clause to app.write preserves the authority check and aligns the rule with the declared capability required by the invariant."
+      },
+      "promptRoot": "226e78033b521f33780207ddc132533f16104f40eb0b71bf7905d8e58a7260fd",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "5c7c3e7ec4fa8996fd42b33f9008c9ad8bbaf3582933e375e80282f7b47beb2e",
+      "mutatedSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "35c0ccd824713596a27e9f57325ea0d4a6877eb866f7a7ab8edfd863ac69f321",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0397e-a424-7390-b5ea-f64aa7337014"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "error"
+        },
+        {
+          "type": "error"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "4f713de8925f2373737c2668a8f1a8ec6166a0776c7b886cbebcfe787d2e535c"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "22ae7df35ed0e5d5735fb31a0b8dbbc7c2a761f545b7c30f848a1407d543f3a0"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 73927,
+            "cached_input_tokens": 59520,
+            "output_tokens": 625,
+            "reasoning_output_tokens": 158
+          }
+        }
+      ],
+      "finalMessageSha256": "22ae7df35ed0e5d5735fb31a0b8dbbc7c2a761f545b7c30f848a1407d543f3a0",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "f8e8f13412bdb4b616908165a786e00ca8aad59b9c10ec7c7ebb6d0015d91521",
+        "failedChecks": [],
+        "error": "RCLCompileError: RCL_COMPILE_ERROR: Subject 'user' lacks warrant 'app.read' on 'app' required by 'addTodo'\n    at compileReality (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/src/compiler.mjs:635:25)\n    at compileRclWebApplication (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/src/web-application-compiler.mjs:66:19)\n    at verifyK02WebCandidate (file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/scripts/verify-k02-web-candidate.mjs:45:22)\n    at file:///C:/Users/User/Documents/RCL/_worktrees/rcl-main-integration/scripts/verify-k02-web-candidate.mjs:116:24\n    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)\n    at async node:internal/modules/esm/loader:639:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "144b97989cd1cb91e74bb0316184d5aa568c6732fb3ae120f75f01eac86d53d0",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-html-binding": {
+            "pass": true
+          },
+          "rule-html-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "server-initial-state": {
+            "pass": true
+          },
+          "server-observe": {
+            "pass": true
+          },
+          "server-add-rule": {
+            "pass": true
+          },
+          "server-reset-rule": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "48d2f60d8e9397a3cf9bdacf24fdd6ebeead7cb2dc969fa7102fea81bed78925"
+    },
+    {
+      "format": "rcl.k02.ai-generation-trial-receipt.v0.1",
+      "trialId": "K02-AI-REPAIR-03",
+      "mutationClass": "REACTIVE_VIEW_BINDING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0397f-ac06-7fc2-b2e6-771a43bdd229",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.web.json",
+        "old": "{\"tag\": \"input\", \"attrs\": {\"aria-label\": \"todo\", \"placeholder\": \"输入一个 Todo\"}, \"valueState\": \"app.todo_input\", \"observeState\": \"app.last_action\"}",
+        "new": "{\"tag\": \"input\", \"attrs\": {\"aria-label\": \"todo\", \"placeholder\": \"输入一个 Todo\"}, \"valueState\": \"app.todo_input\", \"observeState\": \"app.todo_input\"}",
+        "diagnosis": "reactive-html-binding fails because the Todo input displays app.todo_input via valueState but observes app.last_action, splitting display and reactive observation. Change observeState to app.todo_input so the generated browser binding uses one canonical state facet."
+      },
+      "promptRoot": "b014472a44cd8d2f2ccd520033c9f1aae7fa8955e512463ff7986aef48e93ad8",
+      "mutatedFile": "candidate.web.json",
+      "mutatedSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "mutatedSpecSha256": "f14eb548c048dc8f09bea7d1512aadf9a062bf934e67977ae97e361a47c13fbe",
+      "candidateSourceSha256": "cdb59d02888f1f2db6f7351e27ad0694e5f116d6c606999d02701fa6d58ecd9c",
+      "candidateSpecSha256": "ad3a21c4f08c72197acd31fce8a5c286ded89b3d77133ad909d3a82f6d784599",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "5dd12cbd12bdb65cd4e24a73246092f6cb2f60c9b301cef3f4b9e18bbbbda3b9",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0397f-ac06-7fc2-b2e6-771a43bdd229"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "6d88bc28e2553dd80048eb556fa5334c9f3cfabf4ae340f910c1b8ba1df76fe8"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "5618325a2a882f4ad1bf6e827331e517f1705503f514f137de49cc0490ab0378"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55817,
+            "cached_input_tokens": 51968,
+            "output_tokens": 530,
+            "reasoning_output_tokens": 91
+          }
+        }
+      ],
+      "finalMessageSha256": "5618325a2a882f4ad1bf6e827331e517f1705503f514f137de49cc0490ab0378",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "c2a0c44bb107377caf92d94288308336066684a0af6e2525d6c2855d7971592b",
+        "failedChecks": [
+          "reactive-html-binding"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "144b97989cd1cb91e74bb0316184d5aa568c6732fb3ae120f75f01eac86d53d0",
+        "manifestRoot": "da02ed97ade2ef517371e14965e7918b0a77128c35a2e362d4dffc4420ef4345",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "initial-state": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-html-binding": {
+            "pass": true
+          },
+          "rule-html-binding": {
+            "pass": true
+          },
+          "server-surface": {
+            "pass": true
+          },
+          "server-initial-state": {
+            "pass": true
+          },
+          "server-observe": {
+            "pass": true
+          },
+          "server-add-rule": {
+            "pass": true
+          },
+          "server-reset-rule": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "bf361e5239f370305a44415965085e69eefeb3ce2f3c04a15d3ecfec9b512361"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_REPLAY_GITHUB_REPLAY_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves bounded independent repair of the checked-in K02 RCL Web/GUI/reactive vertical slice. It does not prove arbitrary Web generation, browser-engine conformance, Android execution, compiler self-evolution or K400 completion.",
+  "reportRoot": "9f0cf2ed0c4ecc65f79680a8d4ca497e9c79e7c428d9c7a1e3d9c6daaee67f75"
+}

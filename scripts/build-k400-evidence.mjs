@@ -8,6 +8,7 @@ import {
   UNIVERSAL_STRESS_GATES,
   validateUniversalStressEvidence,
 } from '../src/universal-program-stress.mjs';
+import { verifyK02AiGenerationReceipt } from './verify-k02-ai-generation-receipt.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -18,6 +19,9 @@ const browserRuntimePath = 'examples/native-ui/evidence/browser-runtime-result.j
 const k08Path = 'examples/native-ai/evidence/k08-b-evidence.json';
 const k233ReceiptPath = 'examples/native-ai/evidence/k233-ai-generate/receipt.json';
 const k233GithubReplayPath = 'examples/native-ai/evidence/k233-ai-generate/github-replay.json';
+const k02AiContractPath = 'examples/universal-stress/k02-ai-generation-contract.v0.1.json';
+const k02AiReceiptPath = 'examples/universal-stress/evidence/k02-ai-generate/receipt.json';
+const k02AiGithubReplayPath = 'examples/universal-stress/evidence/k02-ai-generate/github-replay.json';
 const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
 const k08TensorMlpGithubReplayPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json';
 const k08TensorLivenessPath = 'examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json';
@@ -48,18 +52,40 @@ const k08TensorMlp = readJson(k08TensorMlpPath);
 const k08TensorLiveness = readJson(k08TensorLivenessPath);
 const k08TensorBorrowedInput = readJson(k08TensorBorrowedInputPath);
 const k08Autodiff = readJson(k08AutodiffPath);
+const k02Ai = await verifyK02AiGenerationReceipt();
+const k02AiAdmitted = k02Ai.aiGenerateAdmission === 'PASS';
+
+function k02AiGate(fallback) {
+  if (!k02AiAdmitted) return fallback;
+  return {
+    status: STRESS_STATUS.PASS,
+    evidence: [k02AiContractPath, k02AiReceiptPath, k02AiGithubReplayPath],
+    note: `Three independent repairs passed deterministic RCL Web/Server replay and GitHub run ${k02Ai.githubAuthority.runId}.`,
+  };
+}
+
+function admittedK02Limits(limits = []) {
+  if (!k02AiAdmitted) return limits;
+  return limits.filter((limit) => !/AI_GENERATE/iu.test(limit)).concat(
+    'AI_GENERATE is limited to the three receipt-bound K02 Web/GUI/reactive repairs; it does not prove arbitrary Web generation.',
+  );
+}
 
 const directClaims = [
   {
     id: 'browser::web',
     coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
     lastVerifiedDate: '2026-08-08',
-    knownLimits: k02.limitations,
+    knownLimits: admittedK02Limits(k02.limitations),
     relatedKillerTasks: ['K02'],
     requiredGenes: ['web-application-semantics', 'browser-lowering', 'server-api', 'authority-preservation'],
-    gates: directGates(k02, k02Path, {
-      AI_GENERATE: 'Independent reproducible generation or repair receipts are still missing.',
-    }),
+    gates: (() => {
+      const gates = directGates(k02, k02Path, {
+        AI_GENERATE: 'Independent reproducible generation or repair receipts are still missing.',
+      });
+      gates.AI_GENERATE = k02AiGate(gates.AI_GENERATE);
+      return gates;
+    })(),
     changes: [{
       id: 'complete-web-application-lowering',
       kind: 'candidate-gene',
@@ -121,6 +147,13 @@ const directClaims = [
 ];
 
 const claimsById = new Map(nativeUi.claims.map((claim) => [claim.id, claim]));
+for (const id of ['browser::gui', 'browser::reactive']) {
+  const claim = structuredClone(claimsById.get(id));
+  if (!claim) throw new Error(`RCL_K400_K02_AI_TARGET_MISSING:${id}`);
+  claim.gates.AI_GENERATE = k02AiGate(claim.gates.AI_GENERATE);
+  claim.knownLimits = admittedK02Limits(claim.knownLimits);
+  claimsById.set(id, claim);
+}
 for (const claim of directClaims) claimsById.set(claim.id, claim);
 
 const evidence = {
@@ -131,12 +164,15 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
     'Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.',
     'K08-B closes K233 through a GitHub-bound 3/3 independent repair receipt; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.',
+    k02AiAdmitted
+      ? `K02 closes K063, K064 and K078 AI_GENERATE through 3/3 independent repairs and GitHub run ${k02Ai.githubAuthority.runId}; it proves only the bounded Web/GUI/reactive vertical slice.`
+      : 'K02 has a 3/3 local independent repair candidate; K063, K064 and K078 remain BLOCKED until GitHub-hosted replay is bound.',
     `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     `K08-E is candidate-only evidence: last-use reclamation measured a ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x logical plan-store reduction and ${k08TensorLiveness.controlledPerformance.speedup.toFixed(3)}x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.`,
     `K08-F is candidate-only local Windows evidence: ${k08TensorBorrowedInput.productionWorkload.inputBindingCount} Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured ${k08TensorBorrowedInput.controlledPerformance.speedup.toFixed(3)}x runtime speedup and ${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.`,

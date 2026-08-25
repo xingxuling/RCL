@@ -1,0 +1,40 @@
+{
+  "schema": "rcl.web-application.v0.1",
+  "title": "RCL K02 Web App",
+  "language": "zh-CN",
+  "routes": [
+    {"path": "/", "title": "RCL K02 Web App"},
+    {"path": "/about", "title": "关于 K02"}
+  ],
+  "styles": [
+    {"selector": ":root", "declarations": {"font-family": "system-ui,sans-serif", "background": "#f6f7fb", "color": "#17181a"}},
+    {"selector": "body", "declarations": {"margin": "0", "min-height": "100vh", "display": "grid", "place-items": "center"}},
+    {"selector": ".card", "declarations": {"width": "min(92vw,560px)", "padding": "24px", "background": "white", "border-radius": "20px", "box-shadow": "0 18px 60px rgba(0,0,0,.12)"}},
+    {"selector": ".row", "declarations": {"display": "flex", "gap": "10px"}},
+    {"selector": "input", "declarations": {"flex": "1", "padding": "12px", "border-radius": "12px", "border": "1px solid #bbb"}},
+    {"selector": "button", "declarations": {"padding": "12px 16px", "border": "0", "border-radius": "12px", "cursor": "pointer"}}
+  ],
+  "document": {
+    "tag": "main",
+    "class": "card",
+    "children": [
+      {"tag": "h1", "text": "RCL 完整 Web 垂直切片"},
+      {"tag": "p", "children": [
+        {"tag": "strong", "text": "Todo 数量："},
+        {"tag": "span", "textState": "app.todo_count"}
+      ]},
+      {"tag": "form", "class": "row", "rule": "addTodo", "children": [
+        {"tag": "input", "attrs": {"aria-label": "todo", "placeholder": "输入一个 Todo"}, "valueState": "app.todo_input", "observeState": "app.todo_input"},
+        {"tag": "button", "attrs": {"type": "submit"}, "text": "添加"}
+      ]},
+      {"tag": "p", "children": [
+        {"tag": "strong", "text": "最近动作："},
+        {"tag": "span", "textState": "app.last_action"}
+      ]},
+      {"tag": "div", "class": "row", "children": [
+        {"tag": "button", "rule": "resetTodos", "text": "重置"},
+        {"tag": "a", "navigate": "/about", "attrs": {"href": "/about"}, "text": "关于"}
+      ]}
+    ]
+  }
+}
