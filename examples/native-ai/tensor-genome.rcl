@@ -1,5 +1,5 @@
-# K08-C: canonical Tensor semantic object with a scalar CPU reference lowering.
-# Storage remains an explicit backend concern; no Tensor or ML VM opcode is added.
+# K08-C: scalar CPU reference lowering for the canonical typed Tensor object.
+# This Sequence envelope is a reference TensorValue + storage, never Tensor identity.
 reality TensorGenomeCandidate {
   reckon one(value : Number) -> Sequence = sequence_append(empty_sequence(), value)
   reckon two(first : Number, second : Number) -> Sequence = sequence_append(one(first), second)
@@ -115,6 +115,44 @@ reality TensorGenomeCandidate {
         broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1)),
         0, empty_sequence()))
 
+  reckon elementwise_value(operation : Number, left : Number, right : Number) -> Number =
+    choose(operation == 0, left + right,
+      choose(operation == 1, left - right,
+        choose(operation == 2, left * right, left / right)))
+
+  reckon broadcast_elementwise_data(operation : Number, left : Sequence, right : Sequence, rows : Number, columns : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= rows * columns, output,
+      broadcast_elementwise_data(
+        operation, left, right, rows, columns, index + 1,
+        sequence_append(output,
+          elementwise_value(operation,
+            broadcast_value(left, integer_quotient(index, columns, 0), integer_remainder(index, columns)),
+            broadcast_value(right, integer_quotient(index, columns, 0), integer_remainder(index, columns))))))
+
+  reckon broadcast_elementwise(operation : Number, name : Text, left : Sequence, right : Sequence) -> Sequence =
+    make_tensor(
+      two(
+        broadcast_dimension(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)),
+        broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1))),
+      tensor_dtype(left), "row-major", tensor_device(left), name,
+      broadcast_elementwise_data(
+        operation, left, right,
+        broadcast_dimension(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)),
+        broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1)),
+        0, empty_sequence()))
+
+  reckon broadcast_divisor_nonzero(right : Sequence, rows : Number, columns : Number, index : Number) -> Truth =
+    choose(index >= rows * columns, true,
+      broadcast_value(right, integer_quotient(index, columns, 0), integer_remainder(index, columns)) != 0 and
+      broadcast_divisor_nonzero(right, rows, columns, index + 1))
+
+  reckon broadcast_div_valid(left : Sequence, right : Sequence) -> Truth =
+    broadcast_valid(left, right) and
+    broadcast_divisor_nonzero(
+      right,
+      broadcast_dimension(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 0)),
+      broadcast_dimension(sequence_get(tensor_shape(left), 1), sequence_get(tensor_shape(right), 1)), 0)
+
   reckon matmul_valid(left : Sequence, right : Sequence) -> Truth =
     tensor_valid(left) and tensor_valid(right) and tensor_rank(left) == 2 and tensor_rank(right) == 2 and
     tensor_dtype(left) == tensor_dtype(right) and tensor_device(left) == tensor_device(right) and
@@ -171,6 +209,98 @@ reality TensorGenomeCandidate {
       tensor_dtype(tensor), "row-major", tensor_device(tensor), "derived:reduce_sum",
       reduce_axis_data(tensor, axis, 0, 0, 0, empty_sequence()))
 
+  reckon scale_data(data : Sequence, divisor : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(data), output,
+      scale_data(data, divisor, index + 1, sequence_append(output, sequence_get(data, index) / divisor)))
+
+  reckon reduce_mean(tensor : Sequence, axis : Number) -> Sequence =
+    make_tensor(
+      one(choose(axis == 0, sequence_get(tensor_shape(tensor), 1), sequence_get(tensor_shape(tensor), 0))),
+      tensor_dtype(tensor), "row-major", tensor_device(tensor), "derived:reduce_mean",
+      scale_data(
+        reduce_axis_data(tensor, axis, 0, 0, 0, empty_sequence()),
+        choose(axis == 0, sequence_get(tensor_shape(tensor), 0), sequence_get(tensor_shape(tensor), 1)),
+        0, empty_sequence()))
+
+  reckon reduce_max_axis_data(tensor : Sequence, axis : Number, output_index : Number, inner : Number, current : Number, output : Sequence) -> Sequence =
+    choose(axis == 0,
+      choose(output_index >= sequence_get(tensor_shape(tensor), 1), output,
+        choose(inner == 0,
+          reduce_max_axis_data(tensor, axis, output_index, 1, tensor_at_2(tensor, 0, output_index), output),
+          choose(inner >= sequence_get(tensor_shape(tensor), 0),
+            reduce_max_axis_data(tensor, axis, output_index + 1, 0, 0, sequence_append(output, current)),
+            reduce_max_axis_data(tensor, axis, output_index, inner + 1, choose(tensor_at_2(tensor, inner, output_index) > current, tensor_at_2(tensor, inner, output_index), current), output)))),
+      choose(output_index >= sequence_get(tensor_shape(tensor), 0), output,
+        choose(inner == 0,
+          reduce_max_axis_data(tensor, axis, output_index, 1, tensor_at_2(tensor, output_index, 0), output),
+          choose(inner >= sequence_get(tensor_shape(tensor), 1),
+            reduce_max_axis_data(tensor, axis, output_index + 1, 0, 0, sequence_append(output, current)),
+            reduce_max_axis_data(tensor, axis, output_index, inner + 1, choose(tensor_at_2(tensor, output_index, inner) > current, tensor_at_2(tensor, output_index, inner), current), output)))))
+
+  reckon reduce_max(tensor : Sequence, axis : Number) -> Sequence =
+    make_tensor(
+      one(choose(axis == 0, sequence_get(tensor_shape(tensor), 1), sequence_get(tensor_shape(tensor), 0))),
+      tensor_dtype(tensor), "row-major", tensor_device(tensor), "derived:reduce_max",
+      reduce_max_axis_data(tensor, axis, 0, 0, 0, empty_sequence()))
+
+  reckon exp_series(value : Number, index : Number, limit : Number, term : Number, accumulated : Number) -> Number =
+    choose(index > limit, accumulated,
+      exp_series(value, index + 1, limit, term * value / index, accumulated + term * value / index))
+
+  reckon exp_approx(value : Number) -> Number =
+    choose(value < 0, 1 / exp_series(0 - value, 1, 32, 1, 1), exp_series(value, 1, 32, 1, 1))
+
+  reckon sqrt_iter(value : Number, index : Number, current : Number) -> Number =
+    choose(index >= 24, current, sqrt_iter(value, index + 1, (current + value / current) / 2))
+
+  reckon sqrt_approx(value : Number) -> Number = choose(value == 0, 0, sqrt_iter(value, 0, choose(value >= 1, value, 1)))
+
+  reckon log_series(y : Number, power : Number, index : Number, limit : Number, accumulated : Number) -> Number =
+    choose(index >= limit, 2 * accumulated,
+      log_series(y, power * y * y, index + 1, limit, accumulated + power / (2 * index + 1)))
+
+  reckon log_approx(value : Number) -> Number = log_series((value - 1) / (value + 1), (value - 1) / (value + 1), 0, 48, 0)
+
+  reckon unary_domain_valid(data : Sequence, operation : Number, index : Number) -> Truth =
+    choose(index >= length(data), true,
+      choose(operation == 1, sequence_get(data, index) > 0,
+        choose(operation == 2, sequence_get(data, index) >= 0, true)) and
+      unary_domain_valid(data, operation, index + 1))
+
+  reckon unary_data(data : Sequence, operation : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(data), output,
+      unary_data(data, operation, index + 1,
+        sequence_append(output,
+          choose(operation == 0, exp_approx(sequence_get(data, index)),
+            choose(operation == 1, log_approx(sequence_get(data, index)), sqrt_approx(sequence_get(data, index)))))))
+
+  reckon unary_tensor(tensor : Sequence, operation : Number, name : Text) -> Sequence =
+    make_tensor(tensor_shape(tensor), tensor_dtype(tensor), "row-major", tensor_device(tensor), name,
+      unary_data(tensor_data(tensor), operation, 0, empty_sequence()))
+
+  reckon softmax_row_exp(tensor : Sequence, row : Number, column : Number, maximum : Number, output : Sequence) -> Sequence =
+    choose(column >= sequence_get(tensor_shape(tensor), 1), output,
+      softmax_row_exp(tensor, row, column + 1, maximum, sequence_append(output, exp_approx(tensor_at_2(tensor, row, column) - maximum))))
+
+  reckon sequence_sum(data : Sequence, index : Number, accumulated : Number) -> Number =
+    choose(index >= length(data), accumulated, sequence_sum(data, index + 1, accumulated + sequence_get(data, index)))
+
+  reckon divide_sequence(data : Sequence, divisor : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(data), output, divide_sequence(data, divisor, index + 1, sequence_append(output, sequence_get(data, index) / divisor)))
+
+  reckon softmax_rows(tensor : Sequence, row : Number, output : Sequence) -> Sequence =
+    choose(row >= sequence_get(tensor_shape(tensor), 0), output,
+      softmax_rows(tensor, row + 1,
+        sequence_concat(output,
+          divide_sequence(
+            softmax_row_exp(tensor, row, 0, sequence_get(tensor_data(reduce_max(tensor, 1)), row), empty_sequence()),
+            sequence_sum(softmax_row_exp(tensor, row, 0, sequence_get(tensor_data(reduce_max(tensor, 1)), row), empty_sequence()), 0, 0),
+            0, empty_sequence()))))
+
+  reckon softmax(tensor : Sequence) -> Sequence =
+    make_tensor(tensor_shape(tensor), tensor_dtype(tensor), "row-major", tensor_device(tensor), "derived:softmax",
+      softmax_rows(tensor, 0, empty_sequence()))
+
   reckon slice_valid(tensor : Sequence, row_start : Number, row_end : Number, column_start : Number, column_end : Number) -> Truth =
     tensor_valid(tensor) and tensor_rank(tensor) == 2 and
     row_start >= 0 and column_start >= 0 and row_end > row_start and column_end > column_start and
@@ -189,22 +319,40 @@ reality TensorGenomeCandidate {
   reckon tensor_b() -> Sequence = make_tensor(two(1, 3), "f64", "row-major", "cpu:scalar", "parameter:b", three(10, 20, 30))
   reckon tensor_c() -> Sequence = make_tensor(two(3, 2), "f64", "row-major", "cpu:scalar", "parameter:c", six(7, 8, 9, 10, 11, 12))
   reckon invalid_broadcast() -> Sequence = make_tensor(two(2, 2), "f64", "row-major", "cpu:scalar", "parameter:invalid", sequence_append(sequence_append(two(1, 2), 3), 4))
+  reckon invalid_dtype() -> Sequence = make_tensor(two(2, 3), "f32", "row-major", "cpu:scalar", "parameter:invalid-dtype", six(1, 2, 3, 4, 5, 6))
+  reckon invalid_device() -> Sequence = make_tensor(two(2, 3), "f64", "row-major", "gpu:0", "parameter:invalid-device", six(1, 2, 3, 4, 5, 6))
+  reckon tensor_positive() -> Sequence = make_tensor(two(1, 3), "f64", "row-major", "cpu:scalar", "constant:positive", three(1, 4, 9))
+  reckon tensor_zero_one() -> Sequence = make_tensor(two(1, 2), "f64", "row-major", "cpu:scalar", "constant:zero-one", two(0, 1))
 
   facet contract.id : Text = "k08-c-tensor-genome-v0.1"
   facet contract.profile : Text = "L2-TENSOR-CANDIDATE-SCALAR-CPU"
   facet tensor.a : Sequence = tensor_a()
   facet tensor.scalar : Sequence = make_tensor(empty_sequence(), "f64", "row-major", "cpu:scalar", "constant", one(42))
   facet tensor.broadcast_add : Sequence = broadcast_add(tensor.a, tensor_b())
+  facet tensor.broadcast_sub : Sequence = broadcast_elementwise(1, "derived:broadcast_sub", tensor.a, tensor_b())
+  facet tensor.broadcast_mul : Sequence = broadcast_elementwise(2, "derived:broadcast_mul", tensor.a, tensor_b())
+  facet tensor.broadcast_div : Sequence = broadcast_elementwise(3, "derived:broadcast_div", tensor.a, tensor_b())
   facet tensor.matmul : Sequence = matmul(tensor.a, tensor_c())
   facet tensor.reshape : Sequence = reshape(tensor.a, two(3, 2))
   facet tensor.transpose : Sequence = transpose_2(tensor.a)
   facet tensor.reduce_axis0 : Sequence = reduce_sum(tensor.a, 0)
   facet tensor.reduce_axis1 : Sequence = reduce_sum(tensor.a, 1)
+  facet tensor.reduce_mean_axis0 : Sequence = reduce_mean(tensor.a, 0)
+  facet tensor.reduce_mean_axis1 : Sequence = reduce_mean(tensor.a, 1)
+  facet tensor.reduce_max_axis0 : Sequence = reduce_max(tensor.a, 0)
+  facet tensor.reduce_max_axis1 : Sequence = reduce_max(tensor.a, 1)
+  facet tensor.exp : Sequence = unary_tensor(tensor_zero_one(), 0, "derived:exp")
+  facet tensor.log : Sequence = unary_tensor(tensor_positive(), 1, "derived:log")
+  facet tensor.sqrt : Sequence = unary_tensor(tensor_positive(), 2, "derived:sqrt")
+  facet tensor.softmax : Sequence = softmax(tensor.a)
   facet tensor.slice : Sequence = slice_2(tensor.a, 0, 2, 1, 3)
   facet evaluation.scalar_valid : Truth = tensor_valid(tensor.scalar)
   facet evaluation.tensor_valid : Truth = tensor_valid(tensor.a)
   facet evaluation.broadcast_valid : Truth = broadcast_valid(tensor.a, tensor_b())
   facet evaluation.invalid_broadcast_rejected : Truth = broadcast_valid(tensor.a, invalid_broadcast()) == false
+  facet evaluation.dtype_mismatch_rejected : Truth = broadcast_valid(tensor.a, invalid_dtype()) == false
+  facet evaluation.device_mismatch_rejected : Truth = broadcast_valid(tensor.a, invalid_device()) == false
+  facet evaluation.broadcast_div_valid : Truth = broadcast_div_valid(tensor.a, tensor_b())
   facet evaluation.matmul_valid : Truth = matmul_valid(tensor.a, tensor_c())
   facet evaluation.invalid_matmul_rejected : Truth = matmul_valid(tensor.a, invalid_broadcast()) == false
   facet evaluation.reshape_valid : Truth = reshape_valid(tensor.a, two(3, 2))

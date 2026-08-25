@@ -1,0 +1,21 @@
+# Canonical Tensor identity is a typed RCL object. Numeric buffers are separate Storage objects.
+reality TensorObjectCandidate {
+  facet tensor.a : tensor.Tensor = {
+    shape: sequence_append(sequence_append(empty_sequence(), 2), 3),
+    rank: 2,
+    dtype: "f64",
+    layout: "row-major",
+    strides: sequence_append(sequence_append(empty_sequence(), 3), 1),
+    storageIdentity: "storage:a",
+    device: "cpu",
+    gradientIdentity: "parameter:a"
+  }
+  facet storage.a : tensor.CpuDenseStorage = {
+    identity: "storage:a",
+    backend: "scalar-reference-sequence",
+    elementCount: 6
+  }
+  facet contract.tensor_is_sequence : Truth = false
+  facet contract.storage_is_replaceable : Truth = true
+  facet contract.canonical_owner : Text = "RCL"
+}

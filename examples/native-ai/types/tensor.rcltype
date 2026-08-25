@@ -1,0 +1,17 @@
+module tensor
+
+export record Tensor {
+  shape: Sequence
+  rank: Number
+  dtype: Text
+  layout: Text
+  strides: Sequence
+  storageIdentity: Text
+  device: Text
+  gradientIdentity: Text
+}
+export record CpuDenseStorage {
+  identity: Text
+  backend: Text
+  elementCount: Number
+}

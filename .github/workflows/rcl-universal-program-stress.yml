@@ -14,11 +14,13 @@ on:
       - 'tests/general-selfhost-fixedpoint.test.mjs'
       - 'tests/selfhost*.test.mjs'
       - 'tests/stage*.test.mjs'
+      - 'tests/k08-tensor*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/run-k08-general-mlp.mjs'
+      - 'scripts/run-k08-tensor-cpu-evidence.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -41,11 +43,13 @@ on:
       - 'tests/general-selfhost-fixedpoint.test.mjs'
       - 'tests/selfhost*.test.mjs'
       - 'tests/stage*.test.mjs'
+      - 'tests/k08-tensor*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
       - 'scripts/run-k08-pure-rcl-xor.mjs'
       - 'scripts/run-k08-general-mlp.mjs'
+      - 'scripts/run-k08-tensor-cpu-evidence.mjs'
       - 'scripts/run-k233-independent-ai-generation.mjs'
       - 'scripts/verify-k233-ai-generation-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
@@ -80,6 +84,8 @@ jobs:
         run: npm run evidence:k08-native-ai
       - name: K08 General MLP native learning campaign
         run: npm run evidence:k08-native-ai:general-mlp
+      - name: K08 Tensor correctness and portable CPU engine tests
+        run: npm run test:k08-tensor
       - name: K233 independent AI generation receipt replay
         run: npm run verify:k233-ai-generate
       - name: Evidence-empty baseline report
@@ -109,6 +115,10 @@ jobs:
         run: npm run build:native
       - name: K01 Windows self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
+      - name: K08 Tensor native provider and CPU engine tests
+        run: npm run test:k08-tensor
+      - name: K08 Tensor Windows performance evidence
+        run: npm run evidence:k08-tensor-cpu
       - name: Upload K01 evidence and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -117,4 +127,5 @@ jobs:
           path: |
             output/universal-stress-v0.1/K01
             output/selfhost
+            output/k08-tensor-cpu-v0.1
           if-no-files-found: warn

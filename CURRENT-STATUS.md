@@ -104,6 +104,8 @@ Direct local evidence supports:
 
 K233 `AI_GENERATE` is bound to GitHub Actions run `32780097954`, focused job `97600047380`, source commit `4686184d6790ec08b213a0176279f646a0919beb`, and rooted authority receipt `bb42598a6d656aab0d19da52491e820c24145aeb0233d3299abca6b171ea6b82`. Tensor, general Autodiff, AdamW, Transformer, LM, accelerator and distributed claims remain unverified.
 
+The separate K08-C branch now carries an `ENGINE_E1_CANDIDATE_LOCAL_WINDOWS` Tensor/CPU-engine candidate. Canonical Tensor identity is a typed RCL record with no data buffer and a distinct Storage Identity; the scalar RCL reference covers add/sub/mul/div, broadcast, reshape, transpose, slice, MatMul, sum/mean/max, exp/log/sqrt and softmax support. A Rust `RclVmProviderV1` CPU Dense organ executes general elementwise, reduction, MatMul, Softmax, LayerNorm and RMSNorm kernels. Local exact differential evidence measured `6.094x` end-to-end speedup for 24-cubed MatMul and `3.061x` kernel-only speedup for 192-cubed MatMul. This candidate is not merged authority, has not lowered General MLP to the backend, and does not close the inherited `118.300x` MLP Native/JS gap.
+
 Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-ai/evidence-ledger.md`.
 
 ### Native UI Genome v0.1 candidate

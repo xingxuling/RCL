@@ -1,0 +1,29 @@
+{
+  "format": "rcl.tensor-execution-request.v0.1",
+  "operation": "matmul",
+  "tensors": [
+    {
+      "id": "a",
+      "shape": [2, 3],
+      "dtype": "f64",
+      "layout": "row-major",
+      "device": "cpu",
+      "gradientIdentity": "parameter:a",
+      "storageIdentity": "storage:a"
+    },
+    {
+      "id": "b",
+      "shape": [3, 2],
+      "dtype": "f64",
+      "layout": "row-major",
+      "device": "cpu",
+      "gradientIdentity": "parameter:b",
+      "storageIdentity": "storage:b"
+    }
+  ],
+  "storages": [
+    { "identity": "storage:a", "kind": "cpu-dense", "data": [1, 2, 3, 4, 5, 6] },
+    { "identity": "storage:b", "kind": "cpu-dense", "data": [7, 8, 9, 10, 11, 12] }
+  ],
+  "attributes": {}
+}

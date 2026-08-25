@@ -59,3 +59,31 @@ node --test --test-concurrency=1 tests/k08-general-mlp.test.mjs tests/k233-ai-ge
 ## Evidence boundary
 
 The ledger proves the bounded General MLP AI-N2 stack and the independently replayed K233 repair evidence. It does not prove Tensor Genome, general Autodiff, AdamW, Transformer, language-model training, accelerator lowering, distributed training, competitive performance or K400 completion.
+
+## K08-C Tensor / CPU Engine candidate
+
+Status: `ENGINE_E1_CANDIDATE_LOCAL_WINDOWS`. Authority remains candidate-only and separate from K233.
+
+| Evidence | Result |
+|---|---:|
+| Canonical identity | typed `tensor::Tensor`, no data field |
+| Storage boundary | separate `tensor::CpuDenseStorage` + `storageIdentity` |
+| RCL scalar operations | add/sub/mul/div, broadcast, reshape, transpose, slice, MatMul, sum/mean/max, exp/log/sqrt, softmax |
+| Optimized backend | Rust f64 CPU Dense organ through `RclVmProviderV1` |
+| Optimized kernels | elementwise, reduction, blocked MatMul, Softmax, LayerNorm, RMSNorm |
+| 24-cubed exact differential drift | `0` |
+| 24-cubed end-to-end median | scalar `180.608 ms`; provider `29.635 ms`; `6.094x` |
+| 192-cubed kernel median | scalar `7.229 ms`; optimized `2.362 ms`; `3.061x` |
+| Replays | `7` scalar roots / `7` provider storage identities, one unique value each |
+| Evidence report root | `890180d14c8585875d7122c0b38369ab8f8a01b592d6af80f127ebae070b3271` |
+
+Positive, negative, boundary and differential coverage includes valid kernels, invalid shape/broadcast/MatMul, dtype/device mismatch, divide-by-zero/log/sqrt domains, storage mismatch, unsupported layout/storage, rank/input/element caps, native self-host/JS compiler byte parity and native VM provider execution.
+
+The evidence intentionally does not relabel the former `118.300x` General MLP Native/JS ratio. The MLP still uses scalar recursive operations and has not been lowered to the new backend. A floating generated-matrix probe also exposed scientific-notation number canonicalization drift between the native state root and the JS verifier; the accepted performance corpus uses integer values and records that unresolved evidence gap rather than disabling strict state-root verification.
+
+Reproduction:
+
+```text
+npm run test:k08-tensor
+npm run evidence:k08-tensor-cpu
+```

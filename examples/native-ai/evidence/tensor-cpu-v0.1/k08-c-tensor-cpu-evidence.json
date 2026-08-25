@@ -1,0 +1,136 @@
+{
+  "format": "rcl.k08-c.tensor-cpu-evidence.v0.1",
+  "status": "ENGINE_E1_CANDIDATE_LOCAL_WINDOWS",
+  "canonicalOwner": "RCL",
+  "backendOwner": "rcl-tensor-cpu-rust-v0.1",
+  "implementationDecision": "GENERAL_TENSOR_PROVIDER_BACKEND_NO_MODEL_SPECIAL_OPCODE",
+  "artifactHashes": {
+    "tensorSemantics": "fc75bd91ff7a00fecb0984859ef892061ce9b55da12b52e5460aa031a23334ee",
+    "tensorContract": "c0e29f2e886bffe6d42542b6ca5660947778c1009ca027971c566cf9962ce9cd",
+    "providerBoundary": "09f6fc1f138c230d33059d1be834a56daf8a8a4600eea3a92b6962f2e334b302",
+    "rustBackend": "ab6c5a2c4bc874b557b9a942673afe564741ea856b9918fc9f7c8fb889c4338b",
+    "releaseBinary": "3f7131eae56d21b559cbf2cc28c13121c22780894d90588c2690a9dca4dc08a5",
+    "selfhostCompilerRbc": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+  },
+  "matrix": [
+    24,
+    24,
+    24
+  ],
+  "repeats": 7,
+  "compilerParity": true,
+  "scalarCompilation": {
+    "bytes": 2577,
+    "sha256": "440cf6cb00a5b6471ebfc3451c838b348f038dff79043a3f9c4996bc56b17971",
+    "selfhostInstructions": 544981
+  },
+  "providerCompilation": {
+    "bytes": 3648,
+    "sha256": "a925cdac778b50a49a75d95462eea9500816dcad9b5e928423a96a76e46a885b",
+    "selfhostInstructions": 1025465
+  },
+  "differential": {
+    "elementCount": 576,
+    "tolerance": 1e-12,
+    "maximumDrift": 0,
+    "exactParity": true,
+    "deterministicScalarRoots": 1,
+    "deterministicStorageIdentities": 1,
+    "storageIdentity": "sha256:1ba5718d8c3fa7131d75b6da9e7621b1867fcdb6c6691c4a526d4d596804981d"
+  },
+  "endToEnd": {
+    "boundary": "warm native process per run; includes VM startup, state serialization and provider dispatch; excludes compilation",
+    "scalarMedianMs": 180.60770000000002,
+    "optimizedProviderMedianMs": 29.63469999999961,
+    "speedup": 6.094466959341664,
+    "scalarSamplesMs": [
+      219.26850000000002,
+      195.5299,
+      182.17920000000004,
+      176.82580000000007,
+      176.34000000000015,
+      180.60770000000002,
+      174.44309999999996
+    ],
+    "optimizedProviderSamplesMs": [
+      41.13869999999997,
+      29.014799999999923,
+      30.577800000000025,
+      29.63469999999961,
+      27.49039999999968,
+      25.13359999999966,
+      30.503899999999703
+    ]
+  },
+  "kernelBenchmark": {
+    "backend": "rcl-tensor-cpu-rust-v0.1",
+    "boundary": "kernel-only monotonic clock; excludes JSON, process startup, RCL compilation and VM provider dispatch",
+    "exactDifferentialParity": true,
+    "format": "rcl.tensor-cpu-benchmark.v0.1",
+    "matrix": [
+      192,
+      192,
+      192
+    ],
+    "optimizedMedianNanos": 2362100,
+    "optimizedSamplesNanos": [
+      1796600,
+      1937300,
+      2168000,
+      2339600,
+      2362100,
+      2365800,
+      2383900,
+      2406100,
+      2432700
+    ],
+    "referenceMedianNanos": 7229400,
+    "referenceSamplesNanos": [
+      7045900,
+      7049700,
+      7137000,
+      7165900,
+      7229400,
+      7270700,
+      7330000,
+      7502200,
+      8030700
+    ],
+    "repeats": 9,
+    "speedup": 3.06058168578807,
+    "status": "CANDIDATE_LOCAL_MEASUREMENT"
+  },
+  "inheritedGeneralMlpNativeToJsRatio": 118.3,
+  "generalMlpGapStatus": "UNMEASURED_AFTER_BACKEND_NOT_YET_LOWERED",
+  "gaps": [
+    {
+      "id": "RCL_GAP_AI_005",
+      "type": "BACKEND_GAP",
+      "disposition": "PARTIALLY_ABSORBED_BY_CPU_TENSOR_ORGAN"
+    },
+    {
+      "id": "RCL_GAP_AI_008",
+      "type": "COMPILER_GAP",
+      "disposition": "TYPED_TENSOR_SOURCE_STILL_USES_JS_TYPED_LINKER"
+    },
+    {
+      "id": "RCL_GAP_AI_009",
+      "type": "LOWERING_GAP",
+      "disposition": "GENERAL_MLP_NOT_YET_LOWERED_TO_TENSOR_BACKEND"
+    },
+    {
+      "id": "RCL_GAP_AI_010",
+      "type": "EVIDENCE_GAP",
+      "disposition": "SCIENTIFIC_NOTATION_NUMBER_ROOT_CANONICALIZATION_EXPOSED_AND_QUARANTINED_FROM_THIS_INTEGER_PERFORMANCE_CORPUS"
+    }
+  ],
+  "claimsNotGranted": [
+    "K400_PASS",
+    "GENERAL_MLP_118X_GAP_CLOSED",
+    "AUTODIFF",
+    "GPU",
+    "DISTRIBUTED_TENSOR",
+    "PRODUCTION_BLAS_PARITY"
+  ],
+  "reportRoot": "890180d14c8585875d7122c0b38369ab8f8a01b592d6af80f127ebae070b3271"
+}

@@ -115,9 +115,27 @@ Evidence and decisions: `docs/native-ai/evidence-ledger.md`, `docs/native-ai/int
 
 ## 7. Next gate
 
-K08-B has removed XOR-specific topology assumptions without adding an `xor_special` primitive. The current highest-value sequence is:
+K08-B removed XOR-specific topology assumptions without adding an `xor_special` primitive. K08-C now begins the Tensor/engine path without granting K233 any new authority:
 
-1. begin Tensor Genome with shape/dtype/layout and fail-closed broadcast/matmul semantics;
-2. add a scalar CPU reference lowering and differential corpus before optimized backends;
-3. add native peak-memory telemetry;
-4. preserve the JavaScript performance gap as a donor advantage until a CPU Tensor backend absorbs it.
+- `tensor::Tensor` is a typed RCL record containing shape, rank, dtype, layout, strides, Storage Identity, device intent and gradient identity; numeric data is not part of the Tensor record;
+- a separate `tensor::CpuDenseStorage` object establishes the replaceable storage boundary;
+- the scalar RCL reference covers elementwise add/sub/mul/div, rank-2 broadcast/MatMul/reshape/transpose/slice, sum/mean/max, bounded exp/log/sqrt approximations and row-wise softmax;
+- `native/tensor-engine` is a Rust CPU execution organ reached through the existing general `RclVmProviderV1` ABI; no Tensor, MLP or Transformer-special VM opcode was added;
+- the backend covers f64 row-major elementwise, general trailing-dimension broadcast, rank-2 blocked MatMul, reductions, unary math, Softmax, LayerNorm and RMSNorm with fail-closed shape/dtype/device/domain/resource controls.
+
+The first accepted local Windows measurement used exact integer MatMul parity:
+
+| Boundary | Reference median | Optimized median | Speedup |
+|---|---:|---:|---:|
+| RCL native scalar vs RCL native provider, 24x24x24, warm process per run | `180.608 ms` | `29.635 ms` | `6.094x` |
+| Rust scalar reference vs blocked CPU kernel, 192x192x192, kernel only | `7.229 ms` | `2.362 ms` | `3.061x` |
+
+Both comparisons have exact output parity for the recorded corpus. Timings are local candidate evidence, not portable thresholds. The original General MLP has not yet been lowered to Tensor IR, so the inherited `118.300x` Native/JS gap remains `UNMEASURED_AFTER_BACKEND_NOT_YET_LOWERED` rather than claimed closed.
+
+The next highest-value sequence is:
+
+1. lower the General MLP forward/backward primitives to the Tensor provider without changing Model source semantics;
+2. rerun its checkpoint/determinism/differential suite and measure the inherited end-to-end gap;
+3. add native process peak-memory telemetry and backend buffer-planning evidence;
+4. close the typed-source self-host compiler gap before Tensor promotion;
+5. resolve scientific-notation number canonicalization in semantic-state-root evidence.

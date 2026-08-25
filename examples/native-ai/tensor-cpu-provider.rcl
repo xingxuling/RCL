@@ -1,0 +1,9 @@
+# RCL owns this Tensor execution request; the Rust organ owns optimized CPU storage and kernels.
+reality TensorCpuProviderCandidate {
+  facet contract.id : Text = "k08-c-tensor-cpu-provider-v0.1"
+  facet contract.provider : Text = "rcl.tensor.cpu"
+  facet contract.capability : Text = "tensor.execute"
+  facet tensor.matmul_request : Text = "{\"format\":\"rcl.tensor-execution-request.v0.1\",\"operation\":\"matmul\",\"tensors\":[{\"id\":\"a\",\"shape\":[2,3],\"dtype\":\"f64\",\"layout\":\"row-major\",\"device\":\"cpu\",\"gradientIdentity\":\"parameter:a\",\"storageIdentity\":\"storage:a\"},{\"id\":\"b\",\"shape\":[3,2],\"dtype\":\"f64\",\"layout\":\"row-major\",\"device\":\"cpu\",\"gradientIdentity\":\"parameter:b\",\"storageIdentity\":\"storage:b\"}],\"storages\":[{\"identity\":\"storage:a\",\"kind\":\"cpu-dense\",\"data\":[1,2,3,4,5,6]},{\"identity\":\"storage:b\",\"kind\":\"cpu-dense\",\"data\":[7,8,9,10,11,12]}],\"attributes\":{}}"
+  facet tensor.matmul_result : Text = provider_call(contract.provider, contract.capability, tensor.matmul_request)
+  facet evidence.path : Text = "RCL_TYPED_TENSOR_SEMANTICS_TO_PROVIDER_CALL_TO_RUST_CPU_DENSE_BACKEND"
+}

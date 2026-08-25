@@ -1,34 +1,51 @@
 {
   "format": "rcl.k08-c.tensor-genome-contract.v0.1",
-  "status": "CANDIDATE_PRE_EVIDENCE_PROBE",
-  "profile": "L2-TENSOR-CANDIDATE-SCALAR-CPU",
+  "status": "ENGINE_E1_CANDIDATE_LOCAL_EVIDENCE",
+  "profile": "ENGINE-E1-CANDIDATE-F64-CPU",
   "canonicalOwner": "RCL",
-  "backendOwner": "scalar CPU reference lowering over current Sequence storage",
+  "backendOwner": "scalar RCL reference lowering plus optimized Rust CPU Dense Storage organ",
   "operations": [
     "scalar",
     "shape",
     "dtype",
     "stride-layout",
     "slice",
-    "broadcast-add",
+    "elementwise-add-sub-mul-div",
+    "broadcast",
     "reshape",
     "transpose-2d",
     "matmul-2d",
-    "reduce-sum",
+    "reduce-sum-mean-max",
+    "exp-log-sqrt",
+    "softmax",
+    "layer-norm",
+    "rms-norm",
     "device",
     "gradient-identity"
   ],
   "fixtures": {
     "broadcastAdd": [11, 22, 33, 14, 25, 36],
+    "broadcastSub": [-9, -18, -27, -6, -15, -24],
+    "broadcastMul": [10, 40, 90, 40, 100, 180],
+    "broadcastDiv": [0.1, 0.1, 0.1, 0.4, 0.25, 0.2],
     "matmul": [58, 64, 139, 154],
     "reshape": [1, 2, 3, 4, 5, 6],
     "transpose": [1, 4, 2, 5, 3, 6],
     "reduceAxis0": [5, 7, 9],
     "reduceAxis1": [6, 15],
+    "reduceMeanAxis0": [2.5, 3.5, 4.5],
+    "reduceMeanAxis1": [2, 5],
+    "reduceMaxAxis0": [4, 5, 6],
+    "reduceMaxAxis1": [3, 6],
     "slice": [2, 3, 5, 6]
   },
   "requiredNativeReplays": 3,
-  "differentialTolerance": 0,
+  "differentialTolerance": 1e-12,
   "maximumMedianNativeRuntimeMs": 10000,
-  "evidenceBoundary": "This candidate can establish bounded deterministic Tensor semantics with a scalar CPU reference lowering. It does not establish general-rank kernels, Autodiff, optimized CPU/GPU execution, DistributedTensor or L2 VERIFIED until the evidence campaign passes."
+  "evidence": {
+    "path": "examples/native-ai/evidence/tensor-cpu-v0.1/k08-c-tensor-cpu-evidence.json",
+    "reportRoot": "890180d14c8585875d7122c0b38369ab8f8a01b592d6af80f127ebae070b3271",
+    "status": "ENGINE_E1_CANDIDATE_LOCAL_WINDOWS"
+  },
+  "evidenceBoundary": "This candidate establishes typed Tensor identity separated from Storage and a bounded f64 CPU execution organ. Local differential and performance evidence does not establish Autodiff, MLP end-to-end acceleration, GPU, DistributedTensor, production BLAS parity or K400 promotion."
 }
