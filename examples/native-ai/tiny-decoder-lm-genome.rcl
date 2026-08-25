@@ -1,0 +1,44 @@
+# K08-J: first bounded RCL-native Tiny Decoder Language Model semantic genome.
+# RCL owns token/model/training/generation semantics; generic Tensor/Autodiff organs execute the math.
+reality TinyDecoderLmGenomeCandidate {
+  reckon dimensions_valid(vocab_size : Number, context_length : Number, hidden_size : Number, feed_forward_size : Number, head_count : Number) -> Truth =
+    vocab_size > 1 and context_length > 1 and hidden_size > 0 and feed_forward_size > 0 and head_count > 0 and hidden_size % head_count == 0
+
+  reckon token_valid(token : Number, vocab_size : Number) -> Truth = token >= 0 and token < vocab_size
+  reckon expected_next(token : Number) -> Number = (token + 1) % 3
+
+  facet contract.id : Text = "k08-j-tiny-decoder-lm-genome-v0.1"
+  facet contract.profile : Text = "ENGINE-E5-TINY-DECODER-LM-CANDIDATE-F64-CPU-SGD"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.execution_owner : Text = "GENERIC_TENSOR_AUTODIFF_ORGANS"
+
+  facet model.vocab_size : Number = 3
+  facet model.context_length : Number = 6
+  facet model.hidden_size : Number = 3
+  facet model.feed_forward_size : Number = 4
+  facet model.head_count : Number = 1
+  facet model.block_count : Number = 1
+
+  facet corpus.symbols : Text = "ABC"
+  facet corpus.training_tokens : Text = "ABCABC"
+  facet corpus.target_tokens : Text = "BCABCA"
+  facet tokenizer.profile : Text = "FIXED_THREE_SYMBOL_TOKEN_IDS_0_1_2"
+
+  facet topology.embedding : Text = "ONE_HOT_TOKEN_IDS_MATMUL_TOKEN_EMBEDDING_PLUS_POSITION_EMBEDDING"
+  facet topology.block : Text = "RMSNORM_CAUSAL_ATTENTION_RESIDUAL_RMSNORM_SILU_FFN_RESIDUAL"
+  facet topology.head : Text = "LINEAR_LM_HEAD_SOFTMAX"
+  facet topology.loss : Text = "NEGATIVE_MEAN_TARGET_ONE_HOT_TIMES_LOG_SOFTMAX"
+  facet training.optimizer : Text = "RCL_BATCH_SGD_V0_1_FOR_FIRST_TINY_LM_VERTICAL_SLICE"
+  facet generation.mode : Text = "AUTOREGRESSIVE_GREEDY_NEXT_TOKEN"
+
+  facet evaluation.dimensions_valid : Truth = dimensions_valid(model.vocab_size, model.context_length, model.hidden_size, model.feed_forward_size, model.head_count)
+  facet evaluation.token_zero_valid : Truth = token_valid(0, model.vocab_size)
+  facet evaluation.token_three_rejected : Truth = not token_valid(3, model.vocab_size)
+  facet evaluation.cycle_a_to_b : Truth = expected_next(0) == 1
+  facet evaluation.cycle_b_to_c : Truth = expected_next(1) == 2
+  facet evaluation.cycle_c_to_a : Truth = expected_next(2) == 0
+
+  facet evidence.allowed_primitives : Text = "MATMUL_ADD_SUB_MUL_DIV_TRANSPOSE_RESHAPE_BROADCAST_MEAN_SUM_SQRT_SIGMOID_SOFTMAX_LOG"
+  facet evidence.forbidden_specialization : Text = "NO_MODEL_SPECIALIZED_TENSOR_OR_VM_OPCODE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_GENERAL_TOKENIZER_TENSOR_ADAMW_MULTI_HEAD_GPU_DISTRIBUTED_OR_K400_PROMOTION"
+}
