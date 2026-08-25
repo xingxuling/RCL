@@ -212,6 +212,9 @@ for (const id of ['android::gui', 'android::mobile', 'android::reactive']) {
       note: `Three independent Android repairs restored canonical bytes and replayed with emulator receipt; GitHub run ${k03Ai.githubAuthority.runId}.`,
     };
     claim.lastVerifiedSha = k03Ai.githubAuthority.sourceCommit;
+    claim.knownLimits = claim.knownLimits.filter((limit) => !/AI_GENERATE/iu.test(limit)).concat(
+      'AI_GENERATE is limited to three receipt-bound K03 transaction/binding/lifecycle repairs; it does not prove arbitrary Android application generation.',
+    );
   }
   claim.lastVerifiedDate = k03Emulator.verifiedAt.slice(0, 10);
   claim.knownLimits = claim.knownLimits.filter((limit) => !/(no Android SDK|no device|device execution|device\/emulator interaction|device timing|performance are unverified)/iu.test(limit)).concat(
@@ -240,7 +243,9 @@ const evidence = {
     k01AiAdmitted
       ? `K01 closes K339 AI_GENERATE through 3/3 independent compiler-source repairs, shared native fixed point and GitHub Linux/Windows run ${k01Ai.githubAuthority.runId}.`
       : 'K01 has a 3/3 local independent compiler repair candidate and shared native fixed point; K339 remains BLOCKED until GitHub Linux/Windows replay is bound.',
-    `K03 real emulator receipt ${k03Emulator.reportRoot} closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098 on the frozen transaction UI; Android AI_GENERATE remains independently blocked.`,
+    k03AiAdmitted
+      ? `K03 real emulator receipt ${k03Emulator.reportRoot} closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098; their independent AI_GENERATE receipt is separately admitted.`
+      : `K03 real emulator receipt ${k03Emulator.reportRoot} closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098 on the frozen transaction UI; Android AI_GENERATE remains independently blocked.`,
     k03AiAdmitted
       ? `K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run ${k03Ai.githubAuthority.runId}.`
       : 'K03 has a 3/3 local independent Android repair candidate bound to the real emulator receipt; Android cells remain BLOCKED until GitHub replay is bound.',

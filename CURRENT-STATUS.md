@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `5 PASS / 3 BLOCKED / 392 UNTESTED`; maturity `U0`; K400 verdict `INCOMPLETE`. The five PASS cells are K063, K064, K078, K233 and K339.
+Current authoritative matrix: `8 PASS / 0 BLOCKED / 392 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K233 and K339.
 
 Every evidence-bearing cell is evaluated through:
 
@@ -73,7 +73,7 @@ Authority document: `docs/K02_COMPLETE_WEB_APP_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K03 — Native Android application
 
-Current result: `BLOCKED`.
+Current result: `PASS (9/9)` for the bounded K03 Android transaction UI across K083, K085 and K098.
 
 Coverage mode: `lowered-execution`.
 
@@ -90,7 +90,7 @@ Implemented evidence supports:
 
 The rebuilt APK was installed and exercised on the API 35 `Rcl_Aether_API35_ATD` emulator. The rooted receipt covers cold launch, initial state, empty-input guard, five transaction/reset rounds, rotation lifecycle restoration and an ADB/UIAutomator end-to-end p95 of `2981.554 ms` under the frozen `5000 ms` budget. Real execution exposed and drove the fix for Java ternary numeric promotion (`1.0` instead of integer `1`). `EXECUTE`, `CORRECT` and `PERFORMANCE` now pass for K083, K085 and K098 on this bounded vertical slice; independent Android `AI_GENERATE` remains the only missing gate for those three cells.
 
-The distinct K03 AI campaign now has a local candidate: three unique read-only sessions repaired transaction increment, reactive input observation and lifecycle restoration mutations, restored exact canonical bytes, and replayed the rooted Android manifest/Activity/host transaction path while binding the emulator receipt. Local AI receipt root is `15a1e75416299146b6987157a1bab9bf2fdc307a4cf1dcd2e007cf80cb2c3fe1`. The three cells remain BLOCKED until GitHub-hosted saved-receipt replay succeeds.
+The distinct K03 AI campaign used three unique read-only sessions to repair transaction increment, reactive input observation and lifecycle restoration mutations, restore exact canonical bytes, and replay the rooted Android manifest/Activity/host transaction path while binding the emulator receipt. GitHub run `32871776578`, focused job `97880272426`, exact source commit `b5d72ca19750b9e63e49bd4121ae30f18b42f8f0`, and authority root `14bb5c06cc64c1c1952418bd7765da7758353984c3c6c86d4e6bf30615750276` close `AI_GENERATE` for K083, K085 and K098 only.
 
 Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 

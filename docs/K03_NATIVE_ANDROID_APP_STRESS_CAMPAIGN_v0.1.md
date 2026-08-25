@@ -1,7 +1,7 @@
 # K03 — Native Android Application Stress Campaign v0.1
 
 **Cell:** `android::mobile`  
-**Current result:** `BLOCKED`  
+**Current result:** `PASS (9/9)` for the bounded K03 transaction UI
 **Coverage mode:** `lowered-execution`
 
 ## Goal
@@ -59,13 +59,13 @@ EXECUTE      PASS
 CORRECT      PASS
 ROBUST       PASS
 PERFORMANCE  PASS
-AI_GENERATE  UNVERIFIED
+AI_GENERATE  PASS
 EVIDENCE     PASS
 
-OVERALL      BLOCKED
+OVERALL      PASS
 ```
 
-The local Android runtime gates are bounded to `Rcl_Aether_API35_ATD` (API 35, x86_64). Five end-to-end ADB/UIAutomator transaction observations measured p95 `2981.554 ms` against the frozen `5000 ms` budget, and rotation preserved the committed count/action state. Physical-device, production-fleet and frame-rendering parity remain unverified. `AI_GENERATE` is the only remaining non-compensatory gate.
+The local Android runtime gates are bounded to `Rcl_Aether_API35_ATD` (API 35, x86_64). Five end-to-end ADB/UIAutomator transaction observations measured p95 `2981.554 ms` against the frozen `5000 ms` budget, and rotation preserved the committed count/action state. Three independent read-only sessions repaired transaction, reactive binding and lifecycle mutations; GitHub run `32871776578`, focused job `97880272426`, bound their saved receipt to the emulator evidence. Physical-device, production-fleet, frame-rendering parity and arbitrary Android generation remain unverified.
 
 ## Reproduction
 
@@ -98,11 +98,11 @@ The focused GitHub Actions workflow provides the same remote build path and uplo
 - not a complete Android framework implementation;
 - not a native RCL VM running inside the APK;
 - not physical-device or production-fleet behavior;
-- not independent AI generation evidence;
+- not arbitrary Android app generation beyond the three frozen independent repair classes;
 - not universal-language maturity from one Android cell.
 
 ## Next evidence closure
 
-1. Run an independent Android generation/repair trial before changing `AI_GENERATE`.
-2. Replay the saved candidates in hosted verification without granting the generator repository write authority.
-3. Preserve physical-device and broader performance work as separate evidence rather than inflating the bounded emulator claim.
+1. Reuse this adapter for adjacent Android program families without silently copying K03 PASS.
+2. Preserve physical-device and broader performance work as separate evidence rather than inflating the bounded emulator claim.
+3. Keep every new matrix cell subject to all nine non-compensatory gates.

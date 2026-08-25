@@ -1,6 +1,6 @@
 # K03 Android AI_GENERATE Integration Court
 
-**Court status:** `LOCAL_CANDIDATE_GITHUB_REPLAY_REQUIRED`
+**Court status:** `PASS_GITHUB_REPLAY_BOUND`
 
 Three unique ephemeral read-only generator sessions repaired effective mutations in the frozen K03 Android vertical slice:
 
@@ -12,4 +12,4 @@ The generators received only mutated candidates, semantic intent and determinist
 
 The candidate is separately bound to real API 35 emulator receipt `9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf`. Local AI receipt root is `15a1e75416299146b6987157a1bab9bf2fdc307a4cf1dcd2e007cf80cb2c3fe1`.
 
-K083, K085 and K098 remain BLOCKED until a GitHub push run successfully replays the saved receipt. Even after admission, the result is limited to the frozen transaction UI; it grants no arbitrary Android generation, physical-device parity, Android framework ownership or K400 completion claim.
+GitHub run `32871776578`, focused job `97880272426`, successfully replayed the saved receipt for exact source commit `b5d72ca19750b9e63e49bd4121ae30f18b42f8f0`. Authority root `14bb5c06cc64c1c1952418bd7765da7758353984c3c6c86d4e6bf30615750276` admits K083, K085 and K098 for the frozen transaction UI. It grants no arbitrary Android generation, physical-device parity, Android framework ownership or K400 completion claim.

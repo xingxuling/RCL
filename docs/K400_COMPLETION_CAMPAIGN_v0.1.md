@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `5 PASS / 3 BLOCKED / 392 UNTESTED`
-**Maturity:** `U0`
-**Report root:** `cf64a981750bd9f3462866e96097fdce35ede0cd7a987516740103a3b560eec6`
+**Current evidence:** `8 PASS / 0 BLOCKED / 392 UNTESTED`
+**Maturity:** `U3`
+**Report root:** `2788a7b31a7b690f3846b08b6e79461e9821e05de4fa3d0a5bd9d6777d0a7799`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -47,17 +47,17 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K063` | `browser::gui` | `PASS` | none for the bounded K02 structural GUI surface |
 | `K078` | `browser::reactive` | `PASS` | none for the bounded K02 reactive state/binding surface |
 | `K233` | `ai-runtime::machine-learning` | `PASS` | none for the bounded AI-N2 General MLP profile; broader Tensor/Autodiff/Transformer work is separate |
-| `K083` | `android::gui` | `BLOCKED` | independent Android `AI_GENERATE` |
-| `K085` | `android::mobile` | `BLOCKED` | independent Android `AI_GENERATE` |
-| `K098` | `android::reactive` | `BLOCKED` | independent Android `AI_GENERATE` |
+| `K083` | `android::gui` | `PASS` | none for the bounded K03 Android GUI slice |
+| `K085` | `android::mobile` | `PASS` | none for the bounded K03 mobile transaction slice |
+| `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 
 ## 4. Closure order
 
-1. Close the three Android `AI_GENERATE` gates through separately executed, receipt-bound Android-lowering/application repair trials.
-2. Preserve the existing API 35 emulator installation, interaction, lifecycle and timing receipt as a non-compensatory runtime gate.
-3. Add reusable campaign adapters for the remaining killer tasks before expanding into adjacent matrix cells.
+1. Add reusable campaign adapters for the remaining killer tasks before expanding into adjacent matrix cells.
+2. Prioritize cells that can reuse the admitted compiler, Web, Android and native-AI genomes without inventing task-specific shortcuts.
+3. Preserve the API 35 emulator installation, interaction, lifecycle and timing receipt as a bounded non-compensatory runtime gate.
 4. Rerun regression and regenerate the complete 400-cell report after every evidence generation.
 
 ## 5. Evidence integrity
@@ -78,7 +78,7 @@ The frozen K02 contract injects three semantic mutations: reactive count transit
 
 K339 is independently closed by three unique read-only compiler-source repair sessions, three effective opcode-table mutations, exact canonical source restoration and one shared native byte-identical `C0 == C1 == C2` fixed point. GitHub run `32869858927` bound focused job `97873981605` and Windows job `97873981286` for exact source commit `1bdab89cbff822b4d5f4119d009aaab8a07c12f0`; authority root is `ef6f03ca31bd6416f13f2fbab199e692c1111fc5b8db66aef947c463a6e52a43`.
 
-The Android campaign installed the rebuilt K03 APK on `Rcl_Aether_API35_ATD`, exercised the initial state, empty-input guard, five increment/reset rounds and activity recreation by rotation, and measured the full ADB/UIAutomator observation path. A real emulator differential exposed integer results rendering as `1.0`; the Java lowering now preserves `Long` without ternary numeric promotion, and the rebuilt APK renders `1`. Receipt root `9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf` records p95 `2981.554 ms` against the frozen `5000 ms` budget. This closes `EXECUTE`, `CORRECT` and `PERFORMANCE` for K083, K085 and K098 only; their distinct `AI_GENERATE` gate remains blocked.
+The Android campaign installed the rebuilt K03 APK on `Rcl_Aether_API35_ATD`, exercised the initial state, empty-input guard, five increment/reset rounds and activity recreation by rotation, and measured the full ADB/UIAutomator observation path. A real emulator differential exposed integer results rendering as `1.0`; the Java lowering now preserves `Long` without ternary numeric promotion, and the rebuilt APK renders `1`. Receipt root `9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf` records p95 `2981.554 ms` against the frozen `5000 ms` budget. GitHub run `32871776578`, focused job `97880272426`, then bound three independent Android repair sessions to that emulator receipt; authority root `14bb5c06cc64c1c1952418bd7765da7758353984c3c6c86d4e6bf30615750276` closes K083, K085 and K098 for this bounded slice.
 
 ## 8. K08-A baseline and K08-B General MLP
 
