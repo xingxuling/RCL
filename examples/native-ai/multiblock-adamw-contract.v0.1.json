@@ -1,0 +1,58 @@
+{
+  "format": "rcl.k08-r.multiblock-adamw-contract.v0.1",
+  "status": "MULTI_BLOCK_ADAMW_CANDIDATE_PRE_HOSTED_EVIDENCE",
+  "canonicalOwner": "RCL",
+  "profile": "TWO_BLOCK_GQA_ROPE_ADAMW_CPU_F64_CANDIDATE",
+  "composition": {
+    "model": "K08-P parametric multi-block decoder LM",
+    "attention": "K08-O GQA",
+    "position": "K08-N RoPE",
+    "autodiff": "K08-G Reverse Autodiff",
+    "optimizer": "K08-H/K08-K RCL AdamW Tensor bridge",
+    "blockCount": 2,
+    "parameterGroups": 14,
+    "optimizerStateGroups": 14,
+    "parameterIdentity": "model-shared plus block-index-scoped",
+    "resumeRule": "direct N steps must equal checkpoint K + resume N-K exactly in the frozen CPU-f64 profile"
+  },
+  "frozenEvidenceProfile": {
+    "sequenceLength": 3,
+    "vocabSize": 4,
+    "hiddenSize": 4,
+    "ffSize": 5,
+    "queryHeads": 2,
+    "kvHeads": 1,
+    "headDimension": 2,
+    "blockCount": 2,
+    "dtype": "f64",
+    "device": "cpu",
+    "optimizer": "AdamW"
+  },
+  "requiredEvidence": [
+    "selfhost-rbc-parity-and-native-semantic-root",
+    "two-block-graph-has-fourteen-unique-parameter-identities",
+    "adamw-updates-all-fourteen-parameter-groups",
+    "all-fourteen-optimizer-states-are-finite-and-bound",
+    "two-block-next-token-loss-decreases-under-adamw",
+    "direct-training-equals-checkpoint-resume",
+    "deterministic-training-replay",
+    "invalid-optimizer-state-binding-fails-closed",
+    "no-model-special-optimizer-opcode"
+  ],
+  "claimsGrantedOnAdmission": [
+    "MULTI_BLOCK_ADAMW_TRAINING_REPLAY",
+    "MULTI_BLOCK_OPTIMIZER_STATE_BINDING",
+    "MULTI_BLOCK_CHECKPOINT_RESUME"
+  ],
+  "claimsNotGranted": [
+    "BF16_AUTODIFF_TRAINING",
+    "MULTI_BLOCK_BF16_TRAINING",
+    "GPU",
+    "CUDA",
+    "PRODUCTION_64K_VOCABULARY",
+    "RCL_10M",
+    "DISTRIBUTED_TRAINING",
+    "RCL_1B_COMPLETE",
+    "K400_PROMOTION"
+  ]
+}
