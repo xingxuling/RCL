@@ -1,0 +1,58 @@
+{
+  "format": "rcl.k08-f.tensor-borrowed-input-github-replay.v0.1",
+  "status": "PASS_GITHUB_HOSTED_REPLAY_BOUND",
+  "sourceCommit": "d130a4d91f68159ea7405222ed6658ff2269b459",
+  "workflow": "RCL Universal Program Stress v0.1",
+  "runId": 32821559973,
+  "runUrl": "https://github.com/xingxuling/RCL/actions/runs/32821559973",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 97720582566,
+      "name": "focused-verification",
+      "platform": "ubuntu-latest",
+      "conclusion": "success",
+      "tensorSteps": [
+        "K08 Tensor correctness and portable CPU engine tests",
+        "Consolidated K400 campaign report"
+      ]
+    },
+    {
+      "id": 97720582266,
+      "name": "k01-windows-verification",
+      "platform": "windows-latest",
+      "conclusion": "success",
+      "tensorSteps": [
+        "K08 Tensor native provider and CPU engine tests",
+        "K08 Tensor Windows performance evidence",
+        "K08 General MLP Tensor lowering evidence",
+        "K08 Tensor borrowed-input and process-memory evidence"
+      ]
+    }
+  ],
+  "localEvidenceReportRoot": "9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe",
+  "priorFailedRuns": [
+    {
+      "runId": 32819776325,
+      "sourceCommit": "550b6fa923a1fb9e57bb2f3d405f276813c69e54",
+      "failureBoundary": "Windows sampler stdin transport produced an empty Tensor request"
+    },
+    {
+      "runId": 32820687027,
+      "sourceCommit": "d70d38e4eb8f672fd5d3c3d2c5d58a19d6b62ec2",
+      "failureBoundary": "Explicit stdin flush did not remove the hosted transport failure"
+    }
+  ],
+  "claimsNotGranted": [
+    "GENERAL_TENSOR_MEMORY_REDUCTION",
+    "PORTABLE_RSS_REDUCTION",
+    "VRAM_REDUCTION",
+    "BUFFER_REUSE",
+    "COMPACT_PLAN_LOWERING",
+    "PERFORMANCE_PARITY_WITH_JAVASCRIPT",
+    "NATIVE_AUTODIFF",
+    "K400_PASS"
+  ],
+  "annotationBoundary": "Two earlier hosted runs failed the new sampler transport and remain preserved above. The admitted run uses the Tensor CLI request-file path, passes portable semantics and real Windows Provider/process-memory execution, and does not convert workload-bounded metrics into portable or general claims. Actions Node 20 deprecation warnings were non-failing infrastructure annotations.",
+  "authorityRoot": "aaa16a7e0a9b64c9a7f2f0cbea7fa50e6bf0c68d74ce1d5c75d9bb928a775436"
+}

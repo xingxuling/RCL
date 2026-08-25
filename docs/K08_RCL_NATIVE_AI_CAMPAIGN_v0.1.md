@@ -197,14 +197,13 @@ A controlled Windows A/B used clean exact-main baseline `9805956dfd24834d650534a
 
 All baseline/candidate roots matched for both workloads. Peak Working Set is sampled from the exact Windows child process while alive, so it includes executable, allocator, JSON plan/input/output and Rust allocations. It is not portable RSS, VRAM, logical Tensor-store size or a general workload claim. Accepted local evidence root: `9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe`.
 
-K08-F is currently `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`; GitHub-hosted replay remains the next admission gate.
+K08-F is `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_GITHUB_REPLAY_BOUND`. GitHub run `32821559973` passed focused Ubuntu job `97720582566` and real Windows job `97720582266` for exact source commit `d130a4d91f68159ea7405222ed6658ff2269b459`. The Windows job rebuilt exact baseline `9805956...`, ran the native Provider/General MLP path, and executed the child-process memory A/B. Runs `32819776325` and `32820687027` failed earlier sampler stdin transports and remain recorded rather than overwritten; the admitted run uses the existing CLI request-file path.
 
 ## 11. Next gate
 
 The next highest-value sequence is:
 
-1. replay K08-F portable semantics and Windows process-memory evidence on GitHub;
-2. add liveness-safe output-buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
-3. close the typed-source self-host compiler gap before Tensor promotion;
-4. resolve scientific-notation number canonicalization in semantic-state-root evidence;
-5. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.
+1. add liveness-safe output-buffer reuse and compact plan lowering, then remeasure the full Native/JS boundary;
+2. close the typed-source self-host compiler gap before Tensor promotion;
+3. resolve scientific-notation number canonicalization in semantic-state-root evidence;
+4. begin a separate general Autodiff candidate only after the execution-plan bottleneck is evidenced.

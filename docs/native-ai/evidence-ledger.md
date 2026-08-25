@@ -154,7 +154,7 @@ The accepted local receipt is `examples/native-ai/evidence/tensor-plan-liveness-
 
 ## K08-F Tensor Plan borrowed-input candidate
 
-Status: `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`. It changes Rust execution ownership only; Tensor Plan and operation semantics remain RCL-owned.
+Status: `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_GITHUB_REPLAY_BOUND`. It changes Rust execution ownership only; Tensor Plan and operation semantics remain RCL-owned.
 
 | Evidence | Result |
 |---|---:|
@@ -169,9 +169,12 @@ Status: `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`. It changes Ru
 | Clone-stress peak Working Set medians | `20,234,240 / 18,636,800 bytes`; `7.895%` lower |
 | Semantic parity | one output root per workload across all baseline/candidate samples |
 | Evidence report root | `9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe` |
-| GitHub replay | pending |
+| GitHub run / source commit | `32821559973 / d130a4d91f68159ea7405222ed6658ff2269b459` |
+| GitHub Ubuntu / Windows jobs | `97720582566 / 97720582266`, both success |
 
 The tracked sampler reads the exact child process `PeakWorkingSet64` while it is alive. The result includes all child-process memory and is deliberately separate from K08-E logical Plan-store telemetry. The 200,000-element-per-input stress isolates the historical `3,200,000`-byte storage clone boundary; neither result grants portable/general RSS reduction, VRAM reduction, buffer reuse, compact lowering, Autodiff or K400 promotion.
+
+The hosted receipt is `examples/native-ai/evidence/tensor-plan-borrowed-inputs-v0.1/github-replay.json`. It binds the admitted run and preserves failed runs `32819776325` and `32820687027`, whose new sampler steps exposed an empty-request stdin transport on GitHub Windows. The admitted implementation reuses the existing Tensor CLI request-file path; it does not erase the negative evidence.
 
 Reproduction:
 

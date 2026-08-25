@@ -2,7 +2,7 @@
 
 ## Decision
 
-Admit borrowed Tensor Plan input binding and Windows peak-process-memory measurement as an `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_LOCAL_WINDOWS`. GitHub replay is required before adding the replay-bound suffix. Do not promote Tensor, K233 or any K400 cell.
+Admit borrowed Tensor Plan input binding and Windows peak-process-memory measurement as an `ENGINE_E1_TENSOR_BORROWED_INPUT_CANDIDATE_GITHUB_REPLAY_BOUND`. Do not promote Tensor, K233 or any K400 cell.
 
 ## Canonical ownership
 
@@ -34,6 +34,8 @@ Admit borrowed Tensor Plan input binding and Windows peak-process-memory measure
 - Windows child-process peak Working Set medians were both `38,445,056 bytes` on the production Plan; no reduction was observed in this run.
 - A 200,000-element-per-input stress fell from `20,234,240` to `18,636,800 bytes` while eliminating the historical `3,200,000`-byte input clone.
 - Accepted local evidence root: `9bc62c3b126a9428f6213989d0cb184ff0787cbeec989c51d130cbedad8720fe`.
+- GitHub run `32821559973` passed Ubuntu `97720582566` and Windows `97720582266` for exact source commit `d130a4d91f68159ea7405222ed6658ff2269b459`, including the exact-baseline process-memory A/B.
+- Failed runs `32819776325` and `32820687027` remain bound as sampler-transport negative evidence; the admitted run uses the existing request-file CLI instead of a new stdin transport.
 
 ## Evidence boundary
 
@@ -52,4 +54,4 @@ The production timing and Working Set results are same-host Windows candidate ev
 
 ## Next evidence gate
 
-Replay the exact implementation on GitHub Ubuntu and Windows. After replay binding, use the already-computed liveness intervals to evaluate semantically safe output-buffer reuse and compact Plan lowering.
+Use the already-computed liveness intervals to evaluate semantically safe output-buffer reuse and compact Plan lowering.
