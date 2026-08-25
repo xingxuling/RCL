@@ -22,4 +22,4 @@ No workaround below may be silently counted as canonical RCL capability.
 
 `K339 compiler-source AI repair -> Android emulator/device gates -> reusable K04+ campaign adapters -> adjacent K400 cells`.
 
-K339 now has a `3/3` independent local repair candidate plus a byte-identical shared native compiler fixed point. It remains blocked until one GitHub push run binds the focused Linux receipt replay and Windows native self-hosting job; this is an evidence/authority gap, not a compiler semantic bypass.
+K339 now has a `3/3` independent repair receipt plus a byte-identical shared native compiler fixed point. GitHub run `32869858927` bound the focused Linux receipt replay and Windows native self-hosting job, closing the evidence/authority gap for K339 only. The next gap is distinct Android `AI_GENERATE`; it cannot inherit K01 or K02 authority.

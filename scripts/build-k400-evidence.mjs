@@ -10,6 +10,8 @@ import {
 } from '../src/universal-program-stress.mjs';
 import { verifyK02AiGenerationReceipt } from './verify-k02-ai-generation-receipt.mjs';
 import { verifyK01AiGenerationReceipt } from './verify-k01-ai-generation-receipt.mjs';
+import { verifyK03AndroidEmulatorEvidence } from './verify-k03-android-emulator-evidence.mjs';
+import { verifyK03AiGenerationReceipt } from './verify-k03-ai-generation-receipt.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -26,6 +28,10 @@ const k02AiGithubReplayPath = 'examples/universal-stress/evidence/k02-ai-generat
 const k01AiContractPath = 'examples/universal-stress/k01-ai-generation-contract.v0.2.json';
 const k01AiReceiptPath = 'examples/universal-stress/evidence/k01-ai-generate/receipt.json';
 const k01AiGithubReplayPath = 'examples/universal-stress/evidence/k01-ai-generate/github-replay.json';
+const k03EmulatorPath = 'examples/universal-stress/evidence/k03-android-emulator-v0.1.json';
+const k03AiContractPath = 'examples/universal-stress/k03-ai-generation-contract.v0.1.json';
+const k03AiReceiptPath = 'examples/universal-stress/evidence/k03-ai-generate/receipt.json';
+const k03AiGithubReplayPath = 'examples/universal-stress/evidence/k03-ai-generate/github-replay.json';
 const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
 const k08TensorMlpGithubReplayPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json';
 const k08TensorLivenessPath = 'examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json';
@@ -60,6 +66,10 @@ const k02Ai = await verifyK02AiGenerationReceipt();
 const k02AiAdmitted = k02Ai.aiGenerateAdmission === 'PASS';
 const k01Ai = verifyK01AiGenerationReceipt();
 const k01AiAdmitted = k01Ai.aiGenerateAdmission === 'PASS';
+const k03Emulator = verifyK03AndroidEmulatorEvidence();
+if (!k03Emulator.admitted) throw new Error('RCL_K400_K03_EMULATOR_EVIDENCE_NOT_ADMITTED');
+const k03Ai = verifyK03AiGenerationReceipt();
+const k03AiAdmitted = k03Ai.aiGenerateAdmission === 'PASS';
 
 function k02AiGate(fallback) {
   if (!k02AiAdmitted) return fallback;
@@ -183,6 +193,32 @@ for (const id of ['browser::gui', 'browser::reactive']) {
   claimsById.set(id, claim);
 }
 for (const claim of directClaims) claimsById.set(claim.id, claim);
+for (const id of ['android::gui', 'android::mobile', 'android::reactive']) {
+  const claim = structuredClone(claimsById.get(id));
+  if (!claim) throw new Error(`RCL_K400_K03_EMULATOR_TARGET_MISSING:${id}`);
+  for (const gate of ['EXECUTE', 'CORRECT', 'PERFORMANCE']) {
+    claim.gates[gate] = {
+      status: STRESS_STATUS.PASS,
+      evidence: [k03EmulatorPath],
+      note: gate === 'PERFORMANCE'
+        ? `API ${k03Emulator.device.apiLevel} emulator ADB/UIAutomator end-to-end p95 ${k03Emulator.performance.p95Ms.toFixed(3)} ms <= ${k03Emulator.performance.interactionBudgetMs} ms.`
+        : `Installed and exercised the frozen K03 transaction UI on ${k03Emulator.device.avdName}; receipt ${k03Emulator.reportRoot}.`,
+    };
+  }
+  if (k03AiAdmitted) {
+    claim.gates.AI_GENERATE = {
+      status: STRESS_STATUS.PASS,
+      evidence: [k03AiContractPath, k03AiReceiptPath, k03AiGithubReplayPath, k03EmulatorPath],
+      note: `Three independent Android repairs restored canonical bytes and replayed with emulator receipt; GitHub run ${k03Ai.githubAuthority.runId}.`,
+    };
+    claim.lastVerifiedSha = k03Ai.githubAuthority.sourceCommit;
+  }
+  claim.lastVerifiedDate = k03Emulator.verifiedAt.slice(0, 10);
+  claim.knownLimits = claim.knownLimits.filter((limit) => !/(no Android SDK|no device|device execution|device\/emulator interaction|device timing|performance are unverified)/iu.test(limit)).concat(
+    'Android runtime evidence is limited to one local API 35 x86_64 AVD and the frozen K03 transaction UI; physical-device, fleet and frame-rendering parity remain unverified.',
+  );
+  claimsById.set(id, claim);
+}
 
 const evidence = {
   schema: 'rcl.universal-stress.evidence.v0.1',
@@ -192,7 +228,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
@@ -204,6 +240,10 @@ const evidence = {
     k01AiAdmitted
       ? `K01 closes K339 AI_GENERATE through 3/3 independent compiler-source repairs, shared native fixed point and GitHub Linux/Windows run ${k01Ai.githubAuthority.runId}.`
       : 'K01 has a 3/3 local independent compiler repair candidate and shared native fixed point; K339 remains BLOCKED until GitHub Linux/Windows replay is bound.',
+    `K03 real emulator receipt ${k03Emulator.reportRoot} closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098 on the frozen transaction UI; Android AI_GENERATE remains independently blocked.`,
+    k03AiAdmitted
+      ? `K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run ${k03Ai.githubAuthority.runId}.`
+      : 'K03 has a 3/3 local independent Android repair candidate bound to the real emulator receipt; Android cells remain BLOCKED until GitHub replay is bound.',
     `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     `K08-E is candidate-only evidence: last-use reclamation measured a ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x logical plan-store reduction and ${k08TensorLiveness.controlledPerformance.speedup.toFixed(3)}x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.`,
     `K08-F is candidate-only local Windows evidence: ${k08TensorBorrowedInput.productionWorkload.inputBindingCount} Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured ${k08TensorBorrowedInput.controlledPerformance.speedup.toFixed(3)}x runtime speedup and ${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.`,

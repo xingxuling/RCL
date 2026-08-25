@@ -78,7 +78,7 @@ These decisions changed the implementation: companion morphology is forbidden on
 | Selfhost/fixed point | PASS — 6/6; minimal UI, Counter, parameterized UI-local events, governed reality-transaction declarations, fixed sizes, navigation and available-width adaptive layout are JS/self-host/native byte-identical; valid mutations change roots; equivalent fixed-number spellings normalize; invalid parameters, rules, authority mixtures, sizes, modes, routes, profile ranges/references and transition cardinality fail closed |
 | Instruction headroom | PASS — 88,744,649 executed per native generation; 211,255,351 remain against the 300 million cap; minimum gate 180 million. The sealed adaptation evidence pair took 228,988.5857 ms against the predeclared 240,000 ms gate; an independent focused reproduction took 232,033 ms |
 | Full regression | PASS — device-adaptation generation: 729 tests, 728 pass, 0 fail, 1 skip; 435,722.8321 ms on this machine. The clean run recorded byte-identical native C0/C1/C2 in 226,921 ms and retained 211,255,351 instruction headroom per generation |
-| K400 / Integration Court | INCOMPLETE — K063, K064, K078 and K233 PASS; 4 evidence-bearing cells remain BLOCKED and 392 UNTESTED; maturity `U0`; deterministic report root `fd7d8ca19f1b3aee74a645dd6d2dc6d8e6d019521d3f2e94d7a3dc953cb6bb83` |
+| K400 / Integration Court | INCOMPLETE — K063, K064, K078, K233 and K339 PASS; 3 evidence-bearing Android cells remain BLOCKED only on AI_GENERATE and 392 are UNTESTED; maturity `U0`; deterministic report root `cf64a981750bd9f3462866e96097fdce35ede0cd7a987516740103a3b560eec6` |
 
 ## Independent K02 AI_GENERATE closure
 
@@ -102,10 +102,10 @@ The final K400 seal also found that `generatedAt` had been included in the repor
 |---|---|
 | Native semantic coverage | `CANDIDATE` — exact Counter, parameterized UI-local, governed-event, fixed-sizing, navigation and width-profile adaptation selfhost slices verified; resources, broader adaptation and full accessibility remain absent or partial |
 | Web lowering | `VERIFIED` for Counter v0.1 |
-| Android lowering | `VERIFIED` for project generation and APK build |
+| Android lowering | `VERIFIED` for project generation, APK build and the frozen API 35 emulator transaction slice |
 | Visual fidelity | `PARTIAL` — semantic structure/style subset, no pixel parity claim |
-| Runtime verification | Web `VERIFIED`; Android host trace `VERIFIED`; APK runtime `NOT VERIFIED` |
-| Device verification | `NOT VERIFIED` |
+| Runtime verification | Web `VERIFIED`; Android host trace and API 35 emulator APK runtime `VERIFIED` for the frozen slice |
+| Device verification | API 35 AVD `VERIFIED`; physical device and fleet parity `NOT VERIFIED` |
 
 ## Integration Court
 
@@ -113,12 +113,12 @@ The final K400 seal also found that `generatedAt` had been included in the repor
 - Do Web and Android consume one Canonical UI? **Yes; lowering roots refer to the same `uiProgramRoot`.**
 - Is platform syntax present in core? **No detected platform widget/layout primitives.**
 - Is Authority/4R preserved? **Yes at the UI boundary; reality actions cannot execute without an external governed gateway.**
-- Is there real execution evidence? **Yes for browser and Android build; no for Android device behavior.**
-- Is regression closed? **Yes for the declared browser paths: the device-adaptation regression remains green and the three saved K02 repairs passed local plus exact-commit GitHub replay. Android device and Android AI-generation gates remain open.**
+- Is there real execution evidence? **Yes for browser and for the frozen Android APK on one API 35 emulator; physical-device behavior remains open.**
+- Is regression closed? **Yes for the declared browser paths and bounded Android emulator slice. The three saved K02 repairs and three K01 compiler repairs passed their exact-commit hosted replays. Android AI-generation remains open.**
 
 Court result: `NATIVE_UI_CANDIDATE_WITH_BLOCKED_CANONICAL_PROMOTION`. It is not permissible to claim repository-wide `native-semantic` UI yet.
 
-The consolidated report preserves the device-adaptation evidence and the post-contract real Chrome performance PASS for the declared Counter workload. K063, K064 and K078 now pass all nine gates through the bounded hosted K02 repair receipt. Compiler self-hosting remains blocked by its distinct compiler-evolution `AI_GENERATE` contract; Android claims remain blocked by device execution/correctness/performance and `AI_GENERATE`. These gates do not compensate for one another.
+The consolidated report preserves the device-adaptation evidence, real Chrome performance and the rooted API 35 emulator receipt. K063, K064 and K078 pass through the bounded hosted K02 repair receipt; K339 passes through its distinct compiler-source repair plus Linux/Windows authority receipt. K083, K085 and K098 now pass device execution/correctness/performance and remain blocked only on distinct Android `AI_GENERATE`. These gates do not compensate for one another.
 
 ## License and diff audit
 
@@ -126,4 +126,4 @@ The candidate implementation reuses repository interfaces and independently impl
 
 ## Matrix impact
 
-The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI. Browser performance passes only for the frozen local Counter budget. The separate hosted K02 receipt closes K063, K064 and K078 AI_GENERATE; K339 still needs compiler-source generation/repair, while Android still lacks device execute/correct/performance and AI evidence. No broader matrix PASS is inferred.
+The selfhost rerun maps to `compiler-runtime::self-hosting`, `browser::gui`, `browser::reactive`, `android::gui` and `android::reactive`. Available-width adaptation closes another selfhost and dual-backend semantic gap without transferring commit authority to the UI. Browser performance passes only for the frozen local Counter budget. The hosted K02 receipt closes K063/K064/K078, and the separate K01 receipt closes K339. Android emulator evidence closes execute/correct/performance for K083/K085/K098, while their Android AI evidence remains open. No broader matrix PASS is inferred.

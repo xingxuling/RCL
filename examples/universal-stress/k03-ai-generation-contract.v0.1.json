@@ -1,0 +1,53 @@
+{
+  "format": "rcl.k03.ai-generation-contract.v0.1",
+  "status": "FROZEN_PENDING_INDEPENDENT_TRIALS",
+  "generator": {
+    "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+    "minimumCliVersion": "0.135.0",
+    "sandbox": "read-only",
+    "network": "not-required"
+  },
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k03-native-android-app.rcl",
+    "sourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+    "specPath": "examples/universal-stress/k03-native-android-app.android.json",
+    "specSha256": "316bb0d84033e367017fd7fcf8559d237c09ac27ebc97be22b33cbc159973f35"
+  },
+  "requiredTrials": 3,
+  "purpose": "Prove that separate AI sessions can repair bounded RCL-owned Android transaction, reactive binding and lifecycle semantics without seeing canonical inputs or oracle edits.",
+  "rules": [
+    "Each generator receives only mutated RCL/Android candidates, semantic intent and deterministic failure diagnostics.",
+    "Canonical files, mutation implementation and oracle edits are absent from the generator workspace.",
+    "Each trial uses a fresh ephemeral read-only session that cannot edit the authoritative repository, tests, thresholds or evidence.",
+    "The evaluator applies only the exact file/old/new edit returned through the frozen JSON Schema.",
+    "Every repair must restore exact canonical bytes, Android manifest lowering, native Activity bindings and host transaction replay.",
+    "The separate rooted API 35 emulator receipt supplies install, interaction, lifecycle and performance evidence.",
+    "Three unique sessions plus GitHub-hosted saved-candidate replay are required before Android AI_GENERATE may pass."
+  ],
+  "trials": [
+    {
+      "id": "K03-AI-REPAIR-01",
+      "mutationClass": "ANDROID_TRANSACTION_TRANSITION",
+      "intent": "Repair the Android transaction program so one accepted increment adds exactly one while preserving the generic governed transaction path."
+    },
+    {
+      "id": "K03-AI-REPAIR-02",
+      "mutationClass": "ANDROID_REACTIVE_INPUT_BINDING",
+      "intent": "Repair the Android input so displayed value and observed changes bind to the same app.input state."
+    },
+    {
+      "id": "K03-AI-REPAIR-03",
+      "mutationClass": "ANDROID_LIFECYCLE_RESTORE",
+      "intent": "Repair the Android target lifecycle contract so committed RCL state is restored across Activity recreation."
+    }
+  ],
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "candidateMustRestoreCanonicalBytes": true,
+    "requiredGithubReplay": true,
+    "requiredEmulatorReceipt": "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+    "eligibleCells": ["K083", "K085", "K098"]
+  },
+  "evidenceBoundary": "This proves three bounded independent repairs for the frozen K03 Android transaction UI, combined with its separate API 35 emulator receipt. It does not prove arbitrary Android app generation, physical-device parity, Android framework ownership or K400 completion."
+}

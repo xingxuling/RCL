@@ -1,0 +1,426 @@
+{
+  "format": "rcl.k03.ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-25T16:21:34.127Z",
+  "contractRoot": "8618ddc487ceae5e6252078275208fa302724990f68bff92f3d77c93b74d488f",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K083",
+    "K085",
+    "K098"
+  ],
+  "emulatorReportRoot": "9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf",
+  "trials": [
+    {
+      "format": "rcl.k03.ai-generation-trial-receipt.v0.1",
+      "trialId": "K03-AI-REPAIR-01",
+      "mutationClass": "ANDROID_TRANSACTION_TRANSITION",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039b8-d098-7e90-99be-de360898cb36",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "alter app.count <- app.count + 2",
+        "new": "alter app.count <- app.count + 1",
+        "diagnosis": "increment-transaction fails because the accepted increment emergence currently adds 2 to app.count. The minimal RCL-owned semantic repair is changing that governed transaction alteration to add exactly 1 while leaving the Android lowering/runtime path unchanged."
+      },
+      "promptRoot": "5f44df9f4671107e47edbb739f42fa54b66261ae55772d51b31fef7d564daa70",
+      "mutatedFile": "candidate.rcl",
+      "mutatedSourceSha256": "c4dc822dd20d15f8be560028c5406f7f43596df5dbc8dc6243cb0cbf8d602c53",
+      "mutatedSpecSha256": "316bb0d84033e367017fd7fcf8559d237c09ac27ebc97be22b33cbc159973f35",
+      "candidateSourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+      "candidateSpecSha256": "316bb0d84033e367017fd7fcf8559d237c09ac27ebc97be22b33cbc159973f35",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "c673cefdd879e11d4d02a3c67ebeb78acc897dc14b580e0e6585e1a9a24782b0",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039b8-d098-7e90-99be-de360898cb36"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "afa9c4cd649f4fa846dc8c35616c5f96f6a42184a55ce3341fa1b1e61fd6d1cb"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "8352dc32ec1031538abf782b9da82071a82ee797127fa82bda15a36c5913b1c6"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55312,
+            "cached_input_tokens": 4864,
+            "output_tokens": 411,
+            "reasoning_output_tokens": 42
+          }
+        }
+      ],
+      "finalMessageSha256": "8352dc32ec1031538abf782b9da82071a82ee797127fa82bda15a36c5913b1c6",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "20545af97b821956aa13d48815081fc8742511eef85ef8f29f14f0dd6fb2fd6f",
+        "failedChecks": [
+          "increment-transaction"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "9d4f150a4679625674dc23f41fc8f7add90944b5cc7c577afa55e4e058520c23",
+        "manifestRoot": "4e65294dfb33ebfa45ec6d0477da85c995741c659b5259c7eb6366a9df1ef3c4",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-input-binding": {
+            "pass": true
+          },
+          "lifecycle-contract": {
+            "pass": true
+          },
+          "native-transaction-lowering": {
+            "pass": true
+          },
+          "integer-number-lowering": {
+            "pass": true
+          },
+          "increment-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "6c2b7dc24d50e3a1f55c931494b181baaabfe97f86a44d09f6ccf5db2c45a1e7"
+    },
+    {
+      "format": "rcl.k03.ai-generation-trial-receipt.v0.1",
+      "trialId": "K03-AI-REPAIR-02",
+      "mutationClass": "ANDROID_REACTIVE_INPUT_BINDING",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039b9-4956-7701-a049-7b05b496e89b",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.android.json",
+        "old": "\"observeState\": \"app.last_action\"",
+        "new": "\"observeState\": \"app.input\"",
+        "diagnosis": "Reactive input binding fails because the input displays app.input via valueState but observes app.last_action. Bind observeState to app.input so display and observation share one app.input state while keeping RCL semantic ownership unchanged."
+      },
+      "promptRoot": "5d9f75707e1559a6c6c72d7fcf5b99214eb5551fde90ef2fb907254d7e149925",
+      "mutatedFile": "candidate.android.json",
+      "mutatedSourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+      "mutatedSpecSha256": "e89a9024d5ec5224239e7ada1685b94aa09e4f39f87814922f02ddbef1784cac",
+      "candidateSourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+      "candidateSpecSha256": "316bb0d84033e367017fd7fcf8559d237c09ac27ebc97be22b33cbc159973f35",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "834fcf8460a9a5ddd59c7f94e3a3bbc19e62de195e50e556d802f97ef747bcaa",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039b9-4956-7701-a049-7b05b496e89b"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "496de9612b506281565fa9226afcfe8ec3e2b6f73306151fce82bb801c7b36ee"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "aad34352e3ed858e4672ccca8f8d361b48326c81c7526b7f2a232f05fce1ec1b"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55315,
+            "cached_input_tokens": 51968,
+            "output_tokens": 413,
+            "reasoning_output_tokens": 52
+          }
+        }
+      ],
+      "finalMessageSha256": "aad34352e3ed858e4672ccca8f8d361b48326c81c7526b7f2a232f05fce1ec1b",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "94212d7efdb45570c70fef30fe180b7f07bd4e5e30a18864f8fd4ea6fc223642",
+        "failedChecks": [
+          "reactive-input-binding"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "9d4f150a4679625674dc23f41fc8f7add90944b5cc7c577afa55e4e058520c23",
+        "manifestRoot": "4e65294dfb33ebfa45ec6d0477da85c995741c659b5259c7eb6366a9df1ef3c4",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-input-binding": {
+            "pass": true
+          },
+          "lifecycle-contract": {
+            "pass": true
+          },
+          "native-transaction-lowering": {
+            "pass": true
+          },
+          "integer-number-lowering": {
+            "pass": true
+          },
+          "increment-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "fc51564f9ec5a76de124e31abf1abf98a2fc3a6fdfb2c97499401519ade2c326"
+    },
+    {
+      "format": "rcl.k03.ai-generation-trial-receipt.v0.1",
+      "trialId": "K03-AI-REPAIR-03",
+      "mutationClass": "ANDROID_LIFECYCLE_RESTORE",
+      "generator": {
+        "kind": "CODEX_CLI_EPHEMERAL_SEPARATE_SESSION",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a039b9-bf8e-79a2-8fc7-376c9b6c0213",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.android.json",
+        "old": "\"restoreState\": false",
+        "new": "\"restoreState\": true",
+        "diagnosis": "The lifecycle-contract check fails because the Android lowering explicitly disables state restoration. Keeping RCL as the semantic owner, the minimal runtime-organ repair is to enable Android restoration of committed RCL state across Activity recreation."
+      },
+      "promptRoot": "973877e93f6e206e30fc15b0e230d2ce2217c05a42f8310e0ea9a86be874e327",
+      "mutatedFile": "candidate.android.json",
+      "mutatedSourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+      "mutatedSpecSha256": "b4f8a43915cb1fc05e19433c0275719da62d843c4fa45d065284240eca4a0b0e",
+      "candidateSourceSha256": "cd93fc021bfc550d30aa18aa30267dde52ae6b53ef003239219fb0ac4e6b930b",
+      "candidateSpecSha256": "316bb0d84033e367017fd7fcf8559d237c09ac27ebc97be22b33cbc159973f35",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "809d11d9ce625fbd37941d417c2aa7990080f065b93a505017b951fa231873a6",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a039b9-bf8e-79a2-8fc7-376c9b6c0213"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "49bbe860f6a8a6e1ad3177ec95485975af4091c8ac1e947eb657896214b59a6b"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "822d0d46da0bb1e83dcc11d031fba7e71f3ff57ab2b91e96c46c021ba4ab2766"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 55315,
+            "cached_input_tokens": 29440,
+            "output_tokens": 429,
+            "reasoning_output_tokens": 86
+          }
+        }
+      ],
+      "finalMessageSha256": "822d0d46da0bb1e83dcc11d031fba7e71f3ff57ab2b91e96c46c021ba4ab2766",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "598e8065e1aaa41459aab4ff5140444566594f587f7a81c693b419622c7add8e",
+        "failedChecks": [
+          "lifecycle-contract"
+        ],
+        "error": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "9d4f150a4679625674dc23f41fc8f7add90944b5cc7c577afa55e4e058520c23",
+        "manifestRoot": "4e65294dfb33ebfa45ec6d0477da85c995741c659b5259c7eb6366a9df1ef3c4",
+        "checks": {
+          "program-identity": {
+            "pass": true
+          },
+          "authority-binding": {
+            "pass": true
+          },
+          "reactive-input-binding": {
+            "pass": true
+          },
+          "lifecycle-contract": {
+            "pass": true
+          },
+          "native-transaction-lowering": {
+            "pass": true
+          },
+          "integer-number-lowering": {
+            "pass": true
+          },
+          "increment-transaction": {
+            "pass": true
+          },
+          "reset-transaction": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "d99184f95420756e6a2d4d20e8212086266866509129be8f9558bc7b08311d0e"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_ANDROID_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "evidenceBoundary": "This proves three bounded independent repairs for the frozen K03 Android transaction UI, combined with its separate API 35 emulator receipt. It does not prove arbitrary Android app generation, physical-device parity, Android framework ownership or K400 completion.",
+  "reportRoot": "15a1e75416299146b6987157a1bab9bf2fdc307a4cf1dcd2e007cf80cb2c3fe1"
+}
+

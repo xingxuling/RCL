@@ -46,6 +46,8 @@ The compiler owns the application semantics. Android is the execution organ, so 
 - preserve negative: `RCL_ANDROID_PRESERVE_FAILED:increment` with no commit;
 - authority negative: `RCL_ANDROID_AUTHORITY_DENIED:increment:app.write`;
 - generated evidence: `examples/universal-stress/k03-direct-evidence-2026-08-08.json`.
+- real API 35 emulator install, transaction, lifecycle and timing receipt: `examples/universal-stress/evidence/k03-android-emulator-v0.1.json`.
+- Android numeric lowering regression: integer arithmetic now emits `Long` without Java ternary numeric promotion; the rebuilt UI renders `1`, not `1.0`.
 
 ## Nine gates
 
@@ -53,17 +55,17 @@ The compiler owns the application semantics. Android is the execution organ, so 
 EXPRESS      PASS
 COMPILE      PASS
 LOWER        PASS
-EXECUTE      UNVERIFIED
-CORRECT      UNVERIFIED
+EXECUTE      PASS
+CORRECT      PASS
 ROBUST       PASS
-PERFORMANCE  UNVERIFIED
+PERFORMANCE  PASS
 AI_GENERATE  UNVERIFIED
 EVIDENCE     PASS
 
 OVERALL      BLOCKED
 ```
 
-The missing Android gates are intentional. The current execution environment has Java but no Android SDK, Gradle, `adb` or emulator. Host replay proves the generated semantic plan, not the APK's real device behavior.
+The local Android runtime gates are bounded to `Rcl_Aether_API35_ATD` (API 35, x86_64). Five end-to-end ADB/UIAutomator transaction observations measured p95 `2981.554 ms` against the frozen `5000 ms` budget, and rotation preserved the committed count/action state. Physical-device, production-fleet and frame-rendering parity remain unverified. `AI_GENERATE` is the only remaining non-compensatory gate.
 
 ## Reproduction
 
@@ -95,14 +97,12 @@ The focused GitHub Actions workflow provides the same remote build path and uplo
 
 - not a complete Android framework implementation;
 - not a native RCL VM running inside the APK;
-- not verified APK installation or emulator behavior in this campaign;
+- not physical-device or production-fleet behavior;
 - not independent AI generation evidence;
 - not universal-language maturity from one Android cell.
 
 ## Next evidence closure
 
-1. Build the generated project with Gradle/Android SDK.
-2. Install the APK on an emulator or physical device.
-3. Exercise input observation, increment, reset, preserve failure and activity recreation.
-4. Record APK hash, device image, timings, screenshots/logcat and replay results.
-5. Run an independent AI generation/repair trial before changing `AI_GENERATE`.
+1. Run an independent Android generation/repair trial before changing `AI_GENERATE`.
+2. Replay the saved candidates in hosted verification without granting the generator repository write authority.
+3. Preserve physical-device and broader performance work as separate evidence rather than inflating the bounded emulator claim.

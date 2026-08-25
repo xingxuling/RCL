@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `4 PASS / 4 BLOCKED / 392 UNTESTED`; maturity `U0`; K400 verdict `INCOMPLETE`. The four PASS cells are K063, K064, K078 and K233.
+Current authoritative matrix: `5 PASS / 3 BLOCKED / 392 UNTESTED`; maturity `U0`; K400 verdict `INCOMPLETE`. The five PASS cells are K063, K064, K078, K233 and K339.
 
 Every evidence-bearing cell is evaluated through:
 
@@ -34,7 +34,7 @@ The gates are non-compensatory: a missing required gate blocks the cell, and a f
 
 ### K01 — Self-hosting compiler
 
-Current result: `BLOCKED (8/9)`.
+Current result: `PASS (9/9)` for the bounded compiler repair/fixed-point profile.
 
 Direct evidence supports:
 
@@ -46,9 +46,7 @@ Direct evidence supports:
 - malformed/unsupported negative-source rejection;
 - native execution and measured performance within the declared campaign budget.
 
-Remaining blocker: independent reproducible `AI_GENERATE` compiler-evolution/repair evidence.
-
-The frozen K01 v0.2 campaign now has a local candidate: three unique ephemeral read-only generator sessions repaired three effective RCL compiler opcode-lowering mutations, restored exact canonical compiler bytes, and shared one native byte-identical `C0 == C1 == C2` fixed point. Local receipt root is `45fdf969b54a300b63f1b2de441e133101c3c135d1faa03d246bde8934b3c85a`. K339 remains BLOCKED until a GitHub push binds both the focused Linux receipt replay and Windows native self-hosting job; no local session may self-promote it.
+The frozen K01 v0.2 campaign used three unique ephemeral read-only generator sessions to repair three effective RCL compiler opcode-lowering mutations, restore exact canonical compiler bytes, and share one native byte-identical `C0 == C1 == C2` fixed point. GitHub run `32869858927` bound focused Linux job `97873981605` and Windows native job `97873981286` for source commit `1bdab89cbff822b4d5f4119d009aaab8a07c12f0`; authority root is `ef6f03ca31bd6416f13f2fbab199e692c1111fc5b8db66aef947c463a6e52a43`. This closes K339 only and does not establish arbitrary compiler evolution or whole-runtime self-hosting.
 
 Authority document: `docs/K01_SELFHOSTING_COMPILER_STRESS_CAMPAIGN_v0.1.md`.
 
@@ -90,7 +88,9 @@ Implemented evidence supports:
 - lifecycle save/restore;
 - host semantic replay and negative controls.
 
-The recorded campaign does **not** yet prove real APK installation/device or emulator interaction. Therefore `EXECUTE`, `CORRECT`, `PERFORMANCE`, and `AI_GENERATE` remain unverified in the campaign evidence.
+The rebuilt APK was installed and exercised on the API 35 `Rcl_Aether_API35_ATD` emulator. The rooted receipt covers cold launch, initial state, empty-input guard, five transaction/reset rounds, rotation lifecycle restoration and an ADB/UIAutomator end-to-end p95 of `2981.554 ms` under the frozen `5000 ms` budget. Real execution exposed and drove the fix for Java ternary numeric promotion (`1.0` instead of integer `1`). `EXECUTE`, `CORRECT` and `PERFORMANCE` now pass for K083, K085 and K098 on this bounded vertical slice; independent Android `AI_GENERATE` remains the only missing gate for those three cells.
+
+The distinct K03 AI campaign now has a local candidate: three unique read-only sessions repaired transaction increment, reactive input observation and lifecycle restoration mutations, restored exact canonical bytes, and replayed the rooted Android manifest/Activity/host transaction path while binding the emulator receipt. Local AI receipt root is `15a1e75416299146b6987157a1bab9bf2fdc307a4cf1dcd2e007cf80cb2c3fe1`. The three cells remain BLOCKED until GitHub-hosted saved-receipt replay succeeds.
 
 Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 

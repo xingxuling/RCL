@@ -32,6 +32,10 @@ on:
       - 'scripts/run-k01-independent-ai-generation.mjs'
       - 'scripts/verify-k01-ai-generation-receipt.mjs'
       - 'scripts/verify-k01-compiler-candidate.mjs'
+      - 'scripts/run-k03-independent-ai-generation.mjs'
+      - 'scripts/verify-k03-ai-generation-receipt.mjs'
+      - 'scripts/verify-k03-android-candidate.mjs'
+      - 'scripts/verify-k03-android-emulator-evidence.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -70,6 +74,10 @@ on:
       - 'scripts/run-k01-independent-ai-generation.mjs'
       - 'scripts/verify-k01-ai-generation-receipt.mjs'
       - 'scripts/verify-k01-compiler-candidate.mjs'
+      - 'scripts/run-k03-independent-ai-generation.mjs'
+      - 'scripts/verify-k03-ai-generation-receipt.mjs'
+      - 'scripts/verify-k03-android-candidate.mjs'
+      - 'scripts/verify-k03-android-emulator-evidence.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -114,6 +122,8 @@ jobs:
         run: npm run verify:k02-ai-generate
       - name: K01 independent AI generation receipt replay
         run: npm run verify:k01-ai-generate
+      - name: K03 independent AI generation receipt replay
+        run: npm run verify:k03-ai-generate
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report

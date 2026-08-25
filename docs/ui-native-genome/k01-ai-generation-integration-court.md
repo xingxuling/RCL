@@ -1,6 +1,6 @@
 # K01 Compiler AI_GENERATE Integration Court
 
-**Court status:** `LOCAL_CANDIDATE_GITHUB_LINUX_WINDOWS_REPLAY_REQUIRED`
+**Court status:** `PASS_GITHUB_LINUX_WINDOWS_REPLAY_BOUND`
 
 ## Admission scope
 
@@ -28,6 +28,8 @@ The evaluator applied one Schema-bounded exact edit per session. All three candi
 - native compiler artifact: SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`
 - shared fixed point: `C0 == C1 == C2`
 - local receipt root: `45fdf969b54a300b63f1b2de441e133101c3c135d1faa03d246bde8934b3c85a`
+- hosted replay: run `32869858927`, focused job `97873981605`, Windows job `97873981286`
+- authority root: `ef6f03ca31bd6416f13f2fbab199e692c1111fc5b8db66aef947c463a6e52a43`
 
 ## Boundary
 

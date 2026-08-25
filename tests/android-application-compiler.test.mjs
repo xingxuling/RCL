@@ -33,6 +33,8 @@ test('K03 compiler emits a native Activity with state observation, authority and
   assert.match(java, /RCL_ANDROID_PRESERVE_FAILED:increment/u);
   assert.match(java, /onSaveInstanceState/u);
   assert.match(java, /restoreState/u);
+  assert.match(java, /if \(Math\.rint\(result\) == result\) return Long\.valueOf/u);
+  assert.doesNotMatch(java, /\? Long\.valueOf\(\(long\) result\) : Double\.valueOf/u);
 });
 
 test('K03 host semantic replay commits increment and reset through the same RCL transaction rules', () => {

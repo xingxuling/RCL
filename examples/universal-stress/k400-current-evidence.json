@@ -5,13 +5,13 @@
     {
       "id": "compiler-runtime::self-hosting",
       "coverageMode": "native-semantic",
-      "lastVerifiedSha": "9621358307cc89a2a981c7fd2a9f8d5285539858",
+      "lastVerifiedSha": "1bdab89cbff822b4d5f4119d009aaab8a07c12f0",
       "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
         "self-host ownership includes the exact Counter slice, typed/custom and standard-inferred UI-local parameters, governed reality-transaction declarations, fixed width/height intent, canonical in-app navigation, and available-width device profiles with adaptive layout direction",
         "resource and full accessibility extensions remain absent or partial",
         "runtime reality execution remains external to the self-host compiler and UI; only CandidateReality may cross the Gateway",
-        "AI_GENERATE remains independently unverified"
+        "AI_GENERATE is limited to three receipt-bound compiler opcode repairs; it does not prove arbitrary compiler evolution or whole-runtime self-hosting."
       ],
       "relatedKillerTasks": [
         "K01"
@@ -81,11 +81,13 @@
           "note": "each native generation executes 88,744,649 instructions with 211,255,351 headroom; the evidence generations completed in 228,988.5857 ms on this machine, within the predeclared 240,000 ms cap"
         },
         "AI_GENERATE": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/universal-stress/k01-ai-generation-contract.json"
+            "examples/universal-stress/k01-ai-generation-contract.v0.2.json",
+            "examples/universal-stress/evidence/k01-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k01-ai-generate/github-replay.json"
           ],
-          "note": "this development session cannot self-certify an independent AI-generation trial"
+          "note": "Three independent compiler-source repairs restored canonical bytes and native fixed point; GitHub run 32869858927 bound Linux replay plus Windows self-hosting."
         },
         "EVIDENCE": {
           "status": "PASS",
@@ -374,12 +376,12 @@
       "id": "android::gui",
       "coverageMode": "lowered-execution",
       "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
-      "lastVerifiedDate": "2026-08-24",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
-        "APK install and device/emulator interaction are unverified",
         "canonical self-host compiler owns the Counter, parameterized UI-local, governed-event, fixed-sizing, in-app navigation and available-width adaptive-layout surfaces; resources remain absent",
         "governed runtime events emit CandidateReality through an external Gateway and do not own commit authority",
-        "Android device adaptation behavior and full accessibility remain unverified or incomplete"
+        "Android device adaptation behavior and full accessibility remain unverified or incomplete",
+        "Android runtime evidence is limited to one local API 35 x86_64 AVD and the frozen K03 transaction UI; physical-device, fleet and frame-rendering parity remain unverified."
       ],
       "relatedKillerTasks": [
         "K03"
@@ -425,16 +427,18 @@
           ]
         },
         "EXECUTE": {
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "real APK built but no device was available"
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+          ],
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "CORRECT": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/semantic-trace-android.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
           ],
-          "note": "host trace is not device correctness"
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "ROBUST": {
           "status": "PASS",
@@ -445,8 +449,11 @@
           ]
         },
         "PERFORMANCE": {
-          "status": "UNVERIFIED",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+          ],
+          "note": "API 35 emulator ADB/UIAutomator end-to-end p95 2981.554 ms <= 5000 ms."
         },
         "AI_GENERATE": {
           "status": "UNVERIFIED",
@@ -478,10 +485,10 @@
       "id": "android::reactive",
       "coverageMode": "lowered-execution",
       "lastVerifiedSha": "f8f3eca982dd7b76a10c38f66045d99516c1c910",
-      "lastVerifiedDate": "2026-08-24",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
-        "device execution and performance are unverified",
-        "AI_GENERATE is unverified"
+        "AI_GENERATE is unverified",
+        "Android runtime evidence is limited to one local API 35 x86_64 AVD and the frozen K03 transaction UI; physical-device, fleet and frame-rendering parity remain unverified."
       ],
       "relatedKillerTasks": [
         "K03"
@@ -513,14 +520,18 @@
           ]
         },
         "EXECUTE": {
-          "status": "UNVERIFIED",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+          ],
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "CORRECT": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/semantic-trace-android.json"
-          ]
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+          ],
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "ROBUST": {
           "status": "PASS",
@@ -529,8 +540,11 @@
           ]
         },
         "PERFORMANCE": {
-          "status": "UNVERIFIED",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+          ],
+          "note": "API 35 emulator ADB/UIAutomator end-to-end p95 2981.554 ms <= 5000 ms."
         },
         "AI_GENERATE": {
           "status": "UNVERIFIED",
@@ -652,12 +666,12 @@
     {
       "id": "android::mobile",
       "coverageMode": "lowered-execution",
-      "lastVerifiedDate": "2026-08-08",
+      "lastVerifiedDate": "2026-08-25",
       "knownLimits": [
-        "The generated Activity and Gradle project are real Android artifacts, but no Android SDK, Gradle, emulator or adb was available in this execution environment.",
         "Host semantic replay is not a substitute for installing and interacting with the APK.",
         "AI_GENERATE remains independently unverified.",
-        "This is a native Android application lowering path, not a claim that RCL already owns the Android OS or the full Android framework semantics."
+        "This is a native Android application lowering path, not a claim that RCL already owns the Android OS or the full Android framework semantics.",
+        "Android runtime evidence is limited to one local API 35 x86_64 AVD and the frozen K03 transaction UI; physical-device, fleet and frame-rendering parity remain unverified."
       ],
       "relatedKillerTasks": [
         "K03"
@@ -688,18 +702,18 @@
           ]
         },
         "EXECUTE": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
           ],
-          "note": "The historical direct receipt had no Android device or emulator."
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "CORRECT": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
           ],
-          "note": "Host replay is not Android-device correctness."
+          "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "ROBUST": {
           "status": "PASS",
@@ -708,11 +722,11 @@
           ]
         },
         "PERFORMANCE": {
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "examples/universal-stress/k03-direct-evidence-2026-08-08.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
           ],
-          "note": "No Android-device timing receipt exists."
+          "note": "API 35 emulator ADB/UIAutomator end-to-end p95 2981.554 ms <= 5000 ms."
         },
         "AI_GENERATE": {
           "status": "UNVERIFIED",
@@ -892,6 +906,9 @@
     "examples/universal-stress/native-ui-genome-v0.1-evidence.json",
     "examples/universal-stress/k02-direct-evidence-2026-08-08.json",
     "examples/universal-stress/k03-direct-evidence-2026-08-08.json",
+    "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+    "examples/universal-stress/k03-ai-generation-contract.v0.1.json",
+    "examples/universal-stress/evidence/k03-ai-generate/receipt.json",
     "examples/native-ai/evidence/k08-b-evidence.json",
     "examples/native-ai/evidence/k233-ai-generate/receipt.json",
     "examples/native-ai/evidence/k233-ai-generate/github-replay.json",
@@ -900,6 +917,7 @@
     "examples/universal-stress/evidence/k02-ai-generate/github-replay.json",
     "examples/universal-stress/k01-ai-generation-contract.v0.2.json",
     "examples/universal-stress/evidence/k01-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k01-ai-generate/github-replay.json",
     "examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json",
     "examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json",
     "examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json",
@@ -917,7 +935,9 @@
     "Missing gates remain BLOCKED and unclaimed matrix cells remain UNTESTED.",
     "K08-B closes K233 through a GitHub-bound 3/3 independent repair receipt; it proves the bounded AI-N2 General MLP profile, not Tensor/Autodiff/Transformer infrastructure.",
     "K02 closes K063, K064 and K078 AI_GENERATE through 3/3 independent repairs and GitHub run 32865270251; it proves only the bounded Web/GUI/reactive vertical slice.",
-    "K01 has a 3/3 local independent compiler repair candidate and shared native fixed point; K339 remains BLOCKED until GitHub Linux/Windows replay is bound.",
+    "K01 closes K339 AI_GENERATE through 3/3 independent compiler-source repairs, shared native fixed point and GitHub Linux/Windows run 32869858927.",
+    "K03 real emulator receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098 on the frozen transaction UI; Android AI_GENERATE remains independently blocked.",
+    "K03 has a 3/3 local independent Android repair candidate bound to the real emulator receipt; Android cells remain BLOCKED until GitHub replay is bound.",
     "K08-D is candidate-only evidence: a 29980-node generic Tensor Plan measured 5.720x local scalar-to-Tensor speedup and a remaining 15.863x JS ratio; it grants no new K233 gate or K400 cell.",
     "K08-E is candidate-only evidence: last-use reclamation measured a 892.823x logical plan-store reduction and 1.159x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.",
     "K08-F is candidate-only local Windows evidence: 54964 Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured 1.220x runtime speedup and 0.000% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.",

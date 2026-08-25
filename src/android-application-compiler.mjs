@@ -297,7 +297,8 @@ function emitJavaRuntimeHelpers() {
       else if ("*".equals(operator)) result = l * r;
       else if ("/".equals(operator)) result = l / r;
       else result = l % r;
-      return Math.rint(result) == result ? Long.valueOf((long) result) : Double.valueOf(result);
+      if (Math.rint(result) == result) return Long.valueOf((long) result);
+      return Double.valueOf(result);
     }
     if ("==".equals(operator)) return java.util.Objects.equals(left, right);
     if ("!=".equals(operator)) return !java.util.Objects.equals(left, right);
