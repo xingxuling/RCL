@@ -125,6 +125,31 @@ test('K08-G accepted receipt is self-rooted and K400 remains non-promoted', () =
 
   const k400 = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'universal-stress', 'k400-current-evidence.json'), 'utf8'));
   assert.equal(k400.sourceReceipts.includes('examples/native-ai/evidence/native-autodiff-v0.1/k08-g-native-autodiff-evidence.json'), true);
+  assert.equal(k400.sourceReceipts.includes('examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json'), true);
   assert.equal(k400.claims.filter((claim) => claim.campaignId === 'K233').length, 1);
   assert.match(k400.notes.join('\n'), /grants no new K233 gate or K400 cell/);
+});
+
+test('K08-G GitHub receipt binds exact Ubuntu and Windows hosted replay', () => {
+  const receipt = JSON.parse(fs.readFileSync(path.join(
+    ROOT,
+    'examples',
+    'native-ai',
+    'evidence',
+    'native-autodiff-v0.1',
+    'github-replay.json',
+  ), 'utf8'));
+  const authorityRoot = receipt.authorityRoot;
+  delete receipt.authorityRoot;
+  const actualRoot = createHash('sha256').update(JSON.stringify(receipt)).digest('hex');
+  assert.equal(authorityRoot, actualRoot);
+  assert.equal(receipt.status, 'PASS_GITHUB_HOSTED_REPLAY_BOUND');
+  assert.equal(receipt.sourceCommit, '103a330f034a234c52d2d7eb287fd154c4e4b902');
+  assert.equal(receipt.runId, 32828410493);
+  assert.deepEqual(receipt.jobs.map(({ platform, conclusion }) => [platform, conclusion]), [
+    ['ubuntu-latest', 'success'],
+    ['windows-latest', 'success'],
+  ]);
+  assert.equal(receipt.localEvidenceReportRoot, '5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709');
+  assert.ok(receipt.claimsNotGranted.includes('K400_PASS'));
 });

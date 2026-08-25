@@ -1,0 +1,58 @@
+{
+  "format": "rcl.k08-g.native-autodiff-github-replay.v0.1",
+  "status": "PASS_GITHUB_HOSTED_REPLAY_BOUND",
+  "sourceCommit": "103a330f034a234c52d2d7eb287fd154c4e4b902",
+  "implementationCommit": "3132b81d9e0b7b7788aaf4b23457656c559b9793",
+  "workflow": "RCL Universal Program Stress v0.1",
+  "runId": 32828410493,
+  "runUrl": "https://github.com/xingxuling/RCL/actions/runs/32828410493",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 97741439391,
+      "name": "focused-verification",
+      "platform": "ubuntu-latest",
+      "conclusion": "success",
+      "autodiffSteps": [
+        "K08 Tensor correctness and portable CPU engine tests",
+        "K08 Native Autodiff portable verification",
+        "K08 Native Autodiff portable evidence",
+        "Consolidated K400 campaign report"
+      ]
+    },
+    {
+      "id": 97741439698,
+      "name": "k01-windows-verification",
+      "platform": "windows-latest",
+      "conclusion": "success",
+      "autodiffSteps": [
+        "K08 Tensor native provider and CPU engine tests",
+        "K08 General MLP Tensor lowering evidence",
+        "K08 Native Autodiff and General MLP migration evidence",
+        "K08 Tensor borrowed-input and process-memory evidence"
+      ]
+    }
+  ],
+  "localEvidenceReportRoot": "5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709",
+  "localFullSuite": {
+    "tests": 875,
+    "passed": 872,
+    "failed": 0,
+    "skipped": 3,
+    "durationMs": 643079.8094
+  },
+  "claimsNotGranted": [
+    "ENGINE_E3_OPTIMIZER_GENOME",
+    "MOMENTUM",
+    "ADAM",
+    "ADAMW",
+    "TRANSFORMER",
+    "TINY_LM",
+    "GPU_OR_ACCELERATOR",
+    "GENERAL_PERFORMANCE_PARITY",
+    "PORTABLE_AUTODIFF_RSS",
+    "K400_PASS"
+  ],
+  "annotationBoundary": "The admitted run binds the exact evidence commit, passes portable Ubuntu Autodiff/Genome/K400 verification and real Windows Tensor/Provider/Autodiff/General-MLP evidence. Batch SGD is the previously owned bounded optimizer semantics; this receipt does not admit ENGINE-E3, Transformer, Tiny LM, accelerator or a new K400 cell.",
+  "authorityRoot": "370de08a986177eb43546348a606c80ce291980eb3f37aba465211e54470a065"
+}

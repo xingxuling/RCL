@@ -218,13 +218,12 @@ The same unchanged General MLP contract is lowered to a compact per-step graph o
 
 Analytic/manual gradients match exactly, the maximum central finite-difference drift is `3.7655e-10`, and three deterministic gradient replays have one root. Exact f64 checkpoint materialization gives bit-exact `32 == 16 + reload + 16`. An earlier one-ULP split-checkpoint failure was retained as a stress case and fixed without widening tolerance.
 
-The accepted local evidence root is `5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709`, bound to implementation commit `3132b81d9e0b7b7788aaf4b23457656c559b9793`. Status is `ENGINE_E2_AUTODIFF_CANDIDATE`; GitHub replay remains required before hosted-bound admission. Peak RSS and general performance parity are unmeasured. Momentum, Adam, AdamW, Transformer, Tiny LM, GPU and K400 promotion are not granted.
+The accepted local evidence root is `5028e21e0c0184795cb0375e8aa2ef928c0f22d8fae1c32584f2192c41de7709`, bound to implementation commit `3132b81d9e0b7b7788aaf4b23457656c559b9793`. GitHub run `32828410493` passed Ubuntu job `97741439391` and Windows job `97741439698` for exact evidence commit `103a330f034a234c52d2d7eb287fd154c4e4b902`. Status is `ENGINE_E2_AUTODIFF_CANDIDATE_GITHUB_REPLAY_BOUND`. Peak RSS and general performance parity are unmeasured. Momentum, Adam, AdamW, Transformer, Tiny LM, GPU and K400 promotion are not granted.
 
 ## 12. Next gate
 
 The next highest-value sequence is fixed by the Model Factory campaign:
 
-1. bind K08-G to successful Ubuntu and Windows GitHub-hosted replay;
-2. build ENGINE-E3 Optimizer Genome for SGD, Momentum, Adam and AdamW with unified optimizer state;
-3. prove rooted `train(N) == train(K) -> save -> reload -> train(N-K)` parity including dataset cursor and RNG/seed identity;
-4. only then begin Transformer primitives and the first Decoder-only block.
+1. build ENGINE-E3 Optimizer Genome for SGD, Momentum, Adam and AdamW with unified optimizer state;
+2. prove rooted `train(N) == train(K) -> save -> reload -> train(N-K)` parity including dataset cursor and RNG/seed identity;
+3. only then begin Transformer primitives and the first Decoder-only block.

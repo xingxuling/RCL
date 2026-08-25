@@ -25,6 +25,7 @@ const k08TensorLivenessGithubReplayPath = 'examples/native-ai/evidence/tensor-pl
 const k08TensorBorrowedInputPath = 'examples/native-ai/evidence/tensor-plan-borrowed-inputs-v0.1/k08-f-tensor-borrowed-input-evidence.json';
 const k08TensorBorrowedInputGithubReplayPath = 'examples/native-ai/evidence/tensor-plan-borrowed-inputs-v0.1/github-replay.json';
 const k08AutodiffPath = 'examples/native-ai/evidence/native-autodiff-v0.1/k08-g-native-autodiff-evidence.json';
+const k08AutodiffGithubReplayPath = 'examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json';
 const outputPath = process.argv[2] ?? 'examples/universal-stress/k400-current-evidence.json';
 
 function readJson(relativePath) {
@@ -130,7 +131,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k08Path, k233ReceiptPath, k233GithubReplayPath, k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',

@@ -186,7 +186,7 @@ npm run evidence:k08-tensor-borrowed-input -- --baseline-binary <exact-main-rele
 
 ## K08-G Native Reverse-Mode Autodiff candidate
 
-Status: `ENGINE_E2_AUTODIFF_CANDIDATE`. It replaces the General MLP execution dependency on its hand-written backward path; the old implementation remains a reference oracle only.
+Status: `ENGINE_E2_AUTODIFF_CANDIDATE_GITHUB_REPLAY_BOUND`. It replaces the General MLP execution dependency on its hand-written backward path; the old implementation remains a reference oracle only.
 
 | Evidence | Result |
 |---|---:|
@@ -217,4 +217,6 @@ npm run test:k08-autodiff
 npm run evidence:k08-autodiff
 ```
 
-This candidate grants no ENGINE-E3 Optimizer Genome, AdamW, Transformer, Tiny LM, accelerator, general performance parity or K400 promotion claim. GitHub-hosted replay is required before adding a `_GITHUB_REPLAY_BOUND` suffix.
+This candidate grants no ENGINE-E3 Optimizer Genome, AdamW, Transformer, Tiny LM, accelerator, general performance parity or K400 promotion claim.
+
+Hosted replay is now bound by `examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json`: run `32828410493`, Ubuntu job `97741439391`, Windows job `97741439698`, exact evidence commit `103a330f034a234c52d2d7eb287fd154c4e4b902`, all successful. The receipt authority root is `370de08a986177eb43546348a606c80ce291980eb3f37aba465211e54470a065`. This hosted admission changes the suffix only; it does not grant any claim listed above.

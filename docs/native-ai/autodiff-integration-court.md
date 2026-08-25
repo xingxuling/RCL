@@ -1,6 +1,6 @@
 # K08-G Native Autodiff Integration Court
 
-Status: `ENGINE_E2_AUTODIFF_CANDIDATE`
+Status: `ENGINE_E2_AUTODIFF_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 ## Reality Audit
 
@@ -33,7 +33,7 @@ No Python, NumPy, PyTorch, TensorFlow, JAX or hosted model participates in train
 - Code: no `unsafe`, new dependency or model-specific opcode.
 - Test: positive, negative, boundary, analytic, finite-difference, deterministic, checkpoint and regression coverage.
 - Security: graph, parameter, step, node-step, allocation, finite-value and identity ceilings remain explicit.
-- Release: local candidate only until hosted replay binds the exact implementation/evidence commits.
+- Release: GitHub run `32828410493` binds exact evidence commit `103a330f034a234c52d2d7eb287fd154c4e4b902` across Ubuntu and Windows; promotion beyond candidate remains closed.
 
 ## Evidence Court
 
@@ -47,7 +47,7 @@ No Python, NumPy, PyTorch, TensorFlow, JAX or hosted model participates in train
 | ROBUST | PASS_LOCAL | fail-closed identity/loss/rule/resource controls; exact checkpoint resume |
 | PERFORMANCE | CANDIDATE | bounded local timings recorded; peak RSS and general/portable ratios unmeasured |
 | AI_GENERATE | NOT_APPLICABLE_TO_ENGINE_E2_ADMISSION | existing K233 receipt is not reused to promote this engine stage |
-| EVIDENCE | CANDIDATE_LOCAL | rooted local receipt; GitHub replay pending |
+| EVIDENCE | CANDIDATE_HOSTED_BOUND | rooted local receipt plus successful exact-SHA Ubuntu and Windows replay |
 
 The nine K400 gates are not reassigned. K233 remains the previously admitted bounded AI-N2 cell; K08-G adds infrastructure evidence but no new cell or gate PASS.
 
@@ -65,4 +65,4 @@ The first 32 versus 16+16 checkpoint probe differed by one ULP. Validation consu
 
 ## Admission decision
 
-Admit as `ENGINE_E2_AUTODIFF_CANDIDATE` only. Promotion to `_GITHUB_REPLAY_BOUND` requires successful exact-SHA Ubuntu and Windows workflow receipts and a rooted hosted replay file. ENGINE-E3 starts only after that replay closes.
+Admit as `ENGINE_E2_AUTODIFF_CANDIDATE_GITHUB_REPLAY_BOUND` only. The rooted hosted receipt closes ENGINE-E2 replay admission but grants no canonical-core promotion, K400 change or ENGINE-E3 capability. ENGINE-E3 may now begin on a separate candidate branch.
