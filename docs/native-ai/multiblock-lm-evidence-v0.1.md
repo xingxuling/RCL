@@ -13,6 +13,16 @@ Implementation run `32848996210`, source commit `e702514c833f3c4dea314c7ec565f22
 - Ubuntu job `97805250272`: 9/9 PASS
 - Windows job `97805250421`: 9/9 PASS
 
+Promoted-contract replay `32849222908`, source commit `fd6d214bb11302e395f4320ea3147dfb20a0e082`:
+
+- Ubuntu job `97805961479`: 9/9 PASS
+- Windows job `97805961266`: 9/9 PASS
+
+Final bound-contract replay `32849432614`, source commit `dff6294a8c8c7934fd7a732f9aa1a3d24b84990e`:
+
+- Ubuntu job `97806617299`: 9/9 PASS
+- Windows job `97806617060`: 9/9 PASS
+
 ## Frozen profiles
 
 ### 1-block reference
