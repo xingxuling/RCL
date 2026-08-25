@@ -1,0 +1,26 @@
+name: RCL-1B Campaign Contract
+
+on:
+  push:
+    branches:
+      - codex/rcl-1b-campaign-v01
+  pull_request:
+    paths:
+      - 'docs/native-ai/RCL_1B_CAMPAIGN_v0.1.md'
+      - 'examples/native-ai/rcl-1b-campaign-contract.v0.1.json'
+      - 'tests/rcl-1b-campaign-contract.test.mjs'
+      - '.github/workflows/rcl-1b-campaign.yml'
+
+jobs:
+  contract:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify frozen RCL-1B north star
+        run: node --test --test-concurrency=1 tests/rcl-1b-campaign-contract.test.mjs
