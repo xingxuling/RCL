@@ -1,0 +1,53 @@
+{
+  "format": "rcl.rcl10m.corpus-admission-local-evidence.v0.1",
+  "status": "CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS",
+  "canonicalOwner": "RCL",
+  "branch": "codex/rcl10m-corpus-admission-v01",
+  "baseMain": "bbfd3f41c7d8c51a563d19a1321d22f407db5c0f",
+  "sourceCommit": "7d373fe15afe481979dbd7bedcb495b3e6f75b3f",
+  "evidenceCommand": "npm run test:rcl-10m-corpus-admission",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 5,
+    "nodeEvidencePassed": 5,
+    "syntheticFixtureOnly": true,
+    "realCorpusPresent": false,
+    "productionAdmission": false
+  },
+  "checks": {
+    "rclOwnedGenomeAndContract": true,
+    "targetTokensFrozenAtTenMillion": true,
+    "tokenizerArtifactRootRequired": true,
+    "multilingualAndCodeMixtureRequired": true,
+    "sourceHashesAndReviewRefsRequired": true,
+    "filterPolicyRootRequired": true,
+    "deduplicationRootRequired": true,
+    "deterministicShardManifestRequired": true,
+    "manifestRootDeterministic": true,
+    "pendingReviewBlocksAdmission": true,
+    "missingMixtureAndBindingsFailClosed": true,
+    "tamperedManifestRootFailsClosed": true,
+    "noProductionCorpusClaim": true
+  },
+  "hostedReplay": {
+    "status": "PENDING",
+    "boundary": "hosted replay can verify the schema gate only; it cannot supply or admit user corpus bytes"
+  },
+  "claimsGranted": [
+    "RCL10M_CORPUS_MANIFEST_SCHEMA_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "PRODUCTION_CORPUS_ADMISSION",
+    "PRODUCTION_TOKENIZER",
+    "RCL_10M_TRAINING",
+    "RCL_10M_QUALITY",
+    "RCL_1B",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW",
+    "RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS",
+    "RCL_GAP_RCL10M_TOKENIZER_FREEZE"
+  ],
+  "reportRoot": "40fd063addabb55212fe56d222ed435eb4868f71eb76706915b365bc081bf6c1"
+}

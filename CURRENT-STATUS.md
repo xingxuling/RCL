@@ -149,7 +149,13 @@ Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. The RCL-owned BF16 cont
 | Local Node evidence | `3/3 PASS` |
 | Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
 
-Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_OPENCL_HOSTED_REPLAY`, `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+### RCL-10M corpus admission gate
+
+Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L byte tokenization and K08-M deterministic byte-BPE infrastructure are reusable, but the repository still contains no admitted Chinese/English/Japanese/code corpus, production approximately 64K tokenizer artifact, license/privacy/poison review, or deterministic real-data shard manifest. The new RCL-owned gate validates the frozen 10,000,000-token manifest shape, rooted tokenizer/filter/dedup/shard provenance, exact ppm mixture coverage and fail-closed admission/tamper boundaries. Its local `5/5` evidence uses only explicitly synthetic `development://` fixture values; it grants no corpus, tokenizer, RCL-10M training or quality claim.
+
+Authority files: `docs/native-ai/rcl-10m-corpus-admission-evidence-v0.1.md`, `examples/native-ai/rcl-10m-corpus-admission-contract.v0.1.json`, `examples/native-ai/evidence/rcl-10m-corpus-admission-v0.1/k08-rcl10m-corpus-admission-local-evidence.json`. Open gaps: `RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW`, `RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS` and `RCL_GAP_RCL10M_TOKENIZER_FREEZE`.
 
 ### K08-S BF16 multi-block candidate
 
