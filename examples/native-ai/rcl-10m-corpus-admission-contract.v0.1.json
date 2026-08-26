@@ -1,0 +1,50 @@
+{
+  "format": "rcl.rcl10m.corpus-admission-contract.v0.1",
+  "status": "CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS",
+  "canonicalOwner": "RCL",
+  "target": {
+    "name": "RCL-10M",
+    "tokens": 10000000,
+    "languages": ["zh", "en", "ja", "code"],
+    "tokenizer": "rooted BPE artifact with lossless byte fallback"
+  },
+  "manifestFormat": "rcl.rcl10m.corpus-admission-manifest.v0.1",
+  "requiredFields": [
+    "manifestRoot",
+    "tokenizer.id",
+    "tokenizer.artifactRoot",
+    "sources[].sourceSha256",
+    "sources[].proportionPpm",
+    "sources[].licenseReviewRef",
+    "sources[].privacyReviewRef",
+    "sources[].poisonReviewRef",
+    "filtering.policyRoot",
+    "deduplication.root",
+    "shards[].tokenStreamSha256",
+    "shards[].root",
+    "admission"
+  ],
+  "canonicalPolicies": {
+    "mixtureUnit": "ppm summing exactly to 1000000",
+    "hash": "sha256 lowercase hex",
+    "sourceEncoding": "UTF-8 bytes",
+    "shardOrder": "contiguous zero-based index",
+    "fallback": "fail closed; no unrooted corpus or tokenizer substitution"
+  },
+  "claimsGrantedOnAdmission": [
+    "RCL10M_CORPUS_MANIFEST_SCHEMA_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "PRODUCTION_CORPUS_ADMISSION",
+    "PRODUCTION_TOKENIZER",
+    "RCL_10M_TRAINING",
+    "RCL_10M_QUALITY",
+    "RCL_1B",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW",
+    "RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS",
+    "RCL_GAP_RCL10M_TOKENIZER_FREEZE"
+  ]
+}

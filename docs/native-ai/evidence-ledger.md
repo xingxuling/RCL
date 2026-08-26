@@ -269,7 +269,56 @@ Authority files:
 - `docs/native-ai/gpu-backend-reality-audit-v0.1.md`
 - `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`
 
-The next bounded candidate is an AMD OpenCL generic BF16 reference organ with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16, RCL-10M or K400 promotion.
+The bounded AMD OpenCL generic BF16 reference organ is now implemented as an auxiliary Python `ctypes` lowerer with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16 Autodiff/AdamW, RCL-10M or K400 promotion.
+
+## K08 AMD OpenCL BF16 matmul candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. RCL owns the BF16 contract and genome; `native/tensor-engine/amd_opencl_bf16_provider.py` is an auxiliary lowerer only. The current Windows host selected the real AMD `gfx1152` OpenCL 2.0 device and executed the generic `rcl_bf16_matmul` kernel with `gpuExecuted=true` and `gpuClaim=false`. A fixed 2×3 by 3×2 request returned `4100,bfc0,4188,0000`, exactly matching the independent CPU BF16 bit oracle. Deterministic replay and fail-closed malformed, non-finite, shape and unsupported-backend negatives pass in `3/3` local tests. Hosted run `32993386531` passed Ubuntu job `98256291089` and Windows job `98256291461` on exact head `a45622d5d3eeee61528d797c38b2f55b1abe78de`; Hosted does not inherit the local AMD device receipt.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Real AMD OpenCL device receipt | PASS, `gfx1152`, driver `3661.0 (PAL,LC)` |
+| OpenCL BF16 matmul execution | PASS, exact output bits |
+| Independent CPU bit differential | exact PASS |
+| Deterministic replay | exact PASS |
+| Fail-closed negatives / no CPU fallback | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
+
+Authority files:
+
+- `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`
+- `examples/native-ai/opencl-bf16-matmul-genome.rcl`
+- `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`
+- `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`
+
+Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Hosted replay gap `RCL_GAP_OPENCL_HOSTED_REPLAY` is closed for this candidate by run `32993386531`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## RCL-10M corpus admission gate
+
+Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Frozen RCL-10M manifest schema | PASS |
+| Deterministic manifest root | PASS |
+| Pending review/bytes block admission | fail-closed PASS |
+| Missing mixture/provenance/shard bindings | fail-closed PASS |
+| Tampered root | fail-closed PASS |
+| Local Node evidence | `5/5 PASS` |
+| Hosted Ubuntu + Windows schema replay | PASS, run `32995055906`, jobs `98261962473` / `98261962226` |
+| Real user corpus and production tokenizer | BLOCKED_USER_INPUT |
+
+Authority files:
+
+- `docs/native-ai/rcl-10m-corpus-admission-evidence-v0.1.md`
+- `examples/native-ai/rcl-10m-corpus-admission-genome.rcl`
+- `examples/native-ai/rcl-10m-corpus-admission-contract.v0.1.json`
+- `examples/native-ai/evidence/rcl-10m-corpus-admission-v0.1/k08-rcl10m-corpus-admission-local-evidence.json`
+
+Reproduction: `npm run test:rcl-10m-corpus-admission`. Claims are limited to a schema candidate. Open gaps: `RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW`, `RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS` and `RCL_GAP_RCL10M_TOKENIZER_FREEZE`.
 
 ## K08-S BF16 multi-block reference candidate
 

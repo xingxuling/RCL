@@ -1,0 +1,42 @@
+name: K08 AMD OpenCL BF16 v0.1
+
+on:
+  push:
+    branches:
+      - codex/k08-amd-opencl-bf16-v01
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-amd-opencl-bf16.test.mjs'
+      - 'examples/native-ai/opencl-bf16-matmul-*'
+      - 'package.json'
+      - '.github/workflows/k08-amd-opencl-bf16.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-amd-opencl-bf16.test.mjs'
+      - 'examples/native-ai/opencl-bf16-matmul-*'
+      - 'package.json'
+      - '.github/workflows/k08-amd-opencl-bf16.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-amd-opencl-bf16:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run AMD OpenCL BF16 reference evidence
+        run: npm run test:k08-amd-opencl-bf16
