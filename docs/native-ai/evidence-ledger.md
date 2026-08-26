@@ -345,6 +345,32 @@ Authority files:
 
 Reproduction: `npm run test:k08-gpu-bf16-multiblock`. Claims are limited to ordered multi-matmul OpenCL hybrid candidate execution. GPU training, GPU backward/optimizer kernels, generic GPU portability, GQA/RoPE GPU, RCL-10M and K400 promotion remain closed. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
+## GPU GQA + RoPE hybrid candidate
+
+Status: `PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_HOSTED_REPLAY_PENDING`. This candidate binds a minimal generic RCL GQA + RoPE graph to the AMD OpenCL matmul lowerer. Two query heads retain independent Q paths while sharing one K/V path; the native RCL RoPE frame organ supplies the position frame. Eleven matmul nodes per forward execute through explicit GPU placement, while 21 softmax, mask, transpose, elementwise and loss nodes remain explicit RCL CPU reference. The current AMD gfx1152 host passed local `3/3`; CPU loss/parameter/state/checkpoint differential and direct/checkpoint replay are exact. Placement/provider/backend negatives fail closed.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Native RCL RoPE frame | PASS |
+| Two query heads with shared K/V path | PASS |
+| Real AMD OpenCL projection/RoPE/attention matmuls | PASS, gfx1152, 11 per forward |
+| Explicit host-reference nodes | PASS, 21 per forward |
+| CPU loss/parameter/state/checkpoint differential | exact PASS |
+| Deterministic replay and checkpoint resume | exact PASS |
+| Placement/provider/backend fail-closed negatives | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu + Windows replay | PENDING, run `33001796170` |
+
+Authority files:
+
+- `docs/native-ai/gpu-gqa-rope-evidence-v0.1.md`
+- `examples/native-ai/gpu-gqa-rope-genome.rcl`
+- `examples/native-ai/gpu-gqa-rope-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-gqa-rope-v0.1/k08-gpu-gqa-rope-local-evidence.json`
+
+Reproduction: `npm run test:k08-gpu-gqa-rope`. Claims are limited to bounded GQA + RoPE forward matmul lowering in an explicit OpenCL hybrid. Full GPU training, GPU-native attention/backward/optimizer kernels, generic GPU portability, RCL-10M and K400 promotion remain closed. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
 ## RCL-10M corpus admission gate
 
 Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.

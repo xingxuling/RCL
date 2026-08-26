@@ -1,0 +1,126 @@
+{
+  "format": "rcl.k08-r.gpu-gqa-rope-local-evidence.v0.1",
+  "status": "PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "branch": "codex/k08-gpu-gqa-rope-v01",
+  "baseMain": "bdbb7c6118970eff2332b7177cedb5c5c6585e65",
+  "sourceCommit": "7cb8e036e84a61dc9a4fab8d30df1207f897e34d",
+  "evidenceCommand": "npm run test:k08-gpu-gqa-rope",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 3,
+    "nodeEvidencePassed": 3,
+    "nativeRclRopeFrame": true,
+    "queryHeads": 2,
+    "sharedKvAcrossQueryHeads": true,
+    "gpuMatmulNodesPerForward": 11,
+    "explicitHostReferenceNodesPerForward": 21,
+    "canonicalParameterCount": 4,
+    "realAmdOpenClExecution": true,
+    "genericGqaRopeAutodiffAdamwLoopReachedGpuPlacements": true,
+    "cpuFallback": false,
+    "gpuClaim": false
+  },
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensionsObserved": [
+      "cl_khr_fp16",
+      "cl_khr_fp64",
+      "cl_khr_subgroups",
+      "cl_amd_device_attribute_query"
+    ]
+  },
+  "executionBoundary": {
+    "rclGraphOwner": true,
+    "rclGqaSharedKvTopologyOwner": true,
+    "rclRopeCompositionOwner": true,
+    "rclBf16RneOwner": true,
+    "rclReverseAutodiffOwner": true,
+    "rclAdamwOwner": true,
+    "gpuOperationSet": [
+      "matmul"
+    ],
+    "hostReferenceOperationSet": [
+      "add",
+      "sub",
+      "mul",
+      "mean",
+      "softmax",
+      "transpose"
+    ],
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerRole": "auxiliary OpenCL matmul lowerer",
+    "placementPolicy": "explicit-per-node",
+    "fallbackPolicy": "forbidden"
+  },
+  "differential": {
+    "cpuReferenceTrainingPath": true,
+    "initialLossExact": true,
+    "finalLossExact": true,
+    "parametersExact": true,
+    "optimizerStatesExact": true,
+    "checkpointRootExact": true,
+    "lossDecreased": true,
+    "deterministicReplay": true,
+    "checkpointResumeExact": true
+  },
+  "checks": {
+    "rclOwnedGenomeAndContract": true,
+    "nativeRclRopeFrame": true,
+    "genericGqaSharedKvGraph": true,
+    "genericGraphUsesNoModelSpecialOpcode": true,
+    "orderedGpuMatmulChain": true,
+    "realAmdOpenClMatmulNodes": true,
+    "explicitGpuPlacement": true,
+    "explicitHostPlacement": true,
+    "cpuDifferential": true,
+    "missingPlacementFailsClosed": true,
+    "cpuMatmulPlacementFailsClosed": true,
+    "missingProviderFailsClosed": true,
+    "backendGraphMismatchFailsClosed": true,
+    "noCpuFallback": true
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_BF16_GQA_ROPE_FORWARD_MATMUL_LOWERING",
+    "OPENCL_HYBRID_GQA_ROPE_FORWARD_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_BF16_BACKWARD_KERNELS",
+    "OPENCL_BF16_OPTIMIZER_KERNELS",
+    "BF16_GQA_ROPE_GPU",
+    "GENERIC_GPU_BACKEND",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "hostedReplay": {
+    "status": "PENDING",
+    "runId": 33001796170,
+    "headSha": "7cb8e03",
+    "ubuntu": {
+      "jobId": 98285257582,
+      "status": "PENDING",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/33001796170/job/98285257582"
+    },
+    "windows": {
+      "jobId": 98285257763,
+      "status": "PENDING",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/33001796170/job/98285257763"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/33001796170",
+    "boundary": "hosted runners prove replay or explicit unavailable-device behavior; they do not inherit the current host AMD receipt"
+  },
+  "gapRegister": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "reportRoot": "82600d4c2cafa895c9c52c89346a9f3933ac40bbc1e8862d24cfdcff16f63f4f"
+}
