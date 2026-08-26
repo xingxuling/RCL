@@ -273,7 +273,7 @@ The next bounded candidate is an AMD OpenCL generic BF16 reference organ with ex
 
 ## K08-S BF16 multi-block reference candidate
 
-Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
+Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
 
 | Evidence | Result |
 |---|---:|
@@ -285,7 +285,7 @@ Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This is a bounde
 | Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
 | Canonical state order and model-special negatives | fail-closed PASS |
 | Local Node evidence | `6/6 PASS` |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32988994250`, Ubuntu job `98241831755`, Windows job `98241831517`, exact head `fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5` |
 
 Authority files:
 
@@ -294,4 +294,25 @@ Authority files:
 - `examples/native-ai/evidence/bf16-multiblock-adamw-v0.1/k08-s-multiblock-local-evidence.json`
 - `docs/native-ai/bf16-multiblock-adamw-evidence-v0.1.md`
 
-Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Open gaps: `RCL_GAP_K08_S_MB_HOSTED_REPLAY`, `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Hosted replay gap `RCL_GAP_K08_S_MB_HOSTED_REPLAY` is closed for this candidate by run `32988994250`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K08-R GQA + RoPE BF16 multi-block candidate
+
+Status: `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. The existing K08-N RoPE + K08-O GQA + K08-R two-block generic Tensor graph now runs through K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW. Fourteen canonical parameter groups update in order, and local evidence is `6/6 PASS` for genome/native-root parity, GQA+RoPE composition, loss decrease, exact state, deterministic replay, exact checkpoint resume and fail-closed negatives.
+
+| Evidence | Result |
+|---|---:|
+| Two-block K08-N/K08-O graph under BF16 Autodiff AdamW | PASS |
+| All fourteen parameter groups update | PASS |
+| Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
+| Local Node evidence | `6/6 PASS` |
+| Hosted Ubuntu + Windows replay | PASS, run `32989948133`, Ubuntu job `98244912540`, Windows job `98244912816`, exact head `3716f51` |
+
+Authority files:
+
+- `examples/native-ai/bf16-gqa-rope-multiblock-genome.rcl`
+- `examples/native-ai/bf16-gqa-rope-multiblock-contract.v0.1.json`
+- `examples/native-ai/evidence/bf16-gqa-rope-multiblock-v0.1/k08-r-bf16-local-evidence.json`
+- `docs/native-ai/bf16-gqa-rope-multiblock-evidence-v0.1.md`
+
+Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 GQA+RoPE two-block training and exact continuation. Hosted gap `RCL_GAP_K08_R_BF16_HOSTED_REPLAY` is closed for this candidate by run `32989948133`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.

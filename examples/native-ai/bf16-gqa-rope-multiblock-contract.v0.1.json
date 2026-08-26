@@ -1,13 +1,14 @@
 {
-  "format": "rcl.k08-s.bf16-multiblock-adamw-contract.v0.1",
-  "status": "BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "format": "rcl.k08-r.bf16-gqa-rope-multiblock-contract.v0.1",
+  "status": "BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING",
   "canonicalOwner": "RCL",
-  "profile": "TWO_BLOCK_GENERIC_TENSOR_BF16_AUTODIFF_ADAMW_CPU_REFERENCE",
+  "profile": "TWO_BLOCK_K08_N_ROPE_K08_O_GQA_BF16_AUTODIFF_ADAMW_CPU_REFERENCE",
   "composition": {
     "blockCount": 2,
-    "parameterGroups": 4,
-    "graph": "RCL Tensor SSA generic block-0 then block-1 composition",
-    "optimizer": "RCL BF16 Autodiff + FP32 AdamW",
+    "parameterGroups": 14,
+    "attention": "K08-O GQA with 2 query heads and 1 shared KV head",
+    "position": "K08-N RoPE",
+    "optimizer": "K08-S BF16 Autodiff + FP32 AdamW",
     "parameterOrder": "autodiff.parameters canonical order",
     "checkpointAuthority": "exact FP32 master, first moment and second moment bits"
   },
@@ -24,9 +25,9 @@
   },
   "requiredEvidence": [
     "rcl-genome-selfhost-byte-parity-and-native-root",
-    "two-block-generic-bf16-forward-loss-differential",
+    "two-block-gqa-rope-bf16-generic-graph",
     "loss-decreases",
-    "all-block-and-shared-parameters-update",
+    "all-fourteen-parameter-groups-update",
     "exact-fp32-master-and-adamw-state",
     "deterministic-replay",
     "direct-n-equals-checkpoint-resume",
@@ -34,9 +35,8 @@
     "no-model-special-operation"
   ],
   "claimsGrantedOnAdmission": [
-    "BF16_MULTI_BLOCK_TRAINING",
-    "BF16_MULTI_BLOCK_CHECKPOINT_RESUME",
-    "ALL_CANONICAL_PARAMETER_GROUPS_UPDATE"
+    "BF16_GQA_ROPE_MULTI_BLOCK_TRAINING",
+    "BF16_GQA_ROPE_CHECKPOINT_RESUME"
   ],
   "claimsNotGranted": [
     "GPU",
