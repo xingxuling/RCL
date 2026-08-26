@@ -333,8 +333,8 @@ Status: `PASS_LOCAL_GPU_HYBRID_ORDERED_MULTI_MATMUL_CANDIDATE_GITHUB_REPLAY_BOUN
 | Deterministic replay and checkpoint resume | exact PASS |
 | Placement/provider/backend fail-closed negatives | PASS |
 | Local Node evidence | `3/3 PASS` |
-| Hosted Ubuntu replay | PASS, run `33000382218`, job `98280360868` |
-| Hosted Windows replay | PASS, run `33000382218`, job `98280360632` |
+| Hosted Ubuntu replay | PASS, run `33000754805`, job `98281650727` |
+| Hosted Windows replay | PASS, run `33000754805`, job `98281650452` |
 
 Authority files:
 

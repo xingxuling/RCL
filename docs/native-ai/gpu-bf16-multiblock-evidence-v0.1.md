@@ -54,8 +54,8 @@ RCL execution. `gpuClaim` remains false.
 
 ## Hosted boundary
 
-PR #90 dedicated workflow run `33000382218` passed on Ubuntu job
-`98280360868` and Windows job `98280360632`. Hosted runners prove replay and
+PR #90 dedicated workflow run `33000754805` passed on Ubuntu job
+`98281650727` and Windows job `98281650452`. Hosted runners prove replay and
 explicit unavailable-device behavior; they do not inherit the local AMD device
 receipt and cannot promote this candidate to GPU training.
 
