@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k333.compiler-machine-learning-ai-trial-receipt.v0.1",
+  "trialId": "K333-AI-REPAIR-01",
+  "mutationClass": "training-label",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03f24-feda-7fd1-ac12-0960b3e91989",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "sequence_append(empty_sequence(), row(1, 1, 1)),",
+    "new": "sequence_append(empty_sequence(), row(1, 1, 0)),",
+    "diagnosis": "The dataset incorrectly labels the small/cold compiler sample as positive. Changing only that unique row restores the invariant that nodes=1, hotness=1 remains class 0 while keeping RCL ownership of dataset, training, inference, and advisory authority."
+  },
+  "promptRoot": "199c050c5aa098356193c358cb77a93712ebafab3d0955ab473f27b18d259cef",
+  "mutatedSourceSha256": "dc73692be03817b0c48a1467102a3bc31c5657ae24872e611234c443dd107405",
+  "candidateSourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "ce8c2cbf9161c524177c4fe438729dba7825099d1eb44c17456293a7f8a281f0",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03f24-feda-7fd1-ac12-0960b3e91989"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "e0d25775bd73e75e57e51b95fa1e0759b1c7c1e7d5a3f4c648c8a6e2c6ec75fa"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "d57de265dec8d6d4033440b4395e18db117fdf577dd3cf05429e06b790d7a433"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 57937,
+        "cached_input_tokens": 29440,
+        "output_tokens": 474,
+        "reasoning_output_tokens": 165
+      }
+    }
+  ],
+  "finalMessageSha256": "d57de265dec8d6d4033440b4395e18db117fdf577dd3cf05429e06b790d7a433",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "11556bb216317ce8d1d189556cd1093ee8391663cedae3c4659c3921e9cd3ddc",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6",
+    "checks": {
+      "rcl-owns-ml-profile": {
+        "pass": true
+      },
+      "model-is-advisory-only": {
+        "pass": true
+      },
+      "perceptron-training-is-expressed": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-training-converges": {
+        "pass": true
+      },
+      "native-model-oracle": {
+        "pass": true
+      },
+      "native-authority-boundary": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "523c72107dca046d9dbc68b2ba718699960f656e4cda2da9f6b06d2747d52b16"
+}

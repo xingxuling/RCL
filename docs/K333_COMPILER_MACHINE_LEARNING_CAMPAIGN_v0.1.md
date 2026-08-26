@@ -1,6 +1,6 @@
 # K333 Compiler Machine-Learning Campaign v0.1
 
-**Status:** local runtime candidate; `AI_GENERATE`, hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
+**Status:** local runtime and 3/3 independent AI repair candidate; hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
 
 ## Reality Audit
 
@@ -41,10 +41,18 @@ Formal local acquisition passed 20/20 native rounds with one artifact hash and o
 | CORRECT | CANDIDATE |
 | ROBUST | CANDIDATE |
 | PERFORMANCE | CANDIDATE |
-| AI_GENERATE | UNVERIFIED |
+| AI_GENERATE | CANDIDATE |
 | EVIDENCE | CANDIDATE |
 
 No gate is promoted to K400 `PASS` from local execution alone. Independent AI repair, exact receipt replay, GitHub-hosted Linux/Windows authority and conditional K400 integration remain separate mandatory gates.
+
+The frozen AI contract then ran three new ephemeral read-only sessions against separately mutated candidates. All three restored exact canonical bytes and passed native replay:
+
+- label repair: `01a03f24-feda-7fd1-ac12-0960b3e91989`
+- perceptron update repair: `01a03f26-d151-75a0-901d-1f2265e032c8`
+- model authority repair: `01a03f28-6991-78e3-a5a6-684a0eb1874c`
+
+The accepted aggregate receipt root is `d16ad0df7481c94c5084acac822e32930d8e39aa855c4d43dc8d79cf0a81c2dc`. An earlier 2/3 acquisition was rejected because the first generator repaired the label but also changed an unrelated training sample; native semantics happened to pass, but exact canonical bytes did not. The evaluator was tightened to single-line edit fragments without exposing the oracle edit, and the complete acquisition was rerun with three fresh sessions. This evidence remains local `CANDIDATE` until checked-in receipt replay and hosted authority are bound.
 
 ## Federation, license and regression boundary
 

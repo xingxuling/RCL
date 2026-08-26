@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k333.compiler-machine-learning-ai-trial-receipt.v0.1",
+  "trialId": "K333-AI-REPAIR-02",
+  "mutationClass": "perceptron-update-direction",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03f26-d151-75a0-901d-1f2265e032c8",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "        node_weight(parameters) - choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0)),",
+    "new": "        node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0)),",
+    "diagnosis": "The perceptron update inverts the node-weight adjustment: a positive misclassified sample subtracts its node feature, producing non-convergent parameters. Changing only this operator restores the invariant while leaving dataset, training, inference, and advisory authority in RCL."
+  },
+  "promptRoot": "8eb4773fdfb7b5611835561587d67190c4318900504a896f4b71aea996f6f562",
+  "mutatedSourceSha256": "abd694de61e5b4cc2e5b8555009be424089f2ef1a6b1b5f95a618660da0663e1",
+  "candidateSourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "5cc6d8ae14b7180c76fd40cd6788bfe7f1ba80193160434f84c6019f3b537e5d",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03f26-d151-75a0-901d-1f2265e032c8"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "2e30d368f373cb6c1f5e87d203dc2409d31bbdeb2771e9c60b8a00cb3bc4f1e4"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "f3b140f6d85bcee2c128544c56d87c82683dbd1139132c021f7d052ce02e9b70"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 57940,
+        "cached_input_tokens": 52992,
+        "output_tokens": 475,
+        "reasoning_output_tokens": 124
+      }
+    }
+  ],
+  "finalMessageSha256": "f3b140f6d85bcee2c128544c56d87c82683dbd1139132c021f7d052ce02e9b70",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "0ce5a559fbf921458efb1c339bfa1263b76cb1b60a3f0af1733a7ad825f9e573",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6",
+    "checks": {
+      "rcl-owns-ml-profile": {
+        "pass": true
+      },
+      "model-is-advisory-only": {
+        "pass": true
+      },
+      "perceptron-training-is-expressed": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-training-converges": {
+        "pass": true
+      },
+      "native-model-oracle": {
+        "pass": true
+      },
+      "native-authority-boundary": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "6cf6304189c9162654aa713f42d3ed6dbcbcfc3c8cb62eb69c389203addc0208"
+}

@@ -1,0 +1,379 @@
+{
+  "format": "rcl.k333.compiler-machine-learning-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-26T17:42:33.216Z",
+  "contractRoot": "b9611d556b2bfbc9ffedf79f6b7528a88a0ca8641a6a32395c2b27b91b9f2483",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K333"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "7abcf71ae895f4db73a826d434dc525ca9fd6d6b2a6157384267939153e395fd",
+    "contractRoot": "8b73b1492cfb8aa01fc2257052778291a7314cde32d0a09bedc61ae4fef44919"
+  },
+  "trials": [
+    {
+      "format": "rcl.k333.compiler-machine-learning-ai-trial-receipt.v0.1",
+      "trialId": "K333-AI-REPAIR-01",
+      "mutationClass": "training-label",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f24-feda-7fd1-ac12-0960b3e91989",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "sequence_append(empty_sequence(), row(1, 1, 1)),",
+        "new": "sequence_append(empty_sequence(), row(1, 1, 0)),",
+        "diagnosis": "The dataset incorrectly labels the small/cold compiler sample as positive. Changing only that unique row restores the invariant that nodes=1, hotness=1 remains class 0 while keeping RCL ownership of dataset, training, inference, and advisory authority."
+      },
+      "promptRoot": "199c050c5aa098356193c358cb77a93712ebafab3d0955ab473f27b18d259cef",
+      "mutatedSourceSha256": "dc73692be03817b0c48a1467102a3bc31c5657ae24872e611234c443dd107405",
+      "candidateSourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "ce8c2cbf9161c524177c4fe438729dba7825099d1eb44c17456293a7f8a281f0",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f24-feda-7fd1-ac12-0960b3e91989"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "e0d25775bd73e75e57e51b95fa1e0759b1c7c1e7d5a3f4c648c8a6e2c6ec75fa"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "d57de265dec8d6d4033440b4395e18db117fdf577dd3cf05429e06b790d7a433"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57937,
+            "cached_input_tokens": 29440,
+            "output_tokens": 474,
+            "reasoning_output_tokens": 165
+          }
+        }
+      ],
+      "finalMessageSha256": "d57de265dec8d6d4033440b4395e18db117fdf577dd3cf05429e06b790d7a433",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "11556bb216317ce8d1d189556cd1093ee8391663cedae3c4659c3921e9cd3ddc",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6",
+        "checks": {
+          "rcl-owns-ml-profile": {
+            "pass": true
+          },
+          "model-is-advisory-only": {
+            "pass": true
+          },
+          "perceptron-training-is-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-training-converges": {
+            "pass": true
+          },
+          "native-model-oracle": {
+            "pass": true
+          },
+          "native-authority-boundary": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "523c72107dca046d9dbc68b2ba718699960f656e4cda2da9f6b06d2747d52b16"
+    },
+    {
+      "format": "rcl.k333.compiler-machine-learning-ai-trial-receipt.v0.1",
+      "trialId": "K333-AI-REPAIR-02",
+      "mutationClass": "perceptron-update-direction",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f26-d151-75a0-901d-1f2265e032c8",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "        node_weight(parameters) - choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0)),",
+        "new": "        node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0)),",
+        "diagnosis": "The perceptron update inverts the node-weight adjustment: a positive misclassified sample subtracts its node feature, producing non-convergent parameters. Changing only this operator restores the invariant while leaving dataset, training, inference, and advisory authority in RCL."
+      },
+      "promptRoot": "8eb4773fdfb7b5611835561587d67190c4318900504a896f4b71aea996f6f562",
+      "mutatedSourceSha256": "abd694de61e5b4cc2e5b8555009be424089f2ef1a6b1b5f95a618660da0663e1",
+      "candidateSourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "5cc6d8ae14b7180c76fd40cd6788bfe7f1ba80193160434f84c6019f3b537e5d",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f26-d151-75a0-901d-1f2265e032c8"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "2e30d368f373cb6c1f5e87d203dc2409d31bbdeb2771e9c60b8a00cb3bc4f1e4"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "f3b140f6d85bcee2c128544c56d87c82683dbd1139132c021f7d052ce02e9b70"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57940,
+            "cached_input_tokens": 52992,
+            "output_tokens": 475,
+            "reasoning_output_tokens": 124
+          }
+        }
+      ],
+      "finalMessageSha256": "f3b140f6d85bcee2c128544c56d87c82683dbd1139132c021f7d052ce02e9b70",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "0ce5a559fbf921458efb1c339bfa1263b76cb1b60a3f0af1733a7ad825f9e573",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6",
+        "checks": {
+          "rcl-owns-ml-profile": {
+            "pass": true
+          },
+          "model-is-advisory-only": {
+            "pass": true
+          },
+          "perceptron-training-is-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-training-converges": {
+            "pass": true
+          },
+          "native-model-oracle": {
+            "pass": true
+          },
+          "native-authority-boundary": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "6cf6304189c9162654aa713f42d3ed6dbcbcfc3c8cb62eb69c389203addc0208"
+    },
+    {
+      "format": "rcl.k333.compiler-machine-learning-ai-trial-receipt.v0.1",
+      "trialId": "K333-AI-REPAIR-03",
+      "mutationClass": "model-authority-boundary",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f28-6991-78e3-a5a6-684a0eb1874c",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "  facet authority.model_commit_granted : Truth = true",
+        "new": "  facet authority.model_commit_granted : Truth = false",
+        "diagnosis": "The only observed semantic violation is that the advisory learned model currently has compiler commit authority. The trained perceptron parameters, inference oracle, dataset ownership, and no-provider constraints are already intact; flipping this facet restores the authority boundary and allows evaluation.pass to satisfy its existing false-authority assertion."
+      },
+      "promptRoot": "d6c69abaed57f298131b846491a3ecc11dcc4e34b594360fc2b01b16fa01ed1a",
+      "mutatedSourceSha256": "9747a026b1b075912cb90fb3c81a754365f1d8a76b5dde1d25284c84bf89a7ca",
+      "candidateSourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "9b06e43ba32566fb3861a25f470bfc158b84d2795fe746df09a8503ad44d369d",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f28-6991-78e3-a5a6-684a0eb1874c"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "30ab7176a9f065e6fecc507460cca77f86d62c7831049d3fb8a9dabdf70dc8a1"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "034cebf95a89d54ee319b3a2462182a049e7ad6dd9c9507d960c9aad13757729"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57973,
+            "cached_input_tokens": 31488,
+            "output_tokens": 468,
+            "reasoning_output_tokens": 150
+          }
+        }
+      ],
+      "finalMessageSha256": "034cebf95a89d54ee319b3a2462182a049e7ad6dd9c9507d960c9aad13757729",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "2e6b90a36ae106e0a926462d19857e6774eeae633354b85d6b008d7cb60e4e1f",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6",
+        "checks": {
+          "rcl-owns-ml-profile": {
+            "pass": true
+          },
+          "model-is-advisory-only": {
+            "pass": true
+          },
+          "perceptron-training-is-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-training-converges": {
+            "pass": true
+          },
+          "native-model-oracle": {
+            "pass": true
+          },
+          "native-authority-boundary": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "4ff211562f99d1fc3d395dcf45d69f76f7df3a2c7e88b23ad17d0fc7451f5b99"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_NATIVE_ML_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K333 label, perceptron-update and model-authority semantics and binds its 20-round native runtime receipt. It grants no arbitrary ML generation, floating-point ML, Transformer, accelerator, compiler decision authority, unrelated K400 cell or K400 completion.",
+  "reportRoot": "d16ad0df7481c94c5084acac822e32930d8e39aa855c4d43dc8d79cf0a81c2dc"
+}
