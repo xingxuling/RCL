@@ -10,6 +10,7 @@ use std::fs;
 use std::io::{self, Read};
 
 const REQUEST_FORMAT: &str = "rcl.bf16-autodiff-adamw-request.v0.2";
+const HYBRID_BACKEND: &str = "opencl-amd-hybrid";
 const RESULT_FORMAT: &str = "rcl.bf16-autodiff-adamw-result.v0.2";
 const POLICY: &str = "rcl.bf16-rne-fp32-accumulation-adamw.v0.2";
 const BACKEND: &str = "cpu-reference";
@@ -113,6 +114,7 @@ struct GradientReceipt {
 #[serde(rename_all = "camelCase")]
 struct Telemetry {
     backend: &'static str,
+    execution_backend: String,
     policy: &'static str,
     forward_compute_dtype: &'static str,
     activation_compute_dtype: &'static str,
@@ -126,6 +128,9 @@ struct Telemetry {
     parameter_elements: usize,
     optimizer_state_elements: usize,
     backward_edge_count: usize,
+    gpu_matmul_nodes: usize,
+    host_cpu_nodes: usize,
+    gpu_execution_roots: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -309,10 +314,22 @@ fn parameter_descriptor(
                 format!("parameter {tensor_id} is not an initial graph tensor"),
             )
         })?;
-    if tensor.dtype != "bf16" || tensor.layout != "row-major" || tensor.device != "cpu" {
+    let expected_device = match request.backend.as_str() {
+        BACKEND => "cpu",
+        HYBRID_BACKEND => "opencl-amd",
+        other => {
+            return Err(TrainError::new(
+                "RCL_ACCELERATOR_BACKEND_UNAVAILABLE",
+                format!("unsupported training backend {other}"),
+            ));
+        }
+    };
+    if tensor.dtype != "bf16" || tensor.layout != "row-major" || tensor.device != expected_device {
         return Err(TrainError::new(
             "RCL_BF16_AD_DESCRIPTOR",
-            format!("parameter {tensor_id} is outside bf16/row-major/cpu profile"),
+            format!(
+                "parameter {tensor_id} is outside bf16/row-major/{expected_device} profile"
+            ),
         ));
     }
     Ok((tensor.storage_identity.clone(), tensor.shape.clone()))
@@ -638,12 +655,33 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
             format!("unsupported request format {}", request.format),
         ));
     }
-    if request.backend != BACKEND {
+    if request.backend != BACKEND && request.backend != HYBRID_BACKEND {
         return Err(TrainError::new(
             "RCL_ACCELERATOR_BACKEND_UNAVAILABLE",
             format!(
                 "backend {} is unavailable; silent CPU fallback is forbidden",
                 request.backend
+            ),
+        ));
+    }
+    let graph_backend = request
+        .autodiff
+        .graph
+        .bindings
+        .get("backend")
+        .and_then(|value| value.as_str())
+        .unwrap_or(BACKEND);
+    let expected_graph_backend = if request.backend == HYBRID_BACKEND {
+        HYBRID_BACKEND
+    } else {
+        BACKEND
+    };
+    if graph_backend != expected_graph_backend {
+        return Err(TrainError::new(
+            "RCL_ACCELERATOR_BACKEND_GRAPH_MISMATCH",
+            format!(
+                "training backend {} does not match graph backend {}",
+                request.backend, graph_backend
             ),
         ));
     }
@@ -732,7 +770,12 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
         autodiff_precision: BF16_AUTODIFF_PRECISION,
         checkpoint_root: checkpoint,
         telemetry: Telemetry {
-            backend: "rcl-tensor-bf16-autodiff-adamw-cpu-reference-v0.2",
+            backend: if request.backend == HYBRID_BACKEND {
+                "rcl-tensor-bf16-autodiff-adamw-opencl-amd-hybrid-v0.1"
+            } else {
+                "rcl-tensor-bf16-autodiff-adamw-cpu-reference-v0.2"
+            },
+            execution_backend: final_result.telemetry.execution_backend.clone(),
             policy: POLICY,
             forward_compute_dtype: "bf16",
             activation_compute_dtype: "bf16",
@@ -746,6 +789,9 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
             parameter_elements,
             optimizer_state_elements,
             backward_edge_count,
+            gpu_matmul_nodes: final_result.telemetry.gpu_matmul_nodes,
+            host_cpu_nodes: final_result.telemetry.host_cpu_nodes,
+            gpu_execution_roots: final_result.telemetry.gpu_execution_roots.clone(),
         },
         gpu_claim: false,
     })
