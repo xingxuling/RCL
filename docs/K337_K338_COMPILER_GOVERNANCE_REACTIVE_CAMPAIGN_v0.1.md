@@ -46,6 +46,7 @@ Candidate absorption: port the reference compiler's cause-subject warrant valida
 | EVIDENCE | UNVERIFIED | Local receipt is rooted; hosted Linux/Windows replay authority is absent. |
 
 The K400 cells remain unadmitted until every gate passes. No current matrix count is changed by this candidate.
+The conditional K400 builder was replayed without a GitHub authority receipt and correctly stayed at `11 PASS / 389 UNTESTED`, `U3`, `INCOMPLETE`; candidate-aware report root is `3b1e7ca478380c6f9f61433ea12033689d0722389a8c15cc6339bfce676ba4c4`.
 
 ## Integration Court
 
