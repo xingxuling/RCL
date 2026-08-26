@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -14,9 +17,68 @@ function sha256(value) { return crypto.createHash('sha256').update(value).digest
 function check(condition, code) {
   if (!condition) throw new Error(code);
 }
+function canonical(value) {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+  }
+  return value;
+}
+function equal(left, right) { return JSON.stringify(canonical(left)) === JSON.stringify(canonical(right)); }
+function record(checks, name, pass, details = {}) {
+  checks[name] = { pass: Boolean(pass), ...details };
+}
 
-export function verifyK337K338CompilerGovernanceReactiveCandidate() {
+export function evaluateK337K338CompilerGovernanceReactiveSource(options = {}) {
   const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
+  const sourcePath = path.resolve(options.sourcePath ?? path.join(ROOT, contract.canonical.sourcePath));
+  const source = fs.readFileSync(sourcePath, 'utf8');
+  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-k337-k338-candidate-'));
+  const outputPath = path.join(directory, 'candidate.rbc');
+  const checks = {};
+  let errorCode = null;
+  let stateRoot = null;
+  let artifactSha256 = null;
+  try {
+    const bootstrapBytecode = Buffer.from(compileRealityToBytecode(source));
+    record(checks, 'reference-compile', true);
+    const compilation = runNativeCompiler(compilerRbcPath, sourcePath, outputPath);
+    artifactSha256 = sha256(compilation.bytecode);
+    record(checks, 'native-selfhost-compile', true);
+    record(checks, 'bootstrap-byte-parity', Buffer.from(compilation.bytecode).equals(bootstrapBytecode));
+    const payload = runNativeBytecode(outputPath, { requireNativeStateRoot: true });
+    stateRoot = payload.semanticStateRoot;
+    record(checks, 'expected-state', equal(payload.state, contract.expectedState), { actual: payload.state });
+    record(checks, 'rule-order', equal(payload.history.map((item) => item.rule), contract.required.transactionRuleOrder));
+    record(checks, 'root-continuity', payload.history[0]?.afterRoot === payload.history[1]?.beforeRoot);
+    record(checks, 'authority-needs', payload.history.every((item) => equal(item.authority?.needs, contract.expectedAuthority[item.rule])));
+    record(checks, 'witnesses', payload.history.every((item) => equal(item.witnesses, contract.expectedWitnesses[item.rule])));
+  } catch (error) {
+    errorCode = error.code ?? 'RCL_K337_K338_CANDIDATE_ERROR';
+    if (!checks['reference-compile']) record(checks, 'reference-compile', false, { errorCode });
+    else if (!checks['native-selfhost-compile']) record(checks, 'native-selfhost-compile', false, { errorCode });
+    record(checks, 'native-execute', false, { errorCode });
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+  if (!checks['native-execute']) record(checks, 'native-execute', errorCode === null);
+  const passed = Object.values(checks).every((item) => item.pass === true);
+  const resultWithoutRoot = {
+    status: passed ? 'PASS' : 'FAIL',
+    sourceSha256: sha256(source),
+    artifactSha256,
+    stateRoot,
+    checks,
+    errorCode,
+  };
+  return { ...resultWithoutRoot, reportRoot: evidenceRoot(resultWithoutRoot) };
+}
+
+export function verifyK337K338CompilerGovernanceReactiveCandidate(options = {}) {
+  const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
+  const candidate = evaluateK337K338CompilerGovernanceReactiveSource(options);
+  if (options.sourcePath) return candidate;
   const evidence = JSON.parse(fs.readFileSync(EVIDENCE_PATH, 'utf8'));
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
   const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
@@ -39,15 +101,18 @@ export function verifyK337K338CompilerGovernanceReactiveCandidate() {
   check(evidence.negativeControlDetails.missingWarrant.rejectionStage === 'NATIVE_VM_BEFORE_COMMIT', 'RCL_K337_K338_WARRANT_STAGE_DISCLOSURE');
   check(evidence.negativeControlDetails.missingWarrant.errorCode === 'RCL_AUTHORITY_DENIED', 'RCL_K337_K338_WARRANT_ERROR');
   check(evidence.rclGaps.some((gap) => gap.id === 'RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION'), 'RCL_K337_K338_STATIC_VALIDATION_GAP');
+  check(candidate.status === 'PASS', 'RCL_K337_K338_CANONICAL_CANDIDATE');
 
   return {
+    status: candidate.status,
+    checks: candidate.checks,
     localRuntimeAdmitted: true,
     eligibleCells: contract.eligibleCells,
     runtimeReportRoot: reportRoot,
     contractRoot: evidence.contractRoot,
     sourceSha256: contract.canonical.sourceSha256,
     artifactSha256: evidence.artifacts.bootstrapArtifactSha256,
-    stateRoot: evidence.rounds[0].stateRoot,
+    stateRoot: candidate.stateRoot,
     rclGap: evidence.rclGaps[0].id,
     aiGenerateAdmission: 'UNVERIFIED',
     githubHostedAdmission: 'UNVERIFIED',

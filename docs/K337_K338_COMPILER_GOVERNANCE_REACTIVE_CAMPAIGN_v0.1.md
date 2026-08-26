@@ -23,6 +23,8 @@ The positive program performs two RCL-owned compiler transactions. `authorize_ca
 - Windows-local p95: compile `83.5467 ms`, execute `70.8424 ms`, combined `145.3796 ms`; frozen budgets are `5000/1000/6000 ms`.
 - Missing warrant, broken preserve, invalid request and corrupt RBC controls all failed closed.
 
+The frozen AI contract then ran three separate ephemeral read-only repair sessions for authority capability binding, reactive phase triggering and preserve bounds. All 3/3 restored canonical bytes and replayed the native evaluator; session IDs are `01a03ed9-e426-7df3-8f38-0aabefb27485`, `01a03edd-32cb-7de2-bd04-55c7c5cd629d` and `01a03ede-ec86-7780-86af-518f0a9015c2`. The rooted aggregate receipt is `52694c563d3cd4f49ef0b3daaf9aec294d6da1bc49ef14ce9d8919334d5ee70a`. This is local `CANDIDATE` evidence only; `AI_GENERATE` remains `UNVERIFIED` until the exact saved receipts pass the declared GitHub-hosted Linux and Windows steps.
+
 ## RCL_GAP
 
 `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` is open. The JS reference compiler rejects a source whose cause subject lacks a needed warrant, but the RCL self-host compiler currently emits RBC for it. The native VM still rejects that artifact with `RCL_AUTHORITY_DENIED` before commit, so the bounded end-to-end profile remains fail-closed. The workaround is not treated as static validation evidence.
@@ -40,7 +42,7 @@ Candidate absorption: port the reference compiler's cause-subject warrant valida
 | CORRECT | PASS | Exact final state, ordered rules, witnesses, authority needs and root continuity matched. |
 | ROBUST | PASS | Four frozen controls rejected or remained mutation-free as specified. |
 | PERFORMANCE | PASS | Frozen local budgets passed; this is not cross-machine or competitive parity. |
-| AI_GENERATE | UNVERIFIED | Independent repair trials have not yet been acquired. |
+| AI_GENERATE | UNVERIFIED | 3/3 independent local repairs passed, but required GitHub-hosted replay authority is absent. |
 | EVIDENCE | UNVERIFIED | Local receipt is rooted; hosted Linux/Windows replay authority is absent. |
 
 The K400 cells remain unadmitted until every gate passes. No current matrix count is changed by this candidate.

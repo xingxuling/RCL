@@ -1,0 +1,142 @@
+{
+  "format": "rcl.k337-k338.compiler-governance-reactive-ai-trial-receipt.v0.1",
+  "trialId": "K337-K338-AI-REPAIR-01",
+  "mutationClass": "authority-capability-binding",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03ed9-e426-7df3-8f38-0aabefb27485",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "    needs compiler.emit on source",
+    "new": "    needs compiler.inspect on source",
+    "diagnosis": "authorize_candidate currently requires compiler.emit on source, but maintainer only warrants compiler.inspect on source and compiler.stage on artifact. Replacing the source need with compiler.inspect preserves the existing artifact stage need and repairs the declared authority invariant without weakening other semantics."
+  },
+  "promptRoot": "794d54b878d573da0ea9957310b1bb83139b8a354fecd211691dfbd2795e4825",
+  "mutatedSourceSha256": "896ebcb9527c923d4e2f8a9d05a40c1c0dd4dee703d9360388145377c43b4c82",
+  "candidateSourceSha256": "68d18b71ff30617ea912a18a6432cdceba5ca8604b46e7be63c0dfb4dd2d658c",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "2e620db1c6de09aa87d26cf7fe9699f48a9ab180c6a32a11c536a23602be426b",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03ed9-e426-7df3-8f38-0aabefb27485"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "c8450150b799ee5a8c741a357d5911a16ceb0098aeed5bd0a936ccdb65e0f5c9"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "49da8032b87100d51af6de798bc60f2b5cce753e22c36b35f34fbd079f9cfbe6"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 56224,
+        "cached_input_tokens": 29440,
+        "output_tokens": 452,
+        "reasoning_output_tokens": 143
+      }
+    }
+  ],
+  "finalMessageSha256": "49da8032b87100d51af6de798bc60f2b5cce753e22c36b35f34fbd079f9cfbe6",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "df48f2cd31274dd2ff86a35e5f9513f91fd33ec864d42521447165b3729256a3",
+    "failedChecks": [
+      "reference-compile",
+      "native-execute"
+    ],
+    "errorCode": "RCL_COMPILE_ERROR"
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "67fd045bf29556cae18d24b0daa1252a0a7e269a77174807193b56d65283d921",
+    "checks": {
+      "reference-compile": {
+        "pass": true
+      },
+      "native-selfhost-compile": {
+        "pass": true
+      },
+      "bootstrap-byte-parity": {
+        "pass": true
+      },
+      "expected-state": {
+        "pass": true,
+        "actual": {
+          "compiler.accepted": true,
+          "compiler.audit_count": 2,
+          "compiler.emitted": true,
+          "compiler.phase": 2,
+          "request.valid": true
+        }
+      },
+      "rule-order": {
+        "pass": true
+      },
+      "root-continuity": {
+        "pass": true
+      },
+      "authority-needs": {
+        "pass": true
+      },
+      "witnesses": {
+        "pass": true
+      },
+      "native-execute": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "6f47fbaba693b231e59aa7304012b1c1c1d06e2db23a9d4f2ff633edf8b6289d"
+}
