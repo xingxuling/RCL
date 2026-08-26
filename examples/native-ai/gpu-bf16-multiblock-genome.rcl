@@ -1,0 +1,19 @@
+# RCL-owned candidate contract for ordered multi-matmul placement inside the
+# generic BF16 Reverse Autodiff + AdamW training organ.
+reality GpuBf16MultiblockCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+
+  facet contract.id : Text = "rcl-k08-s-gpu-bf16-multiblock-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.backend : Text = "opencl-amd-hybrid"
+  facet contract.gpu_operation_set : Text = "ordered-matmul-chain"
+  facet contract.host_reference_placement : Text = "explicit-per-node"
+  facet contract.precision_policy : Text = "BF16_RNE_FORWARD_FP32_REVERSE_ADAMW"
+  facet contract.fallback_policy : Text = "FAIL_CLOSED_NO_CPU_FALLBACK"
+  facet contract.model_special_opcodes : Truth = false
+  facet evaluation.ordered_gpu_matmuls : Truth = positive(2)
+  facet evaluation.parameter_order_is_canonical : Truth = true
+  facet evaluation.gpu_training_claim_closed : Truth = true
+  facet evaluation.rcl10m_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_BOUNDED_ORDERED_OPENCL_MATMUL_CHAIN"
+}
