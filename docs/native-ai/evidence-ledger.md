@@ -373,7 +373,7 @@ Reproduction: `npm run test:k08-gpu-gqa-rope`. Claims are limited to bounded GQA
 
 ## GPU-native BF16 backward + AdamW candidate
 
-Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_HOSTED_REPLAY_PENDING`. The generic RCL Tensor SSA path now reaches three explicit AMD OpenCL lowerings: left and right matmul gradients plus elementwise FP32 AdamW. The current AMD `gfx1152` host executed all three classes of GPU primitive; the Rust organ retains RCL ownership of reverse rules, BF16 RNE, FP32 master/state bits and checkpoint identity, and forbids CPU fallback. The minimal graph matched CPU loss, parameters, optimizer state and checkpoint root exactly, with exact direct replay/resume and fail-closed placement/provider/backend negatives.
+Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_GITHUB_REPLAY_BOUND`. The generic RCL Tensor SSA path now reaches three explicit AMD OpenCL lowerings: left and right matmul gradients plus elementwise FP32 AdamW. The current AMD `gfx1152` host executed all three classes of GPU primitive; the Rust organ retains RCL ownership of reverse rules, BF16 RNE, FP32 master/state bits and checkpoint identity, and forbids CPU fallback. The minimal graph matched CPU loss, parameters, optimizer state and checkpoint root exactly, with exact direct replay/resume and fail-closed placement/provider/backend negatives. PR #93 run `33005295847` passed Ubuntu job `98297368527` and Windows job `98297368737`.
 
 | Evidence | Result |
 |---|---:|
@@ -386,7 +386,7 @@ Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_HOSTED_REPLAY_PENDING`. T
 | Local candidate suite | `3/3 PASS` |
 | Existing GPU/CPU regressions | `15/15 PASS` |
 | Rust Tensor unit tests | `7/7 PASS` |
-| Hosted replay | PENDING, PR #92 |
+| Hosted replay | PASS, PR #93 run `33005295847`, jobs `98297368527` / `98297368737` |
 
 Authority files:
 

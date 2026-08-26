@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_HOSTED_REPLAY_PENDING`
+`PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 This candidate binds a generic RCL BF16 Tensor SSA graph to three bounded AMD
 OpenCL lowerings: left and right matmul gradients, and elementwise FP32 AdamW.
@@ -58,7 +58,7 @@ them without a CPU fallback.
 | ROBUST | PASS_LOCAL | placement, provider and backend negatives fail closed |
 | PERFORMANCE | NOT_EVALUATED | process-per-primitive dispatch is not throughput evidence |
 | AI_GENERATE | NOT_APPLICABLE | no learned generation claim |
-| EVIDENCE | CANDIDATE | local receipt is ready; hosted replay is pending |
+| EVIDENCE | CANDIDATE | local receipt and Ubuntu/Windows hosted replay are bound |
 
 No K400 cell is promoted by this candidate. The evidence is a bounded stress
 case for RCL GPU lowering and does not transfer authority to the auxiliary
@@ -66,10 +66,11 @@ provider.
 
 ## Hosted boundary
 
-Dedicated workflow replay is pending for PR #92. Hosted Ubuntu and Windows
-runners are expected to prove portable compilation/replay and explicit
-unavailable-device behavior; they cannot inherit the current host's AMD
-device receipt or promote this candidate to `GPU_TRAINING`.
+PR #93 dedicated workflow run `33005295847` passed on Ubuntu job
+`98297368527` and Windows job `98297368737`. Hosted runners prove portable
+compilation/replay and explicit unavailable-device behavior; they do not
+inherit the current host's AMD device receipt or promote this candidate to
+`GPU_TRAINING`.
 
 ## Open gaps
 
