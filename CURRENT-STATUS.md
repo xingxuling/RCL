@@ -149,7 +149,13 @@ Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. The RCL-owned BF16 cont
 | Local Node evidence | `3/3 PASS` |
 | Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
 
-Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Authority files: docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md, examples/native-ai/opencl-bf16-matmul-contract.v0.1.json, examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
+
+### GPU BF16 Autodiff + AdamW hybrid candidate
+
+Status: PASS_LOCAL_GPU_HYBRID_CANDIDATE_HOSTED_REPLAY_PENDING. The new generic RCL BF16 Autodiff + AdamW organ accepts an explicit opencl-amd-hybrid graph: every matmul must carry placement gpu and execute through the existing AMD OpenCL lowerer; every non-matmul node must carry placement cpu-reference and execute through the RCL Rust BF16 reference. The current Windows host executed the GPU-placed matmul on AMD gfx1152; the CPU-equivalent graph produced identical initial/final loss, all parameters, optimizer states and checkpoint root. Local evidence is 3/3 PASS, and placement/provider/backend negatives fail closed. This is a bounded hybrid candidate, not GPU training: backward math, FP32 masters, AdamW state and optimizer updates remain in RCL Rust, while GPU backward/optimizer kernels, full-graph GPU execution, GQA/RoPE GPU and throughput remain unclaimed. Hosted run 32997101860 is pending on exact implementation head 4e0ba39ad400a79021281eac0cba4ebe07b030e4.
+
+Authority files: docs/native-ai/gpu-bf16-autodiff-adamw-evidence-v0.1.md, examples/native-ai/gpu-bf16-autodiff-adamw-contract.v0.1.json, examples/native-ai/evidence/gpu-bf16-autodiff-adamw-v0.1/k08-gpu-bf16-autodiff-adamw-local-evidence.json. Reproduction: npm run test:k08-gpu-bf16-autodiff-adamw. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
 
 ### RCL-10M corpus admission gate
 

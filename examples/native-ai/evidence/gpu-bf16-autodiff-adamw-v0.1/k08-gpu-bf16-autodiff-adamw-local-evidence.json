@@ -1,0 +1,116 @@
+{
+  "format": "rcl.k08-s.gpu-bf16-autodiff-adamw-local-evidence.v0.1",
+  "status": "PASS_LOCAL_GPU_HYBRID_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "branch": "codex/k08-gpu-bf16-autodiff-v01",
+  "baseMain": "e6833a32f55f1989b004ba8fe00180adf9e62d35",
+  "sourceCommit": "4e0ba39ad400a79021281eac0cba4ebe07b030e4",
+  "evidenceCommand": "npm run test:k08-gpu-bf16-autodiff-adamw",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 3,
+    "nodeEvidencePassed": 3,
+    "cargoCheckBins": true,
+    "realAmdOpenClExecution": true,
+    "gpuMatmulNodesPerForward": 1,
+    "explicitHostReferenceNodesPerForward": 6,
+    "genericAutodiffAdamwLoopReachedGpuPlacement": true,
+    "cpuFallback": false,
+    "gpuClaim": false
+  },
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensionsObserved": [
+      "cl_khr_fp16",
+      "cl_khr_fp64",
+      "cl_khr_subgroups",
+      "cl_amd_device_attribute_query"
+    ]
+  },
+  "executionBoundary": {
+    "rclGraphOwner": true,
+    "rclBf16RneOwner": true,
+    "rclReverseAutodiffOwner": true,
+    "rclAdamwOwner": true,
+    "gpuOperationSet": [
+      "matmul"
+    ],
+    "hostReferenceOperationSet": [
+      "broadcast",
+      "add",
+      "sub",
+      "mul",
+      "mean"
+    ],
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerRole": "auxiliary OpenCL matmul lowerer",
+    "placementPolicy": "explicit-per-node",
+    "fallbackPolicy": "forbidden"
+  },
+  "differential": {
+    "cpuReferenceTrainingPath": true,
+    "initialLossExact": true,
+    "finalLossExact": true,
+    "parametersExact": true,
+    "optimizerStatesExact": true,
+    "checkpointRootExact": true,
+    "lossDecreased": true,
+    "deterministicReplay": true
+  },
+  "checks": {
+    "rclOwnedGenomeAndContract": true,
+    "genericGraphUsesNoModelSpecialOpcode": true,
+    "realAmdOpenClMatmulNode": true,
+    "explicitGpuPlacement": true,
+    "explicitHostPlacement": true,
+    "cpuDifferential": true,
+    "missingPlacementFailsClosed": true,
+    "cpuMatmulPlacementFailsClosed": true,
+    "missingProviderFailsClosed": true,
+    "backendGraphMismatchFailsClosed": true,
+    "noCpuFallback": true
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_BF16_MATMUL_NODE_LOWERING",
+    "OPENCL_HYBRID_GENERIC_BF16_AUTODIFF_ADAMW_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_BF16_BACKWARD_KERNELS",
+    "OPENCL_BF16_OPTIMIZER_KERNELS",
+    "GENERIC_GPU_BACKEND",
+    "BF16_GQA_ROPE_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "hostedReplay": {
+    "status": "PENDING",
+    "runId": 32997101860,
+    "headSha": "4e0ba39ad400a79021281eac0cba4ebe07b030e4",
+    "ubuntu": {
+      "jobId": 98269112245,
+      "status": "PENDING",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32997101860/job/98269112245"
+    },
+    "windows": {
+      "jobId": 98269112106,
+      "status": "PENDING",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32997101860/job/98269112106"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/32997101860",
+    "boundary": "hosted runners prove replay or explicit unavailable-device behavior; they do not inherit the current host AMD receipt"
+  },
+  "gapRegister": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "reportRoot": "c77e5ea49bc4d6472a51ba251bc6c22c566ac7d99f5435d61996a65f20ee8073"
+}
