@@ -4,7 +4,7 @@
 
 ## Reality Audit
 
-- Base: `origin/main@4c7b3f9c1c90da710903487df8d1e766a8b0afc1`.
+- Current integrated base: `origin/main@e6833a32f55f1989b004ba8fe00180adf9e62d35` (the contract was originally frozen on `4c7b3f9c1c90da710903487df8d1e766a8b0afc1`; focused replay remained exact after the merge).
 - Coordinate: `K333 compiler-runtime::machine-learning`.
 - Canonical semantic owner: RCL.
 - Execution boundary: native `rclc` using the checked-in self-host compiler artifact, followed by native `rclvm`.
