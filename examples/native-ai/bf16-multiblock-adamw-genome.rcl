@@ -1,0 +1,19 @@
+# RCL-owned BF16 two-block Autodiff + AdamW composition genome.
+reality MultiBlockBf16AutodiffAdamWGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_block_count(blocks : Number) -> Truth = positive(blocks) and blocks <= 64
+  reckon parameter_groups(blocks : Number) -> Number = 2 + blocks * 1
+  reckon valid_parameter_groups(blocks : Number, groups : Number) -> Truth = valid_block_count(blocks) and groups == parameter_groups(blocks)
+
+  facet contract.id : Text = "rcl-k08-s-bf16-multiblock-adamw-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.precision_policy : Text = "BF16_RNE_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_AND_ADAMW_STATE"
+  facet contract.block_composition : Text = "GENERIC_TENSOR_SSA_BLOCK_0_THEN_BLOCK_1"
+  facet contract.resume_identity : Text = "DIRECT_N_EQUALS_CHECKPOINT_K_PLUS_RESUME_N_MINUS_K"
+  facet contract.no_model_special_operation : Truth = true
+  facet evaluation.two_block_valid : Truth = valid_parameter_groups(2, 4)
+  facet evaluation.invalid_zero_block : Truth = not valid_block_count(0)
+  facet evaluation.gpu_claim_closed : Truth = true
+  facet evaluation.scale_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_GPU_OPENCL_BF16_RCL10M_RCL1B_OR_K400_PROMOTION"
+}

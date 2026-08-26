@@ -270,3 +270,28 @@ Authority files:
 - `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`
 
 The next bounded candidate is an AMD OpenCL generic BF16 reference organ with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16, RCL-10M or K400 promotion.
+
+## K08-S BF16 multi-block reference candidate
+
+Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
+
+| Evidence | Result |
+|---|---:|
+| RCL genome self-host/native-root parity | PASS |
+| Independent two-block BF16 loss differential | PASS |
+| Loss decrease / all four parameter groups update | PASS |
+| FP32 master versus BF16 compute / exact optimizer state | PASS |
+| Deterministic replay | PASS |
+| Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
+| Canonical state order and model-special negatives | fail-closed PASS |
+| Local Node evidence | `6/6 PASS` |
+| Hosted Ubuntu + Windows replay | NOT YET RUN |
+
+Authority files:
+
+- `examples/native-ai/bf16-multiblock-adamw-genome.rcl`
+- `examples/native-ai/bf16-multiblock-adamw-contract.v0.1.json`
+- `examples/native-ai/evidence/bf16-multiblock-adamw-v0.1/k08-s-multiblock-local-evidence.json`
+- `docs/native-ai/bf16-multiblock-adamw-evidence-v0.1.md`
+
+Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Open gaps: `RCL_GAP_K08_S_MB_HOSTED_REPLAY`, `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
