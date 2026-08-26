@@ -319,6 +319,32 @@ Authority files:
 
 Reproduction: npm run test:k08-gpu-bf16-autodiff-adamw. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
 
+## GPU BF16 ordered multi-block hybrid candidate
+
+Status: `PASS_LOCAL_GPU_HYBRID_ORDERED_MULTI_MATMUL_CANDIDATE_GITHUB_REPLAY_BOUND`. This candidate extends the explicit AMD OpenCL hybrid profile to an ordered generic graph with two GPU-placed matmul nodes and eight explicitly RCL-hosted BF16 reference nodes. The current AMD gfx1152 host executed both matmuls inside the real BF16 Reverse Autodiff + AdamW loop. The CPU-equivalent graph matched initial/final loss, all four canonical parameters, optimizer states and checkpoint root exactly; direct replay and checkpoint resume are exact. Provider, placement and backend mismatch negatives fail closed.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Ordered two-matmul graph | PASS |
+| Real AMD OpenCL execution of both GPU nodes | PASS, gfx1152 |
+| Explicit host-reference nodes | PASS, 8 per forward |
+| CPU loss/parameter/state/checkpoint differential | exact PASS |
+| Deterministic replay and checkpoint resume | exact PASS |
+| Placement/provider/backend fail-closed negatives | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu replay | PASS, run `33000382218`, job `98280360868` |
+| Hosted Windows replay | PASS, run `33000382218`, job `98280360632` |
+
+Authority files:
+
+- `docs/native-ai/gpu-bf16-multiblock-evidence-v0.1.md`
+- `examples/native-ai/gpu-bf16-multiblock-genome.rcl`
+- `examples/native-ai/gpu-bf16-multiblock-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-bf16-multiblock-v0.1/k08-gpu-bf16-multiblock-local-evidence.json`
+
+Reproduction: `npm run test:k08-gpu-bf16-multiblock`. Claims are limited to ordered multi-matmul OpenCL hybrid candidate execution. GPU training, GPU backward/optimizer kernels, generic GPU portability, GQA/RoPE GPU, RCL-10M and K400 promotion remain closed. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
 ## RCL-10M corpus admission gate
 
 Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.
