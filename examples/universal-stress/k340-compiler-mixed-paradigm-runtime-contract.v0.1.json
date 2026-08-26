@@ -1,0 +1,93 @@
+{
+  "format": "rcl.k340.compiler-mixed-paradigm-runtime-contract.v0.1",
+  "status": "FROZEN_PENDING_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": [
+    "K340"
+  ],
+  "profile": {
+    "environment": "compiler-runtime",
+    "programFamily": "mixed-paradigm",
+    "semanticOwner": "RCL",
+    "executionBoundary": "NATIVE_RCLC_TO_RCLVM",
+    "capabilityMode": "native-semantic",
+    "requiredParadigms": [
+      "recursive-functional-computation",
+      "declarative-authority",
+      "transactional-state",
+      "state-triggered-rule-chain"
+    ]
+  },
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k340-compiler-mixed-paradigm.rcl",
+    "sourceSha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+  },
+  "required": {
+    "rounds": 20,
+    "bootstrapByteParity": true,
+    "nativeStateRootRequired": true,
+    "uniqueStateRoots": 1,
+    "transactionRuleOrder": [
+      "analyze_batch",
+      "emit_batch"
+    ],
+    "rootContinuity": true,
+    "authorityNeedsBound": true,
+    "witnessesBound": true,
+    "recursiveMutationRejected": true,
+    "phaseMutationNoCommit": true,
+    "missingWarrantRejected": true,
+    "zeroBatchNoMutation": true,
+    "corruptRbcRejected": true
+  },
+  "expectedState": {
+    "compiler.accepted": true,
+    "compiler.digest": 204,
+    "compiler.emitted": true,
+    "compiler.phase": 2,
+    "input.batch_size": 8
+  },
+  "expectedAuthority": {
+    "analyze_batch": [
+      {
+        "capability": "compiler.analyze",
+        "target": "source"
+      },
+      {
+        "capability": "compiler.stage",
+        "target": "artifact"
+      }
+    ],
+    "emit_batch": [
+      {
+        "capability": "compiler.stage",
+        "target": "artifact"
+      },
+      {
+        "capability": "compiler.emit",
+        "target": "artifact"
+      }
+    ]
+  },
+  "expectedWitnesses": {
+    "analyze_batch": [
+      "k340:functional-transaction:analyzed"
+    ],
+    "emit_batch": [
+      "k340:reactive-authority:emitted"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": [
+    "K340 requires all four declared paradigms to execute inside one RCL-owned program; separate K321 and K337/K338 receipts are not combined as a substitute.",
+    "The profile proves one bounded recursive checksum plus governed two-transaction compiler chain, not arbitrary mixed-paradigm programs.",
+    "Native rclc/rclvm are execution boundaries and receive no canonical or commit authority.",
+    "AI_GENERATE, GitHub Linux/Windows replay, competitive parity, hostile-OS isolation and K400 completion remain separate gates."
+  ]
+}
