@@ -1,11 +1,11 @@
 {
   "format": "rcl.k08-s.bf16-autodiff-adamw-local-evidence.v0.2",
-  "status": "PASS_LOCAL_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_CANDIDATE",
   "canonicalOwner": "RCL",
   "branch": "codex/rcl-native-llm-campaign-v01",
   "baseMain": "30c162c6cd13b2c9310202f2a604da23e5b4c552",
   "historicalCandidate": "1c9cb93bb687eb47fb39ea7dd392d8cd5d607b30",
-  "sourceCommit": "7e06be7",
+  "sourceCommit": "7e06be729be19c3c79893d322a0840ac55c66bd6",
   "evidenceCommand": "npm run test:k08-bf16-autodiff-adamw && cargo test --release --locked --manifest-path native/tensor-engine/Cargo.toml",
   "localExecution": {
     "platform": "Windows current host",
@@ -14,7 +14,7 @@
     "rustUnitTests": 7,
     "rustUnitTestsPassed": 7,
     "gpuClaim": false,
-    "hostedReplay": false
+    "hostedReplay": true
   },
   "checks": {
     "genomeSelfHostByteParity": true,
@@ -51,11 +51,25 @@
     "DISTRIBUTED_TRAINING",
     "K400_PROMOTION"
   ],
+  "hostedReplay": {
+    "runId": "32987036258",
+    "headSha": "73336cb7b76dbecd95aabe7f840374067c22c15a",
+    "ubuntu": {
+      "jobId": "98235663711",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32987036258/job/98235663711"
+    },
+    "windows": {
+      "jobId": "98235663539",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32987036258/job/98235663539"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/32987036258"
+  },
   "gapRegister": [
     "RCL_GAP_GPU_EXECUTION",
-    "RCL_GAP_K08_S_HOSTED_REPLAY",
     "RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION",
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
-  "reportRoot": "2698a4e92d426c4cc91d732176a1834b0435e26e33b42cdfbf452915b69aa98e"
+  "reportRoot": "fc3235622a6d0da8259d2b73fad5eb14dadc58c6fbb54cb9716335b58480db2e"
 }
