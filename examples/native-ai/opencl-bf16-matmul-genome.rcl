@@ -1,0 +1,16 @@
+# RCL-owned contract for the bounded AMD OpenCL BF16 matmul lowerer.
+reality AmdOpenclBf16MatmulProviderCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon bounded(value : Number) -> Truth = positive(value) and value <= 64
+
+  facet contract.id : Text = "rcl-k08-amd-opencl-bf16-matmul-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_LOWERER_NO_SEMANTIC_OWNERSHIP"
+  facet contract.precision_policy : Text = "BF16_RNE_INPUT_FP32_ACCUMULATION_BF16_OUTPUT"
+  facet contract.fallback_policy : Text = "FAIL_CLOSED_NO_CPU_FALLBACK"
+  facet contract.no_model_special_operation : Truth = true
+  facet evaluation.matrix_shape_valid : Truth = bounded(2) and bounded(3) and bounded(3)
+  facet evaluation.gpu_training_claim_closed : Truth = true
+  facet evaluation.scale_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_OPENCL_MATMUL_NO_AUTODIFF_ADAMW_RCL10M_OR_K400_PROMOTION"
+}
