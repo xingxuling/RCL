@@ -371,6 +371,32 @@ Authority files:
 
 Reproduction: `npm run test:k08-gpu-gqa-rope`. Claims are limited to bounded GQA + RoPE forward matmul lowering in an explicit OpenCL hybrid. Full GPU training, GPU-native attention/backward/optimizer kernels, generic GPU portability, RCL-10M and K400 promotion remain closed. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
+## GPU-native BF16 backward + AdamW candidate
+
+Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_CANDIDATE_HOSTED_REPLAY_PENDING`. The generic RCL Tensor SSA path now reaches three explicit AMD OpenCL lowerings: left and right matmul gradients plus elementwise FP32 AdamW. The current AMD `gfx1152` host executed all three classes of GPU primitive; the Rust organ retains RCL ownership of reverse rules, BF16 RNE, FP32 master/state bits and checkpoint identity, and forbids CPU fallback. The minimal graph matched CPU loss, parameters, optimizer state and checkpoint root exactly, with exact direct replay/resume and fail-closed placement/provider/backend negatives.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Real AMD OpenCL reverse matmul gradients | PASS |
+| Real AMD OpenCL FP32 AdamW | PASS |
+| GPU forward/reverse/optimizer telemetry | PASS, `1 / 2 / 4` bounded nodes/elements |
+| CPU exact differential and checkpoint parity | PASS |
+| Fail-closed negatives | PASS |
+| Local candidate suite | `3/3 PASS` |
+| Existing GPU/CPU regressions | `15/15 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| Hosted replay | PENDING, PR #92 |
+
+Authority files:
+
+- `docs/native-ai/gpu-native-backward-adamw-evidence-v0.1.md`
+- `examples/native-ai/gpu-native-backward-adamw-genome.rcl`
+- `examples/native-ai/gpu-native-backward-adamw-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-native-backward-adamw-v0.1/k08-gpu-native-backward-adamw-local-evidence.json`
+
+Reproduction: `npm run test:k08-gpu-native-backward-adamw`. Claims are limited to bounded AMD OpenCL matmul-gradient and FP32 AdamW lowering. `GPU_TRAINING`, full-graph GPU, GPU-native GQA/RoPE training, generic GPU portability, RCL-10M and K400 promotion remain closed. `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` is partially reduced; `RCL_GAP_RCL10M_TOKENIZER_DATASET` remains open and blocked on user-owned corpus bytes.
+
 ## RCL-10M corpus admission gate
 
 Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.

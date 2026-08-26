@@ -1,0 +1,20 @@
+# RCL-owned candidate contract for generic GPU reverse matmul gradients and
+# FP32 AdamW updates. The provider owns lowering only; RCL owns the semantics.
+reality GpuNativeBackwardAdamwCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+
+  facet contract.id : Text = "rcl-k08-s-gpu-native-backward-adamw-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.backend : Text = "opencl-amd-gpu-training"
+  facet contract.gpu_primitives : Text = "matmul-gradient-left,matmul-gradient-right,adamw-update"
+  facet contract.host_reference_placement : Text = "explicit-per-node"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_GRADIENT_FP32_ADAMW"
+  facet contract.fallback_policy : Text = "FAIL_CLOSED_NO_CPU_FALLBACK"
+  facet contract.model_special_opcodes : Truth = false
+  facet evaluation.gpu_gradient_primitives : Truth = positive(2)
+  facet evaluation.gpu_optimizer_primitive : Truth = true
+  facet evaluation.cpu_differential_required : Truth = true
+  facet evaluation.gpu_training_claim_closed : Truth = true
+  facet evaluation.rcl10m_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_BOUNDED_GPU_REVERSE_ADAMW_LOWERING"
+}

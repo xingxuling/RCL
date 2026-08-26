@@ -88,6 +88,8 @@ pub struct AutodiffTelemetry {
     pub gpu_matmul_nodes: usize,
     pub host_cpu_nodes: usize,
     pub gpu_execution_roots: Vec<String>,
+    pub gpu_backward_matmul_nodes: usize,
+    pub gpu_backward_execution_roots: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -143,6 +145,7 @@ struct Gradient {
 enum ExecutionMode {
     CpuReference,
     OpenClAmdHybrid { provider_path: PathBuf },
+    OpenClAmdGpuTraining { provider_path: PathBuf },
 }
 
 impl ExecutionMode {
@@ -150,6 +153,7 @@ impl ExecutionMode {
         match self {
             Self::CpuReference => "cpu",
             Self::OpenClAmdHybrid { .. } => "opencl-amd",
+            Self::OpenClAmdGpuTraining { .. } => "opencl-amd",
         }
     }
 
@@ -159,7 +163,22 @@ impl ExecutionMode {
             Self::OpenClAmdHybrid { .. } => {
                 "rcl-tensor-bf16-autodiff-adamw-opencl-amd-hybrid-v0.1".into()
             }
+            Self::OpenClAmdGpuTraining { .. } => {
+                "rcl-tensor-bf16-autodiff-adamw-opencl-amd-gpu-training-v0.1".into()
+            }
         }
+    }
+
+    fn provider_path(&self) -> Option<&PathBuf> {
+        match self {
+            Self::CpuReference => None,
+            Self::OpenClAmdHybrid { provider_path }
+            | Self::OpenClAmdGpuTraining { provider_path } => Some(provider_path),
+        }
+    }
+
+    fn gpu_backward(&self) -> bool {
+        matches!(self, Self::OpenClAmdGpuTraining { .. })
     }
 }
 
@@ -178,7 +197,7 @@ fn execution_mode(graph: &ComputationGraph) -> Result<ExecutionMode, EngineError
         .unwrap_or("cpu-reference");
     match backend {
         "cpu-reference" => Ok(ExecutionMode::CpuReference),
-        "opencl-amd-hybrid" => {
+        "opencl-amd-hybrid" | "opencl-amd-gpu-training" => {
             if graph
                 .bindings
                 .get("placementPolicy")
@@ -202,7 +221,11 @@ fn execution_mode(graph: &ComputationGraph) -> Result<ExecutionMode, EngineError
                         "opencl-amd-hybrid requires an explicit providerPath",
                     )
                 })?;
-            Ok(ExecutionMode::OpenClAmdHybrid { provider_path })
+            if backend == "opencl-amd-gpu-training" {
+                Ok(ExecutionMode::OpenClAmdGpuTraining { provider_path })
+            } else {
+                Ok(ExecutionMode::OpenClAmdHybrid { provider_path })
+            }
         }
         other => Err(EngineError::new(
             "RCL_ACCELERATOR_BACKEND_UNAVAILABLE",
@@ -215,7 +238,10 @@ fn validate_hybrid_placements(
     graph: &ComputationGraph,
     mode: &ExecutionMode,
 ) -> Result<(), EngineError> {
-    if !matches!(mode, ExecutionMode::OpenClAmdHybrid { .. }) {
+    if !matches!(
+        mode,
+        ExecutionMode::OpenClAmdHybrid { .. } | ExecutionMode::OpenClAmdGpuTraining { .. }
+    ) {
         return Ok(());
     }
     for node in &graph.nodes {
@@ -258,6 +284,10 @@ fn provider_error_code(value: &Value) -> &'static str {
         Some("RCL_OPENCL_AMD_DEVICE_REQUIRED") => "RCL_OPENCL_AMD_DEVICE_REQUIRED",
         Some("RCL_OPENCL_BF16_BITS") => "RCL_OPENCL_BF16_BITS",
         Some("RCL_OPENCL_BF16_NONFINITE") => "RCL_OPENCL_BF16_NONFINITE",
+        Some("RCL_OPENCL_F32_BITS") => "RCL_OPENCL_F32_BITS",
+        Some("RCL_OPENCL_F32_NONFINITE") => "RCL_OPENCL_F32_NONFINITE",
+        Some("RCL_OPENCL_OPERATION") => "RCL_OPENCL_OPERATION",
+        Some("RCL_OPENCL_ADAMW_CONFIG") => "RCL_OPENCL_ADAMW_CONFIG",
         Some("RCL_OPENCL_SHAPE") => "RCL_OPENCL_SHAPE",
         Some("RCL_OPENCL_KERNEL_BUILD") => "RCL_OPENCL_KERNEL_BUILD",
         _ => "RCL_ACCELERATOR_EXECUTION_FAILED",
@@ -483,6 +513,233 @@ fn execute_opencl_matmul(
     ))
 }
 
+fn execute_opencl_json(provider_path: &PathBuf, payload: &Value) -> Result<Value, EngineError> {
+    if !provider_path.is_file() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
+        ));
+    }
+    let python = std::env::var("RCL_PYTHON").unwrap_or_else(|_| {
+        if cfg!(windows) {
+            "python".into()
+        } else {
+            "python3".into()
+        }
+    });
+    let mut child = Command::new(python)
+        .arg(provider_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("could not start OpenCL provider: {error}"),
+            )
+        })?;
+    let encoded = serde_json::to_vec(payload).map_err(|error| {
+        EngineError::new(
+            "RCL_ACCELERATOR_REQUEST_JSON",
+            format!("could not encode OpenCL provider request: {error}"),
+        )
+    })?;
+    let mut stdin = child.stdin.take().ok_or_else(|| {
+        EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            "OpenCL provider stdin was unavailable",
+        )
+    })?;
+    stdin.write_all(&encoded).map_err(|error| {
+        EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!("could not send OpenCL provider request: {error}"),
+        )
+    })?;
+    drop(stdin);
+    let output = child.wait_with_output().map_err(|error| {
+        EngineError::new(
+            "RCL_ACCELERATOR_EXECUTION_FAILED",
+            format!("OpenCL provider process failed: {error}"),
+        )
+    })?;
+    if !output.status.success() {
+        let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(
+            |_| json!({"message": String::from_utf8_lossy(&output.stderr).to_string()}),
+        );
+        return Err(EngineError::new(
+            provider_error_code(&error_value),
+            error_value
+                .get("message")
+                .and_then(Value::as_str)
+                .unwrap_or("OpenCL provider failed")
+                .to_owned(),
+        ));
+    }
+    serde_json::from_slice(&output.stdout).map_err(|error| {
+        EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_JSON",
+            format!("OpenCL provider returned invalid JSON: {error}"),
+        )
+    })
+}
+
+fn opencl_f32_bits(value: f64, label: &str) -> Result<String, EngineError> {
+    let narrowed = value as f32;
+    if !narrowed.is_finite() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_INPUT_INVALID",
+            format!("{label} contains a non-finite FP32 value"),
+        ));
+    }
+    Ok(format!("{:08x}", narrowed.to_bits()))
+}
+
+fn decode_opencl_f32_output(
+    response: &Value,
+    expected: usize,
+    label: &str,
+) -> Result<Vec<f64>, EngineError> {
+    let output_bits = response
+        .get("outputBits")
+        .and_then(Value::as_array)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                format!("OpenCL provider omitted {label} outputBits"),
+            )
+        })?;
+    if output_bits.len() != expected {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider returned the wrong {label} output length"),
+        ));
+    }
+    output_bits
+        .iter()
+        .map(|value| {
+            let bits = value.as_str().ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_RESPONSE_INVALID",
+                    format!("OpenCL {label} outputBits must contain strings"),
+                )
+            })?;
+            if bits.len() != 8 || bits.to_ascii_lowercase() != bits {
+                return Err(EngineError::new(
+                    "RCL_ACCELERATOR_RESPONSE_INVALID",
+                    format!("OpenCL {label} outputBits must contain eight lowercase hex digits"),
+                ));
+            }
+            let parsed = u32::from_str_radix(bits, 16).map_err(|_| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_RESPONSE_INVALID",
+                    format!("OpenCL {label} outputBits contains invalid hexadecimal digits"),
+                )
+            })?;
+            let value = f32::from_bits(parsed);
+            if !value.is_finite() {
+                return Err(EngineError::new(
+                    "RCL_ACCELERATOR_RESPONSE_INVALID",
+                    format!("OpenCL {label} outputBits contains a non-finite value"),
+                ));
+            }
+            Ok(value as f64)
+        })
+        .collect()
+}
+
+fn opencl_execution_root(response: &Value, label: &str) -> Result<String, EngineError> {
+    response
+        .get("executionRoot")
+        .and_then(Value::as_str)
+        .filter(|root| root.len() == 64 && root.chars().all(|value| value.is_ascii_hexdigit()))
+        .map(str::to_owned)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                format!("OpenCL provider omitted an execution root for {label}"),
+            )
+        })
+}
+
+fn execute_opencl_matmul_gradient(
+    node_id: &str,
+    provider_path: &PathBuf,
+    left: &BoundTensor<'_>,
+    right: &BoundTensor<'_>,
+    upstream: &Gradient,
+    input_index: usize,
+) -> Result<(Gradient, String), EngineError> {
+    if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_MATMUL_RANK",
+            format!("GPU gradient node {node_id} requires rank-2 tensors"),
+        ));
+    }
+    let left_rows = left.descriptor.shape[0];
+    let left_columns = left.descriptor.shape[1];
+    let right_rows = right.descriptor.shape[0];
+    let right_columns = right.descriptor.shape[1];
+    if left_columns != right_rows || upstream.shape != vec![left_rows, right_columns] {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_MATMUL_SHAPE",
+            format!("GPU gradient node {node_id} has incompatible matmul shapes"),
+        ));
+    }
+    let operation = match input_index {
+        0 => "left-gradient",
+        1 => "right-gradient",
+        _ => {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_MATMUL_SHAPE",
+                "GPU matmul gradient input index must be zero or one",
+            ));
+        }
+    };
+    let (rows, columns) = if input_index == 0 {
+        (left_rows, left_columns)
+    } else {
+        (right_rows, right_columns)
+    };
+    let payload = json!({
+        "format": "rcl.opencl-bf16-matmul-gradient-request.v0.1",
+        "backend": "opencl-amd",
+        "operation": operation,
+        "leftRows": left_rows,
+        "leftColumns": left_columns,
+        "rightRows": right_rows,
+        "rightColumns": right_columns,
+        "leftBits": opencl_bits(left, "left")?,
+        "rightBits": opencl_bits(right, "right")?,
+        "upstreamF32Bits": upstream
+            .data
+            .iter()
+            .map(|value| opencl_f32_bits(*value, "upstream gradient"))
+            .collect::<Result<Vec<_>, _>>()?,
+        "nodeId": node_id,
+    });
+    let response = execute_opencl_json(provider_path, &payload)?;
+    if response.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-bf16-matmul-gradient-result.v0.1")
+        || response.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_GRADIENT_REFERENCE_CANDIDATE")
+        || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+        || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider did not return an admitted GPU gradient for node {node_id}"),
+        ));
+    }
+    let root = opencl_execution_root(&response, node_id)?;
+    let data = decode_opencl_f32_output(&response, rows * columns, "gradient")?;
+    Ok((gradient(&[rows, columns], data)?, root))
+}
+
 fn validate_graph(
     graph: &ComputationGraph,
     allow_bf16: bool,
@@ -555,7 +812,11 @@ fn forward_tape(
     ),
     EngineError,
 > {
-    if matches!(mode, ExecutionMode::OpenClAmdHybrid { .. }) && !bf16 {
+    if matches!(
+        mode,
+        ExecutionMode::OpenClAmdHybrid { .. } | ExecutionMode::OpenClAmdGpuTraining { .. }
+    ) && !bf16
+    {
         return Err(EngineError::new(
             "RCL_ACCELERATOR_PRECISION_UNSUPPORTED",
             "opencl-amd-hybrid requires the canonical BF16 precision policy",
@@ -590,7 +851,8 @@ fn forward_tape(
                     ExecutionMode::CpuReference => {
                         execute_bound_bf16(&node.operation, &node.attributes, &inputs)?
                     }
-                    ExecutionMode::OpenClAmdHybrid { provider_path } => {
+                    ExecutionMode::OpenClAmdHybrid { provider_path }
+                    | ExecutionMode::OpenClAmdGpuTraining { provider_path } => {
                         if node.attributes.get("placement").and_then(Value::as_str) == Some("gpu") {
                             let (result, root) =
                                 execute_opencl_matmul(&node.id, provider_path, &inputs)?;
@@ -769,6 +1031,12 @@ fn transpose_2d(value: &Gradient) -> Result<Gradient, EngineError> {
     gradient(&[columns, rows], data)
 }
 
+#[derive(Default)]
+struct BackwardExecutionTelemetry {
+    gpu_matmul_nodes: usize,
+    gpu_execution_roots: Vec<String>,
+}
+
 fn reduction_gradient(
     output_gradient: &Gradient,
     input_shape: &[usize],
@@ -815,6 +1083,8 @@ fn node_input_gradients(
     node: &Operation,
     output_gradient: &Gradient,
     tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
+    mode: &ExecutionMode,
+    execution: &mut BackwardExecutionTelemetry,
 ) -> Result<Vec<Gradient>, EngineError> {
     let inputs = node
         .inputs
@@ -923,10 +1193,70 @@ fn node_input_gradients(
             output_gradient,
             &attribute_permutation(&node.attributes)?,
         )?]),
-        "matmul" | "matmul-reference" => Ok(vec![
-            matmul_gradient(output_gradient, &transpose_2d(&inputs[1])?)?,
-            matmul_gradient(&transpose_2d(&inputs[0])?, output_gradient)?,
-        ]),
+        "matmul" | "matmul-reference" => {
+            if mode.gpu_backward()
+                && node.operation == "matmul"
+                && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
+            {
+                let provider_path = mode.provider_path().ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_ACCELERATOR_PROVIDER_REQUIRED",
+                        "GPU backward requires an explicit provider path",
+                    )
+                })?;
+                let left_descriptor = tape.get(&node.inputs[0]).ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_AUTODIFF_INPUT_MISSING",
+                        format!(
+                            "Backward node {} is missing input {}",
+                            node.id, node.inputs[0]
+                        ),
+                    )
+                })?;
+                let right_descriptor = tape.get(&node.inputs[1]).ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_AUTODIFF_INPUT_MISSING",
+                        format!(
+                            "Backward node {} is missing input {}",
+                            node.id, node.inputs[1]
+                        ),
+                    )
+                })?;
+                let left = BoundTensor {
+                    descriptor: &left_descriptor.0,
+                    data: left_descriptor.1.data.as_slice(),
+                };
+                let right = BoundTensor {
+                    descriptor: &right_descriptor.0,
+                    data: right_descriptor.1.data.as_slice(),
+                };
+                let (left_gradient, left_root) = execute_opencl_matmul_gradient(
+                    &node.id,
+                    provider_path,
+                    &left,
+                    &right,
+                    output_gradient,
+                    0,
+                )?;
+                let (right_gradient, right_root) = execute_opencl_matmul_gradient(
+                    &node.id,
+                    provider_path,
+                    &left,
+                    &right,
+                    output_gradient,
+                    1,
+                )?;
+                execution.gpu_matmul_nodes += 2;
+                execution.gpu_execution_roots.push(left_root);
+                execution.gpu_execution_roots.push(right_root);
+                Ok(vec![left_gradient, right_gradient])
+            } else {
+                Ok(vec![
+                    matmul_gradient(output_gradient, &transpose_2d(&inputs[1])?)?,
+                    matmul_gradient(&transpose_2d(&inputs[0])?, output_gradient)?,
+                ])
+            }
+        }
         "sum" | "mean" => {
             let axis = attribute_usize(&node.attributes, "axis")?;
             let scale = if node.operation == "mean" {
@@ -1157,6 +1487,7 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
         gradient(&loss_value.0.shape, vec![1.0])?,
     );
     let mut edges = Vec::new();
+    let mut backward_execution = BackwardExecutionTelemetry::default();
     let mut accumulator = GradientAccumulator {
         tensor_count: 1,
         accumulation_count: 0,
@@ -1170,7 +1501,13 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
         if stop.contains(node.output.id.as_str()) || node.operation == "stop-gradient" {
             continue;
         }
-        let input_gradients = node_input_gradients(node, &output_gradient, &tape)?;
+        let input_gradients = node_input_gradients(
+            node,
+            &output_gradient,
+            &tape,
+            &mode,
+            &mut backward_execution,
+        )?;
         for (input_index, incoming) in input_gradients.into_iter().enumerate() {
             let input = &node.inputs[input_index];
             if stop.contains(input.as_str()) {
@@ -1265,6 +1602,8 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
             gpu_matmul_nodes: forward_execution.gpu_matmul_nodes,
             host_cpu_nodes: forward_execution.host_cpu_nodes,
             gpu_execution_roots: forward_execution.gpu_execution_roots,
+            gpu_backward_matmul_nodes: backward_execution.gpu_matmul_nodes,
+            gpu_backward_execution_roots: backward_execution.gpu_execution_roots,
         },
     })
 }
