@@ -132,7 +132,24 @@ Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-
 
 ### GPU backend reality audit
 
-The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002:0x1114`) with Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device exposing `cl_khr_fp16`. `nvidia-smi` and `rocminfo` are absent. The RCL Tensor organs remain CPU-only and fail closed for GPU device intent, so this is `REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED`, not GPU execution evidence. The next bounded backend candidate is an AMD OpenCL generic BF16 organ with CPU differential parity; no GPU, OpenCL BF16 training, RCL-10M or K400 claim is granted. Authority: `docs/native-ai/gpu-backend-reality-audit-v0.1.md` and `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`.
+The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002:0x1114`) with Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device exposing `cl_khr_fp16`. `nvidia-smi` and `rocminfo` are absent. The RCL Tensor organs remain CPU-only and fail closed for GPU device intent; the bounded AMD OpenCL provider below is a separate auxiliary lowerer and does not alter that ownership boundary. Authority: `docs/native-ai/gpu-backend-reality-audit-v0.1.md` and `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`.
+
+### K08 AMD OpenCL BF16 matmul candidate
+
+Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. The RCL-owned BF16 contract and genome lower a bounded generic matmul through `native/tensor-engine/amd_opencl_bf16_provider.py`. On the current Windows host, the provider selected the real AMD `gfx1152` OpenCL 2.0 device and executed the kernel with `gpuExecuted=true`; the response is explicitly `gpuClaim=false`. Independent CPU BF16 bit differential, deterministic replay, malformed/non-finite input rejection, shape rejection and unsupported-backend fail-closed behavior pass in `3/3` local Node tests. This candidate grants only AMD OpenCL BF16 matmul reference execution and bit-exact differential evidence. Hosted runners may prove replay or explicit unavailable-backend behavior but do not inherit the local device receipt.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Real AMD OpenCL device receipt | PASS, `gfx1152`, driver `3661.0 (PAL,LC)` |
+| 2×3 by 3×2 OpenCL kernel | PASS, output bits `4100,bfc0,4188,0000` |
+| Independent CPU bit differential | exact PASS |
+| Deterministic replay | exact PASS |
+| Fail-closed negatives | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu + Windows replay | PENDING |
+
+Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_OPENCL_HOSTED_REPLAY`, `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
 ### K08-S BF16 multi-block candidate
 

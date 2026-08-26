@@ -1,0 +1,97 @@
+{
+  "format": "rcl.k08.amd-opencl-bf16-matmul-local-evidence.v0.1",
+  "status": "PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "branch": "codex/k08-amd-opencl-bf16-v01",
+  "baseMain": "4c7b3f9c1c90da710903487df8d1e766a8b0afc1",
+  "sourceCommit": "842811b250d272119491effc2bd3ac1997025aec",
+  "evidenceCommand": "npm run test:k08-amd-opencl-bf16",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 3,
+    "nodeEvidencePassed": 3,
+    "pythonSyntax": true,
+    "realOpenClExecution": true,
+    "gpuExecuted": true,
+    "gpuClaim": false,
+    "cpuFallback": false
+  },
+  "provider": {
+    "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "role": "auxiliary OpenCL lowerer",
+    "semanticOwner": "RCL",
+    "loader": "OpenCL.dll",
+    "kernel": "rcl_bf16_matmul",
+    "inputBits": "exact lowercase BF16 hexadecimal",
+    "accumulation": "f32",
+    "outputBits": "BF16 round-to-nearest-ties-to-even"
+  },
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensionsObserved": [
+      "cl_khr_fp16",
+      "cl_khr_fp64",
+      "cl_khr_subgroups",
+      "cl_amd_device_attribute_query"
+    ]
+  },
+  "request": {
+    "format": "rcl.opencl-bf16-matmul-request.v0.1",
+    "backend": "opencl-amd",
+    "rows": 2,
+    "columns": 2,
+    "shared": 3,
+    "leftBits": ["3f80", "4000", "4040", "4080", "40a0", "40c0"],
+    "rightBits": ["3f80", "3f00", "bf80", "4000", "4040", "c000"]
+  },
+  "differential": {
+    "independentCpuExpectedBits": ["4100", "bfc0", "4188", "0000"],
+    "observedGpuBits": ["4100", "bfc0", "4188", "0000"],
+    "observedGpuData": [8.0, -1.5, 17.0, 0.0],
+    "bitExact": true,
+    "deterministicReplay": true,
+    "executionRoot": "f30fadc20ee9cc42a2b3ddbf2709da11b44fca04ebc969536a76444d87d45db1"
+  },
+  "checks": {
+    "rclOwnedGenomeAndContract": true,
+    "openClKernelExecution": true,
+    "realAmdDeviceReceipt": true,
+    "independentCpuBitDifferential": true,
+    "deterministicReplay": true,
+    "unsupportedBackendFailClosed": true,
+    "nonFiniteBf16FailClosed": true,
+    "malformedBitsFailClosed": true,
+    "shapeFailClosed": true,
+    "noCpuFallback": true,
+    "noModelSpecialOperation": true
+  },
+  "claimsGranted": [
+    "AMD_OPENCL_BF16_MATMUL_REFERENCE_EXECUTION",
+    "BF16_MATMUL_BIT_EXACT_DIFFERENTIAL"
+  ],
+  "claimsNotGranted": [
+    "GENERIC_GPU_BACKEND",
+    "OPENCL_BF16_AUTODIFF",
+    "OPENCL_BF16_ADAMW",
+    "GPU_TRAINING",
+    "BF16_GQA_ROPE_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "hostedReplay": {
+    "status": "PENDING",
+    "boundary": "hosted runners may only prove test replay or explicit unavailable-backend fail-closed behavior; they do not inherit this local AMD device receipt"
+  },
+  "gapRegister": [
+    "RCL_GAP_OPENCL_HOSTED_REPLAY",
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION"
+  ],
+  "reportRoot": "d78dc9426ec03b3fc546ff1d68d4453d43c9993555534181b1fe536e77607076"
+}

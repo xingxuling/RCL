@@ -1,0 +1,56 @@
+{
+  "format": "rcl.k08.amd-opencl-bf16-matmul-contract.v0.1",
+  "status": "PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "profile": "AMD_OPENCL_BF16_MATMUL_REFERENCE",
+  "lowering": {
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerLanguage": "Python ctypes",
+    "providerRole": "auxiliary execution lowerer only",
+    "semanticOwner": "RCL",
+    "fallback": "forbidden"
+  },
+  "precisionPolicy": {
+    "inputDtype": "bf16",
+    "accumulationDtype": "f32",
+    "outputDtype": "bf16",
+    "bf16Rounding": "round-to-nearest-ties-to-even",
+    "inputEncoding": "exact four lowercase hexadecimal BF16 bit strings",
+    "nonFinite": "rejected"
+  },
+  "shapePolicy": {
+    "operation": "generic matrix multiplication",
+    "rows": "1..64",
+    "columns": "1..64",
+    "shared": "1..64",
+    "modelSpecialOpcodes": false
+  },
+  "requiredEvidence": [
+    "real-amd-opencl-device-receipt",
+    "opencl-kernel-execution",
+    "independent-cpu-bf16-bit-differential",
+    "deterministic-replay",
+    "unsupported-backend-fails-closed",
+    "malformed-and-nonfinite-input-fails-closed",
+    "hosted-replay-or-explicit-unavailable-boundary"
+  ],
+  "claimsGrantedOnAdmission": [
+    "AMD_OPENCL_BF16_MATMUL_REFERENCE_EXECUTION",
+    "BF16_MATMUL_BIT_EXACT_DIFFERENTIAL"
+  ],
+  "claimsNotGranted": [
+    "GENERIC_GPU_BACKEND",
+    "OPENCL_BF16_AUTODIFF",
+    "OPENCL_BF16_ADAMW",
+    "GPU_TRAINING",
+    "BF16_GQA_ROPE_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_OPENCL_HOSTED_REPLAY",
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION"
+  ]
+}
