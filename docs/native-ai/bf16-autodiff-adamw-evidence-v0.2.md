@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`
+`BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 This is a bounded, generic Tensor SSA candidate. RCL owns the precision, cast, reverse-gradient, optimizer-state, parameter-order and checkpoint semantics. Rust is the CPU reference execution organ. The candidate is not a GPU, multi-block BF16 or RCL-10M admission.
 
@@ -46,7 +46,7 @@ The JSON `f64` array is only a transport container for the existing Tensor ABI. 
 | Exact checkpoint resume and root parity | PASS |
 | Malformed/non-finite/state-order negatives | PASS |
 | Unsupported accelerator fallback | PASS, fail closed |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32987036258`, head `73336cb7b76dbecd95aabe7f840374067c22c15a`, evidence root `fc3235622a6d0da8259d2b73fad5eb14dadc58c6fbb54cb9716335b58480db2e` |
 | Real GPU execution | NOT AVAILABLE / CLOSED |
 
 Reproduction:
@@ -71,7 +71,7 @@ The first local evidence attempt reported `7/9` because the test expected gradie
 | ROBUST | PASS_LOCAL | exact bits, order, shape, nonfinite and backend negatives |
 | PERFORMANCE | CANDIDATE | correctness runtime only; no accepted throughput/RSS benchmark |
 | AI_GENERATE | NOT_APPLICABLE | no new K400 AI-generation claim |
-| EVIDENCE | CANDIDATE_LOCAL | rooted source/contract/test evidence; hosted replay pending |
+| EVIDENCE | CANDIDATE_GITHUB_REPLAY_BOUND | rooted source/contract/test evidence plus Ubuntu/Windows hosted replay |
 
 No K400 cell is promoted by this candidate.
 
@@ -80,7 +80,7 @@ No K400 cell is promoted by this candidate.
 | Gap | Current ruling | Next evidence gate |
 |---|---|---|
 | `RCL_GAP_GPU_EXECUTION` | BLOCKED / no real accelerator runner accepted | identify a real CUDA/ROCm/Vulkan/Metal device and differential-run it; CPU cannot satisfy GPU |
-| `RCL_GAP_K08_S_HOSTED_REPLAY` | OPEN | push exact branch and bind Ubuntu + Windows workflow receipts to the final source SHA |
+| `RCL_GAP_K08_S_HOSTED_REPLAY` | CLOSED_FOR_THIS_CANDIDATE | run `32987036258` passed Ubuntu job `98235663711` and Windows job `98235663539` on exact head `73336cb7b76dbecd95aabe7f840374067c22c15a` |
 | `RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION` | OPEN | integrate K08-N/O/P/R graph with this precision policy after K08-S hosted admission |
 | `RCL_GAP_RCL10M_TOKENIZER_DATASET` | OPEN | freeze real Byte/BPE artifact and provenance-bearing dataset before any RCL-10M claim |
 

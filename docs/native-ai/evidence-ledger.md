@@ -223,7 +223,7 @@ Hosted replay is now bound by `examples/native-ai/evidence/native-autodiff-v0.1/
 
 ## K08-S BF16 Autodiff + AdamW reference candidate
 
-Status: `BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This candidate is based on latest `origin/main@30c162c6cd13b2c9310202f2a604da23e5b4c552` and safely replays the historical K08-S source commit `1c9cb93bb687eb47fb39ea7dd392d8cd5d607b30` before replacing its matmul-only path with a generic RCL Tensor SSA + Reverse Autodiff precision lowering.
+Status: `BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. This candidate is based on latest `origin/main@30c162c6cd13b2c9310202f2a604da23e5b4c552` and safely replays the historical K08-S source commit `1c9cb93bb687eb47fb39ea7dd392d8cd5d607b30` before replacing its matmul-only path with a generic RCL Tensor SSA + Reverse Autodiff precision lowering.
 
 | Evidence | Result |
 |---|---:|
@@ -240,7 +240,7 @@ Status: `BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This candidate is 
 | Canonical optimizer-state order | fail-closed PASS |
 | Unsupported accelerator | fail-closed PASS; no CPU fallback |
 | Local Node suite / Rust unit suite | `9/9` / `7/7` |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32987036258`, head `73336cb7b76dbecd95aabe7f840374067c22c15a`, evidence root `fc3235622a6d0da8259d2b73fad5eb14dadc58c6fbb54cb9716335b58480db2e` |
 | Real GPU execution | CLOSED / no accepted runner |
 
 Authority files:
@@ -258,4 +258,4 @@ npm run test:k08-bf16-autodiff-adamw
 cargo test --release --locked --manifest-path native/tensor-engine/Cargo.toml
 ```
 
-This candidate grants bounded BF16 generic Autodiff, FP32 gradient/master/AdamW state, exact FP32 checkpoint continuation and no-silent-fallback semantics only. It grants no GPU, multi-block BF16, RCL-10M, RCL-1B, production tokenizer/dataset or K400 claim. Open gaps: `RCL_GAP_GPU_EXECUTION`, `RCL_GAP_K08_S_HOSTED_REPLAY`, `RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+This candidate grants bounded BF16 generic Autodiff, FP32 gradient/master/AdamW state, exact FP32 checkpoint continuation and no-silent-fallback semantics only. It grants no GPU, multi-block BF16, RCL-10M, RCL-1B, production tokenizer/dataset or K400 claim. Open gaps: `RCL_GAP_GPU_EXECUTION`, `RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`. Hosted replay gap `RCL_GAP_K08_S_HOSTED_REPLAY` is closed for this candidate by run `32987036258`, with Ubuntu job `98235663711` and Windows job `98235663539`.
