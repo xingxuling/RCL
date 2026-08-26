@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`
+`BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 This candidate composes two generic Tensor SSA blocks under the K08-S BF16 RNE / FP32 accumulation, Reverse Autodiff and AdamW organ. It establishes a bounded two-block BF16 training profile, not the full K08-R GQA+RoPE multi-block profile and not scale evidence.
 
@@ -28,7 +28,7 @@ This candidate composes two generic Tensor SSA blocks under the K08-S BF16 RNE /
 | Canonical optimizer-state order negative | fail-closed PASS |
 | Model-special operation negative | PASS |
 | Node evidence suite | `6/6 PASS` |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32988994250`, Ubuntu job `98241831755`, Windows job `98241831517`, exact head `fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5` |
 
 The first test attempt was `5/6`: the test asserted a non-existent genome field `evaluation.block_count_valid` while the RCL genome declares `evaluation.two_block_valid`. The assertion was corrected to the declared field and the unchanged six-test suite reran at `6/6`; no numerical tolerance or claim boundary changed.
 
@@ -44,13 +44,13 @@ The first test attempt was `5/6`: the test asserted a non-existent genome field 
 | ROBUST | PASS_LOCAL | canonical order and model-special negatives fail closed |
 | PERFORMANCE | CANDIDATE | no accepted throughput/RSS benchmark |
 | AI_GENERATE | NOT_APPLICABLE | no new AI-generation claim |
-| EVIDENCE | CANDIDATE_LOCAL | hosted replay pending |
+| EVIDENCE | CANDIDATE_GITHUB_REPLAY_BOUND | Ubuntu/Windows hosted replay passed |
 
 ## Gap register
 
 | Gap | Ruling | Next gate |
 |---|---|---|
-| `RCL_GAP_K08_S_MB_HOSTED_REPLAY` | OPEN | Ubuntu + Windows replay bound to exact source head |
+| `RCL_GAP_K08_S_MB_HOSTED_REPLAY` | CLOSED_FOR_THIS_CANDIDATE | run `32988994250` passed Ubuntu and Windows on exact head `fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5` |
 | `RCL_GAP_GPU_EXECUTION` | BLOCKED | implement and differentially verify a real AMD OpenCL/Vulkan organ |
 | `RCL_GAP_RCL10M_TOKENIZER_DATASET` | OPEN | freeze provenance-bearing tokenizer and dataset before scale |
 
