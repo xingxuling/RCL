@@ -259,3 +259,14 @@ cargo test --release --locked --manifest-path native/tensor-engine/Cargo.toml
 ```
 
 This candidate grants bounded BF16 generic Autodiff, FP32 gradient/master/AdamW state, exact FP32 checkpoint continuation and no-silent-fallback semantics only. It grants no GPU, multi-block BF16, RCL-10M, RCL-1B, production tokenizer/dataset or K400 claim. Open gaps: `RCL_GAP_GPU_EXECUTION`, `RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`. Hosted replay gap `RCL_GAP_K08_S_HOSTED_REPLAY` is closed for this candidate by run `32987036258`, with Ubuntu job `98235663711` and Windows job `98235663539`.
+
+## GPU backend reality audit
+
+Status: `REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED`. The current Windows host exposes a real AMD Radeon(TM) 860M (`0x1002:0x1114`) through Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device with `cl_khr_fp16`. The RCL Tensor organ is still CPU-only and rejects GPU device intent; hardware discovery is not GPU execution evidence.
+
+Authority files:
+
+- `docs/native-ai/gpu-backend-reality-audit-v0.1.md`
+- `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`
+
+The next bounded candidate is an AMD OpenCL generic BF16 reference organ with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16, RCL-10M or K400 promotion.

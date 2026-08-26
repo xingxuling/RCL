@@ -130,6 +130,10 @@ K08-S is `BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. From lat
 
 Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-ai/evidence-ledger.md`.
 
+### GPU backend reality audit
+
+The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002:0x1114`) with Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device exposing `cl_khr_fp16`. `nvidia-smi` and `rocminfo` are absent. The RCL Tensor organs remain CPU-only and fail closed for GPU device intent, so this is `REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED`, not GPU execution evidence. The next bounded backend candidate is an AMD OpenCL generic BF16 organ with CPU differential parity; no GPU, OpenCL BF16 training, RCL-10M or K400 claim is granted. Authority: `docs/native-ai/gpu-backend-reality-audit-v0.1.md` and `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`.
+
 ### Native UI Genome v0.1 candidate
 
 - `.rcl` reference-parser syntax, rooted Canonical Native UI IR, reactive state/binding/events, layout, style/cascade and lifecycle are implemented on an isolated candidate branch.

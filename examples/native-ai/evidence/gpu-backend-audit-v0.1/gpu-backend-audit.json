@@ -1,0 +1,47 @@
+{
+  "format": "rcl.gpu-backend-reality-audit.v0.1",
+  "status": "REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED",
+  "canonicalOwner": "RCL",
+  "evidenceClass": "DIAGNOSTIC_HOST_HARDWARE_ONLY",
+  "platform": "Windows current host",
+  "observedDevice": {
+    "name": "AMD Radeon(TM) 860M Graphics",
+    "vendorId": "0x1002",
+    "deviceId": "0x1114",
+    "deviceType": "integrated-gpu",
+    "windowsDriverVersion": "32.0.22024.3004",
+    "vulkan": {
+      "instanceVersion": "1.4.313",
+      "deviceApiVersion": "1.4.325",
+      "driverName": "AMD proprietary driver",
+      "driverInfo": "25.20.24.03 (LLPC)",
+      "status": "PASS_DEVICE_DISCOVERY"
+    },
+    "opencl": {
+      "platform": "AMD Accelerated Parallel Processing",
+      "deviceVersion": "OpenCL C 2.0",
+      "driverVersion": "3661.0 (PAL,LC)",
+      "extensionsObserved": ["cl_khr_fp16"],
+      "deviceCount": 1,
+      "status": "PASS_DEVICE_DISCOVERY"
+    }
+  },
+  "toolAvailability": {
+    "nvidiaSmi": false,
+    "rocminfo": false,
+    "vulkaninfo": true,
+    "clinfo": true
+  },
+  "rclBackendAudit": {
+    "cpuReferenceBackend": "rcl-tensor-cpu-rust-v0.1",
+    "bf16ReferenceBackend": "rcl-tensor-bf16-cpu-reference-v0.1",
+    "gpuBackendImplemented": false,
+    "gpuDeviceIntent": "FAIL_CLOSED",
+    "silentCpuFallback": false
+  },
+  "claimsGranted": ["REAL_HOST_GPU_DEVICE_DISCOVERY"],
+  "claimsNotGranted": ["GPU", "VULKAN_GPU", "OPENCL_BF16", "GPU_TRAINING", "RCL_10M", "K400_PROMOTION"],
+  "gapRegister": ["RCL_GAP_GPU_EXECUTION", "RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION"],
+  "nextCandidate": "AMD_OPENCL_GENERIC_BF16_REFERENCE_ORGAN",
+  "reportRoot": "9214abea5ccee95dab20419861d2852275e19f6ed3b0a608798227a5f3141db3"
+}
