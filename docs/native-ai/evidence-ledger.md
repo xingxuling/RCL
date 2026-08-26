@@ -273,7 +273,7 @@ The bounded AMD OpenCL generic BF16 reference organ is now implemented as an aux
 
 ## K08 AMD OpenCL BF16 matmul candidate
 
-Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. RCL owns the BF16 contract and genome; `native/tensor-engine/amd_opencl_bf16_provider.py` is an auxiliary lowerer only. The current Windows host selected the real AMD `gfx1152` OpenCL 2.0 device and executed the generic `rcl_bf16_matmul` kernel with `gpuExecuted=true` and `gpuClaim=false`. A fixed 2×3 by 3×2 request returned `4100,bfc0,4188,0000`, exactly matching the independent CPU BF16 bit oracle. Deterministic replay and fail-closed malformed, non-finite, shape and unsupported-backend negatives pass in `3/3` local tests.
+Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. RCL owns the BF16 contract and genome; `native/tensor-engine/amd_opencl_bf16_provider.py` is an auxiliary lowerer only. The current Windows host selected the real AMD `gfx1152` OpenCL 2.0 device and executed the generic `rcl_bf16_matmul` kernel with `gpuExecuted=true` and `gpuClaim=false`. A fixed 2×3 by 3×2 request returned `4100,bfc0,4188,0000`, exactly matching the independent CPU BF16 bit oracle. Deterministic replay and fail-closed malformed, non-finite, shape and unsupported-backend negatives pass in `3/3` local tests. Hosted run `32993386531` passed Ubuntu job `98256291089` and Windows job `98256291461` on exact head `a45622d5d3eeee61528d797c38b2f55b1abe78de`; Hosted does not inherit the local AMD device receipt.
 
 | Evidence | Result |
 |---|---:|
@@ -284,7 +284,7 @@ Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. RCL owns the
 | Deterministic replay | exact PASS |
 | Fail-closed negatives / no CPU fallback | PASS |
 | Local Node evidence | `3/3 PASS` |
-| Hosted Ubuntu + Windows replay | PENDING |
+| Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
 
 Authority files:
 
@@ -293,7 +293,7 @@ Authority files:
 - `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`
 - `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`
 
-Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Open gaps: `RCL_GAP_OPENCL_HOSTED_REPLAY`, `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Hosted replay gap `RCL_GAP_OPENCL_HOSTED_REPLAY` is closed for this candidate by run `32993386531`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
 ## K08-S BF16 multi-block reference candidate
 
