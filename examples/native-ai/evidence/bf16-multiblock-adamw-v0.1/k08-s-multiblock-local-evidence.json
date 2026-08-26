@@ -1,0 +1,71 @@
+{
+  "format": "rcl.k08-s.bf16-multiblock-adamw-local-evidence.v0.1",
+  "status": "PASS_LOCAL_AND_HOSTED_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "branch": "codex/k08-s-multiblock-bf16-v01",
+  "baseMain": "609fbc57baf7aa7b60eeb8974ba5843dfaec4e10",
+  "sourceCommit": "fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5",
+  "evidenceCommand": "npm run test:k08-bf16-multiblock",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 6,
+    "nodeEvidencePassed": 6,
+    "hostedReplay": true,
+    "gpuClaim": false
+  },
+  "profile": {
+    "blockCount": 2,
+    "parameterGroups": 4,
+    "graph": "generic Tensor SSA block 0 then block 1",
+    "dtype": "bf16",
+    "accumulationDtype": "f32",
+    "optimizer": "AdamW"
+  },
+  "checks": {
+    "genomeSelfHostByteParity": true,
+    "nativeSemanticRoot": true,
+    "independentInitialLoss": true,
+    "lossDecreases": true,
+    "allCanonicalParameterGroupsUpdate": true,
+    "fp32MasterAndExactState": true,
+    "deterministicReplay": true,
+    "exactCheckpointResume": true,
+    "canonicalStateOrderFailClosed": true,
+    "noModelSpecialOperation": true
+  },
+  "claimsGranted": [
+    "BF16_MULTI_BLOCK_TRAINING",
+    "BF16_MULTI_BLOCK_CHECKPOINT_RESUME",
+    "ALL_CANONICAL_PARAMETER_GROUPS_UPDATE"
+  ],
+  "claimsNotGranted": [
+    "BF16_GQA_ROPE_MULTI_BLOCK",
+    "GPU",
+    "OPENCL_BF16",
+    "VULKAN_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "hostedReplay": {
+    "runId": "32988994250",
+    "headSha": "fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5",
+    "ubuntu": {
+      "jobId": "98241831755",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32988994250/job/98241831755"
+    },
+    "windows": {
+      "jobId": "98241831517",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/32988994250/job/98241831517"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/32988994250"
+  },
+  "gapRegister": [
+    "RCL_GAP_GPU_EXECUTION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "reportRoot": "7fdfe2d6a55d905c77a7ec3cea98e7c38de592e3d7425356adcf6de33a33b7fe"
+}

@@ -1,0 +1,55 @@
+{
+  "format": "rcl.k08-r.bf16-gqa-rope-multiblock-contract.v0.1",
+  "status": "BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "profile": "TWO_BLOCK_K08_N_ROPE_K08_O_GQA_BF16_AUTODIFF_ADAMW_CPU_REFERENCE",
+  "composition": {
+    "blockCount": 2,
+    "parameterGroups": 14,
+    "attention": "K08-O GQA with 2 query heads and 1 shared KV head",
+    "position": "K08-N RoPE",
+    "optimizer": "K08-S BF16 Autodiff + FP32 AdamW",
+    "parameterOrder": "autodiff.parameters canonical order",
+    "checkpointAuthority": "exact FP32 master, first moment and second moment bits"
+  },
+  "precisionPolicy": {
+    "parameterComputeDtype": "bf16",
+    "activationComputeDtype": "bf16",
+    "accumulationDtype": "f32",
+    "gradientDtype": "f32",
+    "masterWeightDtype": "f32",
+    "optimizerStateDtype": "f32",
+    "bf16Rounding": "round-to-nearest-ties-to-even",
+    "bf16CastBackward": "straight-through-fp32",
+    "silentAcceleratorFallbackAllowed": false
+  },
+  "requiredEvidence": [
+    "rcl-genome-selfhost-byte-parity-and-native-root",
+    "two-block-gqa-rope-bf16-generic-graph",
+    "loss-decreases",
+    "all-fourteen-parameter-groups-update",
+    "exact-fp32-master-and-adamw-state",
+    "deterministic-replay",
+    "direct-n-equals-checkpoint-resume",
+    "canonical-state-order-fails-closed",
+    "no-model-special-operation"
+  ],
+  "claimsGrantedOnAdmission": [
+    "BF16_GQA_ROPE_MULTI_BLOCK_TRAINING",
+    "BF16_GQA_ROPE_CHECKPOINT_RESUME"
+  ],
+  "claimsNotGranted": [
+    "GPU",
+    "OPENCL_BF16",
+    "VULKAN_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "PRODUCTION_DATASET",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_GPU_EXECUTION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ]
+}
