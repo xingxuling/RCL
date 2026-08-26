@@ -54,6 +54,10 @@ The frozen AI contract then ran three new ephemeral read-only sessions against s
 
 The accepted aggregate receipt root is `d16ad0df7481c94c5084acac822e32930d8e39aa855c4d43dc8d79cf0a81c2dc`. An earlier 2/3 acquisition was rejected because the first generator repaired the label but also changed an unrelated training sample; native semantics happened to pass, but exact canonical bytes did not. The evaluator was tightened to single-line edit fragments without exposing the oracle edit, and the complete acquisition was rerun with three fresh sessions. This evidence remains local `CANDIDATE` until checked-in receipt replay and hosted authority are bound.
 
+The checked-in receipt verifier independently reconstructs every mutation, applies only the saved edit in a fresh temporary file, reruns native compilation/execution, validates all rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step identities. Local replay passes with verdict `PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`; `AI_GENERATE` remains `UNVERIFIED` for K400 admission because `github-replay.json` is absent.
+
+The K400 builder now records K333 runtime and AI receipts as candidate sources and creates `compiler-runtime::machine-learning` only when the hosted authority verifier returns `PASS`. Without that authority, the report remains `INCOMPLETE`, maturity `U3`, with `11 PASS / 389 UNTESTED`; report root `07bad70acb5365d734d37eaa328178ca8d6227d19db720c012dbf5ce726bb64e`.
+
 ## Federation, license and regression boundary
 
 Existing K08 Tensor/Autodiff/AdamW/GQA/RoPE candidates were audited as donors, but the frozen K333 profile needs none of their auxiliary Rust execution organs. It reuses general RCL sequences, recursion, arithmetic and native compiler/runtime semantics. No dependency or third-party code was added, so there is no new license surface. The profile grants no floating-point ML, Transformer, accelerator, arbitrary compiler learning, compiler decision authority, K233 inheritance, unrelated K400 cell or K400 completion claim.

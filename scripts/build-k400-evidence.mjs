@@ -15,6 +15,7 @@ import { verifyK03AiGenerationReceipt } from './verify-k03-ai-generation-receipt
 import { verifyK04ServerRuntimeEvidence } from './verify-k04-server-runtime-evidence.mjs';
 import { verifyK04ServerAiGenerationReceipt } from './verify-k04-server-ai-generation-receipt.mjs';
 import { verifyK327CompilerAiGenerationReceipt } from './verify-k327-compiler-ai-generation-receipt.mjs';
+import { verifyK333CompilerMachineLearningReceipt } from './verify-k333-compiler-machine-learning-receipt.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -43,6 +44,11 @@ const k04ServerAiGithubReplayPath = 'examples/universal-stress/evidence/k04-serv
 const k327CompilerAiContractPath = 'examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json';
 const k327CompilerAiReceiptPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json';
 const k327CompilerAiGithubReplayPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json';
+const k333RuntimeContractPath = 'examples/universal-stress/k333-compiler-machine-learning-runtime-contract.v0.1.json';
+const k333RuntimePath = 'examples/universal-stress/evidence/k333-compiler-machine-learning-runtime-v0.1.json';
+const k333AiContractPath = 'examples/universal-stress/k333-compiler-machine-learning-ai-generation-contract.v0.1.json';
+const k333AiReceiptPath = 'examples/universal-stress/evidence/k333-compiler-machine-learning-ai-generate/receipt.json';
+const k333AiGithubReplayPath = 'examples/universal-stress/evidence/k333-compiler-machine-learning-ai-generate/github-replay.json';
 const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
 const k08TensorMlpGithubReplayPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json';
 const k08TensorLivenessPath = 'examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json';
@@ -87,6 +93,8 @@ const k04ServerAi = await verifyK04ServerAiGenerationReceipt();
 const k04ServerAiAdmitted = k04ServerAi.aiGenerateAdmission === 'PASS';
 const k327CompilerAi = verifyK327CompilerAiGenerationReceipt();
 const k327CompilerAiAdmitted = k327CompilerAi.aiGenerateAdmission === 'PASS';
+const k333Ai = verifyK333CompilerMachineLearningReceipt();
+const k333AiAdmitted = k333Ai.aiGenerateAdmission === 'PASS';
 
 function k02AiGate(fallback) {
   if (!k02AiAdmitted) return fallback;
@@ -262,6 +270,37 @@ if (k327CompilerAiAdmitted) {
   ];
   claimsById.set(compilerClaim.id, compilerClaim);
 }
+if (k333AiAdmitted) {
+  const sharedEvidence = [k333RuntimeContractPath, k333RuntimePath, k333AiContractPath, k333AiReceiptPath, k333AiGithubReplayPath];
+  const gates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: STRESS_STATUS.PASS,
+    evidence: sharedEvidence,
+    note: gate === 'AI_GENERATE'
+      ? `Three independent label/update/authority repairs passed; GitHub run ${k333Ai.githubAuthority.runId} bound focused and Windows replay.`
+      : `Frozen 20-round native compiler advisory perceptron receipt ${k333Ai.runtimeEvidenceBinding.reportRoot}.`,
+  }]));
+  claimsById.set('compiler-runtime::machine-learning', {
+    id: 'compiler-runtime::machine-learning',
+    coverageMode: COVERAGE_MODE.NATIVE_SEMANTIC,
+    lastVerifiedSha: k333Ai.githubAuthority.sourceCommit,
+    lastVerifiedDate: k333Ai.githubAuthority.verifiedAt.slice(0, 10),
+    knownLimits: [
+      'The claim covers one bounded integer perceptron that recommends a compiler optimization profile from node-count and hotness features.',
+      'The learned result is advisory-only; deterministic compiler policy retains commit authority.',
+      'Floating-point state-root canonicalization, arbitrary ML, Transformer, accelerator execution and unrelated K400 cells remain unverified.',
+    ],
+    relatedKillerTasks: ['K08'],
+    requiredGenes: ['integer-perceptron-training', 'native-compiler-runtime', 'semantic-state-root', 'advisory-model-authority-boundary'],
+    gates,
+    changes: [{
+      id: 'compiler-machine-learning-advisor-profile',
+      kind: 'stress-evidence',
+      scope: ['compiler-runtime'],
+      generalPrimitive: true,
+      justification: 'RCL owns dataset, integer training, inference and advisory authority semantics while native rclc/rclvm execute the workload without an opaque provider.',
+    }],
+  });
+}
 for (const id of ['browser::gui', 'browser::reactive']) {
   const claim = structuredClone(claimsById.get(id));
   if (!claim) throw new Error(`RCL_K400_K02_AI_TARGET_MISSING:${id}`);
@@ -312,7 +351,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k333RuntimeContractPath, k333RuntimePath, k333AiContractPath, k333AiReceiptPath, ...(k333AiAdmitted ? [k333AiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
@@ -336,6 +375,9 @@ const evidence = {
     k327CompilerAiAdmitted
       ? `K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run ${k327CompilerAi.githubAuthority.runId}.`
       : 'K327 has a 3/3 local independent compiler builtin-lowering repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
+    k333AiAdmitted
+      ? `K333 closes compiler-runtime::machine-learning through 20/20 native integer-perceptron rounds, 3/3 independent repairs and GitHub run ${k333Ai.githubAuthority.runId}.`
+      : 'K333 has 20/20 rooted native integer-perceptron rounds and a 3/3 independently replayed local repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
     `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     `K08-E is candidate-only evidence: last-use reclamation measured a ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x logical plan-store reduction and ${k08TensorLiveness.controlledPerformance.speedup.toFixed(3)}x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.`,
     `K08-F is candidate-only local Windows evidence: ${k08TensorBorrowedInput.productionWorkload.inputBindingCount} Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured ${k08TensorBorrowedInput.controlledPerformance.speedup.toFixed(3)}x runtime speedup and ${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.`,
