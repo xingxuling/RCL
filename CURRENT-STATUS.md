@@ -132,7 +132,38 @@ Authority documents: `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md` and `docs/native-
 
 ### GPU backend reality audit
 
-The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002:0x1114`) with Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device exposing `cl_khr_fp16`. `nvidia-smi` and `rocminfo` are absent. The RCL Tensor organs remain CPU-only and fail closed for GPU device intent, so this is `REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED`, not GPU execution evidence. The next bounded backend candidate is an AMD OpenCL generic BF16 organ with CPU differential parity; no GPU, OpenCL BF16 training, RCL-10M or K400 claim is granted. Authority: `docs/native-ai/gpu-backend-reality-audit-v0.1.md` and `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`.
+The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002:0x1114`) with Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device exposing `cl_khr_fp16`. `nvidia-smi` and `rocminfo` are absent. The RCL Tensor organs remain CPU-only and fail closed for GPU device intent; the bounded AMD OpenCL provider below is a separate auxiliary lowerer and does not alter that ownership boundary. Authority: `docs/native-ai/gpu-backend-reality-audit-v0.1.md` and `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`.
+
+### K08 AMD OpenCL BF16 matmul candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. The RCL-owned BF16 contract and genome lower a bounded generic matmul through `native/tensor-engine/amd_opencl_bf16_provider.py`. On the current Windows host, the provider selected the real AMD `gfx1152` OpenCL 2.0 device and executed the kernel with `gpuExecuted=true`; the response is explicitly `gpuClaim=false`. Independent CPU BF16 bit differential, deterministic replay, malformed/non-finite input rejection, shape rejection and unsupported-backend fail-closed behavior pass in `3/3` local Node tests. Hosted run `32993386531` passed Ubuntu job `98256291089` and Windows job `98256291461` on exact head `a45622d5d3eeee61528d797c38b2f55b1abe78de`; Hosted does not inherit the local AMD device receipt. This candidate grants only AMD OpenCL BF16 matmul reference execution and bit-exact differential evidence.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Real AMD OpenCL device receipt | PASS, `gfx1152`, driver `3661.0 (PAL,LC)` |
+| 2×3 by 3×2 OpenCL kernel | PASS, output bits `4100,bfc0,4188,0000` |
+| Independent CPU bit differential | exact PASS |
+| Deterministic replay | exact PASS |
+| Fail-closed negatives | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
+
+Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+### RCL-10M corpus admission gate
+
+Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L byte tokenization and K08-M deterministic byte-BPE infrastructure are reusable, but the repository still contains no admitted Chinese/English/Japanese/code corpus, production approximately 64K tokenizer artifact, license/privacy/poison review, or deterministic real-data shard manifest. The new RCL-owned gate validates the frozen 10,000,000-token manifest shape, rooted tokenizer/filter/dedup/shard provenance, exact ppm mixture coverage and fail-closed admission/tamper boundaries. Its local `5/5` evidence uses only explicitly synthetic `development://` fixture values; Hosted run `32995055906` passed Ubuntu job `98261962473` and Windows job `98261962226` for the same schema gate. This grants no corpus, tokenizer, RCL-10M training or quality claim.
+
+Authority files: `docs/native-ai/rcl-10m-corpus-admission-evidence-v0.1.md`, `examples/native-ai/rcl-10m-corpus-admission-contract.v0.1.json`, `examples/native-ai/evidence/rcl-10m-corpus-admission-v0.1/k08-rcl10m-corpus-admission-local-evidence.json`. Open gaps: `RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW`, `RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS` and `RCL_GAP_RCL10M_TOKENIZER_FREEZE`.
+
+### K08-S BF16 multi-block candidate
+
+K08-S multi-block BF16 is `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. On the post-audit main `609fbc57baf7aa7b60eeb8974ba5843dfaec4e10`, a generic two-block Tensor SSA graph trains through the existing BF16 RNE / FP32 accumulation / Reverse Autodiff / exact FP32 AdamW organ. The four canonical groups (token embedding, block 0, block 1 and LM head) all update; independent initial loss, exact direct-versus-checkpoint resume and deterministic replay pass in `6/6` local tests. GitHub run `32988994250` passed Ubuntu job `98241831755` and Windows job `98241831517` on exact head `fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5`. This bounded profile does not claim K08-R's GQA+RoPE graph in BF16, GPU/OpenCL/Vulkan execution, RCL-10M, RCL-1B or K400. Authority: `docs/native-ai/bf16-multiblock-adamw-evidence-v0.1.md`, `examples/native-ai/bf16-multiblock-adamw-contract.v0.1.json` and `examples/native-ai/evidence/bf16-multiblock-adamw-v0.1/k08-s-multiblock-local-evidence.json`.
+
+### K08-R GQA + RoPE BF16 multi-block candidate
+
+K08-R BF16 GQA+RoPE multi-block is `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. On main `a095872beca5d61a3ffde99f31e7163dc54a4dbb`, the existing K08-N/K08-O/K08-R two-block generic graph now executes through K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW. All fourteen canonical parameter groups update; loss decrease, deterministic replay and exact direct `6 == checkpoint 3 + resume 3` pass in `6/6` local tests. GitHub run `32989948133` passed Ubuntu job `98244912540` and Windows job `98244912816` on exact head `3716f51`. No GPU/OpenCL/Vulkan, RCL-10M, RCL-1B or K400 claim is granted. Authority: `docs/native-ai/bf16-gqa-rope-multiblock-evidence-v0.1.md`, `examples/native-ai/bf16-gqa-rope-multiblock-contract.v0.1.json` and `examples/native-ai/evidence/bf16-gqa-rope-multiblock-v0.1/k08-r-bf16-local-evidence.json`.
 
 ### Native UI Genome v0.1 candidate
 

@@ -1,0 +1,16 @@
+# RCL-owned BF16 integration genome for the existing K08-R GQA + RoPE two-block graph.
+reality Bf16GqaRopeMultiBlockGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon valid_block_count(blocks : Number) -> Truth = positive(blocks) and blocks <= 64
+  reckon valid_head_groups(query : Number, keyValue : Number) -> Truth = positive(query) and positive(keyValue) and query >= keyValue and query % keyValue == 0
+
+  facet contract.id : Text = "rcl-k08-r-bf16-gqa-rope-multiblock-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.precision_policy : Text = "BF16_RNE_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_AND_ADAMW_STATE"
+  facet contract.composition : Text = "K08-N_ROPE_K08-O_GQA_K08-P_TWO_BLOCKS_K08-R_ADAMW"
+  facet contract.no_model_special_operation : Truth = true
+  facet evaluation.two_block_gqa_rope_valid : Truth = valid_block_count(2) and valid_head_groups(2, 1)
+  facet evaluation.gpu_claim_closed : Truth = true
+  facet evaluation.scale_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_GPU_OPENCL_BF16_RCL10M_RCL1B_OR_K400_PROMOTION"
+}
