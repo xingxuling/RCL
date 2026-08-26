@@ -31,6 +31,8 @@ The frozen AI contract then ran three separate ephemeral read-only repair sessio
 
 Candidate absorption: port the reference compiler's cause-subject warrant validation into the RCL-owned self-host compiler and add differential invalid-source regression coverage. Affected cells include K337 and K339.
 
+The concrete absorption site is `selfhost/compiler-core.rcl`: parsing already retains `program_subjects`, `program_warrants`, each rule's actor and `rule_needs`, but `validate_rules` currently checks only expressions, alters and preserves, and `validate_program` does not pass subjects/warrants into rule validation. The candidate genome therefore needs a general subject lookup plus scope-aware warrant matcher and recursive need validation. It must be developed under a separate compiler-evolution gate because rebuilding `selfhost/compiler.rbc` changes the fixed point and invalidates existing K01/K327 artifact hashes; this campaign does not silently rewrite those authorities.
+
 ## Nine-gate court
 
 | Gate | Local status | Evidence boundary |
