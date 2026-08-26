@@ -1,6 +1,6 @@
 # K340 Compiler Mixed-Paradigm Campaign v0.1
 
-**Status:** local runtime and independently replayed AI candidate; GitHub-hosted authority and K400 admission remain `UNVERIFIED`.
+**Status:** `PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_MIXED_AUTHORITY_BOUND`; K340 is admitted only for the frozen bounded profile.
 
 ## Reality Audit
 
@@ -14,7 +14,7 @@ K340 cannot be inferred by adding the separate K321 algorithm and K337/K338 gove
 
 The pre-contract design probe produced bootstrap/self-host byte parity and the expected final native state (`digest=204`, `phase=2`, `accepted=true`, `emitted=true`) with continuous transaction roots. It is feasibility evidence only and is not entered as a nine-gate receipt.
 
-The frozen formal contract requires 20 rounds, exact state/history/authority/witness checks, performance budgets, corrupt-RBC rejection and four semantic controls covering recursion, phase triggering, missing authority and inactive input. `AI_GENERATE`, hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
+The frozen formal contract requires 20 rounds, exact state/history/authority/witness checks, performance budgets, corrupt-RBC rejection and four semantic controls covering recursion, phase triggering, missing authority and inactive input.
 
 Formal acquisition passed 20/20 native rounds with one RBC artifact hash and one final semantic state root. All five controls passed: recursive-term corruption and broken authority were rejected, a wrong reactive phase committed only the first transaction, zero input committed nothing, and corrupt RBC was rejected. Windows-local p95 was `63.6461 ms` compile, `49.6164 ms` execute and `110.2470 ms` combined against frozen `5000/1000/6000 ms` budgets. Runtime receipt root: `6a41466ff811dc047d771fc6c84762ec52fe8be91dd1ffa1b1dff66ef1be049a`.
 
@@ -22,8 +22,10 @@ The missing-warrant control again exposes `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_
 
 The frozen AI contract acquired three successful independent ephemeral read-only repairs spanning recursive computation, phase triggering and declarative authority. All three restored exact canonical bytes and passed native replay in unique sessions `01a03ef6-f5a9-7d03-98be-b5cfe5558098`, `01a03efc-3666-7051-b285-1f61a08a9112` and `01a03f01-37c0-7da3-bd8c-2d5d3c52065b`. Aggregate receipt root: `3e0258d10b0040bbb73cc93d9df5251565c5e1ff0fbf75b77ea108dead9313cc`.
 
-The independent receipt verifier reconstructed every frozen mutation, applied only the saved schema edit in a fresh temporary file, reran native evaluation, checked the three unique generator sessions, rebound the 20-round runtime receipt and passed three receipt tests plus the three base tests. It fails closed on rooted runtime tampering. The result is `PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`: local admission is true, but `AI_GENERATE` remains `UNVERIFIED` until the exact focused Linux step and Windows native step succeed in the push workflow and their run identity is bound in `github-replay.json`.
+The independent receipt verifier reconstructed every frozen mutation, applied only the saved schema edit in a fresh temporary file, reran native evaluation, checked the three unique generator sessions and rebound the 20-round runtime receipt. The receipt suite passes `4/4` and fails closed on rooted runtime or authority-step tampering.
 
-The K400 builder is candidate-aware: it records the local runtime and AI receipts as sources but creates no K340 claim without the hosted authority receipt. The current report remains `INCOMPLETE`, maturity `U3`, with `11 PASS / 389 UNTESTED`; report root `a7a14db232825ded6d48d79bb3746f01c15a038f22d905ee46996b10f50ff40d`.
+GitHub Actions run `33005515826` passed focused Linux job `98298112072` and Windows native job `98298112360` on exact source commit `01572386c82dd0e46b2eed4bc13b804ddc548a44`. The bound exact steps were `K340 independent Compiler Mixed AI receipt replay` and `K340 Windows native Compiler Mixed runtime replay`; authority root `5611bea18a41f46aa863f9f2320a59c0b10afae916aec1f33400fb47cace4016` admits `AI_GENERATE` and K340 only.
 
-No new dependency, donor code, provider or runtime opcode is introduced. The candidate reuses general RCL semantics and therefore opens no new `RCL_GAP` at the design gate.
+The K400 builder remains authority-aware: the hosted receipt now produces one K340 claim. The current report remains `INCOMPLETE`, maturity `U3`, with `16 PASS / 384 UNTESTED`; report root `f6b13c00247c074b3f90aa1061c2cf453614fee7d5b62e2a63fe5d2fd855cc0d`.
+
+No new dependency, donor code, provider or runtime opcode is introduced. The campaign reuses general RCL semantics and therefore opens no new `RCL_GAP` at the design gate. The inherited `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open, and this bounded result grants no arbitrary compiler correctness, mixed-language ownership, production promotion, unrelated K400 cell or K400 completion.

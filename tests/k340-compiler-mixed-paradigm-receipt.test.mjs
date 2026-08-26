@@ -15,6 +15,7 @@ const SOURCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k340-compil
 const RUNTIME_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k340-compiler-mixed-paradigm-runtime-v0.1.json');
 const CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k340-compiler-mixed-paradigm-ai-generation-contract.v0.1.json');
 const RECEIPT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k340-compiler-mixed-paradigm-ai-generate', 'receipt.json');
+const AUTHORITY_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k340-compiler-mixed-paradigm-ai-generate', 'github-replay.json');
 function replaceOnce(source, oldText, newText) {
   const index = source.indexOf(oldText);
   assert.notEqual(index, -1);
@@ -30,7 +31,15 @@ test('K340 replays three independent mixed-paradigm repairs and binds runtime ev
   assert.equal(result.runtimeEvidenceAdmitted, true);
   assert.deepEqual(result.eligibleCells, ['K340']);
   assert.equal(result.results.every((trial) => trial.successful), true);
-  assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+  if (fs.existsSync(AUTHORITY_PATH)) {
+    assert.equal(result.githubAuthority.admitted, true);
+    assert.equal(result.aiGenerateAdmission, 'PASS');
+    assert.equal(result.verdict, 'PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_MIXED_AUTHORITY_BOUND');
+  } else {
+    assert.equal(result.githubAuthority.admitted, false);
+    assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+    assert.equal(result.verdict, 'PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED');
+  }
 });
 
 test('all three K340 AI mutations remain effective native negative controls', () => {
