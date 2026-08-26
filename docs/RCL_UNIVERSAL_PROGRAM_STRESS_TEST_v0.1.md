@@ -265,10 +265,10 @@ It does **not** claim that any of the twelve killer tasks already pass.
 `examples/universal-stress/k400-current-evidence.json` consolidates current Native UI, admitted K01/K02/K03, bounded Server Web/Reactive, independently admitted K327 Compiler, and K233 evidence without upgrading historical dates or gates. The generated report currently records:
 
 ```text
-PASS      13
+PASS      15
 BLOCKED    0
-UNTESTED 387
+UNTESTED 385
 VERDICT    INCOMPLETE
 ```
 
-The thirteen admitted cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327 and K339. K124/K138 are limited to the generated Node loopback profile; K233 is limited to the bounded two-Dense-layer General MLP profile; K321/K322 are limited to the frozen recursive-algorithm native CLI profile; K327 is limited to its three builtin-lowering repairs and separately admitted compiler-runtime binding. Tensor Genome promotion, optimizer genome, Transformer, accelerated backends, public server deployment and the remaining 387 matrix cells remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.
+The fifteen admitted cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338 and K339. K124/K138 are limited to the generated Node loopback profile; K233 is limited to the bounded two-Dense-layer General MLP profile; K321/K322 are limited to the frozen recursive-algorithm native CLI profile; K327 is limited to its three builtin-lowering repairs and separately admitted compiler-runtime binding; K337/K338 are limited to the bounded two-transaction compiler-governance profile and do not erase the self-host static warrant-validation gap. Tensor Genome promotion, optimizer genome, Transformer, accelerated backends, public server deployment and the remaining 385 matrix cells remain outside this evidence. See `docs/K400_COMPLETION_CAMPAIGN_v0.1.md` and `docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md`.

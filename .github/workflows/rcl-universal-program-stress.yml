@@ -16,6 +16,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k337-k338*.test.mjs'
       - 'tests/k321-k322*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
@@ -45,6 +46,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k337-k338-compiler-governance-reactive-evidence.mjs'
+      - 'scripts/run-k337-k338-independent-ai-generation.mjs'
+      - 'scripts/verify-k337-k338-compiler-governance-reactive-candidate.mjs'
+      - 'scripts/verify-k337-k338-compiler-governance-reactive-receipt.mjs'
       - 'scripts/run-k321-k322-compiler-algorithm-cli-evidence.mjs'
       - 'scripts/run-k321-k322-independent-ai-generation.mjs'
       - 'scripts/verify-k321-k322-compiler-algorithm-cli-candidate.mjs'
@@ -71,6 +76,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k337-k338*.test.mjs'
       - 'tests/k321-k322*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
@@ -100,6 +106,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k337-k338-compiler-governance-reactive-evidence.mjs'
+      - 'scripts/run-k337-k338-independent-ai-generation.mjs'
+      - 'scripts/verify-k337-k338-compiler-governance-reactive-candidate.mjs'
+      - 'scripts/verify-k337-k338-compiler-governance-reactive-receipt.mjs'
       - 'scripts/run-k321-k322-compiler-algorithm-cli-evidence.mjs'
       - 'scripts/run-k321-k322-independent-ai-generation.mjs'
       - 'scripts/verify-k321-k322-compiler-algorithm-cli-candidate.mjs'
@@ -154,6 +164,8 @@ jobs:
         run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
       - name: K327 independent Compiler AI generation receipt replay
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
+      - name: K337/K338 independent Compiler Governance AI receipt replay
+        run: node --test tests/k337-k338-compiler-governance-reactive.test.mjs tests/k337-k338-compiler-governance-reactive-receipt.test.mjs && npm run verify:k337-k338-compiler-governance-reactive-receipt
       - name: K321/K322 independent Algorithm CLI AI receipt replay
         # Replays saved independent edits; CI never invokes the generator.
         run: node --test tests/k321-k322-compiler-algorithm-cli-receipt.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
@@ -187,6 +199,8 @@ jobs:
         run: npm run build:native
       - name: K01 Windows self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
+      - name: K337/K338 Windows native Compiler Governance runtime replay
+        run: node --test tests/k337-k338-compiler-governance-reactive.test.mjs && npm run verify:k337-k338-compiler-governance-reactive
       - name: K321/K322 Windows native Algorithm CLI runtime replay
         run: node --test tests/k321-k322-compiler-algorithm-cli-receipt.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
       - name: K08 Tensor native provider and CPU engine tests

@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `13 PASS / 0 BLOCKED / 387 UNTESTED`
+**Current evidence:** `15 PASS / 0 BLOCKED / 385 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `86ca5d246c8fc1f192987ee7c1bd070f31046f232edd11436abe2561a8094204`
+**Report root:** `ba4d5bdf5e8a332c628635c38994bebadd7a21a0349369b95d030282f42552a3`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -55,6 +55,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
+| `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
+| `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 
@@ -94,6 +96,8 @@ The Server batch froze its runtime contract before acquisition and ran 20 fresh 
 K327 is independently closed by three new ephemeral read-only sessions repairing effective `contains`, `sequence_concat` and `sha256_text` builtin-lowering mutations. Each saved proposal restored the exact canonical compiler sources and reproduced compiler artifact SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`. The campaign binds the already admitted K01 fixed point only as runtime evidence; it does not inherit K339's AI-generation authority. GitHub run `32880432503` bound focused job `97908294490` and Windows job `97908294012` for exact source commit `42b77ceb71e1d00f686b41096646fd05a61ad6e9`; authority root `72c0ebe2de859e8585fe1f3325d7240896de25eb42055daeec56a78b33934670` closes K327 only.
 
 K321/K322 are independently closed for the bounded frozen recursive-algorithm CLI profile. The profile completed 20/20 native `rclc -> RBC -> rclvm` CLI rounds with one artifact root, one semantic state root, independent GCD/Fibonacci/sum-of-squares Oracle parity, malformed-source rejection and corrupt-RBC rejection. Three isolated read-only sessions repaired three effective algorithm mutations and restored exact canonical bytes. GitHub run `32998424312` bound focused job `98273605189` and Windows job `98273604990` for exact source commit `9c3980a58811fa21c26c2ce9e34f37e05db36356`; authority root is `94dcb025dffd8fe4adb6a8bcc3abae96800b3513a83c93670783c6aad7df8be8`. This closes only K321/K322 for the declared fixed-input native CLI profile; interactive shell authority, arbitrary algorithm generation and unrelated K400 cells remain unclaimed.
+
+K337/K338 are independently closed for the bounded two-transaction compiler-governance profile. Twenty native rounds preserved exact artifact/final-state roots, transaction continuity, authority needs and state-trigger order; missing warrant, broken preserve, inactive request and corrupt RBC controls failed closed. Three isolated read-only sessions repaired authority-capability, reactive-trigger and preserve-bound mutations. GitHub run `33000443777` bound focused job `98280568550` and Windows job `98280568136` for exact source commit `2fe5bcae851af1a81fa28277c7697451d512035f`; authority root is `fd3b8ea7ee48e410e28cd8d2a9411051db03a96551444e51289a342f80af2824`. `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open: the native VM rejects the missing-warrant artifact before commit, but the self-host compiler does not yet reject it statically. No arbitrary compiler security or production-promotion authority is claimed.
 
 ## 10. K08-A baseline and K08-B General MLP
 

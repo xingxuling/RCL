@@ -1,0 +1,90 @@
+{
+  "format": "rcl.k337-k338.compiler-governance-reactive-runtime-contract.v0.1",
+  "status": "FROZEN_PENDING_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": [
+    "K337",
+    "K338"
+  ],
+  "profile": {
+    "environment": "compiler-runtime",
+    "programFamilies": [
+      "security-sensitive",
+      "reactive"
+    ],
+    "semanticOwner": "RCL",
+    "executionBoundary": "NATIVE_RCLC_TO_RCLVM",
+    "capabilityMode": "native-semantic"
+  },
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k337-k338-compiler-governance-reactive.rcl",
+    "sourceSha256": "68d18b71ff30617ea912a18a6432cdceba5ca8604b46e7be63c0dfb4dd2d658c",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+  },
+  "required": {
+    "rounds": 20,
+    "bootstrapByteParity": true,
+    "nativeStateRootRequired": true,
+    "uniqueStateRoots": 1,
+    "transactionRuleOrder": [
+      "authorize_candidate",
+      "emit_candidate"
+    ],
+    "rootContinuity": true,
+    "authorityNeedsBound": true,
+    "witnessesBound": true,
+    "missingWarrantRejected": true,
+    "brokenPreserveRejected": true,
+    "invalidRequestNoMutation": true,
+    "corruptRbcRejected": true
+  },
+  "expectedState": {
+    "compiler.accepted": true,
+    "compiler.audit_count": 2,
+    "compiler.emitted": true,
+    "compiler.phase": 2,
+    "request.valid": true
+  },
+  "expectedAuthority": {
+    "authorize_candidate": [
+      {
+        "capability": "compiler.inspect",
+        "target": "source"
+      },
+      {
+        "capability": "compiler.stage",
+        "target": "artifact"
+      }
+    ],
+    "emit_candidate": [
+      {
+        "capability": "compiler.stage",
+        "target": "artifact"
+      },
+      {
+        "capability": "compiler.emit",
+        "target": "artifact"
+      }
+    ]
+  },
+  "expectedWitnesses": {
+    "authorize_candidate": [
+      "k337:authority:accepted"
+    ],
+    "emit_candidate": [
+      "k338:reactive:emitted"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": [
+    "K337 proves only the bounded compiler-runtime warrant, needs, preserve, rooted transaction and fail-closed negative-control profile.",
+    "K338 proves only the explicit two-rule state-triggered compiler transaction chain; it is not an autonomous event loop or general reactive system proof.",
+    "Native rclc/rclvm execute RCL-owned semantics; they do not acquire canonical or commit authority.",
+    "This contract does not prove hostile operating-system isolation, cryptographic signer custody, arbitrary compiler security, arbitrary reactive generation or K400 completion."
+  ]
+}

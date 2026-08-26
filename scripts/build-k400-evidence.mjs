@@ -15,6 +15,7 @@ import { verifyK03AiGenerationReceipt } from './verify-k03-ai-generation-receipt
 import { verifyK04ServerRuntimeEvidence } from './verify-k04-server-runtime-evidence.mjs';
 import { verifyK04ServerAiGenerationReceipt } from './verify-k04-server-ai-generation-receipt.mjs';
 import { verifyK327CompilerAiGenerationReceipt } from './verify-k327-compiler-ai-generation-receipt.mjs';
+import { verifyK337K338CompilerGovernanceReactiveReceipt } from './verify-k337-k338-compiler-governance-reactive-receipt.mjs';
 import { verifyK321K322CompilerAlgorithmCliReceipt } from './verify-k321-k322-compiler-algorithm-cli-receipt.mjs';
 
 const root = process.cwd();
@@ -44,6 +45,11 @@ const k04ServerAiGithubReplayPath = 'examples/universal-stress/evidence/k04-serv
 const k327CompilerAiContractPath = 'examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json';
 const k327CompilerAiReceiptPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json';
 const k327CompilerAiGithubReplayPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json';
+const k337K338RuntimeContractPath = 'examples/universal-stress/k337-k338-compiler-governance-reactive-runtime-contract.v0.1.json';
+const k337K338RuntimePath = 'examples/universal-stress/evidence/k337-k338-compiler-governance-reactive-runtime-v0.1.json';
+const k337K338AiContractPath = 'examples/universal-stress/k337-k338-compiler-governance-reactive-ai-generation-contract.v0.1.json';
+const k337K338AiReceiptPath = 'examples/universal-stress/evidence/k337-k338-compiler-governance-reactive-ai-generate/receipt.json';
+const k337K338AiGithubReplayPath = 'examples/universal-stress/evidence/k337-k338-compiler-governance-reactive-ai-generate/github-replay.json';
 const k321K322RuntimeContractPath = 'examples/universal-stress/k321-k322-compiler-algorithm-cli-runtime-contract.v0.1.json';
 const k321K322RuntimePath = 'examples/universal-stress/evidence/k321-k322-compiler-algorithm-cli-runtime-v0.1.json';
 const k321K322AiContractPath = 'examples/universal-stress/k321-k322-compiler-algorithm-cli-ai-generation-contract.v0.1.json';
@@ -93,6 +99,8 @@ const k04ServerAi = await verifyK04ServerAiGenerationReceipt();
 const k04ServerAiAdmitted = k04ServerAi.aiGenerateAdmission === 'PASS';
 const k327CompilerAi = verifyK327CompilerAiGenerationReceipt();
 const k327CompilerAiAdmitted = k327CompilerAi.aiGenerateAdmission === 'PASS';
+const k337K338Ai = verifyK337K338CompilerGovernanceReactiveReceipt();
+const k337K338AiAdmitted = k337K338Ai.aiGenerateAdmission === 'PASS';
 const k321K322 = verifyK321K322CompilerAlgorithmCliReceipt();
 const k321K322Admitted = k321K322.aiGenerateAdmission === 'PASS';
 
@@ -310,6 +318,39 @@ if (k327CompilerAiAdmitted) {
   ];
   claimsById.set(compilerClaim.id, compilerClaim);
 }
+if (k337K338AiAdmitted) {
+  const sharedEvidence = [k337K338RuntimeContractPath, k337K338RuntimePath, k337K338AiContractPath, k337K338AiReceiptPath, k337K338AiGithubReplayPath];
+  const gates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: STRESS_STATUS.PASS,
+    evidence: sharedEvidence,
+    note: gate === 'AI_GENERATE'
+      ? `Three independent authority/reactive/preserve repairs passed; GitHub run ${k337K338Ai.githubAuthority.runId} bound focused and Windows replay.`
+      : `Frozen 20-round native compiler-governance receipt ${k337K338Ai.runtimeEvidenceBinding.reportRoot}.`,
+  }]));
+  for (const dimension of ['security-sensitive', 'reactive']) {
+    claimsById.set(`compiler-runtime::${dimension}`, {
+      id: `compiler-runtime::${dimension}`,
+      coverageMode: COVERAGE_MODE.NATIVE_SEMANTIC,
+      lastVerifiedSha: k337K338Ai.githubAuthority.sourceCommit,
+      lastVerifiedDate: k337K338Ai.githubAuthority.verifiedAt.slice(0, 10),
+      knownLimits: [
+        'The evidence covers one bounded two-transaction compiler-governance profile, not arbitrary compiler security or autonomous reactive systems.',
+        'The self-host compiler does not yet statically reject a missing cause-subject warrant; the native VM rejects it with RCL_AUTHORITY_DENIED before commit.',
+        'Hostile operating-system isolation, cryptographic signer custody, production compiler promotion and unrelated K400 cells remain unverified.',
+      ],
+      relatedKillerTasks: ['K01'],
+      requiredGenes: ['authority-warrant', 'transaction-preserve', 'semantic-state-root', 'state-triggered-rule-chain', 'native-compiler-runtime'],
+      gates: structuredClone(gates),
+      changes: [{
+        id: 'compiler-governance-reactive-profile',
+        kind: 'stress-evidence',
+        scope: ['compiler-runtime'],
+        generalPrimitive: true,
+        justification: 'Existing RCL warrant, transaction, invariant and state-trigger semantics execute through the native compiler runtime without a cell-specific opcode.',
+      }],
+    });
+  }
+}
 for (const id of ['browser::gui', 'browser::reactive']) {
   const claim = structuredClone(claimsById.get(id));
   if (!claim) throw new Error(`RCL_K400_K02_AI_TARGET_MISSING:${id}`);
@@ -360,7 +401,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k321K322RuntimeContractPath, k321K322RuntimePath, k321K322AiContractPath, k321K322AiReceiptPath, ...(k321K322Admitted ? [k321K322AiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k321K322RuntimeContractPath, k321K322RuntimePath, k321K322AiContractPath, k321K322AiReceiptPath, ...(k321K322Admitted ? [k321K322AiGithubReplayPath] : []), k337K338RuntimeContractPath, k337K338RuntimePath, k337K338AiContractPath, k337K338AiReceiptPath, ...(k337K338AiAdmitted ? [k337K338AiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
@@ -384,6 +425,9 @@ const evidence = {
     k327CompilerAiAdmitted
       ? `K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run ${k327CompilerAi.githubAuthority.runId}.`
       : 'K327 has a 3/3 local independent compiler builtin-lowering repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
+    k337K338AiAdmitted
+      ? `K337/K338 close compiler-runtime::security-sensitive and compiler-runtime::reactive through 20/20 native transactions, 3/3 independent repairs and GitHub run ${k337K338Ai.githubAuthority.runId}.`
+      : 'K337/K338 have 20/20 rooted native transactions and a 3/3 local independent repair candidate; both remain UNTESTED until GitHub focused and Windows replay are bound.',
     k321K322Admitted
       ? `K321/K322 close compiler-runtime::algorithm and compiler-runtime::cli through 20 native rounds, 3/3 independent repairs and GitHub Linux/Windows run ${k321K322.githubAuthority.runId}.`
       : 'K321/K322 have 20/20 native algorithm CLI rounds and a 3/3 local independent repair candidate; both remain UNTESTED until GitHub focused and Windows replay are bound.',
