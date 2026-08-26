@@ -88,6 +88,8 @@ pub struct ExecutionPlan {
     pub storages: Vec<DenseStorage>,
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub exact_storage_bits: HashMap<String, Vec<String>>,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub exact_f32_storage_bits: HashMap<String, Vec<String>>,
     pub nodes: Vec<PlanNode>,
     pub outputs: Vec<String>,
 }
@@ -911,6 +913,437 @@ fn execute_bound(
     })
 }
 
+// The BF16 path is an explicit precision lowering of the generic Tensor operations.
+// The wire container remains Vec<f64> for ABI compatibility, but every input is
+// materialized through exact BF16 bits and every arithmetic result is rounded back
+// to BF16. Reductions and transcendental kernels accumulate in Rust f32.
+fn bf16_bits(value: f32) -> u16 {
+    let bits = value.to_bits();
+    let lsb = (bits >> 16) & 1;
+    bits.wrapping_add(0x7fff + lsb).wrapping_shr(16) as u16
+}
+
+fn bf16_value(bits: u16) -> f32 {
+    f32::from_bits((bits as u32) << 16)
+}
+
+fn bf16_round(value: f32) -> Result<f32, EngineError> {
+    if !value.is_finite() {
+        return Err(EngineError::new(
+            "RCL_BF16_NONFINITE",
+            "BF16 precision lowering rejects non-finite values",
+        ));
+    }
+    let rounded = bf16_value(bf16_bits(value));
+    if !rounded.is_finite() {
+        return Err(EngineError::new(
+            "RCL_BF16_NONFINITE",
+            "BF16 precision lowering produced a non-finite value",
+        ));
+    }
+    Ok(rounded)
+}
+
+fn bf16_input(value: f64) -> Result<f32, EngineError> {
+    let narrowed = value as f32;
+    if !narrowed.is_finite() {
+        return Err(EngineError::new(
+            "RCL_BF16_F32_OVERFLOW",
+            "BF16 input cannot be represented as finite FP32",
+        ));
+    }
+    bf16_round(narrowed)
+}
+
+fn bf16_materialize(input: &BoundTensor<'_>) -> Result<Vec<f32>, EngineError> {
+    input.data.iter().copied().map(bf16_input).collect()
+}
+
+fn bf16_output(
+    dtype: &str,
+    device: &str,
+    operation: &str,
+    shape: Vec<usize>,
+    values: Vec<f32>,
+    started: Instant,
+) -> Result<ExecutionResult, EngineError> {
+    let data = values
+        .into_iter()
+        .map(bf16_round)
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .map(|value| value as f64)
+        .collect::<Vec<_>>();
+    let storage_identity = output_identity(dtype, &shape, &data);
+    Ok(ExecutionResult {
+        format: RESPONSE_FORMAT,
+        status: "ok",
+        tensor: TensorDescriptor {
+            id: "result".into(),
+            shape: shape.clone(),
+            dtype: dtype.into(),
+            layout: "row-major".into(),
+            device: device.into(),
+            gradient_identity: format!("derived:{operation}"),
+            storage_identity: storage_identity.clone(),
+        },
+        storage: DenseStorage {
+            identity: storage_identity,
+            kind: "cpu-dense".into(),
+            data,
+        },
+        telemetry: Telemetry {
+            backend: "rcl-tensor-bf16-cpu-reference-v0.1",
+            kernel: operation.into(),
+            kernel_nanos: started.elapsed().as_nanos(),
+            element_count: shape.iter().product(),
+            allocated_bytes: shape.iter().product::<usize>() * std::mem::size_of::<u16>(),
+        },
+    })
+}
+
+fn bf16_elementwise(
+    inputs: &[BoundTensor<'_>],
+    operation: &str,
+) -> Result<(Vec<usize>, Vec<f32>), EngineError> {
+    require_arity(inputs, 2)?;
+    let shape =
+        output_shape_for_broadcast(&inputs[0].descriptor.shape, &inputs[1].descriptor.shape)?;
+    let left = bf16_materialize(&inputs[0])?;
+    let right = bf16_materialize(&inputs[1])?;
+    let values = (0..product(&shape)?)
+        .map(|index| {
+            let a = left[broadcast_offset(index, &shape, &inputs[0].descriptor.shape)];
+            let b = right[broadcast_offset(index, &shape, &inputs[1].descriptor.shape)];
+            match operation {
+                "add" => bf16_round(a + b),
+                "sub" => bf16_round(a - b),
+                "mul" => bf16_round(a * b),
+                "div" if b != 0.0 => bf16_round(a / b),
+                "div" => Err(EngineError::new(
+                    "RCL_TENSOR_DIVIDE_BY_ZERO",
+                    "Elementwise division encountered zero",
+                )),
+                _ => Err(EngineError::new(
+                    "RCL_BF16_OPERATION_UNSUPPORTED",
+                    format!("Unsupported BF16 elementwise operation {operation}"),
+                )),
+            }
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok((shape, values))
+}
+
+fn bf16_matmul(inputs: &[BoundTensor<'_>]) -> Result<(Vec<usize>, Vec<f32>), EngineError> {
+    require_arity(inputs, 2)?;
+    let left = &inputs[0];
+    let right = &inputs[1];
+    if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_MATMUL_RANK",
+            "BF16 matmul requires rank-2 tensors",
+        ));
+    }
+    let (m, k) = (left.descriptor.shape[0], left.descriptor.shape[1]);
+    let (right_k, n) = (right.descriptor.shape[0], right.descriptor.shape[1]);
+    if k != right_k {
+        return Err(EngineError::new(
+            "RCL_BF16_MATMUL_SHAPE",
+            "BF16 matmul inner dimensions differ",
+        ));
+    }
+    let a = bf16_materialize(left)?;
+    let b = bf16_materialize(right)?;
+    let mut output = vec![0.0f32; m * n];
+    for row in 0..m {
+        for col in 0..n {
+            let mut sum = 0.0f32;
+            for inner in 0..k {
+                sum += a[row * k + inner] * b[inner * n + col];
+            }
+            output[row * n + col] = bf16_round(sum)?;
+        }
+    }
+    Ok((vec![m, n], output))
+}
+
+fn bf16_transpose(
+    input: &BoundTensor<'_>,
+    permutation: &[usize],
+) -> Result<(Vec<usize>, Vec<f32>), EngineError> {
+    let rank = input.descriptor.shape.len();
+    if permutation.len() != rank {
+        return Err(EngineError::new(
+            "RCL_BF16_TRANSPOSE_PERMUTATION",
+            "Transpose rank mismatch",
+        ));
+    }
+    let mut seen = vec![false; rank];
+    for axis in permutation {
+        if *axis >= rank || seen[*axis] {
+            return Err(EngineError::new(
+                "RCL_BF16_TRANSPOSE_PERMUTATION",
+                "Invalid transpose permutation",
+            ));
+        }
+        seen[*axis] = true;
+    }
+    let shape = permutation
+        .iter()
+        .map(|axis| input.descriptor.shape[*axis])
+        .collect::<Vec<_>>();
+    let output_strides = row_major_strides(&shape);
+    let input_strides = row_major_strides(&input.descriptor.shape);
+    let source = bf16_materialize(input)?;
+    let mut output = vec![0.0f32; product(&shape)?];
+    for (output_index, cell) in output.iter_mut().enumerate() {
+        let mut input_index = 0;
+        for output_axis in 0..rank {
+            let coordinate = (output_index / output_strides[output_axis]) % shape[output_axis];
+            input_index += coordinate * input_strides[permutation[output_axis]];
+        }
+        *cell = source[input_index];
+    }
+    Ok((shape, output))
+}
+
+fn bf16_reduction(
+    input: &BoundTensor<'_>,
+    operation: &str,
+    axis: usize,
+) -> Result<(Vec<usize>, Vec<f32>), EngineError> {
+    if axis >= input.descriptor.shape.len() {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_AXIS",
+            "Reduction axis is outside the input rank",
+        ));
+    }
+    let outer = input.descriptor.shape[..axis].iter().product::<usize>();
+    let width = input.descriptor.shape[axis];
+    let inner = input.descriptor.shape[axis + 1..].iter().product::<usize>();
+    let source = bf16_materialize(input)?;
+    let mut output = vec![0.0f32; outer * inner];
+    for o in 0..outer {
+        for i in 0..inner {
+            let mut value = if operation == "max" {
+                f32::NEG_INFINITY
+            } else {
+                0.0
+            };
+            for w in 0..width {
+                let candidate = source[(o * width + w) * inner + i];
+                value = if operation == "max" {
+                    value.max(candidate)
+                } else {
+                    value + candidate
+                };
+            }
+            if operation == "mean" {
+                value /= width as f32;
+            }
+            output[o * inner + i] = bf16_round(value)?;
+        }
+    }
+    let mut shape = input.descriptor.shape.clone();
+    shape.remove(axis);
+    Ok((shape, output))
+}
+
+fn bf16_normalized(
+    input: &BoundTensor<'_>,
+    operation: &str,
+    epsilon: f32,
+) -> Result<(Vec<usize>, Vec<f32>), EngineError> {
+    if !epsilon.is_finite() || epsilon <= 0.0 {
+        return Err(EngineError::new(
+            "RCL_BF16_EPSILON",
+            "epsilon must be finite and positive",
+        ));
+    }
+    let width = *input.descriptor.shape.last().ok_or_else(|| {
+        EngineError::new(
+            "RCL_BF16_NORMALIZATION_RANK",
+            "Normalization requires rank >= 1",
+        )
+    })?;
+    let rows = input.data.len() / width;
+    let source = bf16_materialize(input)?;
+    let mut output = vec![0.0f32; source.len()];
+    for row in 0..rows {
+        let start = row * width;
+        let source_row = &source[start..start + width];
+        let target = &mut output[start..start + width];
+        match operation {
+            "softmax" => {
+                let maximum = source_row.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+                let mut denominator = 0.0f32;
+                for (out, value) in target.iter_mut().zip(source_row) {
+                    *out = (*value - maximum).exp();
+                    denominator += *out;
+                }
+                for out in target.iter_mut() {
+                    *out /= denominator;
+                }
+            }
+            "layer-norm" => {
+                let mean = source_row.iter().copied().sum::<f32>() / width as f32;
+                let variance = source_row
+                    .iter()
+                    .map(|value| (*value - mean) * (*value - mean))
+                    .sum::<f32>()
+                    / width as f32;
+                let scale = (variance + epsilon).sqrt();
+                for (out, value) in target.iter_mut().zip(source_row) {
+                    *out = (*value - mean) / scale;
+                }
+            }
+            "rms-norm" => {
+                let mean_square =
+                    source_row.iter().map(|value| *value * *value).sum::<f32>() / width as f32;
+                let scale = (mean_square + epsilon).sqrt();
+                for (out, value) in target.iter_mut().zip(source_row) {
+                    *out = *value / scale;
+                }
+            }
+            _ => {
+                return Err(EngineError::new(
+                    "RCL_BF16_OPERATION_UNSUPPORTED",
+                    format!("Unsupported BF16 normalized operation {operation}"),
+                ));
+            }
+        }
+    }
+    Ok((input.descriptor.shape.clone(), output))
+}
+
+pub(crate) fn execute_bound_bf16(
+    operation: &str,
+    attributes: &Value,
+    inputs: &[BoundTensor<'_>],
+) -> Result<ExecutionResult, EngineError> {
+    if inputs.is_empty() {
+        return Err(EngineError::new(
+            "RCL_BF16_INPUT_REQUIRED",
+            "At least one BF16 tensor is required",
+        ));
+    }
+    if inputs.iter().any(|input| input.descriptor.dtype != "bf16") {
+        return Err(EngineError::new(
+            "RCL_BF16_DTYPE_REQUIRED",
+            "BF16 precision lowering requires bf16 Tensor descriptors",
+        ));
+    }
+    if inputs.iter().any(|input| input.descriptor.device != "cpu") {
+        return Err(EngineError::new(
+            "RCL_BF16_DEVICE_UNSUPPORTED",
+            "BF16 reference lowering supports cpu only",
+        ));
+    }
+    let started = Instant::now();
+    let (shape, values) = match operation {
+        "add" | "sub" | "mul" | "div" => bf16_elementwise(inputs, operation)?,
+        "matmul" | "matmul-reference" => bf16_matmul(inputs)?,
+        "transpose" => {
+            require_arity(inputs, 1)?;
+            bf16_transpose(&inputs[0], &attribute_permutation(attributes)?)?
+        }
+        "sum" | "mean" | "max" => {
+            require_arity(inputs, 1)?;
+            bf16_reduction(&inputs[0], operation, attribute_usize(attributes, "axis")?)?
+        }
+        "softmax" | "layer-norm" | "rms-norm" => {
+            require_arity(inputs, 1)?;
+            let epsilon = attributes
+                .get("epsilon")
+                .and_then(Value::as_f64)
+                .unwrap_or(1e-5) as f32;
+            bf16_normalized(&inputs[0], operation, epsilon)?
+        }
+        "abs" | "exp" | "log" | "sqrt" => {
+            require_arity(inputs, 1)?;
+            let source = bf16_materialize(&inputs[0])?;
+            let values = source
+                .into_iter()
+                .map(|value| match operation {
+                    "abs" => bf16_round(value.abs()),
+                    "exp" => bf16_round(value.exp()),
+                    "log" if value > 0.0 => bf16_round(value.ln()),
+                    "log" => Err(EngineError::new(
+                        "RCL_TENSOR_LOG_DOMAIN",
+                        "log requires positive values",
+                    )),
+                    "sqrt" if value >= 0.0 => bf16_round(value.sqrt()),
+                    "sqrt" => Err(EngineError::new(
+                        "RCL_TENSOR_SQRT_DOMAIN",
+                        "sqrt requires non-negative values",
+                    )),
+                    _ => unreachable!(),
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            (inputs[0].descriptor.shape.clone(), values)
+        }
+        "activation" => {
+            require_arity(inputs, 1)?;
+            let kind = attributes
+                .get("kind")
+                .and_then(Value::as_str)
+                .ok_or_else(|| EngineError::new("RCL_BF16_ATTRIBUTE", "Missing activation kind"))?;
+            let source = bf16_materialize(&inputs[0])?;
+            let values = source
+                .into_iter()
+                .map(|value| match kind {
+                    "softsign01" => bf16_round(0.5 * (value / (1.0 + value.abs()) + 1.0)),
+                    "relu" => bf16_round(value.max(0.0)),
+                    "tanh" => bf16_round(value.tanh()),
+                    "sigmoid" => bf16_round(1.0 / (1.0 + (-value).exp())),
+                    _ => Err(EngineError::new(
+                        "RCL_TENSOR_ACTIVATION_UNSUPPORTED",
+                        format!("Unsupported activation {kind}"),
+                    )),
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            (inputs[0].descriptor.shape.clone(), values)
+        }
+        "reshape" | "broadcast" | "stop-gradient" => {
+            require_arity(inputs, 1)?;
+            let source = bf16_materialize(&inputs[0])?;
+            let shape = if operation == "reshape" || operation == "broadcast" {
+                attribute_shape(attributes)?
+            } else {
+                inputs[0].descriptor.shape.clone()
+            };
+            if operation == "reshape" && product(&shape)? != source.len() {
+                return Err(EngineError::new(
+                    "RCL_BF16_RESHAPE_ELEMENTS",
+                    "reshape must preserve element count",
+                ));
+            }
+            if operation == "broadcast" {
+                if output_shape_for_broadcast(&inputs[0].descriptor.shape, &shape)? != shape {
+                    return Err(EngineError::new(
+                        "RCL_BF16_BROADCAST_INVALID",
+                        "invalid BF16 broadcast shape",
+                    ));
+                }
+                let values = (0..product(&shape)?)
+                    .map(|index| {
+                        source[broadcast_offset(index, &shape, &inputs[0].descriptor.shape)]
+                    })
+                    .collect();
+                return bf16_output("bf16", "cpu", operation, shape, values, started);
+            }
+            (shape, source)
+        }
+        _ => {
+            return Err(EngineError::new(
+                "RCL_BF16_OPERATION_UNSUPPORTED",
+                format!("Unsupported BF16 operation {operation}"),
+            ));
+        }
+    };
+    bf16_output("bf16", "cpu", operation, shape, values, started)
+}
+
 pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineError> {
     let inputs = bind(request)?;
     execute_bound(&request.operation, &request.attributes, &inputs)
@@ -918,6 +1351,7 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
 
 fn validate_plan_initials(
     plan: &ExecutionPlan,
+    allow_bf16: bool,
 ) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
     if plan.format != PLAN_REQUEST_FORMAT {
         return Err(EngineError::new(
@@ -1004,6 +1438,61 @@ fn validate_plan_initials(
             })
             .collect::<Result<Vec<_>, _>>()?;
     }
+    if !allow_bf16 && !plan.exact_f32_storage_bits.is_empty() {
+        return Err(EngineError::new(
+            "RCL_TENSOR_EXACT_F32_UNSUPPORTED",
+            "Exact FP32 storage bits require the explicit BF16 Autodiff precision policy",
+        ));
+    }
+    for (storage_identity, bit_values) in &plan.exact_f32_storage_bits {
+        if plan.exact_storage_bits.contains_key(storage_identity) {
+            return Err(EngineError::new(
+                "RCL_TENSOR_EXACT_STORAGE_AMBIGUOUS",
+                format!("Storage {storage_identity} cannot bind both f64 and f32 exact bits"),
+            ));
+        }
+        let storage = storage_map.get_mut(storage_identity).ok_or_else(|| {
+            EngineError::new(
+                "RCL_TENSOR_EXACT_STORAGE_MISSING",
+                format!("Exact FP32 bits reference unavailable storage {storage_identity}"),
+            )
+        })?;
+        if bit_values.len() != storage.data.len() {
+            return Err(EngineError::new(
+                "RCL_TENSOR_EXACT_F32_STORAGE_LENGTH",
+                format!("Exact FP32 bits for {storage_identity} do not match storage length"),
+            ));
+        }
+        storage.data = bit_values
+            .iter()
+            .map(|bits| {
+                if bits.len() != 8 {
+                    return Err(EngineError::new(
+                        "RCL_TENSOR_EXACT_F32_STORAGE_BITS",
+                        format!(
+                            "Exact FP32 bits must contain 8 hexadecimal digits, received {bits}"
+                        ),
+                    ));
+                }
+                let parsed = u32::from_str_radix(bits, 16).map_err(|_| {
+                    EngineError::new(
+                        "RCL_TENSOR_EXACT_F32_STORAGE_BITS",
+                        format!("Invalid exact FP32 bits {bits}"),
+                    )
+                })?;
+                let value = f32::from_bits(parsed);
+                if !value.is_finite() {
+                    return Err(EngineError::new(
+                        "RCL_TENSOR_NONFINITE_INPUT",
+                        format!(
+                            "Exact FP32 bits for {storage_identity} decode to a non-finite value"
+                        ),
+                    ));
+                }
+                Ok(value as f64)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+    }
     let mut values = HashMap::new();
     for tensor in &plan.tensors {
         if tensor.id.is_empty() || values.contains_key(&tensor.id) {
@@ -1012,11 +1501,12 @@ fn validate_plan_initials(
                 format!("Missing or duplicate tensor id {}", tensor.id),
             ));
         }
-        if tensor.dtype != "f64" || tensor.layout != "row-major" || tensor.device != "cpu" {
+        let dtype_allowed = tensor.dtype == "f64" || (allow_bf16 && tensor.dtype == "bf16");
+        if !dtype_allowed || tensor.layout != "row-major" || tensor.device != "cpu" {
             return Err(EngineError::new(
                 "RCL_TENSOR_PLAN_DESCRIPTOR",
                 format!(
-                    "Tensor {} is outside the f64/row-major/cpu v0.1 profile",
+                    "Tensor {} is outside the allowed precision/row-major/cpu v0.1 profile",
                     tensor.id
                 ),
             ));
@@ -1065,7 +1555,7 @@ pub fn execute_plan(plan: &ExecutionPlan) -> Result<ExecutionPlanResult, EngineE
             ),
         ));
     }
-    let mut values = validate_plan_initials(plan)?;
+    let mut values = validate_plan_initials(plan, false)?;
     let mut cumulative_allocated_elements = values
         .values()
         .map(|(_, storage)| storage.data.len())
@@ -1659,6 +2149,7 @@ mod tests {
                 },
             ],
             exact_storage_bits: HashMap::new(),
+            exact_f32_storage_bits: HashMap::new(),
             nodes: vec![
                 PlanNode {
                     id: "transpose-x".into(),
@@ -1718,6 +2209,7 @@ mod tests {
                 },
             ],
             exact_storage_bits: HashMap::new(),
+            exact_f32_storage_bits: HashMap::new(),
             nodes: vec![
                 PlanNode {
                     id: "double".into(),
@@ -1761,6 +2253,7 @@ mod tests {
                 data: vec![1.],
             }],
             exact_storage_bits: HashMap::new(),
+            exact_f32_storage_bits: HashMap::new(),
             nodes: vec![PlanNode {
                 id: "abs".into(),
                 operation: "abs".into(),

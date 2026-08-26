@@ -1,0 +1,77 @@
+{
+  "format": "rcl.k08-s.bf16-autodiff-adamw-contract.v0.2",
+  "status": "BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "GENERIC_TENSOR_SSA_BF16_FORWARD_FP32_REVERSE_ADAMW_CPU_REFERENCE",
+  "precisionPolicy": {
+    "parameterComputeDtype": "bf16",
+    "activationComputeDtype": "bf16",
+    "matmulAccumulationDtype": "f32",
+    "reductionAccumulationDtype": "f32",
+    "normalizationAccumulationDtype": "f32",
+    "gradientDtype": "f32",
+    "masterWeightDtype": "f32",
+    "optimizerStateDtype": "f32",
+    "bf16Rounding": "round-to-nearest-ties-to-even",
+    "bf16CastBackward": "straight-through-fp32",
+    "nonFinitePolicy": "fail-closed",
+    "silentAcceleratorFallbackAllowed": false
+  },
+  "semanticBoundary": {
+    "graph": "RCL Tensor SSA plus RCL Reverse Autodiff",
+    "executionOrgan": "Rust generic Tensor BF16 CPU reference",
+    "transport": "JSON f64 container is not dtype authority; exact FP32/BF16 bit fields are authoritative",
+    "parameterOrder": "autodiff.parameters canonical order",
+    "checkpointAuthority": "exact FP32 master, first moment and second moment bits in canonical parameter order"
+  },
+  "referenceExecution": {
+    "backend": "cpu-reference",
+    "requestFormat": "rcl.bf16-autodiff-adamw-request.v0.2",
+    "resultFormat": "rcl.bf16-autodiff-adamw-result.v0.2",
+    "gpuClaim": false
+  },
+  "requiredEvidence": [
+    "rcl-genome-selfhost-byte-parity-and-native-root",
+    "bf16-rne-bit-level-oracle",
+    "bf16-forward-differential",
+    "fp32-gradient-finite-difference-under-ste-policy",
+    "fp32-master-differs-from-bf16-compute",
+    "adamw-bit-level-update-oracle",
+    "loss-decreases",
+    "all-canonical-parameters-update",
+    "deterministic-replay",
+    "direct-n-equals-checkpoint-resume",
+    "exact-master-and-moment-bits-survive-resume",
+    "checkpoint-root-exact-parity",
+    "malformed-exact-bits-fail-closed",
+    "nonfinite-exact-bits-fail-closed",
+    "unsupported-accelerator-fails-closed",
+    "canonical-optimizer-state-order",
+    "no-model-special-operation"
+  ],
+  "claimsGrantedOnAdmission": [
+    "BF16_CANONICAL_RNE_FORWARD",
+    "BF16_GENERIC_AUTODIFF_CPU_REFERENCE",
+    "FP32_GRADIENT_AND_MASTER_WEIGHT",
+    "FP32_ADAMW_STATE",
+    "EXACT_FP32_CHECKPOINT_RESUME",
+    "NO_SILENT_ACCELERATOR_FALLBACK"
+  ],
+  "claimsNotGranted": [
+    "GPU",
+    "CUDA",
+    "ROCM",
+    "VULKAN_GPU",
+    "MULTI_BLOCK_BF16_TRAINING",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "PRODUCTION_TOKENIZER",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_GPU_EXECUTION",
+    "RCL_GAP_K08_S_HOSTED_REPLAY",
+    "RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION"
+  ]
+}
