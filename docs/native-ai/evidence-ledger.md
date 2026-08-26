@@ -295,6 +295,30 @@ Authority files:
 
 Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Hosted replay gap `RCL_GAP_OPENCL_HOSTED_REPLAY` is closed for this candidate by run `32993386531`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
+## RCL-10M corpus admission gate
+
+Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; they prove the gate, not a dataset.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Frozen RCL-10M manifest schema | PASS |
+| Deterministic manifest root | PASS |
+| Pending review/bytes block admission | fail-closed PASS |
+| Missing mixture/provenance/shard bindings | fail-closed PASS |
+| Tampered root | fail-closed PASS |
+| Local Node evidence | `5/5 PASS` |
+| Real user corpus and production tokenizer | BLOCKED_USER_INPUT |
+
+Authority files:
+
+- `docs/native-ai/rcl-10m-corpus-admission-evidence-v0.1.md`
+- `examples/native-ai/rcl-10m-corpus-admission-genome.rcl`
+- `examples/native-ai/rcl-10m-corpus-admission-contract.v0.1.json`
+- `examples/native-ai/evidence/rcl-10m-corpus-admission-v0.1/k08-rcl10m-corpus-admission-local-evidence.json`
+
+Reproduction: `npm run test:rcl-10m-corpus-admission`. Claims are limited to a schema candidate. Open gaps: `RCL_GAP_USER_CORPUS_LICENSE_PRIVACY_POISON_REVIEW`, `RCL_GAP_RCL10M_CORPUS_BYTES_AND_SHARDS` and `RCL_GAP_RCL10M_TOKENIZER_FREEZE`.
+
 ## K08-S BF16 multi-block reference candidate
 
 Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
