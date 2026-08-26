@@ -1,0 +1,55 @@
+{
+  "format": "rcl.k337-k338.compiler-governance-reactive-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": [
+    "K337",
+    "K338"
+  ],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k337-k338-compiler-governance-reactive.rcl",
+    "sourceSha256": "68d18b71ff30617ea912a18a6432cdceba5ca8604b46e7be63c0dfb4dd2d658c",
+    "candidateReportRoot": "67fd045bf29556cae18d24b0daa1252a0a7e269a77174807193b56d65283d921"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k337-k338-compiler-governance-reactive-runtime-v0.1.json",
+    "reportRoot": "9246052b20d56e655e4e7a39deb81360545bdde0913fafbb8abb4b22d00cb462"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K337-K338-AI-REPAIR-01",
+      "mutationClass": "authority-capability-binding",
+      "semanticInvariant": "authorize_candidate must require compiler.inspect on source and compiler.stage on artifact under maintainer warrants."
+    },
+    {
+      "id": "K337-K338-AI-REPAIR-02",
+      "mutationClass": "reactive-phase-trigger",
+      "semanticInvariant": "emit_candidate must become eligible after authorize_candidate commits accepted=true and phase=1."
+    },
+    {
+      "id": "K337-K338-AI-REPAIR-03",
+      "mutationClass": "transaction-preserve-bound",
+      "semanticInvariant": "The second transaction increments compiler.audit_count from 1 to 2 and must preserve exactly 2."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsRuntimeReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K337/K338 authority, state-trigger and preserve semantics and binds the 20-round native runtime receipt. It grants no arbitrary security-sensitive generation, autonomous reactive runtime, hostile-OS isolation, signer custody, compiler promotion, unrelated K400 cells or K400 completion."
+}

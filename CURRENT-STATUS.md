@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `11 PASS / 0 BLOCKED / 389 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K327 and K339.
+Current authoritative matrix: `15 PASS / 0 BLOCKED / 385 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338 and K339.
 
 Every evidence-bearing cell is evaluated through:
 
@@ -149,7 +149,25 @@ Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. The RCL-owned BF16 cont
 | Local Node evidence | `3/3 PASS` |
 | Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
 
-Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Authority files: docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md, examples/native-ai/opencl-bf16-matmul-contract.v0.1.json, examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
+
+### GPU BF16 Autodiff + AdamW hybrid candidate
+
+Status: PASS_LOCAL_GPU_HYBRID_CANDIDATE_HOSTED_REPLAY_PENDING. The new generic RCL BF16 Autodiff + AdamW organ accepts an explicit opencl-amd-hybrid graph: every matmul must carry placement gpu and execute through the existing AMD OpenCL lowerer; every non-matmul node must carry placement cpu-reference and execute through the RCL Rust BF16 reference. The current Windows host executed the GPU-placed matmul on AMD gfx1152; the CPU-equivalent graph produced identical initial/final loss, all parameters, optimizer states and checkpoint root. Local evidence is 3/3 PASS, and placement/provider/backend negatives fail closed. This is a bounded hybrid candidate, not GPU training: backward math, FP32 masters, AdamW state and optimizer updates remain in RCL Rust, while GPU backward/optimizer kernels, full-graph GPU execution, GQA/RoPE GPU and throughput remain unclaimed. Hosted run 32999052826 is pending on main head 3cdb94bdba850e0c21c1cc4a8a2c9defa95f47d7.
+
+Authority files: docs/native-ai/gpu-bf16-autodiff-adamw-evidence-v0.1.md, examples/native-ai/gpu-bf16-autodiff-adamw-contract.v0.1.json, examples/native-ai/evidence/gpu-bf16-autodiff-adamw-v0.1/k08-gpu-bf16-autodiff-adamw-local-evidence.json. Reproduction: npm run test:k08-gpu-bf16-autodiff-adamw. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
+
+### GPU BF16 ordered multi-block hybrid candidate
+
+Status: `PASS_LOCAL_GPU_HYBRID_ORDERED_MULTI_MATMUL_CANDIDATE_GITHUB_REPLAY_BOUND`. The new RCL-owned generic graph composes two ordered BF16 matmul blocks in one explicit `opencl-amd-hybrid` training forward: both matmuls are `gpu`, and eight non-matmul nodes are explicitly `cpu-reference`. The current AMD gfx1152 host executed both GPU nodes; the CPU-equivalent RCL graph matched initial/final loss, all four canonical parameters, AdamW states and checkpoint root exactly. Direct replay and checkpoint resume are exact, and placement/provider/backend negatives fail closed. This remains a bounded hybrid candidate: reverse Autodiff, FP32 masters, AdamW state and updates remain in RCL Rust; no GPU training, GPU backward/optimizer kernels, GQA/RoPE GPU or throughput claim is granted. PR #90 hosted run `33000754805` passed Ubuntu job `98281650727` and Windows job `98281650452` on the evidence commit.
+
+Authority files: `docs/native-ai/gpu-bf16-multiblock-evidence-v0.1.md`, `examples/native-ai/gpu-bf16-multiblock-contract.v0.1.json`, `examples/native-ai/evidence/gpu-bf16-multiblock-v0.1/k08-gpu-bf16-multiblock-local-evidence.json`. Reproduction: `npm run test:k08-gpu-bf16-multiblock`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+### GPU GQA + RoPE hybrid candidate
+
+Status: `PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_GITHUB_REPLAY_BOUND`. The new RCL-owned generic graph has two independent query heads sharing one K/V projection path, with the RCL `rcl-rope-frame` organ supplying the position frame. Eleven matmul nodes per forward, including projections, RoPE rotations, attention scores and context products, use explicit `gpu` placement through the AMD OpenCL lowerer; 21 masking/softmax/transpose/elementwise/loss nodes use explicit `cpu-reference`. On the current AMD gfx1152 host, local `3/3` evidence passed; CPU-equivalent BF16 training matched loss, all four parameters, AdamW states and checkpoint root exactly, and direct/checkpoint replay was exact. This remains a bounded hybrid forward candidate, not GPU training or GPU-native attention/backward/optimizer execution. PR #91 run `33002049364` passed Ubuntu job `98286127130` and Windows job `98286127096` on the evidence commit.
+
+Authority files: `docs/native-ai/gpu-gqa-rope-evidence-v0.1.md`, `examples/native-ai/gpu-gqa-rope-contract.v0.1.json`, `examples/native-ai/evidence/gpu-gqa-rope-v0.1/k08-gpu-gqa-rope-local-evidence.json`. Reproduction: `npm run test:k08-gpu-gqa-rope`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
 ### RCL-10M corpus admission gate
 
