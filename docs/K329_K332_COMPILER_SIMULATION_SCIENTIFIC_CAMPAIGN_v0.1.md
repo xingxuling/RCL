@@ -37,3 +37,7 @@ Three fresh ephemeral read-only sessions repaired separately mutated state-trans
 - `K329-K332-AI-REPAIR-03`: `01a03f3e-1954-74f0-8a99-cc089528fce8`
 
 Aggregate receipt root: `527ab8dd0c452dd98696be85a2a514b3ef77b628cd51e861573d813a43a26bab`. This is local `CANDIDATE` evidence only; checked-in independent receipt replay and GitHub Linux/Windows authority remain mandatory before either K329 or K332 can enter K400.
+
+The checked-in receipt verifier independently reconstructs all three mutations, applies only each saved edit in a fresh temporary file, reruns native evaluation, validates rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step names. Local verdict is `PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`; K400 `AI_GENERATE` remains `UNVERIFIED` because `github-replay.json` is absent.
+
+The conditional K400 builder records the local receipts as candidate sources but creates neither `compiler-runtime::simulation` nor `compiler-runtime::scientific` without hosted authority. The current report remains `INCOMPLETE`, maturity `U3`, with `11 PASS / 389 UNTESTED`; report root `c1b86258b367790a51c7b5eff493afc5eb1644102fd6ff33b41b553b172d6322`.

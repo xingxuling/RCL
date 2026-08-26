@@ -16,6 +16,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k329-k332*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
@@ -44,6 +45,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k329-k332-compiler-simulation-scientific-evidence.mjs'
+      - 'scripts/run-k329-k332-independent-ai-generation.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-candidate.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -53,6 +58,7 @@ on:
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
       - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
+      - 'docs/K329_K332_COMPILER_SIMULATION_SCIENTIFIC_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
   pull_request:
@@ -66,6 +72,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k329-k332*.test.mjs'
       - 'scripts/universal-program-stress-report.mjs'
       - 'scripts/build-k400-evidence.mjs'
       - 'scripts/run-universal-stress-k01.mjs'
@@ -94,6 +101,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k329-k332-compiler-simulation-scientific-evidence.mjs'
+      - 'scripts/run-k329-k332-independent-ai-generation.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-candidate.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-receipt.mjs'
       - 'scripts/verify-rcl-selfhost-*.mjs'
       - 'scripts/verify-native-windows-boundary.mjs'
       - 'selfhost/**'
@@ -103,6 +114,7 @@ on:
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
       - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
+      - 'docs/K329_K332_COMPILER_SIMULATION_SCIENTIFIC_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
 
@@ -144,6 +156,8 @@ jobs:
         run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
       - name: K327 independent Compiler AI generation receipt replay
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
+      - name: K329/K332 independent Compiler Simulation Scientific AI receipt replay
+        run: npm run test:k329-k332-compiler-simulation-scientific && npm run verify:k329-k332-compiler-simulation-scientific-receipt
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
@@ -174,6 +188,8 @@ jobs:
         run: npm run build:native
       - name: K01 Windows self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
+      - name: K329/K332 Windows native Compiler Simulation Scientific runtime replay
+        run: npm run test:k329-k332-compiler-simulation-scientific && npm run verify:k329-k332-compiler-simulation-scientific-receipt
       - name: K08 Tensor native provider and CPU engine tests
         run: npm run test:k08-tensor
       - name: K08 Tensor Windows performance evidence
