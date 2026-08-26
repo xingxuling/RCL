@@ -1,0 +1,39 @@
+name: K08-S BF16 Autodiff AdamW v0.2
+
+on:
+  push:
+    branches:
+      - codex/rcl-native-llm-campaign-v01
+    paths:
+      - 'examples/native-ai/bf16-autodiff-adamw-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-bf16-autodiff-adamw.test.mjs'
+      - '.github/workflows/k08-bf16-autodiff-adamw.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/bf16-autodiff-adamw-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-bf16-autodiff-adamw.test.mjs'
+      - '.github/workflows/k08-bf16-autodiff-adamw.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-s:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and Tensor organs
+        run: npm run build:native
+      - name: Run K08-S BF16 Autodiff AdamW evidence
+        run: node --test --test-concurrency=1 tests/k08-bf16-autodiff-adamw.test.mjs

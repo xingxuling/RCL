@@ -220,3 +220,53 @@ npm run evidence:k08-autodiff
 This candidate grants no ENGINE-E3 Optimizer Genome, AdamW, Transformer, Tiny LM, accelerator, general performance parity or K400 promotion claim.
 
 Hosted replay is now bound by `examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json`: run `32828410493`, Ubuntu job `97741439391`, Windows job `97741439698`, exact evidence commit `103a330f034a234c52d2d7eb287fd154c4e4b902`, all successful. The receipt authority root is `370de08a986177eb43546348a606c80ce291980eb3f37aba465211e54470a065`. This hosted admission changes the suffix only; it does not grant any claim listed above.
+
+## K08-S BF16 Autodiff + AdamW reference candidate
+
+Status: `BF16_AUTODIFF_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. This candidate is based on latest `origin/main@30c162c6cd13b2c9310202f2a604da23e5b4c552` and safely replays the historical K08-S source commit `1c9cb93bb687eb47fb39ea7dd392d8cd5d607b30` before replacing its matmul-only path with a generic RCL Tensor SSA + Reverse Autodiff precision lowering.
+
+| Evidence | Result |
+|---|---:|
+| RCL genome self-host/native-root parity | PASS |
+| BF16 RNE bit oracle and forward-loss differential | PASS |
+| FP32 gradient under explicit `straight-through-fp32` cast backward | PASS |
+| FP32 master versus BF16 compute weights | PASS |
+| FP32 AdamW one-step bit oracle | PASS |
+| Loss decrease / all canonical parameters update | PASS |
+| Deterministic replay | PASS |
+| Direct N versus checkpoint K + resume N-K | exact PASS |
+| Exact master/moment bits and checkpoint root | exact PASS |
+| Malformed/non-finite exact bits | fail-closed PASS |
+| Canonical optimizer-state order | fail-closed PASS |
+| Unsupported accelerator | fail-closed PASS; no CPU fallback |
+| Local Node suite / Rust unit suite | `9/9` / `7/7` |
+| Hosted Ubuntu + Windows replay | PASS, run `32987036258`, head `73336cb7b76dbecd95aabe7f840374067c22c15a`, evidence root `fc3235622a6d0da8259d2b73fad5eb14dadc58c6fbb54cb9716335b58480db2e` |
+| Real GPU execution | CLOSED / no accepted runner |
+
+Authority files:
+
+- `examples/native-ai/bf16-autodiff-adamw-genome.rcl`
+- `examples/native-ai/bf16-autodiff-adamw-contract.v0.2.json`
+- `examples/native-ai/evidence/bf16-autodiff-adamw-v0.2/k08-s-local-evidence.json`
+- `docs/native-ai/bf16-autodiff-adamw-evidence-v0.2.md`
+
+Reproduction:
+
+```text
+npm run verify:version-contract
+npm run test:k08-bf16-autodiff-adamw
+cargo test --release --locked --manifest-path native/tensor-engine/Cargo.toml
+```
+
+This candidate grants bounded BF16 generic Autodiff, FP32 gradient/master/AdamW state, exact FP32 checkpoint continuation and no-silent-fallback semantics only. It grants no GPU, multi-block BF16, RCL-10M, RCL-1B, production tokenizer/dataset or K400 claim. Open gaps: `RCL_GAP_GPU_EXECUTION`, `RCL_GAP_BF16_MULTI_BLOCK_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`. Hosted replay gap `RCL_GAP_K08_S_HOSTED_REPLAY` is closed for this candidate by run `32987036258`, with Ubuntu job `98235663711` and Windows job `98235663539`.
+
+## GPU backend reality audit
+
+Status: `REAL_GPU_PRESENT_RCL_BACKEND_NOT_IMPLEMENTED_CANDIDATE_BLOCKED`. The current Windows host exposes a real AMD Radeon(TM) 860M (`0x1002:0x1114`) through Vulkan 1.4.325 and one AMD OpenCL 2.0 GPU device with `cl_khr_fp16`. The RCL Tensor organ is still CPU-only and rejects GPU device intent; hardware discovery is not GPU execution evidence.
+
+Authority files:
+
+- `docs/native-ai/gpu-backend-reality-audit-v0.1.md`
+- `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`
+
+The next bounded candidate is an AMD OpenCL generic BF16 reference organ with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16, RCL-10M or K400 promotion.
