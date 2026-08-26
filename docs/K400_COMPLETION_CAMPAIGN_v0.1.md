@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `11 PASS / 0 BLOCKED / 389 UNTESTED`
+**Current evidence:** `13 PASS / 0 BLOCKED / 387 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `5fcfa18469fc3f40e9006f5e154a8e8d16bd158807f9dd850f72c07d06571db2`
+**Report root:** `86ca5d246c8fc1f192987ee7c1bd070f31046f232edd11436abe2561a8094204`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -53,6 +53,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
 | `K124` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile |
 | `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
+| `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
+| `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 
@@ -91,7 +93,7 @@ The Server batch froze its runtime contract before acquisition and ran 20 fresh 
 
 K327 is independently closed by three new ephemeral read-only sessions repairing effective `contains`, `sequence_concat` and `sha256_text` builtin-lowering mutations. Each saved proposal restored the exact canonical compiler sources and reproduced compiler artifact SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`. The campaign binds the already admitted K01 fixed point only as runtime evidence; it does not inherit K339's AI-generation authority. GitHub run `32880432503` bound focused job `97908294490` and Windows job `97908294012` for exact source commit `42b77ceb71e1d00f686b41096646fd05a61ad6e9`; authority root `72c0ebe2de859e8585fe1f3325d7240896de25eb42055daeec56a78b33934670` closes K327 only.
 
-K321/K322 are a local candidate, not an admitted closure. The frozen profile completed 20/20 native `rclc -> RBC -> rclvm` CLI rounds with one artifact root, one semantic state root, independent GCD/Fibonacci/sum-of-squares Oracle parity, malformed-source rejection and corrupt-RBC rejection. Three new isolated read-only sessions repaired three effective algorithm mutations and restored exact canonical bytes. GitHub push-triggered Linux and Windows replay authority remains mandatory before either matrix cell can become `PASS`.
+K321/K322 are independently closed for the bounded frozen recursive-algorithm CLI profile. The profile completed 20/20 native `rclc -> RBC -> rclvm` CLI rounds with one artifact root, one semantic state root, independent GCD/Fibonacci/sum-of-squares Oracle parity, malformed-source rejection and corrupt-RBC rejection. Three isolated read-only sessions repaired three effective algorithm mutations and restored exact canonical bytes. GitHub run `32998424312` bound focused job `98273605189` and Windows job `98273604990` for exact source commit `9c3980a58811fa21c26c2ce9e34f37e05db36356`; authority root is `94dcb025dffd8fe4adb6a8bcc3abae96800b3513a83c93670783c6aad7df8be8`. This closes only K321/K322 for the declared fixed-input native CLI profile; interactive shell authority, arbitrary algorithm generation and unrelated K400 cells remain unclaimed.
 
 ## 10. K08-A baseline and K08-B General MLP
 
