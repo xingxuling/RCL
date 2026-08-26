@@ -273,7 +273,7 @@ The next bounded candidate is an AMD OpenCL generic BF16 reference organ with ex
 
 ## K08-S BF16 multi-block reference candidate
 
-Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
+Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. This is a bounded two-block generic Tensor SSA composition on top of K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW state. It trains four canonical groups in order: shared token embedding, block 0, block 1 and shared LM head. The profile is intentionally smaller than K08-R's GQA+RoPE graph; it does not silently claim BF16 GQA/RoPE integration.
 
 | Evidence | Result |
 |---|---:|
@@ -285,7 +285,7 @@ Status: `BF16_MULTIBLOCK_ADAMW_REFERENCE_CANDIDATE_LOCAL_ONLY`. This is a bounde
 | Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
 | Canonical state order and model-special negatives | fail-closed PASS |
 | Local Node evidence | `6/6 PASS` |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32988994250`, Ubuntu job `98241831755`, Windows job `98241831517`, exact head `fa20e5a860bcbc63594f22a6bdfe4c0bd9c21dc5` |
 
 Authority files:
 
@@ -294,4 +294,4 @@ Authority files:
 - `examples/native-ai/evidence/bf16-multiblock-adamw-v0.1/k08-s-multiblock-local-evidence.json`
 - `docs/native-ai/bf16-multiblock-adamw-evidence-v0.1.md`
 
-Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Open gaps: `RCL_GAP_K08_S_MB_HOSTED_REPLAY`, `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Hosted replay gap `RCL_GAP_K08_S_MB_HOSTED_REPLAY` is closed for this candidate by run `32988994250`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
