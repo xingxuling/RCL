@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `13 PASS / 0 BLOCKED / 387 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327 and K339.
+Current authoritative matrix: `15 PASS / 0 BLOCKED / 385 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338 and K339.
 
 Every evidence-bearing cell is evaluated through:
 

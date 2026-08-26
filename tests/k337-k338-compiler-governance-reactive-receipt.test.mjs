@@ -15,6 +15,7 @@ import {
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SOURCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k337-k338-compiler-governance-reactive.rcl');
 const RUNTIME_EVIDENCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k337-k338-compiler-governance-reactive-runtime-v0.1.json');
+const AUTHORITY_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k337-k338-compiler-governance-reactive-ai-generate', 'github-replay.json');
 
 function replaceExactlyOnce(source, oldText, newText) {
   const index = source.indexOf(oldText);
@@ -31,7 +32,14 @@ test('K337/K338 receipt replays three independent sessions and binds native runt
   assert.equal(result.runtimeEvidenceAdmitted, true);
   assert.deepEqual(result.eligibleCells, ['K337', 'K338']);
   assert.equal(result.results.every((trial) => trial.successful), true);
-  assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+  if (fs.existsSync(AUTHORITY_PATH)) {
+    assert.equal(result.aiGenerateAdmission, 'PASS');
+    assert.equal(result.githubAuthority.admitted, true);
+    assert.match(result.githubAuthority.authorityRoot, /^[0-9a-f]{64}$/u);
+  } else {
+    assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+    assert.equal(result.githubAuthority.admitted, false);
+  }
 });
 
 test('all three K337/K338 semantic mutations are effective native negative controls', () => {

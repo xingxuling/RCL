@@ -1,10 +1,10 @@
 # K337/K338 Compiler Governance + Reactive Campaign v0.1
 
-**Status:** local runtime candidate; `AI_GENERATE` and GitHub-hosted Linux/Windows replay remain `UNVERIFIED`.
+**Status:** `PASS` for the bounded K337/K338 profile with GitHub-hosted Linux/Windows authority; broader compiler security and the static warrant-validation gap remain open.
 
 ## Reality Audit
 
-- Base: `origin/main@30c162c6cd13b2c9310202f2a604da23e5b4c552`.
+- Integrated base: `origin/main@b86b0c9c0c601bf9cfbab45d9e95a770840ce8c8`.
 - Matrix coordinates: `K337 compiler-runtime::security-sensitive` and `K338 compiler-runtime::reactive`.
 - Canonical semantic owner: RCL.
 - Execution boundary: checked-in RCL self-host compiler artifact through native `rclc`, then RBC through native `rclvm`.
@@ -23,7 +23,7 @@ The positive program performs two RCL-owned compiler transactions. `authorize_ca
 - Windows-local p95: compile `83.5467 ms`, execute `70.8424 ms`, combined `145.3796 ms`; frozen budgets are `5000/1000/6000 ms`.
 - Missing warrant, broken preserve, invalid request and corrupt RBC controls all failed closed.
 
-The frozen AI contract then ran three separate ephemeral read-only repair sessions for authority capability binding, reactive phase triggering and preserve bounds. All 3/3 restored canonical bytes and replayed the native evaluator; session IDs are `01a03ed9-e426-7df3-8f38-0aabefb27485`, `01a03edd-32cb-7de2-bd04-55c7c5cd629d` and `01a03ede-ec86-7780-86af-518f0a9015c2`. The rooted aggregate receipt is `52694c563d3cd4f49ef0b3daaf9aec294d6da1bc49ef14ce9d8919334d5ee70a`. This is local `CANDIDATE` evidence only; `AI_GENERATE` remains `UNVERIFIED` until the exact saved receipts pass the declared GitHub-hosted Linux and Windows steps.
+The frozen AI contract then ran three separate ephemeral read-only repair sessions for authority capability binding, reactive phase triggering and preserve bounds. All 3/3 restored canonical bytes and replayed the native evaluator; session IDs are `01a03ed9-e426-7df3-8f38-0aabefb27485`, `01a03edd-32cb-7de2-bd04-55c7c5cd629d` and `01a03ede-ec86-7780-86af-518f0a9015c2`. The rooted aggregate receipt is `52694c563d3cd4f49ef0b3daaf9aec294d6da1bc49ef14ce9d8919334d5ee70a`. GitHub run `33000443777` replayed the exact saved receipts in focused job `98280568550` and the native runtime in Windows job `98280568136`; authority root `fd3b8ea7ee48e410e28cd8d2a9411051db03a96551444e51289a342f80af2824` admits `AI_GENERATE` and `EVIDENCE` for K337/K338 only.
 
 ## RCL_GAP
 
@@ -44,21 +44,20 @@ The concrete absorption site is `selfhost/compiler-core.rcl`: parsing already re
 | CORRECT | PASS | Exact final state, ordered rules, witnesses, authority needs and root continuity matched. |
 | ROBUST | PASS | Four frozen controls rejected or remained mutation-free as specified. |
 | PERFORMANCE | PASS | Frozen local budgets passed; this is not cross-machine or competitive parity. |
-| AI_GENERATE | UNVERIFIED | 3/3 independent local repairs passed, but required GitHub-hosted replay authority is absent. |
-| EVIDENCE | UNVERIFIED | Local receipt is rooted; hosted Linux/Windows replay authority is absent. |
+| AI_GENERATE | PASS | 3/3 independent repairs passed and GitHub focused replay bound the exact saved receipts. |
+| EVIDENCE | PASS | Rooted local/runtime receipts are bound to successful Linux and Windows jobs for source commit `2fe5bcae851af1a81fa28277c7697451d512035f`. |
 
-The K400 cells remain unadmitted until every gate passes. No current matrix count is changed by this candidate.
-The conditional K400 builder was replayed without a GitHub authority receipt and correctly stayed at `11 PASS / 389 UNTESTED`, `U3`, `INCOMPLETE`; candidate-aware report root is `3b1e7ca478380c6f9f61433ea12033689d0722389a8c15cc6339bfce676ba4c4`.
+All nine non-compensatory gates now pass for this bounded profile. The conditional K400 builder admits K337/K338 without changing the global verdict: `15 PASS / 385 UNTESTED`, `U3`, `INCOMPLETE`; report root is `ba4d5bdf5e8a332c628635c38994bebadd7a21a0349369b95d030282f42552a3`.
 
 ## Integration Court
 
 - Founder Twin: kept compiler governance and state-trigger semantics RCL-owned; no provider became the decision owner.
-- 柳清莲 Gate: refused promotion while `AI_GENERATE` and hosted replay are absent, and preserved the static-validation gap as a named blocker.
+- 柳清莲 Gate: admitted only after independent generation and hosted replay passed, while preserving the static-validation gap as a named limitation.
 - 洞哥 Grounding: required real native process execution, exact state/history roots and effective negative controls.
 - Product/UX: limited the profile to an observable two-phase compiler transaction rather than claiming a general security product or event system.
 - Engineering/code: reused existing general warrant, transaction and self-host paths; introduced no cell-specific VM opcode.
 - Test/security: bound missing authority, broken invariant, inactive request and corrupt artifact controls.
-- Release: candidate branch only; no main merge or release claim.
+- Release: hosted authority is admitted on the candidate branch; main promotion still requires the final evidence commit replay and PR merge.
 - Evidence Ledger: source, contract, binaries, per-round roots, performance and RCL gap are rooted in the checked-in receipt.
 
 ## License and diff audit
