@@ -8,6 +8,7 @@ pub const AUTODIFF_SGD_TRAINING_REQUEST_FORMAT: &str =
     "rcl.tensor-autodiff-sgd-training-request.v0.1";
 pub const AUTODIFF_SGD_TRAINING_RESPONSE_FORMAT: &str =
     "rcl.tensor-autodiff-sgd-training-result.v0.1";
+pub const BF16_AUTODIFF_PRECISION: &str = "bf16-rne-fp32-accumulation";
 const MAX_PARAMETERS: usize = 256;
 const MAX_TRAINING_STEPS: usize = 16_384;
 const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
@@ -38,6 +39,8 @@ pub struct AutodiffRequest {
     pub parameters: Vec<Parameter>,
     #[serde(default)]
     pub stop_gradients: Vec<StopGradient>,
+    #[serde(default)]
+    pub precision: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -130,6 +133,7 @@ struct Gradient {
 
 fn validate_graph(
     graph: &ComputationGraph,
+    allow_bf16: bool,
 ) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
     if graph.nodes.is_empty() || graph.nodes.len() > MAX_PLAN_NODES {
         return Err(EngineError::new(
@@ -140,7 +144,7 @@ fn validate_graph(
             ),
         ));
     }
-    let values = validate_plan_initials(graph)?;
+    let values = validate_plan_initials(graph, allow_bf16)?;
     let mut node_ids = HashSet::new();
     let mut defined = values.keys().cloned().collect::<HashSet<_>>();
     for node in &graph.nodes {
@@ -188,8 +192,9 @@ fn validate_graph(
 
 fn forward_tape(
     graph: &ComputationGraph,
+    bf16: bool,
 ) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
-    let mut values = validate_graph(graph)?;
+    let mut values = validate_graph(graph, bf16)?;
     let mut allocated = values
         .values()
         .map(|(_, storage)| storage.data.len())
@@ -212,7 +217,11 @@ fn forward_tape(
                     })
                 })
                 .collect::<Result<Vec<_>, EngineError>>()?;
-            execute_bound(&node.operation, &node.attributes, &inputs)?
+            if bf16 {
+                execute_bound_bf16(&node.operation, &node.attributes, &inputs)?
+            } else {
+                execute_bound(&node.operation, &node.attributes, &inputs)?
+            }
         };
         if result.tensor.shape != node.output.shape
             || result.tensor.dtype != node.output.dtype
@@ -610,6 +619,7 @@ fn accumulate(
     id: &str,
     incoming: Gradient,
     accumulator: &mut GradientAccumulator,
+    fp32: bool,
 ) -> Result<(), EngineError> {
     accumulator.accumulation_count += 1;
     accumulator.accumulated_elements = accumulator
@@ -629,7 +639,11 @@ fn accumulate(
             ));
         }
         for (cell, value) in existing.data.iter_mut().zip(incoming.data) {
-            *cell += value;
+            *cell = if fp32 {
+                (*cell as f32 + value as f32) as f64
+            } else {
+                *cell + value
+            };
         }
         accumulator.merge_count += 1;
     } else {
@@ -637,6 +651,20 @@ fn accumulate(
     }
     accumulator.tensor_count = gradients.len();
     Ok(())
+}
+
+fn round_gradient_fp32(mut value: Gradient) -> Result<Gradient, EngineError> {
+    for cell in &mut value.data {
+        let narrowed = *cell as f32;
+        if !narrowed.is_finite() {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_FP32_GRADIENT_NONFINITE",
+                "BF16 Autodiff produced a non-finite FP32 gradient",
+            ));
+        }
+        *cell = narrowed as f64;
+    }
+    Ok(value)
 }
 
 pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError> {
@@ -652,8 +680,18 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
             format!("Parameter count must be within 1..={MAX_PARAMETERS}"),
         ));
     }
+    let bf16 = match request.precision.as_deref() {
+        None => false,
+        Some(BF16_AUTODIFF_PRECISION) => true,
+        Some(precision) => {
+            return Err(EngineError::new(
+                "RCL_AUTODIFF_PRECISION_UNSUPPORTED",
+                format!("Unsupported Autodiff precision policy {precision}"),
+            ));
+        }
+    };
     let forward_started = Instant::now();
-    let tape = forward_tape(&request.graph)?;
+    let tape = forward_tape(&request.graph, bf16)?;
     let forward_nanos = forward_started.elapsed().as_nanos();
     let loss_value = tape.get(&request.loss).ok_or_else(|| {
         EngineError::new(
@@ -757,7 +795,12 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
                 .get(input)
                 .map(|value| value.0.gradient_identity.clone())
                 .unwrap_or_default();
-            accumulate(&mut gradients, input, incoming, &mut accumulator)?;
+            let incoming = if bf16 {
+                round_gradient_fp32(incoming)?
+            } else {
+                incoming
+            };
+            accumulate(&mut gradients, input, incoming, &mut accumulator, bf16)?;
             edges.push(BackwardEdge {
                 node_id: node.id.clone(),
                 operation: node.operation.clone(),
@@ -781,13 +824,26 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
                 ),
             )
         })?;
-        let storage_identity = output_identity("f64", &derivative.shape, &derivative.data);
+        let gradient_data = if bf16 {
+            round_gradient_fp32(derivative.clone())?.data
+        } else {
+            derivative.data.clone()
+        };
+        let storage_identity = output_identity(
+            if bf16 { "f32" } else { "f64" },
+            &derivative.shape,
+            &gradient_data,
+        );
         results.push(GradientTensorResult {
             parameter: parameter.clone(),
             tensor: TensorDescriptor {
                 id: format!("gradient:{}", parameter.tensor_id),
                 shape: derivative.shape.clone(),
-                dtype: value.0.dtype.clone(),
+                dtype: if bf16 {
+                    "f32".into()
+                } else {
+                    value.0.dtype.clone()
+                },
                 layout: value.0.layout.clone(),
                 device: value.0.device.clone(),
                 gradient_identity: format!(
@@ -799,7 +855,7 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
             storage: DenseStorage {
                 identity: storage_identity,
                 kind: "cpu-dense".into(),
-                data: derivative.data.clone(),
+                data: gradient_data,
             },
         });
     }
@@ -949,7 +1005,7 @@ pub fn train_sgd(
     // Exact checkpoint bits are part of the canonical initial value. Materialize them
     // into the mutable training storage before the first update; otherwise validation
     // would see the exact value while SGD updated the decimal transport approximation.
-    let canonical_initials = validate_plan_initials(&request.graph)?;
+    let canonical_initials = validate_plan_initials(&request.graph, false)?;
     for tensor in &request.graph.tensors {
         let canonical_storage = &canonical_initials.get(&tensor.id).unwrap().1;
         let mutable_storage = request
