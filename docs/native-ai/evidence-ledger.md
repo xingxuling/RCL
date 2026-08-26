@@ -269,7 +269,31 @@ Authority files:
 - `docs/native-ai/gpu-backend-reality-audit-v0.1.md`
 - `examples/native-ai/evidence/gpu-backend-audit-v0.1/gpu-backend-audit.json`
 
-The next bounded candidate is an AMD OpenCL generic BF16 reference organ with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16, RCL-10M or K400 promotion.
+The bounded AMD OpenCL generic BF16 reference organ is now implemented as an auxiliary Python `ctypes` lowerer with explicit pack/unpack, FP32 accumulation, CPU differential parity, deterministic replay and fail-closed unavailable-backend behavior. This does not grant GPU training, OpenCL BF16 Autodiff/AdamW, RCL-10M or K400 promotion.
+
+## K08 AMD OpenCL BF16 matmul candidate
+
+Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. RCL owns the BF16 contract and genome; `native/tensor-engine/amd_opencl_bf16_provider.py` is an auxiliary lowerer only. The current Windows host selected the real AMD `gfx1152` OpenCL 2.0 device and executed the generic `rcl_bf16_matmul` kernel with `gpuExecuted=true` and `gpuClaim=false`. A fixed 2×3 by 3×2 request returned `4100,bfc0,4188,0000`, exactly matching the independent CPU BF16 bit oracle. Deterministic replay and fail-closed malformed, non-finite, shape and unsupported-backend negatives pass in `3/3` local tests.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Real AMD OpenCL device receipt | PASS, `gfx1152`, driver `3661.0 (PAL,LC)` |
+| OpenCL BF16 matmul execution | PASS, exact output bits |
+| Independent CPU bit differential | exact PASS |
+| Deterministic replay | exact PASS |
+| Fail-closed negatives / no CPU fallback | PASS |
+| Local Node evidence | `3/3 PASS` |
+| Hosted Ubuntu + Windows replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`
+- `examples/native-ai/opencl-bf16-matmul-genome.rcl`
+- `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`
+- `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`
+
+Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Open gaps: `RCL_GAP_OPENCL_HOSTED_REPLAY`, `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
 ## K08-S BF16 multi-block reference candidate
 
