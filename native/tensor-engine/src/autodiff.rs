@@ -1,10 +1,10 @@
 use super::*;
+use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::time::Instant;
-use serde_json::json;
 
 pub const AUTODIFF_REQUEST_FORMAT: &str = "rcl.tensor-autodiff-request.v0.1";
 pub const AUTODIFF_RESPONSE_FORMAT: &str = "rcl.tensor-autodiff-result.v0.1";
@@ -307,7 +307,10 @@ fn execute_opencl_matmul(
     if !provider_path.is_file() {
         return Err(EngineError::new(
             "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-            format!("OpenCL provider path is not a file: {}", provider_path.display()),
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
         ));
     }
     let payload = json!({
@@ -365,9 +368,9 @@ fn execute_opencl_matmul(
         )
     })?;
     if !output.status.success() {
-        let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(|_| {
-            json!({"message": String::from_utf8_lossy(&output.stderr).to_string()})
-        });
+        let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(
+            |_| json!({"message": String::from_utf8_lossy(&output.stderr).to_string()}),
+        );
         return Err(EngineError::new(
             provider_error_code(&error_value),
             error_value
@@ -383,8 +386,7 @@ fn execute_opencl_matmul(
             format!("OpenCL provider returned invalid JSON: {error}"),
         )
     })?;
-    if response.get("format").and_then(Value::as_str)
-        != Some("rcl.opencl-bf16-matmul-result.v0.1")
+    if response.get("format").and_then(Value::as_str) != Some("rcl.opencl-bf16-matmul-result.v0.1")
         || response.get("status").and_then(Value::as_str)
             != Some("PASS_LOCAL_GPU_REFERENCE_CANDIDATE")
         || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
@@ -546,7 +548,13 @@ fn forward_tape(
     graph: &ComputationGraph,
     bf16: bool,
     mode: &ExecutionMode,
-) -> Result<(HashMap<String, (TensorDescriptor, DenseStorage)>, ForwardExecutionTelemetry), EngineError> {
+) -> Result<
+    (
+        HashMap<String, (TensorDescriptor, DenseStorage)>,
+        ForwardExecutionTelemetry,
+    ),
+    EngineError,
+> {
     if matches!(mode, ExecutionMode::OpenClAmdHybrid { .. }) && !bf16 {
         return Err(EngineError::new(
             "RCL_ACCELERATOR_PRECISION_UNSUPPORTED",
@@ -583,14 +591,9 @@ fn forward_tape(
                         execute_bound_bf16(&node.operation, &node.attributes, &inputs)?
                     }
                     ExecutionMode::OpenClAmdHybrid { provider_path } => {
-                        if node.attributes.get("placement").and_then(Value::as_str)
-                            == Some("gpu")
-                        {
-                            let (result, root) = execute_opencl_matmul(
-                                &node.id,
-                                provider_path,
-                                &inputs,
-                            )?;
+                        if node.attributes.get("placement").and_then(Value::as_str) == Some("gpu") {
+                            let (result, root) =
+                                execute_opencl_matmul(&node.id, provider_path, &inputs)?;
                             execution.gpu_matmul_nodes += 1;
                             execution.gpu_execution_roots.push(root);
                             result

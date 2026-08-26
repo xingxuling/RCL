@@ -327,9 +327,7 @@ fn parameter_descriptor(
     if tensor.dtype != "bf16" || tensor.layout != "row-major" || tensor.device != expected_device {
         return Err(TrainError::new(
             "RCL_BF16_AD_DESCRIPTOR",
-            format!(
-                "parameter {tensor_id} is outside bf16/row-major/{expected_device} profile"
-            ),
+            format!("parameter {tensor_id} is outside bf16/row-major/{expected_device} profile"),
         ));
     }
     Ok((tensor.storage_identity.clone(), tensor.shape.clone()))
