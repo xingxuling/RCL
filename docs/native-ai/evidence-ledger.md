@@ -298,7 +298,7 @@ Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded 
 
 ## K08-R GQA + RoPE BF16 multi-block candidate
 
-Status: `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_LOCAL_ONLY`. The existing K08-N RoPE + K08-O GQA + K08-R two-block generic Tensor graph now runs through K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW. Fourteen canonical parameter groups update in order, and local evidence is `6/6 PASS` for genome/native-root parity, GQA+RoPE composition, loss decrease, exact state, deterministic replay, exact checkpoint resume and fail-closed negatives.
+Status: `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_GITHUB_REPLAY_BOUND`. The existing K08-N RoPE + K08-O GQA + K08-R two-block generic Tensor graph now runs through K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW. Fourteen canonical parameter groups update in order, and local evidence is `6/6 PASS` for genome/native-root parity, GQA+RoPE composition, loss decrease, exact state, deterministic replay, exact checkpoint resume and fail-closed negatives.
 
 | Evidence | Result |
 |---|---:|
@@ -306,7 +306,7 @@ Status: `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_LOCAL_ONLY`. The existing 
 | All fourteen parameter groups update | PASS |
 | Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
 | Local Node evidence | `6/6 PASS` |
-| Hosted Ubuntu + Windows replay | NOT YET RUN |
+| Hosted Ubuntu + Windows replay | PASS, run `32989948133`, Ubuntu job `98244912540`, Windows job `98244912816`, exact head `3716f51` |
 
 Authority files:
 
@@ -315,4 +315,4 @@ Authority files:
 - `examples/native-ai/evidence/bf16-gqa-rope-multiblock-v0.1/k08-r-bf16-local-evidence.json`
 - `docs/native-ai/bf16-gqa-rope-multiblock-evidence-v0.1.md`
 
-Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 GQA+RoPE two-block training and exact continuation. Open gaps: `RCL_GAP_K08_R_BF16_HOSTED_REPLAY`, `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 GQA+RoPE two-block training and exact continuation. Hosted gap `RCL_GAP_K08_R_BF16_HOSTED_REPLAY` is closed for this candidate by run `32989948133`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
