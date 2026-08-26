@@ -1,0 +1,39 @@
+name: K08-S BF16 Multi-Block v0.1
+
+on:
+  push:
+    branches:
+      - codex/k08-s-multiblock-bf16-v01
+    paths:
+      - 'examples/native-ai/bf16-multiblock-adamw-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-bf16-multiblock.test.mjs'
+      - '.github/workflows/k08-bf16-multiblock.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/bf16-multiblock-adamw-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-bf16-multiblock.test.mjs'
+      - '.github/workflows/k08-bf16-multiblock.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-s-multiblock:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and Tensor organs
+        run: npm run build:native
+      - name: Run K08-S BF16 multi-block evidence
+        run: npm run test:k08-bf16-multiblock
