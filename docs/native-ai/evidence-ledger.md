@@ -347,7 +347,7 @@ Reproduction: `npm run test:k08-gpu-bf16-multiblock`. Claims are limited to orde
 
 ## GPU GQA + RoPE hybrid candidate
 
-Status: `PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_HOSTED_REPLAY_PENDING`. This candidate binds a minimal generic RCL GQA + RoPE graph to the AMD OpenCL matmul lowerer. Two query heads retain independent Q paths while sharing one K/V path; the native RCL RoPE frame organ supplies the position frame. Eleven matmul nodes per forward execute through explicit GPU placement, while 21 softmax, mask, transpose, elementwise and loss nodes remain explicit RCL CPU reference. The current AMD gfx1152 host passed local `3/3`; CPU loss/parameter/state/checkpoint differential and direct/checkpoint replay are exact. Placement/provider/backend negatives fail closed.
+Status: `PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_GITHUB_REPLAY_BOUND`. This candidate binds a minimal generic RCL GQA + RoPE graph to the AMD OpenCL matmul lowerer. Two query heads retain independent Q paths while sharing one K/V path; the native RCL RoPE frame organ supplies the position frame. Eleven matmul nodes per forward execute through explicit GPU placement, while 21 softmax, mask, transpose, elementwise and loss nodes remain explicit RCL CPU reference. The current AMD gfx1152 host passed local `3/3`; CPU loss/parameter/state/checkpoint differential and direct/checkpoint replay are exact. Placement/provider/backend negatives fail closed.
 
 | Evidence | Result |
 |---|---:|
@@ -360,7 +360,7 @@ Status: `PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_HOSTED_REPLAY_PENDING`
 | Deterministic replay and checkpoint resume | exact PASS |
 | Placement/provider/backend fail-closed negatives | PASS |
 | Local Node evidence | `3/3 PASS` |
-| Hosted Ubuntu + Windows replay | PENDING, run `33001796170` |
+| Hosted Ubuntu + Windows replay | PASS, run `33002049364`, Ubuntu job `98286127130`, Windows job `98286127096` |
 
 Authority files:
 

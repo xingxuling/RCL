@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_HOSTED_REPLAY_PENDING`
+`PASS_LOCAL_GPU_HYBRID_GQA_ROPE_FORWARD_CANDIDATE_GITHUB_REPLAY_BOUND`
 
 This candidate binds a minimal generic RCL GQA + RoPE Tensor SSA graph to the
 existing AMD OpenCL matmul lowerer. Two query heads use independent Q paths but
@@ -53,14 +53,14 @@ RoPE composition, softmax and masking remain generic RCL reference operations.
 | ROBUST | PASS_LOCAL | placement, provider and backend negatives fail closed |
 | PERFORMANCE | NOT_EVALUATED | process-per-node provider dispatch is not a throughput result |
 | AI_GENERATE | NOT_APPLICABLE | no learned model generation claim |
-| EVIDENCE | CANDIDATE | local receipt is bound; hosted replay is pending |
+| EVIDENCE | CANDIDATE | local receipt and Ubuntu/Windows hosted replay are bound |
 
 ## Hosted boundary
 
-PR #91 runs the dedicated workflow on Ubuntu and Windows. Hosted runners may
-prove compilation, replay and explicit unavailable-device behavior; they do not
-inherit the local AMD device receipt and cannot promote this candidate to GPU
-training.
+PR #91 dedicated workflow run `33002049364` passed on Ubuntu job
+`98286127130` and Windows job `98286127096`. Hosted runners prove replay and
+explicit unavailable-device behavior; they do not inherit the local AMD device
+receipt and cannot promote this candidate to GPU training.
 
 ## Open gaps
 
