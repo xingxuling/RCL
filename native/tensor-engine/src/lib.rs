@@ -1221,6 +1221,26 @@ pub(crate) fn execute_bound_bf16(
     attributes: &Value,
     inputs: &[BoundTensor<'_>],
 ) -> Result<ExecutionResult, EngineError> {
+    execute_bound_bf16_with_device(operation, attributes, inputs, true)
+}
+
+// Hybrid accelerator graphs keep the canonical BF16 implementation in this
+// module for explicitly host-placed non-matmul nodes. This is intentionally a
+// separate entry point so a GPU-intent graph cannot silently fall back to CPU.
+pub(crate) fn execute_bound_bf16_host(
+    operation: &str,
+    attributes: &Value,
+    inputs: &[BoundTensor<'_>],
+) -> Result<ExecutionResult, EngineError> {
+    execute_bound_bf16_with_device(operation, attributes, inputs, false)
+}
+
+fn execute_bound_bf16_with_device(
+    operation: &str,
+    attributes: &Value,
+    inputs: &[BoundTensor<'_>],
+    require_cpu_device: bool,
+) -> Result<ExecutionResult, EngineError> {
     if inputs.is_empty() {
         return Err(EngineError::new(
             "RCL_BF16_INPUT_REQUIRED",
@@ -1233,12 +1253,13 @@ pub(crate) fn execute_bound_bf16(
             "BF16 precision lowering requires bf16 Tensor descriptors",
         ));
     }
-    if inputs.iter().any(|input| input.descriptor.device != "cpu") {
+    if require_cpu_device && inputs.iter().any(|input| input.descriptor.device != "cpu") {
         return Err(EngineError::new(
             "RCL_BF16_DEVICE_UNSUPPORTED",
             "BF16 reference lowering supports cpu only",
         ));
     }
+    let device = inputs[0].descriptor.device.as_str();
     let started = Instant::now();
     let (shape, values) = match operation {
         "add" | "sub" | "mul" | "div" => bf16_elementwise(inputs, operation)?,
@@ -1330,7 +1351,7 @@ pub(crate) fn execute_bound_bf16(
                         source[broadcast_offset(index, &shape, &inputs[0].descriptor.shape)]
                     })
                     .collect();
-                return bf16_output("bf16", "cpu", operation, shape, values, started);
+                return bf16_output("bf16", device, operation, shape, values, started);
             }
             (shape, source)
         }
@@ -1341,7 +1362,7 @@ pub(crate) fn execute_bound_bf16(
             ));
         }
     };
-    bf16_output("bf16", "cpu", operation, shape, values, started)
+    bf16_output("bf16", device, operation, shape, values, started)
 }
 
 pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineError> {
@@ -1352,6 +1373,14 @@ pub fn execute(request: &ExecutionRequest) -> Result<ExecutionResult, EngineErro
 fn validate_plan_initials(
     plan: &ExecutionPlan,
     allow_bf16: bool,
+) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
+    validate_plan_initials_for_device(plan, allow_bf16, "cpu")
+}
+
+pub(crate) fn validate_plan_initials_for_device(
+    plan: &ExecutionPlan,
+    allow_bf16: bool,
+    required_device: &str,
 ) -> Result<HashMap<String, (TensorDescriptor, DenseStorage)>, EngineError> {
     if plan.format != PLAN_REQUEST_FORMAT {
         return Err(EngineError::new(
@@ -1502,12 +1531,12 @@ fn validate_plan_initials(
             ));
         }
         let dtype_allowed = tensor.dtype == "f64" || (allow_bf16 && tensor.dtype == "bf16");
-        if !dtype_allowed || tensor.layout != "row-major" || tensor.device != "cpu" {
+        if !dtype_allowed || tensor.layout != "row-major" || tensor.device != required_device {
             return Err(EngineError::new(
                 "RCL_TENSOR_PLAN_DESCRIPTOR",
                 format!(
-                    "Tensor {} is outside the allowed precision/row-major/cpu v0.1 profile",
-                    tensor.id
+                    "Tensor {} is outside the allowed precision/row-major/{required_device} v0.1 profile",
+                    tensor.id,
                 ),
             ));
         }

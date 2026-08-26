@@ -293,7 +293,31 @@ Authority files:
 - `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`
 - `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`
 
-Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Hosted replay gap `RCL_GAP_OPENCL_HOSTED_REPLAY` is closed for this candidate by run `32993386531`. Open gaps: `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+Reproduction: npm run test:k08-amd-opencl-bf16. Claims are limited to AMD OpenCL BF16 matmul reference execution and bit-exact differential. Hosted replay gap RCL_GAP_OPENCL_HOSTED_REPLAY is closed for this candidate by run 32993386531. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
+
+## GPU BF16 Autodiff + AdamW hybrid candidate
+
+Status: PASS_LOCAL_GPU_HYBRID_CANDIDATE_HOSTED_REPLAY_PENDING. The generic RCL BF16 Autodiff + AdamW loop now admits an explicit opencl-amd-hybrid placement profile. Matmul nodes must execute through the existing AMD OpenCL lowerer; non-matmul nodes must explicitly use the RCL Rust BF16 CPU reference. The current Windows host executed the GPU matmul node on AMD gfx1152. CPU differential is exact for loss, parameters, optimizer states and checkpoint root. Local evidence is 3/3 PASS; missing placement, CPU matmul placement, missing provider and graph/backend mismatch all fail closed. This only reduces the accelerator integration gap: Reverse Autodiff, FP32 masters, AdamW state and optimizer updates remain RCL-owned Rust execution, and no GPU training, full-graph GPU, GPU backward/optimizer kernels, GQA/RoPE GPU or throughput claim is granted.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Generic BF16 Autodiff + AdamW graph reaches explicit GPU matmul | PASS |
+| Real AMD OpenCL matmul in the training forward path | PASS, gfx1152 |
+| Explicit host-reference placements | PASS |
+| CPU loss/parameter/state/checkpoint differential | exact PASS |
+| Placement/provider/backend fail-closed negatives | PASS |
+| Local Node evidence | 3/3 PASS |
+| Hosted Linux + Windows replay | PENDING, run 32997101860 |
+
+Authority files:
+
+- docs/native-ai/gpu-bf16-autodiff-adamw-evidence-v0.1.md
+- examples/native-ai/gpu-bf16-autodiff-adamw-genome.rcl
+- examples/native-ai/gpu-bf16-autodiff-adamw-contract.v0.1.json
+- examples/native-ai/evidence/gpu-bf16-autodiff-adamw-v0.1/k08-gpu-bf16-autodiff-adamw-local-evidence.json
+
+Reproduction: npm run test:k08-gpu-bf16-autodiff-adamw. Open gaps: RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION and RCL_GAP_RCL10M_TOKENIZER_DATASET.
 
 ## RCL-10M corpus admission gate
 

@@ -1,0 +1,55 @@
+{
+  "format": "rcl.k321-k322.compiler-algorithm-cli-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": [
+    "K321",
+    "K322"
+  ],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k321-k322-compiler-algorithm-cli.rcl",
+    "sourceSha256": "c718635526ce14c49fbec65324332b20d85dbd128c4e07520de13876a89859b9",
+    "candidateReportRoot": "136de5f9138fa8f841011b54bbf320bcf730afb22fd788d66e381c507b6e2623"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k321-k322-compiler-algorithm-cli-runtime-v0.1.json",
+    "reportRoot": "3080db662601682f0b9dc1ddd2b4eea1146948e9e3ddb4ca8b4b93f3824e39e2"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K321-K322-AI-REPAIR-01",
+      "mutationClass": "euclidean-remainder-routing",
+      "semanticInvariant": "Euclidean GCD must recurse with gcd(b, a % b), including the signed-zero boundary."
+    },
+    {
+      "id": "K321-K322-AI-REPAIR-02",
+      "mutationClass": "fibonacci-recurrence-offset",
+      "semanticInvariant": "Fibonacci must use F(n-1)+F(n-2) with F(0)=0 and F(1)=1."
+    },
+    {
+      "id": "K321-K322-AI-REPAIR-03",
+      "mutationClass": "sum-squares-term",
+      "semanticInvariant": "sum_squares(n) must accumulate n*n recursively down to zero."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsCliReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K321/K322 recursive algorithm CLI source and binds its 20-round native runtime receipt. It grants no arbitrary algorithm generation, interactive CLI inputs, shell authority, compiler/self-host AI authority, unrelated K400 cells or K400 completion."
+}

@@ -1,0 +1,123 @@
+{
+  "format": "rcl.k321-k322.compiler-algorithm-cli-ai-trial-receipt.v0.1",
+  "trialId": "K321-K322-AI-REPAIR-01",
+  "mutationClass": "euclidean-remainder-routing",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03a2b-7400-72f1-9136-f03469b9411d",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "  reckon gcd(a : Number, b : Number) -> Number =\n    choose(b == 0, absolute(a), gcd(b, b % a))",
+    "new": "  reckon gcd(a : Number, b : Number) -> Number =\n    choose(b == 0, absolute(a), gcd(b, a % b))",
+    "diagnosis": "The Euclidean recursive step is reversed. It currently recurses as gcd(b, b % a), which breaks the declared invariant and the native CLI result for gcd(1071, 462). The minimal RCL-only repair is to recurse as gcd(b, a % b), while preserving the signed-zero boundary path b == 0 -> absolute(a)."
+  },
+  "promptRoot": "77a3cca234c3925695d8481c3087a95f7094c714e60bab58ec166133eafa1feb",
+  "mutatedSourceSha256": "a498453e642eac4d90012824f197fef43cb9b15349240cf62d4251fec3fb2ad2",
+  "candidateSourceSha256": "c718635526ce14c49fbec65324332b20d85dbd128c4e07520de13876a89859b9",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "ef09938d07a541f52fa438094af47236ea8a0e7362da40881a6ef13b0c4d7a96",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03a2b-7400-72f1-9136-f03469b9411d"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "2de9a2d53176984b11da705385820e3a9dd8e466eaae99616d19c17938e2852d"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "40761befed5c62088e6eb528abd3b92ff7ef658bf95014fa96cc7544aff4ecd1"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 56838,
+        "cached_input_tokens": 29440,
+        "output_tokens": 471,
+        "reasoning_output_tokens": 89
+      }
+    }
+  ],
+  "finalMessageSha256": "40761befed5c62088e6eb528abd3b92ff7ef658bf95014fa96cc7544aff4ecd1",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "d84e2ead2074480332bdb023adbf7db1f5faab9be343b5ad87c3f6531ed26eaf",
+    "failedChecks": [
+      "gcd-euclidean-step",
+      "native-cli-algorithm-results"
+    ],
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "136de5f9138fa8f841011b54bbf320bcf730afb22fd788d66e381c507b6e2623",
+    "checks": {
+      "rcl-owns-profile": {
+        "pass": true
+      },
+      "gcd-euclidean-step": {
+        "pass": true
+      },
+      "fibonacci-recurrence": {
+        "pass": true
+      },
+      "sum-squares-recurrence": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-cli-algorithm-results": {
+        "pass": true
+      },
+      "native-cli-boundary-results": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "344cdac96a7a3145ca22d6624254b2e0a6bd5146944af2b971b67260b97eb68b"
+}

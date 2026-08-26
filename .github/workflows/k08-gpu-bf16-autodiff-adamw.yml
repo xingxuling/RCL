@@ -1,0 +1,44 @@
+name: K08 GPU BF16 Autodiff AdamW
+
+on:
+  push:
+    branches:
+      - codex/k08-gpu-bf16-autodiff-v01
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-bf16-autodiff-adamw.test.mjs'
+      - 'examples/native-ai/gpu-bf16-autodiff-adamw-*'
+      - 'package.json'
+      - '.github/workflows/k08-gpu-bf16-autodiff-adamw.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-bf16-autodiff-adamw.test.mjs'
+      - 'examples/native-ai/gpu-bf16-autodiff-adamw-*'
+      - 'package.json'
+      - '.github/workflows/k08-gpu-bf16-autodiff-adamw.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-gpu-bf16-autodiff-adamw:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: \${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run explicit GPU hybrid BF16 Autodiff AdamW evidence
+        run: npm run test:k08-gpu-bf16-autodiff-adamw
