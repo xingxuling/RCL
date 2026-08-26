@@ -15,6 +15,7 @@ import { verifyK03AiGenerationReceipt } from './verify-k03-ai-generation-receipt
 import { verifyK04ServerRuntimeEvidence } from './verify-k04-server-runtime-evidence.mjs';
 import { verifyK04ServerAiGenerationReceipt } from './verify-k04-server-ai-generation-receipt.mjs';
 import { verifyK327CompilerAiGenerationReceipt } from './verify-k327-compiler-ai-generation-receipt.mjs';
+import { verifyK321K322CompilerAlgorithmCliReceipt } from './verify-k321-k322-compiler-algorithm-cli-receipt.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -43,6 +44,11 @@ const k04ServerAiGithubReplayPath = 'examples/universal-stress/evidence/k04-serv
 const k327CompilerAiContractPath = 'examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json';
 const k327CompilerAiReceiptPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json';
 const k327CompilerAiGithubReplayPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json';
+const k321K322RuntimeContractPath = 'examples/universal-stress/k321-k322-compiler-algorithm-cli-runtime-contract.v0.1.json';
+const k321K322RuntimePath = 'examples/universal-stress/evidence/k321-k322-compiler-algorithm-cli-runtime-v0.1.json';
+const k321K322AiContractPath = 'examples/universal-stress/k321-k322-compiler-algorithm-cli-ai-generation-contract.v0.1.json';
+const k321K322AiReceiptPath = 'examples/universal-stress/evidence/k321-k322-compiler-algorithm-cli-ai-generate/receipt.json';
+const k321K322AiGithubReplayPath = 'examples/universal-stress/evidence/k321-k322-compiler-algorithm-cli-ai-generate/github-replay.json';
 const k08TensorMlpPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/k08-d-general-mlp-tensor-evidence.json';
 const k08TensorMlpGithubReplayPath = 'examples/native-ai/evidence/general-mlp-tensor-v0.1/github-replay.json';
 const k08TensorLivenessPath = 'examples/native-ai/evidence/tensor-plan-liveness-v0.1/k08-e-tensor-plan-liveness-evidence.json';
@@ -87,6 +93,8 @@ const k04ServerAi = await verifyK04ServerAiGenerationReceipt();
 const k04ServerAiAdmitted = k04ServerAi.aiGenerateAdmission === 'PASS';
 const k327CompilerAi = verifyK327CompilerAiGenerationReceipt();
 const k327CompilerAiAdmitted = k327CompilerAi.aiGenerateAdmission === 'PASS';
+const k321K322 = verifyK321K322CompilerAlgorithmCliReceipt();
+const k321K322Admitted = k321K322.aiGenerateAdmission === 'PASS';
 
 function k02AiGate(fallback) {
   if (!k02AiAdmitted) return fallback;
@@ -227,6 +235,46 @@ if (k04ServerAiAdmitted) {
   }
 }
 
+if (k321K322Admitted) {
+  const commonEvidence = [
+    'examples/universal-stress/k321-k322-compiler-algorithm-cli.rcl',
+    k321K322RuntimeContractPath,
+    k321K322RuntimePath,
+  ];
+  const gates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: STRESS_STATUS.PASS,
+    evidence: gate === 'AI_GENERATE'
+      ? [k321K322AiContractPath, k321K322AiReceiptPath, k321K322AiGithubReplayPath, k321K322RuntimePath]
+      : commonEvidence,
+    note: gate === 'AI_GENERATE'
+      ? `Three independent RCL algorithm repairs restored canonical bytes; GitHub run ${k321K322.githubAuthority.runId} bound Linux and Windows native CLI replay.`
+      : `Frozen 20-round native rclc/rclvm CLI profile; runtime receipt ${k321K322.runtimeEvidenceBinding.reportRoot}.`,
+  }]));
+  for (const [programFamily, coverageMode] of [['algorithm', COVERAGE_MODE.NATIVE_SEMANTIC], ['cli', COVERAGE_MODE.LOWERED_EXECUTION]]) {
+    directClaims.push({
+      id: `compiler-runtime::${programFamily}`,
+      coverageMode,
+      lastVerifiedSha: k321K322.githubAuthority.sourceCommit,
+      lastVerifiedDate: k321K322.githubAuthority.verifiedAt.slice(0, 10),
+      knownLimits: [
+        'Evidence is limited to the frozen recursive GCD, Fibonacci and sum-of-squares profile with fixed in-source inputs.',
+        'CLI evidence covers native rclc/rclvm process invocation, stdout JSON and fail-closed source/RBC inputs; interactive arguments and shell authority remain unverified.',
+        'AI_GENERATE is limited to three receipt-bound semantic repairs and grants no K327/K339 compiler authority.',
+      ],
+      relatedKillerTasks: [],
+      requiredGenes: ['recursive-numeric-algorithms', 'native-compiler-byte-parity', 'native-cli-rooted-state', 'fail-closed-cli-inputs'],
+      gates: structuredClone(gates),
+      changes: [{
+        id: 'native-compiler-runtime-algorithm-cli-profile',
+        kind: 'stress-case',
+        scope: ['compiler-runtime'],
+        generalPrimitive: true,
+        justification: 'Existing RCL recursion, arithmetic and state semantics execute through the ordinary native compiler and VM CLI without a task-specific opcode or opaque algorithm provider.',
+      }],
+    });
+  }
+}
+
 const claimsById = new Map(nativeUi.claims.map((claim) => [claim.id, claim]));
 const selfhostClaim = structuredClone(claimsById.get('compiler-runtime::self-hosting'));
 if (!selfhostClaim) throw new Error('RCL_K400_K01_AI_TARGET_MISSING:compiler-runtime::self-hosting');
@@ -312,7 +360,7 @@ const evidence = {
   donorComparisons: nativeUi.donorComparisons ?? [],
   novelTaskTrials: nativeUi.novelTaskTrials ?? 0,
   kernelChangesForNovelTasks: nativeUi.kernelChangesForNovelTasks ?? 0,
-  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
+  sourceReceipts: [nativeUiPath, k02Path, k03Path, k03EmulatorPath, k03AiContractPath, k03AiReceiptPath, ...(k03AiAdmitted ? [k03AiGithubReplayPath] : []), k04ServerRuntimeContractPath, k04ServerRuntimePath, k04ServerAiContractPath, k04ServerAiReceiptPath, ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []), k327CompilerAiContractPath, k327CompilerAiReceiptPath, ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []), k321K322RuntimeContractPath, k321K322RuntimePath, k321K322AiContractPath, k321K322AiReceiptPath, ...(k321K322Admitted ? [k321K322AiGithubReplayPath] : []), k08Path, k233ReceiptPath, k233GithubReplayPath, k02AiContractPath, k02AiReceiptPath, ...(k02AiAdmitted ? [k02AiGithubReplayPath] : []), k01AiContractPath, k01AiReceiptPath, ...(k01AiAdmitted ? [k01AiGithubReplayPath] : []), k08TensorMlpPath, k08TensorMlpGithubReplayPath, k08TensorLivenessPath, k08TensorLivenessGithubReplayPath, k08TensorBorrowedInputPath, k08TensorBorrowedInputGithubReplayPath, k08AutodiffPath, k08AutodiffGithubReplayPath, browserPerformanceContractPath, browserRuntimePath],
   notes: [
     'This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.',
     'Historical K02 and K03 receipts are not relabeled as current execution evidence.',
@@ -336,6 +384,9 @@ const evidence = {
     k327CompilerAiAdmitted
       ? `K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run ${k327CompilerAi.githubAuthority.runId}.`
       : 'K327 has a 3/3 local independent compiler builtin-lowering repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
+    k321K322Admitted
+      ? `K321/K322 close compiler-runtime::algorithm and compiler-runtime::cli through 20 native rounds, 3/3 independent repairs and GitHub Linux/Windows run ${k321K322.githubAuthority.runId}.`
+      : 'K321/K322 have 20/20 native algorithm CLI rounds and a 3/3 local independent repair candidate; both remain UNTESTED until GitHub focused and Windows replay are bound.',
     `K08-D is candidate-only evidence: a ${k08TensorMlp.plan.nodes}-node generic Tensor Plan measured ${k08TensorMlp.performance.scalarToTensorSpeedup.toFixed(3)}x local scalar-to-Tensor speedup and a remaining ${k08TensorMlp.performance.optimizedTensorToOracleRatio.toFixed(3)}x JS ratio; it grants no new K233 gate or K400 cell.`,
     `K08-E is candidate-only evidence: last-use reclamation measured a ${k08TensorLiveness.planStore.peakPlanStoreReductionFactor.toFixed(3)}x logical plan-store reduction and ${k08TensorLiveness.controlledPerformance.speedup.toFixed(3)}x controlled speedup on the same plan; it grants no process-RSS, general-speedup, K233 or K400 claim.`,
     `K08-F is candidate-only local Windows evidence: ${k08TensorBorrowedInput.productionWorkload.inputBindingCount} Plan inputs are borrowed with zero input-storage clones; exact-main A/B measured ${k08TensorBorrowedInput.controlledPerformance.speedup.toFixed(3)}x runtime speedup and ${k08TensorBorrowedInput.processMemory.production.reductionPercent.toFixed(3)}% peak Working Set median delta on the unchanged Plan. It grants no portable/general memory, K233 or K400 claim.`,

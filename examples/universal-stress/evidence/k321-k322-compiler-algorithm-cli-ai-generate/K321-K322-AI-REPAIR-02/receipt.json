@@ -1,0 +1,123 @@
+{
+  "format": "rcl.k321-k322.compiler-algorithm-cli-ai-trial-receipt.v0.1",
+  "trialId": "K321-K322-AI-REPAIR-02",
+  "mutationClass": "fibonacci-recurrence-offset",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03a2c-16aa-7eb1-a75b-4d0454eb6854",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "fibonacci(n - 3)",
+    "new": "fibonacci(n - 2)",
+    "diagnosis": "The Fibonacci recurrence currently uses F(n-1)+F(n-3), which violates the invariant. Replacing the second recursive term with F(n-2) preserves the RCL-owned algorithm and existing base cases F(0)=0 and F(1)=1."
+  },
+  "promptRoot": "52eb1cb6ac6266f8f010d43a06dc7e887f2cdc7fd7ac6cc449e4678eb5f5f77a",
+  "mutatedSourceSha256": "a3c449f4cf7ab215d5e94f6a22df226ac65a6f25465f40d0582165074c628f52",
+  "candidateSourceSha256": "c718635526ce14c49fbec65324332b20d85dbd128c4e07520de13876a89859b9",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "bce88e0d844abc393645d3f83b0665ad796488ae9d094cb1374e28e5e4c8be47",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03a2c-16aa-7eb1-a75b-4d0454eb6854"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "839b9856db1861d853056dd22615d1ff3efb51df19dd7aadf47ae28bb01fb3f7"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "c822ca00269b4c5bbed3097e9e7b1af6d568dbb1e0051d4d447f3b24324f7f44"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 56960,
+        "cached_input_tokens": 29440,
+        "output_tokens": 394,
+        "reasoning_output_tokens": 87
+      }
+    }
+  ],
+  "finalMessageSha256": "c822ca00269b4c5bbed3097e9e7b1af6d568dbb1e0051d4d447f3b24324f7f44",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "8cffcf94910cc87daba15104407c881a952a5cc96c34d827cde16ab5f3756adb",
+    "failedChecks": [
+      "fibonacci-recurrence",
+      "native-cli-algorithm-results"
+    ],
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "136de5f9138fa8f841011b54bbf320bcf730afb22fd788d66e381c507b6e2623",
+    "checks": {
+      "rcl-owns-profile": {
+        "pass": true
+      },
+      "gcd-euclidean-step": {
+        "pass": true
+      },
+      "fibonacci-recurrence": {
+        "pass": true
+      },
+      "sum-squares-recurrence": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-cli-algorithm-results": {
+        "pass": true
+      },
+      "native-cli-boundary-results": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "e7061b8c642417c6e9c720e96d34878055bcadf28da830b4bcfbdb9b9c1c3911"
+}
