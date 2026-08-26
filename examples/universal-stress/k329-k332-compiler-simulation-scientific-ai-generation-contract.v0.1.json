@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k329-k332.compiler-simulation-scientific-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": ["K329", "K332"],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k329-k332-compiler-simulation-scientific.rcl",
+    "sourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+    "candidateReportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+    "reportRoot": "4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K329-K332-AI-REPAIR-01",
+      "mutationClass": "simulation-state-transition",
+      "semanticInvariant": "Each discrete step advances position by the current velocity before acceleration updates velocity."
+    },
+    {
+      "id": "K329-K332-AI-REPAIR-02",
+      "mutationClass": "scientific-closed-form",
+      "semanticInvariant": "The closed-form displacement term for old-velocity Euler integration is acceleration*steps*(steps-1)/2."
+    },
+    {
+      "id": "K329-K332-AI-REPAIR-03",
+      "mutationClass": "zero-step-boundary",
+      "semanticInvariant": "Simulation must stop when completed is greater than or equal to requested steps, so zero steps preserve the initial state."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsRuntimeReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K329/K332 state-transition, closed-form and boundary semantics and binds its 20-round native runtime receipt. It grants no arbitrary simulation/scientific generation, floating-point solver, GPU/HPC claim, unrelated K400 cell or K400 completion."
+}

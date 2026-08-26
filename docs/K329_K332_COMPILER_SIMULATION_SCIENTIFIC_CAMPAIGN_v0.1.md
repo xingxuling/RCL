@@ -1,6 +1,6 @@
 # K329/K332 Compiler Simulation + Scientific Campaign v0.1
 
-**Status:** local runtime candidate; `AI_GENERATE`, hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
+**Status:** local runtime and 3/3 independent AI repair candidate; hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
 
 ## Reality Audit
 
@@ -26,4 +26,14 @@ Formal acquisition passed 20/20 native rounds with one artifact hash and one sta
 
 ## Evidence boundary
 
-Local evidence is `CANDIDATE` only. It grants no floating-point solver, arbitrary physics, chaotic-system accuracy, GPU/HPC performance, AI generation, unrelated K400 cell or K400 completion. No new dependency or donor code was added, so there is no new license surface and no silent RCL bypass.
+Local evidence is `CANDIDATE` only. It grants no floating-point solver, arbitrary physics, chaotic-system accuracy, GPU/HPC performance, arbitrary AI generation, unrelated K400 cell or K400 completion. No new dependency or donor code was added, so there is no new license surface and no silent RCL bypass.
+
+## Independent AI repair candidate
+
+Three fresh ephemeral read-only sessions repaired separately mutated state-transition, closed-form and zero-step boundary semantics. Each restored exact canonical bytes and passed native replay:
+
+- `K329-K332-AI-REPAIR-01`: `01a03f37-9e89-7591-aae9-6ace0a4d5fc8`
+- `K329-K332-AI-REPAIR-02`: `01a03f3a-f79c-7a93-a0c7-f8f04e65717e`
+- `K329-K332-AI-REPAIR-03`: `01a03f3e-1954-74f0-8a99-cc089528fce8`
+
+Aggregate receipt root: `527ab8dd0c452dd98696be85a2a514b3ef77b628cd51e861573d813a43a26bab`. This is local `CANDIDATE` evidence only; checked-in independent receipt replay and GitHub Linux/Windows authority remain mandatory before either K329 or K332 can enter K400.
