@@ -155,6 +155,7 @@ jobs:
       - name: K327 independent Compiler AI generation receipt replay
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
       - name: K321/K322 independent Algorithm CLI AI receipt replay
+        # Replays saved independent edits; CI never invokes the generator.
         run: node --test tests/k321-k322*.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
