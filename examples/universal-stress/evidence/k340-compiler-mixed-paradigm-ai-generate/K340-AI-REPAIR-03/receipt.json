@@ -1,0 +1,133 @@
+{
+  "format": "rcl.k340.compiler-mixed-paradigm-ai-trial-receipt.v0.1",
+  "trialId": "K340-AI-REPAIR-03",
+  "mutationClass": "declarative-authority-binding",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03f01-37c0-7da3-bd8c-2d5d3c52065b",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "needs compiler.emit on source",
+    "new": "needs compiler.analyze on source",
+    "diagnosis": "analyze_batch currently requires compiler.emit on source, but builder only has compiler.analyze on source. This violates the semantic invariant and likely causes the RCL_COMPILE_ERROR. Replace the requirement with compiler.analyze on source under the existing builder warrant."
+  },
+  "promptRoot": "84701ea2b2ca00e9960ca945f2122fcf7336c724d9fb7b186bb175476a5a152d",
+  "mutatedSourceSha256": "9d95187e2314c09d7f6574ada66277c92c30c35700aae774a624627b1c1d1900",
+  "candidateSourceSha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "a41bd87bc9dfd6d2af9961c304e9ced83b9c096973a071d63f59355b28dd2148",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03f01-37c0-7da3-bd8c-2d5d3c52065b"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "85c4c48be340794b7afdc63546bc26c30be44f7cc28f5cb3cf90189f18840b9d"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "d538daa3a72922af634520acd0c37eba7a115b51c08532d506f37a17c345031d"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 40843,
+        "cached_input_tokens": 22272,
+        "output_tokens": 404,
+        "reasoning_output_tokens": 97
+      }
+    }
+  ],
+  "finalMessageSha256": "d538daa3a72922af634520acd0c37eba7a115b51c08532d506f37a17c345031d",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "055f83ca9a0831800d02aff9aaef39ff95a219328881a4362f5854c8de51e782",
+    "errorCode": "RCL_COMPILE_ERROR"
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "752ff1e021945ecc0a227fd2f20952432ea5df65094dcbd29b95bc795c535313",
+    "checks": {
+      "reference-compile": {
+        "pass": true
+      },
+      "native-selfhost-compile": {
+        "pass": true
+      },
+      "bootstrap-byte-parity": {
+        "pass": true
+      },
+      "expected-state": {
+        "pass": true,
+        "actual": {
+          "compiler.accepted": true,
+          "compiler.digest": 204,
+          "compiler.emitted": true,
+          "compiler.phase": 2,
+          "input.batch_size": 8
+        }
+      },
+      "rule-order": {
+        "pass": true
+      },
+      "root-continuity": {
+        "pass": true
+      },
+      "authority-needs": {
+        "pass": true
+      },
+      "witnesses": {
+        "pass": true
+      },
+      "recursive-execution": {
+        "pass": true,
+        "peakCallFrames": 9
+      },
+      "native-execute": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "ac5b859d4daba647cef352f8ac14b7cff071407d6d7954e7b49809303d600b63"
+}

@@ -14,7 +14,9 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `15 PASS / 0 BLOCKED / 385 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338 and K339.
+Current authoritative matrix: `16 PASS / 0 BLOCKED / 384 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338, K339 and K340.
+
+K340 is independently closed for the bounded mixed-paradigm compiler-runtime profile. One RCL program combines recursive functional computation, declarative warrants/needs, governed transactional state changes and a state-triggered second rule. Twenty native rounds preserved one artifact root, one final semantic state root and exact transaction continuity; five semantic/corrupt-artifact controls failed closed. Three isolated read-only sessions repaired recursive computation, phase triggering and declarative authority mutations. GitHub run `33005515826` bound focused job `98298112072` and Windows job `98298112360` for exact source commit `01572386c82dd0e46b2eed4bc13b804ddc548a44`; authority root is `5611bea18a41f46aa863f9f2320a59c0b10afae916aec1f33400fb47cace4016`. This closes only K340 for the frozen profile. `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open, and no arbitrary mixed-language, compiler-security, production-promotion or K400-completion claim is granted.
 
 Every evidence-bearing cell is evaluated through:
 
