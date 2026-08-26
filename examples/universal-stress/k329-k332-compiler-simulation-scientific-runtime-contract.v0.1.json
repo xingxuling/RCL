@@ -1,0 +1,49 @@
+{
+  "format": "rcl.k329-k332.compiler-simulation-scientific-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": ["K329", "K332"],
+  "coordinates": ["compiler-runtime::simulation", "compiler-runtime::scientific"],
+  "canonicalOwner": "RCL",
+  "profile": "NATIVE_INTEGER_CONSTANT_ACCELERATION_SIMULATION_WITH_CLOSED_FORM_ORACLE",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k329-k332-compiler-simulation-scientific.rcl",
+    "sourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "e8aa1d1349db6496cf179b9e48886d2a0603f6484718cddd410aec639dce06c3",
+    "semanticStateRoot": "7e8b4fa76cb4e420ecc7a81d4f2d1df8671dffca0976b45c2a35f7b6530ce70b",
+    "candidateReportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141"
+  },
+  "expectedState": {
+    "result.position": 120,
+    "result.velocity": 23,
+    "result.trajectory": [0, 3, 8, 15, 24, 35, 48, 63, 80, 99, 120],
+    "oracle.position": 120,
+    "oracle.velocity": 23,
+    "boundary.zero_step_state": [0, 3, [0]],
+    "boundary.one_step_state": [3, 5, [0, 3]],
+    "evaluation.pass": true
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "position-update-mutation-rejected",
+      "velocity-update-sign-mutation-rejected",
+      "closed-form-oracle-mutation-rejected",
+      "zero-step-boundary-mutation-rejected",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K329 compiler-runtime::simulation and K332 compiler-runtime::scientific for the frozen integer constant-acceleration profile. It grants no floating-point solver, arbitrary physics, chaotic-system accuracy, GPU/HPC performance, unrelated K400 cell or K400 completion."
+}
