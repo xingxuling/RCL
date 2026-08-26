@@ -1,0 +1,39 @@
+name: K08-R GQA RoPE BF16 v0.1
+
+on:
+  push:
+    branches:
+      - codex/k08-r-gqa-rope-bf16-v01
+    paths:
+      - 'examples/native-ai/bf16-gqa-rope-multiblock-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-r-gqa-rope-bf16.test.mjs'
+      - '.github/workflows/k08-r-gqa-rope-bf16.yml'
+  pull_request:
+    paths:
+      - 'examples/native-ai/bf16-gqa-rope-multiblock-*'
+      - 'native/tensor-engine/**'
+      - 'tests/k08-r-gqa-rope-bf16.test.mjs'
+      - '.github/workflows/k08-r-gqa-rope-bf16.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-r-gqa-rope-bf16:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build native compiler and Tensor organs
+        run: npm run build:native
+      - name: Run K08-R GQA RoPE BF16 evidence
+        run: npm run test:k08-r-gqa-rope-bf16

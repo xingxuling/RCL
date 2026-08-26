@@ -1,0 +1,60 @@
+{
+  "format": "rcl.k08-r.bf16-gqa-rope-multiblock-local-evidence.v0.1",
+  "status": "PASS_LOCAL_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "branch": "codex/k08-r-gqa-rope-bf16-v01",
+  "baseMain": "a095872beca5d61a3ffde99f31e7163dc54a4dbb",
+  "sourceCommit": null,
+  "evidenceCommand": "npm run test:k08-r-gqa-rope-bf16",
+  "localExecution": {
+    "platform": "Windows current host",
+    "nodeEvidenceTests": 6,
+    "nodeEvidencePassed": 6,
+    "hostedReplay": false,
+    "gpuClaim": false
+  },
+  "profile": {
+    "blockCount": 2,
+    "queryHeads": 2,
+    "kvHeads": 1,
+    "headDimension": 2,
+    "parameterGroups": 14,
+    "position": "K08-N RoPE",
+    "attention": "K08-O GQA",
+    "dtype": "bf16",
+    "accumulationDtype": "f32",
+    "optimizer": "AdamW"
+  },
+  "checks": {
+    "genomeSelfHostByteParity": true,
+    "nativeSemanticRoot": true,
+    "gqaRopeTwoBlockGraph": true,
+    "lossDecreases": true,
+    "allFourteenParameterGroupsUpdate": true,
+    "fp32MasterAndExactAdamWState": true,
+    "deterministicReplay": true,
+    "exactCheckpointResume": true,
+    "canonicalStateOrderFailClosed": true,
+    "noModelSpecialOperation": true
+  },
+  "claimsGranted": [
+    "BF16_GQA_ROPE_MULTI_BLOCK_TRAINING",
+    "BF16_GQA_ROPE_CHECKPOINT_RESUME"
+  ],
+  "claimsNotGranted": [
+    "GPU",
+    "OPENCL_BF16",
+    "VULKAN_GPU",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "PRODUCTION_DATASET",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_K08_R_BF16_HOSTED_REPLAY",
+    "RCL_GAP_GPU_EXECUTION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "reportRoot": "5753268adff3abe90e03f477550ec7a6bef3f6a333deb1733ad24bb3343d9892"
+}

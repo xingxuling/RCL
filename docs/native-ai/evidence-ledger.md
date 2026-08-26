@@ -295,3 +295,24 @@ Authority files:
 - `docs/native-ai/bf16-multiblock-adamw-evidence-v0.1.md`
 
 Reproduction: `npm run test:k08-bf16-multiblock`. Claims are limited to bounded two-block BF16 training, exact continuation and all canonical group updates. Hosted replay gap `RCL_GAP_K08_S_MB_HOSTED_REPLAY` is closed for this candidate by run `32988994250`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K08-R GQA + RoPE BF16 multi-block candidate
+
+Status: `BF16_GQA_ROPE_MULTIBLOCK_REFERENCE_CANDIDATE_LOCAL_ONLY`. The existing K08-N RoPE + K08-O GQA + K08-R two-block generic Tensor graph now runs through K08-S BF16 RNE, FP32 accumulation, Reverse Autodiff and exact FP32 AdamW. Fourteen canonical parameter groups update in order, and local evidence is `6/6 PASS` for genome/native-root parity, GQA+RoPE composition, loss decrease, exact state, deterministic replay, exact checkpoint resume and fail-closed negatives.
+
+| Evidence | Result |
+|---|---:|
+| Two-block K08-N/K08-O graph under BF16 Autodiff AdamW | PASS |
+| All fourteen parameter groups update | PASS |
+| Direct 6 versus checkpoint 3 + resume 3 | exact PASS |
+| Local Node evidence | `6/6 PASS` |
+| Hosted Ubuntu + Windows replay | NOT YET RUN |
+
+Authority files:
+
+- `examples/native-ai/bf16-gqa-rope-multiblock-genome.rcl`
+- `examples/native-ai/bf16-gqa-rope-multiblock-contract.v0.1.json`
+- `examples/native-ai/evidence/bf16-gqa-rope-multiblock-v0.1/k08-r-bf16-local-evidence.json`
+- `docs/native-ai/bf16-gqa-rope-multiblock-evidence-v0.1.md`
+
+Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 GQA+RoPE two-block training and exact continuation. Open gaps: `RCL_GAP_K08_R_BF16_HOSTED_REPLAY`, `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
