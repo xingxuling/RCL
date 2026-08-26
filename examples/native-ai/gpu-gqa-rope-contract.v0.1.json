@@ -1,0 +1,78 @@
+{
+  "format": "rcl.k08-r.gpu-gqa-rope-contract.v0.1",
+  "status": "OPENCL_HYBRID_GQA_ROPE_FORWARD_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "GENERIC_GQA_ROPE_BF16_FORWARD_FP32_REVERSE_ADAMW_OPENCL_HYBRID",
+  "lowering": {
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerLanguage": "Python ctypes OpenCL",
+    "providerRole": "auxiliary matmul lowerer only",
+    "semanticOwner": "RCL",
+    "fallback": "forbidden",
+    "requiredPlacements": {
+      "matmul": "gpu",
+      "nonMatmul": "cpu-reference-explicit"
+    }
+  },
+  "precisionPolicy": {
+    "inputDtype": "bf16",
+    "activationComputeDtype": "bf16",
+    "matmulAccumulationDtype": "f32",
+    "gradientDtype": "f32",
+    "masterWeightDtype": "f32",
+    "optimizerStateDtype": "f32",
+    "bf16Rounding": "round-to-nearest-ties-to-even",
+    "bf16CastBackward": "straight-through-fp32",
+    "nonFinite": "rejected"
+  },
+  "graphPolicy": {
+    "deviceIntent": "opencl-amd",
+    "backend": "opencl-amd-hybrid",
+    "placementPolicy": "explicit-per-node",
+    "sharedKvAcrossQueryHeads": true,
+    "gpuOperationSet": [
+      "matmul"
+    ],
+    "hostReferenceOperationSet": [
+      "add",
+      "sub",
+      "mul",
+      "mean",
+      "softmax",
+      "transpose"
+    ],
+    "modelSpecialOpcodes": false
+  },
+  "requiredEvidence": [
+    "rcl-rope-frame-receipt",
+    "generic-gqa-shared-kv-graph",
+    "ordered-gpu-matmul-receipts",
+    "cpu-reference-differential",
+    "deterministic-optimizer-and-checkpoint-parity",
+    "explicit-gpu-and-host-placement-telemetry",
+    "missing-placement-fails-closed",
+    "cpu-matmul-placement-fails-closed",
+    "provider-unavailable-fails-closed",
+    "hosted-replay-or-explicit-unavailable-boundary"
+  ],
+  "claimsGrantedOnAdmission": [
+    "OPENCL_AMD_BF16_GQA_ROPE_FORWARD_MATMUL_LOWERING",
+    "OPENCL_HYBRID_GQA_ROPE_FORWARD_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_BF16_BACKWARD_KERNELS",
+    "OPENCL_BF16_OPTIMIZER_KERNELS",
+    "BF16_GQA_ROPE_GPU",
+    "GENERIC_GPU_BACKEND",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ]
+}
