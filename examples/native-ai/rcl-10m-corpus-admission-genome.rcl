@@ -1,0 +1,16 @@
+# RCL-owned admission gate for a real RCL-10M corpus manifest.
+reality Rcl10mCorpusAdmissionGenomeCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon target(value : Number) -> Truth = value == 10000000
+  reckon complete_mix(zh : Number, en : Number, ja : Number, code : Number) -> Truth = zh > 0 and en > 0 and ja > 0 and code > 0 and zh + en + ja + code == 1000000
+
+  facet contract.id : Text = "rcl-rcl10m-corpus-admission-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.status : Text = "SCHEMA_CANDIDATE_BLOCKED_USER_CORPUS"
+  facet contract.provenance : Text = "SOURCE_HASH_LICENSE_PRIVACY_POISON_FILTER_DEDUP_TOKENIZER_AND_SHARD_ROOTS"
+  facet contract.no_unrooted_substitution : Truth = true
+  facet evaluation.target_is_frozen : Truth = target(10000000)
+  facet evaluation.mixtures_are_explicit : Truth = complete_mix(250000, 250000, 250000, 250000)
+  facet evaluation.training_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_PRODUCTION_CORPUS_RCL10M_OR_K400_PROMOTION"
+}

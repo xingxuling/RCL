@@ -1,0 +1,39 @@
+name: RCL-10M Corpus Admission Gate v0.1
+
+on:
+  push:
+    branches:
+      - codex/rcl10m-corpus-admission-v01
+    paths:
+      - 'src/native-ai-corpus-admission.mjs'
+      - 'tests/rcl-10m-corpus-admission.test.mjs'
+      - 'examples/native-ai/rcl-10m-corpus-admission-*'
+      - 'package.json'
+      - '.github/workflows/rcl-10m-corpus-admission.yml'
+  pull_request:
+    paths:
+      - 'src/native-ai-corpus-admission.mjs'
+      - 'tests/rcl-10m-corpus-admission.test.mjs'
+      - 'examples/native-ai/rcl-10m-corpus-admission-*'
+      - 'package.json'
+      - '.github/workflows/rcl-10m-corpus-admission.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rcl-10m-corpus-admission:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run RCL-10M corpus admission schema gate
+        run: npm run test:rcl-10m-corpus-admission
