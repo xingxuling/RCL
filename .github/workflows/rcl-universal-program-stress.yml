@@ -156,7 +156,7 @@ jobs:
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
       - name: K321/K322 independent Algorithm CLI AI receipt replay
         # Replays saved independent edits; CI never invokes the generator.
-        run: node --test tests/k321-k322*.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
+        run: node --test tests/k321-k322-compiler-algorithm-cli-receipt.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
       - name: Evidence-empty baseline report
         run: node scripts/universal-program-stress-report.mjs examples/universal-stress/v0.1-baseline-evidence.json output/universal-stress-v0.1
       - name: Consolidated K400 campaign report
@@ -188,7 +188,7 @@ jobs:
       - name: K01 Windows self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
       - name: K321/K322 Windows native Algorithm CLI runtime replay
-        run: node --test tests/k321-k322*.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
+        run: node --test tests/k321-k322-compiler-algorithm-cli-receipt.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
       - name: K08 Tensor native provider and CPU engine tests
         run: npm run test:k08-tensor
       - name: K08 Tensor Windows performance evidence
