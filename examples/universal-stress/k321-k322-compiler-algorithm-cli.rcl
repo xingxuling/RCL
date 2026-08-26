@@ -1,0 +1,40 @@
+# K321/K322: compiler-runtime algorithm + CLI bounded profile.
+# RCL owns the algorithms and observable state. Native rclc/rclvm provide the
+# compiler-runtime and command-line execution boundary.
+reality CompilerAlgorithmCli {
+  reckon absolute(value : Number) -> Number = choose(value < 0, -value, value)
+
+  reckon gcd(a : Number, b : Number) -> Number =
+    choose(b == 0, absolute(a), gcd(b, a % b))
+
+  reckon fibonacci(n : Number) -> Number =
+    choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 2))
+
+  reckon sum_squares(n : Number) -> Number =
+    choose(n <= 0, 0, n * n + sum_squares(n - 1))
+
+  facet contract.id : Text = "k321-k322-compiler-algorithm-cli-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM_CLI"
+
+  facet input.gcd_a : Number = 1071
+  facet input.gcd_b : Number = 462
+  facet input.fibonacci_n : Number = 12
+  facet input.sum_squares_n : Number = 24
+
+  facet result.gcd : Number = gcd(input.gcd_a, input.gcd_b)
+  facet result.fibonacci : Number = fibonacci(input.fibonacci_n)
+  facet result.sum_squares : Number = sum_squares(input.sum_squares_n)
+  facet result.boundary_gcd_zero : Number = gcd(-42, 0)
+  facet result.boundary_fibonacci_zero : Number = fibonacci(0)
+  facet result.boundary_fibonacci_one : Number = fibonacci(1)
+  facet result.boundary_sum_zero : Number = sum_squares(0)
+  facet result.correct : Truth =
+    result.gcd == 21 and
+    result.fibonacci == 144 and
+    result.sum_squares == 4900 and
+    result.boundary_gcd_zero == 42 and
+    result.boundary_fibonacci_zero == 0 and
+    result.boundary_fibonacci_one == 1 and
+    result.boundary_sum_zero == 0
+}

@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k321-k322.compiler-algorithm-cli-runtime-contract.v0.1",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": [
+    "K321",
+    "K322"
+  ],
+  "profile": "BOUNDED_NATIVE_COMPILER_RUNTIME_ALGORITHM_CLI",
+  "canonicalOwner": "RCL",
+  "executionBoundary": "selfhost/compiler.rbc -> native rclc CLI -> RBC -> native rclvm CLI -> rooted JSON state",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k321-k322-compiler-algorithm-cli.rcl",
+    "sourceSha256": "c718635526ce14c49fbec65324332b20d85dbd128c4e07520de13876a89859b9",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b"
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "nativeStateRootRequired": true,
+    "bootstrapByteParity": true,
+    "independentJavascriptOracle": true,
+    "malformedSourceRejected": true,
+    "corruptRbcRejected": true
+  },
+  "expectedState": {
+    "contract.id": "k321-k322-compiler-algorithm-cli-v0.1",
+    "contract.owner": "RCL",
+    "contract.execution": "NATIVE_RCLC_TO_RCLVM_CLI",
+    "result.gcd": 21,
+    "result.fibonacci": 144,
+    "result.sum_squares": 4900,
+    "result.boundary_gcd_zero": 42,
+    "result.boundary_fibonacci_zero": 0,
+    "result.boundary_fibonacci_one": 1,
+    "result.boundary_sum_zero": 0,
+    "result.correct": true
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K321 compiler-runtime::algorithm and K322 compiler-runtime::cli for the frozen recursive GCD, Fibonacci and sum-of-squares profile. It grants no arbitrary algorithms, interactive argument parsing, shell authority, compiler self-hosting, unrelated K400 cells or K400 completion."
+}

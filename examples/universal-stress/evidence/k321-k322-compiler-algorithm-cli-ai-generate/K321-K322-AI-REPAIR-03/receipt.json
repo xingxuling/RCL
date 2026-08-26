@@ -1,0 +1,123 @@
+{
+  "format": "rcl.k321-k322.compiler-algorithm-cli-ai-trial-receipt.v0.1",
+  "trialId": "K321-K322-AI-REPAIR-03",
+  "mutationClass": "sum-squares-term",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03a2c-99f1-7422-81a7-2f5a3e3d63c7",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+    "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+    "diagnosis": "sum_squares currently adds n + n at each recursive step, producing twice the arithmetic series instead of accumulating each square. Replace that recursive term with n * n so sum_squares(n) accumulates n*n down to zero."
+  },
+  "promptRoot": "97e399aa573d34b50bd70d1ce851acd1d4ce6d897d4e62b3bf14bade3cab3f83",
+  "mutatedSourceSha256": "9abf927dff746969f4c457a50fabe78cf032a049c0a4f507a997bdf314d479b0",
+  "candidateSourceSha256": "c718635526ce14c49fbec65324332b20d85dbd128c4e07520de13876a89859b9",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "ac42a0b19f9419c9ce9ccdc74c81f463d21b963f696e1294dad84238ef113ad2",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03a2c-99f1-7422-81a7-2f5a3e3d63c7"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "cff5197396cc1712c13896e1a682105ff9e8f2315baf46506c87f315fed795ee"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "c7f1b59602240ee36e319c610b978c3d818533fda6464580527435b4e86c7828"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 56918,
+        "cached_input_tokens": 29440,
+        "output_tokens": 387,
+        "reasoning_output_tokens": 65
+      }
+    }
+  ],
+  "finalMessageSha256": "c7f1b59602240ee36e319c610b978c3d818533fda6464580527435b4e86c7828",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "4130cddce80ee5b87e33972b9c0d57ada6703d2d056724c6fe4b8d0098a655d0",
+    "failedChecks": [
+      "sum-squares-recurrence",
+      "native-cli-algorithm-results"
+    ],
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "136de5f9138fa8f841011b54bbf320bcf730afb22fd788d66e381c507b6e2623",
+    "checks": {
+      "rcl-owns-profile": {
+        "pass": true
+      },
+      "gcd-euclidean-step": {
+        "pass": true
+      },
+      "fibonacci-recurrence": {
+        "pass": true
+      },
+      "sum-squares-recurrence": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-cli-algorithm-results": {
+        "pass": true
+      },
+      "native-cli-boundary-results": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "9da7cf2a6edc86791a17cc9a5e99a44fbc28abfe5d65a4d6fd4ab5c000038829"
+}

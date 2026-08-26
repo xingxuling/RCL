@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `11 PASS / 0 BLOCKED / 389 UNTESTED`
+**Current evidence:** `16 PASS / 0 BLOCKED / 384 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `5fcfa18469fc3f40e9006f5e154a8e8d16bd158807f9dd850f72c07d06571db2`
+**Report root:** `f6b13c00247c074b3f90aa1061c2cf453614fee7d5b62e2a63fe5d2fd855cc0d`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -53,6 +53,11 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
 | `K124` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile |
 | `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
+| `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
+| `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
+| `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
+| `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
+| `K340` | `compiler-runtime::mixed-paradigm` | `PASS` | none for the bounded recursive + declarative + transactional + reactive native profile; self-host static warrant validation remains an explicit RCL gap |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 
@@ -90,6 +95,12 @@ The Server batch froze its runtime contract before acquisition and ran 20 fresh 
 ## 9. K327 compiler closure
 
 K327 is independently closed by three new ephemeral read-only sessions repairing effective `contains`, `sequence_concat` and `sha256_text` builtin-lowering mutations. Each saved proposal restored the exact canonical compiler sources and reproduced compiler artifact SHA-256 `00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b`. The campaign binds the already admitted K01 fixed point only as runtime evidence; it does not inherit K339's AI-generation authority. GitHub run `32880432503` bound focused job `97908294490` and Windows job `97908294012` for exact source commit `42b77ceb71e1d00f686b41096646fd05a61ad6e9`; authority root `72c0ebe2de859e8585fe1f3325d7240896de25eb42055daeec56a78b33934670` closes K327 only.
+
+K321/K322 are independently closed for the bounded frozen recursive-algorithm CLI profile. The profile completed 20/20 native `rclc -> RBC -> rclvm` CLI rounds with one artifact root, one semantic state root, independent GCD/Fibonacci/sum-of-squares Oracle parity, malformed-source rejection and corrupt-RBC rejection. Three isolated read-only sessions repaired three effective algorithm mutations and restored exact canonical bytes. GitHub run `32998424312` bound focused job `98273605189` and Windows job `98273604990` for exact source commit `9c3980a58811fa21c26c2ce9e34f37e05db36356`; authority root is `94dcb025dffd8fe4adb6a8bcc3abae96800b3513a83c93670783c6aad7df8be8`. This closes only K321/K322 for the declared fixed-input native CLI profile; interactive shell authority, arbitrary algorithm generation and unrelated K400 cells remain unclaimed.
+
+K337/K338 are independently closed for the bounded two-transaction compiler-governance profile. Twenty native rounds preserved exact artifact/final-state roots, transaction continuity, authority needs and state-trigger order; missing warrant, broken preserve, inactive request and corrupt RBC controls failed closed. Three isolated read-only sessions repaired authority-capability, reactive-trigger and preserve-bound mutations. GitHub run `33000443777` bound focused job `98280568550` and Windows job `98280568136` for exact source commit `2fe5bcae851af1a81fa28277c7697451d512035f`; authority root is `fd3b8ea7ee48e410e28cd8d2a9411051db03a96551444e51289a342f80af2824`. `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open: the native VM rejects the missing-warrant artifact before commit, but the self-host compiler does not yet reject it statically. No arbitrary compiler security or production-promotion authority is claimed.
+
+K340 is independently closed for the bounded mixed-paradigm compiler-runtime profile and does not inherit K321 or K337/K338 authority. One native RCL program combines recursive functional computation, declarative warrants/needs, governed transactional updates and a state-triggered second rule. Twenty rounds preserved exact artifact/state/transaction roots, while recursive-term corruption, missing authority, wrong phase, inactive input and corrupt RBC controls failed closed. Three isolated read-only sessions repaired recursive computation, phase triggering and declarative authority mutations. GitHub run `33005515826` bound focused job `98298112072` and Windows job `98298112360` for exact source commit `01572386c82dd0e46b2eed4bc13b804ddc548a44`; authority root is `5611bea18a41f46aa863f9f2320a59c0b10afae916aec1f33400fb47cace4016`. This closes only K340 for the frozen profile; `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` and all unrelated cells remain open.
 
 ## 10. K08-A baseline and K08-B General MLP
 

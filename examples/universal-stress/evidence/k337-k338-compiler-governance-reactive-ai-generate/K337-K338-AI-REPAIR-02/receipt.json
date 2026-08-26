@@ -1,0 +1,143 @@
+{
+  "format": "rcl.k337-k338.compiler-governance-reactive-ai-trial-receipt.v0.1",
+  "trialId": "K337-K338-AI-REPAIR-02",
+  "mutationClass": "reactive-phase-trigger",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03edd-32cb-7de2-bd04-55c7c5cd629d",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "    when compiler.accepted == true and compiler.phase == 2",
+    "new": "    when compiler.accepted == true and compiler.phase == 1",
+    "diagnosis": "emit_candidate was gated on compiler.phase == 2, but authorize_candidate commits compiler.accepted=true and compiler.phase=1. Changing only the emit_candidate eligibility guard makes the reactive rule eligible immediately after authorization while preserving authority needs, alters, preserves, witnesses, and audit semantics."
+  },
+  "promptRoot": "db87318e37ffc84cade33babd07f40e35d706f9b123fe7fa60c40260d9e8582d",
+  "mutatedSourceSha256": "837c1b47868a18de420fbfa6b82b327176756dbb59e3a1078c6248ade2161951",
+  "candidateSourceSha256": "68d18b71ff30617ea912a18a6432cdceba5ca8604b46e7be63c0dfb4dd2d658c",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "d574373d8a2fd6946edaf1468a097599d5aa9623579b14c3d3a6c910b7f32188",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03edd-32cb-7de2-bd04-55c7c5cd629d"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "3acf981c7009f95de8997d167d2cb78cec30520b97b8e71661b4800d2e443876"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": -1,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "58dc03b69a6327ec1d641a3e079cfd841a5b28f8fe3f78da41541259c63c75e1"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 49166,
+        "cached_input_tokens": 24320,
+        "output_tokens": 539,
+        "reasoning_output_tokens": 154
+      }
+    }
+  ],
+  "finalMessageSha256": "58dc03b69a6327ec1d641a3e079cfd841a5b28f8fe3f78da41541259c63c75e1",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "48e3974e7cb7ef42973950fd1ad6541afa2fe31981aa211607417c1c8ce25fed",
+    "failedChecks": [
+      "expected-state",
+      "rule-order",
+      "root-continuity"
+    ],
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "67fd045bf29556cae18d24b0daa1252a0a7e269a77174807193b56d65283d921",
+    "checks": {
+      "reference-compile": {
+        "pass": true
+      },
+      "native-selfhost-compile": {
+        "pass": true
+      },
+      "bootstrap-byte-parity": {
+        "pass": true
+      },
+      "expected-state": {
+        "pass": true,
+        "actual": {
+          "compiler.accepted": true,
+          "compiler.audit_count": 2,
+          "compiler.emitted": true,
+          "compiler.phase": 2,
+          "request.valid": true
+        }
+      },
+      "rule-order": {
+        "pass": true
+      },
+      "root-continuity": {
+        "pass": true
+      },
+      "authority-needs": {
+        "pass": true
+      },
+      "witnesses": {
+        "pass": true
+      },
+      "native-execute": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "047546421db23665e62c2edfa5108cb50a95a1be5948693a9a02ac91e7c7d1fb"
+}
