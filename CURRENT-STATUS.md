@@ -136,7 +136,7 @@ The current Windows host has a real AMD Radeon(TM) 860M Graphics device (`0x1002
 
 ### K08 AMD OpenCL BF16 matmul candidate
 
-Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. The RCL-owned BF16 contract and genome lower a bounded generic matmul through `native/tensor-engine/amd_opencl_bf16_provider.py`. On the current Windows host, the provider selected the real AMD `gfx1152` OpenCL 2.0 device and executed the kernel with `gpuExecuted=true`; the response is explicitly `gpuClaim=false`. Independent CPU BF16 bit differential, deterministic replay, malformed/non-finite input rejection, shape rejection and unsupported-backend fail-closed behavior pass in `3/3` local Node tests. This candidate grants only AMD OpenCL BF16 matmul reference execution and bit-exact differential evidence. Hosted runners may prove replay or explicit unavailable-backend behavior but do not inherit the local device receipt.
+Status: `PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`. The RCL-owned BF16 contract and genome lower a bounded generic matmul through `native/tensor-engine/amd_opencl_bf16_provider.py`. On the current Windows host, the provider selected the real AMD `gfx1152` OpenCL 2.0 device and executed the kernel with `gpuExecuted=true`; the response is explicitly `gpuClaim=false`. Independent CPU BF16 bit differential, deterministic replay, malformed/non-finite input rejection, shape rejection and unsupported-backend fail-closed behavior pass in `3/3` local Node tests. Hosted run `32993386531` passed Ubuntu job `98256291089` and Windows job `98256291461` on exact head `a45622d5d3eeee61528d797c38b2f55b1abe78de`; Hosted does not inherit the local AMD device receipt. This candidate grants only AMD OpenCL BF16 matmul reference execution and bit-exact differential evidence.
 
 | Evidence | Result |
 |---|---:|
@@ -147,7 +147,7 @@ Status: `PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`. The RCL-owne
 | Deterministic replay | exact PASS |
 | Fail-closed negatives | PASS |
 | Local Node evidence | `3/3 PASS` |
-| Hosted Ubuntu + Windows replay | PENDING |
+| Hosted Ubuntu + Windows replay | PASS, run `32993386531`, jobs `98256291089` / `98256291461` |
 
 Authority files: `docs/native-ai/opencl-bf16-matmul-evidence-v0.1.md`, `examples/native-ai/opencl-bf16-matmul-contract.v0.1.json`, `examples/native-ai/evidence/opencl-bf16-matmul-v0.1/k08-amd-opencl-local-evidence.json`. Open gaps: `RCL_GAP_OPENCL_HOSTED_REPLAY`, `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 

@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_GPU_REFERENCE_CANDIDATE_HOSTED_REPLAY_PENDING`
+`PASS_LOCAL_AND_HOSTED_GPU_REFERENCE_CANDIDATE`
 
 This candidate is the smallest real accelerator lowerer after the GPU reality audit. RCL remains the canonical owner of BF16 bit encoding, round-to-nearest-ties-to-even conversion, FP32 accumulation, shape validation and fail-closed policy. The Python `ctypes` provider only loads `OpenCL.dll`, selects an AMD GPU, launches a generic matmul kernel and returns an execution receipt.
 
@@ -42,13 +42,13 @@ The fixed local request is a 2×3 by 3×2 multiplication. The independent expect
 
 ## Hosted boundary
 
-The workflow runs the same three tests on Ubuntu and Windows. Hosted runners are allowed to pass by proving the test or by reporting only the explicit unavailable-backend/device boundary. They do not inherit the local AMD receipt and cannot promote this to a generic GPU claim.
+The workflow passed the same three tests on Ubuntu and Windows in run `32993386531`, head `a45622d5d3eeee61528d797c38b2f55b1abe78de`. Hosted runners may pass by proving the test or by reporting only the explicit unavailable-backend/device boundary. They do not inherit the local AMD receipt and cannot promote this to a generic GPU claim.
 
 ## Gap register
 
 | Gap | Ruling | Next gate |
 |---|---|---|
-| `RCL_GAP_OPENCL_HOSTED_REPLAY` | OPEN | complete the hosted replay on the exact evidence commit |
+| `RCL_GAP_OPENCL_HOSTED_REPLAY` | CLOSED_FOR_THIS_CANDIDATE | run `32993386531`, Ubuntu job `98256291089` and Windows job `98256291461` passed |
 | `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` | OPEN | lower one K08-S BF16 matmul through this provider with an independent end-to-end training differential |
 | `RCL_GAP_RCL10M_TOKENIZER_DATASET` | OPEN | freeze provenance-bearing tokenizer and dataset before scale |
 
