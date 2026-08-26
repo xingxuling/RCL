@@ -29,9 +29,10 @@ The new RCL-owned admission validator freezes the minimum RCL-10M manifest shape
 | Missing mixture/provenance/shard bindings | fail-closed PASS |
 | Tampered manifest root | fail-closed PASS |
 | Local Node evidence | `5/5 PASS` |
+| Hosted Ubuntu + Windows schema replay | PASS, run `32995055906`, jobs `98261962473` / `98261962226` |
 | Real user corpus bytes | BLOCKED_USER_CORPUS |
 
-The local fixture uses `development://` references and synthetic hashes solely to exercise the validator. Those values are not corpus provenance and grant no training or quality claim.
+The local fixture uses `development://` references and synthetic hashes solely to exercise the validator. Those values are not corpus provenance and grant no training or quality claim. Hosted replay confirms the same schema gate on both platforms; it does not provide corpus bytes or user review decisions.
 
 ## K400 / Integration Court gates
 
