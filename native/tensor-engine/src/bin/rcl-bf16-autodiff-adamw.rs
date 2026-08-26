@@ -1,36 +1,40 @@
+use rcl_tensor_engine::{
+    AutodiffRequest, AutodiffResult, BF16_AUTODIFF_PRECISION, EngineError, Parameter, backward,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
+use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::io::{self, Read};
 
-const REQUEST_FORMAT: &str = "rcl.bf16-autodiff-adamw-request.v0.1";
-const RESULT_FORMAT: &str = "rcl.bf16-autodiff-adamw-result.v0.1";
-const POLICY: &str = "rcl.bf16-autodiff-fp32-master-adamw.v0.1";
+const REQUEST_FORMAT: &str = "rcl.bf16-autodiff-adamw-request.v0.2";
+const RESULT_FORMAT: &str = "rcl.bf16-autodiff-adamw-result.v0.2";
+const POLICY: &str = "rcl.bf16-rne-fp32-accumulation-adamw.v0.2";
 const BACKEND: &str = "cpu-reference";
-const MAX_ELEMENTS: usize = 1_048_576;
 const MAX_STEPS: usize = 16_384;
+const MAX_PARAMETERS: usize = 256;
 
 #[derive(Debug)]
-struct MpTrainError {
+struct TrainError {
     code: &'static str,
     message: String,
 }
 
-impl MpTrainError {
+impl TrainError {
     fn new(code: &'static str, message: impl Into<String>) -> Self {
-        Self { code, message: message.into() }
+        Self {
+            code,
+            message: message.into(),
+        }
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct TensorInput {
-    shape: Vec<usize>,
-    data: Vec<f64>,
-    #[serde(default)]
-    exact_f32_bits: Vec<String>,
+impl From<EngineError> for TrainError {
+    fn from(error: EngineError) -> Self {
+        Self::new(error.code, error.message)
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -47,12 +51,13 @@ struct AdamWConfig {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct OptimizerState {
+    tensor_id: String,
     step: usize,
     first_moment: Vec<f32>,
     second_moment: Vec<f32>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     exact_first_moment_bits: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     exact_second_moment_bits: Vec<String>,
 }
 
@@ -62,12 +67,10 @@ struct Request {
     format: String,
     backend: String,
     steps: usize,
-    input: TensorInput,
-    target: TensorInput,
-    master_weight: TensorInput,
-    optimizer: AdamWConfig,
+    autodiff: AutodiffRequest,
+    config: AdamWConfig,
     #[serde(default)]
-    optimizer_state: Option<OptimizerState>,
+    optimizer_states: Vec<OptimizerState>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -93,17 +96,36 @@ struct Fp32TensorReceipt {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+struct ParameterReceipt {
+    tensor_id: String,
+    master_weight: Fp32TensorReceipt,
+    compute_weight: Bf16TensorReceipt,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct GradientReceipt {
+    tensor_id: String,
+    gradient: Fp32TensorReceipt,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct Telemetry {
     backend: &'static str,
     policy: &'static str,
     forward_compute_dtype: &'static str,
+    activation_compute_dtype: &'static str,
     accumulation_dtype: &'static str,
     gradient_dtype: &'static str,
     master_weight_dtype: &'static str,
     optimizer_state_dtype: &'static str,
-    cast_gradient_policy: &'static str,
+    cast_backward_policy: &'static str,
     steps: usize,
+    parameter_count: usize,
     parameter_elements: usize,
+    optimizer_state_elements: usize,
+    backward_edge_count: usize,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -113,494 +135,653 @@ struct ResultReceipt {
     status: &'static str,
     initial_loss: f32,
     final_loss: f32,
-    initial_prediction: Bf16TensorReceipt,
-    initial_gradient: Fp32TensorReceipt,
-    final_prediction: Bf16TensorReceipt,
-    final_gradient: Fp32TensorReceipt,
-    master_weight: Fp32TensorReceipt,
-    compute_weight: Bf16TensorReceipt,
-    optimizer_state: OptimizerState,
+    initial_gradients: Vec<GradientReceipt>,
+    final_gradients: Vec<GradientReceipt>,
+    parameters: Vec<ParameterReceipt>,
+    optimizer_states: Vec<OptimizerState>,
+    parameter_order: Vec<String>,
+    autodiff_precision: &'static str,
     checkpoint_root: String,
     telemetry: Telemetry,
     gpu_claim: bool,
 }
 
-#[derive(Clone)]
-struct ForwardPass {
-    prediction_bits: Vec<u16>,
-    prediction: Vec<f32>,
-    residual: Vec<f32>,
-    loss: f32,
-    quantized_input: Vec<f32>,
-    quantized_weight: Vec<f32>,
-}
-
-fn checked_product(shape: &[usize]) -> Result<usize, MpTrainError> {
-    if shape.is_empty() || shape.len() > 2 || shape.contains(&0) {
-        return Err(MpTrainError::new(
-            "RCL_BF16_AD_SHAPE",
-            format!("bounded K08-S profile requires rank-1 or rank-2 positive shape, received {shape:?}"),
-        ));
-    }
-    let count = shape.iter().try_fold(1usize, |total, value| total.checked_mul(*value))
-        .ok_or_else(|| MpTrainError::new("RCL_BF16_AD_SHAPE_OVERFLOW", "shape element count overflowed"))?;
-    if count > MAX_ELEMENTS {
-        return Err(MpTrainError::new(
-            "RCL_BF16_AD_ELEMENT_LIMIT",
-            format!("{count} elements exceed the K08-S limit {MAX_ELEMENTS}"),
-        ));
-    }
-    Ok(count)
-}
-
-fn validate_config(config: &AdamWConfig) -> Result<(), MpTrainError> {
+fn validate_config(config: &AdamWConfig) -> Result<(), TrainError> {
     if !config.learning_rate.is_finite() || config.learning_rate <= 0.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_LEARNING_RATE", "learningRate must be finite and positive"));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_LEARNING_RATE",
+            "learningRate must be finite and positive",
+        ));
     }
-    if !config.beta1.is_finite() || config.beta1 < 0.0 || config.beta1 >= 1.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_BETA1", "beta1 must be in [0,1)"));
+    if !config.beta1.is_finite() || !(0.0..1.0).contains(&config.beta1) {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_BETA1",
+            "beta1 must be in [0,1)",
+        ));
     }
-    if !config.beta2.is_finite() || config.beta2 < 0.0 || config.beta2 >= 1.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_BETA2", "beta2 must be in [0,1)"));
+    if !config.beta2.is_finite() || !(0.0..1.0).contains(&config.beta2) {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_BETA2",
+            "beta2 must be in [0,1)",
+        ));
     }
     if !config.epsilon.is_finite() || config.epsilon <= 0.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_EPSILON", "epsilon must be finite and positive"));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_EPSILON",
+            "epsilon must be finite and positive",
+        ));
     }
     if !config.weight_decay.is_finite() || config.weight_decay < 0.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_WEIGHT_DECAY", "weightDecay must be finite and non-negative"));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_WEIGHT_DECAY",
+            "weightDecay must be finite and non-negative",
+        ));
     }
     if !config.gradient_clip.is_finite() || config.gradient_clip <= 0.0 {
-        return Err(MpTrainError::new("RCL_BF16_AD_GRADIENT_CLIP", "gradientClip must be finite and positive"));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_GRADIENT_CLIP",
+            "gradientClip must be finite and positive",
+        ));
     }
     Ok(())
 }
 
-fn f32_to_bf16_bits(value: f32) -> u16 {
+fn exact_f32_bits(values: &[f32]) -> Vec<String> {
+    values
+        .iter()
+        .map(|value| format!("{:08x}", value.to_bits()))
+        .collect()
+}
+
+fn decode_f32_bits(
+    values: &[String],
+    expected: usize,
+    label: &str,
+) -> Result<Vec<f32>, TrainError> {
+    if values.len() != expected {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_EXACT_LENGTH",
+            format!(
+                "exact FP32 bits for {label} require {expected} values, received {}",
+                values.len()
+            ),
+        ));
+    }
+    values.iter().map(|bits| {
+        if bits.len() != 8 {
+            return Err(TrainError::new("RCL_BF16_AD_EXACT_BITS", format!("exact FP32 bits for {label} must contain 8 lowercase hex digits, received {bits}")));
+        }
+        let parsed = u32::from_str_radix(bits, 16).map_err(|_| TrainError::new("RCL_BF16_AD_EXACT_BITS", format!("invalid exact FP32 bits for {label}: {bits}")))?;
+        if format!("{parsed:08x}") != *bits {
+            return Err(TrainError::new("RCL_BF16_AD_EXACT_BITS", format!("exact FP32 bits for {label} are not canonical lowercase hex: {bits}")));
+        }
+        let value = f32::from_bits(parsed);
+        if !value.is_finite() {
+            return Err(TrainError::new("RCL_BF16_AD_NONFINITE", format!("exact FP32 bits for {label} decode to a non-finite value")));
+        }
+        Ok(value)
+    }).collect()
+}
+
+fn f32_to_bf16_bits(value: f32) -> Result<u16, TrainError> {
+    if !value.is_finite() {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_NONFINITE",
+            "BF16 conversion rejects non-finite values",
+        ));
+    }
     let bits = value.to_bits();
     let lsb = (bits >> 16) & 1;
     let rounded = bits.wrapping_add(0x7fff + lsb);
-    (rounded >> 16) as u16
+    let result = (rounded >> 16) as u16;
+    if !f32::from_bits((result as u32) << 16).is_finite() {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_NONFINITE",
+            "BF16 conversion produced a non-finite value",
+        ));
+    }
+    Ok(result)
 }
 
 fn bf16_bits_to_f32(bits: u16) -> f32 {
     f32::from_bits((bits as u32) << 16)
 }
 
-fn bf16_quantize(value: f32) -> Result<(u16, f32), MpTrainError> {
-    if !value.is_finite() {
-        return Err(MpTrainError::new("RCL_BF16_AD_NONFINITE", "BF16 conversion rejects non-finite values"));
+fn storage_root(dtype: &str, policy: &str, shape: &[usize], bits: &[u8]) -> String {
+    let mut hash = Sha256::new();
+    hash.update(b"rcl.tensor.storage.v0.2\0");
+    hash.update(dtype.as_bytes());
+    hash.update(policy.as_bytes());
+    hash.update((shape.len() as u64).to_le_bytes());
+    for dimension in shape {
+        hash.update((*dimension as u64).to_le_bytes());
     }
-    let bits = f32_to_bf16_bits(value);
-    let decoded = bf16_bits_to_f32(bits);
-    if !decoded.is_finite() {
-        return Err(MpTrainError::new("RCL_BF16_AD_NONFINITE", "BF16 conversion produced a non-finite value"));
-    }
-    Ok((bits, decoded))
+    hash.update(bits);
+    format!("sha256:{}", hex::encode(hash.finalize()))
 }
 
-fn decode_f32_bits(values: &[String], expected: usize, label: &str) -> Result<Vec<f32>, MpTrainError> {
-    if values.len() != expected {
-        return Err(MpTrainError::new(
-            "RCL_BF16_AD_EXACT_LENGTH",
-            format!("exact f32 bits for {label} require {expected} values, received {}", values.len()),
-        ));
+fn f32_receipt(shape: Vec<usize>, values: Vec<f32>, role: &str) -> Fp32TensorReceipt {
+    let bytes = values
+        .iter()
+        .flat_map(|value| value.to_bits().to_le_bytes())
+        .collect::<Vec<_>>();
+    Fp32TensorReceipt {
+        shape: shape.clone(),
+        dtype: "f32",
+        bits_hex: exact_f32_bits(&values),
+        data: values,
+        storage_root: storage_root("f32", role, &shape, &bytes),
     }
-    values.iter().map(|bits| {
-        if bits.len() != 8 {
-            return Err(MpTrainError::new(
-                "RCL_BF16_AD_EXACT_BITS",
-                format!("exact f32 bits for {label} must contain 8 hex digits, received {bits}"),
-            ));
-        }
-        let parsed = u32::from_str_radix(bits, 16).map_err(|_| {
-            MpTrainError::new("RCL_BF16_AD_EXACT_BITS", format!("invalid exact f32 bits for {label}: {bits}"))
-        })?;
-        let value = f32::from_bits(parsed);
-        if !value.is_finite() {
-            return Err(MpTrainError::new(
-                "RCL_BF16_AD_NONFINITE",
-                format!("exact f32 bits for {label} decode to a non-finite value"),
-            ));
-        }
-        Ok(value)
-    }).collect()
 }
 
-fn materialize_input(input: &TensorInput, label: &str) -> Result<Vec<f32>, MpTrainError> {
-    let expected = checked_product(&input.shape)?;
-    if input.data.len() != expected {
-        return Err(MpTrainError::new(
-            "RCL_BF16_AD_STORAGE_SHAPE",
-            format!("{label} shape {:?} requires {expected} values, received {}", input.shape, input.data.len()),
-        ));
-    }
-    if !input.exact_f32_bits.is_empty() {
-        return decode_f32_bits(&input.exact_f32_bits, expected, label);
-    }
-    input.data.iter().map(|value| {
-        if !value.is_finite() {
-            return Err(MpTrainError::new("RCL_BF16_AD_NONFINITE", format!("{label} contains a non-finite value")));
-        }
-        let narrowed = *value as f32;
-        if !narrowed.is_finite() {
-            return Err(MpTrainError::new("RCL_BF16_AD_F32_OVERFLOW", format!("{label} value {value} overflows f32")));
-        }
-        Ok(narrowed)
-    }).collect()
-}
-
-fn quantize_vec(values: &[f32]) -> Result<(Vec<u16>, Vec<f32>), MpTrainError> {
-    let mut bits = Vec::with_capacity(values.len());
-    let mut data = Vec::with_capacity(values.len());
-    for value in values {
-        let (encoded, decoded) = bf16_quantize(*value)?;
-        bits.push(encoded);
-        data.push(decoded);
-    }
-    Ok((bits, data))
-}
-
-fn validate_geometry(input: &TensorInput, target: &TensorInput, weight: &TensorInput) -> Result<(usize, usize, usize), MpTrainError> {
-    if input.shape.len() != 2 || target.shape.len() != 2 || weight.shape.len() != 2 {
-        return Err(MpTrainError::new("RCL_BF16_AD_GEOMETRY", "K08-S matmul-MSE profile requires rank-2 input, target, and masterWeight"));
-    }
-    let batch = input.shape[0];
-    let input_width = input.shape[1];
-    let output_width = target.shape[1];
-    if target.shape[0] != batch || weight.shape != vec![input_width, output_width] {
-        return Err(MpTrainError::new(
-            "RCL_BF16_AD_GEOMETRY",
-            format!("incompatible input {:?}, target {:?}, weight {:?}", input.shape, target.shape, weight.shape),
-        ));
-    }
-    checked_product(&input.shape)?;
-    checked_product(&target.shape)?;
-    checked_product(&weight.shape)?;
-    Ok((batch, input_width, output_width))
-}
-
-fn forward(
-    input_master: &[f32],
-    target_master: &[f32],
-    weight_master: &[f32],
-    batch: usize,
-    input_width: usize,
-    output_width: usize,
-) -> Result<ForwardPass, MpTrainError> {
-    let (_, input) = quantize_vec(input_master)?;
-    let (_, target) = quantize_vec(target_master)?;
-    let (_, weight) = quantize_vec(weight_master)?;
-    let mut prediction_bits = Vec::with_capacity(batch * output_width);
-    let mut prediction = Vec::with_capacity(batch * output_width);
-    for row in 0..batch {
-        for col in 0..output_width {
-            let mut sum = 0.0f32;
-            for inner in 0..input_width {
-                let product = input[row * input_width + inner] * weight[inner * output_width + col];
-                sum = sum + product;
-            }
-            if !sum.is_finite() {
-                return Err(MpTrainError::new("RCL_BF16_AD_ACCUMULATION", "FP32 matmul accumulation became non-finite"));
-            }
-            let (bits, value) = bf16_quantize(sum)?;
-            prediction_bits.push(bits);
-            prediction.push(value);
-        }
-    }
-    let mut residual = Vec::with_capacity(prediction.len());
-    let mut squared = Vec::with_capacity(prediction.len());
-    for index in 0..prediction.len() {
-        let (_, delta) = bf16_quantize(prediction[index] - target[index])?;
-        let (_, square) = bf16_quantize(delta * delta)?;
-        residual.push(delta);
-        squared.push(square);
-    }
-    let mut sum = 0.0f32;
-    for value in &squared {
-        sum = sum + *value;
-    }
-    let loss = sum / squared.len() as f32;
-    if !loss.is_finite() {
-        return Err(MpTrainError::new("RCL_BF16_AD_LOSS", "FP32 reduction produced a non-finite loss"));
-    }
-    Ok(ForwardPass {
-        prediction_bits,
-        prediction,
-        residual,
-        loss,
-        quantized_input: input,
-        quantized_weight: weight,
+fn bf16_receipt(shape: Vec<usize>, values: &[f32]) -> Result<Bf16TensorReceipt, TrainError> {
+    let bits = values
+        .iter()
+        .map(|value| f32_to_bf16_bits(*value))
+        .collect::<Result<Vec<_>, _>>()?;
+    let bytes = bits
+        .iter()
+        .flat_map(|value| value.to_le_bytes())
+        .collect::<Vec<_>>();
+    Ok(Bf16TensorReceipt {
+        shape: shape.clone(),
+        dtype: "bf16",
+        accumulation_dtype: "f32",
+        bits_hex: bits.iter().map(|value| format!("{value:04x}")).collect(),
+        data: bits.iter().map(|value| bf16_bits_to_f32(*value)).collect(),
+        storage_root: storage_root("bf16", POLICY, &shape, &bytes),
     })
 }
 
-fn backward_weight(
-    pass: &ForwardPass,
-    batch: usize,
-    input_width: usize,
-    output_width: usize,
-) -> Result<Vec<f32>, MpTrainError> {
-    let scale = 2.0f32 / (batch * output_width) as f32;
-    let mut output_gradient = vec![0.0f32; batch * output_width];
-    for index in 0..output_gradient.len() {
-        output_gradient[index] = pass.residual[index] * scale;
+fn parameter_descriptor(
+    request: &Request,
+    tensor_id: &str,
+) -> Result<(String, Vec<usize>), TrainError> {
+    let tensor = request
+        .autodiff
+        .graph
+        .tensors
+        .iter()
+        .find(|tensor| tensor.id == tensor_id)
+        .ok_or_else(|| {
+            TrainError::new(
+                "RCL_BF16_AD_PARAMETER_MISSING",
+                format!("parameter {tensor_id} is not an initial graph tensor"),
+            )
+        })?;
+    if tensor.dtype != "bf16" || tensor.layout != "row-major" || tensor.device != "cpu" {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_DESCRIPTOR",
+            format!("parameter {tensor_id} is outside bf16/row-major/cpu profile"),
+        ));
     }
-    let mut gradient = vec![0.0f32; input_width * output_width];
-    for inner in 0..input_width {
-        for col in 0..output_width {
-            let mut sum = 0.0f32;
-            for row in 0..batch {
-                sum = sum + pass.quantized_input[row * input_width + inner] * output_gradient[row * output_width + col];
-            }
-            if !sum.is_finite() {
-                return Err(MpTrainError::new("RCL_BF16_AD_GRADIENT", "FP32 gradient accumulation became non-finite"));
-            }
-            gradient[inner * output_width + col] = sum;
-        }
-    }
-    Ok(gradient)
+    Ok((tensor.storage_identity.clone(), tensor.shape.clone()))
 }
 
-fn f32_pow(mut base: f32, exponent: usize) -> f32 {
+fn parameter_order(request: &Request) -> Result<Vec<(Parameter, String, Vec<usize>)>, TrainError> {
+    if request.autodiff.parameters.is_empty() || request.autodiff.parameters.len() > MAX_PARAMETERS
+    {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_PARAMETER_LIMIT",
+            format!("parameter count must be within 1..={MAX_PARAMETERS}"),
+        ));
+    }
+    let mut ids = HashSet::new();
+    let mut gradient_ids = HashSet::new();
+    let mut storage_ids = HashSet::new();
+    request
+        .autodiff
+        .parameters
+        .iter()
+        .map(|parameter| {
+            if !ids.insert(parameter.tensor_id.clone())
+                || !gradient_ids.insert(parameter.gradient_identity.clone())
+            {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_PARAMETER_DUPLICATE",
+                    "parameter and GradientIdentity order must be unique",
+                ));
+            }
+            let (storage, shape) = parameter_descriptor(request, &parameter.tensor_id)?;
+            if !storage_ids.insert(storage.clone()) {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_PARAMETER_ALIAS",
+                    "parameters cannot share mutable storage",
+                ));
+            }
+            if !request
+                .autodiff
+                .graph
+                .exact_f32_storage_bits
+                .contains_key(&storage)
+            {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_EXACT_MASTER_REQUIRED",
+                    format!("exact FP32 master bits are required for {storage}"),
+                ));
+            }
+            Ok((parameter.clone(), storage, shape))
+        })
+        .collect()
+}
+
+fn initial_master(
+    request: &Request,
+    order: &[(Parameter, String, Vec<usize>)],
+) -> Result<Vec<Vec<f32>>, TrainError> {
+    order
+        .iter()
+        .map(|(parameter, storage, shape)| {
+            decode_f32_bits(
+                request
+                    .autodiff
+                    .graph
+                    .exact_f32_storage_bits
+                    .get(storage)
+                    .unwrap(),
+                shape.iter().product(),
+                &format!("{}.masterWeight", parameter.tensor_id),
+            )
+        })
+        .collect()
+}
+
+fn validate_or_initialize_states(
+    request: &Request,
+    order: &[(Parameter, String, Vec<usize>)],
+) -> Result<Vec<OptimizerState>, TrainError> {
+    if request.optimizer_states.is_empty() {
+        return Ok(order
+            .iter()
+            .map(|(parameter, _, shape)| OptimizerState {
+                tensor_id: parameter.tensor_id.clone(),
+                step: 0,
+                first_moment: vec![0.0; shape.iter().product()],
+                second_moment: vec![0.0; shape.iter().product()],
+                exact_first_moment_bits: Vec::new(),
+                exact_second_moment_bits: Vec::new(),
+            })
+            .collect());
+    }
+    if request.optimizer_states.len() != order.len() {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_STATE_COUNT",
+            "optimizerStates must contain exactly one state per canonical parameter",
+        ));
+    }
+    let mut result = Vec::with_capacity(order.len());
+    let mut step = None;
+    for ((parameter, _, shape), supplied) in order.iter().zip(&request.optimizer_states) {
+        if supplied.tensor_id != parameter.tensor_id {
+            return Err(TrainError::new(
+                "RCL_BF16_AD_STATE_ORDER",
+                "optimizerStates must follow canonical parameter order",
+            ));
+        }
+        if step.is_none() {
+            step = Some(supplied.step);
+        }
+        if step != Some(supplied.step) {
+            return Err(TrainError::new(
+                "RCL_BF16_AD_STATE_STEP",
+                "all optimizer states must share one step",
+            ));
+        }
+        let expected = shape.iter().product();
+        if supplied.first_moment.len() != expected || supplied.second_moment.len() != expected {
+            return Err(TrainError::new(
+                "RCL_BF16_AD_STATE_SHAPE",
+                format!("optimizer state shape mismatch for {}", supplied.tensor_id),
+            ));
+        }
+        if supplied.exact_first_moment_bits.is_empty()
+            || supplied.exact_second_moment_bits.is_empty()
+        {
+            return Err(TrainError::new(
+                "RCL_BF16_AD_EXACT_STATE_REQUIRED",
+                format!(
+                    "exact FP32 moments are required for {} resume",
+                    supplied.tensor_id
+                ),
+            ));
+        }
+        let first = decode_f32_bits(
+            &supplied.exact_first_moment_bits,
+            expected,
+            &format!("{}.firstMoment", supplied.tensor_id),
+        )?;
+        let second = decode_f32_bits(
+            &supplied.exact_second_moment_bits,
+            expected,
+            &format!("{}.secondMoment", supplied.tensor_id),
+        )?;
+        result.push(OptimizerState {
+            tensor_id: supplied.tensor_id.clone(),
+            step: supplied.step,
+            first_moment: first,
+            second_moment: second,
+            exact_first_moment_bits: supplied.exact_first_moment_bits.clone(),
+            exact_second_moment_bits: supplied.exact_second_moment_bits.clone(),
+        });
+    }
+    Ok(result)
+}
+
+fn sync_master(
+    request: &mut Request,
+    order: &[(Parameter, String, Vec<usize>)],
+    master: &[Vec<f32>],
+) {
+    for ((_, storage, _), values) in order.iter().zip(master) {
+        let target = request
+            .autodiff
+            .graph
+            .storages
+            .iter_mut()
+            .find(|item| item.identity == *storage)
+            .unwrap();
+        target.data = values.iter().map(|value| *value as f64).collect();
+        request
+            .autodiff
+            .graph
+            .exact_f32_storage_bits
+            .insert(storage.clone(), exact_f32_bits(values));
+    }
+}
+
+fn gradients(
+    result: &AutodiffResult,
+    order: &[(Parameter, String, Vec<usize>)],
+) -> Result<Vec<Vec<f32>>, TrainError> {
+    if result.gradients.len() != order.len() {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_GRADIENT_COUNT",
+            "Autodiff did not return one gradient per canonical parameter",
+        ));
+    }
+    order
+        .iter()
+        .zip(&result.gradients)
+        .map(|((parameter, _, shape), gradient)| {
+            if gradient.parameter.tensor_id != parameter.tensor_id || gradient.tensor.dtype != "f32"
+            {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_GRADIENT_BINDING",
+                    format!("gradient binding mismatch for {}", parameter.tensor_id),
+                ));
+            }
+            if gradient.storage.data.len() != shape.iter().product::<usize>() {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_GRADIENT_SHAPE",
+                    format!("gradient shape mismatch for {}", parameter.tensor_id),
+                ));
+            }
+            gradient
+                .storage
+                .data
+                .iter()
+                .map(|value| {
+                    let narrowed = *value as f32;
+                    if narrowed.is_finite() {
+                        Ok(narrowed)
+                    } else {
+                        Err(TrainError::new(
+                            "RCL_BF16_AD_NONFINITE",
+                            "gradient is non-finite",
+                        ))
+                    }
+                })
+                .collect()
+        })
+        .collect()
+}
+
+fn f32_pow(base: f32, exponent: usize) -> f32 {
     let mut result = 1.0f32;
     for _ in 0..exponent {
-        result = result * base;
+        result *= base;
     }
     result
 }
 
-fn initialize_state(
-    supplied: Option<OptimizerState>,
-    parameter_count: usize,
-) -> Result<OptimizerState, MpTrainError> {
-    match supplied {
-        None => Ok(OptimizerState {
-            step: 0,
-            first_moment: vec![0.0; parameter_count],
-            second_moment: vec![0.0; parameter_count],
-            exact_first_moment_bits: Vec::new(),
-            exact_second_moment_bits: Vec::new(),
-        }),
-        Some(mut state) => {
-            if state.first_moment.len() != parameter_count || state.second_moment.len() != parameter_count {
-                return Err(MpTrainError::new("RCL_BF16_AD_STATE_SHAPE", "optimizer state shape does not match masterWeight"));
-            }
-            let has_first = !state.exact_first_moment_bits.is_empty();
-            let has_second = !state.exact_second_moment_bits.is_empty();
-            if has_first != has_second {
-                return Err(MpTrainError::new("RCL_BF16_AD_STATE_EXACT_BINDING", "exact optimizer state requires both first and second moments"));
-            }
-            if has_first {
-                state.first_moment = decode_f32_bits(&state.exact_first_moment_bits, parameter_count, "firstMoment")?;
-                state.second_moment = decode_f32_bits(&state.exact_second_moment_bits, parameter_count, "secondMoment")?;
-            }
-            if state.first_moment.iter().chain(&state.second_moment).any(|value| !value.is_finite()) {
-                return Err(MpTrainError::new("RCL_BF16_AD_STATE_NONFINITE", "optimizer state contains non-finite values"));
-            }
-            Ok(state)
-        }
-    }
-}
-
 fn adamw_step(
-    master_weight: &mut [f32],
-    gradient: &[f32],
-    state: &mut OptimizerState,
+    master: &mut [Vec<f32>],
+    gradients: &[Vec<f32>],
+    states: &mut [OptimizerState],
     config: &AdamWConfig,
-) -> Result<(), MpTrainError> {
-    let next_step = state.step.checked_add(1)
-        .ok_or_else(|| MpTrainError::new("RCL_BF16_AD_STEP_OVERFLOW", "optimizer step overflowed"))?;
-    let bias1 = 1.0f32 - f32_pow(config.beta1, next_step);
-    let bias2 = 1.0f32 - f32_pow(config.beta2, next_step);
-    let decay = 1.0f32 - config.learning_rate * config.weight_decay;
-    for index in 0..master_weight.len() {
-        let grad = gradient[index].max(-config.gradient_clip).min(config.gradient_clip);
-        let next_m = config.beta1 * state.first_moment[index] + (1.0 - config.beta1) * grad;
-        let next_v = config.beta2 * state.second_moment[index] + (1.0 - config.beta2) * grad * grad;
-        let m_hat = next_m / bias1;
-        let v_hat = next_v / bias2;
-        let direction = m_hat / (v_hat.sqrt() + config.epsilon);
-        let next_weight = master_weight[index] * decay - config.learning_rate * direction;
-        if !next_m.is_finite() || !next_v.is_finite() || !next_weight.is_finite() {
-            return Err(MpTrainError::new("RCL_BF16_AD_UPDATE_NONFINITE", "AdamW produced a non-finite FP32 state or master weight"));
+) -> Result<(), TrainError> {
+    for ((weights, gradient), state) in master.iter_mut().zip(gradients).zip(states.iter_mut()) {
+        let next_step = state.step.checked_add(1).ok_or_else(|| {
+            TrainError::new("RCL_BF16_AD_STEP_OVERFLOW", "optimizer step overflowed")
+        })?;
+        let bias1 = 1.0 - f32_pow(config.beta1, next_step);
+        let bias2 = 1.0 - f32_pow(config.beta2, next_step);
+        let decay = 1.0 - config.learning_rate * config.weight_decay;
+        for index in 0..weights.len() {
+            let grad = gradient[index]
+                .max(-config.gradient_clip)
+                .min(config.gradient_clip);
+            let next_m = config.beta1 * state.first_moment[index] + (1.0 - config.beta1) * grad;
+            let next_v =
+                config.beta2 * state.second_moment[index] + (1.0 - config.beta2) * grad * grad;
+            let direction = (next_m / bias1) / ((next_v / bias2).sqrt() + config.epsilon);
+            let next_weight = weights[index] * decay - config.learning_rate * direction;
+            if !next_m.is_finite() || !next_v.is_finite() || !next_weight.is_finite() {
+                return Err(TrainError::new(
+                    "RCL_BF16_AD_UPDATE_NONFINITE",
+                    "AdamW produced a non-finite FP32 update",
+                ));
+            }
+            state.first_moment[index] = next_m;
+            state.second_moment[index] = next_v;
+            weights[index] = next_weight;
         }
-        state.first_moment[index] = next_m;
-        state.second_moment[index] = next_v;
-        master_weight[index] = next_weight;
+        state.step = next_step;
+        state.exact_first_moment_bits = exact_f32_bits(&state.first_moment);
+        state.exact_second_moment_bits = exact_f32_bits(&state.second_moment);
     }
-    state.step = next_step;
-    state.exact_first_moment_bits = exact_f32_bits(&state.first_moment);
-    state.exact_second_moment_bits = exact_f32_bits(&state.second_moment);
     Ok(())
 }
 
-fn exact_f32_bits(values: &[f32]) -> Vec<String> {
-    values.iter().map(|value| format!("{:08x}", value.to_bits())).collect()
-}
-
-fn bf16_storage_root(shape: &[usize], bits: &[u16]) -> String {
-    let mut hash = Sha256::new();
-    hash.update(b"rcl.bf16.storage.v0.1\0");
-    hash.update(POLICY.as_bytes());
-    for dimension in shape {
-        hash.update((*dimension as u64).to_le_bytes());
-    }
-    for value in bits {
-        hash.update(value.to_le_bytes());
-    }
-    format!("sha256:{}", hex::encode(hash.finalize()))
-}
-
-fn f32_storage_root(shape: &[usize], data: &[f32], role: &str) -> String {
-    let mut hash = Sha256::new();
-    hash.update(b"rcl.f32.storage.v0.1\0");
-    hash.update(POLICY.as_bytes());
-    hash.update(role.as_bytes());
-    for dimension in shape {
-        hash.update((*dimension as u64).to_le_bytes());
-    }
-    for value in data {
-        hash.update(value.to_bits().to_le_bytes());
-    }
-    format!("sha256:{}", hex::encode(hash.finalize()))
-}
-
-fn bf16_receipt(shape: Vec<usize>, bits: Vec<u16>) -> Bf16TensorReceipt {
-    let data = bits.iter().map(|value| bf16_bits_to_f32(*value)).collect::<Vec<_>>();
-    Bf16TensorReceipt {
-        storage_root: bf16_storage_root(&shape, &bits),
-        shape,
-        dtype: "bf16",
-        accumulation_dtype: "f32",
-        bits_hex: bits.iter().map(|value| format!("{value:04x}")).collect(),
-        data,
-    }
-}
-
-fn f32_receipt(shape: Vec<usize>, data: Vec<f32>, role: &str) -> Fp32TensorReceipt {
-    Fp32TensorReceipt {
-        storage_root: f32_storage_root(&shape, &data, role),
-        shape,
-        dtype: "f32",
-        bits_hex: exact_f32_bits(&data),
-        data,
-    }
-}
-
-fn checkpoint_root(config: &AdamWConfig, weight: &[f32], state: &OptimizerState) -> String {
-    let mut hash = Sha256::new();
-    hash.update(b"rcl.bf16-autodiff-adamw.checkpoint.v0.1\0");
-    hash.update(POLICY.as_bytes());
-    for value in [
+fn checkpoint_root(
+    config: &AdamWConfig,
+    order: &[(Parameter, String, Vec<usize>)],
+    master: &[Vec<f32>],
+    states: &[OptimizerState],
+) -> String {
+    let config_bits = [
         config.learning_rate,
         config.beta1,
         config.beta2,
         config.epsilon,
         config.weight_decay,
         config.gradient_clip,
-    ] {
-        hash.update(value.to_bits().to_le_bytes());
-    }
-    hash.update((state.step as u64).to_le_bytes());
-    for value in weight {
-        hash.update(value.to_bits().to_le_bytes());
-    }
-    for value in &state.first_moment {
-        hash.update(value.to_bits().to_le_bytes());
-    }
-    for value in &state.second_moment {
-        hash.update(value.to_bits().to_le_bytes());
-    }
-    format!("sha256:{}", hex::encode(hash.finalize()))
+    ]
+    .iter()
+    .map(|value| format!("{:08x}", value.to_bits()))
+    .collect::<Vec<_>>();
+    let payload = json!({
+        "format": RESULT_FORMAT,
+        "policy": POLICY,
+        "parameterOrder": order.iter().map(|(parameter, storage, _)| json!({"tensorId": parameter.tensor_id, "storageIdentity": storage})).collect::<Vec<_>>(),
+        "configBits": config_bits,
+        "masterWeightBits": master.iter().map(|values| exact_f32_bits(values)).collect::<Vec<_>>(),
+        "optimizerStateBits": states.iter().map(|state| json!({"tensorId": state.tensor_id, "step": state.step, "firstMomentBits": state.exact_first_moment_bits, "secondMomentBits": state.exact_second_moment_bits})).collect::<Vec<_>>(),
+    });
+    format!(
+        "sha256:{}",
+        hex::encode(Sha256::digest(serde_json::to_vec(&payload).unwrap()))
+    )
 }
 
-fn execute(request: Request) -> Result<ResultReceipt, MpTrainError> {
+fn make_parameters(
+    order: &[(Parameter, String, Vec<usize>)],
+    master: &[Vec<f32>],
+) -> Result<Vec<ParameterReceipt>, TrainError> {
+    order
+        .iter()
+        .zip(master)
+        .map(|((parameter, _, shape), values)| {
+            Ok(ParameterReceipt {
+                tensor_id: parameter.tensor_id.clone(),
+                master_weight: f32_receipt(shape.clone(), values.clone(), "masterWeight"),
+                compute_weight: bf16_receipt(shape.clone(), values)?,
+            })
+        })
+        .collect()
+}
+
+fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
     if request.format != REQUEST_FORMAT {
-        return Err(MpTrainError::new("RCL_BF16_AD_FORMAT", format!("unsupported request format {}", request.format)));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_FORMAT",
+            format!("unsupported request format {}", request.format),
+        ));
     }
     if request.backend != BACKEND {
-        return Err(MpTrainError::new(
+        return Err(TrainError::new(
             "RCL_ACCELERATOR_BACKEND_UNAVAILABLE",
-            format!("backend {} is unavailable for K08-S; silent CPU fallback is forbidden", request.backend),
+            format!(
+                "backend {} is unavailable; silent CPU fallback is forbidden",
+                request.backend
+            ),
         ));
     }
     if request.steps == 0 || request.steps > MAX_STEPS {
-        return Err(MpTrainError::new("RCL_BF16_AD_STEP_LIMIT", format!("steps must be within 1..={MAX_STEPS}")));
+        return Err(TrainError::new(
+            "RCL_BF16_AD_STEP_LIMIT",
+            format!("steps must be within 1..={MAX_STEPS}"),
+        ));
     }
-    validate_config(&request.optimizer)?;
-    let (batch, input_width, output_width) = validate_geometry(&request.input, &request.target, &request.master_weight)?;
-    let input = materialize_input(&request.input, "input")?;
-    let target = materialize_input(&request.target, "target")?;
-    let mut master_weight = materialize_input(&request.master_weight, "masterWeight")?;
-    let mut state = initialize_state(request.optimizer_state, master_weight.len())?;
-
-    let initial_pass = forward(&input, &target, &master_weight, batch, input_width, output_width)?;
-    let initial_gradient = backward_weight(&initial_pass, batch, input_width, output_width)?;
-    let initial_prediction = bf16_receipt(request.target.shape.clone(), initial_pass.prediction_bits.clone());
-
+    if request.autodiff.precision.as_deref() != Some(BF16_AUTODIFF_PRECISION) {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_PRECISION_REQUIRED",
+            "request must explicitly select bf16-rne-fp32-accumulation",
+        ));
+    }
+    validate_config(&request.config)?;
+    if request.autodiff.graph.nodes.iter().any(|node| {
+        let operation = node.operation.to_ascii_lowercase();
+        operation.contains("special")
+            || operation.contains("transformer")
+            || operation.contains("lm")
+    }) {
+        return Err(TrainError::new(
+            "RCL_BF16_AD_MODEL_SPECIAL_OPERATION",
+            "model-special operations are forbidden",
+        ));
+    }
+    let order = parameter_order(&request)?;
+    let mut master = initial_master(&request, &order)?;
+    let mut states = validate_or_initialize_states(&request, &order)?;
+    sync_master(&mut request, &order, &master);
+    let initial_result = backward(&request.autodiff)?;
+    let initial_gradients = gradients(&initial_result, &order)?;
     for _ in 0..request.steps {
-        let pass = forward(&input, &target, &master_weight, batch, input_width, output_width)?;
-        let gradient = backward_weight(&pass, batch, input_width, output_width)?;
-        adamw_step(&mut master_weight, &gradient, &mut state, &request.optimizer)?;
+        sync_master(&mut request, &order, &master);
+        let step_result = backward(&request.autodiff)?;
+        let step_gradients = gradients(&step_result, &order)?;
+        adamw_step(&mut master, &step_gradients, &mut states, &request.config)?;
     }
-
-    let final_pass = forward(&input, &target, &master_weight, batch, input_width, output_width)?;
-    let final_gradient_data = backward_weight(&final_pass, batch, input_width, output_width)?;
-    let final_prediction = bf16_receipt(request.target.shape.clone(), final_pass.prediction_bits.clone());
-    let (compute_weight_bits, _) = quantize_vec(&master_weight)?;
-    let root = checkpoint_root(&request.optimizer, &master_weight, &state);
-
+    sync_master(&mut request, &order, &master);
+    let final_result = backward(&request.autodiff)?;
+    let final_gradients = gradients(&final_result, &order)?;
+    let backward_edge_count = final_result.backward_edges.len();
+    let parameter_elements = master.iter().map(Vec::len).sum::<usize>();
+    let optimizer_state_elements = states
+        .iter()
+        .map(|state| state.first_moment.len() + state.second_moment.len())
+        .sum::<usize>();
+    let parameters = make_parameters(&order, &master)?;
+    let checkpoint = checkpoint_root(&request.config, &order, &master, &states);
     Ok(ResultReceipt {
         format: RESULT_FORMAT,
         status: "ok",
-        initial_loss: initial_pass.loss,
-        final_loss: final_pass.loss,
-        initial_prediction,
-        initial_gradient: f32_receipt(request.master_weight.shape.clone(), initial_gradient, "gradient.initial"),
-        final_prediction,
-        final_gradient: f32_receipt(request.master_weight.shape.clone(), final_gradient_data, "gradient.final"),
-        master_weight: f32_receipt(request.master_weight.shape.clone(), master_weight.clone(), "masterWeight"),
-        compute_weight: bf16_receipt(request.master_weight.shape.clone(), compute_weight_bits),
-        optimizer_state: state,
-        checkpoint_root: root,
+        initial_loss: initial_result.loss.storage.data[0] as f32,
+        final_loss: final_result.loss.storage.data[0] as f32,
+        initial_gradients: order
+            .iter()
+            .zip(initial_gradients)
+            .map(|((parameter, _, shape), values)| GradientReceipt {
+                tensor_id: parameter.tensor_id.clone(),
+                gradient: f32_receipt(
+                    shape.clone(),
+                    values,
+                    &format!("{}.gradient.initial", parameter.tensor_id),
+                ),
+            })
+            .collect(),
+        final_gradients: order
+            .iter()
+            .zip(final_gradients)
+            .map(|((parameter, _, shape), values)| GradientReceipt {
+                tensor_id: parameter.tensor_id.clone(),
+                gradient: f32_receipt(
+                    shape.clone(),
+                    values,
+                    &format!("{}.gradient.final", parameter.tensor_id),
+                ),
+            })
+            .collect(),
+        parameters,
+        optimizer_states: states,
+        parameter_order: order
+            .iter()
+            .map(|(parameter, _, _)| parameter.tensor_id.clone())
+            .collect(),
+        autodiff_precision: BF16_AUTODIFF_PRECISION,
+        checkpoint_root: checkpoint,
         telemetry: Telemetry {
-            backend: BACKEND,
+            backend: "rcl-tensor-bf16-autodiff-adamw-cpu-reference-v0.2",
             policy: POLICY,
             forward_compute_dtype: "bf16",
+            activation_compute_dtype: "bf16",
             accumulation_dtype: "f32",
             gradient_dtype: "f32",
             master_weight_dtype: "f32",
             optimizer_state_dtype: "f32",
-            cast_gradient_policy: "straight-through-fp32",
+            cast_backward_policy: "straight-through-fp32",
             steps: request.steps,
-            parameter_elements: master_weight.len(),
+            parameter_count: order.len(),
+            parameter_elements,
+            optimizer_state_elements,
+            backward_edge_count,
         },
         gpu_claim: false,
     })
 }
 
-fn read_input(argument: Option<&String>) -> Result<String, MpTrainError> {
+fn read_request(argument: Option<&String>) -> Result<String, TrainError> {
     match argument {
         Some(path) if path != "-" => fs::read_to_string(path)
-            .map_err(|error| MpTrainError::new("RCL_BF16_AD_REQUEST_IO", error.to_string())),
+            .map_err(|error| TrainError::new("RCL_BF16_AD_REQUEST_IO", error.to_string())),
         _ => {
             let mut input = String::new();
-            io::stdin().read_to_string(&mut input)
-                .map_err(|error| MpTrainError::new("RCL_BF16_AD_REQUEST_IO", error.to_string()))?;
+            io::stdin()
+                .read_to_string(&mut input)
+                .map_err(|error| TrainError::new("RCL_BF16_AD_REQUEST_IO", error.to_string()))?;
             Ok(input)
         }
     }
 }
 
-fn fail<T>(error: MpTrainError) -> T {
-    eprintln!("{}", json!({"status":"error","code":error.code,"message":error.message}));
+fn fail(error: TrainError) -> ! {
+    eprintln!(
+        "{}",
+        json!({"status":"error", "code":error.code, "message":error.message})
+    );
     std::process::exit(1)
 }
 
 fn main() {
     let arguments = env::args().collect::<Vec<_>>();
-    let input = read_input(arguments.get(1)).unwrap_or_else(fail);
-    let request = serde_json::from_str::<Request>(&input)
-        .unwrap_or_else(|error| fail(MpTrainError::new("RCL_BF16_AD_REQUEST_JSON", error.to_string())));
-    let result = execute(request).unwrap_or_else(fail);
+    let input = read_request(arguments.get(1)).unwrap_or_else(|error| fail(error));
+    let request = serde_json::from_str::<Request>(&input).unwrap_or_else(|error| {
+        fail(TrainError::new(
+            "RCL_BF16_AD_REQUEST_JSON",
+            error.to_string(),
+        ))
+    });
+    let result = train(request).unwrap_or_else(|error| fail(error));
     println!("{}", serde_json::to_string(&result).unwrap());
 }
