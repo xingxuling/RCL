@@ -297,7 +297,7 @@ Reproduction: `npm run test:k08-amd-opencl-bf16`. Claims are limited to AMD Open
 
 ## RCL-10M corpus admission gate
 
-Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; they prove the gate, not a dataset.
+Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.
 
 | Evidence | Result |
 |---|---:|
@@ -308,6 +308,7 @@ Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reu
 | Missing mixture/provenance/shard bindings | fail-closed PASS |
 | Tampered root | fail-closed PASS |
 | Local Node evidence | `5/5 PASS` |
+| Hosted Ubuntu + Windows schema replay | PASS, run `32995055906`, jobs `98261962473` / `98261962226` |
 | Real user corpus and production tokenizer | BLOCKED_USER_INPUT |
 
 Authority files:
