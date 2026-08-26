@@ -1,0 +1,421 @@
+{
+  "format": "rcl.k340.compiler-mixed-paradigm-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-26T17:00:25.491Z",
+  "contractRoot": "2d9c3916670c9b42b5c57a3351c73bb5db55c52bbb1056e6568f764fc5e04ea2",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K340"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "6a41466ff811dc047d771fc6c84762ec52fe8be91dd1ffa1b1dff66ef1be049a",
+    "contractRoot": "f67ca43a11ea5316c994478e98236bdb78b7c91973500687bbd1b076f80c459d"
+  },
+  "trials": [
+    {
+      "format": "rcl.k340.compiler-mixed-paradigm-ai-trial-receipt.v0.1",
+      "trialId": "K340-AI-REPAIR-01",
+      "mutationClass": "recursive-functional-term",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03ef6-f5a9-7d03-98be-b5cfe5558098",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)",
+        "diagnosis": "sum_squares is accumulating 2*n instead of n*n, so batch size 8 computes 72 and violates the preserved digest 204 during native execution. Replacing the recursive step with n*n preserves the recursive RCL computation and satisfies 1^2+...+8^2 = 204."
+      },
+      "promptRoot": "30d4621a6a7cb57ad4e81c2e2c9855b09c02e5e188fca9ce292b468a52242116",
+      "mutatedSourceSha256": "6b809bf9aef35a44713514358c17dca698c77cc2c004a446b8011264a6874be5",
+      "candidateSourceSha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "71679ec40f7c50655de8b1482ab7d2db2d10cc380bb23b392300ebd7b5645a17",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03ef6-f5a9-7d03-98be-b5cfe5558098"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "ebdf665ff5490b9065345cb88a04e320548a3dbf559b725e54203c1bda9d28ef"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "405ecc124c8b578a27943d6da098d5fff5427c0790e2b1de2a27166f715c8483"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 40962,
+            "cached_input_tokens": 24320,
+            "output_tokens": 454,
+            "reasoning_output_tokens": 132
+          }
+        }
+      ],
+      "finalMessageSha256": "405ecc124c8b578a27943d6da098d5fff5427c0790e2b1de2a27166f715c8483",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "17b042fb6ce9a845d968c6708429b3b9ea1a5b5258cde3eb13d3c327a9fa78d2",
+        "errorCode": "RCL_REALITY_BOUND_BROKEN"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "752ff1e021945ecc0a227fd2f20952432ea5df65094dcbd29b95bc795c535313",
+        "checks": {
+          "reference-compile": {
+            "pass": true
+          },
+          "native-selfhost-compile": {
+            "pass": true
+          },
+          "bootstrap-byte-parity": {
+            "pass": true
+          },
+          "expected-state": {
+            "pass": true,
+            "actual": {
+              "compiler.accepted": true,
+              "compiler.digest": 204,
+              "compiler.emitted": true,
+              "compiler.phase": 2,
+              "input.batch_size": 8
+            }
+          },
+          "rule-order": {
+            "pass": true
+          },
+          "root-continuity": {
+            "pass": true
+          },
+          "authority-needs": {
+            "pass": true
+          },
+          "witnesses": {
+            "pass": true
+          },
+          "recursive-execution": {
+            "pass": true,
+            "peakCallFrames": 9
+          },
+          "native-execute": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "31d7cc3340c86c64def8bef78be40a26950f48f2d4fb94a501ba8323d50966c5"
+    },
+    {
+      "format": "rcl.k340.compiler-mixed-paradigm-ai-trial-receipt.v0.1",
+      "trialId": "K340-AI-REPAIR-02",
+      "mutationClass": "state-triggered-phase",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03efc-3666-7051-b285-1f61a08a9112",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "when compiler.phase == 2 and compiler.digest == 204",
+        "new": "when compiler.phase == 1 and compiler.digest == 204",
+        "diagnosis": "emit_batch is gated on phase=2, but analyze_batch commits phase=1 with digest=204. This makes emit_batch ineligible after analysis, leaving compiler.emitted=false and causing rule-order/root-continuity failures. Changing the trigger to phase=1 preserves RCL-owned authority, transaction, recursion, and phase-triggering semantics while allowing emit_batch to advance phase to 2."
+      },
+      "promptRoot": "3c35714e39b16f2d9f471daff2d4a97bea87d485d313a4ebb3f49d009fa9707e",
+      "mutatedSourceSha256": "604105cf04bc3b6060fb8ef57dc8d31f0cf771eb003ab11f12badb502eb0b90f",
+      "candidateSourceSha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "9da070116399187b2f73a8f3994ec6ab210e58a1f148fe0134782aa1aa6fb880",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03efc-3666-7051-b285-1f61a08a9112"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "ea14deb9e5f4fa3aa608461dedb4a89759fc42661b43ddae23d2b3e2bbb92ac2"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "ed37c8c3fbd9dcc9c1eac978827797266fde87bddf5de490e082257c61bfdad7"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 41213,
+            "cached_input_tokens": 22272,
+            "output_tokens": 444,
+            "reasoning_output_tokens": 110
+          }
+        }
+      ],
+      "finalMessageSha256": "ed37c8c3fbd9dcc9c1eac978827797266fde87bddf5de490e082257c61bfdad7",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "caab6adfe355a17deec40412b754ff07d4d821594616bbf55435a1194ecb76ae",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "752ff1e021945ecc0a227fd2f20952432ea5df65094dcbd29b95bc795c535313",
+        "checks": {
+          "reference-compile": {
+            "pass": true
+          },
+          "native-selfhost-compile": {
+            "pass": true
+          },
+          "bootstrap-byte-parity": {
+            "pass": true
+          },
+          "expected-state": {
+            "pass": true,
+            "actual": {
+              "compiler.accepted": true,
+              "compiler.digest": 204,
+              "compiler.emitted": true,
+              "compiler.phase": 2,
+              "input.batch_size": 8
+            }
+          },
+          "rule-order": {
+            "pass": true
+          },
+          "root-continuity": {
+            "pass": true
+          },
+          "authority-needs": {
+            "pass": true
+          },
+          "witnesses": {
+            "pass": true
+          },
+          "recursive-execution": {
+            "pass": true,
+            "peakCallFrames": 9
+          },
+          "native-execute": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "ad34c2dff0c3ab4828a5b8d61a72705fba29480138426159a5f779145c7dce79"
+    },
+    {
+      "format": "rcl.k340.compiler-mixed-paradigm-ai-trial-receipt.v0.1",
+      "trialId": "K340-AI-REPAIR-03",
+      "mutationClass": "declarative-authority-binding",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f01-37c0-7da3-bd8c-2d5d3c52065b",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "needs compiler.emit on source",
+        "new": "needs compiler.analyze on source",
+        "diagnosis": "analyze_batch currently requires compiler.emit on source, but builder only has compiler.analyze on source. This violates the semantic invariant and likely causes the RCL_COMPILE_ERROR. Replace the requirement with compiler.analyze on source under the existing builder warrant."
+      },
+      "promptRoot": "84701ea2b2ca00e9960ca945f2122fcf7336c724d9fb7b186bb175476a5a152d",
+      "mutatedSourceSha256": "9d95187e2314c09d7f6574ada66277c92c30c35700aae774a624627b1c1d1900",
+      "candidateSourceSha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "a41bd87bc9dfd6d2af9961c304e9ced83b9c096973a071d63f59355b28dd2148",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f01-37c0-7da3-bd8c-2d5d3c52065b"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "85c4c48be340794b7afdc63546bc26c30be44f7cc28f5cb3cf90189f18840b9d"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "d538daa3a72922af634520acd0c37eba7a115b51c08532d506f37a17c345031d"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 40843,
+            "cached_input_tokens": 22272,
+            "output_tokens": 404,
+            "reasoning_output_tokens": 97
+          }
+        }
+      ],
+      "finalMessageSha256": "d538daa3a72922af634520acd0c37eba7a115b51c08532d506f37a17c345031d",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "055f83ca9a0831800d02aff9aaef39ff95a219328881a4362f5854c8de51e782",
+        "errorCode": "RCL_COMPILE_ERROR"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "752ff1e021945ecc0a227fd2f20952432ea5df65094dcbd29b95bc795c535313",
+        "checks": {
+          "reference-compile": {
+            "pass": true
+          },
+          "native-selfhost-compile": {
+            "pass": true
+          },
+          "bootstrap-byte-parity": {
+            "pass": true
+          },
+          "expected-state": {
+            "pass": true,
+            "actual": {
+              "compiler.accepted": true,
+              "compiler.digest": 204,
+              "compiler.emitted": true,
+              "compiler.phase": 2,
+              "input.batch_size": 8
+            }
+          },
+          "rule-order": {
+            "pass": true
+          },
+          "root-continuity": {
+            "pass": true
+          },
+          "authority-needs": {
+            "pass": true
+          },
+          "witnesses": {
+            "pass": true
+          },
+          "recursive-execution": {
+            "pass": true,
+            "peakCallFrames": 9
+          },
+          "native-execute": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "ac5b859d4daba647cef352f8ac14b7cff071407d6d7954e7b49809303d600b63"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_NATIVE_MIXED_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent repairs spanning the frozen K340 recursive, state-triggered and authority semantics and binds its 20-round native runtime receipt. It grants no arbitrary mixed-paradigm generation, hostile-OS security, compiler promotion, unrelated K400 cells or K400 completion.",
+  "reportRoot": "3e0258d10b0040bbb73cc93d9df5251565c5e1ff0fbf75b77ea108dead9313cc"
+}

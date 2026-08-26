@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -12,8 +15,63 @@ const EVIDENCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence'
 
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function check(condition, code) { if (!condition) throw new Error(code); }
+function canonical(value) {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+  return value;
+}
+function equal(left, right) { return JSON.stringify(canonical(left)) === JSON.stringify(canonical(right)); }
+function record(checks, name, pass, details = {}) { checks[name] = { pass: Boolean(pass), ...details }; }
+
+export function evaluateK340CompilerMixedParadigmSource(options = {}) {
+  const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
+  const sourcePath = path.resolve(options.sourcePath ?? path.join(ROOT, contract.canonical.sourcePath));
+  const source = fs.readFileSync(sourcePath, 'utf8');
+  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-k340-candidate-'));
+  const outputPath = path.join(directory, 'candidate.rbc');
+  const checks = {};
+  let errorCode = null;
+  let stateRoot = null;
+  let artifactSha256 = null;
+  try {
+    const bootstrapBytecode = Buffer.from(compileRealityToBytecode(source));
+    record(checks, 'reference-compile', true);
+    const compilation = runNativeCompiler(compilerRbcPath, sourcePath, outputPath);
+    artifactSha256 = sha256(compilation.bytecode);
+    record(checks, 'native-selfhost-compile', true);
+    record(checks, 'bootstrap-byte-parity', Buffer.from(compilation.bytecode).equals(bootstrapBytecode));
+    const payload = runNativeBytecode(outputPath, { requireNativeStateRoot: true });
+    stateRoot = payload.semanticStateRoot;
+    record(checks, 'expected-state', equal(payload.state, contract.expectedState), { actual: payload.state });
+    record(checks, 'rule-order', equal(payload.history.map((item) => item.rule), contract.required.transactionRuleOrder));
+    record(checks, 'root-continuity', payload.history[0]?.afterRoot === payload.history[1]?.beforeRoot);
+    record(checks, 'authority-needs', payload.history.every((item) => equal(item.authority?.needs, contract.expectedAuthority[item.rule])));
+    record(checks, 'witnesses', payload.history.every((item) => equal(item.witnesses, contract.expectedWitnesses[item.rule])));
+    record(checks, 'recursive-execution', Number(payload.metrics?.peakCallFrames ?? 0) > 0, { peakCallFrames: payload.metrics?.peakCallFrames ?? 0 });
+  } catch (error) {
+    errorCode = error.code ?? 'RCL_K340_CANDIDATE_ERROR';
+    if (!checks['reference-compile']) record(checks, 'reference-compile', false, { errorCode });
+    else if (!checks['native-selfhost-compile']) record(checks, 'native-selfhost-compile', false, { errorCode });
+    record(checks, 'native-execute', false, { errorCode });
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+  if (!checks['native-execute']) record(checks, 'native-execute', errorCode === null);
+  const passed = Object.values(checks).every((item) => item.pass === true);
+  const resultWithoutRoot = {
+    status: passed ? 'PASS' : 'FAIL',
+    sourceSha256: sha256(source),
+    artifactSha256,
+    stateRoot,
+    checks,
+    errorCode,
+  };
+  return { ...resultWithoutRoot, reportRoot: evidenceRoot(resultWithoutRoot) };
+}
 
 export function verifyK340CompilerMixedParadigmCandidate(options = {}) {
+  if (options.sourcePath) return evaluateK340CompilerMixedParadigmSource(options);
   const contractPath = path.resolve(options.contractPath ?? CONTRACT_PATH);
   const evidencePath = path.resolve(options.evidencePath ?? EVIDENCE_PATH);
   const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
@@ -21,6 +79,7 @@ export function verifyK340CompilerMixedParadigmCandidate(options = {}) {
   const { reportRoot, ...evidenceWithoutRoot } = evidence;
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
   const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const candidate = evaluateK340CompilerMixedParadigmSource({ sourcePath });
 
   check(contract.format === 'rcl.k340.compiler-mixed-paradigm-runtime-contract.v0.1', 'RCL_K340_CONTRACT_FORMAT');
   check(contract.frozenBeforeAcquisition === true, 'RCL_K340_CONTRACT_NOT_FROZEN');
@@ -39,16 +98,18 @@ export function verifyK340CompilerMixedParadigmCandidate(options = {}) {
   check(evidence.rounds.every((round) => round.peakCallFrames > 0), 'RCL_K340_RECURSION_NOT_EXECUTED');
   check(evidence.rounds.every((round) => round.transactionRoots[0].afterRoot === round.transactionRoots[1].beforeRoot), 'RCL_K340_ROOT_CONTINUITY');
   check(evidence.rclGaps.some((gap) => gap.id === 'RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION'), 'RCL_K340_STATIC_VALIDATION_GAP');
+  check(candidate.status === 'PASS', 'RCL_K340_CANONICAL_CANDIDATE');
 
   return {
-    status: 'PASS',
+    status: candidate.status,
+    checks: candidate.checks,
     localRuntimeAdmitted: true,
     eligibleCells: contract.eligibleCells,
     runtimeReportRoot: reportRoot,
     contractRoot: evidence.contractRoot,
     sourceSha256: contract.canonical.sourceSha256,
     artifactSha256: evidence.artifacts.bootstrapArtifactSha256,
-    stateRoot: evidence.rounds[0].stateRoot,
+    stateRoot: candidate.stateRoot,
     paradigms: contract.profile.requiredParadigms,
     aiGenerateAdmission: 'UNVERIFIED',
     githubHostedAdmission: 'UNVERIFIED',

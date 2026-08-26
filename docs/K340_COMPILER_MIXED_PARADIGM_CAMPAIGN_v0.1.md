@@ -20,4 +20,6 @@ Formal acquisition passed 20/20 native rounds with one RBC artifact hash and one
 
 The missing-warrant control again exposes `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION`: the self-host compiler emits the negative artifact, but native `rclvm` rejects it with `RCL_AUTHORITY_DENIED` before commit. This is recorded as a compiler validation gap rather than misreported as compile-time rejection.
 
+The frozen AI contract acquired three successful independent ephemeral read-only repairs spanning recursive computation, phase triggering and declarative authority. All three restored exact canonical bytes and passed native replay in unique sessions `01a03ef6-f5a9-7d03-98be-b5cfe5558098`, `01a03efc-3666-7051-b285-1f61a08a9112` and `01a03f01-37c0-7da3-bd8c-2d5d3c52065b`. Aggregate receipt root: `3e0258d10b0040bbb73cc93d9df5251565c5e1ff0fbf75b77ea108dead9313cc`. This remains local `CANDIDATE` evidence until independent receipt replay and GitHub-hosted Linux/Windows authority are bound.
+
 No new dependency, donor code, provider or runtime opcode is introduced. The candidate reuses general RCL semantics and therefore opens no new `RCL_GAP` at the design gate.
