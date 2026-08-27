@@ -502,3 +502,40 @@ Authority files:
 - `docs/native-ai/bf16-gqa-rope-multiblock-evidence-v0.1.md`
 
 Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 GQA+RoPE two-block training and exact continuation. Hosted gap `RCL_GAP_K08_R_BF16_HOSTED_REPLAY` is closed for this candidate by run `32989948133`. Open gaps: `RCL_GAP_GPU_EXECUTION` and `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K09 AMD OpenCL persistent dispatch candidate
+
+Status: `PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING`.
+The RCL-owned GPU training path now uses one newline-delimited auxiliary
+provider session per RCL training request. The session reuses one provider
+process, OpenCL context and OpenCL program while keeping kernel and buffer
+objects request-local. Real AMD `gfx1152` session smoke passed with exact
+`4000` output roots; the two-block GQA+RoPE GPU-native backward/AdamW path
+passed `3/3` with CPU loss, parameters, optimizer states and checkpoint root
+exact. One-step telemetry records `338` ordered provider requests over
+`persistent-session-v0.1`. K08-S/K08-R CPU and prior GPU regressions remain
+green; provider, placement and backend errors remain fail-closed.
+
+| Evidence | Result |
+|---|---:|
+| Local K09 persistent-session smoke | `1/1 PASS` |
+| Local K08 GPU-native GQA+RoPE integration | `3/3 PASS` |
+| K08 CPU regression suites | `21/21 PASS` |
+| K08 GPU regression suites | `12/12 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| Hosted replay | PENDING for `b985a08` |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-persistent-dispatch-genome.rcl`
+- `examples/native-ai/gpu-opencl-persistent-dispatch-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-opencl-persistent-dispatch-v0.1/k09-opencl-persistent-dispatch-local-evidence.json`
+
+Reproduction: `npm run test:k09-opencl-persistent-dispatch` and
+`npm run test:k08-gpu-gqa-rope-native-backward-adamw`. The candidate grants
+only `OPENCL_AMD_PERSISTENT_PROVIDER_TRANSPORT_CANDIDATE`; batched kernels,
+device-buffer residency, throughput, generic portability, GPU training
+promotion, RCL-10M and K400 remain closed. Open gaps:
+`RCL_GAP_GPU_PROVIDER_DISPATCH_OVERHEAD` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.

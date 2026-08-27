@@ -270,3 +270,24 @@ node scripts/run-universal-stress-k01.mjs
 - The repository does not currently claim “RCL can write any program.” It defines a permanent, falsifiable process for testing how far that proposition can be pushed.
 
 `CONTEXT.md` remains historical handoff material and must not be treated as the current authority state.
+
+## K09 AMD OpenCL persistent provider dispatch
+
+Status: `PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING`.
+The RCL-owned BF16 GPU training path now starts one auxiliary Python provider
+session per training request and reuses one AMD OpenCL context/program across
+ordered forward matmul, reverse matmul-gradient and AdamW requests. The
+current Windows AMD `gfx1152` host passed the two-request session smoke and
+the two-block GQA+RoPE GPU-native exact differential (`3/3`); one-step
+telemetry records `338` ordered requests over `persistent-session-v0.1`.
+K08-S/K08-R CPU and prior GPU regressions remain green, and provider,
+placement and backend errors still fail closed. This reduces
+`RCL_GAP_GPU_PROVIDER_DISPATCH_OVERHEAD` only partially: batched kernels,
+device-buffer residency, throughput, generic GPU portability, GPU training
+promotion and K400 remain closed. Hosted replay for commit `b985a08` is
+pending. The RCL-10M tokenizer/dataset gate remains
+`OPEN / BLOCKED_USER_CORPUS`.
+
+Authority: `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-persistent-dispatch-contract.v0.1.json` and
+`examples/native-ai/evidence/gpu-opencl-persistent-dispatch-v0.1/k09-opencl-persistent-dispatch-local-evidence.json`.
