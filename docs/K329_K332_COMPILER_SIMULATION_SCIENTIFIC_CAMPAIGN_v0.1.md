@@ -1,16 +1,16 @@
 # K329/K332 Compiler Simulation + Scientific Campaign v0.1
 
-**Status:** local runtime and 3/3 independent AI repair candidate; hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
+**Status:** `PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_SIMULATION_SCIENTIFIC_AUTHORITY_BOUND`; K329 and K332 are admitted only for the frozen bounded profile.
 
 ## Reality Audit
 
-- Base: `origin/main@e6833a32f55f1989b004ba8fe00180adf9e62d35`.
+- Integrated base: `origin/main@359a12c831bb8e3c32853d67163b25c1481da209`.
 - Coordinates: `K329 compiler-runtime::simulation` and `K332 compiler-runtime::scientific`.
 - Canonical semantic owner: RCL.
 - Execution boundary: native `rclc` with the checked-in self-host compiler, then native `rclvm`.
 - No auxiliary provider, external solver or model-special opcode participates.
 
-The shared profile is not credited merely as another recursive algorithm. RCL owns a multi-step physical state, its trajectory, constant-acceleration transition law, zero/one-step boundaries, a closed-form position/velocity oracle and the discrete work invariant induced by the update scheme. K329 is bound to state evolution and trajectory evidence; K332 is bound to closed-form and invariant agreement. Both still require their own complete nine-gate receipt before admission.
+The shared profile is not credited merely as another recursive algorithm. RCL owns a multi-step physical state, its trajectory, constant-acceleration transition law, zero/one-step boundaries, a closed-form position/velocity oracle and the discrete work invariant induced by the update scheme. K329 is bound to state evolution and trajectory evidence; K332 is bound to closed-form and invariant agreement. Both are admitted only through their complete nine-gate receipts and share no authority with adjacent cells.
 
 ## Frozen local evidence
 
@@ -36,8 +36,8 @@ Three fresh ephemeral read-only sessions repaired separately mutated state-trans
 - `K329-K332-AI-REPAIR-02`: `01a03f3a-f79c-7a93-a0c7-f8f04e65717e`
 - `K329-K332-AI-REPAIR-03`: `01a03f3e-1954-74f0-8a99-cc089528fce8`
 
-Aggregate receipt root: `527ab8dd0c452dd98696be85a2a514b3ef77b628cd51e861573d813a43a26bab`. This is local `CANDIDATE` evidence only; checked-in independent receipt replay and GitHub Linux/Windows authority remain mandatory before either K329 or K332 can enter K400.
+Aggregate receipt root: `527ab8dd0c452dd98696be85a2a514b3ef77b628cd51e861573d813a43a26bab`. GitHub run `33087711271` then replayed the checked-in receipt on exact source commit `311dcc56d0553a0784a3fe44bdbe3ac05931b961`: focused Linux job `98571828813` and Windows native job `98571829415` both passed their exact K329/K332 steps. The resulting authority root is `3bd66c8f780345d688b381ba7364e6308fb9652f597439a8e9a1004f079d590c`.
 
-The checked-in receipt verifier independently reconstructs all three mutations, applies only each saved edit in a fresh temporary file, reruns native evaluation, validates rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step names. Local verdict is `PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`; K400 `AI_GENERATE` remains `UNVERIFIED` because `github-replay.json` is absent.
+The checked-in receipt verifier independently reconstructs all three mutations, applies only each saved edit in a fresh temporary file, reruns native evaluation, validates rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step names. With the checked-in authority receipt, the verdict is `PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_SIMULATION_SCIENTIFIC_AUTHORITY_BOUND`.
 
-The conditional K400 builder records the local receipts as candidate sources but creates neither `compiler-runtime::simulation` nor `compiler-runtime::scientific` without hosted authority. The current report remains `INCOMPLETE`, maturity `U3`, with `11 PASS / 389 UNTESTED`; report root `c1b86258b367790a51c7b5eff493afc5eb1644102fd6ff33b41b553b172d6322`.
+The conditional K400 builder now admits `compiler-runtime::simulation` and `compiler-runtime::scientific`, with all nine non-compensatory gates PASS only for the frozen bounded profile. The current report remains `INCOMPLETE`, maturity `U3`, with `19 PASS / 381 UNTESTED`; report root `6ae437359107339c1a939cfbe1550689b9b5504449d22f0ce11787b987e292f2`.

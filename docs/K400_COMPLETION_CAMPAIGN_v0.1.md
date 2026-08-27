@@ -1,10 +1,10 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `17 PASS / 0 BLOCKED / 383 UNTESTED`
+**Current evidence:** `19 PASS / 0 BLOCKED / 381 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `1320f279933361b6a8ae8109d310c8590c4e5aaa911c28fa35372fda0831e5a1`
-**Date:** 2026-08-26
+**Report root:** `6ae437359107339c1a939cfbe1550689b9b5504449d22f0ce11787b987e292f2`
+**Date:** 2026-08-27
 
 ## 1. Completion contract
 
@@ -44,6 +44,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 |---|---|---|---|
 | `K064` | `browser::web` | `PASS` | none for the bounded K02 RCL Web/Server vertical slice |
 | `K327` | `compiler-runtime::compiler` | `PASS` | none for the bounded three-mutation builtin-lowering repair profile with admitted compiler-runtime binding |
+| `K329` | `compiler-runtime::simulation` | `PASS` | none for the bounded integer constant-acceleration trajectory profile; arbitrary physics and floating-point solvers remain unverified |
+| `K332` | `compiler-runtime::scientific` | `PASS` | none for the bounded closed-form and discrete-work-invariant differential profile; general scientific/HPC parity remains unverified |
 | `K339` | `compiler-runtime::self-hosting` | `PASS` | none for the bounded three-mutation compiler repair profile |
 | `K063` | `browser::gui` | `PASS` | none for the bounded K02 structural GUI surface |
 | `K078` | `browser::reactive` | `PASS` | none for the bounded K02 reactive state/binding surface |

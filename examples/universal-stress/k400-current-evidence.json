@@ -745,6 +745,268 @@
       ]
     },
     {
+      "id": "compiler-runtime::simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "311dcc56d0553a0784a3fe44bdbe3ac05931b961",
+      "lastVerifiedDate": "2026-08-27",
+      "knownLimits": [
+        "The simulation claim is limited to one deterministic integer constant-acceleration trajectory.",
+        "Floating-point solvers, arbitrary physics, chaotic-system accuracy, GPU/HPC performance and unrelated K400 cells remain unverified."
+      ],
+      "relatedKillerTasks": [
+        "K10"
+      ],
+      "requiredGenes": [
+        "discrete-state-evolution",
+        "trajectory-observation",
+        "native-compiler-runtime",
+        "semantic-state-root"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent transition/oracle/boundary repairs passed; GitHub run 33087711271 bound focused and Windows replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        }
+      },
+      "changes": [
+        {
+          "id": "compiler-simulation-scientific-profile",
+          "kind": "stress-evidence",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL owns state evolution, trajectory, closed-form oracle and invariant semantics while native rclc/rclvm execute without an opaque solver."
+        }
+      ]
+    },
+    {
+      "id": "compiler-runtime::scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "311dcc56d0553a0784a3fe44bdbe3ac05931b961",
+      "lastVerifiedDate": "2026-08-27",
+      "knownLimits": [
+        "The scientific claim is limited to one integer closed-form and discrete-invariant differential.",
+        "Floating-point solvers, arbitrary physics, chaotic-system accuracy, GPU/HPC performance and unrelated K400 cells remain unverified."
+      ],
+      "relatedKillerTasks": [
+        "K10"
+      ],
+      "requiredGenes": [
+        "closed-form-scientific-oracle",
+        "discrete-work-invariant",
+        "native-compiler-runtime",
+        "semantic-state-root"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent transition/oracle/boundary repairs passed; GitHub run 33087711271 bound focused and Windows replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
+            "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native simulation/scientific receipt 4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c."
+        }
+      },
+      "changes": [
+        {
+          "id": "compiler-simulation-scientific-profile",
+          "kind": "stress-evidence",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL owns state evolution, trajectory, closed-form oracle and invariant semantics while native rclc/rclvm execute without an opaque solver."
+        }
+      ]
+    },
+    {
       "id": "compiler-runtime::machine-learning",
       "coverageMode": "native-semantic",
       "lastVerifiedSha": "6983b7d66813790b0727e4b66aafc8a8a27c4b01",
@@ -2062,6 +2324,7 @@
     "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-ai-generate/github-replay.json",
     "examples/universal-stress/k333-compiler-machine-learning-runtime-contract.v0.1.json",
     "examples/universal-stress/evidence/k333-compiler-machine-learning-runtime-v0.1.json",
     "examples/universal-stress/k333-compiler-machine-learning-ai-generation-contract.v0.1.json",
@@ -2113,7 +2376,7 @@
     "K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run 32871776578.",
     "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
     "K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run 32880432503.",
-    "K329/K332 have 20/20 rooted native simulation/scientific rounds and a 3/3 independently replayed local repair candidate; both remain UNTESTED until GitHub focused and Windows replay are bound.",
+    "K329/K332 close compiler-runtime::simulation and compiler-runtime::scientific through 20/20 native rounds, 3/3 independent repairs and GitHub run 33087711271.",
     "K333 closes compiler-runtime::machine-learning through 20/20 native integer-perceptron rounds, 3/3 independent repairs and GitHub run 33008611515.",
     "K340 closes compiler-runtime::mixed-paradigm through 20/20 four-paradigm native rounds, 3/3 independent repairs and GitHub run 33005515826.",
     "K337/K338 close compiler-runtime::security-sensitive and compiler-runtime::reactive through 20/20 native transactions, 3/3 independent repairs and GitHub run 33000443777.",

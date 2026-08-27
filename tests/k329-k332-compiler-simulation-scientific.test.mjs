@@ -21,6 +21,7 @@ const CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k329-k332
 const EVIDENCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k329-k332-compiler-simulation-scientific-runtime-v0.1.json');
 const AI_CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json');
 const AI_RECEIPT_DIR = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k329-k332-compiler-simulation-scientific-ai-generate');
+const AUTHORITY_PATH = path.join(AI_RECEIPT_DIR, 'github-replay.json');
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 
 function replaceExactlyOnce(source, oldText, newText) {
@@ -96,14 +97,22 @@ test('K329/K332 AI receipt binds three unique exact-canonical native repairs', (
   }
 });
 
-test('K329/K332 independent receipt replay remains local without hosted authority', () => {
+test('K329/K332 independent receipt replay binds hosted authority only when present', () => {
   const result = verifyK329K332CompilerSimulationScientificReceipt();
   assert.equal(result.localAdmitted, true);
   assert.equal(result.successfulTrials, 3);
   assert.equal(result.uniqueGeneratorSessions, 3);
   assert.equal(result.runtimeEvidenceAdmitted, true);
-  assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
   assert.deepEqual(result.eligibleCells, ['K329', 'K332']);
+  if (fs.existsSync(AUTHORITY_PATH)) {
+    assert.equal(result.githubAuthority.admitted, true);
+    assert.equal(result.aiGenerateAdmission, 'PASS');
+    assert.equal(result.verdict, 'PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_SIMULATION_SCIENTIFIC_AUTHORITY_BOUND');
+  } else {
+    assert.equal(result.githubAuthority.admitted, false);
+    assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+    assert.equal(result.githubAuthority.status, 'GITHUB_AUTHORITY_RECEIPT_MISSING');
+  }
 });
 
 test('K329/K332 rooted runtime tampering fails closed', () => {
