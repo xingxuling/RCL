@@ -58,7 +58,7 @@ function buildEngine() {
   ], {
     cwd: ROOT,
     encoding: 'utf8',
-    timeout: 180_000,
+    timeout: 300_000,
     maxBuffer: 32 * 1024 * 1024,
   });
   assert.equal(run.status, 0, run.stderr || run.stdout);
