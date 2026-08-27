@@ -397,6 +397,41 @@ Authority files:
 
 Reproduction: `npm run test:k08-gpu-native-backward-adamw`. Claims are limited to bounded AMD OpenCL matmul-gradient and FP32 AdamW lowering. `GPU_TRAINING`, full-graph GPU, GPU-native GQA/RoPE training, generic GPU portability, RCL-10M and K400 promotion remain closed. `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` is partially reduced; `RCL_GAP_RCL10M_TOKENIZER_DATASET` remains open and blocked on user-owned corpus bytes.
 
+## GPU-native multi-block GQA + RoPE backward + AdamW candidate
+
+Status: `PASS_LOCAL_GPU_NATIVE_GQA_ROPE_BACKWARD_ADAMW_CANDIDATE_GITHUB_REPLAY_BOUND`. This candidate integrates the prior GPU-native reverse matmul and FP32 AdamW primitives into the complete bounded K08-R-style two-block generic Tensor SSA graph. RCL owns the graph, two-query-head/shared-KV topology, native RoPE composition, reverse rules, BF16 RNE, FP32 accumulation, FP32 master/state bits and checkpoint identity. The Python provider remains an auxiliary lowering organ and CPU fallback is forbidden.
+
+| Evidence | Result |
+|---|---:|
+| RCL-owned genome and contract | PASS |
+| Two-block GQA with shared K/V per block | PASS |
+| Native RCL RoPE frame | PASS |
+| Generic graph without model-special opcode | PASS |
+| GPU forward matmul nodes per step | `36` |
+| GPU reverse matmul-gradient calls per step | `72` |
+| Explicit host CPU reference nodes per step | `>40` |
+| Canonical parameter groups / elements | `14 / 208` |
+| Real AMD OpenCL forward, reverse-left, reverse-right and AdamW | PASS |
+| CPU loss/parameter/state/checkpoint differential | exact PASS |
+| Direct replay and checkpoint resume | exact PASS |
+| Placement/provider/backend negatives | fail-closed PASS |
+| Local candidate suite | `3/3 PASS` |
+| Existing GPU/CPU regressions | `15/15 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| Hosted dedicated workflow | PASS, run `33089637536`, jobs `98578654811` / `98578655228` |
+| Repository-wide canonical verification | PASS on rerun, `1045/1045`, job `98582383466` |
+
+The current host receipt is AMD Accelerated Parallel Processing / `gfx1152` / OpenCL `2.0 AMD-APP (3661.0)` / driver `3661.0 (PAL,LC)`. The one-step differential timing was `234474.7675 ms`; the two-step replay/resume/negative-boundary timing was `1095830.0468 ms`. These are correctness-run timings, not throughput evidence. The first repository-wide attempt failed only at an existing Android package verification assertion (`expected verified`, `actual rejected`); the same job was rerun at the identical head and passed, and the initial failure remains recorded in the evidence JSON.
+
+Authority files:
+
+- `docs/native-ai/gpu-gqa-rope-native-backward-adamw-evidence-v0.1.md`
+- `examples/native-ai/gpu-gqa-rope-native-backward-adamw-genome.rcl`
+- `examples/native-ai/gpu-gqa-rope-native-backward-adamw-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-gqa-rope-native-backward-adamw-v0.1/k08-gpu-gqa-rope-native-backward-adamw-local-evidence.json`
+
+Reproduction: `npm run test:k08-gpu-gqa-rope-native-backward-adamw`. Claims are limited to bounded AMD OpenCL GQA/RoPE forward matmul plus GPU-native reverse matmul-gradient and FP32 AdamW lowering. `GPU_TRAINING`, full-graph GPU, generic GPU portability, throughput, RCL-10M, RCL-1B, distributed training and K400 promotion remain closed. `RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION` is partially reduced; `RCL_GAP_RCL10M_TOKENIZER_DATASET` remains open and blocked on user-owned corpus bytes.
+
 ## RCL-10M corpus admission gate
 
 Status: `CANDIDATE_SCHEMA_ONLY_BLOCKED_USER_CORPUS`. K08-L and K08-M provide reusable byte/BPE semantics and deterministic rooted artifacts, but no real admitted multilingual/code corpus or production tokenizer artifact is present in the repository. The new RCL-owned validator freezes the minimum 10,000,000-token admission manifest: rooted tokenizer, exact ppm language/domain mixture, source hashes and review references, filtering and dedup roots, deterministic shards and explicit admission decisions. Local `5/5` tests use synthetic `development://` values only; Hosted run `32995055906` passed the same schema gate on Ubuntu and Windows. They prove the gate, not a dataset.
