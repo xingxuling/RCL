@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k329-k332.compiler-simulation-scientific-ai-trial-receipt.v0.1",
+  "trialId": "K329-K332-AI-REPAIR-01",
+  "mutationClass": "simulation-state-transition",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03f37-9e89-7591-aae9-6ace0a4d5fc8",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "state_position(state) + acceleration,",
+    "new": "state_position(state) + state_velocity(state),",
+    "diagnosis": "The advance step updates position by acceleration, producing final position 20 and one-step position 2. The invariant requires position to advance by current velocity before velocity is accelerated, so only the position update fragment should change."
+  },
+  "promptRoot": "daf85c3676ebe5ed7a49ec683a9ccf5b41b12b4882e5f8166ded8e0ec7c359cd",
+  "mutatedSourceSha256": "7747495d7aeeaf63c546f11ad72bb3e053efe36d3bcaaf3dbd214776866e62d0",
+  "candidateSourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "f3f90a28f4b3abbf26af4e9e1a42f086062075fecfb36001bfd393d411d97c22",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03f37-9e89-7591-aae9-6ace0a4d5fc8"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "6abf1f19832629a57eec3944117d72e66c1cb512e406b3e30083cf604c30cd04"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "994ae5d18329eb400a15261b20516045d745af4d1b15cd9b1f0ae7c9b9624455"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 57676,
+        "cached_input_tokens": 29440,
+        "output_tokens": 584,
+        "reasoning_output_tokens": 278
+      }
+    }
+  ],
+  "finalMessageSha256": "994ae5d18329eb400a15261b20516045d745af4d1b15cd9b1f0ae7c9b9624455",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "183a3ea7514b361c14e900f80443304cf616b731253415ff176595642421cd47",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141",
+    "checks": {
+      "rcl-owns-scientific-simulation": {
+        "pass": true
+      },
+      "state-evolution-expressed": {
+        "pass": true
+      },
+      "closed-form-oracle-expressed": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-simulation-result": {
+        "pass": true
+      },
+      "native-scientific-oracle": {
+        "pass": true
+      },
+      "native-boundary-states": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "11d9b2767026330d3a40a32ff0d03f424122300bb0ab0af08df196f010b45822"
+}

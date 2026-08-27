@@ -16,6 +16,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k329-k332*.test.mjs'
       - 'tests/k333*.test.mjs'
       - 'tests/k340*.test.mjs'
       - 'tests/k337-k338*.test.mjs'
@@ -48,6 +49,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k329-k332-compiler-simulation-scientific-evidence.mjs'
+      - 'scripts/run-k329-k332-independent-ai-generation.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-candidate.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-receipt.mjs'
       - 'scripts/run-k333-compiler-machine-learning-evidence.mjs'
       - 'scripts/run-k333-independent-ai-generation.mjs'
       - 'scripts/verify-k333-compiler-machine-learning-candidate.mjs'
@@ -73,6 +78,7 @@ on:
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
       - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
+      - 'docs/K329_K332_COMPILER_SIMULATION_SCIENTIFIC_CAMPAIGN_v0.1.md'
       - 'docs/K333_COMPILER_MACHINE_LEARNING_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
@@ -87,6 +93,7 @@ on:
       - 'tests/stage*.test.mjs'
       - 'tests/k08-tensor*.test.mjs'
       - 'tests/k08-native-autodiff.test.mjs'
+      - 'tests/k329-k332*.test.mjs'
       - 'tests/k333*.test.mjs'
       - 'tests/k340*.test.mjs'
       - 'tests/k337-k338*.test.mjs'
@@ -119,6 +126,10 @@ on:
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
+      - 'scripts/run-k329-k332-compiler-simulation-scientific-evidence.mjs'
+      - 'scripts/run-k329-k332-independent-ai-generation.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-candidate.mjs'
+      - 'scripts/verify-k329-k332-compiler-simulation-scientific-receipt.mjs'
       - 'scripts/run-k333-compiler-machine-learning-evidence.mjs'
       - 'scripts/run-k333-independent-ai-generation.mjs'
       - 'scripts/verify-k333-compiler-machine-learning-candidate.mjs'
@@ -144,6 +155,7 @@ on:
       - 'examples/universal-stress/**'
       - 'docs/K400_COMPLETION_CAMPAIGN_v0.1.md'
       - 'docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md'
+      - 'docs/K329_K332_COMPILER_SIMULATION_SCIENTIFIC_CAMPAIGN_v0.1.md'
       - 'docs/K333_COMPILER_MACHINE_LEARNING_CAMPAIGN_v0.1.md'
       - 'docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md'
       - '.github/workflows/rcl-universal-program-stress.yml'
@@ -186,6 +198,8 @@ jobs:
         run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
       - name: K327 independent Compiler AI generation receipt replay
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
+      - name: K329/K332 independent Compiler Simulation Scientific AI receipt replay
+        run: npm run test:k329-k332-compiler-simulation-scientific && npm run verify:k329-k332-compiler-simulation-scientific-receipt
       - name: K333 independent Compiler ML AI receipt replay
         run: npm run test:k333-compiler-machine-learning && npm run verify:k333-compiler-machine-learning-receipt
       - name: K340 independent Compiler Mixed AI receipt replay
@@ -225,6 +239,8 @@ jobs:
         run: npm run build:native
       - name: K01 Windows self-hosting compiler campaign
         run: node scripts/run-universal-stress-k01.mjs output/universal-stress-v0.1/K01 examples/universal-stress/k01-ai-generation-contract.json
+      - name: K329/K332 Windows native Compiler Simulation Scientific runtime replay
+        run: npm run test:k329-k332-compiler-simulation-scientific && npm run verify:k329-k332-compiler-simulation-scientific-receipt
       - name: K333 Windows native Compiler ML runtime replay
         run: npm run test:k333-compiler-machine-learning && npm run verify:k333-compiler-machine-learning-receipt
       - name: K340 Windows native Compiler Mixed runtime replay

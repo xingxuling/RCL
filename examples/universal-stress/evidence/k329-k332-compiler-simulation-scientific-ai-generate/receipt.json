@@ -1,0 +1,380 @@
+{
+  "format": "rcl.k329-k332.compiler-simulation-scientific-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-26T18:07:25.167Z",
+  "contractRoot": "bf8ae33d4737ad3c2d6d0171a2b1ca2d70e218b10f49b977b0c494e3e61c0cdf",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K329",
+    "K332"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "4a6f45ae3365f61a0f83fa7bf4f790de8258a64918898282c8b9ba9b6cefad9c",
+    "contractRoot": "1723ce3e0217d7850c5dc663e517c20807a0a3e76ec598b026ddf4d15c8ed55d"
+  },
+  "trials": [
+    {
+      "format": "rcl.k329-k332.compiler-simulation-scientific-ai-trial-receipt.v0.1",
+      "trialId": "K329-K332-AI-REPAIR-01",
+      "mutationClass": "simulation-state-transition",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f37-9e89-7591-aae9-6ace0a4d5fc8",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "state_position(state) + acceleration,",
+        "new": "state_position(state) + state_velocity(state),",
+        "diagnosis": "The advance step updates position by acceleration, producing final position 20 and one-step position 2. The invariant requires position to advance by current velocity before velocity is accelerated, so only the position update fragment should change."
+      },
+      "promptRoot": "daf85c3676ebe5ed7a49ec683a9ccf5b41b12b4882e5f8166ded8e0ec7c359cd",
+      "mutatedSourceSha256": "7747495d7aeeaf63c546f11ad72bb3e053efe36d3bcaaf3dbd214776866e62d0",
+      "candidateSourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "f3f90a28f4b3abbf26af4e9e1a42f086062075fecfb36001bfd393d411d97c22",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f37-9e89-7591-aae9-6ace0a4d5fc8"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "6abf1f19832629a57eec3944117d72e66c1cb512e406b3e30083cf604c30cd04"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "994ae5d18329eb400a15261b20516045d745af4d1b15cd9b1f0ae7c9b9624455"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57676,
+            "cached_input_tokens": 29440,
+            "output_tokens": 584,
+            "reasoning_output_tokens": 278
+          }
+        }
+      ],
+      "finalMessageSha256": "994ae5d18329eb400a15261b20516045d745af4d1b15cd9b1f0ae7c9b9624455",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "183a3ea7514b361c14e900f80443304cf616b731253415ff176595642421cd47",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141",
+        "checks": {
+          "rcl-owns-scientific-simulation": {
+            "pass": true
+          },
+          "state-evolution-expressed": {
+            "pass": true
+          },
+          "closed-form-oracle-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-simulation-result": {
+            "pass": true
+          },
+          "native-scientific-oracle": {
+            "pass": true
+          },
+          "native-boundary-states": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "11d9b2767026330d3a40a32ff0d03f424122300bb0ab0af08df196f010b45822"
+    },
+    {
+      "format": "rcl.k329-k332.compiler-simulation-scientific-ai-trial-receipt.v0.1",
+      "trialId": "K329-K332-AI-REPAIR-02",
+      "mutationClass": "scientific-closed-form",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f3a-f79c-7a93-a0c7-f8f04e65717e",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "acceleration * steps * (steps + 1) / 2",
+        "new": "acceleration * steps * (steps - 1) / 2",
+        "diagnosis": "The simulation advances position using old velocity before adding acceleration, so the closed-form displacement acceleration term must be acceleration*steps*(steps-1)/2. The candidate uses steps+1, producing oraclePosition 140 instead of the simulated 120 for steps=10."
+      },
+      "promptRoot": "a86e7cbb16d2556908b6c6528e9be82cbe8f15d4384a750aa1d1056fc2d8fca2",
+      "mutatedSourceSha256": "9a448db052fe72bbf28a2a55c29bee30e1aa6ceaa123ed0635a10ea9df9b3013",
+      "candidateSourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "97acabb70806fb02b09e25c174d472bc7700a43539496ad25fe4174ca9d2a79a",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f3a-f79c-7a93-a0c7-f8f04e65717e"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "0c23cca0475496db0c4dd8e2c95f926ad8cd5ec5dda9301c7e51f1f2501001a5"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "abcbc6baf328cc62f91562fc7e961a0408a09b916902827ca16456e4b42b17be"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57687,
+            "cached_input_tokens": 29440,
+            "output_tokens": 434,
+            "reasoning_output_tokens": 101
+          }
+        }
+      ],
+      "finalMessageSha256": "abcbc6baf328cc62f91562fc7e961a0408a09b916902827ca16456e4b42b17be",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "d22d50dc3d9b7242de98cb05717263b512fc6c2cd3e17d260f6a6d2528f02ec1",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141",
+        "checks": {
+          "rcl-owns-scientific-simulation": {
+            "pass": true
+          },
+          "state-evolution-expressed": {
+            "pass": true
+          },
+          "closed-form-oracle-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-simulation-result": {
+            "pass": true
+          },
+          "native-scientific-oracle": {
+            "pass": true
+          },
+          "native-boundary-states": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "38e676aa1543e2005d072933f3add8010cb96846ae649f3654a05f67973aeded"
+    },
+    {
+      "format": "rcl.k329-k332.compiler-simulation-scientific-ai-trial-receipt.v0.1",
+      "trialId": "K329-K332-AI-REPAIR-03",
+      "mutationClass": "zero-step-boundary",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a03f3e-1954-74f0-8a99-cc089528fce8",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "choose(completed > steps,",
+        "new": "choose(completed >= steps,",
+        "diagnosis": "The recursion stops one iteration late. With completed > steps, simulate(..., 0, 0) advances once and a 10-step run advances 11 times. Changing the stop condition to completed >= steps preserves the initial state for zero steps and aligns the iterative result with the closed-form oracle."
+      },
+      "promptRoot": "58d0b05f3962da90e958065064c325c25f934b6226f0ee5d97d4188dfb1eb492",
+      "mutatedSourceSha256": "156716ab568699fc6a3cd601604cf8cf21937f95df40bd2d49ecdd30e4420f91",
+      "candidateSourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "746a7ccc39a965bdf245ed97c1050df15f5740145adde5b122c7e64fcdc3301c",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a03f3e-1954-74f0-8a99-cc089528fce8"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "1b0b4bcd3032ccfaa0b936c7b2db893a0b748f2ac4be492e4773e71402e496ba"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "36202107b0cd8b0215c80c6af8ba17c53b1ac2e641459b373c8b0328e61653e9"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 57680,
+            "cached_input_tokens": 52992,
+            "output_tokens": 392,
+            "reasoning_output_tokens": 86
+          }
+        }
+      ],
+      "finalMessageSha256": "36202107b0cd8b0215c80c6af8ba17c53b1ac2e641459b373c8b0328e61653e9",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "cabe964fc60a9fde27bc9b2ad338f7d029562ddfbdaba22d466e3fcbe33c105b",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141",
+        "checks": {
+          "rcl-owns-scientific-simulation": {
+            "pass": true
+          },
+          "state-evolution-expressed": {
+            "pass": true
+          },
+          "closed-form-oracle-expressed": {
+            "pass": true
+          },
+          "no-opaque-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-simulation-result": {
+            "pass": true
+          },
+          "native-scientific-oracle": {
+            "pass": true
+          },
+          "native-boundary-states": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "ff6849738ad8e74d91b3474c673e3002c33e84accf3ab8822eed360ad0a1a084"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_NATIVE_SIMULATION_SCIENTIFIC_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K329/K332 state-transition, closed-form and boundary semantics and binds its 20-round native runtime receipt. It grants no arbitrary simulation/scientific generation, floating-point solver, GPU/HPC claim, unrelated K400 cell or K400 completion.",
+  "reportRoot": "527ab8dd0c452dd98696be85a2a514b3ef77b628cd51e861573d813a43a26bab"
+}

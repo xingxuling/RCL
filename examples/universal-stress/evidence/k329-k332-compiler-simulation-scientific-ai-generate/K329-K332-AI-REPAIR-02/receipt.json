@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k329-k332.compiler-simulation-scientific-ai-trial-receipt.v0.1",
+  "trialId": "K329-K332-AI-REPAIR-02",
+  "mutationClass": "scientific-closed-form",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03f3a-f79c-7a93-a0c7-f8f04e65717e",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "acceleration * steps * (steps + 1) / 2",
+    "new": "acceleration * steps * (steps - 1) / 2",
+    "diagnosis": "The simulation advances position using old velocity before adding acceleration, so the closed-form displacement acceleration term must be acceleration*steps*(steps-1)/2. The candidate uses steps+1, producing oraclePosition 140 instead of the simulated 120 for steps=10."
+  },
+  "promptRoot": "a86e7cbb16d2556908b6c6528e9be82cbe8f15d4384a750aa1d1056fc2d8fca2",
+  "mutatedSourceSha256": "9a448db052fe72bbf28a2a55c29bee30e1aa6ceaa123ed0635a10ea9df9b3013",
+  "candidateSourceSha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "97acabb70806fb02b09e25c174d472bc7700a43539496ad25fe4174ca9d2a79a",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03f3a-f79c-7a93-a0c7-f8f04e65717e"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "0c23cca0475496db0c4dd8e2c95f926ad8cd5ec5dda9301c7e51f1f2501001a5"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "abcbc6baf328cc62f91562fc7e961a0408a09b916902827ca16456e4b42b17be"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 57687,
+        "cached_input_tokens": 29440,
+        "output_tokens": 434,
+        "reasoning_output_tokens": 101
+      }
+    }
+  ],
+  "finalMessageSha256": "abcbc6baf328cc62f91562fc7e961a0408a09b916902827ca16456e4b42b17be",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "d22d50dc3d9b7242de98cb05717263b512fc6c2cd3e17d260f6a6d2528f02ec1",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "bba376f5175f7d71ad5701e345e4e3b412bf43e3a4ef65b69b7216537d651141",
+    "checks": {
+      "rcl-owns-scientific-simulation": {
+        "pass": true
+      },
+      "state-evolution-expressed": {
+        "pass": true
+      },
+      "closed-form-oracle-expressed": {
+        "pass": true
+      },
+      "no-opaque-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-simulation-result": {
+        "pass": true
+      },
+      "native-scientific-oracle": {
+        "pass": true
+      },
+      "native-boundary-states": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "38e676aa1543e2005d072933f3add8010cb96846ae649f3654a05f67973aeded"
+}

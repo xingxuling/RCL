@@ -1,0 +1,67 @@
+# K329/K332: compiler-runtime simulation + scientific bounded profile.
+# RCL owns the discrete physical model, state evolution, trajectory and
+# closed-form scientific oracle. Native rclc/rclvm are the execution boundary.
+reality CompilerSimulationScientific {
+  reckon make_state(position : Number, velocity : Number, trajectory : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), position), velocity), trajectory)
+
+  reckon state_position(state : Sequence) -> Number = sequence_get(state, 0)
+  reckon state_velocity(state : Sequence) -> Number = sequence_get(state, 1)
+  reckon state_trajectory(state : Sequence) -> Sequence = sequence_get(state, 2)
+
+  reckon advance(state : Sequence, acceleration : Number) -> Sequence =
+    make_state(
+      state_position(state) + state_velocity(state),
+      state_velocity(state) + acceleration,
+      sequence_append(state_trajectory(state), state_position(state) + state_velocity(state)))
+
+  reckon simulate(state : Sequence, acceleration : Number, completed : Number, steps : Number) -> Sequence =
+    choose(completed >= steps,
+      state,
+      simulate(advance(state, acceleration), acceleration, completed + 1, steps))
+
+  reckon closed_form_position(initial_position : Number, initial_velocity : Number, acceleration : Number, steps : Number) -> Number =
+    initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2
+
+  reckon closed_form_velocity(initial_velocity : Number, acceleration : Number, steps : Number) -> Number =
+    initial_velocity + acceleration * steps
+
+  reckon discrete_work_invariant(initial_velocity : Number, acceleration : Number, steps : Number, displacement : Number, final_velocity : Number) -> Truth =
+    final_velocity * final_velocity - initial_velocity * initial_velocity ==
+      2 * acceleration * displacement + steps * acceleration * acceleration
+
+  facet contract.id : Text = "k329-k332-compiler-simulation-scientific-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet model.kind : Text = "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR"
+  facet input.initial_position : Number = 0
+  facet input.initial_velocity : Number = 3
+  facet input.acceleration : Number = 2
+  facet input.steps : Number = 10
+  facet simulation.initial_state : Sequence = make_state(input.initial_position, input.initial_velocity, sequence_append(empty_sequence(), input.initial_position))
+  facet simulation.final_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, input.steps)
+  facet result.position : Number = state_position(simulation.final_state)
+  facet result.velocity : Number = state_velocity(simulation.final_state)
+  facet result.trajectory : Sequence = state_trajectory(simulation.final_state)
+  facet oracle.position : Number = closed_form_position(input.initial_position, input.initial_velocity, input.acceleration, input.steps)
+  facet oracle.velocity : Number = closed_form_velocity(input.initial_velocity, input.acceleration, input.steps)
+  facet boundary.zero_step_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, 0)
+  facet boundary.one_step_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, 1)
+  facet evaluation.pass : Truth =
+    result.position == 120 and
+    result.velocity == 23 and
+    length(result.trajectory) == 11 and
+    sequence_get(result.trajectory, 0) == 0 and
+    sequence_get(result.trajectory, 1) == 3 and
+    sequence_get(result.trajectory, 10) == 120 and
+    result.position == oracle.position and
+    result.velocity == oracle.velocity and
+    discrete_work_invariant(input.initial_velocity, input.acceleration, input.steps, result.position - input.initial_position, result.velocity) and
+    state_position(boundary.zero_step_state) == 0 and
+    state_velocity(boundary.zero_step_state) == 3 and
+    length(state_trajectory(boundary.zero_step_state)) == 1 and
+    state_position(boundary.one_step_state) == 3 and
+    state_velocity(boundary.one_step_state) == 5
+  facet evidence.no_opaque_provider : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}
