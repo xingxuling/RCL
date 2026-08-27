@@ -2,7 +2,7 @@
 
 ## Verdict
 
-`LOCAL_NATIVE_CANDIDATE / GITHUB_AUTHORITY_REQUIRED`
+`PASS_GITHUB_LINUX_WINDOWS_NATIVE_DATABASE_AUTHORITY_BOUND`
 
 This campaign does not claim that RCL is a SQL engine. It freezes one bounded `compiler-runtime::database` profile in which RCL source owns integer relation rows, primary-key uniqueness, foreign-key existence, selection, join, aggregation and atomic insert commit/rollback. Native `rclc` and `rclvm` are the execution boundary. JavaScript is an independent oracle and evidence organ only.
 
@@ -42,10 +42,10 @@ Expected bounded results are initial sum/count `160 / 2`, three rejected transac
 | CORRECT | PASS_LOCAL | independent JavaScript relational oracle matches every frozen projection |
 | ROBUST | PASS_LOCAL | four semantic mutations plus corrupt RBC fail closed |
 | PERFORMANCE | PASS_LOCAL | P95 compile, execute and combined time remain inside the frozen contract budget |
-| AI_GENERATE | CANDIDATE | three unique read-only ephemeral sessions restored exact canonical bytes; hosted replay is still required |
-| EVIDENCE | CANDIDATE | rooted runtime and AI receipts exist; GitHub Linux/Windows authority is still required |
+| AI_GENERATE | PASS | three unique read-only ephemeral sessions restored exact canonical bytes; GitHub focused replay passed |
+| EVIDENCE | PASS | rooted runtime/AI receipts and exact GitHub Linux/Windows authority are bound |
 
-Because the nine gates are non-compensatory, K326 remains `UNTESTED` in the authoritative K400 matrix until the exact focused and Windows hosted steps pass and their identities are bound into `github-replay.json`.
+All nine non-compensatory gates are admitted for this frozen profile. GitHub run `33093366736` passed focused job `98591815601` and Windows job `98591815857` for source commit `f7c266c6360ef72162064e6605a11fe3de4d1069`; the authority root is `4eb155d0b6824d85c5191f2106c316a5a1d81c4e84b5c3e1c6ab6153617c208f`.
 
 ## Multi-civilization Integration Court
 
