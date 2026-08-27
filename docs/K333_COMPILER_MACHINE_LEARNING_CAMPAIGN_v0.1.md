@@ -1,10 +1,10 @@
 # K333 Compiler Machine-Learning Campaign v0.1
 
-**Status:** local runtime and 3/3 independent AI repair candidate; hosted Linux/Windows replay and K400 admission remain `UNVERIFIED`.
+**Status:** `PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_COMPILER_ML_AUTHORITY_BOUND`; K333 is admitted only for the frozen bounded integer-perceptron advisory profile.
 
 ## Reality Audit
 
-- Current integrated base: `origin/main@e6833a32f55f1989b004ba8fe00180adf9e62d35` (the contract was originally frozen on `4c7b3f9c1c90da710903487df8d1e766a8b0afc1`; focused replay remained exact after the merge).
+- Current integrated base: `origin/main@9e68bb2bf97f39149a4c94750209a76a1b10d00a` (the contract was originally frozen on `4c7b3f9c1c90da710903487df8d1e766a8b0afc1`; focused and Windows replay remained exact after integration).
 - Coordinate: `K333 compiler-runtime::machine-learning`.
 - Canonical semantic owner: RCL.
 - Execution boundary: native `rclc` using the checked-in self-host compiler artifact, followed by native `rclvm`.
@@ -32,19 +32,19 @@ Formal local acquisition passed 20/20 native rounds with one artifact hash and o
 
 ## Nine-gate boundary
 
-| Gate | Local result |
+| Gate | Admitted result |
 |---|---|
-| EXPRESS | CANDIDATE |
-| COMPILE | CANDIDATE |
-| LOWER | CANDIDATE |
-| EXECUTE | CANDIDATE |
-| CORRECT | CANDIDATE |
-| ROBUST | CANDIDATE |
-| PERFORMANCE | CANDIDATE |
-| AI_GENERATE | CANDIDATE |
-| EVIDENCE | CANDIDATE |
+| EXPRESS | PASS |
+| COMPILE | PASS |
+| LOWER | PASS |
+| EXECUTE | PASS |
+| CORRECT | PASS |
+| ROBUST | PASS |
+| PERFORMANCE | PASS |
+| AI_GENERATE | PASS |
+| EVIDENCE | PASS |
 
-No gate is promoted to K400 `PASS` from local execution alone. Independent AI repair, exact receipt replay, GitHub-hosted Linux/Windows authority and conditional K400 integration remain separate mandatory gates.
+No gate was promoted from local execution alone. Independent AI repair, exact receipt replay, GitHub-hosted Linux/Windows authority and conditional K400 integration were evaluated as separate mandatory gates.
 
 The frozen AI contract then ran three new ephemeral read-only sessions against separately mutated candidates. All three restored exact canonical bytes and passed native replay:
 
@@ -52,11 +52,11 @@ The frozen AI contract then ran three new ephemeral read-only sessions against s
 - perceptron update repair: `01a03f26-d151-75a0-901d-1f2265e032c8`
 - model authority repair: `01a03f28-6991-78e3-a5a6-684a0eb1874c`
 
-The accepted aggregate receipt root is `d16ad0df7481c94c5084acac822e32930d8e39aa855c4d43dc8d79cf0a81c2dc`. An earlier 2/3 acquisition was rejected because the first generator repaired the label but also changed an unrelated training sample; native semantics happened to pass, but exact canonical bytes did not. The evaluator was tightened to single-line edit fragments without exposing the oracle edit, and the complete acquisition was rerun with three fresh sessions. This evidence remains local `CANDIDATE` until checked-in receipt replay and hosted authority are bound.
+The accepted aggregate receipt root is `d16ad0df7481c94c5084acac822e32930d8e39aa855c4d43dc8d79cf0a81c2dc`. An earlier 2/3 acquisition was rejected because the first generator repaired the label but also changed an unrelated training sample; native semantics happened to pass, but exact canonical bytes did not. The evaluator was tightened to single-line edit fragments without exposing the oracle edit, and the complete acquisition was rerun with three fresh sessions. That local candidate is now bound by the checked-in hosted authority receipt below.
 
-The checked-in receipt verifier independently reconstructs every mutation, applies only the saved edit in a fresh temporary file, reruns native compilation/execution, validates all rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step identities. Local replay passes with verdict `PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`; `AI_GENERATE` remains `UNVERIFIED` for K400 admission because `github-replay.json` is absent.
+The checked-in receipt verifier independently reconstructs every mutation, applies only the saved edit in a fresh temporary file, reruns native compilation/execution, validates all rooted runtime and generator receipts, and requires three unique session identities. It also tests rooted runtime tampering and exact GitHub focused/Windows step identities. GitHub run `33008611515` passed focused job `98308743737` and Windows job `98308743547` on exact source commit `6983b7d66813790b0727e4b66aafc8a8a27c4b01`; authority root `72e8b699d53f5685b542de32dfdee2a3d41eea4b3c1bbed0395b9fc6f77d663d` admits K333 only.
 
-The K400 builder now records K333 runtime and AI receipts as candidate sources and creates `compiler-runtime::machine-learning` only when the hosted authority verifier returns `PASS`. Without that authority, the report remains `INCOMPLETE`, maturity `U3`, with `11 PASS / 389 UNTESTED`; report root `07bad70acb5365d734d37eaa328178ca8d6227d19db720c012dbf5ce726bb64e`.
+The K400 builder records K333 runtime, AI and hosted-authority receipts and now creates `compiler-runtime::machine-learning`. The report remains `INCOMPLETE`, maturity `U3`, with `17 PASS / 383 UNTESTED`; report root `1320f279933361b6a8ae8109d310c8590c4e5aaa911c28fa35372fda0831e5a1`.
 
 ## Federation, license and regression boundary
 
