@@ -949,11 +949,24 @@ where
     )
 }
 
-fn tensor_gradient(value: &(TensorDescriptor, DenseStorage)) -> Gradient {
-    Gradient {
+fn tensor_gradient(
+    value: &(TensorDescriptor, DenseStorage),
+    bf16: bool,
+) -> Result<Gradient, EngineError> {
+    let data = if bf16 {
+        value
+            .1
+            .data
+            .iter()
+            .map(|cell| bf16_input(*cell).map(f64::from))
+            .collect::<Result<Vec<_>, _>>()?
+    } else {
+        value.1.data.clone()
+    };
+    Ok(Gradient {
         shape: value.0.shape.clone(),
-        data: value.1.data.clone(),
-    }
+        data,
+    })
 }
 
 fn transpose_gradient(value: &Gradient, permutation: &[usize]) -> Result<Gradient, EngineError> {
@@ -995,7 +1008,11 @@ fn transpose_gradient(value: &Gradient, permutation: &[usize]) -> Result<Gradien
     gradient(&output_shape, data)
 }
 
-fn matmul_gradient(left: &Gradient, right: &Gradient) -> Result<Gradient, EngineError> {
+fn matmul_gradient(
+    left: &Gradient,
+    right: &Gradient,
+    fp32_accumulation: bool,
+) -> Result<Gradient, EngineError> {
     if left.shape.len() != 2 || right.shape.len() != 2 || left.shape[1] != right.shape[0] {
         return Err(EngineError::new(
             "RCL_AUTODIFF_MATMUL_SHAPE",
@@ -1007,7 +1024,14 @@ fn matmul_gradient(left: &Gradient, right: &Gradient) -> Result<Gradient, Engine
     for i in 0..m {
         for inner in 0..k {
             for j in 0..n {
-                data[i * n + j] += left.data[i * k + inner] * right.data[inner * n + j];
+                let cell = i * n + j;
+                if fp32_accumulation {
+                    let product =
+                        (left.data[i * k + inner] as f32) * (right.data[inner * n + j] as f32);
+                    data[cell] = (data[cell] as f32 + product) as f64;
+                } else {
+                    data[cell] += left.data[i * k + inner] * right.data[inner * n + j];
+                }
             }
         }
     }
@@ -1084,23 +1108,25 @@ fn node_input_gradients(
     output_gradient: &Gradient,
     tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
     mode: &ExecutionMode,
+    bf16: bool,
     execution: &mut BackwardExecutionTelemetry,
 ) -> Result<Vec<Gradient>, EngineError> {
     let inputs = node
         .inputs
         .iter()
         .map(|id| {
-            tape.get(id).map(tensor_gradient).ok_or_else(|| {
-                EngineError::new(
-                    "RCL_AUTODIFF_INPUT_MISSING",
-                    format!("Backward node {} is missing input {id}", node.id),
-                )
-            })
+            tape.get(id)
+                .ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_AUTODIFF_INPUT_MISSING",
+                        format!("Backward node {} is missing input {id}", node.id),
+                    )
+                })
+                .and_then(|value| tensor_gradient(value, bf16))
         })
         .collect::<Result<Vec<_>, _>>()?;
     let output = tape
         .get(&node.output.id)
-        .map(tensor_gradient)
         .ok_or_else(|| {
             EngineError::new(
                 "RCL_AUTODIFF_OUTPUT_MISSING",
@@ -1109,7 +1135,8 @@ fn node_input_gradients(
                     node.id, node.output.id
                 ),
             )
-        })?;
+        })
+        .and_then(|value| tensor_gradient(value, bf16))?;
     let direct = |value: Gradient, shape: &[usize]| reduce_to_shape(&value, shape);
     match node.operation.as_str() {
         "add" => Ok(vec![
@@ -1252,8 +1279,8 @@ fn node_input_gradients(
                 Ok(vec![left_gradient, right_gradient])
             } else {
                 Ok(vec![
-                    matmul_gradient(output_gradient, &transpose_2d(&inputs[1])?)?,
-                    matmul_gradient(&transpose_2d(&inputs[0])?, output_gradient)?,
+                    matmul_gradient(output_gradient, &transpose_2d(&inputs[1])?, bf16)?,
+                    matmul_gradient(&transpose_2d(&inputs[0])?, output_gradient, bf16)?,
                 ])
             }
         }
@@ -1506,6 +1533,7 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
             &output_gradient,
             &tape,
             &mode,
+            bf16,
             &mut backward_execution,
         )?;
         for (input_index, incoming) in input_gradients.into_iter().enumerate() {
