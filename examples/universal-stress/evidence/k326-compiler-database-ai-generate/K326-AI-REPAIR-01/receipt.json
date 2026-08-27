@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k326.compiler-database-ai-trial-receipt.v0.1",
+  "trialId": "K326-AI-REPAIR-01",
+  "mutationClass": "primary-key-lookup",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04407-d4c7-72c3-9ec9-608eee007556",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "      choose(order_id(sequence_get(orders, cursor)) != id,",
+    "new": "      choose(order_id(sequence_get(orders, cursor)) == id,",
+    "diagnosis": "has_order currently returns true on the first non-matching order id, so valid inserts are falsely rejected. The primary-key existence test should return true only when an existing order id equals the inserted row id."
+  },
+  "promptRoot": "4acefde133237dc19e8c7f7a3a5e31caa7cb258b46f2b08aa33149702362a7f8",
+  "mutatedSourceSha256": "245a36ac2a5e32f04aeedafc3668be6bfcecb4cdd5bd51078a5fe34efaa49ff2",
+  "candidateSourceSha256": "f28093884180e528a379750001278a76de6c73250472bc9ec6d90d41a8e3c3a1",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "dbd193d001a58cfed82e9e62140922ba00f3259f7e952c21466960f1b194191d",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04407-d4c7-72c3-9ec9-608eee007556"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "9c5a9b9989e5e630baaca71f81a747c61140a66cf2d188a3c68e495f1643961f"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "393419a9f5c840c9b68cda1d9363316320352051d5c962a0cab025af273c72ef"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 58573,
+        "cached_input_tokens": 29440,
+        "output_tokens": 479,
+        "reasoning_output_tokens": 161
+      }
+    }
+  ],
+  "finalMessageSha256": "393419a9f5c840c9b68cda1d9363316320352051d5c962a0cab025af273c72ef",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "3fdb652db9a43e4618534167bc59e7abd2fb967e5ca1fe11b38fe7498c889012",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "384f72dc9916adf76248cf5e4639587c05ce074752d74996210df58e2f5ae115",
+    "checks": {
+      "rcl-owns-relational-transaction": {
+        "pass": true
+      },
+      "database-semantics-expressed": {
+        "pass": true
+      },
+      "atomic-controls-expressed": {
+        "pass": true
+      },
+      "no-opaque-database-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-relational-query": {
+        "pass": true
+      },
+      "native-atomic-rollback": {
+        "pass": true
+      },
+      "native-valid-commit": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "e3884c70ee067c2a9dbc5e51b2a73b5f22e1d2bd5d9ea84ade5b885ab98499eb"
+}

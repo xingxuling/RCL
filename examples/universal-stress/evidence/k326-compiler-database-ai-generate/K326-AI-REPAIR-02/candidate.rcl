@@ -1,0 +1,127 @@
+# K326: compiler-runtime database bounded relational-transaction profile.
+# RCL owns relation rows, primary/foreign-key constraints, selection, join,
+# aggregation and atomic commit/rollback. SQL is a semantic donor only.
+reality CompilerDatabase {
+  reckon make_customer(id : Number, region : Number, credit : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), id), region), credit)
+
+  reckon customer_id(row : Sequence) -> Number = sequence_get(row, 0)
+  reckon customer_region(row : Sequence) -> Number = sequence_get(row, 1)
+
+  reckon make_order(id : Number, customer : Number, amount : Number, approved : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), customer), amount), approved)
+
+  reckon order_id(row : Sequence) -> Number = sequence_get(row, 0)
+  reckon order_customer(row : Sequence) -> Number = sequence_get(row, 1)
+  reckon order_amount(row : Sequence) -> Number = sequence_get(row, 2)
+  reckon order_approved(row : Sequence) -> Number = sequence_get(row, 3)
+
+  reckon make_transaction(rows : Sequence, committed : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), rows), committed)
+
+  reckon transaction_rows(transaction : Sequence) -> Sequence = sequence_get(transaction, 0)
+  reckon transaction_committed(transaction : Sequence) -> Number = sequence_get(transaction, 1)
+
+  reckon has_customer(customers : Sequence, cursor : Number, id : Number) -> Truth =
+    choose(cursor >= length(customers),
+      false,
+      choose(customer_id(sequence_get(customers, cursor)) == id,
+        true,
+        has_customer(customers, cursor + 1, id)))
+
+  reckon has_order(orders : Sequence, cursor : Number, id : Number) -> Truth =
+    choose(cursor >= length(orders),
+      false,
+      choose(order_id(sequence_get(orders, cursor)) == id,
+        true,
+        has_order(orders, cursor + 1, id)))
+
+  reckon primary_keys_unique(orders : Sequence, left : Number, right : Number) -> Truth =
+    choose(left >= length(orders),
+      true,
+      choose(right >= length(orders),
+        primary_keys_unique(orders, left + 1, left + 2),
+        choose(order_id(sequence_get(orders, left)) == order_id(sequence_get(orders, right)),
+          false,
+          primary_keys_unique(orders, left, right + 1))))
+
+  reckon count_customers_in_region(customers : Sequence, cursor : Number, region : Number) -> Number =
+    choose(cursor >= length(customers),
+      0,
+      choose(customer_region(sequence_get(customers, cursor)) == region,
+        1,
+        0) + count_customers_in_region(customers, cursor + 1, region))
+
+  reckon customer_is_in_region(customers : Sequence, cursor : Number, id : Number, region : Number) -> Truth =
+    choose(cursor >= length(customers),
+      false,
+      choose(customer_id(sequence_get(customers, cursor)) == id,
+        customer_region(sequence_get(customers, cursor)) == region,
+        customer_is_in_region(customers, cursor + 1, id, region)))
+
+  reckon sum_approved_orders_for_region(customers : Sequence, orders : Sequence, cursor : Number, region : Number) -> Number =
+    choose(cursor >= length(orders),
+      0,
+      choose(order_approved(sequence_get(orders, cursor)) == 1 and
+             customer_is_in_region(customers, 0, order_customer(sequence_get(orders, cursor)), region),
+        order_amount(sequence_get(orders, cursor)),
+        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))
+
+  reckon count_approved_orders_for_region(customers : Sequence, orders : Sequence, cursor : Number, region : Number) -> Number =
+    choose(cursor >= length(orders),
+      0,
+      choose(order_approved(sequence_get(orders, cursor)) == 1 and
+             customer_is_in_region(customers, 0, order_customer(sequence_get(orders, cursor)), region),
+        1,
+        0) + count_approved_orders_for_region(customers, orders, cursor + 1, region))
+
+  reckon insert_order(customers : Sequence, orders : Sequence, row : Sequence) -> Sequence =
+    choose(has_order(orders, 0, order_id(row)) or
+           not has_customer(customers, 0, order_customer(row)) or
+           order_amount(row) < 0,
+      make_transaction(orders, 0),
+      make_transaction(sequence_append(orders, row), 1))
+
+  facet contract.id : Text = "k326-compiler-database-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet donor.sql : Text = "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT"
+  facet boundary.profile : Text = "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE"
+
+  facet database.customers : Sequence = sequence_append(sequence_append(sequence_append(
+    empty_sequence(), make_customer(1, 10, 500)), make_customer(2, 20, 300)), make_customer(3, 10, 400))
+  facet database.orders : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(
+    empty_sequence(), make_order(100, 1, 70, 1)), make_order(101, 2, 40, 1)),
+    make_order(102, 1, 30, 0)), make_order(103, 3, 90, 1))
+
+  facet query.region_10_customer_count : Number = count_customers_in_region(database.customers, 0, 10)
+  facet query.region_10_initial_sum : Number = sum_approved_orders_for_region(database.customers, database.orders, 0, 10)
+  facet query.region_10_initial_join_count : Number = count_approved_orders_for_region(database.customers, database.orders, 0, 10)
+
+  facet transaction.duplicate : Sequence = insert_order(database.customers, database.orders, make_order(103, 2, 55, 1))
+  facet transaction.orphan : Sequence = insert_order(database.customers, database.orders, make_order(104, 99, 25, 1))
+  facet transaction.negative : Sequence = insert_order(database.customers, database.orders, make_order(104, 3, 0 - 25, 1))
+  facet transaction.valid : Sequence = insert_order(database.customers, database.orders, make_order(104, 3, 25, 1))
+  facet database.committed_orders : Sequence = transaction_rows(transaction.valid)
+  facet query.region_10_committed_sum : Number = sum_approved_orders_for_region(database.customers, database.committed_orders, 0, 10)
+  facet query.region_10_committed_join_count : Number = count_approved_orders_for_region(database.customers, database.committed_orders, 0, 10)
+
+  facet evaluation.pass : Truth =
+    primary_keys_unique(database.orders, 0, 1) and
+    primary_keys_unique(database.committed_orders, 0, 1) and
+    query.region_10_customer_count == 2 and
+    query.region_10_initial_sum == 160 and
+    query.region_10_initial_join_count == 2 and
+    transaction_committed(transaction.duplicate) == 0 and
+    length(transaction_rows(transaction.duplicate)) == 4 and
+    transaction_committed(transaction.orphan) == 0 and
+    length(transaction_rows(transaction.orphan)) == 4 and
+    transaction_committed(transaction.negative) == 0 and
+    length(transaction_rows(transaction.negative)) == 4 and
+    transaction_committed(transaction.valid) == 1 and
+    length(database.committed_orders) == 5 and
+    query.region_10_committed_sum == 185 and
+    query.region_10_committed_join_count == 3
+  facet evidence.no_opaque_provider : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}

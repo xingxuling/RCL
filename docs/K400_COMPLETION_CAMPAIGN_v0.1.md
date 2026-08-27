@@ -44,6 +44,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 |---|---|---|---|
 | `K064` | `browser::web` | `PASS` | none for the bounded K02 RCL Web/Server vertical slice |
 | `K327` | `compiler-runtime::compiler` | `PASS` | none for the bounded three-mutation builtin-lowering repair profile with admitted compiler-runtime binding |
+| `K326` | `compiler-runtime::database` | `PASS` | none for the bounded in-memory relational query and atomic-insert profile; SQL engines, persistence, concurrency and isolation remain unverified |
 | `K329` | `compiler-runtime::simulation` | `PASS` | none for the bounded integer constant-acceleration trajectory profile; arbitrary physics and floating-point solvers remain unverified |
 | `K332` | `compiler-runtime::scientific` | `PASS` | none for the bounded closed-form and discrete-work-invariant differential profile; general scientific/HPC parity remains unverified |
 | `K339` | `compiler-runtime::self-hosting` | `PASS` | none for the bounded three-mutation compiler repair profile |

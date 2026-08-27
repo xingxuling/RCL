@@ -745,6 +745,138 @@
       ]
     },
     {
+      "id": "compiler-runtime::database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "f7c266c6360ef72162064e6605a11fe3de4d1069",
+      "lastVerifiedDate": "2026-08-27",
+      "knownLimits": [
+        "The database claim is limited to one bounded in-memory integer relation profile with primary/foreign keys, selection, join, aggregation and atomic insert rollback.",
+        "SQL parsing, durable storage, concurrency, isolation levels, query planning, external database services and unrelated K400 cells remain unverified."
+      ],
+      "relatedKillerTasks": [
+        "K05"
+      ],
+      "requiredGenes": [
+        "relation-sequences",
+        "primary-foreign-key-constraints",
+        "selection-join-aggregation",
+        "atomic-commit-rollback",
+        "native-compiler-runtime"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent primary-key/foreign-key/domain-constraint repairs passed; GitHub run 33093366736 bound focused and Windows replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+            "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native relational-transaction receipt dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8."
+        }
+      },
+      "changes": [
+        {
+          "id": "compiler-database-relational-transaction-profile",
+          "kind": "stress-evidence",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL owns relation rows, constraints, queries and atomic transaction semantics while native rclc/rclvm execute without an opaque database provider."
+        }
+      ]
+    },
+    {
       "id": "compiler-runtime::simulation",
       "coverageMode": "native-semantic",
       "lastVerifiedSha": "311dcc56d0553a0784a3fe44bdbe3ac05931b961",
@@ -2320,6 +2452,11 @@
     "examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json",
     "examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json",
+    "examples/universal-stress/k326-compiler-database-runtime-contract.v0.1.json",
+    "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+    "examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json",
+    "examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
     "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
@@ -2376,6 +2513,7 @@
     "K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run 32871776578.",
     "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
     "K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run 32880432503.",
+    "K326 closes compiler-runtime::database through 20/20 native relational-transaction rounds, 3/3 independent repairs and GitHub run 33093366736.",
     "K329/K332 close compiler-runtime::simulation and compiler-runtime::scientific through 20/20 native rounds, 3/3 independent repairs and GitHub run 33087711271.",
     "K333 closes compiler-runtime::machine-learning through 20/20 native integer-perceptron rounds, 3/3 independent repairs and GitHub run 33008611515.",
     "K340 closes compiler-runtime::mixed-paradigm through 20/20 four-paradigm native rounds, 3/3 independent repairs and GitHub run 33005515826.",

@@ -1,0 +1,56 @@
+{
+  "format": "rcl.k326.compiler-database-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": ["K326"],
+  "coordinates": ["compiler-runtime::database"],
+  "canonicalOwner": "RCL",
+  "donor": "SQL_RELATIONAL_TRANSACTION_SEMANTICS",
+  "profile": "NATIVE_BOUNDED_IN_MEMORY_RELATIONAL_QUERY_AND_ATOMIC_INSERT",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k326-compiler-database.rcl",
+    "sourceSha256": "f28093884180e528a379750001278a76de6c73250472bc9ec6d90d41a8e3c3a1",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "33965adc79877669c6173528bb6b0857733cd8cbc1a1ff9eb018f6ace8cd9dae",
+    "semanticStateRoot": "08c24a1a0455a1cb22423de4131ea5481341f3754adb86cd0933d47522a45037",
+    "candidateReportRoot": "384f72dc9916adf76248cf5e4639587c05ce074752d74996210df58e2f5ae115"
+  },
+  "expectedProjection": {
+    "customerCount": 2,
+    "initialSum": 160,
+    "initialJoinCount": 2,
+    "duplicateCommitted": 0,
+    "duplicateLength": 4,
+    "orphanCommitted": 0,
+    "orphanLength": 4,
+    "negativeCommitted": 0,
+    "negativeLength": 4,
+    "validCommitted": 1,
+    "validLength": 5,
+    "committedSum": 185,
+    "committedJoinCount": 3,
+    "evaluationPass": true
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "primary-key-mutation-rejected",
+      "foreign-key-mutation-rejected",
+      "aggregate-mutation-rejected",
+      "rollback-mutation-rejected",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K326 compiler-runtime::database for one bounded in-memory integer relation and atomic-insert profile. It grants no SQL parser, durable storage, isolation-level, concurrency, distributed database, arbitrary query planner, external database service, unrelated K400 cell or K400 completion."
+}
