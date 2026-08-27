@@ -1,0 +1,141 @@
+{
+  "format": "rcl.k337-k338.compiler-governance-reactive-ai-trial-receipt.v0.1",
+  "trialId": "K337-K338-AI-REPAIR-03",
+  "mutationClass": "transaction-preserve-bound",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a03ede-ec86-7780-86af-518f0a9015c2",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "    preserve compiler.audit_count == 3",
+    "new": "    preserve compiler.audit_count == 2",
+    "diagnosis": "The second transaction `emit_candidate` increments `compiler.audit_count` from 1 to 2, but its preserve clause incorrectly requires 3, causing `RCL_REALITY_BOUND_BROKEN`. The minimal repair is to preserve exactly 2."
+  },
+  "promptRoot": "dc4db279a8a6eefab1ffded727a482d7991cb53a7f82d39d9badcb64430d3e44",
+  "mutatedSourceSha256": "46f2e48ad11a45d1d00ae10df107a1a941f3ea1a8fb70603abb8d37e48119658",
+  "candidateSourceSha256": "68d18b71ff30617ea912a18a6432cdceba5ca8604b46e7be63c0dfb4dd2d658c",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "61fa12fd7a5c30969475cc2543541b2ec7941d7b0204eba942bcf0d4acdd9e35",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a03ede-ec86-7780-86af-518f0a9015c2"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "25ec54d7dcf8e18cd2715772bca004655c2a1f47d65739a155014d8d0658ed9a"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "1dee0dc2429888a65712936848d33bb716b1cdb85da52727635a11849bb94aed"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 48528,
+        "cached_input_tokens": 25344,
+        "output_tokens": 445,
+        "reasoning_output_tokens": 71
+      }
+    }
+  ],
+  "finalMessageSha256": "1dee0dc2429888a65712936848d33bb716b1cdb85da52727635a11849bb94aed",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "e3ce5fe40fbb4aed6cf3383a95216d7288e2bcf2cea3ab733a3bb1509c2eaa5b",
+    "failedChecks": [
+      "native-execute"
+    ],
+    "errorCode": "RCL_REALITY_BOUND_BROKEN"
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "67fd045bf29556cae18d24b0daa1252a0a7e269a77174807193b56d65283d921",
+    "checks": {
+      "reference-compile": {
+        "pass": true
+      },
+      "native-selfhost-compile": {
+        "pass": true
+      },
+      "bootstrap-byte-parity": {
+        "pass": true
+      },
+      "expected-state": {
+        "pass": true,
+        "actual": {
+          "compiler.accepted": true,
+          "compiler.audit_count": 2,
+          "compiler.emitted": true,
+          "compiler.phase": 2,
+          "request.valid": true
+        }
+      },
+      "rule-order": {
+        "pass": true
+      },
+      "root-continuity": {
+        "pass": true
+      },
+      "authority-needs": {
+        "pass": true
+      },
+      "witnesses": {
+        "pass": true
+      },
+      "native-execute": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "5ca45457bf408104a0606263eb3e59dd0d5deb39344baca94afc38752d662433"
+}

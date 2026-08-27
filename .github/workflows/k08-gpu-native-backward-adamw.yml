@@ -1,0 +1,44 @@
+name: K08 GPU Native Backward AdamW
+
+on:
+  push:
+    branches:
+      - codex/k08-gpu-native-backward-adamw-v01
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-native-backward-adamw.test.mjs'
+      - 'examples/native-ai/gpu-native-backward-adamw-*'
+      - 'package.json'
+      - '.github/workflows/k08-gpu-native-backward-adamw.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-native-backward-adamw.test.mjs'
+      - 'examples/native-ai/gpu-native-backward-adamw-*'
+      - 'package.json'
+      - '.github/workflows/k08-gpu-native-backward-adamw.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k08-gpu-native-backward-adamw:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run GPU-native reverse and AdamW evidence
+        run: npm run test:k08-gpu-native-backward-adamw

@@ -13,14 +13,20 @@ import ctypes
 import hashlib
 import json
 import os
+import struct
 import sys
 from typing import Any
 
 
 REQUEST_FORMAT = "rcl.opencl-bf16-matmul-request.v0.1"
 RESULT_FORMAT = "rcl.opencl-bf16-matmul-result.v0.1"
+GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-matmul-gradient-request.v0.1"
+GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-matmul-gradient-result.v0.1"
+ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
+ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
 BACKEND = "opencl-amd"
 MAX_DIMENSION = 64
+MAX_ELEMENTS = 4096
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -95,11 +101,40 @@ def bf16_value(bits: int) -> float:
     ).value
 
 
+def f32_bits(value: float) -> int:
+    return struct.unpack(">I", struct.pack(">f", ctypes.c_float(value).value))[0]
+
+
+def f32_value(bits: int) -> float:
+    return struct.unpack(">f", struct.pack(">I", bits))[0]
+
+
+def parse_f32_bits(values: Any, label: str, expected: int | None = None) -> list[float]:
+    if not isinstance(values, list):
+        raise fail("RCL_OPENCL_F32_BITS", f"{label} must be an array")
+    if expected is not None and len(values) != expected:
+        raise fail("RCL_OPENCL_SHAPE", f"{label} length must be {expected}")
+    parsed: list[float] = []
+    for value in values:
+        if not isinstance(value, str) or len(value) != 8 or value.lower() != value:
+            raise fail("RCL_OPENCL_F32_BITS", f"{label} must use eight lowercase hexadecimal digits")
+        try:
+            bits = int(value, 16)
+        except ValueError as error:
+            raise fail("RCL_OPENCL_F32_BITS", f"invalid {label} bits {value}") from error
+        number = f32_value(bits)
+        if not (number == number and abs(number) != float("inf")):
+            raise fail("RCL_OPENCL_F32_NONFINITE", f"{label} contains non-finite FP32 bits")
+        parsed.append(number)
+    return parsed
+
+
 def bits_hex(bits: int) -> str:
     return f"{bits:04x}"
 
 
 KERNEL = r"""
+#pragma OPENCL FP_CONTRACT OFF
 uint rcl_bf16_rne(float value) {
   uint bits = as_uint(value);
   uint lsb = (bits >> 16) & 1;
@@ -123,6 +158,86 @@ __kernel void rcl_bf16_matmul(
                  * rcl_bf16_to_f32(right[inner * columns + column]);
   }
   output[row * columns + column] = (ushort)rcl_bf16_rne(accumulator);
+}
+
+__kernel void rcl_bf16_matmul_grad_left(
+    __global const ushort* right,
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns,
+    uint shared,
+    uint right_width
+) {
+  uint row = get_global_id(0);
+  uint column = get_global_id(1);
+  if (row >= rows || column >= columns) return;
+  float accumulator = 0.0f;
+  for (uint inner = 0; inner < shared; inner++) {
+    accumulator += upstream[row * shared + inner]
+                 * rcl_bf16_to_f32(right[column * right_width + inner]);
+  }
+  output[row * columns + column] = accumulator;
+}
+
+__kernel void rcl_bf16_matmul_grad_right(
+    __global const ushort* left,
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns,
+    uint shared,
+    uint left_width
+) {
+  uint row = get_global_id(0);
+  uint column = get_global_id(1);
+  if (row >= rows || column >= columns) return;
+  float accumulator = 0.0f;
+  for (uint inner = 0; inner < shared; inner++) {
+    accumulator += rcl_bf16_to_f32(left[inner * left_width + row])
+                 * upstream[inner * columns + column];
+  }
+  output[row * columns + column] = accumulator;
+}
+
+__kernel void rcl_adamw_update(
+    __global const float* master,
+    __global const float* gradient,
+    __global const float* first,
+    __global const float* second,
+    __global float* next_master,
+    __global float* next_first,
+    __global float* next_second,
+    uint length,
+    float beta1,
+    float beta2,
+    float bias1,
+    float bias2,
+    float learning_rate,
+    float decay,
+    float epsilon,
+    float clip
+) {
+  uint index = get_global_id(0);
+  if (index >= length) return;
+  volatile float grad = clamp(gradient[index], -clip, clip);
+  volatile float beta1_complement = 1.0f - beta1;
+  volatile float beta2_complement = 1.0f - beta2;
+  volatile float first_product = beta1 * first[index];
+  volatile float gradient_first_product = beta1_complement * grad;
+  volatile float next_m = first_product + gradient_first_product;
+  volatile float second_product = beta2 * second[index];
+  volatile float gradient_second_product = beta2_complement * grad * grad;
+  volatile float next_v = second_product + gradient_second_product;
+  volatile float bias_corrected_first = next_m / bias1;
+  volatile float bias_corrected_second = next_v / bias2;
+  volatile float direction = bias_corrected_first / (sqrt(bias_corrected_second) + epsilon);
+  volatile float decayed_weight = master[index] * decay;
+  volatile float gradient_step = learning_rate * direction;
+  volatile float next_weight = decayed_weight - gradient_step;
+  next_master[index] = next_weight;
+  next_first[index] = next_m;
+  next_second[index] = next_v;
 }
 """
 
@@ -346,8 +461,272 @@ def select_amd_device(cl: OpenCL) -> tuple[CLHandle, CLHandle]:
     )
 
 
+def run_opencl_kernel(
+    kernel_name: str,
+    input_specs: list[tuple[str, list[int] | list[float]]],
+    output_specs: list[tuple[str, int]],
+    scalar_specs: list[tuple[Any, int | float]],
+    global_size: tuple[int, ...],
+) -> tuple[dict[str, str], list[list[int] | list[float]]]:
+    cl = OpenCL()
+    platform, device = select_amd_device(cl)
+    device_info = cl.device_receipt(platform, device)
+    context = queue = program = kernel = None
+    buffers: list[CLHandle] = []
+    host_outputs: list[Any] = []
+    try:
+        properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, platform.value, 0)
+        code = CLInt()
+        context = cl.create_context(properties, 1, ctypes.byref(device), None, None, ctypes.byref(code))
+        check(code.value, "clCreateContext")
+        queue = cl.create_command_queue(context, device, 0, ctypes.byref(code))
+        check(code.value, "clCreateCommandQueue")
+        source = KERNEL.encode("utf-8")
+        source_array = (ctypes.c_char_p * 1)(source)
+        lengths = (CLSize * 1)(len(source))
+        program = cl.create_program(context, 1, source_array, lengths, ctypes.byref(code))
+        check(code.value, "clCreateProgramWithSource")
+        build_code = cl.build_program(
+            program,
+            1,
+            ctypes.byref(device),
+            b"-cl-fp32-correctly-rounded-divide-sqrt",
+            None,
+            None,
+        )
+        if build_code != CL_SUCCESS:
+            raise fail(
+                "RCL_OPENCL_KERNEL_BUILD",
+                f"clBuildProgram returned OpenCL error {build_code}; build log: {cl.build_log(program, device)}",
+            )
+        kernel = cl.create_kernel(program, kernel_name.encode("ascii"), ctypes.byref(code))
+        check(code.value, f"clCreateKernel:{kernel_name}")
+
+        for kind, values in input_specs:
+            array_type = ctypes.c_uint16 if kind == "u16" else ctypes.c_float
+            host_data = (array_type * len(values))(*values)
+            flags = CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR
+            buffer = cl.create_buffer(
+                context,
+                flags,
+                ctypes.sizeof(host_data),
+                ctypes.cast(host_data, ctypes.c_void_p),
+                ctypes.byref(code),
+            )
+            check(code.value, f"clCreateBuffer:input:{kind}")
+            buffers.append(buffer)
+
+        for kind, length in output_specs:
+            array_type = ctypes.c_uint16 if kind == "u16" else ctypes.c_float
+            host_data = (array_type * length)()
+            buffer = cl.create_buffer(
+                context,
+                CL_MEM_WRITE_ONLY,
+                ctypes.sizeof(host_data),
+                None,
+                ctypes.byref(code),
+            )
+            check(code.value, f"clCreateBuffer:output:{kind}")
+            buffers.append(buffer)
+            host_outputs.append(host_data)
+
+        for index, buffer in enumerate(buffers):
+            argument = CLHandle(buffer)
+            check(
+                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
+                f"clSetKernelArg:buffer:{index}",
+            )
+        for index, (scalar_type, value) in enumerate(scalar_specs, start=len(buffers)):
+            argument = scalar_type(value)
+            check(
+                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
+                f"clSetKernelArg:scalar:{index}",
+            )
+
+        global_values = (CLSize * len(global_size))(*global_size)
+        check(
+            cl.enqueue_kernel(queue, kernel, len(global_size), None, global_values, None, 0, None, None),
+            f"clEnqueueNDRangeKernel:{kernel_name}",
+        )
+        check(cl.finish(queue), f"clFinish:{kernel_name}")
+        for index, (host_data, (_, length)) in enumerate(zip(host_outputs, output_specs)):
+            output_buffer = buffers[len(input_specs) + index]
+            check(
+                cl.enqueue_read(
+                    queue,
+                    output_buffer,
+                    1,
+                    0,
+                    ctypes.sizeof(host_data),
+                    ctypes.cast(host_data, ctypes.c_void_p),
+                    0,
+                    None,
+                    None,
+                ),
+                f"clEnqueueReadBuffer:{kernel_name}:{index}",
+            )
+            check(cl.finish(queue), f"clFinish:read:{kernel_name}:{index}")
+            if len(host_data) != length:
+                raise fail("RCL_OPENCL_SHAPE", f"OpenCL output length mismatch for {kernel_name}")
+        return device_info, [list(host_data) for host_data in host_outputs]
+    finally:
+        for buffer in reversed(buffers):
+            cl.release_mem(buffer)
+        if kernel is not None:
+            cl.release_kernel(kernel)
+        if program is not None:
+            cl.release_program(program)
+        if queue is not None:
+            cl.release_queue(queue)
+        if context is not None:
+            cl.release_context(context)
+
+
+def gradient_dimensions(request: dict[str, Any]) -> tuple[int, int, int, int]:
+    values = [request.get("leftRows"), request.get("leftColumns"), request.get("rightRows"), request.get("rightColumns")]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in values):
+        raise fail("RCL_OPENCL_SHAPE", "gradient matrix dimensions must be integers")
+    left_rows, left_columns, right_rows, right_columns = values
+    if any(value < 1 or value > MAX_DIMENSION for value in values):
+        raise fail("RCL_OPENCL_SHAPE", "gradient matrix dimensions must be within 1..=64")
+    if left_columns != right_rows:
+        raise fail("RCL_OPENCL_SHAPE", "gradient matrix inner dimensions do not match")
+    return left_rows, left_columns, right_rows, right_columns
+
+
+def gradient_result(
+    operation: str,
+    device: dict[str, str],
+    output: list[float],
+    rows: int,
+    columns: int,
+) -> dict[str, Any]:
+    output_hex = [f"{f32_bits(value):08x}" for value in output]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-matmul-gradient-v0.1\0")
+    digest.update(operation.encode("ascii"))
+    digest.update(device["deviceName"].encode("utf-8"))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": GRADIENT_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_GRADIENT_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": operation,
+        "device": device,
+        "shape": [rows, columns],
+        "outputBits": output_hex,
+        "outputData": [f32_value(int(bits, 16)) for bits in output_hex],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
+def run_gradient(request: dict[str, Any]) -> dict[str, Any]:
+    if request.get("format") != GRADIENT_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 gradient request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    operation = request.get("operation")
+    if operation not in ("left-gradient", "right-gradient"):
+        raise fail("RCL_OPENCL_OPERATION", "gradient operation must be left-gradient or right-gradient")
+    left_rows, left_columns, right_rows, right_columns = gradient_dimensions(request)
+    left = parse_bits(request.get("leftBits"), "left",)
+    right = parse_bits(request.get("rightBits"), "right")
+    upstream = parse_f32_bits(request.get("upstreamF32Bits"), "upstream", left_rows * right_columns)
+    if len(left) != left_rows * left_columns or len(right) != right_rows * right_columns:
+        raise fail("RCL_OPENCL_SHAPE", "BF16 bit payload length does not match gradient matrix shape")
+    if operation == "left-gradient":
+        rows, columns, shared = left_rows, left_columns, right_columns
+        device, outputs = run_opencl_kernel(
+            "rcl_bf16_matmul_grad_left",
+            [("u16", right), ("f32", upstream)],
+            [("f32", rows * columns)],
+            [(CLUint, rows), (CLUint, columns), (CLUint, shared), (CLUint, right_columns)],
+            (rows, columns),
+        )
+    else:
+        rows, columns, shared = left_columns, right_columns, left_rows
+        device, outputs = run_opencl_kernel(
+            "rcl_bf16_matmul_grad_right",
+            [("u16", left), ("f32", upstream)],
+            [("f32", rows * columns)],
+            [(CLUint, rows), (CLUint, columns), (CLUint, shared), (CLUint, left_columns)],
+            (rows, columns),
+        )
+    return gradient_result(operation, device, outputs[0], rows, columns)
+
+
+def run_adamw(request: dict[str, Any]) -> dict[str, Any]:
+    if request.get("format") != ADAMW_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL AdamW request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    length = request.get("length")
+    if not isinstance(length, int) or isinstance(length, bool) or length < 1 or length > MAX_ELEMENTS:
+        raise fail("RCL_OPENCL_SHAPE", f"AdamW length must be within 1..={MAX_ELEMENTS}")
+    master = parse_f32_bits(request.get("masterBits"), "master", length)
+    gradient = parse_f32_bits(request.get("gradientBits"), "gradient", length)
+    first = parse_f32_bits(request.get("firstMomentBits"), "firstMoment", length)
+    second = parse_f32_bits(request.get("secondMomentBits"), "secondMoment", length)
+    scalar_names = ["beta1", "beta2", "bias1", "bias2", "learningRate", "decay", "epsilon", "gradientClip"]
+    scalars: dict[str, float] = {}
+    for name in scalar_names:
+        value = request.get(name)
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or not (value == value and abs(value) != float("inf")):
+            raise fail("RCL_OPENCL_F32_NONFINITE", f"AdamW scalar {name} must be finite")
+        scalars[name] = float(value)
+    if scalars["bias1"] <= 0 or scalars["bias2"] <= 0 or scalars["learningRate"] <= 0 or scalars["epsilon"] <= 0 or scalars["gradientClip"] <= 0:
+        raise fail("RCL_OPENCL_ADAMW_CONFIG", "AdamW positive scalars are required")
+    device, outputs = run_opencl_kernel(
+        "rcl_adamw_update",
+        [("f32", master), ("f32", gradient), ("f32", first), ("f32", second)],
+        [("f32", length), ("f32", length), ("f32", length)],
+        [
+            (CLUint, length),
+            (ctypes.c_float, scalars["beta1"]),
+            (ctypes.c_float, scalars["beta2"]),
+            (ctypes.c_float, scalars["bias1"]),
+            (ctypes.c_float, scalars["bias2"]),
+            (ctypes.c_float, scalars["learningRate"]),
+            (ctypes.c_float, scalars["decay"]),
+            (ctypes.c_float, scalars["epsilon"]),
+            (ctypes.c_float, scalars["gradientClip"]),
+        ],
+        (length,),
+    )
+    output_hex = [[f"{f32_bits(value):08x}" for value in output] for output in outputs]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-adamw-update-v0.1\0")
+    digest.update(device["deviceName"].encode("utf-8"))
+    for values in output_hex:
+        for bits in values:
+            digest.update(bits.encode("ascii"))
+    return {
+        "format": ADAMW_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_ADAMW_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "device": device,
+        "masterBits": output_hex[0],
+        "firstMomentBits": output_hex[1],
+        "secondMomentBits": output_hex[2],
+        "masterData": [f32_value(int(bits, 16)) for bits in output_hex[0]],
+        "firstMomentData": [f32_value(int(bits, 16)) for bits in output_hex[1]],
+        "secondMomentData": [f32_value(int(bits, 16)) for bits in output_hex[2]],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
 def run(request: dict[str, Any]) -> dict[str, Any]:
-    if request.get("format") != REQUEST_FORMAT:
+    request_format = request.get("format")
+    if request_format == GRADIENT_REQUEST_FORMAT:
+        return run_gradient(request)
+    if request_format == ADAMW_REQUEST_FORMAT:
+        return run_adamw(request)
+    if request_format != REQUEST_FORMAT:
         raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 request format")
     if request.get("backend") != BACKEND:
         raise fail(
@@ -381,7 +760,14 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         lengths = (CLSize * 1)(len(source))
         program = cl.create_program(context, 1, source_array, lengths, ctypes.byref(code))
         check(code.value, "clCreateProgramWithSource")
-        build_code = cl.build_program(program, 1, ctypes.byref(device), None, None, None)
+        build_code = cl.build_program(
+            program,
+            1,
+            ctypes.byref(device),
+            b"-cl-fp32-correctly-rounded-divide-sqrt",
+            None,
+            None,
+        )
         if build_code != CL_SUCCESS:
             raise fail(
                 "RCL_OPENCL_KERNEL_BUILD",

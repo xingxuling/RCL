@@ -1,0 +1,18 @@
+# RCL-owned candidate contract for explicit AMD OpenCL placement inside the
+# generic BF16 Reverse Autodiff + AdamW training organ.
+reality GpuBf16AutodiffAdamwCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+
+  facet contract.id : Text = "rcl-k08-s-gpu-bf16-autodiff-adamw-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.backend : Text = "opencl-amd-hybrid"
+  facet contract.gpu_operation_set : Text = "matmul"
+  facet contract.host_reference_placement : Text = "explicit-per-node"
+  facet contract.precision_policy : Text = "BF16_RNE_FORWARD_FP32_REVERSE_ADAMW"
+  facet contract.fallback_policy : Text = "FAIL_CLOSED_NO_CPU_FALLBACK"
+  facet contract.model_special_opcodes : Truth = false
+  facet evaluation.graph_is_nonempty : Truth = positive(1)
+  facet evaluation.gpu_training_claim_closed : Truth = true
+  facet evaluation.rcl10m_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_BOUNDED_OPENCL_MATMUL_IN_GENERIC_AUTODIFF_ADAMW"
+}

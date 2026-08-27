@@ -1,0 +1,49 @@
+# K340: compiler-runtime mixed-paradigm bounded profile.
+# One RCL program combines recursive functional computation, declarative
+# authority, transactional state change and a state-triggered rule chain.
+reality CompilerMixedParadigm {
+  reckon sum_squares(n : Number) -> Number =
+    choose(n <= 0, 0, n * n + sum_squares(n - 1))
+
+  facet input.batch_size : Number = 8
+  facet compiler.phase : Number = 0
+  facet compiler.digest : Number = 0
+  facet compiler.accepted : Truth = false
+  facet compiler.emitted : Truth = false
+
+  subject builder {
+    warrant compiler.analyze on source
+    warrant compiler.stage on artifact
+    warrant compiler.emit on artifact
+  }
+
+  emergence analyze_batch {
+    cause builder
+    when compiler.phase == 0 and input.batch_size > 0
+    needs compiler.analyze on source
+    needs compiler.stage on artifact
+    alter compiler.digest <- sum_squares(input.batch_size)
+    alter compiler.accepted <- true
+    alter compiler.phase <- 1
+    preserve compiler.digest == 204
+    preserve compiler.accepted == true
+    witness "k340:functional-transaction:analyzed"
+  }
+
+  emergence emit_batch {
+    cause builder
+    when compiler.phase == 1 and compiler.digest == 204
+    needs compiler.stage on artifact
+    needs compiler.emit on artifact
+    alter compiler.emitted <- true
+    alter compiler.phase <- 2
+    preserve compiler.emitted == true
+    preserve compiler.digest == 204
+    witness "k340:reactive-authority:emitted"
+  }
+
+  foresee analyze_batch
+  realize analyze_batch
+  foresee emit_batch
+  realize emit_batch
+}
