@@ -1,0 +1,100 @@
+# K333: compiler-runtime machine-learning bounded profile.
+# RCL owns dataset, integer perceptron training, inference and recommendation
+# semantics. The learned result is advisory; deterministic compiler policy
+# retains commit authority.
+reality CompilerMachineLearning {
+  reckon row(nodes : Number, hotness : Number, label : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), nodes), hotness), label)
+
+  reckon training_dataset() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), row(1, 1, 0)),
+          row(3, 1, 1)),
+        row(1, 3, 1)),
+      row(3, 3, 1))
+
+  reckon make_parameters(node_weight : Number, hotness_weight : Number, bias : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), node_weight), hotness_weight), bias)
+
+  reckon node_weight(parameters : Sequence) -> Number = sequence_get(parameters, 0)
+  reckon hotness_weight(parameters : Sequence) -> Number = sequence_get(parameters, 1)
+  reckon bias(parameters : Sequence) -> Number = sequence_get(parameters, 2)
+  reckon score(parameters : Sequence, nodes : Number, hotness : Number) -> Number =
+    node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)
+  reckon classify(score_value : Number) -> Number = choose(score_value >= 0, 1, 0)
+
+  reckon update_for_row(parameters : Sequence, sample : Sequence) -> Sequence =
+    choose(
+      classify(score(parameters, sequence_get(sample, 0), sequence_get(sample, 1))) == sequence_get(sample, 2),
+      parameters,
+      make_parameters(
+        node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0)),
+        hotness_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 1), -sequence_get(sample, 1)),
+        bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)))
+
+  reckon train_rows(parameters : Sequence, dataset : Sequence, index : Number) -> Sequence =
+    choose(index >= length(dataset),
+      parameters,
+      train_rows(update_for_row(parameters, sequence_get(dataset, index)), dataset, index + 1))
+
+  reckon train(parameters : Sequence, dataset : Sequence, epoch : Number, epochs : Number) -> Sequence =
+    choose(epoch >= epochs,
+      parameters,
+      train(train_rows(parameters, dataset, 0), dataset, epoch + 1, epochs))
+
+  reckon correct_rows(parameters : Sequence, dataset : Sequence, index : Number, accumulated : Number) -> Number =
+    choose(index >= length(dataset),
+      accumulated,
+      correct_rows(
+        parameters,
+        dataset,
+        index + 1,
+        accumulated + choose(
+          classify(score(parameters, sequence_get(sequence_get(dataset, index), 0), sequence_get(sequence_get(dataset, index), 1))) == sequence_get(sequence_get(dataset, index), 2),
+          1,
+          0)))
+
+  reckon model_valid(parameters : Sequence) -> Truth = length(parameters) == 3
+  reckon dataset_valid(dataset : Sequence) -> Truth = length(dataset) >= 2
+  reckon recommendation(classification : Number) -> Text =
+    choose(classification == 1, "EXPENSIVE_OPTIMIZATION_CANDIDATE", "STANDARD_OPTIMIZATION_CANDIDATE")
+  reckon recommendation_allowed(value : Text) -> Truth =
+    value == "EXPENSIVE_OPTIMIZATION_CANDIDATE" or value == "STANDARD_OPTIMIZATION_CANDIDATE"
+
+  facet contract.id : Text = "k333-compiler-machine-learning-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet contract.model : Text = "INTEGER_PERCEPTRON"
+  facet contract.model_authority : Text = "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT"
+  facet training.dataset : Sequence = training_dataset()
+  facet training.initial_parameters : Sequence = make_parameters(0, 0, 0)
+  facet training.epochs : Number = 16
+  facet training.final_parameters : Sequence = train(training.initial_parameters, training.dataset, 0, training.epochs)
+  facet evaluation.correct : Number = correct_rows(training.final_parameters, training.dataset, 0, 0)
+  facet evaluation.accuracy : Number = evaluation.correct / length(training.dataset)
+  facet inference.nodes : Number = 4
+  facet inference.hotness : Number = 2
+  facet inference.score : Number = score(training.final_parameters, inference.nodes, inference.hotness)
+  facet inference.classification : Number = classify(inference.score)
+  facet inference.recommendation : Text = recommendation(inference.classification)
+  facet boundary.small_cold_classification : Number = classify(score(training.final_parameters, 1, 1))
+  facet authority.model_commit_granted : Truth = false
+  facet evaluation.pass : Truth =
+    model_valid(training.final_parameters) and
+    dataset_valid(training.dataset) and
+    not dataset_valid(empty_sequence()) and
+    node_weight(training.final_parameters) == 3 and
+    hotness_weight(training.final_parameters) == 1 and
+    bias(training.final_parameters) == -5 and
+    evaluation.accuracy == 1 and
+    inference.score == 9 and
+    inference.classification == 1 and
+    boundary.small_cold_classification == 0 and
+    inference.recommendation == "EXPENSIVE_OPTIMIZATION_CANDIDATE" and
+    recommendation_allowed(inference.recommendation) and
+    authority.model_commit_granted == false
+  facet evidence.no_opaque_provider : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}

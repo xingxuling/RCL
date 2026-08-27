@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k333.compiler-machine-learning-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": ["K333"],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k333-compiler-machine-learning.rcl",
+    "sourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+    "candidateReportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k333-compiler-machine-learning-runtime-v0.1.json",
+    "reportRoot": "7abcf71ae895f4db73a826d434dc525ca9fd6d6b2a6157384267939153e395fd"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K333-AI-REPAIR-01",
+      "mutationClass": "training-label",
+      "semanticInvariant": "The small/cold compiler sample (nodes=1, hotness=1) must remain label 0 so the learned boundary preserves the standard path."
+    },
+    {
+      "id": "K333-AI-REPAIR-02",
+      "mutationClass": "perceptron-update-direction",
+      "semanticInvariant": "A misclassified positive sample must add its node feature in the perceptron update."
+    },
+    {
+      "id": "K333-AI-REPAIR-03",
+      "mutationClass": "model-authority-boundary",
+      "semanticInvariant": "The learned model is advisory and must never receive compiler commit authority."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsRuntimeReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent repairs of the frozen K333 label, perceptron-update and model-authority semantics and binds its 20-round native runtime receipt. It grants no arbitrary ML generation, floating-point ML, Transformer, accelerator, compiler decision authority, unrelated K400 cell or K400 completion."
+}

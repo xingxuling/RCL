@@ -1,9 +1,9 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `16 PASS / 0 BLOCKED / 384 UNTESTED`
+**Current evidence:** `17 PASS / 0 BLOCKED / 383 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `f6b13c00247c074b3f90aa1061c2cf453614fee7d5b62e2a63fe5d2fd855cc0d`
+**Report root:** `1320f279933361b6a8ae8109d310c8590c4e5aaa911c28fa35372fda0831e5a1`
 **Date:** 2026-08-26
 
 ## 1. Completion contract
@@ -55,6 +55,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
+| `K333` | `compiler-runtime::machine-learning` | `PASS` | none for the bounded integer-perceptron advisory profile; floating-point state-root canonicalization remains an explicit RCL gap |
 | `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
 | `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
 | `K340` | `compiler-runtime::mixed-paradigm` | `PASS` | none for the bounded recursive + declarative + transactional + reactive native profile; self-host static warrant validation remains an explicit RCL gap |
@@ -101,6 +102,8 @@ K321/K322 are independently closed for the bounded frozen recursive-algorithm CL
 K337/K338 are independently closed for the bounded two-transaction compiler-governance profile. Twenty native rounds preserved exact artifact/final-state roots, transaction continuity, authority needs and state-trigger order; missing warrant, broken preserve, inactive request and corrupt RBC controls failed closed. Three isolated read-only sessions repaired authority-capability, reactive-trigger and preserve-bound mutations. GitHub run `33000443777` bound focused job `98280568550` and Windows job `98280568136` for exact source commit `2fe5bcae851af1a81fa28277c7697451d512035f`; authority root is `fd3b8ea7ee48e410e28cd8d2a9411051db03a96551444e51289a342f80af2824`. `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open: the native VM rejects the missing-warrant artifact before commit, but the self-host compiler does not yet reject it statically. No arbitrary compiler security or production-promotion authority is claimed.
 
 K340 is independently closed for the bounded mixed-paradigm compiler-runtime profile and does not inherit K321 or K337/K338 authority. One native RCL program combines recursive functional computation, declarative warrants/needs, governed transactional updates and a state-triggered second rule. Twenty rounds preserved exact artifact/state/transaction roots, while recursive-term corruption, missing authority, wrong phase, inactive input and corrupt RBC controls failed closed. Three isolated read-only sessions repaired recursive computation, phase triggering and declarative authority mutations. GitHub run `33005515826` bound focused job `98298112072` and Windows job `98298112360` for exact source commit `01572386c82dd0e46b2eed4bc13b804ddc548a44`; authority root is `5611bea18a41f46aa863f9f2320a59c0b10afae916aec1f33400fb47cace4016`. This closes only K340 for the frozen profile; `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` and all unrelated cells remain open.
+
+K333 is independently closed for the bounded integer-perceptron compiler-advisory profile and does not inherit K233's AI-runtime authority. Twenty native rounds preserved exact artifact/state roots, matched an independent JavaScript oracle and passed label, update-sign, zero-epoch, model-authority and corrupt-RBC controls. Three isolated read-only sessions repaired label, update and authority mutations and restored exact canonical bytes. GitHub run `33008611515` bound focused job `98308743737` and Windows job `98308743547` for exact source commit `6983b7d66813790b0727e4b66aafc8a8a27c4b01`; authority root is `72e8b699d53f5685b542de32dfdee2a3d41eea4b3c1bbed0395b9fc6f77d663d`. The learned output remains advisory; deterministic compiler policy retains commit authority. This closes only K333, while `RCL_GAP_K333_FLOAT_STATE_ROOT_CANONICALIZATION` and broader ML/compiler-learning claims remain open.
 
 ## 10. K08-A baseline and K08-B General MLP
 

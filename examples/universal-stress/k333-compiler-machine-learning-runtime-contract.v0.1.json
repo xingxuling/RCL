@@ -1,0 +1,61 @@
+{
+  "format": "rcl.k333.compiler-machine-learning-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": [
+    "K333"
+  ],
+  "coordinate": "compiler-runtime::machine-learning",
+  "canonicalOwner": "RCL",
+  "profile": "NATIVE_INTEGER_PERCEPTRON_COMPILER_OPTIMIZATION_ADVISOR",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k333-compiler-machine-learning.rcl",
+    "sourceSha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "86000933fd75557ecdc48c83c6fe0300652da020ae967247abc1435cdc34078b",
+    "semanticStateRoot": "eece94a8c1afe9dc74f0b16814fbad5aa234f58e90cfafc2d03e4f406df6a1ca",
+    "candidateReportRoot": "29fde4f1f93cda29ff5cc5427f5bef9575cd29481c9e7823081d6ce98af174d6"
+  },
+  "expectedState": {
+    "training.final_parameters": [3, 1, -5],
+    "evaluation.accuracy": 1,
+    "inference.score": 9,
+    "inference.classification": 1,
+    "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+    "boundary.small_cold_classification": 0,
+    "authority.model_commit_granted": false,
+    "evaluation.pass": true
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "training-label-mutation-rejected",
+      "perceptron-update-sign-mutation-rejected",
+      "zero-epoch-no-training",
+      "model-commit-authority-remains-false",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "authorityBoundary": "The learned model may emit an optimization candidate only. It cannot commit compiler policy, mutate canonical source, weaken warrants or promote a K400 cell.",
+  "knownGap": {
+    "id": "RCL_GAP_K333_FLOAT_STATE_ROOT_CANONICALIZATION",
+    "type": "EVIDENCE",
+    "missingCapability": "Portable canonical semantic-state roots for floating-point training output",
+    "workaround": "The frozen profile uses an integer perceptron so strict native state-root verification remains enabled",
+    "generality": "CROSS_PROJECT",
+    "candidateAbsorption": "Normalize numeric state-root encoding across JS and native runtimes before a future floating-point K333 profile",
+    "affectedK400Cells": ["K333", "K233", "K253"]
+  },
+  "evidenceBoundary": "This contract can admit only K333 compiler-runtime::machine-learning for the frozen integer perceptron advisory profile. It grants no K233 relabel, arbitrary ML generation, floating-point training, Transformer, accelerator, compiler decision authority, unrelated K400 cell or K400 completion."
+}

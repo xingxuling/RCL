@@ -14,9 +14,11 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `16 PASS / 0 BLOCKED / 384 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K337, K338, K339 and K340.
+Current authoritative matrix: `17 PASS / 0 BLOCKED / 383 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K327, K333, K337, K338, K339 and K340.
 
 K340 is independently closed for the bounded mixed-paradigm compiler-runtime profile. One RCL program combines recursive functional computation, declarative warrants/needs, governed transactional state changes and a state-triggered second rule. Twenty native rounds preserved one artifact root, one final semantic state root and exact transaction continuity; five semantic/corrupt-artifact controls failed closed. Three isolated read-only sessions repaired recursive computation, phase triggering and declarative authority mutations. GitHub run `33005515826` bound focused job `98298112072` and Windows job `98298112360` for exact source commit `01572386c82dd0e46b2eed4bc13b804ddc548a44`; authority root is `5611bea18a41f46aa863f9f2320a59c0b10afae916aec1f33400fb47cace4016`. This closes only K340 for the frozen profile. `RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION` remains open, and no arbitrary mixed-language, compiler-security, production-promotion or K400-completion claim is granted.
+
+K333 is independently closed for the bounded integer-perceptron compiler-advisory profile. Twenty native rounds preserved exact artifact and semantic-state roots, matched an independent JavaScript oracle and passed five semantic/corrupt-artifact controls. Three isolated read-only sessions repaired label, update and model-authority mutations while restoring exact canonical bytes. GitHub run `33008611515` bound focused job `98308743737` and Windows job `98308743547` for exact source commit `6983b7d66813790b0727e4b66aafc8a8a27c4b01`; authority root is `72e8b699d53f5685b542de32dfdee2a3d41eea4b3c1bbed0395b9fc6f77d663d`. The learned recommendation remains advisory and deterministic compiler policy retains commit authority. This closes only K333; `RCL_GAP_K333_FLOAT_STATE_ROOT_CANONICALIZATION` and all broader ML/compiler-learning claims remain open.
 
 Every evidence-bearing cell is evaluated through:
 
