@@ -1,0 +1,12 @@
+# K09: provider transport candidate. RCL owns tensor and training semantics;
+# the provider owns only reusable OpenCL execution resources.
+reality OpenClPersistentDispatchCandidate {
+  facet contract.id : Text = "rcl-k09-opencl-amd-persistent-dispatch-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_LOWERER_AND_TRANSPORT_ONLY"
+  facet contract.transport : Text = "RCL_OPENCL_AMD_SESSION_NDJSON_V0_1"
+  facet contract.session_scope : Text = "ONE_RCL_TRAINING_REQUEST"
+  facet contract.reused_resources : Text = "PROVIDER_PROCESS_OPENCL_CONTEXT_OPENCL_PROGRAM"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_STATE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_BATCHED_KERNEL_THROUGHPUT_OR_RCL10M_PROMOTION"
+}
