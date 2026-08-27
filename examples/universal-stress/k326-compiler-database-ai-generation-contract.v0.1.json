@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k326.compiler-database-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": ["K326"],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k326-compiler-database.rcl",
+    "sourceSha256": "f28093884180e528a379750001278a76de6c73250472bc9ec6d90d41a8e3c3a1",
+    "candidateReportRoot": "384f72dc9916adf76248cf5e4639587c05ce074752d74996210df58e2f5ae115"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k326-compiler-database-runtime-v0.1.json",
+    "reportRoot": "dea1ff0d1af174e708463555c57210f23d35047b7b25e93605d3bf3aa8a0a8a8"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K326-AI-REPAIR-01",
+      "mutationClass": "primary-key-lookup",
+      "semanticInvariant": "An insert must be rejected when an existing order has the same primary key."
+    },
+    {
+      "id": "K326-AI-REPAIR-02",
+      "mutationClass": "foreign-key-constraint",
+      "semanticInvariant": "An insert must be rejected when its customer foreign key does not exist."
+    },
+    {
+      "id": "K326-AI-REPAIR-03",
+      "mutationClass": "domain-constraint",
+      "semanticInvariant": "A negative order amount must roll back while zero or positive amounts remain eligible."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsRuntimeReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K326 primary-key, foreign-key and nonnegative-domain constraints and binds its 20-round native runtime receipt. It grants no arbitrary database generation, SQL engine, persistent/concurrent/distributed storage, unrelated K400 cell or K400 completion."
+}
