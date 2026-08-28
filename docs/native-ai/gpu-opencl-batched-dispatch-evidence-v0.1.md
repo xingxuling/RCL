@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_AND_HOSTED_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`
+`PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`
 
 RCL remains the canonical owner of Tensor, BF16, autodiff and AdamW semantics. The AMD OpenCL provider is an auxiliary lowering and transport organ. K10 adds a bounded ordered batch message to the K09 persistent session and integrates it only at the independent AdamW-update boundary. The provider still creates request-local kernel and input/output buffers; no device-buffer residency or parallel-kernel claim is made.
 
@@ -36,9 +36,15 @@ Authority files:
 - `examples/native-ai/gpu-opencl-batched-dispatch-genome.rcl`
 - `examples/native-ai/evidence/gpu-opencl-batched-dispatch-v0.1/k10-opencl-batched-dispatch-local-evidence.json`
 
-Hosted replay for exact head `e0ce6377e3d3a390cf4acd6d72874cb0d862cb39` passed:
-K10 runs `33136656080` and `33136656302`, Universal Stress run
-`33136656048`, Authority run `33136656032` and Canonical Verification run
-`33136656022`. Post-merge main verification remains pending.
+Hosted replay for exact head `dbd4979f0ff37fcf098bdafb3c8cbf389399840a` passed:
+K10 run `33137325268`, Universal Stress run `33137325306` after rerunning the
+Windows K01 job, Authority run `33137325285` and Canonical Verification run
+`33137325278`. The initial K01 job `98740106273` exceeded the declared 240000 ms
+fixed-point budget; rerun job `98741699248` passed, with no source change.
+
+Post-merge main verification also passed at `686659c848a6c642a8d9fd2191f3d6b82b4205d2`:
+K10 run `33138220712`, K09 regression `33138220700`, Universal Stress
+`33138220701` (focused job `98742958714` and Windows K01 job `98742958841`),
+Authority `33138220757` and Canonical Verification `33138220708`.
 
 Reproduction: `npm run test:k10-opencl-batched-dispatch` and `npm run test:k08-gpu-gqa-rope-native-backward-adamw`.
