@@ -338,6 +338,11 @@
     "verify:k334-compiler-agent": "node scripts/verify-k334-compiler-agent-candidate.mjs",
     "evidence:k334-compiler-agent-ai-generate": "node scripts/run-k334-independent-ai-generation.mjs",
     "verify:k334-compiler-agent-receipt": "node scripts/verify-k334-compiler-agent-receipt.mjs",
+    "test:k331-compiler-realtime": "node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs tests/k331-compiler-realtime.test.mjs",
+    "evidence:k331-compiler-realtime": "node scripts/run-k331-compiler-realtime-evidence.mjs",
+    "verify:k331-compiler-realtime": "node scripts/verify-k331-compiler-realtime-candidate.mjs",
+    "evidence:k331-compiler-realtime-ai-generate": "node scripts/run-k331-independent-ai-generation.mjs",
+    "verify:k331-compiler-realtime-receipt": "node scripts/verify-k331-compiler-realtime-receipt.mjs",
     "test:k329-k332-compiler-simulation-scientific": "node --test --test-concurrency=1 tests/k329-k332-compiler-simulation-scientific.test.mjs",
     "evidence:k329-k332-compiler-simulation-scientific": "node scripts/run-k329-k332-compiler-simulation-scientific-evidence.mjs",
     "verify:k329-k332-compiler-simulation-scientific": "node scripts/verify-k329-k332-compiler-simulation-scientific-candidate.mjs",
@@ -359,7 +364,8 @@
     "evidence:k321-k322-compiler-algorithm-cli-runtime": "node scripts/run-k321-k322-compiler-algorithm-cli-evidence.mjs",
     "evidence:k321-k322-compiler-algorithm-cli-ai-generate": "node scripts/run-k321-k322-independent-ai-generation.mjs",
     "verify:k321-k322-compiler-algorithm-cli": "node scripts/verify-k321-k322-compiler-algorithm-cli-receipt.mjs",
-    "evidence:k400": "node scripts/build-k400-evidence.mjs && node scripts/universal-program-stress-report.mjs examples/universal-stress/k400-current-evidence.json output/universal-stress-k400"
+    "evidence:k400": "node scripts/build-k400-evidence.mjs && node scripts/universal-program-stress-report.mjs examples/universal-stress/k400-current-evidence.json output/universal-stress-k400",
+    "test:logical-time": "node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs"
   },
   "engines": {
     "node": ">=20"

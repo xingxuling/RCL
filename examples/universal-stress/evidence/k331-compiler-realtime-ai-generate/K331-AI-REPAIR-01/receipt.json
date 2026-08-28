@@ -1,0 +1,128 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-01",
+  "mutationClass": "same-instant-priority-order",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04680-0fe1-7090-b7be-ca4d6eb9061a",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "(event_at(left) == event_at(right) and event_priority(left) > event_priority(right)) or",
+    "new": "(event_at(left) == event_at(right) and event_priority(left) < event_priority(right)) or",
+    "diagnosis": "The deterministic ordering comparator reverses equal-instant priority. Diagnostics show time-2 events ordered [20,10,15], but the invariant and oracle require lower numeric priority before stable identity, giving [10,15,20]. The minimal canonical repair is changing the priority tie-break comparator from > to < while leaving event identity stability, logical time, budget atomicity, and external-time authority semantics unchanged."
+  },
+  "promptRoot": "dc987cb99813a51bc8925e4932b55a8d1a87b6f96f53d9dbba5d18fda328a6b7",
+  "mutatedSourceSha256": "3e33bef19c159fe6d36c686d18086fc2364f2cd8dfe3502182e805c8d1e94d8b",
+  "candidateSourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "0ca910832270fd8251c2355c9ee045a35d049379f1780a72fbf3b85f617c0b1b",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04680-0fe1-7090-b7be-ca4d6eb9061a"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "6fff5d9134c3eade2dbf03ea840c0a7409910ad792885c40a39b9e8004efe4e0"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "52002a55a58825f989b1ee68e8ed0b1de941a3bc6067c2fa469c1587beadd27c"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "52002a55a58825f989b1ee68e8ed0b1de941a3bc6067c2fa469c1587beadd27c"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 34839,
+        "cached_input_tokens": 24320,
+        "output_tokens": 604,
+        "reasoning_output_tokens": 97
+      }
+    }
+  ],
+  "finalMessageSha256": "52002a55a58825f989b1ee68e8ed0b1de941a3bc6067c2fa469c1587beadd27c",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "42275236eb22645cd45edc9ba047ab4fc83b80fd687f8de62e8151216e6f1e0b",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": true
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "22f2dd5de2ed45ef45be55bb98cf53f84aaf6705cbb155deabebef1226e1af5c"
+}

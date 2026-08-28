@@ -1713,3 +1713,14 @@ export {
   runRslFederationBenchmark,
   buildLanguageFederationEvidence,
 } from './auxiliary-language-federation.mjs';
+
+export {
+  RCL_LOGICAL_TIME_SCHEDULER_VERSION,
+  RCL_LOGICAL_TIME_SCHEDULER_FORMAT,
+  RCL_LOGICAL_TIME_SNAPSHOT_FORMAT,
+  LogicalTimeSchedulerError,
+  LogicalTimeScheduler,
+  createLogicalTimeScheduler,
+  validateLogicalTimeSnapshot,
+  restoreLogicalTimeScheduler,
+} from './logical-time-scheduler.mjs';

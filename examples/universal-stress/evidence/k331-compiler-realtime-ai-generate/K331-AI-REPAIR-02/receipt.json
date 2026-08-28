@@ -1,0 +1,131 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-02",
+  "mutationClass": "event-budget-atomicity",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04682-9b87-74e3-b198-4106fd1db23b",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "        choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+    "new": "        choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+    "diagnosis": "The budget guard is inverted. It currently rejects advances when due events are below the declared budget, allowing over-budget advances to commit. Changing < to > restores fail-closed budget atomicity: exceeding max_events rejects without moving logical time or committing events."
+  },
+  "promptRoot": "6190065f880cd4c7ea4a7455e6f332fcef9d398f38256cf13bfc0e9730c41803",
+  "mutatedSourceSha256": "54540ed7e639cbaa4bbb8d6cc68767c2af52e90ab0f040c47f3e72bd82571af1",
+  "candidateSourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "0e9c16a198d4e424b446e8b519e597cb6d63222beaf7f9c25df24fd3ddde2506",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04682-9b87-74e3-b198-4106fd1db23b"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "6f1107d6739fe894a37d6a157989405f7bda9def16cad54cde5c476da37bdd7d"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "53ee03087c132ec442d5079e8505de552618b9c4ce43e80c722ce0d3e13d990e"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 34853,
+        "cached_input_tokens": 11008,
+        "output_tokens": 485,
+        "reasoning_output_tokens": 152
+      }
+    }
+  ],
+  "finalMessageSha256": "53ee03087c132ec442d5079e8505de552618b9c4ce43e80c722ce0d3e13d990e",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "7ea77ef51acf8325d682179682e706106ea2e432b9049a0260636434b929cae0",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": true
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "871bbd53531d256547b8b9896e72020533c1b3024a3005b4eead5e51ffacffc8"
+}

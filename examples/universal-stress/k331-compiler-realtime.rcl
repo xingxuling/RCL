@@ -1,0 +1,139 @@
+# K331: compiler-runtime realtime bounded logical-time profile.
+# RCL owns deterministic event ordering, monotonic logical advancement,
+# event-budget atomicity and explicit external-time admission. The JavaScript
+# LogicalTimeScheduler is an auxiliary Runtime and differential Oracle only.
+reality CompilerRealtime {
+  reckon make_event(id : Number, at : Number, priority : Number, active : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), at), priority), active)
+
+  reckon event_id(event : Sequence) -> Number = sequence_get(event, 0)
+  reckon event_at(event : Sequence) -> Number = sequence_get(event, 1)
+  reckon event_priority(event : Sequence) -> Number = sequence_get(event, 2)
+  reckon event_active(event : Sequence) -> Number = sequence_get(event, 3)
+
+  reckon event_before(left : Sequence, right : Sequence) -> Truth =
+    event_at(left) < event_at(right) or
+    (event_at(left) == event_at(right) and event_priority(left) < event_priority(right)) or
+    (event_at(left) == event_at(right) and event_priority(left) == event_priority(right) and event_id(left) < event_id(right))
+
+  reckon insert_event(sorted : Sequence, event : Sequence, cursor : Number, inserted : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(sorted),
+      choose(inserted == 1, output, sequence_append(output, event)),
+      choose(inserted == 0 and event_before(event, sequence_get(sorted, cursor)),
+        insert_event(sorted, event, cursor + 1, 1,
+          sequence_append(sequence_append(output, event), sequence_get(sorted, cursor))),
+        insert_event(sorted, event, cursor + 1, inserted,
+          sequence_append(output, sequence_get(sorted, cursor)))))
+
+  reckon sort_events(events : Sequence, cursor : Number, sorted : Sequence) -> Sequence =
+    choose(cursor >= length(events),
+      sorted,
+      sort_events(events, cursor + 1,
+        insert_event(sorted, sequence_get(events, cursor), 0, 0, empty_sequence())))
+
+  reckon valid_events(events : Sequence, cursor : Number) -> Truth =
+    choose(cursor >= length(events),
+      true,
+      choose(event_id(sequence_get(events, cursor)) < 0 or
+             event_at(sequence_get(events, cursor)) < 0 or
+             event_active(sequence_get(events, cursor)) < 0 or
+             event_active(sequence_get(events, cursor)) > 1,
+        false,
+        valid_events(events, cursor + 1)))
+
+  reckon due_count(sorted : Sequence, target : Number, cursor : Number) -> Number =
+    choose(cursor >= length(sorted),
+      0,
+      choose(event_active(sequence_get(sorted, cursor)) == 1 and event_at(sequence_get(sorted, cursor)) <= target,
+        1,
+        0) + due_count(sorted, target, cursor + 1))
+
+  reckon due_ids(sorted : Sequence, target : Number, cursor : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(sorted),
+      output,
+      choose(event_active(sequence_get(sorted, cursor)) == 1 and event_at(sequence_get(sorted, cursor)) <= target,
+        due_ids(sorted, target, cursor + 1, sequence_append(output, event_id(sequence_get(sorted, cursor)))),
+        due_ids(sorted, target, cursor + 1, output)))
+
+  reckon make_advance_result(code : Number, logical_time : Number, committed : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), code), logical_time), committed)
+
+  reckon advance_to(events : Sequence, current : Number, target : Number, max_events : Number) -> Sequence =
+    choose(valid_events(events, 0) == false,
+      make_advance_result(0 - 5, current, empty_sequence()),
+      choose(target < current,
+        make_advance_result(0 - 1, current, empty_sequence()),
+        choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,
+          make_advance_result(0 - 2, current, empty_sequence()),
+          make_advance_result(1, target,
+            due_ids(sort_events(events, 0, empty_sequence()), target, 0, empty_sequence())))))
+
+  reckon result_code(result : Sequence) -> Number = sequence_get(result, 0)
+  reckon result_time(result : Sequence) -> Number = sequence_get(result, 1)
+  reckon result_events(result : Sequence) -> Sequence = sequence_get(result, 2)
+
+  reckon commit_external_time(current : Number, proposed : Number, temporal_commit_capability : Number) -> Sequence =
+    choose(temporal_commit_capability != 1,
+      make_advance_result(0 - 3, current, empty_sequence()),
+      choose(proposed < current,
+        make_advance_result(0 - 1, current, empty_sequence()),
+        make_advance_result(1, proposed, empty_sequence())))
+
+  reckon wall_projection(logical_delta : Number, time_scale : Number) -> Number =
+    choose(time_scale <= 0, 0 - 1, logical_delta / time_scale)
+
+  facet contract.id : Text = "k331-compiler-realtime-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet donor.logical_scheduler : Text = "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE"
+  facet boundary.profile : Text = "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME"
+
+  facet schedule.events : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
+    empty_sequence(), make_event(30, 4, 0, 1)),
+    make_event(20, 2, 1, 1)),
+    make_event(10, 2, 0, 1)),
+    make_event(15, 2, 0, 1)),
+    make_event(40, 6, 0, 1))
+  facet schedule.invalid : Sequence = sequence_append(empty_sequence(), make_event(50, 0 - 1, 0, 1))
+  facet schedule.sorted : Sequence = sort_events(schedule.events, 0, empty_sequence())
+
+  facet result.success : Sequence = advance_to(schedule.events, 0, 4, 4)
+  facet result.budget_rejected : Sequence = advance_to(schedule.events, 0, 4, 3)
+  facet result.backward_rejected : Sequence = advance_to(schedule.events, 4, 3, 4)
+  facet result.invalid_rejected : Sequence = advance_to(schedule.invalid, 0, 4, 4)
+  facet result.external_unapproved : Sequence = commit_external_time(4, 8, 0)
+  facet result.external_approved : Sequence = commit_external_time(4, 8, 1)
+  facet projection.normal : Number = wall_projection(8, 1)
+  facet projection.accelerated : Number = wall_projection(8, 4)
+  facet projection.invalid : Number = wall_projection(8, 0)
+
+  facet evaluation.pass : Truth =
+    length(schedule.sorted) == 5 and
+    event_id(sequence_get(schedule.sorted, 0)) == 10 and
+    event_id(sequence_get(schedule.sorted, 1)) == 15 and
+    event_id(sequence_get(schedule.sorted, 2)) == 20 and
+    event_id(sequence_get(schedule.sorted, 3)) == 30 and
+    event_id(sequence_get(schedule.sorted, 4)) == 40 and
+    result_code(result.success) == 1 and
+    result_time(result.success) == 4 and
+    length(result_events(result.success)) == 4 and
+    sequence_get(result_events(result.success), 0) == 10 and
+    sequence_get(result_events(result.success), 1) == 15 and
+    sequence_get(result_events(result.success), 2) == 20 and
+    sequence_get(result_events(result.success), 3) == 30 and
+    result_code(result.budget_rejected) == 0 - 2 and
+    result_time(result.budget_rejected) == 0 and
+    length(result_events(result.budget_rejected)) == 0 and
+    result_code(result.backward_rejected) == 0 - 1 and
+    result_time(result.backward_rejected) == 4 and
+    result_code(result.invalid_rejected) == 0 - 5 and
+    result_code(result.external_unapproved) == 0 - 3 and
+    result_time(result.external_unapproved) == 4 and
+    result_code(result.external_approved) == 1 and
+    result_time(result.external_approved) == 8 and
+    projection.normal == 8 and
+    projection.accelerated == 2 and
+    projection.invalid == 0 - 1
+  facet evidence.no_wall_clock_authority : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}

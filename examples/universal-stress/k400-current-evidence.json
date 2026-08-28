@@ -1144,6 +1144,138 @@
       ]
     },
     {
+      "id": "compiler-runtime::realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "43d195d98e1bbd4066922bb47a1e24eed816f86b",
+      "lastVerifiedDate": "2026-08-28",
+      "knownLimits": [
+        "The realtime claim is limited to one bounded deterministic logical-time ordering, monotonic advance, event-budget atomicity, acceleration projection and external-time authority profile.",
+        "Wall-clock precision, deadline scheduling, interrupts, hard real-time guarantees, distributed consensus, durable WAL and physical-clock synchronization remain unverified."
+      ],
+      "relatedKillerTasks": [
+        "K09"
+      ],
+      "requiredGenes": [
+        "logical-time-total-order",
+        "monotonic-advance",
+        "event-budget-atomicity",
+        "external-time-authority",
+        "native-compiler-runtime"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent priority/budget/authority repairs passed; GitHub run 33141180858 bound focused and Windows replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+            "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native logical-time receipt 94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d."
+        }
+      },
+      "changes": [
+        {
+          "id": "compiler-realtime-logical-time-profile",
+          "kind": "stress-evidence",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL owns deterministic logical-time and admission semantics; the JavaScript scheduler remains an auxiliary differential/runtime organ and native rclc/rclvm execute the canonical profile."
+        }
+      ]
+    },
+    {
       "id": "compiler-runtime::simulation",
       "coverageMode": "native-semantic",
       "lastVerifiedSha": "311dcc56d0553a0784a3fe44bdbe3ac05931b961",
@@ -2734,6 +2866,11 @@
     "examples/universal-stress/k334-compiler-agent-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k334-compiler-agent-ai-generate/receipt.json",
     "examples/universal-stress/evidence/k334-compiler-agent-ai-generate/github-replay.json",
+    "examples/universal-stress/k331-compiler-realtime-runtime-contract.v0.1.json",
+    "examples/universal-stress/evidence/k331-compiler-realtime-runtime-v0.1.json",
+    "examples/universal-stress/k331-compiler-realtime-ai-generation-contract.v0.1.json",
+    "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k331-compiler-realtime-ai-generate/github-replay.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
     "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
@@ -2793,6 +2930,7 @@
     "K326 closes compiler-runtime::database through 20/20 native relational-transaction rounds, 3/3 independent repairs and GitHub run 33093366736.",
     "K336 closes compiler-runtime::automation through 20/20 native governed-workflow rounds, 3/3 independent repairs and GitHub run 33135430077.",
     "K334 closes compiler-runtime::agent through 20/20 native governed-deliberation rounds, 3/3 independent repairs and GitHub run 33137843366.",
+    "K331 closes compiler-runtime::realtime through 20/20 native logical-time rounds, auxiliary-runtime differential parity, 3/3 independent repairs and GitHub run 33141180858.",
     "K329/K332 close compiler-runtime::simulation and compiler-runtime::scientific through 20/20 native rounds, 3/3 independent repairs and GitHub run 33087711271.",
     "K333 closes compiler-runtime::machine-learning through 20/20 native integer-perceptron rounds, 3/3 independent repairs and GitHub run 33008611515.",
     "K340 closes compiler-runtime::mixed-paradigm through 20/20 four-paradigm native rounds, 3/3 independent repairs and GitHub run 33005515826.",
