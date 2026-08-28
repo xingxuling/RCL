@@ -877,6 +877,139 @@
       ]
     },
     {
+      "id": "compiler-runtime::automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedSha": "a989db99643c8a3f61d6f416c57e5887c275eae1",
+      "lastVerifiedDate": "2026-08-28",
+      "knownLimits": [
+        "The automation claim is limited to one bounded deterministic dependency/retry/approval/kill-switch/compensation workflow profile.",
+        "External actions, wall-clock scheduling, arbitrary DAGs, durable queues and production workflow authority remain unverified."
+      ],
+      "relatedKillerTasks": [
+        "K09"
+      ],
+      "requiredGenes": [
+        "dependency-gate",
+        "bounded-retry",
+        "human-approval",
+        "kill-switch",
+        "compensating-rollback",
+        "native-compiler-runtime"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Three independent dependency/retry/approval repairs passed; GitHub run 33135430077 bound focused and Windows replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
+            "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json"
+          ],
+          "note": "Frozen 20-round native governed-automation receipt c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c."
+        }
+      },
+      "changes": [
+        {
+          "id": "compiler-automation-governed-workflow-profile",
+          "kind": "stress-evidence",
+          "scope": [
+            "compiler-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "RCL owns dependency, retry, approval, kill-switch, audit, commit and compensation semantics while native rclc/rclvm execute without an external action provider."
+        }
+      ]
+    },
+    {
       "id": "compiler-runtime::simulation",
       "coverageMode": "native-semantic",
       "lastVerifiedSha": "311dcc56d0553a0784a3fe44bdbe3ac05931b961",
@@ -2461,6 +2594,7 @@
     "examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json",
     "examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json",
     "examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json",
     "examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json",
@@ -2518,7 +2652,7 @@
     "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
     "K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run 32880432503.",
     "K326 closes compiler-runtime::database through 20/20 native relational-transaction rounds, 3/3 independent repairs and GitHub run 33093366736.",
-    "K336 has 20/20 rooted native governed-workflow rounds and a 3/3 independently replayed local repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.",
+    "K336 closes compiler-runtime::automation through 20/20 native governed-workflow rounds, 3/3 independent repairs and GitHub run 33135430077.",
     "K329/K332 close compiler-runtime::simulation and compiler-runtime::scientific through 20/20 native rounds, 3/3 independent repairs and GitHub run 33087711271.",
     "K333 closes compiler-runtime::machine-learning through 20/20 native integer-perceptron rounds, 3/3 independent repairs and GitHub run 33008611515.",
     "K340 closes compiler-runtime::mixed-paradigm through 20/20 four-paradigm native rounds, 3/3 independent repairs and GitHub run 33005515826.",

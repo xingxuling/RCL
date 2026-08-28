@@ -2,7 +2,7 @@
 
 ## Verdict
 
-`LOCAL_NATIVE_CANDIDATE / GITHUB_AUTHORITY_REQUIRED`
+`PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_AUTOMATION_AUTHORITY_BOUND`
 
 This campaign freezes one bounded `compiler-runtime::automation` profile. RCL source owns task dependency gates, bounded retries, human approval, kill-switch behavior, audit order, commit and compensating rollback. The existing JavaScript experiment-automation adapter is a Donor and product organ only; it does not own the canonical semantics or receive K400 credit.
 
@@ -27,19 +27,19 @@ No execution-language workaround was used. JavaScript remains an independent ora
 
 ## Nine non-compensatory gates
 
-| Gate | Local result | Evidence |
+| Gate | Result | Evidence |
 |---|---|---|
-| EXPRESS | PASS_LOCAL | all workflow and governance semantics are canonical RCL source |
-| COMPILE | PASS_LOCAL | bootstrap and native compiler emit byte-identical RBC |
-| LOWER | PASS_LOCAL | generic Sequence/control-flow bytecode; no automation-special opcode |
-| EXECUTE | PASS_LOCAL | native VM completed 20/20 rounds |
-| CORRECT | PASS_LOCAL | independent JavaScript workflow state machine matches every projection |
-| ROBUST | PASS_LOCAL | dependency, retry, approval, compensation and corrupt-RBC controls fail closed |
-| PERFORMANCE | PASS_LOCAL | P95 compile/execute/combined times remain under the frozen budgets |
-| AI_GENERATE | CANDIDATE | three unique read-only sessions restore exact canonical bytes; hosted replay required |
-| EVIDENCE | CANDIDATE | rooted local receipts exist; GitHub Linux/Windows authority required |
+| EXPRESS | PASS | all workflow and governance semantics are canonical RCL source |
+| COMPILE | PASS | bootstrap and native compiler emit byte-identical RBC |
+| LOWER | PASS | generic Sequence/control-flow bytecode; no automation-special opcode |
+| EXECUTE | PASS | native VM completed 20/20 rounds and exact hosted Linux/Windows replay |
+| CORRECT | PASS | independent JavaScript workflow state machine matches every projection |
+| ROBUST | PASS | dependency, retry, approval, compensation and corrupt-RBC controls fail closed |
+| PERFORMANCE | PASS | P95 compile/execute/combined times remain under the frozen budgets |
+| AI_GENERATE | PASS | three unique read-only sessions restored exact canonical bytes; hosted replay is bound |
+| EVIDENCE | PASS | rooted local receipts and exact GitHub Linux/Windows authority are bound |
 
-K336 remains `UNTESTED` until both named GitHub steps and their parent jobs succeed for the exact source commit.
+GitHub run `33135430077` bound focused job `98734185571` and Windows job `98734185483` for exact source commit `a989db99643c8a3f61d6f416c57e5887c275eae1`. Both named K336 steps and both parent jobs succeeded. Authority root: `406b0891c40b01d7ce84021e36b2a188cb32c72db173fc9711df2ad0af341ab7`.
 
 ## Multi-civilization Integration Court
 
