@@ -364,7 +364,7 @@ Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 
 ## K12 AMD OpenCL cross-node gradient batch candidate
 
-Status: `PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE`.
 K12 adds an opt-in RCL-owned planner for contiguous ready independent GPU
 matmul nodes in canonical reverse order. Each node contributes its fixed K11
 `left-gradient`, `right-gradient` pair to one bounded K10 transport message;
@@ -382,8 +382,11 @@ modes fail closed. Local K12 is `4/4 PASS`, Rust Tensor is `7/7`, K08 Tensor is
 on exact head `f7257091c8178d6c8f813d8d0ba8faaf34543ac8`: K12
 `33186294873` passed Ubuntu and Windows; K11 `33186294809`, K10
 `33186294821`, K09 `33186294829`, Universal Stress `33186294878`, Canonical
-`33186294825` and Authority `33186294855` also passed. Post-merge verification
-remains pending. Authority:
+`33186294825` and Authority `33186294855` also passed. Post-merge main
+verification passed at `b6886c8c35f8a3fbc0f3441cff016bc601371f54`: K12
+`33189905627` passed Ubuntu and Windows; K11 `33189905678`, K10 `33189905671`,
+K09 `33189905592`, Universal Stress `33189905603`, Canonical `33189905537` and
+Authority `33189905662` also passed. Authority:
 `docs/native-ai/gpu-opencl-cross-node-gradient-batch-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-cross-node-gradient-batch-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-cross-node-gradient-batch-genome.rcl` and
