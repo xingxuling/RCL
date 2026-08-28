@@ -29,6 +29,7 @@ const ROPE_ENGINE = path.join(
 const PROVIDER = path.join(ROOT, 'native', 'tensor-engine', 'amd_opencl_bf16_provider.py');
 const GENOME = path.join(ROOT, 'examples', 'native-ai', 'gpu-gqa-rope-native-backward-adamw-genome.rcl');
 const CONTRACT = path.join(ROOT, 'examples', 'native-ai', 'gpu-gqa-rope-native-backward-adamw-contract.v0.1.json');
+const PERSISTENT_CONTRACT = path.join(ROOT, 'examples', 'native-ai', 'gpu-opencl-persistent-dispatch-contract.v0.1.json');
 
 const S = 3;
 const V = 4;
@@ -542,6 +543,14 @@ test('K08 GPU-native multi-block GQA+RoPE contract remains RCL-owned and generic
   });
   assert.ok(contract.claimsNotGranted.includes('GPU_TRAINING'));
   assert.ok(contract.claimsNotGranted.includes('RCL_10M'));
+  const persistentContract = JSON.parse(fs.readFileSync(PERSISTENT_CONTRACT, 'utf8'));
+  assert.equal(persistentContract.canonicalOwner, 'RCL');
+  assert.equal(persistentContract.semanticBoundary.providerRole, 'auxiliary OpenCL lowering and transport only');
+  assert.equal(persistentContract.semanticBoundary.fallback, 'forbidden');
+  assert.equal(persistentContract.transport.format, 'rcl.opencl-amd-session-ndjson.v0.1');
+  assert.deepEqual(persistentContract.transport.reusedResources, [
+    'provider-process', 'OpenCL-context', 'OpenCL-program',
+  ]);
   const graph = buildGraph(frame);
   assert.equal(graph.nodes.filter((node) => node.operation === 'matmul').length, 36);
   assert.equal(graph.nodes.filter((node) => node.attributes.placement === 'gpu').length, 36);
@@ -576,6 +585,8 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.equal(gpu.value.telemetry.gpuBackwardExecutionRoots.length, 72);
   assert.equal(gpu.value.telemetry.gpuOptimizerElements, 208);
   assert.equal(gpu.value.telemetry.gpuOptimizerExecutionRoots.length, PARAMETER_IDS.length);
+  assert.equal(gpu.value.telemetry.gpuProviderTransport, 'persistent-session-v0.1');
+  assert.equal(gpu.value.telemetry.gpuProviderRequests, 338);
   assert.ok(gpu.value.telemetry.hostCpuNodes > 40);
   assert.ok(gpu.value.telemetry.gpuExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
   assert.ok(gpu.value.telemetry.gpuBackwardExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));

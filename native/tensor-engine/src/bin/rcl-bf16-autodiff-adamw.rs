@@ -1,5 +1,6 @@
 use rcl_tensor_engine::{
-    AutodiffRequest, AutodiffResult, BF16_AUTODIFF_PRECISION, EngineError, Parameter, backward,
+    AutodiffRequest, AutodiffResult, BF16_AUTODIFF_PRECISION, EngineError,
+    OpenClProviderSession, Parameter, backward_with_provider,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -9,7 +10,6 @@ use std::env;
 use std::fs;
 use std::io::{self, Read};
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
 
 const REQUEST_FORMAT: &str = "rcl.bf16-autodiff-adamw-request.v0.2";
 const HYBRID_BACKEND: &str = "opencl-amd-hybrid";
@@ -138,6 +138,8 @@ struct Telemetry {
     gpu_backward_execution_roots: Vec<String>,
     gpu_optimizer_elements: usize,
     gpu_optimizer_execution_roots: Vec<String>,
+    gpu_provider_transport: &'static str,
+    gpu_provider_requests: usize,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -620,18 +622,6 @@ struct GpuOptimizerTelemetry {
     execution_roots: Vec<String>,
 }
 
-fn provider_error_code(value: &Value) -> &'static str {
-    match value.get("code").and_then(Value::as_str) {
-        Some("RCL_OPENCL_BACKEND_UNAVAILABLE") => "RCL_OPENCL_BACKEND_UNAVAILABLE",
-        Some("RCL_OPENCL_AMD_DEVICE_REQUIRED") => "RCL_OPENCL_AMD_DEVICE_REQUIRED",
-        Some("RCL_OPENCL_F32_BITS") => "RCL_OPENCL_F32_BITS",
-        Some("RCL_OPENCL_F32_NONFINITE") => "RCL_OPENCL_F32_NONFINITE",
-        Some("RCL_OPENCL_ADAMW_CONFIG") => "RCL_OPENCL_ADAMW_CONFIG",
-        Some("RCL_OPENCL_SHAPE") => "RCL_OPENCL_SHAPE",
-        _ => "RCL_ACCELERATOR_EXECUTION_FAILED",
-    }
-}
-
 fn gpu_provider_path(request: &AutodiffRequest) -> Result<PathBuf, TrainError> {
     let value = request
         .graph
@@ -706,7 +696,7 @@ fn decode_gpu_f32_output(
 }
 
 fn execute_gpu_adamw(
-    provider_path: &PathBuf,
+    provider_session: &mut OpenClProviderSession,
     master: &[f32],
     gradient: &[f32],
     state: &OptimizerState,
@@ -746,70 +736,7 @@ fn execute_gpu_adamw(
         "epsilon": config.epsilon,
         "gradientClip": config.gradient_clip,
     });
-    let python = env::var("RCL_PYTHON").unwrap_or_else(|_| {
-        if cfg!(windows) {
-            "python".into()
-        } else {
-            "python3".into()
-        }
-    });
-    let mut child = Command::new(python)
-        .arg(provider_path)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|error| {
-            TrainError::new(
-                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-                format!("could not start OpenCL provider: {error}"),
-            )
-        })?;
-    let encoded = serde_json::to_vec(&payload).map_err(|error| {
-        TrainError::new(
-            "RCL_ACCELERATOR_REQUEST_JSON",
-            format!("could not encode GPU AdamW request: {error}"),
-        )
-    })?;
-    let mut stdin = child.stdin.take().ok_or_else(|| {
-        TrainError::new(
-            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-            "OpenCL provider stdin was unavailable",
-        )
-    })?;
-    use std::io::Write;
-    stdin.write_all(&encoded).map_err(|error| {
-        TrainError::new(
-            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-            format!("could not send GPU AdamW request: {error}"),
-        )
-    })?;
-    drop(stdin);
-    let output = child.wait_with_output().map_err(|error| {
-        TrainError::new(
-            "RCL_ACCELERATOR_EXECUTION_FAILED",
-            format!("OpenCL provider process failed: {error}"),
-        )
-    })?;
-    if !output.status.success() {
-        let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(
-            |_| json!({"message": String::from_utf8_lossy(&output.stderr).to_string()}),
-        );
-        return Err(TrainError::new(
-            provider_error_code(&error_value),
-            error_value
-                .get("message")
-                .and_then(Value::as_str)
-                .unwrap_or("OpenCL provider failed")
-                .to_owned(),
-        ));
-    }
-    let response: Value = serde_json::from_slice(&output.stdout).map_err(|error| {
-        TrainError::new(
-            "RCL_ACCELERATOR_RESPONSE_JSON",
-            format!("OpenCL provider returned invalid GPU AdamW JSON: {error}"),
-        )
-    })?;
+    let response: Value = provider_session.execute(&payload)?;
     if response.get("format").and_then(Value::as_str) != Some("rcl.opencl-adamw-update-result.v0.1")
         || response.get("status").and_then(Value::as_str)
             != Some("PASS_LOCAL_GPU_ADAMW_REFERENCE_CANDIDATE")
@@ -845,12 +772,12 @@ fn adamw_step_gpu(
     gradients: &[Vec<f32>],
     states: &mut [OptimizerState],
     config: &AdamWConfig,
-    provider_path: &PathBuf,
+    provider_session: &mut OpenClProviderSession,
     telemetry: &mut GpuOptimizerTelemetry,
 ) -> Result<(), TrainError> {
     for ((weights, gradient), state) in master.iter_mut().zip(gradients).zip(states.iter_mut()) {
         let (next_master, next_first, next_second, root) =
-            execute_gpu_adamw(provider_path, weights, gradient, state, config)?;
+            execute_gpu_adamw(provider_session, weights, gradient, state, config)?;
         telemetry.elements = telemetry
             .elements
             .checked_add(weights.len())
@@ -993,21 +920,31 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
     } else {
         None
     };
+    let mut gpu_provider_session = gpu_provider
+        .as_ref()
+        .map(OpenClProviderSession::new)
+        .transpose()?;
     let mut gpu_optimizer_telemetry = GpuOptimizerTelemetry::default();
     sync_master(&mut request, &order, &master);
-    let initial_result = backward(&request.autodiff)?;
+    let initial_result = backward_with_provider(
+        &request.autodiff,
+        gpu_provider_session.as_mut(),
+    )?;
     let initial_gradients = gradients(&initial_result, &order)?;
     for _ in 0..request.steps {
         sync_master(&mut request, &order, &master);
-        let step_result = backward(&request.autodiff)?;
+        let step_result = backward_with_provider(
+            &request.autodiff,
+            gpu_provider_session.as_mut(),
+        )?;
         let step_gradients = gradients(&step_result, &order)?;
-        if let Some(provider_path) = gpu_provider.as_ref() {
+        if let Some(provider_session) = gpu_provider_session.as_mut() {
             adamw_step_gpu(
                 &mut master,
                 &step_gradients,
                 &mut states,
                 &request.config,
-                provider_path,
+                provider_session,
                 &mut gpu_optimizer_telemetry,
             )?;
         } else {
@@ -1015,7 +952,10 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
         }
     }
     sync_master(&mut request, &order, &master);
-    let final_result = backward(&request.autodiff)?;
+    let final_result = backward_with_provider(
+        &request.autodiff,
+        gpu_provider_session.as_mut(),
+    )?;
     let final_gradients = gradients(&final_result, &order)?;
     let backward_edge_count = final_result.backward_edges.len();
     let parameter_elements = master.iter().map(Vec::len).sum::<usize>();
@@ -1094,6 +1034,15 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
                 .clone(),
             gpu_optimizer_elements: gpu_optimizer_telemetry.elements,
             gpu_optimizer_execution_roots: gpu_optimizer_telemetry.execution_roots,
+            gpu_provider_transport: if gpu_provider_session.is_some() {
+                "persistent-session-v0.1"
+            } else {
+                "none"
+            },
+            gpu_provider_requests: gpu_provider_session
+                .as_ref()
+                .map(|session| session.request_count())
+                .unwrap_or(0),
         },
         gpu_claim: false,
     })
