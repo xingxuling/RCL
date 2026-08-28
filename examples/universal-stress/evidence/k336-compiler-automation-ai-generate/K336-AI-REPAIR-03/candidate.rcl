@@ -1,0 +1,123 @@
+# K336: compiler-runtime automation bounded governed-workflow profile.
+# RCL owns dependency gates, retry limits, approval, kill-switch, audit order,
+# commit and compensating rollback. JavaScript automation is a donor only.
+reality CompilerAutomation {
+  reckon make_task(id : Number, dependency : Number, failures_before_success : Number, max_attempts : Number, requires_approval : Number, compensatable : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), dependency), failures_before_success), max_attempts), requires_approval), compensatable)
+
+  reckon task_id(task : Sequence) -> Number = sequence_get(task, 0)
+  reckon task_dependency(task : Sequence) -> Number = sequence_get(task, 1)
+  reckon task_failures_before_success(task : Sequence) -> Number = sequence_get(task, 2)
+  reckon task_max_attempts(task : Sequence) -> Number = sequence_get(task, 3)
+  reckon task_requires_approval(task : Sequence) -> Number = sequence_get(task, 4)
+  reckon task_compensatable(task : Sequence) -> Number = sequence_get(task, 5)
+
+  reckon dependency_blocked(task : Sequence, completed : Number) -> Truth =
+    task_dependency(task) >= completed
+
+  reckon make_result(code : Number, attempts : Number, completed : Number, rollback : Number, audit : Sequence, committed : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), code), attempts), completed), rollback), audit), committed)
+
+  reckon result_code(result : Sequence) -> Number = sequence_get(result, 0)
+  reckon result_attempts(result : Sequence) -> Number = sequence_get(result, 1)
+  reckon result_completed(result : Sequence) -> Number = sequence_get(result, 2)
+  reckon result_rollback(result : Sequence) -> Number = sequence_get(result, 3)
+  reckon result_audit(result : Sequence) -> Sequence = sequence_get(result, 4)
+  reckon result_committed(result : Sequence) -> Number = sequence_get(result, 5)
+
+  reckon count_compensatable(tasks : Sequence, cursor : Number, completed : Number) -> Number =
+    choose(cursor >= completed,
+      0,
+      task_compensatable(sequence_get(tasks, cursor)) + count_compensatable(tasks, cursor + 1, completed))
+
+  reckon run_workflow(tasks : Sequence, cursor : Number, attempts : Number, completed : Number, audit : Sequence, human_approval : Number, kill_switch : Number) -> Sequence =
+    choose(kill_switch == 1,
+      make_result(0 - 4, attempts, completed, count_compensatable(tasks, 0, completed), sequence_append(audit, 0 - 4), 0),
+      choose(cursor >= length(tasks),
+        make_result(1, attempts, completed, 0, audit, 1),
+        choose(dependency_blocked(sequence_get(tasks, cursor), completed),
+          make_result(0 - 3, attempts, completed, count_compensatable(tasks, 0, completed), sequence_append(audit, 0 - task_id(sequence_get(tasks, cursor))), 0),
+          choose(task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0,
+            make_result(0 - 2, attempts, completed, count_compensatable(tasks, 0, completed), sequence_append(audit, 0 - task_id(sequence_get(tasks, cursor))), 0),
+            choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),
+              run_workflow(tasks, cursor + 1,
+                attempts + task_failures_before_success(sequence_get(tasks, cursor)) + 1,
+                completed + 1,
+                sequence_append(audit, task_id(sequence_get(tasks, cursor))),
+                human_approval,
+                kill_switch),
+              make_result(0 - 1,
+                attempts + task_max_attempts(sequence_get(tasks, cursor)),
+                completed,
+                count_compensatable(tasks, 0, completed),
+                sequence_append(audit, 0 - task_id(sequence_get(tasks, cursor))),
+                0))))))
+
+  reckon validate_plan(tasks : Sequence, cursor : Number, completed : Number) -> Truth =
+    choose(cursor >= length(tasks),
+      true,
+      choose(dependency_blocked(sequence_get(tasks, cursor), completed),
+        false,
+        validate_plan(tasks, cursor + 1, completed + 1)))
+
+  reckon dry_run(tasks : Sequence) -> Sequence =
+    choose(validate_plan(tasks, 0, 0),
+      make_result(2, 0, length(tasks), 0, empty_sequence(), 0),
+      make_result(0 - 3, 0, 0, 0, empty_sequence(), 0))
+
+  facet contract.id : Text = "k336-compiler-automation-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet donor.automation : Text = "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION"
+  facet boundary.profile : Text = "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER"
+
+  facet workflow.success_tasks : Sequence = sequence_append(sequence_append(sequence_append(
+    empty_sequence(), make_task(10, 0 - 1, 0, 1, 0, 1)),
+    make_task(20, 0, 1, 2, 0, 1)),
+    make_task(30, 1, 1, 2, 1, 1))
+  facet workflow.failure_tasks : Sequence = sequence_append(sequence_append(sequence_append(
+    empty_sequence(), make_task(10, 0 - 1, 0, 1, 0, 1)),
+    make_task(20, 0, 1, 2, 0, 1)),
+    make_task(30, 1, 2, 2, 1, 1))
+  facet workflow.invalid_dependency_tasks : Sequence = sequence_append(
+    empty_sequence(), make_task(10, 0, 0, 1, 0, 1))
+
+  facet result.success : Sequence = run_workflow(workflow.success_tasks, 0, 0, 0, empty_sequence(), 1, 0)
+  facet result.retry_failure : Sequence = run_workflow(workflow.failure_tasks, 0, 0, 0, empty_sequence(), 1, 0)
+  facet result.unapproved : Sequence = run_workflow(workflow.success_tasks, 0, 0, 0, empty_sequence(), 0, 0)
+  facet result.kill_switch : Sequence = run_workflow(workflow.success_tasks, 0, 0, 0, empty_sequence(), 1, 1)
+  facet result.invalid_dependency : Sequence = run_workflow(workflow.invalid_dependency_tasks, 0, 0, 0, empty_sequence(), 1, 0)
+  facet result.dry_run : Sequence = dry_run(workflow.success_tasks)
+
+  facet evaluation.pass : Truth =
+    result_code(result.success) == 1 and
+    result_attempts(result.success) == 5 and
+    result_completed(result.success) == 3 and
+    result_rollback(result.success) == 0 and
+    result_committed(result.success) == 1 and
+    length(result_audit(result.success)) == 3 and
+    sequence_get(result_audit(result.success), 0) == 10 and
+    sequence_get(result_audit(result.success), 1) == 20 and
+    sequence_get(result_audit(result.success), 2) == 30 and
+    result_code(result.retry_failure) == 0 - 1 and
+    result_attempts(result.retry_failure) == 5 and
+    result_completed(result.retry_failure) == 2 and
+    result_rollback(result.retry_failure) == 2 and
+    result_committed(result.retry_failure) == 0 and
+    sequence_get(result_audit(result.retry_failure), 2) == 0 - 30 and
+    result_code(result.unapproved) == 0 - 2 and
+    result_attempts(result.unapproved) == 3 and
+    result_completed(result.unapproved) == 2 and
+    result_rollback(result.unapproved) == 2 and
+    result_code(result.kill_switch) == 0 - 4 and
+    result_attempts(result.kill_switch) == 0 and
+    result_completed(result.kill_switch) == 0 and
+    result_code(result.invalid_dependency) == 0 - 3 and
+    result_attempts(result.invalid_dependency) == 0 and
+    result_code(result.dry_run) == 2 and
+    result_attempts(result.dry_run) == 0 and
+    result_completed(result.dry_run) == 3 and
+    result_committed(result.dry_run) == 0
+  facet evidence.no_external_action_provider : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}
