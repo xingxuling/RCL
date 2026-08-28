@@ -335,6 +335,26 @@ Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
 
+## K12 AMD OpenCL next-boundary reality audit
+
+Status: `CANDIDATE_AUDIT_ONLY_DEVICE_RESIDENCY_AND_CROSS_NODE_PLANNER_NOT_READY`.
+The post-K11 audit at main `3058de9` finds that Canonical `33143626197`,
+Universal Stress `33143626244` and Authority `33143626261` passed after the
+evidence merge, and that the persistent AMD OpenCL
+session retains only the provider process, OpenCL context and program. Each
+child operation still owns isolated kernel/input/output buffers and performs
+host readback; canonical RCL `DenseStorage` remains host-side. The next
+bounded candidate is a session-scoped device-buffer lifecycle on a two-operation
+read-only reuse slice. Cross-node batching is explicitly blocked until a
+resource-aware planner can prove readiness, reverse-order preservation,
+last-use release and child-root parity. No K12 implementation, throughput,
+accelerator promotion or K400 claim is granted by this audit.
+
+Authority: `docs/native-ai/gpu-opencl-next-boundary-reality-audit-v0.1.md` and
+`examples/native-ai/gpu-opencl-next-boundary-audit.v0.1.json`. Open gaps remain
+`RCL_GAP_GPU_BATCH_PLANNER`, `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
 ## K11 AMD OpenCL gradient pair batch candidate
 
 Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.

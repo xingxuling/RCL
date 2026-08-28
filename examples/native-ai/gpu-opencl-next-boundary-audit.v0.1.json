@@ -1,0 +1,117 @@
+{
+  "format": "rcl.k12.opencl-amd-next-boundary-audit.v0.1",
+  "status": "CANDIDATE_AUDIT_ONLY_DEVICE_RESIDENCY_AND_CROSS_NODE_PLANNER_NOT_READY",
+  "sourceRevision": "3058de9ba252061ba24fd544659e1ec8771a97c1",
+  "evidenceClass": "DESIGN_AND_SOURCE_AUDIT_ONLY",
+  "canonicalOwner": "RCL",
+  "providerRole": "auxiliary OpenCL lowering and bounded transport",
+  "fallback": "forbidden",
+  "baseline": {
+    "implementation": "K11 gradient-pair ordered transport",
+    "logicalRequests": 338,
+    "transportDispatches": 217,
+    "gradientPairBatches": 108,
+    "adamwBatches": 1,
+    "claims": [
+      "OPENCL_AMD_GRADIENT_PAIR_BATCHED_DISPATCH_CANDIDATE"
+    ],
+    "claimsNotGranted": [
+      "OPENCL_DEVICE_BUFFER_RESIDENCY",
+      "OPENCL_CROSS_NODE_BATCHING",
+      "OPENCL_PARALLEL_EXECUTION",
+      "OPENCL_TRAINING_THROUGHPUT",
+      "GPU_TRAINING_PROMOTION",
+      "K400_PASS"
+    ]
+  },
+  "findings": {
+    "persistentResources": [
+      "provider-process",
+      "OpenCL-context",
+      "OpenCL-program"
+    ],
+    "perOperationResources": [
+      "kernel",
+      "input-buffers",
+      "output-buffers",
+      "host-readback"
+    ],
+    "canonicalHostStorage": "DenseStorage.data is Vec<f64>; BoundTensor borrows host slices",
+    "transportPayload": "serialized BF16/F32 bit arrays per child operation",
+    "stressGraph": {
+      "forwardGpuMatmuls": 36,
+      "backwardGradientOperations": 72,
+      "adamwParameterGroups": 14,
+      "explicitHostCpuNodes": ">40"
+    }
+  },
+  "selectedNextCandidate": {
+    "id": "K12-A",
+    "profile": "session-scoped-device-buffer-readonly-reuse",
+    "slice": "one uploaded input consumed by two ordered matmul operations, explicit readback and release",
+    "requires": [
+      "buffer identity and descriptor binding",
+      "upload/consume/readback/release lifecycle",
+      "session ownership and bounded resource budget",
+      "cleanup on provider and validation errors",
+      "CPU differential and deterministic replay",
+      "fail-closed alias/use-after-release/cross-session negatives"
+    ],
+    "dependsOn": [],
+    "unblocks": [
+      "RCL_GAP_GPU_BATCH_PLANNER"
+    ]
+  },
+  "deferred": [
+    "cross-node batch planner",
+    "batched kernels",
+    "parallel execution",
+    "throughput and VRAM benchmark"
+  ],
+  "noSilentRclBypass": {
+    "task": "K12 next GPU dispatch boundary",
+    "missingCapability": "RCL-visible bounded device-buffer resource identity/lifecycle and graph-aware GPU batch planning",
+    "workaround": "host serialized bit arrays per provider operation with persistent process/context/program",
+    "donor": "OpenCL cl_mem lifecycle plus K09/K10/K11 persistent ordered transport",
+    "gapType": [
+      "runtime-protocol",
+      "lowering-resource-ir",
+      "evidence"
+    ],
+    "generality": "generic Tensor matmul/gradient/optimizer graphs over OpenCL-like auxiliary providers",
+    "candidateAbsorption": "candidate resource contract and provider adapter first; RCL profile absorption only after lifecycle and differential evidence",
+    "affectedK400Cells": [
+      "K233 unchanged; no accelerator credit",
+      "accelerated Tensor/ML profiles remain outside the admitted matrix"
+    ]
+  },
+  "gateRuling": {
+    "EXPRESS": "CANDIDATE_AUDIT_ONLY",
+    "COMPILE": "NOT_RUN",
+    "LOWER": "NOT_RUN",
+    "EXECUTE": "NOT_RUN",
+    "CORRECT": "NOT_RUN",
+    "ROBUST": "NOT_RUN",
+    "PERFORMANCE": "NOT_EVALUATED",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_SOURCE_AUDIT_ONLY"
+  },
+  "openGaps": [
+    "RCL_GAP_GPU_BATCH_PLANNER",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "claimsGranted": [],
+  "claimsNotGranted": [
+    "OPENCL_DEVICE_BUFFER_RESIDENCY",
+    "OPENCL_CROSS_NODE_BATCHING",
+    "OPENCL_BATCHED_KERNELS",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ]
+}

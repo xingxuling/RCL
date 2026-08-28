@@ -596,7 +596,9 @@ residency or throughput claim is made. Real AMD `gfx1152` pair smoke matched
 individual child output bits and execution roots. K08 GPU-native backward/AdamW
 passed `3/3` with exact CPU checkpoint parity; telemetry records `338` logical
 requests, `217` transport dispatches, `108` gradient-pair batches and one
-AdamW batch. Hosted and post-merge verification are pending.
+AdamW batch. Hosted and post-merge verification are recorded below; the
+docs-only evidence merge at `3058de9` also passed Canonical `33143626197`,
+Universal Stress `33143626244` and Authority `33143626261` verification.
 
 | Evidence | Result |
 |---|---:|
@@ -622,5 +624,28 @@ Reproduction: `npm run test:k11-opencl-gradient-pair-batch` and
 batched kernels, device-buffer residency, parallel execution, throughput,
 generic portability, GPU training promotion, RCL-10M and K400 remain closed.
 Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
+`RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K12 AMD OpenCL next-boundary reality audit
+
+Status: `CANDIDATE_AUDIT_ONLY_DEVICE_RESIDENCY_AND_CROSS_NODE_PLANNER_NOT_READY`.
+The source audit at main `3058de9` confirms that K09/K10/K11 persist only the
+provider process, OpenCL context and program. Every child operation still
+creates and releases its own kernel, input buffers and output buffers, while
+RCL `DenseStorage` and `BoundTensor` remain host-side representations. The
+K08 GPU-native stress graph contains 36 forward GPU matmuls, 72 reverse
+matmul-gradient operations, 14 AdamW groups and more than 40 explicit CPU
+nodes. Therefore device-buffer residency is the next bounded candidate;
+cross-node batching is blocked behind a resource-aware planner and lifecycle
+contract. No K12 implementation, execution, throughput or K400 claim is
+admitted by this audit.
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-next-boundary-reality-audit-v0.1.md`
+- `examples/native-ai/gpu-opencl-next-boundary-audit.v0.1.json`
+
+Open gaps remain `RCL_GAP_GPU_BATCH_PLANNER`,
 `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
