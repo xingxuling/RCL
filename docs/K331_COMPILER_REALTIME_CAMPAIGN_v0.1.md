@@ -2,7 +2,7 @@
 
 ## Current verdict
 
-`PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`
+`PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_LOGICAL_TIME_AUTHORITY_BOUND`
 
 This campaign freezes one bounded `compiler-runtime::realtime` logical-time profile. RCL source owns event representation, total ordering, monotonic advance, event-budget atomicity, acceleration projection and explicit external-time admission. The salvaged JavaScript `LogicalTimeScheduler` is an auxiliary Runtime and differential Oracle; it does not own Canonical semantics or receive K400 credit by itself.
 
@@ -40,15 +40,15 @@ No wall-clock call or provider result enters Canonical state. This is determinis
 
 | Gate | Current result | Evidence |
 |---|---|---|
-| EXPRESS | local PASS candidate | logical-time semantics are canonical RCL source |
-| COMPILE | local PASS candidate | bootstrap and native compiler emit byte-identical RBC |
-| LOWER | local PASS candidate | generic Sequence/control-flow bytecode; no realtime-special opcode |
-| EXECUTE | local PASS candidate | native VM completed 20/20 local rounds |
-| CORRECT | local PASS candidate | auxiliary scheduler matches frozen order, budget and authority projection |
-| ROBUST | local PASS candidate | priority, monotonicity, budget, authority and corrupt-RBC controls fail closed |
-| PERFORMANCE | local PASS candidate | P95 compile `311.980 ms`, execute `40.656 ms`, combined `349.274 ms`, under frozen budgets |
-| AI_GENERATE | local CANDIDATE | three unique read-only sessions restored exact Canonical bytes; GitHub authority remains required |
-| EVIDENCE | local CANDIDATE | rooted local receipts exist; hosted Linux/Windows receipt is absent |
+| EXPRESS | PASS | logical-time semantics are canonical RCL source |
+| COMPILE | PASS | bootstrap and native compiler emit byte-identical RBC |
+| LOWER | PASS | generic Sequence/control-flow bytecode; no realtime-special opcode |
+| EXECUTE | PASS | native VM completed 20/20 rounds; GitHub Windows replay passed |
+| CORRECT | PASS | auxiliary scheduler matches frozen order, budget and authority projection |
+| ROBUST | PASS | priority, monotonicity, budget, authority and corrupt-RBC controls fail closed |
+| PERFORMANCE | PASS | P95 compile `311.980 ms`, execute `40.656 ms`, combined `349.274 ms`, under frozen budgets |
+| AI_GENERATE | PASS | three unique read-only sessions restored exact Canonical bytes; GitHub focused replay passed |
+| EVIDENCE | PASS | local roots are bound to exact GitHub push-run, job, step and source identities |
 
 Canonical roots:
 
@@ -57,6 +57,7 @@ Canonical roots:
 - semantic state `41fa543355ad9212ec22e8b10f2c979ee8137395c44c62a3bb9e995cf7005847`;
 - runtime report `94f6597d73c38a44568128081d2c1ead9c105068a42ef0a2e5e158f615c9895d`;
 - successful AI report `16c4f920c2a59d69a9935061da079e0886082143b3879420c27d8b52b63eb2a7`.
+- GitHub authority `033010acf7f2f0005466b1ff53ed1cf324f9e613ab25c783404e24d8e084408d`.
 
 The first independent acquisition produced an honest `2/3` result because the external-authority mutation was ambiguous about the rejection branch. That failed receipt remains preserved under `k331-compiler-realtime-ai-generate-failed-01`. After freezing the clearer `!= 0` mutation, three new unique sessions restored priority ordering, event-budget atomicity and exact capability admission to Canonical bytes.
 
@@ -65,16 +66,16 @@ The first independent acquisition produced an honest `2/3` result because the ex
 | Civilization | Artifact consequence |
 |---|---|
 | Founder Twin | reuses the existing scheduler Donor but assigns Canonical ownership to RCL |
-| 柳清莲 Gate | keeps local evidence candidate-only until exact hosted Linux and Windows replay |
+| 柳清莲 Gate | admits only the bounded profile after exact hosted Linux and Windows replay |
 | 洞哥 Grounding | distinguishes logical time from physical clocks and hard real-time claims |
 | Product | exposes stable rejection codes for backward time, budget, authority and invalid schedules |
 | UX | deterministic ordering makes replay and event inspection explainable |
 | Engineering / Code | keeps mature snapshot/runtime machinery in the auxiliary JS organ and generic semantics in RCL |
 | Test | covers order, boundaries, corrupt RBC, rooted snapshots, negative mutations and differential parity |
 | Security | external time cannot become authoritative without explicit temporal capability |
-| Release / Evidence Ledger | requires exact GitHub job and step identities before K331 admission |
+| Release / Evidence Ledger | binds GitHub run `33141180858`, focused job `98752173946`, Windows job `98752173843` and source `43d195d98e1bbd4066922bb47a1e24eed816f86b` |
 
-Integration Court verdict: `LOCAL_CANDIDATE_GITHUB_AUTHORITY_REQUIRED`. K331 remains `UNTESTED` in the authoritative matrix until the hosted receipt exists.
+Integration Court verdict: `PASS_BOUNDED_LOGICAL_TIME_PROFILE`. K331 is admitted for this profile only; physical-time and hard-real-time semantics remain outside the claim.
 
 ## License and diff audit
 
