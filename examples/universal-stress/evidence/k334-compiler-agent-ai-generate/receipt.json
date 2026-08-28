@@ -1,0 +1,388 @@
+{
+  "format": "rcl.k334.compiler-agent-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-28T03:01:56.260Z",
+  "contractRoot": "68f5621ff5130352c456fad3ec4bb5aade67e7e25ddfa5132a81dbdaa8c0cd2f",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K334"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "1415632161bb550c2740a4d6f2423f9aa9662ff6775ee5caeb2b5c5086bd24e3",
+    "contractRoot": "8c139fe41722e9f84cde13d8d482147fa1af99eb2983bf703b417bed63d5ba79"
+  },
+  "trials": [
+    {
+      "format": "rcl.k334.compiler-agent-ai-trial-receipt.v0.1",
+      "trialId": "K334-AI-REPAIR-01",
+      "mutationClass": "capability-gate",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a04648-714c-7f22-a731-810bc89175ee",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "action_capability(action) == granted_capability",
+        "new": "action_capability(action) != granted_capability",
+        "diagnosis": "The eligibility guard is inverted. Equal capabilities currently reject with -1, while mismatched capabilities proceed; changing the equality test to inequality makes capability mismatch fail closed and exact matches continue through budget, approval, and risk checks."
+      },
+      "promptRoot": "273173ac448db593fd86665542bc36452c07916b64cf185421449d797ea914fb",
+      "mutatedSourceSha256": "d4b322126e2ca575f03d9a3dbad2adf1fbeb7f00452998d52b1db8593c78d95b",
+      "candidateSourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "80a70a0b55a9c21a281a47f62ef130002b8ee0fcb80a4ccad474bdd1840eaca1",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a04648-714c-7f22-a731-810bc89175ee"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "86635adadef0ac8cfb8ca857b4b08630f4d890f902a09a0720dddc42d9763ccc"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "60f2fd22393ab0c9ed57891564cd7888f7c914786b9781746c8a29ee61f57efd"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 39391,
+            "cached_input_tokens": 20224,
+            "output_tokens": 750,
+            "reasoning_output_tokens": 451
+          }
+        }
+      ],
+      "finalMessageSha256": "60f2fd22393ab0c9ed57891564cd7888f7c914786b9781746c8a29ee61f57efd",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "43f0362d0c8d3e48d0d118a3c8d4a5d846a8ad04c19e23888bfee9865e8b0fee",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3",
+        "checks": {
+          "rcl-owns-agent-semantics": {
+            "pass": true
+          },
+          "deliberation-and-memory-expressed": {
+            "pass": true
+          },
+          "capability-budget-risk-authority-expressed": {
+            "pass": true
+          },
+          "commit-observe-kill-boundaries-expressed": {
+            "pass": true
+          },
+          "no-external-tool-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-goal-directed-selection": {
+            "pass": true
+          },
+          "native-observe-only-no-commit": {
+            "pass": true
+          },
+          "native-constraints-fail-closed": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "b22ae74e1cac648b419c9c3d8c75a7bc3f1e21456b1f7360fba3dc48d7fa4168"
+    },
+    {
+      "format": "rcl.k334.compiler-agent-ai-trial-receipt.v0.1",
+      "trialId": "K334-AI-REPAIR-02",
+      "mutationClass": "budget-boundary",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0464b-a435-7e13-a388-3da1f731667c",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "choose(action_cost(action) < budget,",
+        "new": "choose(action_cost(action) > budget,",
+        "diagnosis": "Budget eligibility is inverted: affordable actions are rejected and over-budget actions can commit. Replace the budget guard so only costs exceeding the bounded budget fail closed before selection/commit."
+      },
+      "promptRoot": "059ef14074aa820852a223e5acd2658144cd8006114f46cc7d3a4cf380f6da1a",
+      "mutatedSourceSha256": "715899f59df53d87222ebda0e5d1c20bbbb938c24ddc038f7e5adc4e1f690365",
+      "candidateSourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "315cddfb6899edcc8e57e8b982c55fb34ff9ffda8a1c39ec742380e2476bf942",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0464b-a435-7e13-a388-3da1f731667c"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "17997f1d906d611d8c1e341ec7251836512219a82e5001d4295df74f5a5b0005"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "622749e91c81a29e313998a15d9724e5d2a0828b4f21bc85fd534da061ec6d95"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 39366,
+            "cached_input_tokens": 20224,
+            "output_tokens": 541,
+            "reasoning_output_tokens": 251
+          }
+        }
+      ],
+      "finalMessageSha256": "622749e91c81a29e313998a15d9724e5d2a0828b4f21bc85fd534da061ec6d95",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "055278ee4908c895c68322240fa622f9ae99f21faf4153ed73df2060622a2a01",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3",
+        "checks": {
+          "rcl-owns-agent-semantics": {
+            "pass": true
+          },
+          "deliberation-and-memory-expressed": {
+            "pass": true
+          },
+          "capability-budget-risk-authority-expressed": {
+            "pass": true
+          },
+          "commit-observe-kill-boundaries-expressed": {
+            "pass": true
+          },
+          "no-external-tool-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-goal-directed-selection": {
+            "pass": true
+          },
+          "native-observe-only-no-commit": {
+            "pass": true
+          },
+          "native-constraints-fail-closed": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "2f4989eec3e69eee32d0d603a37e60aba6934a356c440e40769a277727407b0c"
+    },
+    {
+      "format": "rcl.k334.compiler-agent-ai-trial-receipt.v0.1",
+      "trialId": "K334-AI-REPAIR-03",
+      "mutationClass": "human-approval-gate",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0464e-7417-7562-8ab1-76e75157e26d",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "action_requires_approval(action) == 1 and human_approval == 1",
+        "new": "action_requires_approval(action) == 1 and human_approval == 0",
+        "diagnosis": "Approval guard is inverted: it rejects approval-required actions when approval is present, and allows them when approval is absent. Flip the human_approval comparison so missing approval fails closed with rejection code -3 and approved actions remain eligible."
+      },
+      "promptRoot": "2c3f51c5773dc5776501acdf0a6dffcad43244b22d6a5c117cf5c08f2491fc97",
+      "mutatedSourceSha256": "604e81790ab55a8f71adc3df44cbc856749c9c12d36e7440061b2131c9b1d002",
+      "candidateSourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "97ce63e573c0f03bed4c53b1964bb1e72f90430be3f71242390fa7691e39b9f1",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0464e-7417-7562-8ab1-76e75157e26d"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "ba32c1efb7188c7dc9e97fdc48f0563e2de7a8eaf3ba2508e040551c77ca5a82"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "aeac234ee241b4bcf474ed6dd8588fbcfc0390199a9b298703689f91bddb4d2f"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 39372,
+            "cached_input_tokens": 20224,
+            "output_tokens": 460,
+            "reasoning_output_tokens": 158
+          }
+        }
+      ],
+      "finalMessageSha256": "aeac234ee241b4bcf474ed6dd8588fbcfc0390199a9b298703689f91bddb4d2f",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "def04633a0a8f5af2199667b6226a4f1cb6bc5bd84f0973db112a16c6156ec36",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3",
+        "checks": {
+          "rcl-owns-agent-semantics": {
+            "pass": true
+          },
+          "deliberation-and-memory-expressed": {
+            "pass": true
+          },
+          "capability-budget-risk-authority-expressed": {
+            "pass": true
+          },
+          "commit-observe-kill-boundaries-expressed": {
+            "pass": true
+          },
+          "no-external-tool-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-goal-directed-selection": {
+            "pass": true
+          },
+          "native-observe-only-no-commit": {
+            "pass": true
+          },
+          "native-constraints-fail-closed": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "5128da2e3699c9ee4b7ae587fb9bc04f279d91de09a628a821c41b71ecc18d56"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_NATIVE_AGENT_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K334 capability, budget and approval gates and binds its 20-round native runtime receipt. It grants no arbitrary agent generation, LLM reasoning, external tool authority, durable memory, autonomous production operation, unrelated K400 cell or K400 completion.",
+  "reportRoot": "8b3b5105fd43c994dadcea68273090839d461569cfb958d7ba847e98d0373309"
+}

@@ -1,0 +1,122 @@
+{
+  "format": "rcl.k334.compiler-agent-ai-trial-receipt.v0.1",
+  "trialId": "K334-AI-REPAIR-02",
+  "mutationClass": "budget-boundary",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0464b-a435-7e13-a388-3da1f731667c",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "choose(action_cost(action) < budget,",
+    "new": "choose(action_cost(action) > budget,",
+    "diagnosis": "Budget eligibility is inverted: affordable actions are rejected and over-budget actions can commit. Replace the budget guard so only costs exceeding the bounded budget fail closed before selection/commit."
+  },
+  "promptRoot": "059ef14074aa820852a223e5acd2658144cd8006114f46cc7d3a4cf380f6da1a",
+  "mutatedSourceSha256": "715899f59df53d87222ebda0e5d1c20bbbb938c24ddc038f7e5adc4e1f690365",
+  "candidateSourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "315cddfb6899edcc8e57e8b982c55fb34ff9ffda8a1c39ec742380e2476bf942",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0464b-a435-7e13-a388-3da1f731667c"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "17997f1d906d611d8c1e341ec7251836512219a82e5001d4295df74f5a5b0005"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "622749e91c81a29e313998a15d9724e5d2a0828b4f21bc85fd534da061ec6d95"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39366,
+        "cached_input_tokens": 20224,
+        "output_tokens": 541,
+        "reasoning_output_tokens": 251
+      }
+    }
+  ],
+  "finalMessageSha256": "622749e91c81a29e313998a15d9724e5d2a0828b4f21bc85fd534da061ec6d95",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "055278ee4908c895c68322240fa622f9ae99f21faf4153ed73df2060622a2a01",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3",
+    "checks": {
+      "rcl-owns-agent-semantics": {
+        "pass": true
+      },
+      "deliberation-and-memory-expressed": {
+        "pass": true
+      },
+      "capability-budget-risk-authority-expressed": {
+        "pass": true
+      },
+      "commit-observe-kill-boundaries-expressed": {
+        "pass": true
+      },
+      "no-external-tool-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-goal-directed-selection": {
+        "pass": true
+      },
+      "native-observe-only-no-commit": {
+        "pass": true
+      },
+      "native-constraints-fail-closed": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "2f4989eec3e69eee32d0d603a37e60aba6934a356c440e40769a277727407b0c"
+}

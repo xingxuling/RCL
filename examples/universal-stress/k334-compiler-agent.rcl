@@ -1,0 +1,119 @@
+# K334: compiler-runtime agent bounded governed-deliberation profile.
+# RCL owns observation-to-action selection, capability and budget constraints,
+# human approval, kill-switch, bounded memory, commit and observe-only behavior.
+# External model and tool runtimes remain providers and are not exercised here.
+reality CompilerAgent {
+  reckon make_action(id : Number, capability : Number, utility : Number, evidence : Number, risk : Number, cost : Number, requires_approval : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), capability), utility), evidence), risk), cost), requires_approval)
+
+  reckon action_id(action : Sequence) -> Number = sequence_get(action, 0)
+  reckon action_capability(action : Sequence) -> Number = sequence_get(action, 1)
+  reckon action_utility(action : Sequence) -> Number = sequence_get(action, 2)
+  reckon action_evidence(action : Sequence) -> Number = sequence_get(action, 3)
+  reckon action_risk(action : Sequence) -> Number = sequence_get(action, 4)
+  reckon action_cost(action : Sequence) -> Number = sequence_get(action, 5)
+  reckon action_requires_approval(action : Sequence) -> Number = sequence_get(action, 6)
+
+  reckon action_score(action : Sequence) -> Number =
+    action_utility(action) + action_evidence(action) - action_risk(action) - action_cost(action)
+
+  reckon eligibility_code(action : Sequence, granted_capability : Number, budget : Number, max_risk : Number, human_approval : Number) -> Number =
+    choose(action_capability(action) != granted_capability,
+      0 - 1,
+      choose(action_cost(action) > budget,
+        0 - 2,
+        choose(action_requires_approval(action) == 1 and human_approval == 0,
+          0 - 3,
+          choose(action_risk(action) > max_risk,
+            0 - 5,
+            1))))
+
+  reckon make_deliberation(best_action : Sequence, best_score : Number, rejection_code : Number, considered : Number, memory : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), best_action), best_score), rejection_code), considered), memory)
+
+  reckon deliberation_action(deliberation : Sequence) -> Sequence = sequence_get(deliberation, 0)
+  reckon deliberation_score(deliberation : Sequence) -> Number = sequence_get(deliberation, 1)
+  reckon deliberation_rejection(deliberation : Sequence) -> Number = sequence_get(deliberation, 2)
+  reckon deliberation_considered(deliberation : Sequence) -> Number = sequence_get(deliberation, 3)
+  reckon deliberation_memory(deliberation : Sequence) -> Sequence = sequence_get(deliberation, 4)
+
+  reckon deliberate(actions : Sequence, cursor : Number, best_action : Sequence, best_score : Number, rejection_code : Number, considered : Number, memory : Sequence, granted_capability : Number, budget : Number, max_risk : Number, human_approval : Number) -> Sequence =
+    choose(cursor >= length(actions),
+      make_deliberation(best_action, best_score, rejection_code, considered, memory),
+      choose(eligibility_code(sequence_get(actions, cursor), granted_capability, budget, max_risk, human_approval) == 1,
+        choose(action_score(sequence_get(actions, cursor)) > best_score,
+          deliberate(actions, cursor + 1, sequence_get(actions, cursor), action_score(sequence_get(actions, cursor)), rejection_code, considered + 1, sequence_append(memory, action_id(sequence_get(actions, cursor))), granted_capability, budget, max_risk, human_approval),
+          deliberate(actions, cursor + 1, best_action, best_score, rejection_code, considered + 1, sequence_append(memory, action_id(sequence_get(actions, cursor))), granted_capability, budget, max_risk, human_approval)),
+        deliberate(actions, cursor + 1, best_action, best_score, eligibility_code(sequence_get(actions, cursor), granted_capability, budget, max_risk, human_approval), considered + 1, sequence_append(memory, 0 - action_id(sequence_get(actions, cursor))), granted_capability, budget, max_risk, human_approval)))
+
+  reckon make_result(code : Number, selected : Number, score : Number, spent : Number, memory : Sequence, committed : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), code), selected), score), spent), memory), committed)
+
+  reckon result_code(result : Sequence) -> Number = sequence_get(result, 0)
+  reckon result_selected(result : Sequence) -> Number = sequence_get(result, 1)
+  reckon result_score(result : Sequence) -> Number = sequence_get(result, 2)
+  reckon result_spent(result : Sequence) -> Number = sequence_get(result, 3)
+  reckon result_memory(result : Sequence) -> Sequence = sequence_get(result, 4)
+  reckon result_committed(result : Sequence) -> Number = sequence_get(result, 5)
+
+  reckon run_agent(actions : Sequence, granted_capability : Number, budget : Number, max_risk : Number, human_approval : Number, kill_switch : Number, observe_only : Number) -> Sequence =
+    choose(kill_switch == 1,
+      make_result(0 - 4, 0, 0, 0, sequence_append(empty_sequence(), 0 - 4), 0),
+      run_deliberation(deliberate(actions, 0, make_action(0, 0, 0, 0, 0, 0, 0), 0 - 1000, 0, 0, empty_sequence(), granted_capability, budget, max_risk, human_approval), observe_only))
+
+  reckon run_deliberation(deliberation : Sequence, observe_only : Number) -> Sequence =
+    choose(action_id(deliberation_action(deliberation)) == 0,
+      make_result(deliberation_rejection(deliberation), 0, 0, 0, deliberation_memory(deliberation), 0),
+      choose(observe_only == 1,
+        make_result(2, action_id(deliberation_action(deliberation)), deliberation_score(deliberation), 0, deliberation_memory(deliberation), 0),
+        make_result(1, action_id(deliberation_action(deliberation)), deliberation_score(deliberation), action_cost(deliberation_action(deliberation)), deliberation_memory(deliberation), 1)))
+
+  facet contract.id : Text = "k334-compiler-agent-v0.1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "NATIVE_RCLC_TO_RCLVM"
+  facet donor.agent : Text = "GOAL_DIRECTED_SELECTION_CAPABILITY_BUDGET_AUTHORITY_MEMORY"
+  facet boundary.profile : Text = "BOUNDED_DETERMINISTIC_DELIBERATION_NOT_LLM_OR_EXTERNAL_TOOL_RUNTIME"
+
+  facet actions.success : Sequence = sequence_append(sequence_append(
+    empty_sequence(), make_action(10, 1, 7, 4, 1, 2, 0)),
+    make_action(20, 1, 10, 6, 2, 3, 1))
+  facet actions.capability_denied : Sequence = sequence_append(empty_sequence(), make_action(30, 2, 9, 5, 1, 2, 0))
+  facet actions.budget_denied : Sequence = sequence_append(empty_sequence(), make_action(40, 1, 9, 5, 1, 8, 0))
+  facet actions.risk_denied : Sequence = sequence_append(empty_sequence(), make_action(50, 1, 12, 5, 7, 2, 0))
+  facet actions.unapproved : Sequence = sequence_append(empty_sequence(), make_action(20, 1, 10, 6, 2, 3, 1))
+
+  facet result.success : Sequence = run_agent(actions.success, 1, 5, 3, 1, 0, 0)
+  facet result.observe_only : Sequence = run_agent(actions.success, 1, 5, 3, 1, 0, 1)
+  facet result.capability_denied : Sequence = run_agent(actions.capability_denied, 1, 5, 3, 1, 0, 0)
+  facet result.budget_denied : Sequence = run_agent(actions.budget_denied, 1, 5, 3, 1, 0, 0)
+  facet result.unapproved : Sequence = run_agent(actions.unapproved, 1, 5, 3, 0, 0, 0)
+  facet result.risk_denied : Sequence = run_agent(actions.risk_denied, 1, 5, 3, 1, 0, 0)
+  facet result.kill_switch : Sequence = run_agent(actions.success, 1, 5, 3, 1, 1, 0)
+
+  facet evaluation.pass : Truth =
+    result_code(result.success) == 1 and
+    result_selected(result.success) == 20 and
+    result_score(result.success) == 11 and
+    result_spent(result.success) == 3 and
+    result_committed(result.success) == 1 and
+    length(result_memory(result.success)) == 2 and
+    sequence_get(result_memory(result.success), 0) == 10 and
+    sequence_get(result_memory(result.success), 1) == 20 and
+    result_code(result.observe_only) == 2 and
+    result_selected(result.observe_only) == 20 and
+    result_spent(result.observe_only) == 0 and
+    result_committed(result.observe_only) == 0 and
+    result_code(result.capability_denied) == 0 - 1 and
+    sequence_get(result_memory(result.capability_denied), 0) == 0 - 30 and
+    result_code(result.budget_denied) == 0 - 2 and
+    result_code(result.unapproved) == 0 - 3 and
+    result_code(result.kill_switch) == 0 - 4 and
+    result_code(result.risk_denied) == 0 - 5 and
+    result_committed(result.capability_denied) == 0 and
+    result_committed(result.budget_denied) == 0 and
+    result_committed(result.unapproved) == 0 and
+    result_committed(result.kill_switch) == 0 and
+    result_committed(result.risk_denied) == 0
+  facet evidence.no_external_tool_provider : Truth = true
+  facet evidence.ai_generate : Text = "UNVERIFIED_SEPARATE_GATE"
+}
