@@ -16,6 +16,7 @@ pub const BF16_AUTODIFF_PRECISION: &str = "bf16-rne-fp32-accumulation";
 const MAX_PARAMETERS: usize = 256;
 const MAX_TRAINING_STEPS: usize = 16_384;
 const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
+const MAX_PROVIDER_BATCH_REQUESTS: usize = 64;
 
 pub type ComputationGraph = ExecutionPlan;
 pub type Operation = PlanNode;
@@ -290,6 +291,7 @@ fn provider_error_code(value: &Value) -> &'static str {
         Some("RCL_OPENCL_ADAMW_CONFIG") => "RCL_OPENCL_ADAMW_CONFIG",
         Some("RCL_OPENCL_SHAPE") => "RCL_OPENCL_SHAPE",
         Some("RCL_OPENCL_KERNEL_BUILD") => "RCL_OPENCL_KERNEL_BUILD",
+        Some("RCL_OPENCL_BATCH") => "RCL_OPENCL_BATCH",
         _ => "RCL_ACCELERATOR_EXECUTION_FAILED",
     }
 }
@@ -303,6 +305,8 @@ pub struct OpenClProviderSession {
     stdin: ChildStdin,
     stdout: BufReader<ChildStdout>,
     request_count: usize,
+    dispatch_count: usize,
+    batch_count: usize,
 }
 
 impl OpenClProviderSession {
@@ -353,6 +357,8 @@ impl OpenClProviderSession {
             stdin,
             stdout: BufReader::new(stdout),
             request_count: 0,
+            dispatch_count: 0,
+            batch_count: 0,
         })
     }
 
@@ -360,7 +366,15 @@ impl OpenClProviderSession {
         self.request_count
     }
 
-    pub fn execute(&mut self, payload: &Value) -> Result<Value, EngineError> {
+    pub fn dispatch_count(&self) -> usize {
+        self.dispatch_count
+    }
+
+    pub fn batch_count(&self) -> usize {
+        self.batch_count
+    }
+
+    fn send(&mut self, payload: &Value) -> Result<Value, EngineError> {
         let encoded = serde_json::to_vec(payload).map_err(|error| {
             EngineError::new(
                 "RCL_ACCELERATOR_REQUEST_JSON",
@@ -405,7 +419,7 @@ impl OpenClProviderSession {
                 format!("OpenCL provider session closed unexpectedly{state}"),
             ));
         }
-        self.request_count = self.request_count.checked_add(1).ok_or_else(|| {
+        self.dispatch_count = self.dispatch_count.checked_add(1).ok_or_else(|| {
             EngineError::new(
                 "RCL_ACCELERATOR_EXECUTION_FAILED",
                 "OpenCL provider session request accounting overflowed",
@@ -428,6 +442,76 @@ impl OpenClProviderSession {
             ));
         }
         Ok(response)
+    }
+
+    pub fn execute(&mut self, payload: &Value) -> Result<Value, EngineError> {
+        let response = self.send(payload)?;
+        self.request_count = self.request_count.checked_add(1).ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                "OpenCL provider session request accounting overflowed",
+            )
+        })?;
+        Ok(response)
+    }
+
+    pub fn execute_batch(&mut self, payloads: &[Value]) -> Result<Vec<Value>, EngineError> {
+        if payloads.is_empty() || payloads.len() > MAX_PROVIDER_BATCH_REQUESTS {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BATCH_INVALID",
+                format!(
+                    "OpenCL provider batch must contain 1..={MAX_PROVIDER_BATCH_REQUESTS} requests"
+                ),
+            ));
+        }
+        let response = self.send(&json!({
+            "format": "rcl.opencl-amd-batch-request.v0.1",
+            "backend": "opencl-amd",
+            "requests": payloads,
+        }))?;
+        if response.get("format").and_then(Value::as_str)
+            != Some("rcl.opencl-amd-batch-result.v0.1")
+            || response.get("status").and_then(Value::as_str)
+                != Some("PASS_LOCAL_GPU_BATCH_REFERENCE_CANDIDATE")
+            || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+            || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL provider did not return an admitted GPU batch result",
+            ));
+        }
+        let responses = response
+            .get("responses")
+            .and_then(Value::as_array)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_RESPONSE_INVALID",
+                    "OpenCL provider batch result omitted responses",
+                )
+            })?;
+        if responses.len() != payloads.len() {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL provider batch response length mismatch",
+            ));
+        }
+        self.request_count = self
+            .request_count
+            .checked_add(payloads.len())
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_EXECUTION_FAILED",
+                    "OpenCL provider session request accounting overflowed",
+                )
+            })?;
+        self.batch_count = self.batch_count.checked_add(1).ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                "OpenCL provider batch accounting overflowed",
+            )
+        })?;
+        Ok(responses.to_vec())
     }
 }
 

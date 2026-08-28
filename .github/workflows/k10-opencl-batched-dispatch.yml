@@ -1,0 +1,42 @@
+name: K10 AMD OpenCL Batched Dispatch
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k10-opencl-batched-dispatch.test.mjs'
+      - 'examples/native-ai/gpu-opencl-batched-dispatch-*'
+      - 'package.json'
+      - '.github/workflows/k10-opencl-batched-dispatch.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k10-opencl-batched-dispatch.test.mjs'
+      - 'examples/native-ai/gpu-opencl-batched-dispatch-*'
+      - 'package.json'
+      - '.github/workflows/k10-opencl-batched-dispatch.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  batched-dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Build tensor engine
+        run: cargo build --release --locked --manifest-path native/tensor-engine/Cargo.toml --bin rcl-bf16-autodiff-adamw --bin rcl-rope-frame
+      - name: Run K10 batched provider smoke
+        run: npm run test:k10-opencl-batched-dispatch

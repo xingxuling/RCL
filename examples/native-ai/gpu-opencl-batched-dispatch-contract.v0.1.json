@@ -1,0 +1,58 @@
+{
+  "format": "rcl.k10.opencl-amd-batched-dispatch-contract.v0.1",
+  "status": "OPENCL_AMD_BATCHED_DISPATCH_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-BACKWARD-ADAMW-BATCHED-TRANSPORT",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "operations": ["matmul", "reverse-matmul-gradient", "adamw"],
+    "precision": "BF16 forward with FP32 accumulation, gradients, master weights and optimizer state",
+    "providerRole": "auxiliary OpenCL lowering and batched transport only",
+    "fallback": "forbidden"
+  },
+  "transport": {
+    "format": "rcl.opencl-amd-batch-request.v0.1",
+    "scope": "one ordered RCL training dispatch",
+    "maxOperations": 64,
+    "reusedResources": ["provider-process", "OpenCL-context", "OpenCL-program"],
+    "perOperationIsolation": ["kernel", "input-buffers", "output-buffers"]
+  },
+  "integration": {
+    "enabledOperation": "adamw-update",
+    "logicalRequestAccounting": "preserved",
+    "dispatchAccounting": "one transport message per batch",
+    "childExecution": "ordered through the same persistent OpenCL runtime"
+  },
+  "acceptance": [
+    "bounded batch accepts 1..64 admitted child requests",
+    "batch child results are exact-equivalent to individual provider results",
+    "GPU AdamW updates preserve CPU checkpoint and optimizer-state parity",
+    "provider and device failures remain fail-closed"
+  ],
+  "evidence": [
+    "real AMD OpenCL batch protocol smoke",
+    "GPU-native multi-block GQA+RoPE backward and AdamW differential",
+    "logical-request versus transport-dispatch telemetry",
+    "hosted Linux and Windows replay",
+    "post-merge canonical verification"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_BATCHED_ADAMW_DISPATCH_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_BF16_BATCHED_KERNELS",
+    "OPENCL_DEVICE_BUFFER_RESIDENCY",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_BATCH_PLANNER",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_THROUGHPUT_OR_RCL10M_PROMOTION"
+}
