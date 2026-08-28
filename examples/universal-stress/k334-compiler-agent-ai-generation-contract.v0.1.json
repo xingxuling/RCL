@@ -1,0 +1,52 @@
+{
+  "format": "rcl.k334.compiler-agent-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": ["K334"],
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k334-compiler-agent.rcl",
+    "sourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+    "candidateReportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k334-compiler-agent-runtime-v0.1.json",
+    "reportRoot": "1415632161bb550c2740a4d6f2423f9aa9662ff6775ee5caeb2b5c5086bd24e3"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.117.0"
+  },
+  "trials": [
+    {
+      "id": "K334-AI-REPAIR-01",
+      "mutationClass": "capability-gate",
+      "semanticInvariant": "An action is eligible only when its required capability exactly matches the granted capability."
+    },
+    {
+      "id": "K334-AI-REPAIR-02",
+      "mutationClass": "budget-boundary",
+      "semanticInvariant": "An action whose cost exceeds the bounded budget must be rejected before commit."
+    },
+    {
+      "id": "K334-AI-REPAIR-03",
+      "mutationClass": "human-approval-gate",
+      "semanticInvariant": "An action requiring human approval must not commit when approval is absent."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true,
+    "githubWindowsRuntimeReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K334 capability, budget and approval gates and binds its 20-round native runtime receipt. It grants no arbitrary agent generation, LLM reasoning, external tool authority, durable memory, autonomous production operation, unrelated K400 cell or K400 completion."
+}

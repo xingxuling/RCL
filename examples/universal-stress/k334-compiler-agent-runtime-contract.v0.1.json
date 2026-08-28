@@ -1,0 +1,49 @@
+{
+  "format": "rcl.k334.compiler-agent-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": ["K334"],
+  "coordinates": ["compiler-runtime::agent"],
+  "canonicalOwner": "RCL",
+  "donor": "BOUNDED_AGENT_DELIBERATION_AND_AUTHORITY_SEMANTICS",
+  "profile": "NATIVE_BOUNDED_GOVERNED_AGENT_DELIBERATION",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k334-compiler-agent.rcl",
+    "sourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "51147d3c3c690023e2620a59fe74e006b4b3a99770deed8797d8b7ec1e960a82",
+    "semanticStateRoot": "867748492f160fb8156f3e92dfef61d4c2fe3092cb31f1c64fee6096d5d189ff",
+    "candidateReportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3"
+  },
+  "expectedProjection": {
+    "success": [1, 20, 11, 3, [10, 20], 1],
+    "observeOnly": [2, 20, 11, 0, [10, 20], 0],
+    "capabilityDenied": [-1, 0, 0, 0, [-30], 0],
+    "budgetDenied": [-2, 0, 0, 0, [-40], 0],
+    "unapproved": [-3, 0, 0, 0, [-20], 0],
+    "riskDenied": [-5, 0, 0, 0, [-50], 0],
+    "killSwitch": [-4, 0, 0, 0, [-4], 0]
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "capability-mutation-rejected",
+      "budget-mutation-rejected",
+      "approval-mutation-rejected",
+      "selection-mutation-rejected",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K334 compiler-runtime::agent for one bounded deterministic observation/action selection, capability, budget, risk, approval, kill-switch, memory and commit profile. It grants no LLM reasoning, external tool execution, network access, durable memory, autonomous production authority, unrelated K400 cell or K400 completion."
+}

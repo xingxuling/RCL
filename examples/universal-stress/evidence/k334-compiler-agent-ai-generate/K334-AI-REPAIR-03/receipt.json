@@ -1,0 +1,122 @@
+{
+  "format": "rcl.k334.compiler-agent-ai-trial-receipt.v0.1",
+  "trialId": "K334-AI-REPAIR-03",
+  "mutationClass": "human-approval-gate",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0464e-7417-7562-8ab1-76e75157e26d",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "action_requires_approval(action) == 1 and human_approval == 1",
+    "new": "action_requires_approval(action) == 1 and human_approval == 0",
+    "diagnosis": "Approval guard is inverted: it rejects approval-required actions when approval is present, and allows them when approval is absent. Flip the human_approval comparison so missing approval fails closed with rejection code -3 and approved actions remain eligible."
+  },
+  "promptRoot": "2c3f51c5773dc5776501acdf0a6dffcad43244b22d6a5c117cf5c08f2491fc97",
+  "mutatedSourceSha256": "604e81790ab55a8f71adc3df44cbc856749c9c12d36e7440061b2131c9b1d002",
+  "candidateSourceSha256": "8b1503eed14d7c653560a3ce9ef549b2af7ff4d82918e508d100dcaa1241f843",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "97ce63e573c0f03bed4c53b1964bb1e72f90430be3f71242390fa7691e39b9f1",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0464e-7417-7562-8ab1-76e75157e26d"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "ba32c1efb7188c7dc9e97fdc48f0563e2de7a8eaf3ba2508e040551c77ca5a82"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "aeac234ee241b4bcf474ed6dd8588fbcfc0390199a9b298703689f91bddb4d2f"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39372,
+        "cached_input_tokens": 20224,
+        "output_tokens": 460,
+        "reasoning_output_tokens": 158
+      }
+    }
+  ],
+  "finalMessageSha256": "aeac234ee241b4bcf474ed6dd8588fbcfc0390199a9b298703689f91bddb4d2f",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "def04633a0a8f5af2199667b6226a4f1cb6bc5bd84f0973db112a16c6156ec36",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "b9319da03406c6e2a25f228ef4ba61f35bd18e61163d1a12527413b39f6ad5b3",
+    "checks": {
+      "rcl-owns-agent-semantics": {
+        "pass": true
+      },
+      "deliberation-and-memory-expressed": {
+        "pass": true
+      },
+      "capability-budget-risk-authority-expressed": {
+        "pass": true
+      },
+      "commit-observe-kill-boundaries-expressed": {
+        "pass": true
+      },
+      "no-external-tool-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-goal-directed-selection": {
+        "pass": true
+      },
+      "native-observe-only-no-commit": {
+        "pass": true
+      },
+      "native-constraints-fail-closed": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "5128da2e3699c9ee4b7ae587fb9bc04f279d91de09a628a821c41b71ecc18d56"
+}
