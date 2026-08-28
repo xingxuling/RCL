@@ -2,7 +2,7 @@
   "schema": "rcl.native-ai.gpu-opencl-cross-node-gradient-batch.evidence.v0.1",
   "campaign": "RCL Native LLM Campaign",
   "task": "K12",
-  "status": "PASS_LOCAL_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_HOSTED_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING",
   "canonicalOwner": "RCL",
   "implementationCommit": "bb0e8c46dde7241e6184059f4b82416a4828aaa4",
   "branch": "codex/k12-opencl-cross-node-batch-v01",
@@ -70,7 +70,29 @@
     "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_DONOR_CODE"
   },
   "hostedReplay": {
-    "status": "PENDING"
+    "status": "PASS_EXACT_HEAD",
+    "head": "f7257091c8178d6c8f813d8d0ba8faaf34543ac8",
+    "k12Run": {
+      "runId": 33186294873,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 98900043188, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 98900043219, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33186294809, "jobId": 98900042566, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33186294821, "jobId": 98900042892, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33186294829, "jobId": 98900042972, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33186294878,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 98900043321, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 98900042950, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33186294825, "jobId": 98900042768, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33186294855, "jobId": 98900042862, "conclusion": "SUCCESS" }
   },
   "postMergeVerification": {
     "status": "PENDING"
@@ -90,7 +112,7 @@
     "ROBUST": "PASS_LOCAL",
     "PERFORMANCE": "DISPATCH_COUNT_ONLY_NO_THROUGHPUT_CLAIM",
     "AI_GENERATE": "NOT_APPLICABLE",
-    "EVIDENCE": "CANDIDATE_HOSTED_PENDING"
+    "EVIDENCE": "CANDIDATE_HOSTED_BOUND"
   },
   "claimsGranted": [
     "OPENCL_AMD_CROSS_NODE_GRADIENT_BATCHED_DISPATCH_CANDIDATE"
@@ -112,5 +134,5 @@
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
   "authority": "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_PARALLEL_EXECUTION_THROUGHPUT_OR_RCL10M_PROMOTION",
-  "reportRoot": "f7b41aed9992e73b36aa3a442cd1bc28da326cc3a0f60075404f67735c10a16e"
+  "reportRoot": "4f9e841ef86f6035419295bcee1b5a56ce441162255e4b8b5527ebd53f987d3f"
 }
