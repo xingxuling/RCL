@@ -335,7 +335,7 @@ Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 
 ## K11 AMD OpenCL gradient pair batch candidate
 
-Status: `PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
 K11 reuses the K10 bounded ordered batch transport for exactly the two
 reverse-matmul gradient children of one GPU matmul node, in the fixed order
 `left-gradient`, `right-gradient`. It does not batch across nodes, change RCL
@@ -348,7 +348,10 @@ plus one AdamW batch. This is dispatch evidence, not throughput evidence.
 Hosted replay for exact head `5838471265383762c858a6c4630e217c0e7eed28` passed:
 K11 `33140897123`, K10 `33140897173`, K09 `33140897078`, Universal Stress
 `33140897113` (including Windows K01), Canonical `33140897161` and Authority
-`33140897104`. Post-merge main verification is pending. Authority:
+`33140897104`. Post-merge main verification passed at
+`e17cca7e1f4ee613acbad3e2f720cf65f6056218`: K11 `33142026819`, K10
+`33142026818`, K09 `33142026797`, Universal Stress `33142026794`, Canonical
+`33142026816` and Authority `33142026811`. Authority:
 `docs/native-ai/gpu-opencl-gradient-pair-batch-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-gradient-pair-batch-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-gradient-pair-batch-genome.rcl` and
