@@ -461,45 +461,91 @@ def select_amd_device(cl: OpenCL) -> tuple[CLHandle, CLHandle]:
     )
 
 
+class OpenCLRuntime:
+    """One bounded OpenCL context/program reused by a provider session."""
+
+    def __init__(self) -> None:
+        self.cl = OpenCL()
+        self.platform, self.device = select_amd_device(self.cl)
+        self.device_info = self.cl.device_receipt(self.platform, self.device)
+        self.context = self.queue = self.program = None
+        try:
+            properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, self.platform.value, 0)
+            code = CLInt()
+            self.context = self.cl.create_context(
+                properties,
+                1,
+                ctypes.byref(self.device),
+                None,
+                None,
+                ctypes.byref(code),
+            )
+            check(code.value, "clCreateContext")
+            self.queue = self.cl.create_command_queue(
+                self.context,
+                self.device,
+                0,
+                ctypes.byref(code),
+            )
+            check(code.value, "clCreateCommandQueue")
+            source = KERNEL.encode("utf-8")
+            source_array = (ctypes.c_char_p * 1)(source)
+            lengths = (CLSize * 1)(len(source))
+            self.program = self.cl.create_program(
+                self.context,
+                1,
+                source_array,
+                lengths,
+                ctypes.byref(code),
+            )
+            check(code.value, "clCreateProgramWithSource")
+            build_code = self.cl.build_program(
+                self.program,
+                1,
+                ctypes.byref(self.device),
+                b"-cl-fp32-correctly-rounded-divide-sqrt",
+                None,
+                None,
+            )
+            if build_code != CL_SUCCESS:
+                raise fail(
+                    "RCL_OPENCL_KERNEL_BUILD",
+                    "clBuildProgram returned OpenCL error "
+                    f"{build_code}; build log: {self.cl.build_log(self.program, self.device)}",
+                )
+        except Exception:
+            self.close()
+            raise
+
+    def close(self) -> None:
+        if self.program is not None:
+            self.cl.release_program(self.program)
+            self.program = None
+        if self.queue is not None:
+            self.cl.release_queue(self.queue)
+            self.queue = None
+        if self.context is not None:
+            self.cl.release_context(self.context)
+            self.context = None
+
+
 def run_opencl_kernel(
     kernel_name: str,
     input_specs: list[tuple[str, list[int] | list[float]]],
     output_specs: list[tuple[str, int]],
     scalar_specs: list[tuple[Any, int | float]],
     global_size: tuple[int, ...],
+    runtime: OpenCLRuntime | None = None,
 ) -> tuple[dict[str, str], list[list[int] | list[float]]]:
-    cl = OpenCL()
-    platform, device = select_amd_device(cl)
-    device_info = cl.device_receipt(platform, device)
-    context = queue = program = kernel = None
+    owned_runtime = runtime is None
+    active_runtime = runtime or OpenCLRuntime()
+    cl = active_runtime.cl
+    kernel = None
     buffers: list[CLHandle] = []
     host_outputs: list[Any] = []
     try:
-        properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, platform.value, 0)
         code = CLInt()
-        context = cl.create_context(properties, 1, ctypes.byref(device), None, None, ctypes.byref(code))
-        check(code.value, "clCreateContext")
-        queue = cl.create_command_queue(context, device, 0, ctypes.byref(code))
-        check(code.value, "clCreateCommandQueue")
-        source = KERNEL.encode("utf-8")
-        source_array = (ctypes.c_char_p * 1)(source)
-        lengths = (CLSize * 1)(len(source))
-        program = cl.create_program(context, 1, source_array, lengths, ctypes.byref(code))
-        check(code.value, "clCreateProgramWithSource")
-        build_code = cl.build_program(
-            program,
-            1,
-            ctypes.byref(device),
-            b"-cl-fp32-correctly-rounded-divide-sqrt",
-            None,
-            None,
-        )
-        if build_code != CL_SUCCESS:
-            raise fail(
-                "RCL_OPENCL_KERNEL_BUILD",
-                f"clBuildProgram returned OpenCL error {build_code}; build log: {cl.build_log(program, device)}",
-            )
-        kernel = cl.create_kernel(program, kernel_name.encode("ascii"), ctypes.byref(code))
+        kernel = cl.create_kernel(active_runtime.program, kernel_name.encode("ascii"), ctypes.byref(code))
         check(code.value, f"clCreateKernel:{kernel_name}")
 
         for kind, values in input_specs:
@@ -507,7 +553,7 @@ def run_opencl_kernel(
             host_data = (array_type * len(values))(*values)
             flags = CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR
             buffer = cl.create_buffer(
-                context,
+                active_runtime.context,
                 flags,
                 ctypes.sizeof(host_data),
                 ctypes.cast(host_data, ctypes.c_void_p),
@@ -520,7 +566,7 @@ def run_opencl_kernel(
             array_type = ctypes.c_uint16 if kind == "u16" else ctypes.c_float
             host_data = (array_type * length)()
             buffer = cl.create_buffer(
-                context,
+                active_runtime.context,
                 CL_MEM_WRITE_ONLY,
                 ctypes.sizeof(host_data),
                 None,
@@ -545,15 +591,15 @@ def run_opencl_kernel(
 
         global_values = (CLSize * len(global_size))(*global_size)
         check(
-            cl.enqueue_kernel(queue, kernel, len(global_size), None, global_values, None, 0, None, None),
+            cl.enqueue_kernel(active_runtime.queue, kernel, len(global_size), None, global_values, None, 0, None, None),
             f"clEnqueueNDRangeKernel:{kernel_name}",
         )
-        check(cl.finish(queue), f"clFinish:{kernel_name}")
+        check(cl.finish(active_runtime.queue), f"clFinish:{kernel_name}")
         for index, (host_data, (_, length)) in enumerate(zip(host_outputs, output_specs)):
             output_buffer = buffers[len(input_specs) + index]
             check(
                 cl.enqueue_read(
-                    queue,
+                    active_runtime.queue,
                     output_buffer,
                     1,
                     0,
@@ -565,21 +611,17 @@ def run_opencl_kernel(
                 ),
                 f"clEnqueueReadBuffer:{kernel_name}:{index}",
             )
-            check(cl.finish(queue), f"clFinish:read:{kernel_name}:{index}")
+            check(cl.finish(active_runtime.queue), f"clFinish:read:{kernel_name}:{index}")
             if len(host_data) != length:
                 raise fail("RCL_OPENCL_SHAPE", f"OpenCL output length mismatch for {kernel_name}")
-        return device_info, [list(host_data) for host_data in host_outputs]
+        return active_runtime.device_info, [list(host_data) for host_data in host_outputs]
     finally:
         for buffer in reversed(buffers):
             cl.release_mem(buffer)
         if kernel is not None:
             cl.release_kernel(kernel)
-        if program is not None:
-            cl.release_program(program)
-        if queue is not None:
-            cl.release_queue(queue)
-        if context is not None:
-            cl.release_context(context)
+        if owned_runtime:
+            active_runtime.close()
 
 
 def gradient_dimensions(request: dict[str, Any]) -> tuple[int, int, int, int]:
@@ -623,7 +665,10 @@ def gradient_result(
     }
 
 
-def run_gradient(request: dict[str, Any]) -> dict[str, Any]:
+def run_gradient(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
     if request.get("format") != GRADIENT_REQUEST_FORMAT:
         raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 gradient request format")
     if request.get("backend") != BACKEND:
@@ -645,6 +690,7 @@ def run_gradient(request: dict[str, Any]) -> dict[str, Any]:
             [("f32", rows * columns)],
             [(CLUint, rows), (CLUint, columns), (CLUint, shared), (CLUint, right_columns)],
             (rows, columns),
+            runtime,
         )
     else:
         rows, columns, shared = left_columns, right_columns, left_rows
@@ -654,11 +700,15 @@ def run_gradient(request: dict[str, Any]) -> dict[str, Any]:
             [("f32", rows * columns)],
             [(CLUint, rows), (CLUint, columns), (CLUint, shared), (CLUint, left_columns)],
             (rows, columns),
+            runtime,
         )
     return gradient_result(operation, device, outputs[0], rows, columns)
 
 
-def run_adamw(request: dict[str, Any]) -> dict[str, Any]:
+def run_adamw(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
     if request.get("format") != ADAMW_REQUEST_FORMAT:
         raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL AdamW request format")
     if request.get("backend") != BACKEND:
@@ -695,6 +745,7 @@ def run_adamw(request: dict[str, Any]) -> dict[str, Any]:
             (ctypes.c_float, scalars["gradientClip"]),
         ],
         (length,),
+        runtime,
     )
     output_hex = [[f"{f32_bits(value):08x}" for value in output] for output in outputs]
     digest = hashlib.sha256()
@@ -720,12 +771,12 @@ def run_adamw(request: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def run(request: dict[str, Any]) -> dict[str, Any]:
+def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[str, Any]:
     request_format = request.get("format")
     if request_format == GRADIENT_REQUEST_FORMAT:
-        return run_gradient(request)
+        return run_gradient(request, runtime)
     if request_format == ADAMW_REQUEST_FORMAT:
-        return run_adamw(request)
+        return run_adamw(request, runtime)
     if request_format != REQUEST_FORMAT:
         raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 request format")
     if request.get("backend") != BACKEND:
@@ -744,136 +795,69 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     if len(left) != rows * shared or len(right) != shared * columns:
         raise fail("RCL_OPENCL_SHAPE", "BF16 bit payload length does not match matrix shape")
 
-    cl = OpenCL()
-    platform, device = select_amd_device(cl)
-    device_info = cl.device_receipt(platform, device)
-    context = queue = program = kernel = left_buffer = right_buffer = output_buffer = None
-    try:
-        properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, platform.value, 0)
-        code = CLInt()
-        context = cl.create_context(properties, 1, ctypes.byref(device), None, None, ctypes.byref(code))
-        check(code.value, "clCreateContext")
-        queue = cl.create_command_queue(context, device, 0, ctypes.byref(code))
-        check(code.value, "clCreateCommandQueue")
-        source = KERNEL.encode("utf-8")
-        source_array = (ctypes.c_char_p * 1)(source)
-        lengths = (CLSize * 1)(len(source))
-        program = cl.create_program(context, 1, source_array, lengths, ctypes.byref(code))
-        check(code.value, "clCreateProgramWithSource")
-        build_code = cl.build_program(
-            program,
-            1,
-            ctypes.byref(device),
-            b"-cl-fp32-correctly-rounded-divide-sqrt",
-            None,
-            None,
-        )
-        if build_code != CL_SUCCESS:
-            raise fail(
-                "RCL_OPENCL_KERNEL_BUILD",
-                f"clBuildProgram returned OpenCL error {build_code}; build log: {cl.build_log(program, device)}",
-            )
-        kernel = cl.create_kernel(program, b"rcl_bf16_matmul", ctypes.byref(code))
-        check(code.value, "clCreateKernel")
-        left_data = (ctypes.c_uint16 * len(left))(*left)
-        right_data = (ctypes.c_uint16 * len(right))(*right)
-        output_data = (ctypes.c_uint16 * (rows * columns))()
-        left_buffer = cl.create_buffer(
-            context,
-            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-            ctypes.sizeof(left_data),
-            ctypes.cast(left_data, ctypes.c_void_p),
-            ctypes.byref(code),
-        )
-        check(code.value, "clCreateBuffer:left")
-        right_buffer = cl.create_buffer(
-            context,
-            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-            ctypes.sizeof(right_data),
-            ctypes.cast(right_data, ctypes.c_void_p),
-            ctypes.byref(code),
-        )
-        check(code.value, "clCreateBuffer:right")
-        output_buffer = cl.create_buffer(
-            context,
-            CL_MEM_WRITE_ONLY,
-            ctypes.sizeof(output_data),
-            None,
-            ctypes.byref(code),
-        )
-        check(code.value, "clCreateBuffer:output")
+    device, outputs = run_opencl_kernel(
+        "rcl_bf16_matmul",
+        [("u16", left), ("u16", right)],
+        [("u16", rows * columns)],
+        [(CLUint, rows), (CLUint, columns), (CLUint, shared)],
+        (rows, columns),
+        runtime,
+    )
+    output_bits = [int(value) for value in outputs[0]]
+    if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
+        raise fail("RCL_OPENCL_BF16_NONFINITE", "OpenCL BF16 output is non-finite")
+    output_hex = [bits_hex(bits) for bits in output_bits]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-matmul-v0.1\0")
+    digest.update(device["deviceName"].encode("utf-8"))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "device": device,
+        "outputBits": output_hex,
+        "outputData": [bf16_value(bits) for bits in output_bits],
+        "executionRoot": digest.hexdigest(),
+    }
 
-        for index, buffer in enumerate((left_buffer, right_buffer, output_buffer)):
-            argument = CLHandle(buffer)
-            check(
-                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
-                f"clSetKernelArg:buffer:{index}",
-            )
-        for index, value in enumerate((rows, columns, shared), start=3):
-            argument = CLUint(value)
-            check(
-                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
-                f"clSetKernelArg:dimension:{index}",
-            )
-        global_size = (CLSize * 2)(rows, columns)
-        check(
-            cl.enqueue_kernel(queue, kernel, 2, None, global_size, None, 0, None, None),
-            "clEnqueueNDRangeKernel",
-        )
-        check(cl.finish(queue), "clFinish")
-        check(
-            cl.enqueue_read(
-                queue,
-                output_buffer,
-                1,
-                0,
-                ctypes.sizeof(output_data),
-                ctypes.cast(output_data, ctypes.c_void_p),
-                0,
-                None,
-                None,
-            ),
-            "clEnqueueReadBuffer",
-        )
-        check(cl.finish(queue), "clFinish:read")
-        output_bits = [int(value) for value in output_data]
-        if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
-            raise fail("RCL_OPENCL_BF16_NONFINITE", "OpenCL BF16 output is non-finite")
-        output_hex = [bits_hex(bits) for bits in output_bits]
-        digest = hashlib.sha256()
-        digest.update(b"rcl.opencl-bf16-matmul-v0.1\0")
-        digest.update(device_info["deviceName"].encode("utf-8"))
-        for bits in output_hex:
-            digest.update(bits.encode("ascii"))
-        return {
-            "format": RESULT_FORMAT,
-            "status": "PASS_LOCAL_GPU_REFERENCE_CANDIDATE",
-            "backend": BACKEND,
-            "gpuExecuted": True,
-            "gpuClaim": False,
-            "device": device_info,
-            "outputBits": output_hex,
-            "outputData": [bf16_value(bits) for bits in output_bits],
-            "executionRoot": digest.hexdigest(),
-        }
-    finally:
-        if output_buffer is not None:
-            cl.release_mem(output_buffer)
-        if right_buffer is not None:
-            cl.release_mem(right_buffer)
-        if left_buffer is not None:
-            cl.release_mem(left_buffer)
-        if kernel is not None:
-            cl.release_kernel(kernel)
-        if program is not None:
-            cl.release_program(program)
-        if queue is not None:
-            cl.release_queue(queue)
-        if context is not None:
-            cl.release_context(context)
+
+def serve_session() -> int:
+    """Serve newline-delimited requests while reusing one OpenCL runtime."""
+    runtime: OpenCLRuntime | None = None
+    for raw in sys.stdin:
+        if not raw.strip():
+            continue
+        try:
+            request = json.loads(raw)
+            if runtime is None:
+                runtime = OpenCLRuntime()
+            response = run(request, runtime)
+        except ProviderError as error:
+            response = {"status": "error", "code": error.code, "message": error.message}
+            if error.code in {
+                "RCL_OPENCL_BACKEND_UNAVAILABLE",
+                "RCL_OPENCL_AMD_DEVICE_REQUIRED",
+                "RCL_OPENCL_SYMBOL_UNAVAILABLE",
+                "RCL_OPENCL_KERNEL_BUILD",
+            }:
+                if runtime is not None:
+                    runtime.close()
+                runtime = None
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+            response = {"status": "error", "code": "RCL_OPENCL_REQUEST", "message": str(error)}
+        print(json.dumps(response, separators=(",", ":"), ensure_ascii=False), flush=True)
+    if runtime is not None:
+        runtime.close()
+    return 0
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--session":
+        return serve_session()
     try:
         argument = sys.argv[1] if len(sys.argv) > 1 else "-"
         raw = sys.stdin.read() if argument == "-" else open(argument, encoding="utf-8").read()

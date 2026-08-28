@@ -1,0 +1,146 @@
+{
+  "format": "rcl.k09.opencl-amd-persistent-dispatch-local-evidence.v0.1",
+  "status": "PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING",
+  "canonicalOwner": "RCL",
+  "sourceCommit": "fb9afdbf9af318d466a2e2ce8fed03847acfa317",
+  "implementationCommit": "b985a08",
+  "evidenceCommand": "npm run test:k09-opencl-persistent-dispatch",
+  "integrationCommand": "npm run test:k08-gpu-gqa-rope-native-backward-adamw",
+  "localExecution": {
+    "platform": "Windows current host",
+    "realAmdOpenClExecution": true,
+    "sessionSmokeTests": "1/1 PASS",
+    "sessionRequests": 2,
+    "sessionRequestRootsEqual": true,
+    "integrationNodeTests": "3/3 PASS",
+    "gpuProviderTransport": "persistent-session-v0.1",
+    "oneStepProviderRequests": 338,
+    "persistentSessionScope": "one RCL training request",
+    "persistentResources": [
+      "provider-process",
+      "OpenCL-context",
+      "OpenCL-program"
+    ],
+    "perRequestIsolation": [
+      "kernel",
+      "input-buffers",
+      "output-buffers"
+    ],
+    "oneStepIntegrationTestDurationMs": 1394.0469,
+    "replayResumeNegativeIntegrationTestDurationMs": 4805.5328,
+    "cpuFallback": false,
+    "gpuClaim": false
+  },
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensionsObserved": [
+      "cl_khr_fp16",
+      "cl_khr_fp64",
+      "cl_khr_subgroups",
+      "cl_amd_device_attribute_query"
+    ]
+  },
+  "semanticBoundary": {
+    "rclGraphOwner": true,
+    "rclBf16RneOwner": true,
+    "rclFp32AccumulationOwner": true,
+    "rclReverseRuleOwner": true,
+    "rclAdamwOwner": true,
+    "rclCheckpointOwner": true,
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerRole": "auxiliary OpenCL lowering and transport only",
+    "fallbackPolicy": "forbidden",
+    "semanticOperations": [
+      "matmul",
+      "matmul-gradient-left",
+      "matmul-gradient-right",
+      "adamw-update"
+    ]
+  },
+  "checks": {
+    "rclOwnedContractAndGenome": true,
+    "sessionAcceptsOrderedRequests": true,
+    "sessionReusesProcessByProtocol": true,
+    "sessionSmokeExactOutput": true,
+    "twoBlockGqaRopeIntegration": true,
+    "cpuDifferentialExact": true,
+    "checkpointResumeExact": true,
+    "deterministicReplayExact": true,
+    "placementProviderBackendNegativesFailClosed": true,
+    "k08CpuRegressions": "21/21 PASS",
+    "k08GpuRegressions": "12/12 PASS",
+    "rustTensorUnitTests": "7/7 PASS",
+    "noModelSpecialOpcode": true,
+    "noCpuFallback": true
+  },
+  "hostedReplay": {
+    "status": "PASS",
+    "workflow": ".github/workflows/k09-opencl-persistent-dispatch.yml",
+    "runId": 33095344582,
+    "headSha": "fb9afdbf9af318d466a2e2ce8fed03847acfa317",
+    "ubuntu": {
+      "jobId": 98598676425,
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/33095344582/job/98598676425"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/33095344582",
+    "boundary": "Hosted replay proves compilation, portable session protocol handling and unavailable-device fail-closed behavior; it does not inherit this Windows AMD device receipt"
+  },
+  "universalStress": {
+    "status": "PASS",
+    "runId": 33095344489,
+    "focusedJobId": 98598676280,
+    "windowsJobId": 98598675940,
+    "headSha": "fb9afdbf9af318d466a2e2ce8fed03847acfa317"
+  },
+  "authorityVerification": {
+    "status": "PASS",
+    "runId": 33095344565,
+    "jobId": 98598677005,
+    "headSha": "fb9afdbf9af318d466a2e2ce8fed03847acfa317"
+  },
+  "canonicalVerification": {
+    "status": "PASS",
+    "runId": 33095344564,
+    "jobId": 98598676193,
+    "tests": "full suite PASS",
+    "headSha": "fb9afdbf9af318d466a2e2ce8fed03847acfa317",
+    "url": "https://github.com/xingxuling/RCL/actions/runs/33095344564/job/98598676193",
+    "boundary": "Canonical verification passed the full repository suite and self-hosted examples at the exact hosted head"
+  },
+  "k400": {
+    "status": "CANDIDATE_NOT_PROMOTED",
+    "express": "CANDIDATE",
+    "compile": "PASS_LOCAL",
+    "lower": "PASS_LOCAL_CANDIDATE",
+    "execute": "PASS_LOCAL",
+    "correct": "PASS_LOCAL",
+    "robust": "PASS_LOCAL",
+    "performance": "NOT_EVALUATED",
+    "aiGenerate": "NOT_APPLICABLE",
+    "evidence": "CANDIDATE"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_PERSISTENT_PROVIDER_TRANSPORT_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_BF16_BATCHED_KERNELS",
+    "OPENCL_DEVICE_BUFFER_RESIDENCY",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_GPU_PROVIDER_DISPATCH_OVERHEAD",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "reportRoot": "7de8d3a0b21ad686633f02a3e325ffe1e5b61dbe25bf0ffed009d0477e93e77b"
+}

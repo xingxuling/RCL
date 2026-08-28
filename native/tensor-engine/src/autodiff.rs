@@ -1,9 +1,9 @@
 use super::*;
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 use std::time::Instant;
 
 pub const AUTODIFF_REQUEST_FORMAT: &str = "rcl.tensor-autodiff-request.v0.1";
@@ -294,6 +294,150 @@ fn provider_error_code(value: &Value) -> &'static str {
     }
 }
 
+/// A bounded newline-delimited provider transport. RCL retains semantic
+/// ownership; the auxiliary provider owns only accelerator lowering. The
+/// session keeps one provider process and one OpenCL context/program alive for
+/// the lifetime of a single training request.
+pub struct OpenClProviderSession {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: BufReader<ChildStdout>,
+    request_count: usize,
+}
+
+impl OpenClProviderSession {
+    pub fn new(provider_path: &PathBuf) -> Result<Self, EngineError> {
+        if !provider_path.is_file() {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!(
+                    "OpenCL provider path is not a file: {}",
+                    provider_path.display()
+                ),
+            ));
+        }
+        let python = std::env::var("RCL_PYTHON").unwrap_or_else(|_| {
+            if cfg!(windows) {
+                "python".into()
+            } else {
+                "python3".into()
+            }
+        });
+        let mut child = Command::new(python)
+            .arg(provider_path)
+            .arg("--session")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|error| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                    format!("could not start OpenCL provider session: {error}"),
+                )
+            })?;
+        let stdin = child.stdin.take().ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                "OpenCL provider session stdin was unavailable",
+            )
+        })?;
+        let stdout = child.stdout.take().ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                "OpenCL provider session stdout was unavailable",
+            )
+        })?;
+        Ok(Self {
+            child,
+            stdin,
+            stdout: BufReader::new(stdout),
+            request_count: 0,
+        })
+    }
+
+    pub fn request_count(&self) -> usize {
+        self.request_count
+    }
+
+    pub fn execute(&mut self, payload: &Value) -> Result<Value, EngineError> {
+        let encoded = serde_json::to_vec(payload).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_REQUEST_JSON",
+                format!("could not encode OpenCL session request: {error}"),
+            )
+        })?;
+        self.stdin.write_all(&encoded).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("could not send OpenCL session request: {error}"),
+            )
+        })?;
+        self.stdin.write_all(b"\n").map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("could not delimit OpenCL session request: {error}"),
+            )
+        })?;
+        self.stdin.flush().map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("could not flush OpenCL session request: {error}"),
+            )
+        })?;
+        let mut line = String::new();
+        let read = self.stdout.read_line(&mut line).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                format!("could not read OpenCL session response: {error}"),
+            )
+        })?;
+        if read == 0 {
+            let state = self
+                .child
+                .try_wait()
+                .ok()
+                .flatten()
+                .map(|status| format!(" (provider exited with {status})"))
+                .unwrap_or_default();
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("OpenCL provider session closed unexpectedly{state}"),
+            ));
+        }
+        self.request_count = self.request_count.checked_add(1).ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                "OpenCL provider session request accounting overflowed",
+            )
+        })?;
+        let response: Value = serde_json::from_str(line.trim()).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_JSON",
+                format!("OpenCL provider session returned invalid JSON: {error}"),
+            )
+        })?;
+        if response.get("status").and_then(Value::as_str) == Some("error") {
+            return Err(EngineError::new(
+                provider_error_code(&response),
+                response
+                    .get("message")
+                    .and_then(Value::as_str)
+                    .unwrap_or("OpenCL provider session failed")
+                    .to_owned(),
+            ));
+        }
+        Ok(response)
+    }
+}
+
+impl Drop for OpenClProviderSession {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
 fn opencl_bits(input: &BoundTensor<'_>, label: &str) -> Result<Vec<String>, EngineError> {
     input
         .data
@@ -314,6 +458,7 @@ fn execute_opencl_matmul(
     node_id: &str,
     provider_path: &PathBuf,
     inputs: &[BoundTensor<'_>],
+    mut provider_session: Option<&mut OpenClProviderSession>,
 ) -> Result<(ExecutionResult, String), EngineError> {
     require_arity(inputs, 2)?;
     let left = &inputs[0];
@@ -353,69 +498,73 @@ fn execute_opencl_matmul(
         "rightBits": opencl_bits(right, "right")?,
         "nodeId": node_id,
     });
-    let python = std::env::var("RCL_PYTHON").unwrap_or_else(|_| {
-        if cfg!(windows) {
-            "python".into()
-        } else {
-            "python3".into()
-        }
-    });
-    let mut child = Command::new(python)
-        .arg(provider_path)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|error| {
+    let response: Value = if let Some(session) = provider_session.as_deref_mut() {
+        session.execute(&payload)?
+    } else {
+        let python = std::env::var("RCL_PYTHON").unwrap_or_else(|_| {
+            if cfg!(windows) {
+                "python".into()
+            } else {
+                "python3".into()
+            }
+        });
+        let mut child = Command::new(python)
+            .arg(provider_path)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|error| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                    format!("could not start OpenCL provider: {error}"),
+                )
+            })?;
+        let encoded = serde_json::to_vec(&payload).map_err(|error| {
             EngineError::new(
-                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-                format!("could not start OpenCL provider: {error}"),
+                "RCL_ACCELERATOR_REQUEST_JSON",
+                format!("could not encode OpenCL provider request: {error}"),
             )
         })?;
-    let encoded = serde_json::to_vec(&payload).map_err(|error| {
-        EngineError::new(
-            "RCL_ACCELERATOR_REQUEST_JSON",
-            format!("could not encode OpenCL provider request: {error}"),
-        )
-    })?;
-    let mut stdin = child.stdin.take().ok_or_else(|| {
-        EngineError::new(
-            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-            "OpenCL provider stdin was unavailable",
-        )
-    })?;
-    stdin.write_all(&encoded).map_err(|error| {
-        EngineError::new(
-            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
-            format!("could not send OpenCL provider request: {error}"),
-        )
-    })?;
-    drop(stdin);
-    let output = child.wait_with_output().map_err(|error| {
-        EngineError::new(
-            "RCL_ACCELERATOR_EXECUTION_FAILED",
-            format!("OpenCL provider process failed: {error}"),
-        )
-    })?;
-    if !output.status.success() {
-        let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(
-            |_| json!({"message": String::from_utf8_lossy(&output.stderr).to_string()}),
-        );
-        return Err(EngineError::new(
-            provider_error_code(&error_value),
-            error_value
-                .get("message")
-                .and_then(Value::as_str)
-                .unwrap_or("OpenCL provider failed")
-                .to_owned(),
-        ));
-    }
-    let response: Value = serde_json::from_slice(&output.stdout).map_err(|error| {
-        EngineError::new(
-            "RCL_ACCELERATOR_RESPONSE_JSON",
-            format!("OpenCL provider returned invalid JSON: {error}"),
-        )
-    })?;
+        let mut stdin = child.stdin.take().ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                "OpenCL provider stdin was unavailable",
+            )
+        })?;
+        stdin.write_all(&encoded).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+                format!("could not send OpenCL provider request: {error}"),
+            )
+        })?;
+        drop(stdin);
+        let output = child.wait_with_output().map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                format!("OpenCL provider process failed: {error}"),
+            )
+        })?;
+        if !output.status.success() {
+            let error_value = serde_json::from_slice::<Value>(&output.stderr).unwrap_or_else(
+                |_| json!({"message": String::from_utf8_lossy(&output.stderr).to_string()}),
+            );
+            return Err(EngineError::new(
+                provider_error_code(&error_value),
+                error_value
+                    .get("message")
+                    .and_then(Value::as_str)
+                    .unwrap_or("OpenCL provider failed")
+                    .to_owned(),
+            ));
+        }
+        serde_json::from_slice(&output.stdout).map_err(|error| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_JSON",
+                format!("OpenCL provider returned invalid JSON: {error}"),
+            )
+        })?
+    };
     if response.get("format").and_then(Value::as_str) != Some("rcl.opencl-bf16-matmul-result.v0.1")
         || response.get("status").and_then(Value::as_str)
             != Some("PASS_LOCAL_GPU_REFERENCE_CANDIDATE")
@@ -673,6 +822,7 @@ fn execute_opencl_matmul_gradient(
     right: &BoundTensor<'_>,
     upstream: &Gradient,
     input_index: usize,
+    provider_session: Option<&mut OpenClProviderSession>,
 ) -> Result<(Gradient, String), EngineError> {
     if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
         return Err(EngineError::new(
@@ -722,7 +872,11 @@ fn execute_opencl_matmul_gradient(
             .collect::<Result<Vec<_>, _>>()?,
         "nodeId": node_id,
     });
-    let response = execute_opencl_json(provider_path, &payload)?;
+    let response = if let Some(session) = provider_session {
+        session.execute(&payload)?
+    } else {
+        execute_opencl_json(provider_path, &payload)?
+    };
     if response.get("format").and_then(Value::as_str)
         != Some("rcl.opencl-bf16-matmul-gradient-result.v0.1")
         || response.get("status").and_then(Value::as_str)
@@ -805,6 +959,7 @@ fn forward_tape(
     graph: &ComputationGraph,
     bf16: bool,
     mode: &ExecutionMode,
+    mut provider_session: Option<&mut OpenClProviderSession>,
 ) -> Result<
     (
         HashMap<String, (TensorDescriptor, DenseStorage)>,
@@ -854,8 +1009,12 @@ fn forward_tape(
                     ExecutionMode::OpenClAmdHybrid { provider_path }
                     | ExecutionMode::OpenClAmdGpuTraining { provider_path } => {
                         if node.attributes.get("placement").and_then(Value::as_str) == Some("gpu") {
-                            let (result, root) =
-                                execute_opencl_matmul(&node.id, provider_path, &inputs)?;
+                            let (result, root) = execute_opencl_matmul(
+                                &node.id,
+                                provider_path,
+                                &inputs,
+                                provider_session.as_deref_mut(),
+                            )?;
                             execution.gpu_matmul_nodes += 1;
                             execution.gpu_execution_roots.push(root);
                             result
@@ -1109,6 +1268,7 @@ fn node_input_gradients(
     tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
     mode: &ExecutionMode,
     bf16: bool,
+    mut provider_session: Option<&mut OpenClProviderSession>,
     execution: &mut BackwardExecutionTelemetry,
 ) -> Result<Vec<Gradient>, EngineError> {
     let inputs = node
@@ -1264,6 +1424,7 @@ fn node_input_gradients(
                     &right,
                     output_gradient,
                     0,
+                    provider_session.as_deref_mut(),
                 )?;
                 let (right_gradient, right_root) = execute_opencl_matmul_gradient(
                     &node.id,
@@ -1272,6 +1433,7 @@ fn node_input_gradients(
                     &right,
                     output_gradient,
                     1,
+                    provider_session.as_deref_mut(),
                 )?;
                 execution.gpu_matmul_nodes += 2;
                 execution.gpu_execution_roots.push(left_root);
@@ -1409,6 +1571,13 @@ fn round_gradient_fp32(mut value: Gradient) -> Result<Gradient, EngineError> {
 }
 
 pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError> {
+    backward_with_provider(request, None)
+}
+
+pub fn backward_with_provider(
+    request: &AutodiffRequest,
+    mut provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<AutodiffResult, EngineError> {
     if request.format != AUTODIFF_REQUEST_FORMAT {
         return Err(EngineError::new(
             "RCL_AUTODIFF_FORMAT",
@@ -1433,7 +1602,8 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
     };
     let mode = execution_mode(&request.graph)?;
     let forward_started = Instant::now();
-    let (tape, forward_execution) = forward_tape(&request.graph, bf16, &mode)?;
+    let (tape, forward_execution) =
+        forward_tape(&request.graph, bf16, &mode, provider_session.as_deref_mut())?;
     let forward_nanos = forward_started.elapsed().as_nanos();
     let loss_value = tape.get(&request.loss).ok_or_else(|| {
         EngineError::new(
@@ -1534,6 +1704,7 @@ pub fn backward(request: &AutodiffRequest) -> Result<AutodiffResult, EngineError
             &tape,
             &mode,
             bf16,
+            provider_session.as_deref_mut(),
             &mut backward_execution,
         )?;
         for (input_index, incoming) in input_gradients.into_iter().enumerate() {
