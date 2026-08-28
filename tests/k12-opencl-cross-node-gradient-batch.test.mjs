@@ -6,11 +6,20 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { evidenceRoot } from '../src/universal-program-stress.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROVIDER = path.join(ROOT, 'native', 'tensor-engine', 'amd_opencl_bf16_provider.py');
 const GENOME = path.join(ROOT, 'examples', 'native-ai', 'gpu-opencl-cross-node-gradient-batch-genome.rcl');
 const CONTRACT = path.join(ROOT, 'examples', 'native-ai', 'gpu-opencl-cross-node-gradient-batch-contract.v0.1.json');
+const EVIDENCE = path.join(
+  ROOT,
+  'examples',
+  'native-ai',
+  'evidence',
+  'gpu-opencl-cross-node-gradient-batch-v0.1',
+  'k12-opencl-cross-node-gradient-batch-local-evidence.json',
+);
 const PYTHON = process.env.RCL_PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
 
 const base = {
@@ -46,6 +55,14 @@ test('K12 cross-node reverse-matmul frontier preserves ordered child results', (
   assert.equal(contract.planner.requiresReadyGradient, true);
   assert.equal(contract.planner.requiresIndependentNodes, true);
   assert.equal(contract.planner.canonicalReverseOrder, true);
+  const evidence = JSON.parse(fs.readFileSync(EVIDENCE, 'utf8'));
+  assert.equal(evidence.implementationCommit, 'bb0e8c46dde7241e6184059f4b82416a4828aaa4');
+  assert.equal(
+    evidence.reportRoot,
+    evidenceRoot({ ...evidence, reportRoot: undefined }),
+  );
+  assert.equal(evidence.k400.matrixAfter, '23 PASS / 0 BLOCKED / 377 UNTESTED');
+  assert.equal(evidence.k400.verdict, 'INCOMPLETE');
 
   const requests = ['k12-node-b', 'k12-node-a'].flatMap((nodeId) => [
     { ...base, operation: 'left-gradient', nodeId },
@@ -89,4 +106,13 @@ test('K12 cross-node reverse-matmul frontier preserves ordered child results', (
     individual.map((response) => response.executionRoot),
   );
   assert.match(batched.executionRoot, /^[0-9a-f]{64}$/);
+  if (process.env.RCL_K12_EVIDENCE === '1') {
+    console.log(`K12_PROTOCOL_EVIDENCE ${JSON.stringify({
+      operations: batched.responses.map((response) => response.operation),
+      outputBits: batched.responses.map((response) => response.outputBits),
+      childExecutionRoots: batched.responses.map((response) => response.executionRoot),
+      childRootsEqualIndividual: true,
+      batchExecutionRoot: batched.executionRoot,
+    })}`);
+  }
 });

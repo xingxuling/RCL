@@ -361,3 +361,29 @@ K11 `33140897123`, K10 `33140897173`, K09 `33140897078`, Universal Stress
 Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K12 AMD OpenCL cross-node gradient batch candidate
+
+Status: `PASS_LOCAL_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_HOSTED_PENDING`.
+K12 adds an opt-in RCL-owned planner for contiguous ready independent GPU
+matmul nodes in canonical reverse order. Each node contributes its fixed K11
+`left-gradient`, `right-gradient` pair to one bounded K10 transport message;
+the frontier is capped at `32` nodes / `64` operations and singleton work stays
+on the K11 path. Real AMD `gfx1152` execution preserved all forward/backward
+child roots, losses, parameters, optimizer states and checkpoint root exactly
+against same-node batching, while retaining exact CPU checkpoint parity. In the
+one-step two-block GQA+RoPE fixture, `338` logical requests and `108` logical
+gradient batches were unchanged; `18` cross-node batches covered `36` nodes and
+reduced transport dispatches `217 -> 199` and total batches `109 -> 91`. This
+is dispatch-count evidence, not throughput evidence. Unknown and unavailable
+modes fail closed. Local K12 is `4/4 PASS`, Rust Tensor is `7/7`, K08 Tensor is
+`16 PASS + 1 declared skip`, and K11/K10/K09 regressions are green. K400 stays
+`23 PASS / 377 UNTESTED`; no cell promotion is claimed. Hosted and post-merge
+verification remain pending. Authority:
+`docs/native-ai/gpu-opencl-cross-node-gradient-batch-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-cross-node-gradient-batch-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-cross-node-gradient-batch-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-cross-node-gradient-batch-v0.1/k12-opencl-cross-node-gradient-batch-local-evidence.json`.
+Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
+`RCL_GAP_GPU_TRAINING_THROUGHPUT` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.
