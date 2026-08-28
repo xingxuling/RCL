@@ -545,7 +545,7 @@ promotion, RCL-10M and K400 remain closed. Open gaps:
 
 ## K10 AMD OpenCL batched dispatch candidate
 
-Status: `PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED`.
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`.
 K10 adds a bounded ordered batch transport to the K09 persistent session and
 integrates it at the independent AdamW-update boundary. RCL remains the
 canonical owner; the provider remains an auxiliary lowering/transport organ.
@@ -568,7 +568,8 @@ GPU and K09 regressions remain green.
 | K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
 | Affected K08 GPU suites | five suites, `3/3 PASS` each |
 | K09 persistent regression | `1/1 PASS` |
-| Hosted / post-merge replay | PENDING |
+| Hosted exact-head replay | PASS, K10 `33136656080` / `33136656302`, Universal `33136656048`, Authority `33136656032`, Canonical `33136656022` |
+| Post-merge main replay | PENDING |
 
 Authority files:
 

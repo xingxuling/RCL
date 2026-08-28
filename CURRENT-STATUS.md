@@ -299,7 +299,7 @@ Authority: `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`,
 
 ## K10 AMD OpenCL batched dispatch candidate
 
-Status: `PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED`.
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`.
 K10 adds a bounded ordered batch message to the K09 persistent AMD OpenCL
 session and applies it at the independent AdamW-update boundary. RCL retains
 logical request accounting and all Tensor/BF16/autodiff/AdamW semantics. The
@@ -311,8 +311,11 @@ backward/AdamW differential passed `3/3`; one-step telemetry preserved `338`
 logical requests while recording `325` transport dispatches and one batch.
 This is dispatch evidence, not throughput evidence. Device-buffer residency,
 parallel execution, batched kernels, portability, GPU training promotion,
-RCL-10M and K400 remain closed. Hosted and post-merge verification are pending
-for this candidate.
+RCL-10M and K400 remain closed. Hosted replay for exact head
+`e0ce6377e3d3a390cf4acd6d72874cb0d862cb39` passed: K10 runs
+`33136656080` and `33136656302`, Universal Stress `33136656048`, Authority
+`33136656032` and Canonical Verification `33136656022`. Post-merge main
+verification remains pending.
 
 Authority: `docs/native-ai/gpu-opencl-batched-dispatch-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json`,

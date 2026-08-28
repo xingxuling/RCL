@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED`
+`PASS_LOCAL_AND_HOSTED_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`
 
 RCL remains the canonical owner of Tensor, BF16, autodiff and AdamW semantics. The AMD OpenCL provider is an auxiliary lowering and transport organ. K10 adds a bounded ordered batch message to the K09 persistent session and integrates it only at the independent AdamW-update boundary. The provider still creates request-local kernel and input/output buffers; no device-buffer residency or parallel-kernel claim is made.
 
@@ -35,5 +35,10 @@ Authority files:
 - `examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json`
 - `examples/native-ai/gpu-opencl-batched-dispatch-genome.rcl`
 - `examples/native-ai/evidence/gpu-opencl-batched-dispatch-v0.1/k10-opencl-batched-dispatch-local-evidence.json`
+
+Hosted replay for exact head `e0ce6377e3d3a390cf4acd6d72874cb0d862cb39` passed:
+K10 runs `33136656080` and `33136656302`, Universal Stress run
+`33136656048`, Authority run `33136656032` and Canonical Verification run
+`33136656022`. Post-merge main verification remains pending.
 
 Reproduction: `npm run test:k10-opencl-batched-dispatch` and `npm run test:k08-gpu-gqa-rope-native-backward-adamw`.
