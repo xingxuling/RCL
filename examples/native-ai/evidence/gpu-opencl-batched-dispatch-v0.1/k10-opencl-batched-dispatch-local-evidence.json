@@ -1,0 +1,99 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-batched-dispatch.evidence.v0.1",
+  "campaign": "RCL Native LLM Campaign",
+  "task": "K10",
+  "status": "PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED",
+  "canonicalOwner": "RCL",
+  "implementationCommit": "7a7f137",
+  "branch": "codex/k10-opencl-batched-dispatch-v01",
+  "contract": "examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-batched-dispatch-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "batchSmoke": {
+      "status": "PASS_LOCAL",
+      "singleOutputBits": ["4000"],
+      "singleOutputData": [2.0],
+      "singleExecutionRoot": "a778e917cee54f2c97356453cf99acaed000b380ff8adaa69797a6480c35f341",
+      "operationCount": 2,
+      "childOutputBits": [["4000"], ["4000"]],
+      "childExecutionRootsEqualSingle": true,
+      "batchExecutionRoot": "4d3432f612594ef02584f7075bfb9bf428d2ea80b42b6ad2a9d47657518b992f"
+    },
+    "boundedFailure": {
+      "status": "PASS_LOCAL_FAIL_CLOSED",
+      "maxOperations": 64,
+      "attemptedOperations": 65,
+      "errorCode": "RCL_OPENCL_BATCH"
+    },
+    "gpuTrainingIntegration": {
+      "status": "PASS_LOCAL",
+      "suite": "tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs",
+      "tests": "3/3",
+      "oneStepLogicalProviderRequests": 338,
+      "oneStepTransportDispatches": 325,
+      "oneStepBatches": 1,
+      "batchMode": "adamw-update-v0.1",
+      "cpuLossParametersOptimizerStatesCheckpoint": "exact"
+    },
+    "regressions": {
+      "rustTensorUnitTests": "7/7 PASS",
+      "k08TensorSuite": "16 PASS, 1 declared skip, 0 FAIL",
+      "k08GpuNativeBackwardAdamw": "3/3 PASS",
+      "k08GpuBf16AutodiffAdamw": "3/3 PASS",
+      "k08GpuBf16Multiblock": "3/3 PASS",
+      "k08GpuGqaRope": "3/3 PASS",
+      "k08GpuGqaRopeNativeBackwardAdamw": "3/3 PASS",
+      "k09PersistentDispatch": "1/1 PASS",
+      "diffCheck": "PASS"
+    }
+  },
+  "hostedReplay": {
+    "status": "PENDING_PR_REPLAY"
+  },
+  "authorityVerification": {
+    "status": "PENDING_PR_REPLAY"
+  },
+  "postMergeVerification": {
+    "status": "PENDING_MAIN_PUSH_REPLAY"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL",
+    "CORRECT": "PASS_LOCAL",
+    "ROBUST": "PASS_LOCAL",
+    "PERFORMANCE": "NOT_EVALUATED",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_BATCHED_ADAMW_DISPATCH_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_BF16_BATCHED_KERNELS",
+    "OPENCL_DEVICE_BUFFER_RESIDENCY",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_BATCH_PLANNER",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_THROUGHPUT_OR_RCL10M_PROMOTION",
+  "reportRoot": "24a0e1cab02a01bac68f725e8cc84e52ec3fce20cf5c2cca375c0fd0ab1d9adf"
+}

@@ -542,3 +542,45 @@ device-buffer residency, throughput, generic portability, GPU training
 promotion, RCL-10M and K400 remain closed. Open gaps:
 `RCL_GAP_GPU_PROVIDER_DISPATCH_OVERHEAD` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K10 AMD OpenCL batched dispatch candidate
+
+Status: `PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED`.
+K10 adds a bounded ordered batch transport to the K09 persistent session and
+integrates it at the independent AdamW-update boundary. RCL remains the
+canonical owner; the provider remains an auxiliary lowering/transport organ.
+Real AMD `gfx1152` smoke passed for individual versus two-operation batched
+BF16 matmul with exact child output bits and execution roots. The 65-operation
+boundary failed closed with `RCL_OPENCL_BATCH`. The K08 GPU-native two-block
+GQA+RoPE backward/AdamW differential passed `3/3`, preserving exact CPU loss,
+parameters, optimizer state and checkpoint root. One-step telemetry records
+`338` logical provider requests, `325` transport dispatches and one
+`adamw-update-v0.1` batch; no throughput conclusion is made. K08 CPU/Tensor,
+GPU and K09 regressions remain green.
+
+| Evidence | Result |
+|---|---:|
+| K10 genome/contract compilation | PASS_LOCAL |
+| Real AMD batch smoke and exact child parity | PASS_LOCAL |
+| 65-operation bound and fail-closed error | PASS_LOCAL |
+| K08 GPU-native integration | `3/3 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| Affected K08 GPU suites | five suites, `3/3 PASS` each |
+| K09 persistent regression | `1/1 PASS` |
+| Hosted / post-merge replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-batched-dispatch-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-batched-dispatch-genome.rcl`
+- `examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-opencl-batched-dispatch-v0.1/k10-opencl-batched-dispatch-local-evidence.json`
+
+Reproduction: `npm run test:k10-opencl-batched-dispatch` and
+`npm run test:k08-gpu-gqa-rope-native-backward-adamw`. Claims are limited to
+`OPENCL_AMD_BATCHED_ADAMW_DISPATCH_CANDIDATE`; batched kernels,
+device-buffer residency, parallel execution, throughput, generic portability,
+GPU training promotion, RCL-10M and K400 remain closed. Open gaps:
+`RCL_GAP_GPU_BATCH_PLANNER`, `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.

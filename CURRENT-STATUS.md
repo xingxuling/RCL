@@ -296,3 +296,28 @@ passed at exact head `fb9afdbf9af318d466a2e2ce8fed03847acfa317`. The RCL-10M tok
 Authority: `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-persistent-dispatch-contract.v0.1.json` and
 `examples/native-ai/evidence/gpu-opencl-persistent-dispatch-v0.1/k09-opencl-persistent-dispatch-local-evidence.json`.
+
+## K10 AMD OpenCL batched dispatch candidate
+
+Status: `PASS_LOCAL_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE_PENDING_HOSTED`.
+K10 adds a bounded ordered batch message to the K09 persistent AMD OpenCL
+session and applies it at the independent AdamW-update boundary. RCL retains
+logical request accounting and all Tensor/BF16/autodiff/AdamW semantics. The
+provider reuses its process/context/program, but every child operation still
+uses isolated kernel and input/output buffers. Real AMD `gfx1152` batch smoke
+matched individual BF16 matmul output/root exactly; a 65-operation request
+failed closed with `RCL_OPENCL_BATCH`. The two-block GQA+RoPE GPU-native
+backward/AdamW differential passed `3/3`; one-step telemetry preserved `338`
+logical requests while recording `325` transport dispatches and one batch.
+This is dispatch evidence, not throughput evidence. Device-buffer residency,
+parallel execution, batched kernels, portability, GPU training promotion,
+RCL-10M and K400 remain closed. Hosted and post-merge verification are pending
+for this candidate.
+
+Authority: `docs/native-ai/gpu-opencl-batched-dispatch-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-batched-dispatch-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-batched-dispatch-v0.1/k10-opencl-batched-dispatch-local-evidence.json`.
+Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
+`RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.
