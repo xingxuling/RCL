@@ -303,7 +303,7 @@ Authority: `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`,
 
 ## K10 AMD OpenCL batched dispatch candidate
 
-Status: `PASS_LOCAL_AND_HOSTED_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_BATCHED_ADAMW_DISPATCH_CANDIDATE`.
 K10 adds a bounded ordered batch message to the K09 persistent AMD OpenCL
 session and applies it at the independent AdamW-update boundary. RCL retains
 logical request accounting and all Tensor/BF16/autodiff/AdamW semantics. The
@@ -316,10 +316,14 @@ logical requests while recording `325` transport dispatches and one batch.
 This is dispatch evidence, not throughput evidence. Device-buffer residency,
 parallel execution, batched kernels, portability, GPU training promotion,
 RCL-10M and K400 remain closed. Hosted replay for exact head
-`e0ce6377e3d3a390cf4acd6d72874cb0d862cb39` passed: K10 runs
-`33136656080` and `33136656302`, Universal Stress `33136656048`, Authority
-`33136656032` and Canonical Verification `33136656022`. Post-merge main
-verification remains pending.
+`dbd4979f0ff37fcf098bdafb3c8cbf389399840a` passed: K10 `33137325268`,
+Universal Stress `33137325306` after K01 rerun job `98741699248`, Authority
+`33137325285` and Canonical Verification `33137325278`. The initial K01 job
+`98740106273` exceeded the 240000 ms fixed-point budget; the rerun passed
+without a source change. Post-merge main verification passed at
+`686659c848a6c642a8d9fd2191f3d6b82b4205d2`: K10 `33138220712`, K09
+`33138220700`, Universal Stress `33138220701`, Authority `33138220757` and
+Canonical Verification `33138220708`.
 
 Authority: `docs/native-ai/gpu-opencl-batched-dispatch-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-batched-dispatch-contract.v0.1.json`,
