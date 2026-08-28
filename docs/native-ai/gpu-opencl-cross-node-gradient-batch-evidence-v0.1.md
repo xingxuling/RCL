@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING`
+`PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE`
 
 RCL remains the canonical owner of Tensor, BF16, reverse-mode Autodiff, gradient accumulation and AdamW semantics. K12 adds an opt-in bounded planner for a contiguous ready frontier of independent GPU matmul nodes. RCL fixes canonical reverse-node order and each node's `left-gradient`, `right-gradient` child order; the AMD OpenCL provider remains an auxiliary ordered transport organ. A singleton falls back to K11's same-node pair path. No new model-special or accelerator-special core opcode was added.
 
@@ -55,6 +55,13 @@ K12 run `33186294873` passed Ubuntu job `98900043188` and Windows job
 `98900043219`; K11 `33186294809`, K10 `33186294821`, K09 `33186294829`,
 Universal Stress `33186294878` (focused job `98900043321`, Windows K01 job
 `98900042950`), Canonical Verification `33186294825` and Authority
-`33186294855` also passed. Post-merge verification remains pending.
+`33186294855` also passed.
+
+Post-merge main verification passed at `b6886c8c35f8a3fbc0f3441cff016bc601371f54`:
+K12 run `33189905627` passed Ubuntu job `98912431830` and Windows job
+`98912432159`; K11 `33189905678`, K10 `33189905671`, K09 `33189905592`,
+Universal Stress `33189905603` (focused job `98912432101`, Windows K01 job
+`98912431797`), Canonical Verification `33189905537` and Authority
+`33189905662` also passed.
 
 Reproduction: `npm run test:k12-opencl-cross-node-gradient-batch`, `npm run test:k11-opencl-gradient-pair-batch`, `npm run test:k10-opencl-batched-dispatch`, `npm run test:k09-opencl-persistent-dispatch` and `npm run test:k08-tensor`.

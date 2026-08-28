@@ -627,7 +627,7 @@ Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 
 ## K12 AMD OpenCL cross-node gradient batch candidate
 
-Status: `PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE`.
 K12 closes the bounded K11 cross-node planner gap for one opt-in ready-frontier
 profile. RCL owns readiness, independence, canonical reverse order and gradient
 accumulation; the OpenCL provider owns only ordered auxiliary transport. The
@@ -650,7 +650,7 @@ opcode was introduced.
 | K11/K10/K09 regressions | `1/1 PASS` each |
 | License audit | PASS, no new dependencies or donor code |
 | Hosted exact-head replay | PASS, head `f725709`, K12 `33186294873` Ubuntu+Windows, K11 `33186294809`, K10 `33186294821`, K09 `33186294829`, Universal `33186294878`, Canonical `33186294825`, Authority `33186294855` |
-| Post-merge main replay | PENDING |
+| Post-merge main replay | PASS, merge `b6886c8`, K12 `33189905627` Ubuntu+Windows, K11 `33189905678`, K10 `33189905671`, K09 `33189905592`, Universal `33189905603`, Canonical `33189905537`, Authority `33189905662` |
 
 Authority files:
 

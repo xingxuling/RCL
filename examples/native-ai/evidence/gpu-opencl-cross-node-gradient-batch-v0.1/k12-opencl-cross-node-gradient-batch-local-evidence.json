@@ -2,7 +2,7 @@
   "schema": "rcl.native-ai.gpu-opencl-cross-node-gradient-batch.evidence.v0.1",
   "campaign": "RCL Native LLM Campaign",
   "task": "K12",
-  "status": "PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE",
   "canonicalOwner": "RCL",
   "implementationCommit": "bb0e8c46dde7241e6184059f4b82416a4828aaa4",
   "branch": "codex/k12-opencl-cross-node-batch-v01",
@@ -95,7 +95,29 @@
     "authorityRun": { "runId": 33186294855, "jobId": 98900042862, "conclusion": "SUCCESS" }
   },
   "postMergeVerification": {
-    "status": "PENDING"
+    "status": "PASS_MAIN_POSTMERGE",
+    "mainSha": "b6886c8c35f8a3fbc0f3441cff016bc601371f54",
+    "k12Run": {
+      "runId": 33189905627,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 98912431830, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 98912432159, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33189905678, "jobId": 98912431683, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33189905671, "jobId": 98912431654, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33189905592, "jobId": 98912431566, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33189905603,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 98912432101, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 98912431797, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33189905537, "jobId": 98912431812, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33189905662, "jobId": 98912431561, "conclusion": "SUCCESS" }
   },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -134,5 +156,5 @@
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
   "authority": "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_PARALLEL_EXECUTION_THROUGHPUT_OR_RCL10M_PROMOTION",
-  "reportRoot": "4f9e841ef86f6035419295bcee1b5a56ce441162255e4b8b5527ebd53f987d3f"
+  "reportRoot": "e897379c5a971d6e88c34aed4fc4d6147492cfd6c202ac6fa55361e3080955f7"
 }
