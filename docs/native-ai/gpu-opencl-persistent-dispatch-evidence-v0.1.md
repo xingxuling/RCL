@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING`
+`PASS_LOCAL_AND_HOSTED_OPENCL_PERSISTENT_DISPATCH_CANDIDATE`
 
 The K09 candidate reduces a concrete execution-organ gap in the RCL-native
 GPU campaign. One RCL BF16 training request now opens one provider process and
@@ -63,10 +63,18 @@ a benchmark because the timing boundary is a test-process observation.
 
 ## Hosted boundary
 
-Hosted replay is pending for implementation commit `b985a08`. Hosted runners
-can prove compilation, portable session protocol handling and fail-closed
-unavailable-device behavior; they do not inherit the current Windows AMD
-device receipt. The hosted workflow is:
+Hosted replay passed for exact evidence head
+`fb9afdbf9af318d466a2e2ce8fed03847acfa317`:
+
+- K09 dedicated workflow `33095344582`, Ubuntu job `98598676425` — PASS;
+- Universal Stress `33095344489`, focused job `98598676280`, Windows job
+  `98598675940` — PASS;
+- Authority `33095344565`, job `98598677005` — PASS;
+- Canonical Verification `33095344564`, verify job `98598676193` — PASS.
+
+Hosted runners prove compilation, portable session protocol handling and
+fail-closed unavailable-device behavior; they do not inherit the current
+Windows AMD device receipt. The hosted workflow is:
 
 `/.github/workflows/k09-opencl-persistent-dispatch.yml`
 
@@ -82,7 +90,7 @@ device receipt. The hosted workflow is:
 | ROBUST | PASS_LOCAL | provider, placement and backend negatives fail closed |
 | PERFORMANCE | NOT_EVALUATED | no throughput or device-residency claim |
 | AI_GENERATE | NOT_APPLICABLE | no learned generation claim |
-| EVIDENCE | CANDIDATE | local receipt bound; hosted replay pending |
+| EVIDENCE | CANDIDATE | local receipt and hosted replay bound |
 
 No K400 cell is promoted.
 

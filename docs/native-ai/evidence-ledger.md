@@ -505,7 +505,7 @@ Reproduction: `npm run test:k08-r-gqa-rope-bf16`. This grants only bounded BF16 
 
 ## K09 AMD OpenCL persistent dispatch candidate
 
-Status: `PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_PERSISTENT_DISPATCH_CANDIDATE`.
 The RCL-owned GPU training path now uses one newline-delimited auxiliary
 provider session per RCL training request. The session reuses one provider
 process, OpenCL context and OpenCL program while keeping kernel and buffer
@@ -514,7 +514,10 @@ objects request-local. Real AMD `gfx1152` session smoke passed with exact
 passed `3/3` with CPU loss, parameters, optimizer states and checkpoint root
 exact. One-step telemetry records `338` ordered provider requests over
 `persistent-session-v0.1`. K08-S/K08-R CPU and prior GPU regressions remain
-green; provider, placement and backend errors remain fail-closed.
+green; provider, placement and backend errors remain fail-closed. K09
+dedicated run `33095344582`, Universal Stress `33095344489`, Authority
+`33095344565` and Canonical Verification `33095344564` all passed at exact
+head `fb9afdbf9af318d466a2e2ce8fed03847acfa317`.
 
 | Evidence | Result |
 |---|---:|
@@ -523,7 +526,7 @@ green; provider, placement and backend errors remain fail-closed.
 | K08 CPU regression suites | `21/21 PASS` |
 | K08 GPU regression suites | `12/12 PASS` |
 | Rust Tensor unit tests | `7/7 PASS` |
-| Hosted replay | PENDING for `b985a08` |
+| Hosted K09 / Universal Stress / Authority / Canonical | PASS at `fb9afdbf9af318d466a2e2ce8fed03847acfa317` |
 
 Authority files:
 

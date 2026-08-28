@@ -273,7 +273,7 @@ node scripts/run-universal-stress-k01.mjs
 
 ## K09 AMD OpenCL persistent provider dispatch
 
-Status: `PASS_LOCAL_OPENCL_PERSISTENT_DISPATCH_CANDIDATE_HOSTED_REPLAY_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_PERSISTENT_DISPATCH_CANDIDATE`.
 The RCL-owned BF16 GPU training path now starts one auxiliary Python provider
 session per training request and reuses one AMD OpenCL context/program across
 ordered forward matmul, reverse matmul-gradient and AdamW requests. The
@@ -284,8 +284,11 @@ K08-S/K08-R CPU and prior GPU regressions remain green, and provider,
 placement and backend errors still fail closed. This reduces
 `RCL_GAP_GPU_PROVIDER_DISPATCH_OVERHEAD` only partially: batched kernels,
 device-buffer residency, throughput, generic GPU portability, GPU training
-promotion and K400 remain closed. Hosted replay for commit `b985a08` is
-pending. The RCL-10M tokenizer/dataset gate remains
+promotion and K400 remain closed. Hosted replay for exact evidence head
+`fb9afdbf9af318d466a2e2ce8fed03847acfa317` passed: K09 dedicated run
+`33095344582`, Universal Stress run `33095344489`,
+Authority run `33095344565` and Canonical Verification run `33095344564` all
+passed at exact head `fb9afdbf9af318d466a2e2ce8fed03847acfa317`. The RCL-10M tokenizer/dataset gate remains
 `OPEN / BLOCKED_USER_CORPUS`.
 
 Authority: `docs/native-ai/gpu-opencl-persistent-dispatch-evidence-v0.1.md`,
