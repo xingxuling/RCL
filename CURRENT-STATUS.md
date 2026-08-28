@@ -332,3 +332,27 @@ Authority: `docs/native-ai/gpu-opencl-batched-dispatch-evidence-v0.1.md`,
 Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K11 AMD OpenCL gradient pair batch candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
+K11 reuses the K10 bounded ordered batch transport for exactly the two
+reverse-matmul gradient children of one GPU matmul node, in the fixed order
+`left-gradient`, `right-gradient`. It does not batch across nodes, change RCL
+reverse traversal, create batched kernels or retain device buffers. Real AMD
+`gfx1152` individual and pair smoke matched child output bits and execution
+roots exactly. The K08 GPU-native multi-block GQA+RoPE backward/AdamW
+differential passed `3/3`; one-step telemetry preserved `338` logical requests,
+reduced transport dispatches to `217`, and recorded `108` gradient-pair batches
+plus one AdamW batch. This is dispatch evidence, not throughput evidence.
+Hosted replay for exact head `5838471265383762c858a6c4630e217c0e7eed28` passed:
+K11 `33140897123`, K10 `33140897173`, K09 `33140897078`, Universal Stress
+`33140897113` (including Windows K01), Canonical `33140897161` and Authority
+`33140897104`. Post-merge main verification is pending. Authority:
+`docs/native-ai/gpu-opencl-gradient-pair-batch-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-gradient-pair-batch-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-gradient-pair-batch-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-gradient-pair-batch-v0.1/k11-opencl-gradient-pair-batch-local-evidence.json`.
+Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
+`RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.

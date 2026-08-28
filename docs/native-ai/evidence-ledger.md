@@ -585,3 +585,42 @@ device-buffer residency, parallel execution, throughput, generic portability,
 GPU training promotion, RCL-10M and K400 remain closed. Open gaps:
 `RCL_GAP_GPU_BATCH_PLANNER`, `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K11 AMD OpenCL gradient pair batch candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
+K11 reuses the K10 ordered batch transport for exactly one GPU matmul node's
+`left-gradient` then `right-gradient` children. RCL owns reverse traversal and
+all Tensor/BF16/autodiff/AdamW semantics; no cross-node batching, device-buffer
+residency or throughput claim is made. Real AMD `gfx1152` pair smoke matched
+individual child output bits and execution roots. K08 GPU-native backward/AdamW
+passed `3/3` with exact CPU checkpoint parity; telemetry records `338` logical
+requests, `217` transport dispatches, `108` gradient-pair batches and one
+AdamW batch. Hosted and post-merge verification are pending.
+
+| Evidence | Result |
+|---|---:|
+| K11 genome/contract compilation | PASS_LOCAL |
+| Real AMD individual versus pair gradient smoke | PASS_LOCAL |
+| K08 GPU-native backward/AdamW integration | `3/3 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| K08 GPU and K10/K09 regressions | PASS_LOCAL |
+| Hosted exact-head replay | PASS, head `5838471`, K11 `33140897123`, K10 `33140897173`, K09 `33140897078`, Universal `33140897113`, Authority `33140897104`, Canonical `33140897161` |
+| Post-merge main replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-gradient-pair-batch-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-gradient-pair-batch-genome.rcl`
+- `examples/native-ai/gpu-opencl-gradient-pair-batch-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-opencl-gradient-pair-batch-v0.1/k11-opencl-gradient-pair-batch-local-evidence.json`
+
+Reproduction: `npm run test:k11-opencl-gradient-pair-batch` and
+`npm run test:k08-gpu-gqa-rope-native-backward-adamw`. Claims are limited to
+`OPENCL_AMD_GRADIENT_PAIR_BATCHED_DISPATCH_CANDIDATE`; cross-node batching,
+batched kernels, device-buffer residency, parallel execution, throughput,
+generic portability, GPU training promotion, RCL-10M and K400 remain closed.
+Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
+`RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.

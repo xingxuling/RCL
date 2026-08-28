@@ -307,6 +307,7 @@ pub struct OpenClProviderSession {
     request_count: usize,
     dispatch_count: usize,
     batch_count: usize,
+    gradient_batch_count: usize,
 }
 
 impl OpenClProviderSession {
@@ -359,6 +360,7 @@ impl OpenClProviderSession {
             request_count: 0,
             dispatch_count: 0,
             batch_count: 0,
+            gradient_batch_count: 0,
         })
     }
 
@@ -372,6 +374,10 @@ impl OpenClProviderSession {
 
     pub fn batch_count(&self) -> usize {
         self.batch_count
+    }
+
+    pub fn gradient_batch_count(&self) -> usize {
+        self.gradient_batch_count
     }
 
     fn send(&mut self, payload: &Value) -> Result<Value, EngineError> {
@@ -512,6 +518,23 @@ impl OpenClProviderSession {
             )
         })?;
         Ok(responses.to_vec())
+    }
+
+    pub fn execute_gradient_pair(&mut self, payloads: &[Value]) -> Result<Vec<Value>, EngineError> {
+        if payloads.len() != 2 {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_GRADIENT_BATCH_INVALID",
+                "OpenCL gradient pair batch must contain exactly two requests",
+            ));
+        }
+        let responses = self.execute_batch(payloads)?;
+        self.gradient_batch_count = self.gradient_batch_count.checked_add(1).ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_EXECUTION_FAILED",
+                "OpenCL gradient batch accounting overflowed",
+            )
+        })?;
+        Ok(responses)
     }
 }
 
@@ -899,15 +922,13 @@ fn opencl_execution_root(response: &Value, label: &str) -> Result<String, Engine
         })
 }
 
-fn execute_opencl_matmul_gradient(
+fn opencl_matmul_gradient_payload(
     node_id: &str,
-    provider_path: &PathBuf,
     left: &BoundTensor<'_>,
     right: &BoundTensor<'_>,
     upstream: &Gradient,
     input_index: usize,
-    provider_session: Option<&mut OpenClProviderSession>,
-) -> Result<(Gradient, String), EngineError> {
+) -> Result<(Value, usize, usize), EngineError> {
     if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
         return Err(EngineError::new(
             "RCL_BF16_MATMUL_RANK",
@@ -956,11 +977,15 @@ fn execute_opencl_matmul_gradient(
             .collect::<Result<Vec<_>, _>>()?,
         "nodeId": node_id,
     });
-    let response = if let Some(session) = provider_session {
-        session.execute(&payload)?
-    } else {
-        execute_opencl_json(provider_path, &payload)?
-    };
+    Ok((payload, rows, columns))
+}
+
+fn decode_opencl_matmul_gradient(
+    response: &Value,
+    node_id: &str,
+    rows: usize,
+    columns: usize,
+) -> Result<(Gradient, String), EngineError> {
     if response.get("format").and_then(Value::as_str)
         != Some("rcl.opencl-bf16-matmul-gradient-result.v0.1")
         || response.get("status").and_then(Value::as_str)
@@ -976,6 +1001,39 @@ fn execute_opencl_matmul_gradient(
     let root = opencl_execution_root(&response, node_id)?;
     let data = decode_opencl_f32_output(&response, rows * columns, "gradient")?;
     Ok((gradient(&[rows, columns], data)?, root))
+}
+
+fn execute_opencl_matmul_gradient_pair(
+    node_id: &str,
+    provider_path: &PathBuf,
+    left: &BoundTensor<'_>,
+    right: &BoundTensor<'_>,
+    upstream: &Gradient,
+    provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<((Gradient, String), (Gradient, String)), EngineError> {
+    let (left_payload, left_rows, left_columns) =
+        opencl_matmul_gradient_payload(node_id, left, right, upstream, 0)?;
+    let (right_payload, right_rows, right_columns) =
+        opencl_matmul_gradient_payload(node_id, left, right, upstream, 1)?;
+    let payloads = [left_payload, right_payload];
+    let responses = if let Some(session) = provider_session {
+        session.execute_gradient_pair(&payloads)?
+    } else {
+        vec![
+            execute_opencl_json(provider_path, &payloads[0])?,
+            execute_opencl_json(provider_path, &payloads[1])?,
+        ]
+    };
+    if responses.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider returned {} gradient pair responses", responses.len()),
+        ));
+    }
+    Ok((
+        decode_opencl_matmul_gradient(&responses[0], node_id, left_rows, left_columns)?,
+        decode_opencl_matmul_gradient(&responses[1], node_id, right_rows, right_columns)?,
+    ))
 }
 
 fn validate_graph(
@@ -1501,22 +1559,13 @@ fn node_input_gradients(
                     descriptor: &right_descriptor.0,
                     data: right_descriptor.1.data.as_slice(),
                 };
-                let (left_gradient, left_root) = execute_opencl_matmul_gradient(
+                let ((left_gradient, left_root), (right_gradient, right_root)) =
+                    execute_opencl_matmul_gradient_pair(
                     &node.id,
                     provider_path,
                     &left,
                     &right,
                     output_gradient,
-                    0,
-                    provider_session.as_deref_mut(),
-                )?;
-                let (right_gradient, right_root) = execute_opencl_matmul_gradient(
-                    &node.id,
-                    provider_path,
-                    &left,
-                    &right,
-                    output_gradient,
-                    1,
                     provider_session.as_deref_mut(),
                 )?;
                 execution.gpu_matmul_nodes += 2;

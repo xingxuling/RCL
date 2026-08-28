@@ -1,0 +1,44 @@
+name: K11 AMD OpenCL Gradient Pair Batch
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k11-opencl-gradient-pair-batch.test.mjs'
+      - 'examples/native-ai/gpu-opencl-gradient-pair-batch-*'
+      - 'package.json'
+      - '.github/workflows/k11-opencl-gradient-pair-batch.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k11-opencl-gradient-pair-batch.test.mjs'
+      - 'examples/native-ai/gpu-opencl-gradient-pair-batch-*'
+      - 'package.json'
+      - '.github/workflows/k11-opencl-gradient-pair-batch.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  gradient-pair-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Build tensor engine
+        run: cargo build --release --locked --manifest-path native/tensor-engine/Cargo.toml --bin rcl-bf16-autodiff-adamw --bin rcl-rope-frame
+      - name: Run K11 gradient pair provider smoke
+        run: npm run test:k11-opencl-gradient-pair-batch
+      - name: Run K08 GPU-native regression
+        run: npm run test:k08-gpu-gqa-rope-native-backward-adamw
