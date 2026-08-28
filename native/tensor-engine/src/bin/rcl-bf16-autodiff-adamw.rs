@@ -144,6 +144,8 @@ struct Telemetry {
     gpu_provider_dispatches: usize,
     gpu_provider_batches: usize,
     gpu_provider_gradient_batches: usize,
+    gpu_provider_cross_node_gradient_batches: usize,
+    gpu_provider_cross_node_gradient_nodes: usize,
     gpu_provider_batch_mode: &'static str,
 }
 
@@ -1028,12 +1030,34 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
         .as_ref()
         .map(|session| session.gradient_batch_count())
         .unwrap_or(0);
-    let gpu_provider_batch_mode = match (gpu_provider_gradient_batches, gpu_provider_batches) {
-        (gradient_batches, total_batches) if gradient_batches > 0 && total_batches > gradient_batches => {
+    let gpu_provider_cross_node_gradient_batches = gpu_provider_session
+        .as_ref()
+        .map(|session| session.cross_node_gradient_batch_count())
+        .unwrap_or(0);
+    let gpu_provider_cross_node_gradient_nodes = gpu_provider_session
+        .as_ref()
+        .map(|session| session.cross_node_gradient_node_count())
+        .unwrap_or(0);
+    let gpu_provider_batch_mode = match (
+        gpu_provider_cross_node_gradient_batches,
+        gpu_provider_gradient_batches,
+        gpu_provider_batches,
+    ) {
+        (cross_node_batches, _, total_batches)
+            if cross_node_batches > 0 && total_batches > cross_node_batches =>
+        {
+            "cross-node-frontier-and-gradient-pair-and-adamw-update-v0.1"
+        }
+        (cross_node_batches, _, _) if cross_node_batches > 0 => {
+            "cross-node-frontier-and-gradient-pair-v0.1"
+        }
+        (0, gradient_batches, total_batches)
+            if gradient_batches > 0 && total_batches > gradient_batches =>
+        {
             "gradient-pair-and-adamw-update-v0.1"
         }
-        (gradient_batches, _) if gradient_batches > 0 => "gradient-pair-v0.1",
-        (0, total_batches) if total_batches > 0 => "adamw-update-v0.1",
+        (0, gradient_batches, _) if gradient_batches > 0 => "gradient-pair-v0.1",
+        (0, 0, total_batches) if total_batches > 0 => "adamw-update-v0.1",
         _ => "none",
     };
     Ok(ResultReceipt {
@@ -1120,6 +1144,8 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
                 .unwrap_or(0),
             gpu_provider_batches,
             gpu_provider_gradient_batches,
+            gpu_provider_cross_node_gradient_batches,
+            gpu_provider_cross_node_gradient_nodes,
             gpu_provider_batch_mode,
         },
         gpu_claim: false,

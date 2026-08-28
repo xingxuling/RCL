@@ -1,0 +1,138 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-cross-node-gradient-batch.evidence.v0.1",
+  "campaign": "RCL Native LLM Campaign",
+  "task": "K12",
+  "status": "PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING",
+  "canonicalOwner": "RCL",
+  "implementationCommit": "bb0e8c46dde7241e6184059f4b82416a4828aaa4",
+  "branch": "codex/k12-opencl-cross-node-batch-v01",
+  "contract": "examples/native-ai/gpu-opencl-cross-node-gradient-batch-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-cross-node-gradient-batch-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "crossNodeProtocolSmoke": {
+      "status": "PASS_LOCAL",
+      "nodeCount": 2,
+      "operationCount": 4,
+      "operations": ["left-gradient", "right-gradient", "left-gradient", "right-gradient"],
+      "outputBits": [["40c00000"], ["40400000"], ["40c00000"], ["40400000"]],
+      "childExecutionRoots": [
+        "09c0dd2dd8fc1ec81a7023d27b4eaa86c2bb44c74beb73f4ddf9620390a54210",
+        "39c8f61d77280692a5b591c3014765662ef7cf97c409df074f51b9ccda816e8f",
+        "09c0dd2dd8fc1ec81a7023d27b4eaa86c2bb44c74beb73f4ddf9620390a54210",
+        "39c8f61d77280692a5b591c3014765662ef7cf97c409df074f51b9ccda816e8f"
+      ],
+      "childRootsEqualIndividual": true,
+      "batchExecutionRoot": "c9d531028bc9e45213f3092e956565cead878f395906d875918e38f07a01a830"
+    },
+    "gpuTrainingIntegration": {
+      "status": "PASS_LOCAL",
+      "suite": "tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs",
+      "tests": "3/3",
+      "oneStepLogicalProviderRequests": 338,
+      "sameNodeTransportDispatches": 217,
+      "crossNodeTransportDispatches": 199,
+      "dispatchReduction": 18,
+      "sameNodeBatches": 109,
+      "crossNodeBatches": 91,
+      "logicalGradientBatches": 108,
+      "crossNodeFrontierBatches": 18,
+      "crossNodeFrontierNodes": 36,
+      "batchMode": "cross-node-frontier-and-gradient-pair-and-adamw-update-v0.1",
+      "sameNodeVersusCrossNodeRootsLossParametersOptimizerStatesCheckpoint": "exact",
+      "cpuLossParametersOptimizerStatesCheckpoint": "exact"
+    },
+    "negativeAndBoundary": {
+      "unsupportedMode": "RCL_ACCELERATOR_GRADIENT_BATCH_MODE_UNSUPPORTED",
+      "cpuOrNonPersistentMode": "RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_UNAVAILABLE",
+      "maxFrontierNodes": 32,
+      "maxChildOperations": 64,
+      "singletonFallback": "same-node-pair-v0.1",
+      "providerFallback": "forbidden"
+    },
+    "regressions": {
+      "k12Suite": "4/4 PASS",
+      "rustTensorUnitTests": "7/7 PASS",
+      "k08TensorSuite": "16 PASS, 1 declared skip, 0 FAIL",
+      "k11GradientPair": "1/1 PASS",
+      "k10BatchedDispatch": "1/1 PASS",
+      "k09PersistentDispatch": "1/1 PASS",
+      "diffCheck": "PASS"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_DONOR_CODE"
+  },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD",
+    "head": "f7257091c8178d6c8f813d8d0ba8faaf34543ac8",
+    "k12Run": {
+      "runId": 33186294873,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 98900043188, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 98900043219, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33186294809, "jobId": 98900042566, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33186294821, "jobId": 98900042892, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33186294829, "jobId": 98900042972, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33186294878,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 98900043321, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 98900042950, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33186294825, "jobId": 98900042768, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33186294855, "jobId": 98900042862, "conclusion": "SUCCESS" }
+  },
+  "postMergeVerification": {
+    "status": "PENDING"
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance stress evidence only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT",
+    "ROBUST": "PASS_LOCAL",
+    "PERFORMANCE": "DISPATCH_COUNT_ONLY_NO_THROUGHPUT_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_HOSTED_BOUND"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_CROSS_NODE_GRADIENT_BATCHED_DISPATCH_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_BF16_BATCHED_KERNELS",
+    "OPENCL_DEVICE_BUFFER_RESIDENCY",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_PARALLEL_EXECUTION_THROUGHPUT_OR_RCL10M_PROMOTION",
+  "reportRoot": "4f9e841ef86f6035419295bcee1b5a56ce441162255e4b8b5527ebd53f987d3f"
+}

@@ -591,6 +591,8 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.equal(gpu.value.telemetry.gpuProviderDispatches, 217);
   assert.equal(gpu.value.telemetry.gpuProviderBatches, 109);
   assert.equal(gpu.value.telemetry.gpuProviderGradientBatches, 108);
+  assert.equal(gpu.value.telemetry.gpuProviderCrossNodeGradientBatches, 0);
+  assert.equal(gpu.value.telemetry.gpuProviderCrossNodeGradientNodes, 0);
   assert.ok(gpu.value.telemetry.hostCpuNodes > 40);
   assert.ok(gpu.value.telemetry.gpuExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
   assert.ok(gpu.value.telemetry.gpuBackwardExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
@@ -606,6 +608,63 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.deepEqual(gpu.value.parameters, cpu.value.parameters);
   assert.deepEqual(gpu.value.optimizerStates, cpu.value.optimizerStates);
   assert.equal(gpu.value.checkpointRoot, cpu.value.checkpointRoot);
+
+  const crossNodeRequest = structuredClone(gpuRequest);
+  crossNodeRequest.autodiff.graph.bindings.gpuGradientBatchMode = 'cross-node-frontier-v0.1';
+  const crossNode = execute(crossNodeRequest);
+  assert.equal(crossNode.status, 0, JSON.stringify(crossNode.value));
+  assert.equal(
+    crossNode.value.telemetry.gpuProviderBatchMode,
+    'cross-node-frontier-and-gradient-pair-and-adamw-update-v0.1',
+  );
+  assert.equal(
+    crossNode.value.telemetry.gpuProviderRequests,
+    gpu.value.telemetry.gpuProviderRequests,
+  );
+  assert.equal(
+    crossNode.value.telemetry.gpuProviderGradientBatches,
+    gpu.value.telemetry.gpuProviderGradientBatches,
+  );
+  assert.equal(crossNode.value.telemetry.gpuProviderDispatches, 199);
+  assert.equal(crossNode.value.telemetry.gpuProviderBatches, 91);
+  assert.equal(crossNode.value.telemetry.gpuProviderCrossNodeGradientBatches, 18);
+  assert.equal(crossNode.value.telemetry.gpuProviderCrossNodeGradientNodes, 36);
+  assert.deepEqual(crossNode.value.telemetry.gpuExecutionRoots, gpu.value.telemetry.gpuExecutionRoots);
+  assert.deepEqual(
+    crossNode.value.telemetry.gpuBackwardExecutionRoots,
+    gpu.value.telemetry.gpuBackwardExecutionRoots,
+  );
+  assert.deepEqual(crossNode.value.parameters, gpu.value.parameters);
+  assert.deepEqual(crossNode.value.optimizerStates, gpu.value.optimizerStates);
+  assert.equal(crossNode.value.initialLoss, gpu.value.initialLoss);
+  assert.equal(crossNode.value.finalLoss, gpu.value.finalLoss);
+  assert.equal(crossNode.value.checkpointRoot, gpu.value.checkpointRoot);
+  if (process.env.RCL_K12_EVIDENCE === '1') {
+    console.log(`K12_EVIDENCE ${JSON.stringify({
+      legacy: {
+        requests: gpu.value.telemetry.gpuProviderRequests,
+        dispatches: gpu.value.telemetry.gpuProviderDispatches,
+        batches: gpu.value.telemetry.gpuProviderBatches,
+        gradientBatches: gpu.value.telemetry.gpuProviderGradientBatches,
+      },
+      crossNode: {
+        requests: crossNode.value.telemetry.gpuProviderRequests,
+        dispatches: crossNode.value.telemetry.gpuProviderDispatches,
+        batches: crossNode.value.telemetry.gpuProviderBatches,
+        gradientBatches: crossNode.value.telemetry.gpuProviderGradientBatches,
+        crossNodeBatches: crossNode.value.telemetry.gpuProviderCrossNodeGradientBatches,
+        crossNodeNodes: crossNode.value.telemetry.gpuProviderCrossNodeGradientNodes,
+      },
+      exact: {
+        executionRoots: true,
+        backwardExecutionRoots: true,
+        losses: true,
+        parameters: true,
+        optimizerStates: true,
+        checkpointRoot: true,
+      },
+    })}`);
+  }
 });
 
 test('K08 GPU-native multi-block GQA+RoPE resume, replay and backend boundaries fail closed', { timeout: 2_400_000 }, () => {
@@ -651,4 +710,18 @@ test('K08 GPU-native multi-block GQA+RoPE resume, replay and backend boundaries 
   const mismatchedGraph = requestFor(frame);
   mismatchedGraph.autodiff.graph.bindings.backend = 'opencl-amd-hybrid';
   assert.equal(execute(mismatchedGraph).value.code, 'RCL_ACCELERATOR_BACKEND_GRAPH_MISMATCH');
+
+  const unsupportedBatchMode = requestFor(frame);
+  unsupportedBatchMode.autodiff.graph.bindings.gpuGradientBatchMode = 'cross-node-unbounded';
+  assert.equal(
+    execute(unsupportedBatchMode).value.code,
+    'RCL_ACCELERATOR_GRADIENT_BATCH_MODE_UNSUPPORTED',
+  );
+
+  const unavailableBatchMode = cpuEquivalent(requestFor(frame));
+  unavailableBatchMode.autodiff.graph.bindings.gpuGradientBatchMode = 'cross-node-frontier-v0.1';
+  assert.equal(
+    execute(unavailableBatchMode).value.code,
+    'RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_UNAVAILABLE',
+  );
 });

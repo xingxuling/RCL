@@ -624,3 +624,45 @@ generic portability, GPU training promotion, RCL-10M and K400 remain closed.
 Open gaps: `RCL_GAP_GPU_BATCH_PLANNER`,
 `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K12 AMD OpenCL cross-node gradient batch candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_CROSS_NODE_GRADIENT_BATCH_CANDIDATE_POSTMERGE_PENDING`.
+K12 closes the bounded K11 cross-node planner gap for one opt-in ready-frontier
+profile. RCL owns readiness, independence, canonical reverse order and gradient
+accumulation; the OpenCL provider owns only ordered auxiliary transport. The
+planner admits at most `32` contiguous ready independent GPU matmul nodes and
+keeps each node's left/right child order. No model-special or GPU-special Core
+opcode was introduced.
+
+| Evidence | Result |
+|---|---:|
+| K12 genome/contract compilation | PASS_LOCAL |
+| Real AMD two-node/four-child protocol smoke | PASS_LOCAL |
+| Same-node versus cross-node execution roots/state/checkpoint | EXACT |
+| CPU checkpoint differential | EXACT |
+| Logical provider accounting | `338` requests, `108` gradient batches unchanged |
+| Transport accounting | dispatches `217 -> 199`; batches `109 -> 91`; `18` cross-node batches / `36` nodes |
+| Unsupported/unavailable modes | FAIL_CLOSED |
+| K12 integration/protocol suite | `4/4 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| K11/K10/K09 regressions | `1/1 PASS` each |
+| License audit | PASS, no new dependencies or donor code |
+| Hosted exact-head replay | PASS, head `f725709`, K12 `33186294873` Ubuntu+Windows, K11 `33186294809`, K10 `33186294821`, K09 `33186294829`, Universal `33186294878`, Canonical `33186294825`, Authority `33186294855` |
+| Post-merge main replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-cross-node-gradient-batch-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-cross-node-gradient-batch-genome.rcl`
+- `examples/native-ai/gpu-opencl-cross-node-gradient-batch-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-opencl-cross-node-gradient-batch-v0.1/k12-opencl-cross-node-gradient-batch-local-evidence.json`
+
+Reproduction: `npm run test:k12-opencl-cross-node-gradient-batch`. Claims are
+limited to `OPENCL_AMD_CROSS_NODE_GRADIENT_BATCHED_DISPATCH_CANDIDATE`.
+Batched kernels, device-buffer residency, parallel execution, throughput,
+generic portability, GPU training promotion, RCL-10M, RCL-1B and K400 remain
+closed. Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
+`RCL_GAP_GPU_TRAINING_THROUGHPUT` and
+`RCL_GAP_RCL10M_TOKENIZER_DATASET`.
