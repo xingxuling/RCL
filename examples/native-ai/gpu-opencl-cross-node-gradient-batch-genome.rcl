@@ -1,0 +1,18 @@
+# K12: bounded cross-node reverse-matmul gradient frontier candidate. RCL owns
+# readiness, independence, reverse order and accumulation. The provider owns
+# only ordered auxiliary accelerator dispatch.
+reality OpenClCrossNodeGradientBatchCandidate {
+  facet contract.id : Text = "rcl-k12-opencl-amd-cross-node-gradient-batch-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_LOWERER_AND_ORDERED_TRANSPORT_ONLY"
+  facet contract.transport : Text = "RCL_OPENCL_AMD_BATCH_NDJSON_V0_1"
+  facet contract.mode : Text = "CROSS_NODE_FRONTIER_V0_1_OPT_IN"
+  facet contract.max_nodes : Number = 32
+  facet contract.max_operations : Number = 64
+  facet contract.node_pair_order : Text = "LEFT_GRADIENT_RIGHT_GRADIENT"
+  facet contract.frontier_rule : Text = "CONTIGUOUS_READY_INDEPENDENT_GPU_MATMUL_NODES"
+  facet contract.commit_order : Text = "CANONICAL_REVERSE_NODE_ORDER"
+  facet contract.singleton_fallback : Text = "SAME_NODE_PAIR_V0_1"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_STATE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_PARALLEL_EXECUTION_THROUGHPUT_OR_RCL10M_PROMOTION"
+}

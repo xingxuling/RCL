@@ -17,6 +17,8 @@ const MAX_PARAMETERS: usize = 256;
 const MAX_TRAINING_STEPS: usize = 16_384;
 const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
 const MAX_PROVIDER_BATCH_REQUESTS: usize = 64;
+const MAX_CROSS_NODE_GRADIENT_NODES: usize = MAX_PROVIDER_BATCH_REQUESTS / 2;
+const CROSS_NODE_GRADIENT_BATCH_MODE: &str = "cross-node-frontier-v0.1";
 
 pub type ComputationGraph = ExecutionPlan;
 pub type Operation = PlanNode;
@@ -308,6 +310,8 @@ pub struct OpenClProviderSession {
     dispatch_count: usize,
     batch_count: usize,
     gradient_batch_count: usize,
+    cross_node_gradient_batch_count: usize,
+    cross_node_gradient_node_count: usize,
 }
 
 impl OpenClProviderSession {
@@ -361,6 +365,8 @@ impl OpenClProviderSession {
             dispatch_count: 0,
             batch_count: 0,
             gradient_batch_count: 0,
+            cross_node_gradient_batch_count: 0,
+            cross_node_gradient_node_count: 0,
         })
     }
 
@@ -378,6 +384,14 @@ impl OpenClProviderSession {
 
     pub fn gradient_batch_count(&self) -> usize {
         self.gradient_batch_count
+    }
+
+    pub fn cross_node_gradient_batch_count(&self) -> usize {
+        self.cross_node_gradient_batch_count
+    }
+
+    pub fn cross_node_gradient_node_count(&self) -> usize {
+        self.cross_node_gradient_node_count
     }
 
     fn send(&mut self, payload: &Value) -> Result<Value, EngineError> {
@@ -534,6 +548,69 @@ impl OpenClProviderSession {
                 "OpenCL gradient batch accounting overflowed",
             )
         })?;
+        Ok(responses)
+    }
+
+    pub fn execute_cross_node_gradient_batch(
+        &mut self,
+        payloads: &[Value],
+        node_count: usize,
+    ) -> Result<Vec<Value>, EngineError> {
+        if node_count < 2
+            || node_count > MAX_CROSS_NODE_GRADIENT_NODES
+            || payloads.len() != node_count * 2
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_INVALID",
+                format!(
+                    "OpenCL cross-node gradient batch must contain 2..={MAX_CROSS_NODE_GRADIENT_NODES} complete node pairs"
+                ),
+            ));
+        }
+        let mut node_ids = HashSet::new();
+        for pair in payloads.chunks_exact(2) {
+            let left_node = pair[0].get("nodeId").and_then(Value::as_str);
+            let right_node = pair[1].get("nodeId").and_then(Value::as_str);
+            if pair[0].get("operation").and_then(Value::as_str) != Some("left-gradient")
+                || pair[1].get("operation").and_then(Value::as_str) != Some("right-gradient")
+                || left_node.is_none()
+                || left_node != right_node
+                || !node_ids.insert(left_node.unwrap())
+            {
+                return Err(EngineError::new(
+                    "RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_INVALID",
+                    "OpenCL cross-node gradient batch must preserve unique node-local left/right pairs",
+                ));
+            }
+        }
+        let responses = self.execute_batch(payloads)?;
+        self.gradient_batch_count = self
+            .gradient_batch_count
+            .checked_add(node_count)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_EXECUTION_FAILED",
+                    "OpenCL gradient batch accounting overflowed",
+                )
+            })?;
+        self.cross_node_gradient_batch_count = self
+            .cross_node_gradient_batch_count
+            .checked_add(1)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_EXECUTION_FAILED",
+                    "OpenCL cross-node gradient batch accounting overflowed",
+                )
+            })?;
+        self.cross_node_gradient_node_count = self
+            .cross_node_gradient_node_count
+            .checked_add(node_count)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_EXECUTION_FAILED",
+                    "OpenCL cross-node gradient node accounting overflowed",
+                )
+            })?;
         Ok(responses)
     }
 }
@@ -1034,6 +1111,96 @@ fn execute_opencl_matmul_gradient_pair(
         decode_opencl_matmul_gradient(&responses[0], node_id, left_rows, left_columns)?,
         decode_opencl_matmul_gradient(&responses[1], node_id, right_rows, right_columns)?,
     ))
+}
+
+fn is_gpu_matmul_gradient_node(node: &Operation, mode: &ExecutionMode) -> bool {
+    mode.gpu_backward()
+        && node.operation == "matmul"
+        && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
+}
+
+fn execute_opencl_cross_node_gradient_batch(
+    nodes: &[(&Operation, Gradient)],
+    tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
+    mode: &ExecutionMode,
+    provider_session: &mut OpenClProviderSession,
+    execution: &mut BackwardExecutionTelemetry,
+) -> Result<Vec<Vec<Gradient>>, EngineError> {
+    mode.provider_path().ok_or_else(|| {
+        EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_REQUIRED",
+            "GPU backward requires an explicit provider path",
+        )
+    })?;
+    let mut payloads = Vec::with_capacity(nodes.len() * 2);
+    let mut metadata = Vec::with_capacity(nodes.len() * 2);
+    for (node, upstream) in nodes {
+        let left_descriptor = tape.get(&node.inputs[0]).ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_INPUT_MISSING",
+                format!(
+                    "Backward node {} is missing input {}",
+                    node.id, node.inputs[0]
+                ),
+            )
+        })?;
+        let right_descriptor = tape.get(&node.inputs[1]).ok_or_else(|| {
+            EngineError::new(
+                "RCL_AUTODIFF_INPUT_MISSING",
+                format!(
+                    "Backward node {} is missing input {}",
+                    node.id, node.inputs[1]
+                ),
+            )
+        })?;
+        let left = BoundTensor {
+            descriptor: &left_descriptor.0,
+            data: left_descriptor.1.data.as_slice(),
+        };
+        let right = BoundTensor {
+            descriptor: &right_descriptor.0,
+            data: right_descriptor.1.data.as_slice(),
+        };
+        let (left_payload, left_rows, left_columns) =
+            opencl_matmul_gradient_payload(&node.id, &left, &right, upstream, 0)?;
+        let (right_payload, right_rows, right_columns) =
+            opencl_matmul_gradient_payload(&node.id, &left, &right, upstream, 1)?;
+        payloads.push(left_payload);
+        payloads.push(right_payload);
+        metadata.push((node.id.as_str(), left_rows, left_columns));
+        metadata.push((node.id.as_str(), right_rows, right_columns));
+    }
+    let responses = provider_session.execute_cross_node_gradient_batch(&payloads, nodes.len())?;
+    if responses.len() != metadata.len() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!(
+                "OpenCL provider returned {} responses for {} cross-node gradient children",
+                responses.len(),
+                metadata.len()
+            ),
+        ));
+    }
+    let mut decoded = Vec::with_capacity(nodes.len());
+    for (response_pair, metadata_pair) in responses.chunks_exact(2).zip(metadata.chunks_exact(2)) {
+        let left = decode_opencl_matmul_gradient(
+            &response_pair[0],
+            metadata_pair[0].0,
+            metadata_pair[0].1,
+            metadata_pair[0].2,
+        )?;
+        let right = decode_opencl_matmul_gradient(
+            &response_pair[1],
+            metadata_pair[1].0,
+            metadata_pair[1].1,
+            metadata_pair[1].2,
+        )?;
+        execution.gpu_matmul_nodes += 2;
+        execution.gpu_execution_roots.push(left.1);
+        execution.gpu_execution_roots.push(right.1);
+        decoded.push(vec![left.0, right.0]);
+    }
+    Ok(decoded)
 }
 
 fn validate_graph(
@@ -1689,6 +1856,54 @@ fn accumulate(
     Ok(())
 }
 
+fn record_node_gradients(
+    node: &Operation,
+    input_gradients: Vec<Gradient>,
+    tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
+    stop: &HashSet<&str>,
+    gradients: &mut HashMap<String, Gradient>,
+    accumulator: &mut GradientAccumulator,
+    edges: &mut Vec<BackwardEdge>,
+    bf16: bool,
+) -> Result<(), EngineError> {
+    if input_gradients.len() != node.inputs.len() {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_REVERSE_ARITY",
+            format!(
+                "Backward node {} returned {} gradients for {} inputs",
+                node.id,
+                input_gradients.len(),
+                node.inputs.len()
+            ),
+        ));
+    }
+    for (input_index, incoming) in input_gradients.into_iter().enumerate() {
+        let input = &node.inputs[input_index];
+        if stop.contains(input.as_str()) {
+            continue;
+        }
+        let identity = tape
+            .get(input)
+            .map(|value| value.0.gradient_identity.clone())
+            .unwrap_or_default();
+        let incoming = if bf16 {
+            round_gradient_fp32(incoming)?
+        } else {
+            incoming
+        };
+        accumulate(gradients, input, incoming, accumulator, bf16)?;
+        edges.push(BackwardEdge {
+            node_id: node.id.clone(),
+            operation: node.operation.clone(),
+            output: node.output.id.clone(),
+            input: input.clone(),
+            input_index,
+            gradient_identity: identity,
+        });
+    }
+    Ok(())
+}
+
 fn round_gradient_fp32(mut value: Gradient) -> Result<Gradient, EngineError> {
     for cell in &mut value.data {
         let narrowed = *cell as f32;
@@ -1734,6 +1949,27 @@ pub fn backward_with_provider(
         }
     };
     let mode = execution_mode(&request.graph)?;
+    let cross_node_gradient_batch = match request
+        .graph
+        .bindings
+        .get("gpuGradientBatchMode")
+        .and_then(Value::as_str)
+    {
+        None | Some("same-node-pair-v0.1") => false,
+        Some(CROSS_NODE_GRADIENT_BATCH_MODE) => true,
+        Some(other) => {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_GRADIENT_BATCH_MODE_UNSUPPORTED",
+                format!("unsupported GPU gradient batch mode {other}"),
+            ));
+        }
+    };
+    if cross_node_gradient_batch && (!bf16 || !mode.gpu_backward() || provider_session.is_none()) {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_UNAVAILABLE",
+            "cross-node gradient batching requires explicit BF16 GPU-training placement and a persistent provider session",
+        ));
+    }
     let forward_started = Instant::now();
     let (tape, forward_execution) =
         forward_tape(&request.graph, bf16, &mode, provider_session.as_deref_mut())?;
@@ -1824,12 +2060,74 @@ pub fn backward_with_provider(
         merge_count: 0,
         accumulated_elements: 1,
     };
-    for node in request.graph.nodes.iter().rev() {
+    let reverse_nodes = request.graph.nodes.iter().rev().collect::<Vec<_>>();
+    let mut reverse_index = 0;
+    while reverse_index < reverse_nodes.len() {
+        let node = reverse_nodes[reverse_index];
         let Some(output_gradient) = gradients.get(&node.output.id).cloned() else {
+            reverse_index += 1;
             continue;
         };
         if stop.contains(node.output.id.as_str()) || node.operation == "stop-gradient" {
+            reverse_index += 1;
             continue;
+        }
+        if cross_node_gradient_batch && is_gpu_matmul_gradient_node(node, &mode) {
+            let mut planned = vec![(node, output_gradient.clone())];
+            let mut planned_outputs = HashSet::from([node.output.id.as_str()]);
+            let mut planned_inputs = node
+                .inputs
+                .iter()
+                .map(String::as_str)
+                .collect::<HashSet<_>>();
+            for candidate in reverse_nodes.iter().skip(reverse_index + 1) {
+                if planned.len() >= MAX_CROSS_NODE_GRADIENT_NODES
+                    || stop.contains(candidate.output.id.as_str())
+                    || candidate.operation == "stop-gradient"
+                    || !is_gpu_matmul_gradient_node(candidate, &mode)
+                {
+                    break;
+                }
+                let Some(candidate_gradient) = gradients.get(&candidate.output.id).cloned() else {
+                    break;
+                };
+                if planned_inputs.contains(candidate.output.id.as_str())
+                    || candidate
+                        .inputs
+                        .iter()
+                        .any(|input| planned_outputs.contains(input.as_str()))
+                {
+                    break;
+                }
+                planned_outputs.insert(candidate.output.id.as_str());
+                planned_inputs.extend(candidate.inputs.iter().map(String::as_str));
+                planned.push((candidate, candidate_gradient));
+            }
+            if planned.len() >= 2 {
+                let input_gradient_batches = execute_opencl_cross_node_gradient_batch(
+                    &planned,
+                    &tape,
+                    &mode,
+                    provider_session.as_deref_mut().unwrap(),
+                    &mut backward_execution,
+                )?;
+                for ((planned_node, _), input_gradients) in
+                    planned.iter().zip(input_gradient_batches)
+                {
+                    record_node_gradients(
+                        planned_node,
+                        input_gradients,
+                        &tape,
+                        &stop,
+                        &mut gradients,
+                        &mut accumulator,
+                        &mut edges,
+                        bf16,
+                    )?;
+                }
+                reverse_index += planned.len();
+                continue;
+            }
         }
         let input_gradients = node_input_gradients(
             node,
@@ -1840,30 +2138,17 @@ pub fn backward_with_provider(
             provider_session.as_deref_mut(),
             &mut backward_execution,
         )?;
-        for (input_index, incoming) in input_gradients.into_iter().enumerate() {
-            let input = &node.inputs[input_index];
-            if stop.contains(input.as_str()) {
-                continue;
-            }
-            let identity = tape
-                .get(input)
-                .map(|value| value.0.gradient_identity.clone())
-                .unwrap_or_default();
-            let incoming = if bf16 {
-                round_gradient_fp32(incoming)?
-            } else {
-                incoming
-            };
-            accumulate(&mut gradients, input, incoming, &mut accumulator, bf16)?;
-            edges.push(BackwardEdge {
-                node_id: node.id.clone(),
-                operation: node.operation.clone(),
-                output: node.output.id.clone(),
-                input: input.clone(),
-                input_index,
-                gradient_identity: identity,
-            });
-        }
+        record_node_gradients(
+            node,
+            input_gradients,
+            &tape,
+            &stop,
+            &mut gradients,
+            &mut accumulator,
+            &mut edges,
+            bf16,
+        )?;
+        reverse_index += 1;
     }
     let backward_nanos = backward_started.elapsed().as_nanos();
     let mut results = Vec::with_capacity(request.parameters.len());
