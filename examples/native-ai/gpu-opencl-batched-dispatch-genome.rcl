@@ -1,0 +1,13 @@
+# K10: bounded batch transport candidate. RCL owns tensor and training
+# semantics; the provider owns only ordered accelerator dispatch.
+reality OpenClBatchedDispatchCandidate {
+  facet contract.id : Text = "rcl-k10-opencl-amd-batched-dispatch-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_LOWERER_AND_BATCHED_TRANSPORT_ONLY"
+  facet contract.transport : Text = "RCL_OPENCL_AMD_BATCH_NDJSON_V0_1"
+  facet contract.max_operations : Number = 64
+  facet contract.integration : Text = "ADAMW_UPDATE_ONLY"
+  facet contract.per_operation_isolation : Text = "KERNEL_INPUT_BUFFERS_OUTPUT_BUFFERS"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_STATE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_DEVICE_RESIDENCY_THROUGHPUT_OR_RCL10M_PROMOTION"
+}

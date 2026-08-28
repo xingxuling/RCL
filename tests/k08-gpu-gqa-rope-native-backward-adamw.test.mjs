@@ -586,7 +586,10 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.equal(gpu.value.telemetry.gpuOptimizerElements, 208);
   assert.equal(gpu.value.telemetry.gpuOptimizerExecutionRoots.length, PARAMETER_IDS.length);
   assert.equal(gpu.value.telemetry.gpuProviderTransport, 'persistent-session-v0.1');
+  assert.equal(gpu.value.telemetry.gpuProviderBatchMode, 'adamw-update-v0.1');
   assert.equal(gpu.value.telemetry.gpuProviderRequests, 338);
+  assert.equal(gpu.value.telemetry.gpuProviderDispatches, 325);
+  assert.equal(gpu.value.telemetry.gpuProviderBatches, 1);
   assert.ok(gpu.value.telemetry.hostCpuNodes > 40);
   assert.ok(gpu.value.telemetry.gpuExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
   assert.ok(gpu.value.telemetry.gpuBackwardExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));

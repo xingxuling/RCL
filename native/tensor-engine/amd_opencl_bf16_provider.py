@@ -24,9 +24,12 @@ GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-matmul-gradient-request.v0.1"
 GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-matmul-gradient-result.v0.1"
 ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
 ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
+BATCH_REQUEST_FORMAT = "rcl.opencl-amd-batch-request.v0.1"
+BATCH_RESULT_FORMAT = "rcl.opencl-amd-batch-result.v0.1"
 BACKEND = "opencl-amd"
 MAX_DIMENSION = 64
 MAX_ELEMENTS = 4096
+MAX_BATCH_REQUESTS = 64
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -771,8 +774,51 @@ def run_adamw(
     }
 
 
+def run_batch(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    """Lower a bounded ordered batch through one persistent OpenCL runtime.
+
+    The batch is only a transport/dispatch optimization. Each child operation
+    still uses its own kernel and input/output buffers, and the child response
+    roots remain the authoritative operation receipts.
+    """
+    if request.get("format") != BATCH_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL batch request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    requests = request.get("requests")
+    if not isinstance(requests, list) or not requests:
+        raise fail("RCL_OPENCL_BATCH", "batch requests must be a non-empty array")
+    if len(requests) > MAX_BATCH_REQUESTS:
+        raise fail("RCL_OPENCL_BATCH", f"batch requests must contain at most {MAX_BATCH_REQUESTS} operations")
+    if any(not isinstance(item, dict) for item in requests):
+        raise fail("RCL_OPENCL_BATCH", "batch requests must contain JSON objects")
+    responses = [run(item, runtime) for item in requests]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-amd-batch-v0.1\0")
+    for response in responses:
+        root = response.get("executionRoot")
+        if not isinstance(root, str):
+            raise fail("RCL_OPENCL_BATCH", "batch child response omitted executionRoot")
+        digest.update(root.encode("ascii"))
+    return {
+        "format": BATCH_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_BATCH_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operationCount": len(responses),
+        "responses": responses,
+        "executionRoot": digest.hexdigest(),
+    }
+
+
 def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[str, Any]:
     request_format = request.get("format")
+    if request_format == BATCH_REQUEST_FORMAT:
+        return run_batch(request, runtime)
     if request_format == GRADIENT_REQUEST_FORMAT:
         return run_gradient(request, runtime)
     if request_format == ADAMW_REQUEST_FORMAT:

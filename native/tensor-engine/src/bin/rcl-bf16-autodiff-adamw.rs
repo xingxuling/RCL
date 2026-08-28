@@ -19,6 +19,7 @@ const POLICY: &str = "rcl.bf16-rne-fp32-accumulation-adamw.v0.2";
 const BACKEND: &str = "cpu-reference";
 const MAX_STEPS: usize = 16_384;
 const MAX_PARAMETERS: usize = 256;
+const MAX_GPU_PROVIDER_BATCH_REQUESTS: usize = 64;
 
 #[derive(Debug)]
 struct TrainError {
@@ -140,6 +141,9 @@ struct Telemetry {
     gpu_optimizer_execution_roots: Vec<String>,
     gpu_provider_transport: &'static str,
     gpu_provider_requests: usize,
+    gpu_provider_dispatches: usize,
+    gpu_provider_batches: usize,
+    gpu_provider_batch_mode: &'static str,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -695,13 +699,12 @@ fn decode_gpu_f32_output(
         .collect()
 }
 
-fn execute_gpu_adamw(
-    provider_session: &mut OpenClProviderSession,
+fn gpu_adamw_payload(
     master: &[f32],
     gradient: &[f32],
     state: &OptimizerState,
     config: &AdamWConfig,
-) -> Result<(Vec<f32>, Vec<f32>, Vec<f32>, String), TrainError> {
+) -> Result<Value, TrainError> {
     if master.len() != gradient.len()
         || master.len() != state.first_moment.len()
         || master.len() != state.second_moment.len()
@@ -736,7 +739,13 @@ fn execute_gpu_adamw(
         "epsilon": config.epsilon,
         "gradientClip": config.gradient_clip,
     });
-    let response: Value = provider_session.execute(&payload)?;
+    Ok(payload)
+}
+
+fn decode_gpu_adamw_response(
+    response: &Value,
+    expected: usize,
+) -> Result<(Vec<f32>, Vec<f32>, Vec<f32>, String), TrainError> {
     if response.get("format").and_then(Value::as_str) != Some("rcl.opencl-adamw-update-result.v0.1")
         || response.get("status").and_then(Value::as_str)
             != Some("PASS_LOCAL_GPU_ADAMW_REFERENCE_CANDIDATE")
@@ -760,11 +769,38 @@ fn execute_gpu_adamw(
             )
         })?;
     Ok((
-        decode_gpu_f32_output(&response, "masterBits", master.len())?,
-        decode_gpu_f32_output(&response, "firstMomentBits", master.len())?,
-        decode_gpu_f32_output(&response, "secondMomentBits", master.len())?,
+        decode_gpu_f32_output(response, "masterBits", expected)?,
+        decode_gpu_f32_output(response, "firstMomentBits", expected)?,
+        decode_gpu_f32_output(response, "secondMomentBits", expected)?,
         root,
     ))
+}
+
+fn execute_gpu_adamw_batch(
+    provider_session: &mut OpenClProviderSession,
+    master: &[Vec<f32>],
+    gradients: &[Vec<f32>],
+    states: &[OptimizerState],
+    config: &AdamWConfig,
+) -> Result<Vec<(Vec<f32>, Vec<f32>, Vec<f32>, String)>, TrainError> {
+    if master.len() != gradients.len() || master.len() != states.len() {
+        return Err(TrainError::new(
+            "RCL_ACCELERATOR_INPUT_INVALID",
+            "GPU AdamW batch inputs have inconsistent parameter counts",
+        ));
+    }
+    let payloads = master
+        .iter()
+        .zip(gradients)
+        .zip(states)
+        .map(|((weights, gradient), state)| gpu_adamw_payload(weights, gradient, state, config))
+        .collect::<Result<Vec<_>, _>>()?;
+    let responses = provider_session.execute_batch(&payloads)?;
+    responses
+        .iter()
+        .zip(master)
+        .map(|(response, weights)| decode_gpu_adamw_response(response, weights.len()))
+        .collect()
 }
 
 fn adamw_step_gpu(
@@ -775,27 +811,45 @@ fn adamw_step_gpu(
     provider_session: &mut OpenClProviderSession,
     telemetry: &mut GpuOptimizerTelemetry,
 ) -> Result<(), TrainError> {
-    for ((weights, gradient), state) in master.iter_mut().zip(gradients).zip(states.iter_mut()) {
-        let (next_master, next_first, next_second, root) =
-            execute_gpu_adamw(provider_session, weights, gradient, state, config)?;
-        telemetry.elements = telemetry
-            .elements
-            .checked_add(weights.len())
-            .ok_or_else(|| {
-                TrainError::new(
-                    "RCL_BF16_AD_MEMORY_LIMIT",
-                    "GPU optimizer accounting overflowed",
-                )
+    if master.len() != gradients.len() || master.len() != states.len() {
+        return Err(TrainError::new(
+            "RCL_ACCELERATOR_INPUT_INVALID",
+            "GPU AdamW inputs have inconsistent parameter counts",
+        ));
+    }
+    for start in (0..master.len()).step_by(MAX_GPU_PROVIDER_BATCH_REQUESTS) {
+        let end = (start + MAX_GPU_PROVIDER_BATCH_REQUESTS).min(master.len());
+        let updates = execute_gpu_adamw_batch(
+            provider_session,
+            &master[start..end],
+            &gradients[start..end],
+            &states[start..end],
+            config,
+        )?;
+        for ((weights, state), (next_master, next_first, next_second, root)) in master[start..end]
+            .iter_mut()
+            .zip(states[start..end].iter_mut())
+            .zip(updates)
+        {
+            telemetry.elements = telemetry
+                .elements
+                .checked_add(weights.len())
+                .ok_or_else(|| {
+                    TrainError::new(
+                        "RCL_BF16_AD_MEMORY_LIMIT",
+                        "GPU optimizer accounting overflowed",
+                    )
+                })?;
+            telemetry.execution_roots.push(root);
+            weights.copy_from_slice(&next_master);
+            state.first_moment = next_first;
+            state.second_moment = next_second;
+            state.step = state.step.checked_add(1).ok_or_else(|| {
+                TrainError::new("RCL_BF16_AD_STEP_OVERFLOW", "optimizer step overflowed")
             })?;
-        telemetry.execution_roots.push(root);
-        weights.copy_from_slice(&next_master);
-        state.first_moment = next_first;
-        state.second_moment = next_second;
-        state.step = state.step.checked_add(1).ok_or_else(|| {
-            TrainError::new("RCL_BF16_AD_STEP_OVERFLOW", "optimizer step overflowed")
-        })?;
-        state.exact_first_moment_bits = exact_f32_bits(&state.first_moment);
-        state.exact_second_moment_bits = exact_f32_bits(&state.second_moment);
+            state.exact_first_moment_bits = exact_f32_bits(&state.first_moment);
+            state.exact_second_moment_bits = exact_f32_bits(&state.second_moment);
+        }
     }
     Ok(())
 }
@@ -1043,6 +1097,19 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
                 .as_ref()
                 .map(|session| session.request_count())
                 .unwrap_or(0),
+            gpu_provider_dispatches: gpu_provider_session
+                .as_ref()
+                .map(|session| session.dispatch_count())
+                .unwrap_or(0),
+            gpu_provider_batches: gpu_provider_session
+                .as_ref()
+                .map(|session| session.batch_count())
+                .unwrap_or(0),
+            gpu_provider_batch_mode: if gpu_provider_session.is_some() {
+                "adamw-update-v0.1"
+            } else {
+                "none"
+            },
         },
         gpu_claim: false,
     })
