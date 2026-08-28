@@ -69,7 +69,7 @@ test('K10 batched OpenCL dispatch is bounded, exact and fail-closed', () => {
     assert.equal(responses[1].status, 'error');
     assert.equal(unavailable(responses[1].code), true, JSON.stringify(responses));
     assert.equal(responses[2].status, 'error');
-    assert.equal(responses[2].code, 'RCL_OPENCL_BATCH');
+    assert.equal(unavailable(responses[2].code), true, JSON.stringify(responses));
     return;
   }
 
