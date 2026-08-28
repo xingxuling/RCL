@@ -16,6 +16,7 @@ import { verifyK04ServerRuntimeEvidence } from './verify-k04-server-runtime-evid
 import { verifyK04ServerAiGenerationReceipt } from './verify-k04-server-ai-generation-receipt.mjs';
 import { verifyK327CompilerAiGenerationReceipt } from './verify-k327-compiler-ai-generation-receipt.mjs';
 import { verifyK326CompilerDatabaseReceipt } from './verify-k326-compiler-database-receipt.mjs';
+import { verifyK336CompilerAutomationReceipt } from './verify-k336-compiler-automation-receipt.mjs';
 import { verifyK329K332CompilerSimulationScientificReceipt } from './verify-k329-k332-compiler-simulation-scientific-receipt.mjs';
 import { verifyK333CompilerMachineLearningReceipt } from './verify-k333-compiler-machine-learning-receipt.mjs';
 import { verifyK340CompilerMixedParadigmReceipt } from './verify-k340-compiler-mixed-paradigm-receipt.mjs';
@@ -54,6 +55,11 @@ const k326RuntimePath = 'examples/universal-stress/evidence/k326-compiler-databa
 const k326AiContractPath = 'examples/universal-stress/k326-compiler-database-ai-generation-contract.v0.1.json';
 const k326AiReceiptPath = 'examples/universal-stress/evidence/k326-compiler-database-ai-generate/receipt.json';
 const k326AiGithubReplayPath = 'examples/universal-stress/evidence/k326-compiler-database-ai-generate/github-replay.json';
+const k336RuntimeContractPath = 'examples/universal-stress/k336-compiler-automation-runtime-contract.v0.1.json';
+const k336RuntimePath = 'examples/universal-stress/evidence/k336-compiler-automation-runtime-v0.1.json';
+const k336AiContractPath = 'examples/universal-stress/k336-compiler-automation-ai-generation-contract.v0.1.json';
+const k336AiReceiptPath = 'examples/universal-stress/evidence/k336-compiler-automation-ai-generate/receipt.json';
+const k336AiGithubReplayPath = 'examples/universal-stress/evidence/k336-compiler-automation-ai-generate/github-replay.json';
 const k329K332RuntimeContractPath = 'examples/universal-stress/k329-k332-compiler-simulation-scientific-runtime-contract.v0.1.json';
 const k329K332RuntimePath = 'examples/universal-stress/evidence/k329-k332-compiler-simulation-scientific-runtime-v0.1.json';
 const k329K332AiContractPath = 'examples/universal-stress/k329-k332-compiler-simulation-scientific-ai-generation-contract.v0.1.json';
@@ -125,6 +131,8 @@ const k327CompilerAi = verifyK327CompilerAiGenerationReceipt();
 const k327CompilerAiAdmitted = k327CompilerAi.aiGenerateAdmission === 'PASS';
 const k326Ai = verifyK326CompilerDatabaseReceipt();
 const k326AiAdmitted = k326Ai.aiGenerateAdmission === 'PASS';
+const k336Ai = verifyK336CompilerAutomationReceipt();
+const k336AiAdmitted = k336Ai.aiGenerateAdmission === 'PASS';
 const k329K332Ai = verifyK329K332CompilerSimulationScientificReceipt();
 const k329K332AiAdmitted = k329K332Ai.aiGenerateAdmission === 'PASS';
 const k333Ai = verifyK333CompilerMachineLearningReceipt();
@@ -380,6 +388,36 @@ if (k326AiAdmitted) {
     }],
   });
 }
+if (k336AiAdmitted) {
+  const sharedEvidence = [k336RuntimeContractPath, k336RuntimePath, k336AiContractPath, k336AiReceiptPath, k336AiGithubReplayPath];
+  const gates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: STRESS_STATUS.PASS,
+    evidence: sharedEvidence,
+    note: gate === 'AI_GENERATE'
+      ? `Three independent dependency/retry/approval repairs passed; GitHub run ${k336Ai.githubAuthority.runId} bound focused and Windows replay.`
+      : `Frozen 20-round native governed-automation receipt ${k336Ai.runtimeEvidenceBinding.reportRoot}.`,
+  }]));
+  claimsById.set('compiler-runtime::automation', {
+    id: 'compiler-runtime::automation',
+    coverageMode: COVERAGE_MODE.NATIVE_SEMANTIC,
+    lastVerifiedSha: k336Ai.githubAuthority.sourceCommit,
+    lastVerifiedDate: k336Ai.githubAuthority.verifiedAt.slice(0, 10),
+    knownLimits: [
+      'The automation claim is limited to one bounded deterministic dependency/retry/approval/kill-switch/compensation workflow profile.',
+      'External actions, wall-clock scheduling, arbitrary DAGs, durable queues and production workflow authority remain unverified.',
+    ],
+    relatedKillerTasks: ['K09'],
+    requiredGenes: ['dependency-gate', 'bounded-retry', 'human-approval', 'kill-switch', 'compensating-rollback', 'native-compiler-runtime'],
+    gates: structuredClone(gates),
+    changes: [{
+      id: 'compiler-automation-governed-workflow-profile',
+      kind: 'stress-evidence',
+      scope: ['compiler-runtime'],
+      generalPrimitive: true,
+      justification: 'RCL owns dependency, retry, approval, kill-switch, audit, commit and compensation semantics while native rclc/rclvm execute without an external action provider.',
+    }],
+  });
+}
 if (k329K332AiAdmitted) {
   const sharedEvidence = [k329K332RuntimeContractPath, k329K332RuntimePath, k329K332AiContractPath, k329K332AiReceiptPath, k329K332AiGithubReplayPath];
   const gates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
@@ -581,6 +619,11 @@ const evidence = {
     k326AiContractPath,
     k326AiReceiptPath,
     ...(k326AiAdmitted ? [k326AiGithubReplayPath] : []),
+    k336RuntimeContractPath,
+    k336RuntimePath,
+    k336AiContractPath,
+    k336AiReceiptPath,
+    ...(k336AiAdmitted ? [k336AiGithubReplayPath] : []),
     k329K332RuntimeContractPath,
     k329K332RuntimePath,
     k329K332AiContractPath,
@@ -652,6 +695,9 @@ const evidence = {
     k326AiAdmitted
       ? `K326 closes compiler-runtime::database through 20/20 native relational-transaction rounds, 3/3 independent repairs and GitHub run ${k326Ai.githubAuthority.runId}.`
       : 'K326 has 20/20 rooted native relational-transaction rounds and a 3/3 independently replayed local repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
+    k336AiAdmitted
+      ? `K336 closes compiler-runtime::automation through 20/20 native governed-workflow rounds, 3/3 independent repairs and GitHub run ${k336Ai.githubAuthority.runId}.`
+      : 'K336 has 20/20 rooted native governed-workflow rounds and a 3/3 independently replayed local repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
     k329K332AiAdmitted
       ? `K329/K332 close compiler-runtime::simulation and compiler-runtime::scientific through 20/20 native rounds, 3/3 independent repairs and GitHub run ${k329K332Ai.githubAuthority.runId}.`
       : 'K329/K332 have 20/20 rooted native simulation/scientific rounds and a 3/3 independently replayed local repair candidate; both remain UNTESTED until GitHub focused and Windows replay are bound.',

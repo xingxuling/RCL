@@ -1,0 +1,48 @@
+{
+  "format": "rcl.k336.compiler-automation-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": ["K336"],
+  "coordinates": ["compiler-runtime::automation"],
+  "canonicalOwner": "RCL",
+  "donor": "EXPERIMENT_AUTOMATION_WORKFLOW_SEMANTICS",
+  "profile": "NATIVE_BOUNDED_GOVERNED_DEPENDENCY_RETRY_COMPENSATION_WORKFLOW",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k336-compiler-automation.rcl",
+    "sourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "b490d9c79a75971b310eec7046fb26a2431bfb66376808f48b4045a5f4881df3",
+    "semanticStateRoot": "28cf245b90460d9e5a9bbd002d7f78a4f8e18088c78adad0d95b457a14f9dc8c",
+    "candidateReportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92"
+  },
+  "expectedProjection": {
+    "success": [1, 5, 3, 0, [10, 20, 30], 1],
+    "retryFailure": [-1, 5, 2, 2, [10, 20, -30], 0],
+    "unapproved": [-2, 3, 2, 2, [10, 20, -30], 0],
+    "killSwitch": [-4, 0, 0, 0, [-4], 0],
+    "invalidDependency": [-3, 0, 0, 0, [-10], 0],
+    "dryRun": [2, 0, 3, 0, [], 0]
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "dependency-mutation-rejected",
+      "retry-boundary-mutation-rejected",
+      "approval-mutation-rejected",
+      "compensation-mutation-rejected",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K336 compiler-runtime::automation for one bounded deterministic dependency/retry/approval/kill-switch/compensation profile. It grants no external action execution, wall-clock scheduler, arbitrary DAG, durable queue, production workflow authority, unrelated K400 cell or K400 completion."
+}

@@ -1,0 +1,379 @@
+{
+  "format": "rcl.k336.compiler-automation-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-08-28T02:09:54.065Z",
+  "contractRoot": "35a91c36e18d569eb3628ac2e21bcdaea492236f9117224db0b344fc0fd19381",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K336"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "c5741dfbc5b28032f82a04fe06edd26a64604888ff7980dcb579e37ba880947c",
+    "contractRoot": "308f7780ab32671082e1444f896ff4a5e68f5d739e2e8e606166c7287e418920"
+  },
+  "trials": [
+    {
+      "format": "rcl.k336.compiler-automation-ai-trial-receipt.v0.1",
+      "trialId": "K336-AI-REPAIR-01",
+      "mutationClass": "dependency-gate",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a04619-5d38-7d12-bd71-063fbd228f0c",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed",
+        "diagnosis": "The dependency gate is off by one. The invariant requires a task to be blocked unless its zero-based dependency index is strictly below the completed-task count, so blocked must be dependency >= completed. Current logic allows dependency == completed, which incorrectly lets invalidDependency complete and commit."
+      },
+      "promptRoot": "307c6472bd7a3901c7059bdc6986f01aa379bf9f6d5b599100c3d7ab2b9b89e6",
+      "mutatedSourceSha256": "925cae28b36d23a005bbf8524a87a367c1eb0f5016b52bdd2ae1ed92b3c58db3",
+      "candidateSourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "c5638f2ce29f802583b988c72fc00aea4f332f73f76ca49af372b60cc70ed044",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a04619-5d38-7d12-bd71-063fbd228f0c"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "9b138aef6d71ab2fc92295f25e8b7d943054dbf1a1b3168e338b89b369b054da"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "33891ce06753eb3d732ba951b4a04ce682d2e48151f04a3f79024f346f26fb54"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 38827,
+            "cached_input_tokens": 20224,
+            "output_tokens": 491,
+            "reasoning_output_tokens": 186
+          }
+        }
+      ],
+      "finalMessageSha256": "33891ce06753eb3d732ba951b4a04ce682d2e48151f04a3f79024f346f26fb54",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "a69bcf35aaa08326037cace6bfad2b93657cdc5893a122eac7e736f596dc286f",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92",
+        "checks": {
+          "rcl-owns-automation-semantics": {
+            "pass": true
+          },
+          "workflow-control-expressed": {
+            "pass": true
+          },
+          "governance-and-compensation-expressed": {
+            "pass": true
+          },
+          "no-external-action-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-success-and-retry": {
+            "pass": true
+          },
+          "native-governance-stops": {
+            "pass": true
+          },
+          "native-dry-run": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "13dc59af6f4ea66e224b6a38680b8a931b17b311c7458c6f8a98c738d52e0d84"
+    },
+    {
+      "format": "rcl.k336.compiler-automation-ai-trial-receipt.v0.1",
+      "trialId": "K336-AI-REPAIR-02",
+      "mutationClass": "retry-boundary",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0461c-0771-7351-92d2-9952341eef26",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+        "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+        "diagnosis": "The retry success condition is off by one. The invariant requires failures-before-success to be strictly less than max_attempts; allowing equality incorrectly makes the 2-failures/2-attempts task succeed."
+      },
+      "promptRoot": "a486d74284b0fe96c7c243e5143203a163a6a1728314c60b70e774a3b239a7ba",
+      "mutatedSourceSha256": "99ac740f1b33e340b531d548cc459d4f0a0ad3ac7a5b1a6fbf7492fb2d1a10f9",
+      "candidateSourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "4be3c142eae7c9a3d5a0dd7d01b8e22f23571da211fdff7c1d479b2c53bc1acd",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0461c-0771-7351-92d2-9952341eef26"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "db3b325793741e088a2cb297104c7f4fc5c5bec105f30c61aebb1bd12e0c731a"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "dec2fbf3665591e61bc807a932ad97b1d42da521a50cd933dab9300b11fdb281"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 43018,
+            "cached_input_tokens": 22272,
+            "output_tokens": 517,
+            "reasoning_output_tokens": 193
+          }
+        }
+      ],
+      "finalMessageSha256": "dec2fbf3665591e61bc807a932ad97b1d42da521a50cd933dab9300b11fdb281",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "5881a48a9573b6db7688540a3f3ababab2bb777dca740f10ad2d8bf3d1b4d137",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92",
+        "checks": {
+          "rcl-owns-automation-semantics": {
+            "pass": true
+          },
+          "workflow-control-expressed": {
+            "pass": true
+          },
+          "governance-and-compensation-expressed": {
+            "pass": true
+          },
+          "no-external-action-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-success-and-retry": {
+            "pass": true
+          },
+          "native-governance-stops": {
+            "pass": true
+          },
+          "native-dry-run": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "1aaa32f6b90c466e9454be2fe0fea76846038eb38463144e9edf753dd0d382a8"
+    },
+    {
+      "format": "rcl.k336.compiler-automation-ai-trial-receipt.v0.1",
+      "trialId": "K336-AI-REPAIR-03",
+      "mutationClass": "human-approval-gate",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a0461f-7324-79b0-a932-84e106db74c6",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "choose(task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1,",
+        "new": "choose(task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0,",
+        "diagnosis": "The approval gate is inverted. It currently compensates when human approval is present, causing approved success/retry paths to stop and unapproved paths to run. Changing only the approval absence check restores the invariant: approval-required tasks stop and compensate when approval is absent."
+      },
+      "promptRoot": "37756fe650185f73a4deda030536a6d4e2f8860014843cd4d1f05312adb17a22",
+      "mutatedSourceSha256": "a40a5581eb1c6b599c3ae835d035b452c6f0b0d9626eca98b74a09088b7d43fb",
+      "candidateSourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "6cb17403efa8e66b524958529ffa8a2d5b21f1ae5fdf1dcd81ac12f9f4bb0250",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a0461f-7324-79b0-a932-84e106db74c6"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "8a63acf1e988f3a0655ab05ce0f1eeec11576bf36805fb109439981869887eb8"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "f1cda51a804004deefb47c3005a4bcc876e1f6d806c8f036bd7d6f3c1f09390f"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 38920,
+            "cached_input_tokens": 20224,
+            "output_tokens": 474,
+            "reasoning_output_tokens": 153
+          }
+        }
+      ],
+      "finalMessageSha256": "f1cda51a804004deefb47c3005a4bcc876e1f6d806c8f036bd7d6f3c1f09390f",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "7b58fc6adb6eefb779b58341ebd9837b45f4d327cb76eede7b7724a4da5aaeb9",
+        "errorCode": null
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92",
+        "checks": {
+          "rcl-owns-automation-semantics": {
+            "pass": true
+          },
+          "workflow-control-expressed": {
+            "pass": true
+          },
+          "governance-and-compensation-expressed": {
+            "pass": true
+          },
+          "no-external-action-provider": {
+            "pass": true
+          },
+          "native-compiler-byte-parity": {
+            "pass": true
+          },
+          "native-success-and-retry": {
+            "pass": true
+          },
+          "native-governance-stops": {
+            "pass": true
+          },
+          "native-dry-run": {
+            "pass": true
+          }
+        }
+      },
+      "receiptRoot": "c3413c589e1b0eaa331760fbd3ae404f718831a2746fdae9df9e533b60d9eaac"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_NATIVE_AUTOMATION_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K336 dependency, retry and approval gates and binds its 20-round native runtime receipt. It grants no arbitrary workflow generation, external action authority, production scheduler, unrelated K400 cell or K400 completion.",
+  "reportRoot": "a520a8fe894197613130985608a527102937061450b4c2f5fb49bf70d9b9d5d1"
+}

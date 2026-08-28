@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k336.compiler-automation-ai-trial-receipt.v0.1",
+  "trialId": "K336-AI-REPAIR-01",
+  "mutationClass": "dependency-gate",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04619-5d38-7d12-bd71-063fbd228f0c",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "task_dependency(task) > completed",
+    "new": "task_dependency(task) >= completed",
+    "diagnosis": "The dependency gate is off by one. The invariant requires a task to be blocked unless its zero-based dependency index is strictly below the completed-task count, so blocked must be dependency >= completed. Current logic allows dependency == completed, which incorrectly lets invalidDependency complete and commit."
+  },
+  "promptRoot": "307c6472bd7a3901c7059bdc6986f01aa379bf9f6d5b599100c3d7ab2b9b89e6",
+  "mutatedSourceSha256": "925cae28b36d23a005bbf8524a87a367c1eb0f5016b52bdd2ae1ed92b3c58db3",
+  "candidateSourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "c5638f2ce29f802583b988c72fc00aea4f332f73f76ca49af372b60cc70ed044",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04619-5d38-7d12-bd71-063fbd228f0c"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "9b138aef6d71ab2fc92295f25e8b7d943054dbf1a1b3168e338b89b369b054da"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "33891ce06753eb3d732ba951b4a04ce682d2e48151f04a3f79024f346f26fb54"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 38827,
+        "cached_input_tokens": 20224,
+        "output_tokens": 491,
+        "reasoning_output_tokens": 186
+      }
+    }
+  ],
+  "finalMessageSha256": "33891ce06753eb3d732ba951b4a04ce682d2e48151f04a3f79024f346f26fb54",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "a69bcf35aaa08326037cace6bfad2b93657cdc5893a122eac7e736f596dc286f",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92",
+    "checks": {
+      "rcl-owns-automation-semantics": {
+        "pass": true
+      },
+      "workflow-control-expressed": {
+        "pass": true
+      },
+      "governance-and-compensation-expressed": {
+        "pass": true
+      },
+      "no-external-action-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-success-and-retry": {
+        "pass": true
+      },
+      "native-governance-stops": {
+        "pass": true
+      },
+      "native-dry-run": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "13dc59af6f4ea66e224b6a38680b8a931b17b311c7458c6f8a98c738d52e0d84"
+}

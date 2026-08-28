@@ -59,6 +59,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
 | `K333` | `compiler-runtime::machine-learning` | `PASS` | none for the bounded integer-perceptron advisory profile; floating-point state-root canonicalization remains an explicit RCL gap |
+| `K336` | `compiler-runtime::automation` | `UNTESTED` | local 20-round governed-workflow and 3/3 independent-repair candidate exists; exact GitHub focused and Windows authority remains required |
 | `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
 | `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
 | `K340` | `compiler-runtime::mixed-paradigm` | `PASS` | none for the bounded recursive + declarative + transactional + reactive native profile; self-host static warrant validation remains an explicit RCL gap |

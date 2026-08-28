@@ -1,0 +1,119 @@
+{
+  "format": "rcl.k336.compiler-automation-ai-trial-receipt.v0.1",
+  "trialId": "K336-AI-REPAIR-03",
+  "mutationClass": "human-approval-gate",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0461f-7324-79b0-a932-84e106db74c6",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "choose(task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1,",
+    "new": "choose(task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0,",
+    "diagnosis": "The approval gate is inverted. It currently compensates when human approval is present, causing approved success/retry paths to stop and unapproved paths to run. Changing only the approval absence check restores the invariant: approval-required tasks stop and compensate when approval is absent."
+  },
+  "promptRoot": "37756fe650185f73a4deda030536a6d4e2f8860014843cd4d1f05312adb17a22",
+  "mutatedSourceSha256": "a40a5581eb1c6b599c3ae835d035b452c6f0b0d9626eca98b74a09088b7d43fb",
+  "candidateSourceSha256": "b1f19e787b6b8503d4c79e8dbc23d2559ddb3c825ae0828e8b7f2a53002926a3",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "6cb17403efa8e66b524958529ffa8a2d5b21f1ae5fdf1dcd81ac12f9f4bb0250",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0461f-7324-79b0-a932-84e106db74c6"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "8a63acf1e988f3a0655ab05ce0f1eeec11576bf36805fb109439981869887eb8"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "f1cda51a804004deefb47c3005a4bcc876e1f6d806c8f036bd7d6f3c1f09390f"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 38920,
+        "cached_input_tokens": 20224,
+        "output_tokens": 474,
+        "reasoning_output_tokens": 153
+      }
+    }
+  ],
+  "finalMessageSha256": "f1cda51a804004deefb47c3005a4bcc876e1f6d806c8f036bd7d6f3c1f09390f",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "7b58fc6adb6eefb779b58341ebd9837b45f4d327cb76eede7b7724a4da5aaeb9",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "855e61a89e88b2846c44d7dfef848a4a2a2bf1d82dbae2c5c49381d5776b2f92",
+    "checks": {
+      "rcl-owns-automation-semantics": {
+        "pass": true
+      },
+      "workflow-control-expressed": {
+        "pass": true
+      },
+      "governance-and-compensation-expressed": {
+        "pass": true
+      },
+      "no-external-action-provider": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-success-and-retry": {
+        "pass": true
+      },
+      "native-governance-stops": {
+        "pass": true
+      },
+      "native-dry-run": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "c3413c589e1b0eaa331760fbd3ae404f718831a2746fdae9df9e533b60d9eaac"
+}
