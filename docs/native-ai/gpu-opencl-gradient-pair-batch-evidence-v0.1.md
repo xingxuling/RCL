@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`
+`PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`
 
 RCL remains the canonical owner of Tensor, BF16, autodiff and AdamW semantics. The AMD OpenCL provider is an auxiliary lowering and transport organ. K11 reuses the K10 bounded ordered batch message for exactly the two reverse-matmul gradient children of one GPU matmul node: `left-gradient` followed by `right-gradient`. It does not batch across nodes, change reverse traversal order, create batched kernels or retain device buffers.
 
@@ -35,6 +35,10 @@ Authority files:
 - `examples/native-ai/gpu-opencl-gradient-pair-batch-genome.rcl`
 - `examples/native-ai/evidence/gpu-opencl-gradient-pair-batch-v0.1/k11-opencl-gradient-pair-batch-local-evidence.json`
 
-Hosted replay and post-merge main verification are pending for the local candidate commit.
+Hosted replay for exact head `5838471265383762c858a6c4630e217c0e7eed28` passed:
+K11 run `33140897123`, K10 regression `33140897173`, K09 regression
+`33140897078`, Universal Stress `33140897113` (focused job `98751302182` and
+Windows K01 job `98751302347`), Canonical Verification `33140897161` and
+Authority `33140897104`. Post-merge main verification remains pending.
 
 Reproduction: `npm run test:k11-opencl-gradient-pair-batch` and `npm run test:k08-gpu-gqa-rope-native-backward-adamw`.

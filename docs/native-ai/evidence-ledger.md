@@ -588,7 +588,7 @@ GPU training promotion, RCL-10M and K400 remain closed. Open gaps:
 
 ## K11 AMD OpenCL gradient pair batch candidate
 
-Status: `PASS_LOCAL_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE`.
 K11 reuses the K10 ordered batch transport for exactly one GPU matmul node's
 `left-gradient` then `right-gradient` children. RCL owns reverse traversal and
 all Tensor/BF16/autodiff/AdamW semantics; no cross-node batching, device-buffer
@@ -606,7 +606,7 @@ AdamW batch. Hosted and post-merge verification are pending.
 | Rust Tensor unit tests | `7/7 PASS` |
 | K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
 | K08 GPU and K10/K09 regressions | PASS_LOCAL |
-| Hosted exact-head replay | PENDING |
+| Hosted exact-head replay | PASS, head `5838471`, K11 `33140897123`, K10 `33140897173`, K09 `33140897078`, Universal `33140897113`, Authority `33140897104`, Canonical `33140897161` |
 | Post-merge main replay | PENDING |
 
 Authority files:

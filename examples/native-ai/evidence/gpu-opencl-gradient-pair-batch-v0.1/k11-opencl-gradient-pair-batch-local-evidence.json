@@ -2,7 +2,7 @@
   "schema": "rcl.native-ai.gpu-opencl-gradient-pair-batch.evidence.v0.1",
   "campaign": "RCL Native LLM Campaign",
   "task": "K11",
-  "status": "PASS_LOCAL_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE",
+  "status": "PASS_LOCAL_AND_HOSTED_OPENCL_GRADIENT_PAIR_BATCH_CANDIDATE",
   "canonicalOwner": "RCL",
   "implementationCommit": "6cd7f02",
   "branch": "codex/k11-opencl-gradient-batch-v01",
@@ -56,7 +56,21 @@
     }
   },
   "hostedReplay": {
-    "status": "PENDING_EXACT_HEAD"
+    "status": "PASS_EXACT_HEAD",
+    "head": "5838471265383762c858a6c4630e217c0e7eed28",
+    "k11Run": { "runId": 33140897123, "jobId": 98751302014, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33140897173, "jobId": 98751302427, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33140897078, "jobId": 98751301934, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33140897113,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 98751302182, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 98751302347, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33140897161, "jobId": 98751302270, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33140897104, "jobId": 98751301907, "conclusion": "SUCCESS" }
   },
   "postMergeVerification": {
     "status": "PENDING_MAIN_MERGE"
@@ -92,5 +106,5 @@
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
   "authority": "CANDIDATE_ONLY_NO_CROSS_NODE_PLANNER_DEVICE_RESIDENCY_THROUGHPUT_OR_RCL10M_PROMOTION",
-  "reportRoot": "84eed8883cb396203062ab55a438aadf2286724c06ec352c4fce47c3b2b073c0"
+  "reportRoot": "4872d79a7293a98403e3908b7dee7ecfeda51fdd7e770884c1c6531f61f9e504"
 }
