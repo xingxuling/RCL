@@ -2,7 +2,7 @@
 
 ## Current verdict
 
-`PASS_LOCAL_RECEIPT_GITHUB_AUTHORITY_REQUIRED`
+`PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_AGENT_AUTHORITY_BOUND`
 
 This campaign freezes one bounded `compiler-runtime::agent` profile. RCL source owns action representation, deterministic deliberation, capability grants, budget and risk bounds, human approval, kill-switch behavior, bounded audit memory, observe-only behavior and commit. Existing JavaScript agent products are Donors and product organs only; no LLM or external tool runtime receives canonical semantic ownership or K400 credit.
 
@@ -32,14 +32,14 @@ No execution-language workaround owns a canonical result. The current evidence d
 | EXPRESS | PASS | all deliberation, constraint, memory and authority semantics are canonical RCL source |
 | COMPILE | PASS | bootstrap and native compiler emit byte-identical RBC |
 | LOWER | PASS | generic Sequence/control-flow bytecode; no agent-special opcode |
-| EXECUTE | PASS_LOCAL | native VM completed 20/20 local rounds; hosted Linux/Windows replay is pending |
-| CORRECT | PASS_LOCAL | independent JavaScript oracle matches every frozen projection |
-| ROBUST | PASS_LOCAL | capability, budget, approval, selection and corrupt-RBC controls fail closed |
-| PERFORMANCE | PASS_LOCAL | local P95 compile/execute/combined times remain under frozen budgets |
-| AI_GENERATE | CANDIDATE | three unique read-only sessions restored exact canonical bytes; hosted replay is pending |
-| EVIDENCE | CANDIDATE | rooted local receipts exist; exact GitHub Linux/Windows authority is pending |
+| EXECUTE | PASS | native VM completed 20/20 local rounds and exact hosted Linux/Windows replay |
+| CORRECT | PASS | independent JavaScript oracle matches every frozen projection |
+| ROBUST | PASS | capability, budget, approval, selection and corrupt-RBC controls fail closed |
+| PERFORMANCE | PASS | P95 compile/execute/combined times remain under frozen budgets |
+| AI_GENERATE | PASS | three unique read-only sessions restored exact canonical bytes; hosted replay is bound |
+| EVIDENCE | PASS | rooted local receipts and exact GitHub Linux/Windows authority are bound |
 
-K334 remains `UNTESTED` in the authoritative K400 matrix until the exact source commit passes both named GitHub jobs and a rooted authority receipt is checked in.
+GitHub run `33137843366` bound focused job `98741775199` and Windows job `98741775274` for exact source commit `b4287289b35423f3c74861e9a258afb0861532b8`. Both named K334 steps and both parent jobs succeeded. Authority root: `64d632a8fbeaa71b48d05d44bbf3270caaef2a017cb7732d73cf1eea96e16a8b`.
 
 ## Multi-civilization Integration Court
 
@@ -55,7 +55,7 @@ K334 remains `UNTESTED` in the authoritative K400 matrix until the exact source 
 | Security | external tools are impossible in-profile; capability, approval and kill-switch checks precede commit |
 | Release / Evidence Ledger | requires exact GitHub focused and Windows job/step identities before admission |
 
-The Integration Court verdict is `CANDIDATE_READY_FOR_HOSTED_AUTHORITY`, not K334 PASS.
+The Integration Court verdict is `PASS_RECEIPT_REPLAY_GITHUB_LINUX_WINDOWS_NATIVE_AGENT_AUTHORITY_BOUND` for K334 only.
 
 ## License and diff audit
 

@@ -1,10 +1,10 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `19 PASS / 0 BLOCKED / 381 UNTESTED`
+**Current evidence:** `22 PASS / 0 BLOCKED / 378 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `6ae437359107339c1a939cfbe1550689b9b5504449d22f0ce11787b987e292f2`
-**Date:** 2026-08-27
+**Report root:** `502e3687b95198465aec1041f974568e54cb3b0cdf6df56c7005d1292fa9c303`
+**Date:** 2026-08-28
 
 ## 1. Completion contract
 
@@ -59,6 +59,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
 | `K333` | `compiler-runtime::machine-learning` | `PASS` | none for the bounded integer-perceptron advisory profile; floating-point state-root canonicalization remains an explicit RCL gap |
+| `K334` | `compiler-runtime::agent` | `PASS` | none for the bounded deterministic deliberation/capability/budget/risk/approval/memory profile; external agent I/O remains an explicit RCL gap |
 | `K336` | `compiler-runtime::automation` | `PASS` | none for the bounded deterministic dependency/retry/approval/kill-switch/compensation profile; the external-effect protocol remains an explicit RCL gap |
 | `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
 | `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
