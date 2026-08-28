@@ -1,0 +1,50 @@
+{
+  "format": "rcl.k331.compiler-realtime-runtime-contract.v0.1",
+  "status": "FROZEN_BEFORE_FORMAL_ACQUISITION",
+  "frozenBeforeAcquisition": true,
+  "eligibleCells": ["K331"],
+  "coordinates": ["compiler-runtime::realtime"],
+  "canonicalOwner": "RCL",
+  "donor": "LOGICAL_TIME_SCHEDULER_AUXILIARY_RUNTIME",
+  "profile": "NATIVE_BOUNDED_DETERMINISTIC_LOGICAL_TIME",
+  "canonical": {
+    "sourcePath": "examples/universal-stress/k331-compiler-realtime.rcl",
+    "sourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+    "compilerRbcPath": "selfhost/compiler.rbc",
+    "compilerRbcSha256": "00321946e2b4651b4a05b229e7ec650c76375b394afebbc89fb7e095fc28779b",
+    "bootstrapArtifactSha256": "0c98e9a13b5cf84c52ffde8677317d4b8702e07323edce091cad7800cda6339d",
+    "semanticStateRoot": "41fa543355ad9212ec22e8b10f2c979ee8137395c44c62a3bb9e995cf7005847",
+    "candidateReportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685"
+  },
+  "expectedProjection": {
+    "sortedIds": [10, 15, 20, 30, 40],
+    "success": [1, 4, [10, 15, 20, 30]],
+    "budgetRejected": [-2, 0, []],
+    "backwardRejected": [-1, 4, []],
+    "invalidRejected": [-5, 0, []],
+    "externalUnapproved": [-3, 4, []],
+    "externalApproved": [1, 8, []],
+    "projection": [8, 2]
+  },
+  "required": {
+    "rounds": 20,
+    "uniqueStateRoots": 1,
+    "uniqueArtifactHashes": 1,
+    "bootstrapByteParity": true,
+    "nativeSemanticStateRoot": true,
+    "independentJavascriptOracle": true,
+    "negativeControls": [
+      "priority-order-mutation-rejected",
+      "monotonicity-mutation-rejected",
+      "event-budget-mutation-rejected",
+      "external-authority-mutation-rejected",
+      "corrupt-rbc-rejected"
+    ]
+  },
+  "performanceBudget": {
+    "compileP95MsMax": 5000,
+    "executeP95MsMax": 1000,
+    "combinedP95MsMax": 6000
+  },
+  "evidenceBoundary": "This contract can admit only K331 compiler-runtime::realtime for one bounded deterministic logical-time ordering, monotonic advance, event-budget atomicity, acceleration projection and explicit external-time authority profile. It grants no wall-clock precision, deadline scheduling, interrupt handling, hard real-time guarantee, distributed consensus, durable WAL, physical-clock synchronization, unrelated K400 cell or K400 completion."
+}

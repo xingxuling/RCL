@@ -1,0 +1,122 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-02",
+  "mutationClass": "event-budget-atomicity",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04678-6799-71d2-b273-3ad509e5d8d6",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+    "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+    "diagnosis": "The budget guard is inverted. It currently rejects advances when due events are below the declared budget, so a due_count of 4 with max_events 3 commits. The canonical invariant requires fail-closed rejection only when due_count exceeds max_events, preserving current time and empty committed events."
+  },
+  "promptRoot": "6190065f880cd4c7ea4a7455e6f332fcef9d398f38256cf13bfc0e9730c41803",
+  "mutatedSourceSha256": "54540ed7e639cbaa4bbb8d6cc68767c2af52e90ab0f040c47f3e72bd82571af1",
+  "candidateSourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "653896a5a53555013697ff98c329e440d0d32e1a721754b95143d2e290887656",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04678-6799-71d2-b273-3ad509e5d8d6"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "9f430c833770623a6019bdaf261e772758b0922b94d1e34798d8f0a4da32f94a"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "fe76e77a3c82ecf42305240b891f78fb4d8039e57f1405828e9ce06c2f863337"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39007,
+        "cached_input_tokens": 34560,
+        "output_tokens": 475,
+        "reasoning_output_tokens": 147
+      }
+    }
+  ],
+  "finalMessageSha256": "fe76e77a3c82ecf42305240b891f78fb4d8039e57f1405828e9ce06c2f863337",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "7ea77ef51acf8325d682179682e706106ea2e432b9049a0260636434b929cae0",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": true
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "180b177bb6cf9076f23c4411ba5e944454c61097baa35ab362d75137bcc42a24"
+}

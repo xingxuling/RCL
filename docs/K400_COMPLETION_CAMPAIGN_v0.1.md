@@ -3,7 +3,7 @@
 **Verdict:** `INCOMPLETE`
 **Current evidence:** `22 PASS / 0 BLOCKED / 378 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `502e3687b95198465aec1041f974568e54cb3b0cdf6df56c7005d1292fa9c303`
+**Report root:** `9e829406dabf607dc6ac3f69d3595001b4c6f902c0c752ebb37d795435c46bc7`
 **Date:** 2026-08-28
 
 ## 1. Completion contract
@@ -60,6 +60,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
 | `K333` | `compiler-runtime::machine-learning` | `PASS` | none for the bounded integer-perceptron advisory profile; floating-point state-root canonicalization remains an explicit RCL gap |
 | `K334` | `compiler-runtime::agent` | `PASS` | none for the bounded deterministic deliberation/capability/budget/risk/approval/memory profile; external agent I/O remains an explicit RCL gap |
+| `K331` | `compiler-runtime::realtime` | `LOCAL CANDIDATE` | exact GitHub focused + Windows native replay; physical time/interrupt protocol remains an explicit RCL gap |
 | `K336` | `compiler-runtime::automation` | `PASS` | none for the bounded deterministic dependency/retry/approval/kill-switch/compensation profile; the external-effect protocol remains an explicit RCL gap |
 | `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
 | `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |

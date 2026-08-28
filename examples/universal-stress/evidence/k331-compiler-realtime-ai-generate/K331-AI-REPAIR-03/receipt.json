@@ -1,0 +1,128 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-03",
+  "mutationClass": "external-time-authority",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04685-7f3e-7e70-8df8-d3d591d3d05c",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "    choose(temporal_commit_capability != 0,",
+    "new": "    choose(temporal_commit_capability != 1,",
+    "diagnosis": "The candidate inverted external-time authority: capability 0 was admitted and capability 1 was rejected. The semantic invariant requires fail-closed rejection for all values except the exact temporal commit capability value 1, so the minimal canonical repair changes the guard from != 0 to != 1."
+  },
+  "promptRoot": "bf5544c3ca2a30a7369f2ae7e257b75974eeab2f2448adeb5a21f2da040e37d1",
+  "mutatedSourceSha256": "bb18b18f11f25c4017dd9599abc74d7862fe01120e0e957c69f65833d72f7c16",
+  "candidateSourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "480d5126cc6b691dc4839d032b61a6768826b96e80b2d55e26446ec4c35bb2b9",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04685-7f3e-7e70-8df8-d3d591d3d05c"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "9ede0220e2ba851e7e7c3f3219d129f41504fa6f72bd2507c55778ee74988c67"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "39684f877bf12d0dadd3a576c420fe2aac75124ab79b75627ca0bdfb384b4a51"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 34861,
+        "cached_input_tokens": 29440,
+        "output_tokens": 389,
+        "reasoning_output_tokens": 76
+      }
+    }
+  ],
+  "finalMessageSha256": "39684f877bf12d0dadd3a576c420fe2aac75124ab79b75627ca0bdfb384b4a51",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "cd3a47f53dc8f5088cc7ad30ba3092b42ba410e3cd82ff3f60661670a7bece36",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": true
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "6bf18df35a42ff049df720ff86fc5db414fbc32580883d499925da0074d1aa5e"
+}

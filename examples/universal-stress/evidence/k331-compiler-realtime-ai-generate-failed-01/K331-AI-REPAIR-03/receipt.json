@@ -1,0 +1,122 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-03",
+  "mutationClass": "external-time-authority",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a0467c-2d7b-7313-b257-ac96d66737c4",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "temporal_commit_capability == 1",
+    "new": "temporal_commit_capability == 0",
+    "diagnosis": "The external-time authority gate is inverted: proposals without temporal commit capability are currently committed, while explicit capability is rejected. Changing the guard from 1 to 0 restores fail-closed external-time semantics."
+  },
+  "promptRoot": "14ca1a4cd24f4b64606bab52911790b9fd7a5eddfb009b656d837228020ff73c",
+  "mutatedSourceSha256": "1ea992f0e8489ac060f6b80ecfd83dfae13cc1edb29a94c1d36e3b9a0d511fb1",
+  "candidateSourceSha256": "5480a3e447dd92ee636a4a74f6ec78f9f7bae3057f69df8250f8881f30e3a439",
+  "restoredCanonicalBytes": false,
+  "generatorEventLogSha256": "585a76ed98302b7573b2f74995f9de40b21862b3ebc7d62ef1e9ff9fe0e4134c",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a0467c-2d7b-7313-b257-ac96d66737c4"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "ac9445f7f61ed10b0f372270c1e61d10ea7c99acd75ea85f7937d787bb3fd07f"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "e2ce478a4e65d5aae71763b93c96ad479c4ad90de00bfe8e61eaa051e5a0bb6e"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39013,
+        "cached_input_tokens": 34560,
+        "output_tokens": 480,
+        "reasoning_output_tokens": 185
+      }
+    }
+  ],
+  "finalMessageSha256": "e2ce478a4e65d5aae71763b93c96ad479c4ad90de00bfe8e61eaa051e5a0bb6e",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "0a9fa685faa87baa63d7f150f4b73e0488c872971ff19f7a7326f503a171279f",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": false,
+    "status": "FAIL",
+    "reportRoot": "92cc67994b1a2de963e36bd4525b39356e06a93d847a3d6f20ca76591b20b0b8",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": false
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "8f0b4ef433bb616c4d002af95d029d98d02f42174ab773be899c4023a5a0c5fb"
+}

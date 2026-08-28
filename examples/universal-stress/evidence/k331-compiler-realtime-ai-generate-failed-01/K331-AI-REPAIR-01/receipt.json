@@ -1,0 +1,122 @@
+{
+  "format": "rcl.k331.compiler-realtime-ai-trial-receipt.v0.1",
+  "trialId": "K331-AI-REPAIR-01",
+  "mutationClass": "same-instant-priority-order",
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "cliVersion": "codex-cli 0.135.0",
+    "threadId": "01a04675-0685-7643-b646-931b771c27cc",
+    "ephemeral": true,
+    "ignoredUserConfig": true,
+    "ignoredRules": true,
+    "sandbox": "read-only",
+    "authoritativeRepositoryWritable": false
+  },
+  "independence": {
+    "oracleEditVisibleToGenerator": false,
+    "canonicalFilesVisibleToGenerator": false,
+    "developmentAgentAuthoredEdit": false,
+    "generatorReceivedMutatedCandidatesOnly": true,
+    "evaluatorAppliedExactSchemaEdit": true
+  },
+  "proposal": {
+    "file": "candidate.rcl",
+    "old": "event_priority(left) > event_priority(right)",
+    "new": "event_priority(left) < event_priority(right)",
+    "diagnosis": "Equal-instant ordering is inverted: higher numeric priority is currently sorted before lower numeric priority. Replace the priority comparator with lower-before-higher while preserving the existing event-time and stable identity tie-break semantics."
+  },
+  "promptRoot": "dc987cb99813a51bc8925e4932b55a8d1a87b6f96f53d9dbba5d18fda328a6b7",
+  "mutatedSourceSha256": "3e33bef19c159fe6d36c686d18086fc2364f2cd8dfe3502182e805c8d1e94d8b",
+  "candidateSourceSha256": "8c4de600d4aebae91bb6b05b6e34575f03e8daaeb1a8f52f7793329628fd3953",
+  "restoredCanonicalBytes": true,
+  "generatorEventLogSha256": "850f8eb253bccef11528624b0f01056e40470fdf28a86d086635ecc9566a898b",
+  "generatorEvents": [
+    {
+      "type": "thread.started",
+      "threadId": "01a04675-0685-7643-b646-931b771c27cc"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "4e63d36cd5565a0eedf5264f8f2372483e9d64dcce6d2424117e06234019d1fc"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.started"
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "command_execution",
+      "exitCode": 0,
+      "textRoot": null
+    },
+    {
+      "type": "item.completed",
+      "itemType": "agent_message",
+      "exitCode": null,
+      "textRoot": "09a07bf8f2a4f76d03e733c7fe3789393ca0df191aea11aebdffcfba2297bd55"
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 39004,
+        "cached_input_tokens": 20224,
+        "output_tokens": 370,
+        "reasoning_output_tokens": 81
+      }
+    }
+  ],
+  "finalMessageSha256": "09a07bf8f2a4f76d03e733c7fe3789393ca0df191aea11aebdffcfba2297bd55",
+  "diagnostic": {
+    "status": "FAIL",
+    "reportRoot": "42275236eb22645cd45edc9ba047ab4fc83b80fd687f8de62e8151216e6f1e0b",
+    "errorCode": null
+  },
+  "verification": {
+    "successful": true,
+    "status": "PASS",
+    "reportRoot": "d0cbd5bf910b9e205ad435c39012f72d3b4eb1046e1d0bf4e336351aeb035685",
+    "checks": {
+      "rcl-owns-logical-time-semantics": {
+        "pass": true
+      },
+      "deterministic-total-order-expressed": {
+        "pass": true
+      },
+      "monotonic-budget-authority-expressed": {
+        "pass": true
+      },
+      "explicit-non-hard-realtime-boundary": {
+        "pass": true
+      },
+      "no-wall-clock-or-provider-bypass": {
+        "pass": true
+      },
+      "native-compiler-byte-parity": {
+        "pass": true
+      },
+      "native-deterministic-order-and-advance": {
+        "pass": true
+      },
+      "native-fail-closed-boundaries": {
+        "pass": true
+      },
+      "auxiliary-runtime-differential-oracle": {
+        "pass": true
+      }
+    }
+  },
+  "receiptRoot": "d19d143f3bd2d6b6a04c87d60b264bd54c332f13de5a3e99488444a3d260ab86"
+}
