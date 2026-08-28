@@ -1,0 +1,16 @@
+# K11: same-node reverse-matmul gradient pair transport candidate. RCL owns
+# autodiff semantics and reverse traversal; the provider owns only ordered
+# auxiliary accelerator dispatch.
+reality OpenClGradientPairBatchCandidate {
+  facet contract.id : Text = "rcl-k11-opencl-amd-gradient-pair-batch-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_LOWERER_AND_GRADIENT_PAIR_TRANSPORT_ONLY"
+  facet contract.transport : Text = "RCL_OPENCL_AMD_BATCH_NDJSON_V0_1"
+  facet contract.max_operations : Number = 2
+  facet contract.pair_order : Text = "LEFT_GRADIENT_RIGHT_GRADIENT"
+  facet contract.cross_node_batching : Text = "FORBIDDEN"
+  facet contract.integration : Text = "REVERSE_MATMUL_GRADIENT_PAIR_ONLY"
+  facet contract.per_operation_isolation : Text = "KERNEL_INPUT_BUFFERS_OUTPUT_BUFFERS"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_ACCUMULATION_GRADIENT_MASTER_STATE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_CROSS_NODE_PLANNER_DEVICE_RESIDENCY_THROUGHPUT_OR_RCL10M_PROMOTION"
+}

@@ -143,6 +143,7 @@ struct Telemetry {
     gpu_provider_requests: usize,
     gpu_provider_dispatches: usize,
     gpu_provider_batches: usize,
+    gpu_provider_gradient_batches: usize,
     gpu_provider_batch_mode: &'static str,
 }
 
@@ -1019,6 +1020,22 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
         .sum::<usize>();
     let parameters = make_parameters(&order, &master)?;
     let checkpoint = checkpoint_root(&request.config, &order, &master, &states);
+    let gpu_provider_batches = gpu_provider_session
+        .as_ref()
+        .map(|session| session.batch_count())
+        .unwrap_or(0);
+    let gpu_provider_gradient_batches = gpu_provider_session
+        .as_ref()
+        .map(|session| session.gradient_batch_count())
+        .unwrap_or(0);
+    let gpu_provider_batch_mode = match (gpu_provider_gradient_batches, gpu_provider_batches) {
+        (gradient_batches, total_batches) if gradient_batches > 0 && total_batches > gradient_batches => {
+            "gradient-pair-and-adamw-update-v0.1"
+        }
+        (gradient_batches, _) if gradient_batches > 0 => "gradient-pair-v0.1",
+        (0, total_batches) if total_batches > 0 => "adamw-update-v0.1",
+        _ => "none",
+    };
     Ok(ResultReceipt {
         format: RESULT_FORMAT,
         status: "ok",
@@ -1101,15 +1118,9 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
                 .as_ref()
                 .map(|session| session.dispatch_count())
                 .unwrap_or(0),
-            gpu_provider_batches: gpu_provider_session
-                .as_ref()
-                .map(|session| session.batch_count())
-                .unwrap_or(0),
-            gpu_provider_batch_mode: if gpu_provider_session.is_some() {
-                "adamw-update-v0.1"
-            } else {
-                "none"
-            },
+            gpu_provider_batches,
+            gpu_provider_gradient_batches,
+            gpu_provider_batch_mode,
         },
         gpu_claim: false,
     })
