@@ -1,0 +1,49 @@
+{
+  "schema_id": "rcl.usce-creative-federation-contract.v0.1",
+  "status": "CANDIDATE_ONLY",
+  "provider_organ": "rcl",
+  "canonical_semantic_owner": "rcl",
+  "capabilities": [
+    {
+      "capability_id": "creative.generate.candidate.v1",
+      "authority_domain": "semantic.governed_envelope",
+      "effect_class": "CANDIDATE_ARTIFACT",
+      "promotion_performed": false,
+      "description": "Generate one bounded set of heterogeneous unscored CreationProposal values through RCL Creative Reality using an authorized candidate Provider implementation."
+    }
+  ],
+  "provider_lowering": {
+    "current_candidate_provider": "sga-multiview",
+    "provider_capability": "candidate.multiview.generate.v1",
+    "provider_target": "creative-reality",
+    "rcl_runtime": "ProviderRuntimeV2",
+    "result_semantics": "CreationProposal<Text>",
+    "rule": "Provider supplies candidate values only. RCL validates Provider output and owns proposal/scoring/selection/authority/evidence semantics."
+  },
+  "input_contract": {
+    "required": ["goal", "base_structure"],
+    "optional": ["constraints", "invariants", "known_conflicts", "candidate_budget"],
+    "provider_location_is_deployment_configuration": true
+  },
+  "output_contract": {
+    "format": "rcl.usce-creative-candidate-result.v0.1",
+    "candidate_only": true,
+    "unscored": true,
+    "required_roots": ["provider_receipt_root", "candidate_set_root", "candidate_roots"],
+    "proposal_kind": "CreationProposal"
+  },
+  "forbidden_capabilities": [
+    "creative.score.self",
+    "creative.select.auto",
+    "aesthetics.evaluate",
+    "science.truth.promote",
+    "future.probability.claim",
+    "authority.delegate",
+    "evidence.commit",
+    "world_fact.promote",
+    "reality.transition.commit",
+    "artifact.promote",
+    "organ.promote"
+  ],
+  "claim_boundary": "This surface exposes bounded candidate generation through RCL Creative Reality. It does not prove general imagination quality, aesthetics, scientific truth, future success, artifact acceptance, AGI, or autonomous execution."
+}
