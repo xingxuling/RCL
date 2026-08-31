@@ -1,0 +1,69 @@
+{
+  "format": "rcl.usce-creative-federation-gate-receipt.v0.1",
+  "status": "PASS",
+  "date": "2026-08-31",
+  "capability": "creative.generate.candidate.v1",
+  "tests": {
+    "adapter_unit": {
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "command": "node --test --test-concurrency=1 tests/rcl-usce-creative-adapter.test.mjs"
+    },
+    "real_provider_cli": {
+      "handshake": "PASS",
+      "invoke": "PASS",
+      "candidate_count": 4,
+      "proposal_count": 4,
+      "all_proposals_unscored": true,
+      "implementation_provider": "sga-multiview"
+    }
+  },
+  "source_bindings": {
+    "federation/RCL_USCE_CREATIVE_FEDERATION_CONTRACT_v0.1.json": "a14fdd90ee1aac0294d1e782aaac0f9c22f297d0",
+    "federation/RCL_USCE_CREATIVE_CANONICAL_OWNERSHIP_v0.1.json": "a2cd12eaf7ba0ebdcb4f9b5e35e98c1ce3f88909",
+    "adapters/rcl-usce-creative-adapter.mjs": "8d071cc2062c6cac974aa0d02eb10d47b7ac7d17",
+    "adapters/sga-multiview-provider-v2.mjs": "1b72cc19009ac5f598555c13955fedb45876159f",
+    "adapters/sga-multiview-creative-lowering.mjs": "aa93837ccb39be1a4958d0306a821cbc9ef58cbd",
+    "src/provider-runtime-v2.mjs": "1a5ff42880ac6eb372d79c1af41e075cb06c89eb",
+    "src/creative-proposal-api.mjs": "d477b114a5e3131ac7016b8fd443d3335b25fe5d",
+    "tests/rcl-usce-creative-adapter.test.mjs": "7321499a49f6e5f96ace519529878f3631c76a92"
+  },
+  "runtime_evidence": {
+    "provider_receipt_root": "b90d42b1901a0fed76d5d4680be30af91400e1c0900d664811fbe3f122995122",
+    "candidate_set_root": "abfe84b314895880c214449fe2af3bf63ec21a6859bb7ba531e9550b7909bf7e",
+    "candidate_count": 4,
+    "proposal_count": 4,
+    "proposal_kinds": [
+      "CreationProposal",
+      "CreationProposal",
+      "CreationProposal",
+      "CreationProposal"
+    ],
+    "proposal_scores_present": [false, false, false, false]
+  },
+  "authority_boundary": {
+    "provider_owns_creative_semantics": false,
+    "rcl_owns_creative_semantics": true,
+    "scoring_performed": false,
+    "selection_performed": false,
+    "canonical_promotion_performed": false,
+    "rcl_evidence_commit_performed": false,
+    "rncs_commit_performed": false
+  },
+  "dependencies": {
+    "sga_source_bound_gate_status": "PASS",
+    "sga_source_scope_root": "8c0480ec084574bcfda3639eb8ff9a4947c6f860814941ae981d521c8573a34f",
+    "sga_gate_receipt_root": "e14145a7a40c43a857370e475443661f1eb1fe54aa0ea1908b16629191ae6f8c"
+  },
+  "not_proven": [
+    "general imagination quality",
+    "aesthetic judgment",
+    "scientific truth",
+    "future success probability",
+    "USCE mount",
+    "Canonical promotion",
+    "RNCS execution"
+  ],
+  "receipt_root": "1b9e705c5a9756605bbff9ce2ec77ee2466e831f37614972438c5447ec6a8b1d"
+}
