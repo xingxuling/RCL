@@ -1,0 +1,57 @@
+{
+  "schema_id": "rcl.sga-multiview-creative-lowering-contract.v0.1",
+  "status": "CANDIDATE_ONLY",
+  "source_provider": "sga-multiview",
+  "source_capability": "candidate.multiview.generate.v1",
+  "target_owner": "rcl",
+  "target_semantics": "Creative Reality / CreationProposal<T>",
+  "transport": "canonical JSON artifact",
+  "v0_1_value_lowering": {
+    "rcl_base_type": "Text",
+    "encoding": "canonical JSON of SGA candidate_value",
+    "reason": "Do not silently pretend an arbitrary SGA structural object is already a Canonical RCL typed record."
+  },
+  "required_source_checks": [
+    "candidate-set format",
+    "candidate count",
+    "candidate roots",
+    "set root",
+    "UNEVALUATED status",
+    "absence of score/novelty/utility/feasibility/risk fields",
+    "candidate-only authority boundary",
+    "evaluation-boundary false flags"
+  ],
+  "lowering_output": {
+    "kind": "CreationProposal",
+    "preserves": [
+      "SGA candidate root",
+      "SGA set root",
+      "SGA source root",
+      "view profile",
+      "source operator provenance"
+    ],
+    "must_not_contain": [
+      "score",
+      "selected status",
+      "aesthetic verdict",
+      "scientific verdict",
+      "future probability",
+      "authority commit"
+    ]
+  },
+  "scoring_boundary": {
+    "candidate_generator_may_self_score": false,
+    "evaluator_receipt_required": true,
+    "required_evaluator_fields": ["organ_id", "evidence_root", "scores"],
+    "required_scores": ["novelty", "utility", "feasibility", "risk"],
+    "selection_not_part_of_lowering": true
+  },
+  "authority_boundary": {
+    "rcl_evidence_commit": false,
+    "rncs_commit": false,
+    "world_fact_promotion": false,
+    "organ_promotion": false,
+    "usce_final_route_choice": false
+  },
+  "claim_boundary": "This is a cross-language candidate-lowering contract. It proves neither general imagination nor candidate quality."
+}
