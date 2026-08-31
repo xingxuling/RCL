@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { ProviderRuntimeV2Error } from '../src/provider-runtime-v2.mjs';
 import {
   canonicalSha256,
@@ -9,6 +12,7 @@ import {
   SGA_MULTIVIEW_PROVIDER_CAPABILITY,
   SGA_MULTIVIEW_PROVIDER_ID,
   SGA_MULTIVIEW_PROVIDER_TARGET,
+  createPythonSgaMultiviewInvoker,
   createSgaCreativeProviderRuntime,
   invokeSgaThroughRclCreativeProvider,
 } from '../adapters/sga-multiview-provider-v2.mjs';
@@ -117,4 +121,36 @@ test('provider listing keeps SGA as provider implementation, not Creative Realit
   assert.equal(listing.providerCount, 1);
   assert.equal(listing.providers[0].id, SGA_MULTIVIEW_PROVIDER_ID);
   assert.deepEqual(listing.providers[0].capabilities[0].effects, ['CandidateOnly']);
+});
+
+test('Python SGA invoker does not create __pycache__ in a source-bound checkout', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'sga-provider-clean-'));
+  try {
+    const payload = JSON.stringify(candidateSet());
+    const moduleSource = [
+      'import json',
+      `PAYLOAD = json.loads(${JSON.stringify(JSON.stringify(payload))})`,
+      'def generate_multiview_candidates(request):',
+      '    return PAYLOAD',
+      '',
+    ].join('\n');
+    fs.writeFileSync(
+      path.join(directory, 'sga_multiview_candidate_generator.py'),
+      moduleSource,
+      'utf8',
+    );
+    const invoke = createPythonSgaMultiviewInvoker({
+      sgaModuleDir: directory,
+      pythonExecutable: process.env.PYTHON ?? 'python3',
+    });
+    const result = await invoke({ goal: 'x', base_structure: {} });
+    assert.equal(result.format, 'sga.multiview-candidate-set.v0.1');
+    assert.equal(fs.existsSync(path.join(directory, '__pycache__')), false);
+    assert.equal(
+      fs.readdirSync(directory).some(name => name.endsWith('.pyc')),
+      false,
+    );
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
