@@ -193,12 +193,12 @@ export function scoreSgaCreationProposal(proposal, evaluatorReceipt) {
     throw new SgaCreativeLoweringError('EVALUATOR_EVIDENCE_ROOT', 'evaluator receipt requires a SHA-256 evidence_root');
   }
   const scores = evaluatorReceipt.scores ?? {};
-  return scoreCreation(proposal, {
-    novelty: scores.novelty,
-    utility: scores.utility,
-    feasibility: scores.feasibility,
-    risk: scores.risk,
+  const scoreOptions = {
     evidence: [`evaluator:${evaluatorId}:${evidenceRoot}`],
     basedOn: [`evaluator:${evaluatorId}`],
-  });
+  };
+  for (const key of ['novelty', 'utility', 'feasibility', 'risk']) {
+    if (Object.prototype.hasOwnProperty.call(scores, key)) scoreOptions[key] = scores[key];
+  }
+  return scoreCreation(proposal, scoreOptions);
 }
