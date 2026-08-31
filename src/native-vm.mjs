@@ -69,6 +69,7 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
   try {
     const result = spawnSync(vmPath, [bytecodePath], {
       encoding: 'utf8',
+      env: { ...process.env, ...(options.env ?? {}) },
       maxBuffer: options.maxBuffer ?? 16 * 1024 * 1024,
       timeout: options.timeout ?? 30_000,
     });
