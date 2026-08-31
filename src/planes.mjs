@@ -1,6 +1,6 @@
 import { realityRoot } from './canonical.mjs';
 import { isKnowledge } from './knowledge.mjs';
-import { isUtterance, isIntent, isUnderstanding, isCreation } from './cognition.mjs';
+import { isUtterance, isIntent, isUnderstanding, isCreation, isCreationProposal } from './cognition.mjs';
 
 function selectByPrefixes(state, prefixes) {
   const selected = {};
@@ -51,9 +51,14 @@ export function buildUnderstandingReality(program, state, history = []) {
 
 export function buildCreativeReality(program, state, history = []) {
   const values = selectByPrefixes(state, (program.creations ?? []).map(domain => domain.name));
+  const proposals = {};
   const candidates = {};
   const selected = {};
   for (const [path, value] of Object.entries(values)) {
+    if (isCreationProposal(value)) {
+      proposals[path] = value;
+      continue;
+    }
     if (!isCreation(value)) continue;
     candidates[path] = value;
     if (value.status === 'selected') selected[path] = value;
@@ -61,6 +66,7 @@ export function buildCreativeReality(program, state, history = []) {
   return freezePlane({
     format: 'rcl.creative-reality.v0.1',
     program: program.name,
+    proposals,
     candidates,
     selected,
     generations: history.filter(record => record.domainKind === 'creative-plane').map(record => structuredClone(record)),
