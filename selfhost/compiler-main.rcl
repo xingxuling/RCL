@@ -1,6 +1,36 @@
+  reckon k337_scope_matches(granted : Text, required : Text) -> Truth =
+    choose(granted == "*", true,
+      choose(granted == required, true, starts_with(required, granted + ".")))
+
+  reckon k337_warrant_matches(node : Sequence, actor : Text, need : Sequence) -> Truth =
+    warrant_subject(node) == actor
+      and warrant_capability(node) == need_capability(need)
+      and k337_scope_matches(warrant_target(node), need_target(need))
+
+  reckon k337_warrant_exists(items : Sequence, index : Number, actor : Text, need : Sequence) -> Truth =
+    choose(index >= length(items), false,
+      choose(k337_warrant_matches(sequence_get(items, index), actor, need), true,
+        k337_warrant_exists(items, index + 1, actor, need)))
+
+  reckon k337_validate_rule_needs(items : Sequence, index : Number, warrants : Sequence, actor : Text, name : Text) -> Truth =
+    choose(index >= length(items), true,
+      choose(actor == "", k337_validate_rule_needs(items, index + 1, warrants, actor, name),
+        choose(semantic_check(k337_warrant_exists(warrants, 0, actor, sequence_get(items, index)),
+            "RCL_WARRANT_MISSING", name + ":" + actor + ":" + need_capability(sequence_get(items, index)) + ":" + need_target(sequence_get(items, index))),
+          k337_validate_rule_needs(items, index + 1, warrants, actor, name), false)))
+
+  reckon k337_validate_rules(items : Sequence, index : Number, warrants : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(k337_validate_rule_needs(rule_needs(sequence_get(items, index)), 0, warrants,
+          rule_actor(sequence_get(items, index)), rule_name(sequence_get(items, index))),
+        k337_validate_rules(items, index + 1, warrants), false))
+
+  reckon k337_validated_program(program : Sequence) -> Sequence =
+    choose(k337_validate_rules(program_rules(program), 0, program_warrants(program)), program, program)
+
   facet compiler.source : Text = provider_call("compiler_input", "source", "{}")
   facet compiler.tokens : Sequence = tokenize(compiler.source)
-  facet compiler.program : Sequence = parse_program(compiler.tokens)
+  facet compiler.program : Sequence = k337_validated_program(parse_program(compiler.tokens))
   facet compiler.canonical : Text = canonical_program(compiler.program)
   facet compiler.root : Text = program_root(compiler.program)
   facet compiler.strings : Sequence = build_string_pool(compiler.program, compiler.root)
