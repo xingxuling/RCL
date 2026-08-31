@@ -3,21 +3,22 @@
   "status": "PASS",
   "date": "2026-08-31",
   "test_command": "node --test --test-concurrency=1 tests/sga-multiview-provider-v2.test.mjs",
-  "tests": 4,
-  "pass": 4,
+  "tests": 5,
+  "pass": 5,
   "fail": 0,
   "source_bindings": {
     "src/provider-runtime-v2.mjs": "1a5ff42880ac6eb372d79c1af41e075cb06c89eb",
     "src/creative-proposal-api.mjs": "d477b114a5e3131ac7016b8fd443d3335b25fe5d",
     "adapters/sga-multiview-creative-lowering.mjs": "aa93837ccb39be1a4958d0306a821cbc9ef58cbd",
-    "adapters/sga-multiview-provider-v2.mjs": "1b72cc19009ac5f598555c13955fedb45876159f",
-    "tests/sga-multiview-provider-v2.test.mjs": "46fe83e295a03454f28338b0fe1ce34704aaba85"
+    "adapters/sga-multiview-provider-v2.mjs": "f265bec86386c389a55e276444b74b96f1646d09",
+    "tests/sga-multiview-provider-v2.test.mjs": "07e81d724923ffb0f33cdefb4d67267c7853d62c"
   },
   "proven": [
     "RCL ProviderRuntime v2 can invoke a bounded SGA provider definition and lower verified output into unscored CreationProposal values",
     "RCL ProviderRuntime policy rejects an unapproved actor",
-    "invalid SGA provider output fails closed before lowering",
-    "provider listing exposes SGA as a Provider implementation and does not transfer Creative Reality ownership"
+    "invalid SGA Provider output fails closed before lowering",
+    "provider listing exposes SGA as a Provider implementation and does not transfer Creative Reality ownership",
+    "Python SGA subprocess invocation suppresses .pyc/__pycache__ writes so a source-bound provider checkout stays clean"
   ],
   "authority": {
     "candidate_only": true,
@@ -28,11 +29,10 @@
     "rncs_commit_performed": false
   },
   "not_proven": [
-    "real Python subprocess invocation by this unit test",
     "general imagination quality",
     "aesthetic judgment",
     "USCE integration",
     "Canonical promotion"
   ],
-  "receipt_root": "bad16c2afc338cc5fee762ffcba4e33ad3814700541e539cd0fb4dab59bf8f88"
+  "receipt_root": "53204d500e97878ccaac82dea26b3342e7b81c7e5f1c84e5ff8a540f0878147e"
 }
