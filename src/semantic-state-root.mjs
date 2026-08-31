@@ -1,6 +1,8 @@
+import { RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM, semanticStateRootV2 } from './canonical-f64.mjs';
 import { createHash } from 'node:crypto';
 
 export const RCL_NATIVE_STATE_ROOT_ALGORITHM = 'rcl.semantic-state-root.v1';
+export const RCL_NATIVE_STATE_ROOT_ALGORITHMS = Object.freeze([RCL_NATIVE_STATE_ROOT_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM]);
 
 const NATIVE_HEAP_METADATA = new Set([
   '__rclKind',
@@ -54,15 +56,18 @@ export function verifyNativeSemanticStateRoot(payload, options = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_PAYLOAD', 'Native VM payload must be an object', { payload });
   }
-  const computedStateRoot = semanticStateRoot(payload.state ?? {});
   const nativeStateRoot = typeof payload.stateRoot === 'string' ? payload.stateRoot : null;
   const nativeStateRootAlgorithm = typeof payload.stateRootAlgorithm === 'string' ? payload.stateRootAlgorithm : null;
   if ((nativeStateRoot === null) !== (nativeStateRootAlgorithm === null)) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_INCOMPLETE', 'Native VM must emit stateRoot and stateRootAlgorithm together', { nativeStateRoot, nativeStateRootAlgorithm });
   }
-  if (nativeStateRootAlgorithm !== null && nativeStateRootAlgorithm !== RCL_NATIVE_STATE_ROOT_ALGORITHM) {
-    throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', `Unsupported native state root algorithm: ${nativeStateRootAlgorithm}`, { nativeStateRootAlgorithm, expected: RCL_NATIVE_STATE_ROOT_ALGORITHM });
+  if (nativeStateRootAlgorithm !== null && !RCL_NATIVE_STATE_ROOT_ALGORITHMS.includes(nativeStateRootAlgorithm)) {
+    throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', `Unsupported native state root algorithm: ${nativeStateRootAlgorithm}`, { nativeStateRootAlgorithm, expected: RCL_NATIVE_STATE_ROOT_ALGORITHMS });
   }
+  const selectedAlgorithm = nativeStateRootAlgorithm ?? RCL_NATIVE_STATE_ROOT_ALGORITHM;
+  const computedStateRoot = selectedAlgorithm === RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM
+    ? semanticStateRootV2(payload.state ?? {})
+    : semanticStateRoot(payload.state ?? {});
   if (nativeStateRoot !== null && nativeStateRoot !== computedStateRoot) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_MISMATCH', `Native state root ${nativeStateRoot} does not match semantic state root ${computedStateRoot}`, { nativeStateRoot, computedStateRoot });
   }
@@ -74,7 +79,7 @@ export function verifyNativeSemanticStateRoot(payload, options = {}) {
     nativeStateRoot,
     semanticStateRoot: computedStateRoot,
     stateRoot: computedStateRoot,
-    stateRootAlgorithm: nativeStateRootAlgorithm ?? RCL_NATIVE_STATE_ROOT_ALGORITHM,
+    stateRootAlgorithm: selectedAlgorithm,
     stateRootVerified: nativeStateRoot !== null,
     stateRootParity: nativeStateRoot !== null && nativeStateRoot === computedStateRoot,
   };
