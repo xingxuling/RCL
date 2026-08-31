@@ -129,7 +129,7 @@ test('Python SGA invoker does not create __pycache__ in a source-bound checkout'
     const payload = JSON.stringify(candidateSet());
     const moduleSource = [
       'import json',
-      `PAYLOAD = json.loads(${JSON.stringify(JSON.stringify(payload))})`,
+      `PAYLOAD = json.loads(${JSON.stringify(payload)})`,
       'def generate_multiview_candidates(request):',
       '    return PAYLOAD',
       '',
