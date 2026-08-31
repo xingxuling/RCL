@@ -35,13 +35,14 @@ export function createPythonSgaMultiviewInvoker(options = {}) {
   ].join('\n');
 
   return async request => {
-    const result = spawnSync(python, ['-c', script], {
+    const result = spawnSync(python, ['-B', '-c', script], {
       encoding: 'utf8',
       input: JSON.stringify(request),
       timeout: timeoutMs,
       maxBuffer: 8 * 1024 * 1024,
       env: {
         ...process.env,
+        PYTHONDONTWRITEBYTECODE: '1',
         PYTHONPATH: [moduleDir, process.env.PYTHONPATH].filter(Boolean).join(process.platform === 'win32' ? ';' : ':'),
       },
     });
