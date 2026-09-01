@@ -3,7 +3,11 @@ import { canonicalReality } from './canonical.mjs';
 
 export function buildLinkedTypeGraphAdmission(typeModuleSources) {
   const report = compileTypedModuleGraph(typeModuleSources, { throwOnError: true });
-  const canonicalIr = canonicalReality(report.ir);
+  // `report.ir` carries its own convenience `root` field, while `irRoot` was
+  // computed over the pre-root IR.  Reconstruct exactly that preimage so the
+  // RCL-owned sha256_text check verifies the same semantic object.
+  const { root: _embeddedRoot, ...preRootIr } = report.ir;
+  const canonicalIr = canonicalReality(preRootIr);
   return Object.freeze({
     format: 'rcl.selfhost-linked-type-graph-admission.v0.1',
     irRoot: report.irRoot,
