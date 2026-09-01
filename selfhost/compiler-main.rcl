@@ -1,6 +1,39 @@
+  reckon static_scope_matches(granted : Text, required : Text) -> Truth =
+    choose(granted == "*", true,
+      choose(granted == required, true,
+        choose(length(required) <= length(granted), false,
+          slice_text(required, 0, length(granted) + 1) == granted + ".")))
+
+  reckon static_warrant_matches(items : Sequence, index : Number, actor : Text, capability : Text, target : Text) -> Truth =
+    choose(index >= length(items), false,
+      choose(warrant_subject(sequence_get(items, index)) == actor
+          and warrant_capability(sequence_get(items, index)) == capability
+          and static_scope_matches(warrant_target(sequence_get(items, index)), target),
+        true, static_warrant_matches(items, index + 1, actor, capability, target)))
+
+  reckon validate_static_needs(items : Sequence, index : Number, actor : Text, rule_name_value : Text, warrants : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check(static_warrant_matches(warrants, 0, actor,
+            need_capability(sequence_get(items, index)), need_target(sequence_get(items, index))),
+          "RCL_WARRANT_MISSING", actor + ":" + need_capability(sequence_get(items, index)) + "@"
+            + need_target(sequence_get(items, index)) + ":" + rule_name_value),
+        validate_static_needs(items, index + 1, actor, rule_name_value, warrants), false))
+
+  reckon validate_static_rule_warrants(items : Sequence, index : Number, subjects : Sequence, warrants : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check(find_text(subjects, 0, rule_actor(sequence_get(items, index))) >= 0,
+          "RCL_SUBJECT_UNKNOWN", rule_actor(sequence_get(items, index))),
+        choose(validate_static_needs(rule_needs(sequence_get(items, index)), 0,
+            rule_actor(sequence_get(items, index)), rule_name(sequence_get(items, index)), warrants),
+          validate_static_rule_warrants(items, index + 1, subjects, warrants), false), false))
+
+  reckon validate_static_warrants(program : Sequence) -> Sequence =
+    choose(validate_static_rule_warrants(program_rules(program), 0, program_subjects(program), program_warrants(program)),
+      program, program)
+
   facet compiler.source : Text = provider_call("compiler_input", "source", "{}")
   facet compiler.tokens : Sequence = tokenize(compiler.source)
-  facet compiler.program : Sequence = parse_program(compiler.tokens)
+  facet compiler.program : Sequence = validate_static_warrants(parse_program(compiler.tokens))
   facet compiler.canonical : Text = canonical_program(compiler.program)
   facet compiler.root : Text = program_root(compiler.program)
   facet compiler.strings : Sequence = build_string_pool(compiler.program, compiler.root)
