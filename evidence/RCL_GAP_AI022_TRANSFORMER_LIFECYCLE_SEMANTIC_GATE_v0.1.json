@@ -1,0 +1,57 @@
+{
+  "format": "rcl.gap-ai022-transformer-lifecycle-semantic-gate.v0.1",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "date": "2026-09-01",
+  "gap": "RCL_GAP_AI_022 / RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING",
+  "scope_ruling": "Close only the RCL-owned lifecycle/governance semantics. Production corpus, tokenizer, sustained training, GPU execution, final weights, held-out quality and serving performance remain Provider/Data/Runtime evidence responsibilities.",
+  "source_scope": {
+    "src/production-transformer-lifecycle.mjs_git_blob": "935a3916574b90bf7858d614a5a569cc5fc6c463",
+    "tests/production-transformer-lifecycle.test.mjs_git_blob": "59ad5e3761cd39fea0cf597562b7659944687c47"
+  },
+  "targeted_test": {
+    "command": "node --test --test-concurrency=1 tests/production-transformer-lifecycle.test.mjs",
+    "passed": 5,
+    "failed": 0,
+    "checks": [
+      "sequential lifecycle from SPEC_FROZEN to SERVING_CANDIDATE",
+      "corpus license/privacy/poison admission evidence required",
+      "corpus/checkpoint/evaluation lineage preserved",
+      "RCL training-execution owner theft rejected",
+      "contaminated evaluation rejected",
+      "identical evidence produces deterministic lifecycle roots"
+    ]
+  },
+  "rcl_owned_semantics": [
+    "model/optimizer/numerical/provider-plan root binding",
+    "corpus admission gate semantics",
+    "tokenizer lineage binding",
+    "training-ready governance gate",
+    "external-provider training execution boundary",
+    "atomic-checkpoint admission",
+    "held-out evaluation lineage",
+    "autoregressive-serving candidate admission",
+    "deterministic lifecycle and transition receipts"
+  ],
+  "authority_boundary": {
+    "provider_owns_training_execution": true,
+    "rcl_owns_lifecycle_semantics": true,
+    "canonical_promotion_performed": false,
+    "rcl_evidence_commit_performed": false,
+    "rncs_reality_commit_performed": false,
+    "world_fact_promoted": false,
+    "action_authority_granted": false
+  },
+  "remaining_external_evidence": [
+    "production multilingual/code corpus raw-byte admission and provenance",
+    "final production tokenizer artifact and compression/coverage evidence",
+    "sustained multi-block Transformer training and convergence",
+    "production accelerator placement and numerical envelopes",
+    "final trained checkpoint/weights",
+    "held-out language-generation quality evaluation",
+    "KV-cache/sampling/quantization/export execution evidence",
+    "serving throughput/latency/reliability evidence"
+  ],
+  "disposition": "RCL_SEMANTIC_SLICE_CANDIDATE_CLOSED / PRODUCTION_EVIDENCE_OPEN",
+  "canonical_gap_retired": false,
+  "claim_boundary": "This receipt proves the bounded RCL-owned Transformer lifecycle/governance state machine and negative controls only. It does not prove a production Transformer, trained model quality, GPU scale, admitted real corpus, or serving readiness."
+}
