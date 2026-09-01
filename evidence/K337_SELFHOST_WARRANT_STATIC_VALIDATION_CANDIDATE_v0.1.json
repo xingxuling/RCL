@@ -1,0 +1,49 @@
+{
+  "schema_id": "rcl.k337-selfhost-warrant-static-validation-candidate.v0.1",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "date": "2026-09-01",
+  "base_commit": "924b130455cc0118fe2971c1c73c5e7f018a347f",
+  "gap": "RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION",
+  "source_grounding": {
+    "selfhost/compiler-core.rcl_git_blob": "ca12ce1b5ed138ae13085c684686675d1d921b38",
+    "baseline_selfhost/compiler-main.rcl_git_blob": "2d91f0b86390e3998305c742220ac8cdf9178035",
+    "candidate_selfhost/compiler-main.rcl_git_blob": "2a278c1dc4b47f8b69b6ded7b0502752fd5d9161",
+    "candidate_test_git_blob": "c8e2b38271d556993793f8cf668484f02202455d"
+  },
+  "targeted_test": {
+    "command": "node --test --test-concurrency=1 tests/k337-selfhost-warrant-static-validation.test.mjs",
+    "passed": 4,
+    "failed": 0,
+    "duration_ms": 2086.461585,
+    "checks": [
+      "exact subject warrant is accepted and bytecode matches the JS reference compiler",
+      "missing required warrant is rejected before target RBC emission",
+      "hierarchical warrant target matching preserves the reference scope rule",
+      "unknown causing subject is rejected during static validation"
+    ]
+  },
+  "parent_engineering_kit_replay": {
+    "tool": "parent.failure-replay.v0.1",
+    "shell": false,
+    "candidate_returncode": 0,
+    "baseline_returncode": 1,
+    "verdict": "CANDIDATE_IMPROVEMENT",
+    "candidate_signature": "b09f1140174e03444b77622682ef904a9a57695e3c07fdbf2ef2f853c77f9fe0",
+    "baseline_signature": "83c22a7adfc48e01e399023e88f39f97584a38a43c5c65790825612fa701dd1a",
+    "baseline_behavior": "SELFHOST_ACCEPTED_MISSING_WARRANT",
+    "candidate_behavior": "SELFHOST_STATIC_REJECTION"
+  },
+  "authority_boundary": {
+    "canonical_promotion_performed": false,
+    "rcl_evidence_commit_performed": false,
+    "rncs_reality_commit_performed": false,
+    "world_fact_promoted": false,
+    "checked_in_selfhost_compiler_rbc_rebuilt": false
+  },
+  "remaining_gate": [
+    "rebuild selfhost/compiler.rbc and prove new C0 == C1 == C2 fixed point",
+    "replay K01/K327/K337/K339 affected compiler authority suites against the new artifact root",
+    "only then retire the gap from Canonical status"
+  ],
+  "claim_boundary": "This candidate closes the missing static-validation behavior at source/C0 execution level. It does not yet close the fixed-point artifact and downstream authority-root migration required for Canonical retirement of RCL_GAP_K337_SELFHOST_WARRANT_STATIC_VALIDATION."
+}
