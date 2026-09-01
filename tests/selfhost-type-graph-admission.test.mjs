@@ -35,13 +35,15 @@ test('AI008 linked type-graph admission fails closed on root drift', () => {
   const admission = buildLinkedTypeGraphAdmission([tensorSource]);
   assert.throws(
     () => execute(renderRclTypeGraphAdmission(admission, { declaredRoot: '0'.repeat(64) })),
-    /RCL_LINKED_TYPE_GRAPH_ROOT_MISMATCH/u,
+    error => error?.code === 'RCL_SEMANTIC_ASSERT' && /0{64}/u.test(error.message),
   );
 });
 
 test('AI008 linker rejects invalid raw type source before RCL admission', () => {
   assert.throws(
     () => buildLinkedTypeGraphAdmission(['module tensor\nexport record Broken { missing Nope }']),
-    /Invalid record field/u,
+    error => error?.name === 'RCLTypeModuleError'
+      && Array.isArray(error.diagnostics)
+      && error.diagnostics.some(item => item.code === 'RCL_RECORD_FIELD_INVALID'),
   );
 });
