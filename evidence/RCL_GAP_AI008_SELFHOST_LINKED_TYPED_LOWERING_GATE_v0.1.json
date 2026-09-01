@@ -7,27 +7,34 @@
   "source_scope": {
     "src/selfhost-linked-typed-record-lowering.mjs_git_blob": "8bfa80345a23b9c9116de760b12adf4fd8ca6a5a",
     "tests/selfhost-linked-typed-record-lowering.test.mjs_git_blob": "21f709703442b5fad010fec2ee2dfcd96a5bb7f6",
+    "src/selfhost-type-graph-admission.mjs_git_blob": "097b30efcee42cebe5b3d2e809de6569cd8f41ae",
+    "tests/selfhost-type-graph-admission.test.mjs_git_blob": "e4817443d49a49eb161d10aab4817fad58f99002",
     "examples/native-ai/types/tensor.rcltype_git_blob": "09f868b8f2a623bf28e32efe0b1eb4d0eeaaeae9"
   },
   "targeted_test": {
-    "command": "node --test --test-concurrency=1 tests/selfhost-linked-typed-record-lowering.test.mjs",
-    "passed": 3,
+    "command": "node --test --test-concurrency=1 tests/selfhost-type-graph-admission.test.mjs tests/selfhost-linked-typed-record-lowering.test.mjs",
+    "passed": 6,
     "failed": 0,
     "native_vm_built_from_uploaded_exact_source_snapshot": true,
     "checks": [
+      "RCL execution recomputes and accepts the exact linked Tensor type-graph root",
+      "type-graph root drift fails closed",
+      "invalid raw type source is rejected before admission",
       "RCL-authored lowerer emits byte-exact RBC for linked tensor::Tensor record",
-      "same lowerer handles different tensor::CpuDenseStorage record shape",
+      "same RCL lowerer handles tensor::CpuDenseStorage record shape",
       "unsupported linked field expression kind fails closed"
     ]
   },
   "architecture": {
-    "existing_type_graph_linker": "current typed compiler / type-module kernel",
+    "existing_type_graph_linker": "current typed compiler / type-module kernel constructs the linked semantic graph",
+    "rcl_owned_admission": "RCL native execution independently recomputes sha256 over the canonical pre-root type-graph IR and rejects owner/root drift before lowering",
     "rcl_owned_lowering": "rendered RCL lowering program builds RBC header, pools and generic record instruction plan inside native RCL execution",
     "native_target": "RBC MAKE_TYPED_RECORD + STORE_STATE + HALT",
     "special_model_opcode_added": false,
     "tensor_specific_vm_opcode_added": false
   },
   "boundary": {
+    "linked_type_graph_root_admission_candidate_closed": true,
     "linked_typed_record_lowering_candidate_closed": true,
     "raw_rcltype_parsing_inside_selfhost_compiler": false,
     "generic_union_lowering_inside_this_slice": false,
@@ -36,11 +43,11 @@
     "canonical_promotion_performed": false,
     "rcl_evidence_commit_performed": false
   },
-  "disposition": "AI008_REDUCED_TO_RAW_TYPE_GRAPH_SELFHOST_ADMISSION_AND_BROADER_TYPED_EXPRESSION_LOWERING",
+  "disposition": "AI008_SUBSTANTIALLY_REDUCED_TO_RAW_RCLTYPE_SELFHOST_PARSING_LINKING_AND_BROADER_TYPED_EXPRESSION_LOWERING",
   "next_layer": [
-    "move linked type-graph admission/root verification into the self-host compiler boundary",
-    "extend the RCL-owned linked lowerer from record literals to union/nested typed expressions using existing Stage17 typed-value donor semantics",
-    "then unify AI009/AI012 graph construction onto the same SELFHOST_TYPED_LOWERING mother family"
+    "absorb raw .rcltype record/union parser-linker semantics into the self-host boundary or prove it remains an explicit compiler organ",
+    "extend RCL-owned linked lowering from record literals to union/nested typed expressions using existing Stage17 typed-value donor semantics",
+    "unify AI009/AI012 graph construction onto the same SELFHOST_TYPED_LOWERING mother family"
   ],
-  "claim_boundary": "This candidate proves RCL-authored byte-exact lowering for an already-linked bounded typed-record plan across two Tensor-family record shapes. It does not yet prove that raw .rcltype parsing/linking is self-hosted, nor full generic typed-expression lowering."
+  "claim_boundary": "This candidate proves root-bound admission plus RCL-authored byte-exact lowering for an already-linked bounded typed-record graph across two Tensor-family record shapes. It does not yet prove raw .rcltype parsing/linking is self-hosted or full generic typed-expression lowering."
 }
