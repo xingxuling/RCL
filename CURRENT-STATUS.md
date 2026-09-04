@@ -518,3 +518,41 @@ and K400 promotion remain closed. Authority:
 `native/tensor-engine/amd_opencl_bf16_provider.py`,
 `tests/k16-opencl-masked-softmax.test.mjs` and
 `examples/native-ai/evidence/gpu-opencl-masked-softmax-v0.1/k16-opencl-masked-softmax-local-evidence.json`.
+
+## K17 AMD OpenCL mixed Tensor graph candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_MIXED_GRAPH_CANDIDATE`.
+K17 extends the RCL-owned ordered Tensor graph with a bounded generic
+`matmul -> additive masked-softmax` chain. The BF16 matmul output remains an
+ephemeral device resource consumed by the masked-softmax node; intermediate
+readback is rejected and exactly one final readback is allowed. RCL owns the
+Tensor, graph, masking and numerical semantics. The AMD OpenCL provider owns
+only the auxiliary lowering, dispatch and temporary `cl_mem` lifetime.
+
+On the real AMD `gfx1152` device, the `[1,2]` fixture returned exact BF16 bits
+`3f00 3f00`, with exact CPU differential and deterministic execution root
+`fc1ac696f0e92dd4798d4344bd886dc040eb6d21db177bfb0527d2641c9d1a9f`. Local
+K17 is `3/3 PASS`; telemetry recorded zero intermediate readbacks, one final
+readback, three host-to-device transfers, one device-to-host transfer, five
+allocations/releases and zero resident bytes at close. Unknown operation,
+non-additive mask, intermediate readback and shape drift all fail closed.
+
+Exact head `7717296f38326ea30ba82951adecbf95254e851e` passed PR #130 on Ubuntu
+and Windows, including K08 AMD, K09–K16, Authority, Canonical and Universal
+scopes. The PR merged as `main@edc166ae9acb50741c490678e66d078fb821ec5a`;
+post-merge K17, K09–K16, Authority, Canonical and Universal replay also passed.
+The earlier K01 Windows timeout was a transient repository-wide replay event;
+the rerun passed and is retained in the hosted receipt chain.
+
+This remains a bounded lowering candidate. Full graph or training-step
+residency, GPU-native Autodiff/AdamW, GPU training, parallel execution,
+throughput, VRAM, portability, RCL-10M/RCL-1B, production model claims and
+K400 promotion remain closed. Authority:
+`docs/native-ai/gpu-opencl-tensor-mixed-graph-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-tensor-mixed-graph-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-tensor-mixed-graph-genome.rcl`,
+`native/tensor-engine/amd_opencl_bf16_provider.py`,
+`native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`,
+`tests/k17-opencl-tensor-mixed-graph.test.mjs` and
+`examples/native-ai/evidence/gpu-opencl-tensor-mixed-graph-v0.1/k17-opencl-tensor-mixed-graph-local-evidence.json`.
+The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.

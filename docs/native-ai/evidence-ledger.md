@@ -825,3 +825,42 @@ Claims are limited to `OPENCL_AMD_BF16_MASKED_SOFTMAX_LOWERING_CANDIDATE` and
 residency, GPU-native Autodiff/AdamW, GPU training, throughput, VRAM,
 portability, RCL-10M, RCL-1B and K400 promotion remain closed. The K400 matrix
 remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K17 AMD OpenCL mixed Tensor graph candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_MIXED_GRAPH_CANDIDATE`.
+K17 keeps RCL as the canonical owner of generic Tensor graph and masking
+semantics while extending the bounded OpenCL lowerer to an ordered
+`matmul -> additive masked-softmax` chain. The intermediate is an ephemeral
+device resource; intermediate readback is forbidden and one final readback is
+explicit.
+
+| Evidence | Result |
+|---|---:|
+| K17 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, BF16 `[1,2]` mixed graph |
+| Exact output | BF16 bits `3f00 3f00` |
+| CPU differential | exact independent BF16/FP32 reference |
+| Deterministic replay | execution root `fc1ac696f0e92dd4798d4344bd886dc040eb6d21db177bfb0527d2641c9d1a9f` repeated exactly |
+| Residency telemetry | 0 intermediate / 1 final readback; 3 H2D / 1 D2H; 5 allocations / 5 releases; resident bytes 0 at close |
+| Negative controls | unknown operation, non-additive mask, intermediate readback and shape drift fail closed |
+| K17 protocol suite | `3/3 PASS` |
+| K08 AMD and K09–K16 regressions | green locally, exact-head PR #130 and post-merge `edc166a` scope; Canonical/Universal/Authority also SUCCESS |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-tensor-mixed-graph-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-tensor-mixed-graph-contract.v0.1.json`
+- `examples/native-ai/gpu-opencl-tensor-mixed-graph-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`
+- `tests/k17-opencl-tensor-mixed-graph.test.mjs`
+- `examples/native-ai/evidence/gpu-opencl-tensor-mixed-graph-v0.1/k17-opencl-tensor-mixed-graph-local-evidence.json`
+
+Reproduction: `npm run test:k17-opencl-tensor-mixed-graph`.
+Claims are limited to `OPENCL_AMD_ORDERED_TENSOR_MIXED_GRAPH_CANDIDATE` and
+`OPENCL_AMD_GRAPH_MASKED_SOFTMAX_CANDIDATE`. Full graph/output or training-step
+residency, GPU-native Autodiff/AdamW, GPU training, parallel execution,
+throughput, VRAM, portability, RCL-10M, RCL-1B and K400 promotion remain
+closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
