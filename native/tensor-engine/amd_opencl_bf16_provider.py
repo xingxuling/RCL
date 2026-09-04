@@ -28,13 +28,18 @@ BATCH_REQUEST_FORMAT = "rcl.opencl-amd-batch-request.v0.1"
 BATCH_RESULT_FORMAT = "rcl.opencl-amd-batch-result.v0.1"
 SESSION_CLOSE_REQUEST_FORMAT = "rcl.opencl-amd-session-close-request.v0.1"
 SESSION_CLOSE_RESULT_FORMAT = "rcl.opencl-amd-session-close-result.v0.1"
+TENSOR_RESIDENCY_REQUEST_FORMAT = "rcl.opencl-amd-tensor-residency-request.v0.1"
+TENSOR_RESIDENCY_RESULT_FORMAT = "rcl.opencl-amd-tensor-residency-result.v0.1"
 BACKEND = "opencl-amd"
 MAX_DIMENSION = 64
 MAX_ELEMENTS = 4096
 MAX_BATCH_REQUESTS = 64
 SESSION_BUFFER_ARENA_MODE = "session-arena-v0.1"
+TENSOR_RESIDENCY_MODE = "tensor-residency-v0.1"
 MAX_ARENA_BUFFERS = 64
 MAX_ARENA_BYTES = 2 * 1024 * 1024
+MAX_RESIDENT_TENSORS = 64
+MAX_RESIDENT_BYTES = 2 * 1024 * 1024
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -139,6 +144,21 @@ def parse_f32_bits(values: Any, label: str, expected: int | None = None) -> list
 
 def bits_hex(bits: int) -> str:
     return f"{bits:04x}"
+
+
+def tensor_value_root(dtype: str, shape: list[int], bits: list[str]) -> str:
+    """Compute the RCL-owned value root used to bind a resident Tensor."""
+    digest = hashlib.sha256()
+    digest.update(b"rcl.tensor.value-residency.v0.1\0")
+    digest.update(dtype.encode("ascii"))
+    digest.update(b"\0")
+    digest.update(struct.pack("<Q", len(shape)))
+    for dimension in shape:
+        digest.update(struct.pack("<Q", dimension))
+    for value in bits:
+        digest.update(value.encode("ascii"))
+        digest.update(b"\0")
+    return f"sha256:{digest.hexdigest()}"
 
 
 KERNEL = r"""
@@ -488,7 +508,7 @@ class OpenCLRuntime:
     """One bounded OpenCL context/program reused by a provider session."""
 
     def __init__(self, buffer_mode: str | None = None) -> None:
-        if buffer_mode not in {None, SESSION_BUFFER_ARENA_MODE}:
+        if buffer_mode not in {None, SESSION_BUFFER_ARENA_MODE, TENSOR_RESIDENCY_MODE}:
             raise fail(
                 "RCL_OPENCL_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
                 f"unsupported OpenCL buffer allocation mode {buffer_mode}",
@@ -506,6 +526,14 @@ class OpenCLRuntime:
         self.allocation_bytes = 0
         self.reuse_count = 0
         self.release_count = 0
+        self.resident_tensors: dict[str, dict[str, Any]] = {}
+        self.resident_bytes = 0
+        self.tensor_bind_count = 0
+        self.tensor_residency_hit_count = 0
+        self.tensor_replacement_count = 0
+        self.tensor_host_to_device_transfers = 0
+        self.tensor_device_to_host_transfers = 0
+        self.tensor_release_count = 0
         self.context = self.queue = self.program = None
         try:
             properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, self.platform.value, 0)
@@ -558,6 +586,9 @@ class OpenCLRuntime:
     def arena_enabled(self) -> bool:
         return self.buffer_mode == SESSION_BUFFER_ARENA_MODE
 
+    def tensor_residency_enabled(self) -> bool:
+        return self.buffer_mode == TENSOR_RESIDENCY_MODE
+
     def acquire_buffer(self, flags: int, size: int) -> CLHandle:
         key = (flags, size)
         pooled = self.buffer_pool.get(key)
@@ -597,6 +628,150 @@ class OpenCLRuntime:
         self.cl.release_mem(buffer)
         self.release_count += 1
 
+    def bind_resident_tensor(
+        self,
+        identity: str,
+        value_root: str,
+        dtype: str,
+        shape: list[int],
+        bits: list[int] | None,
+        replace: bool = False,
+        previous_value_root: str | None = None,
+    ) -> str:
+        if not self.tensor_residency_enabled():
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+                "Tensor value residency requires the tensor-residency-v0.1 session mode",
+            )
+        existing = self.resident_tensors.get(identity)
+        if existing is not None:
+            if existing["valueRoot"] == value_root:
+                if dtype != existing["dtype"] or shape != existing["shape"]:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_IDENTITY_MISMATCH",
+                        f"resident Tensor {identity} changed dtype or shape without a new identity",
+                    )
+                if bits is not None and tensor_value_root(dtype, shape, [bits_hex(value) for value in bits]) != value_root:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_VALUE_ROOT_MISMATCH",
+                        f"resident Tensor {identity} bits do not match valueRoot",
+                    )
+                self.tensor_residency_hit_count += 1
+                return "elided"
+            if not replace or previous_value_root != existing["valueRoot"]:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_VALUE_STALE",
+                    f"resident Tensor {identity} has a different valueRoot; explicit replacement is required",
+                )
+            if bits is None:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_VALUE_BITS_REQUIRED",
+                    f"resident Tensor {identity} replacement requires value bits",
+                )
+            self._release_resident_tensor(identity)
+            self.tensor_replacement_count += 1
+
+        if bits is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_VALUE_BITS_REQUIRED",
+                f"resident Tensor {identity} requires value bits for its first binding",
+            )
+        if tensor_value_root(dtype, shape, [bits_hex(value) for value in bits]) != value_root:
+            raise fail(
+                "RCL_OPENCL_TENSOR_VALUE_ROOT_MISMATCH",
+                f"resident Tensor {identity} bits do not match valueRoot",
+            )
+        size = len(bits) * ctypes.sizeof(ctypes.c_uint16)
+        if len(self.resident_tensors) >= MAX_RESIDENT_TENSORS:
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_LIMIT",
+                f"resident Tensor count exceeds {MAX_RESIDENT_TENSORS}",
+            )
+        if self.resident_bytes + size > MAX_RESIDENT_BYTES:
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_LIMIT",
+                f"resident Tensor bytes exceed {MAX_RESIDENT_BYTES}",
+            )
+        code = CLInt()
+        flags = CL_MEM_READ_ONLY
+        buffer = self.cl.create_buffer(
+            self.context,
+            flags,
+            size,
+            None,
+            ctypes.byref(code),
+        )
+        check(code.value, "clCreateBuffer:tensor-residency")
+        try:
+            host_data = (ctypes.c_uint16 * len(bits))(*bits)
+            check(
+                self.cl.enqueue_write(
+                    self.queue,
+                    buffer,
+                    1,
+                    0,
+                    size,
+                    ctypes.cast(host_data, ctypes.c_void_p),
+                    0,
+                    None,
+                    None,
+                ),
+                "clEnqueueWriteBuffer:tensor-residency",
+            )
+            check(self.cl.finish(self.queue), "clFinish:tensor-residency-upload")
+        except Exception:
+            self.cl.release_mem(buffer)
+            raise
+        self.resident_tensors[identity] = {
+            "buffer": buffer,
+            "flags": flags,
+            "size": size,
+            "dtype": dtype,
+            "shape": list(shape),
+            "valueRoot": value_root,
+        }
+        self.resident_bytes += size
+        self.allocation_count += 1
+        self.allocation_bytes += size
+        self.tensor_bind_count += 1
+        self.tensor_host_to_device_transfers += 1
+        return "uploaded"
+
+    def resident_tensor(self, identity: str, value_root: str) -> dict[str, Any]:
+        if not self.tensor_residency_enabled():
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+                "Tensor value residency requires the tensor-residency-v0.1 session mode",
+            )
+        resident = self.resident_tensors.get(identity)
+        if resident is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_NOT_RESIDENT",
+                f"Tensor {identity} is not resident in this session",
+            )
+        if resident["valueRoot"] != value_root:
+            raise fail(
+                "RCL_OPENCL_TENSOR_VALUE_STALE",
+                f"resident Tensor {identity} valueRoot does not match the requested value",
+            )
+        return resident
+
+    def _release_resident_tensor(self, identity: str) -> None:
+        resident = self.resident_tensors.pop(identity, None)
+        if resident is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_NOT_RESIDENT",
+                f"Tensor {identity} is not resident in this session",
+            )
+        self.cl.release_mem(resident["buffer"])
+        self.release_count += 1
+        self.tensor_release_count += 1
+        self.resident_bytes -= resident["size"]
+
+    def release_resident_tensor(self, identity: str, value_root: str) -> None:
+        self.resident_tensor(identity, value_root)
+        self._release_resident_tensor(identity)
+
     def session_stats(self) -> dict[str, Any]:
         return {
             "bufferAllocationMode": self.buffer_mode or "per-kernel-v0.1",
@@ -610,10 +785,26 @@ class OpenCLRuntime:
             "peakPooledBytes": self.peak_pooled_bytes,
             "maxArenaBuffers": MAX_ARENA_BUFFERS,
             "maxArenaBytes": MAX_ARENA_BYTES,
-            "tensorValueResidency": False,
+            "tensorValueResidency": self.tensor_residency_enabled(),
+            "residentTensorCount": len(self.resident_tensors),
+            "residentBytes": self.resident_bytes,
+            "maxResidentTensors": MAX_RESIDENT_TENSORS,
+            "maxResidentBytes": MAX_RESIDENT_BYTES,
+            "tensorBindCount": self.tensor_bind_count,
+            "tensorResidencyHitCount": self.tensor_residency_hit_count,
+            "tensorReplacementCount": self.tensor_replacement_count,
+            "tensorHostToDeviceTransfers": self.tensor_host_to_device_transfers,
+            "tensorDeviceToHostTransfers": self.tensor_device_to_host_transfers,
+            "tensorReleaseCount": self.tensor_release_count,
         }
 
     def close(self) -> None:
+        for resident in self.resident_tensors.values():
+            self.cl.release_mem(resident["buffer"])
+            self.release_count += 1
+            self.tensor_release_count += 1
+        self.resident_tensors.clear()
+        self.resident_bytes = 0
         for pooled in self.buffer_pool.values():
             for buffer in pooled:
                 self.cl.release_mem(buffer)
@@ -759,6 +950,264 @@ def run_opencl_kernel(
             cl.release_kernel(kernel)
         if owned_runtime:
             active_runtime.close()
+
+
+def _residency_identity(request: dict[str, Any], field: str) -> str:
+    value = request.get(field)
+    if not isinstance(value, str) or not value or len(value) > 256:
+        raise fail("RCL_OPENCL_TENSOR_IDENTITY", f"{field} must be a non-empty identity string")
+    return value
+
+
+def _residency_root(request: dict[str, Any], field: str) -> str:
+    value = request.get(field)
+    if (
+        not isinstance(value, str)
+        or len(value) != 71
+        or not value.startswith("sha256:")
+        or any(character not in "0123456789abcdef" for character in value[7:])
+    ):
+        raise fail("RCL_OPENCL_TENSOR_VALUE_ROOT", f"{field} must be a canonical sha256 value root")
+    return value
+
+
+def _residency_shape(request: dict[str, Any], field: str = "shape") -> list[int]:
+    shape = request.get(field)
+    if (
+        not isinstance(shape, list)
+        or len(shape) != 2
+        or any(not isinstance(value, int) or isinstance(value, bool) for value in shape)
+        or any(value < 1 or value > MAX_DIMENSION for value in shape)
+    ):
+        raise fail("RCL_OPENCL_TENSOR_SHAPE", f"{field} must be a rank-2 shape within 1..={MAX_DIMENSION}")
+    return [int(value) for value in shape]
+
+
+def _residency_dtype(request: dict[str, Any]) -> str:
+    dtype = request.get("dtype")
+    if dtype != "bf16":
+        raise fail("RCL_OPENCL_TENSOR_DTYPE", "resident Tensor dtype must be bf16")
+    return dtype
+
+
+def run_tensor_residency_bind(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    identity = _residency_identity(request, "tensorIdentity")
+    value_root = _residency_root(request, "valueRoot")
+    dtype = _residency_dtype(request)
+    shape = _residency_shape(request)
+    if request.get("access", "read-only") != "read-only":
+        raise fail("RCL_OPENCL_TENSOR_ACCESS", "resident Tensor bindings are read-only")
+    bits_value = request.get("bits")
+    bits = None if bits_value is None else parse_bits(bits_value, f"Tensor {identity}")
+    if bits is not None and len(bits) != shape[0] * shape[1]:
+        raise fail("RCL_OPENCL_TENSOR_SHAPE", f"Tensor {identity} bit payload length does not match shape")
+    replace = request.get("replace", False)
+    if not isinstance(replace, bool):
+        raise fail("RCL_OPENCL_TENSOR_REPLACEMENT", "replace must be boolean")
+    previous_value_root = request.get("previousValueRoot")
+    if previous_value_root is not None and (
+        not isinstance(previous_value_root, str)
+        or len(previous_value_root) != 71
+        or not previous_value_root.startswith("sha256:")
+        or any(character not in "0123456789abcdef" for character in previous_value_root[7:])
+    ):
+        raise fail("RCL_OPENCL_TENSOR_VALUE_ROOT", "previousValueRoot must be a canonical sha256 value root")
+    transfer = runtime.bind_resident_tensor(
+        identity,
+        value_root,
+        dtype,
+        shape,
+        bits,
+        replace,
+        previous_value_root,
+    )
+    return {
+        "format": TENSOR_RESIDENCY_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_TENSOR_RESIDENCY_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "operation": "bind",
+        "tensorIdentity": identity,
+        "valueRoot": value_root,
+        "transfer": transfer,
+        "resident": True,
+        "device": runtime.device_info,
+    }
+
+
+def run_tensor_residency_release(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    identity = _residency_identity(request, "tensorIdentity")
+    value_root = _residency_root(request, "valueRoot")
+    runtime.release_resident_tensor(identity, value_root)
+    return {
+        "format": TENSOR_RESIDENCY_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_TENSOR_RESIDENCY_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "operation": "release",
+        "tensorIdentity": identity,
+        "valueRoot": value_root,
+        "resident": False,
+        "device": runtime.device_info,
+    }
+
+
+def run_tensor_residency_matmul(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    if request.get("readback") is not True:
+        raise fail(
+            "RCL_OPENCL_TENSOR_READBACK_REQUIRED",
+            "the bounded Tensor residency candidate requires an explicit output readback",
+        )
+    left_identity = _residency_identity(request, "leftTensorIdentity")
+    right_identity = _residency_identity(request, "rightTensorIdentity")
+    left_root = _residency_root(request, "leftValueRoot")
+    right_root = _residency_root(request, "rightValueRoot")
+    rows_value = request.get("rows")
+    columns_value = request.get("columns")
+    shared_value = request.get("shared")
+    dimensions = [rows_value, columns_value, shared_value]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in dimensions):
+        raise fail("RCL_OPENCL_TENSOR_SHAPE", "resident matmul dimensions must be integers")
+    rows, columns, shared = dimensions
+    if any(value < 1 or value > MAX_DIMENSION for value in dimensions):
+        raise fail("RCL_OPENCL_TENSOR_SHAPE", f"resident matmul dimensions must be within 1..={MAX_DIMENSION}")
+    left = runtime.resident_tensor(left_identity, left_root)
+    right = runtime.resident_tensor(right_identity, right_root)
+    if left["dtype"] != "bf16" or right["dtype"] != "bf16":
+        raise fail("RCL_OPENCL_TENSOR_DTYPE", "resident matmul inputs must be bf16")
+    if left["shape"] != [rows, shared] or right["shape"] != [shared, columns]:
+        raise fail("RCL_OPENCL_TENSOR_SHAPE", "resident matmul input shapes do not match the request")
+    output_identity = _residency_identity(request, "outputTensorIdentity")
+    node_id = request.get("nodeId", output_identity)
+    if not isinstance(node_id, str) or not node_id or len(node_id) > 256:
+        raise fail("RCL_OPENCL_TENSOR_IDENTITY", "nodeId must be a non-empty identity string")
+
+    cl = runtime.cl
+    kernel = None
+    output_buffer = None
+    code = CLInt()
+    output_size = rows * columns * ctypes.sizeof(ctypes.c_uint16)
+    try:
+        kernel = cl.create_kernel(runtime.program, b"rcl_bf16_matmul", ctypes.byref(code))
+        check(code.value, "clCreateKernel:tensor-residency-matmul")
+        output_buffer = cl.create_buffer(
+            runtime.context,
+            CL_MEM_WRITE_ONLY,
+            output_size,
+            None,
+            ctypes.byref(code),
+        )
+        check(code.value, "clCreateBuffer:tensor-residency-output")
+        buffers = [left["buffer"], right["buffer"], output_buffer]
+        for index, buffer in enumerate(buffers):
+            argument = CLHandle(buffer)
+            check(
+                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
+                f"clSetKernelArg:tensor-residency:{index}",
+            )
+        for index, value in enumerate((rows, columns, shared), start=len(buffers)):
+            argument = CLUint(value)
+            check(
+                cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
+                f"clSetKernelArg:tensor-residency:scalar:{index}",
+            )
+        global_values = (CLSize * 2)(rows, columns)
+        check(
+            cl.enqueue_kernel(runtime.queue, kernel, 2, None, global_values, None, 0, None, None),
+            "clEnqueueNDRangeKernel:tensor-residency-matmul",
+        )
+        check(cl.finish(runtime.queue), "clFinish:tensor-residency-matmul")
+        host_output = (ctypes.c_uint16 * (rows * columns))()
+        check(
+            cl.enqueue_read(
+                runtime.queue,
+                output_buffer,
+                1,
+                0,
+                output_size,
+                ctypes.cast(host_output, ctypes.c_void_p),
+                0,
+                None,
+                None,
+            ),
+            "clEnqueueReadBuffer:tensor-residency-matmul",
+        )
+        check(cl.finish(runtime.queue), "clFinish:read:tensor-residency-matmul")
+        output_bits = [int(value) for value in host_output]
+        if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
+            raise fail("RCL_OPENCL_BF16_NONFINITE", "resident OpenCL BF16 output is non-finite")
+        runtime.allocation_count += 1
+        runtime.allocation_bytes += output_size
+        runtime.release_count += 1
+        runtime.tensor_device_to_host_transfers += 1
+    finally:
+        if output_buffer is not None:
+            cl.release_mem(output_buffer)
+        if kernel is not None:
+            cl.release_kernel(kernel)
+    output_hex = [bits_hex(bits) for bits in output_bits]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-tensor-residency-matmul-v0.1\0")
+    digest.update(runtime.device_info["deviceName"].encode("utf-8"))
+    digest.update(node_id.encode("utf-8"))
+    digest.update(left_identity.encode("utf-8"))
+    digest.update(left_root.encode("ascii"))
+    digest.update(right_identity.encode("utf-8"))
+    digest.update(right_root.encode("ascii"))
+    digest.update(output_identity.encode("utf-8"))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": TENSOR_RESIDENCY_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_TENSOR_RESIDENCY_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "operation": "matmul",
+        "nodeId": node_id,
+        "leftTensorIdentity": left_identity,
+        "rightTensorIdentity": right_identity,
+        "outputTensorIdentity": output_identity,
+        "outputBits": output_hex,
+        "executionRoot": digest.hexdigest(),
+        "readback": True,
+        "device": runtime.device_info,
+    }
+
+
+def run_tensor_residency(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    if request.get("format") != TENSOR_RESIDENCY_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL Tensor residency request format")
+    if not runtime.tensor_residency_enabled():
+        raise fail(
+            "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+            "Tensor value residency requires the tensor-residency-v0.1 session mode",
+        )
+    operation = request.get("operation")
+    if operation == "bind":
+        return run_tensor_residency_bind(request, runtime)
+    if operation == "release":
+        return run_tensor_residency_release(request, runtime)
+    if operation == "matmul":
+        return run_tensor_residency_matmul(request, runtime)
+    raise fail("RCL_OPENCL_TENSOR_OPERATION", "Tensor residency operation must be bind, matmul or release")
 
 
 def gradient_dimensions(request: dict[str, Any]) -> tuple[int, int, int, int]:
@@ -951,6 +1400,13 @@ def run_batch(
 
 def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[str, Any]:
     request_format = request.get("format")
+    if request_format == TENSOR_RESIDENCY_REQUEST_FORMAT:
+        if runtime is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+                "Tensor value residency requires a persistent provider session",
+            )
+        return run_tensor_residency(request, runtime)
     if request_format == BATCH_REQUEST_FORMAT:
         return run_batch(request, runtime)
     if request_format == GRADIENT_REQUEST_FORMAT:

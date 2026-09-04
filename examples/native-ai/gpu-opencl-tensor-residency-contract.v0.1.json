@@ -1,0 +1,57 @@
+{
+  "format": "rcl.k14.opencl-amd-tensor-residency-contract.v0.1",
+  "status": "OPENCL_AMD_TENSOR_VALUE_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-TENSOR-VALUE-RESIDENCY",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "identity": "storageIdentity",
+    "valueRoot": "sha256 over dtype shape and canonical BF16 bits",
+    "providerRole": "auxiliary OpenCL cl_mem lifetime and kernel execution organ only",
+    "residentAccess": "read-only Tensor values bound to one persistent provider session",
+    "inputTransfer": "host-to-device on first valueRoot bind; elided on exact identity/valueRoot hit",
+    "outputTransfer": "explicit device-to-host readback for every matmul",
+    "fallback": "forbidden"
+  },
+  "residency": {
+    "mode": "tensor-residency-v0.1",
+    "optIn": true,
+    "bindFormat": "rcl.opencl-amd-tensor-residency-request.v0.1",
+    "identityRule": "same storageIdentity and same valueRoot may hit; changed valueRoot requires explicit replacement",
+    "staleRule": "identity/valueRoot mismatch fails closed",
+    "maxResidentTensors": 64,
+    "maxResidentBytes": 2097152,
+    "lifetime": "one bounded provider session",
+    "cleanup": "release every resident cl_mem before context teardown"
+  },
+  "acceptance": [
+    "RCL computes and binds a deterministic valueRoot from dtype, shape and canonical BF16 bits",
+    "first bind uploads exactly once and repeated exact identity/valueRoot binds report transfer elision",
+    "matmul consumes resident references without input bits and preserves exact output bits and execution roots",
+    "changed valueRoot without explicit replacement fails closed",
+    "resident counts and bytes stay within bounds and close releases every resident allocation",
+    "output readback remains explicit for every operation"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_INPUT_TRANSFER_ELISION_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_OUTPUT_RESIDENCY",
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_READ_ONLY_TENSOR_INPUT_RESIDENCY_WITH_EXPLICIT_ROOTS_AND_READBACK"
+}

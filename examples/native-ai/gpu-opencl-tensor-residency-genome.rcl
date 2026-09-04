@@ -1,0 +1,16 @@
+# K14: RCL-owned Tensor value identity and bounded OpenCL input residency.
+# The provider owns only cl_mem lifetime and lowering; it cannot mint identity.
+reality OpenClTensorResidencyCandidate {
+  facet contract.id : Text = "rcl-k14-opencl-amd-tensor-residency-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_CL_MEM_LIFETIME_AND_KERNEL_ORGAN_ONLY"
+  facet contract.mode : Text = "TENSOR_RESIDENCY_V0_1_OPT_IN"
+  facet contract.identity : Text = "STORAGE_IDENTITY_PLUS_VALUE_ROOT"
+  facet contract.stale_rule : Text = "MISMATCH_FAILS_CLOSED_EXPLICIT_REPLACEMENT_REQUIRED"
+  facet contract.max_resident_tensors : Number = 64
+  facet contract.max_resident_bytes : Number = 2097152
+  facet contract.first_input_transfer : Text = "HOST_TO_DEVICE_ON_FIRST_BIND"
+  facet contract.reused_input_transfer : Text = "ELIDED_ON_EXACT_IDENTITY_AND_VALUE_ROOT_HIT"
+  facet contract.output_transfer : Text = "EXPLICIT_DEVICE_TO_HOST_EVERY_MATMUL"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_READ_ONLY_TENSOR_INPUT_RESIDENCY_WITH_EXPLICIT_ROOTS_AND_READBACK"
+}
