@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import Arena from './Arena.jsx';
+import { demoSnapshots } from './demoSnapshots.js';
 import { demoTimeline } from './demoTimeline.js';
 import { shortRoot } from './semanticMotion.js';
 
@@ -66,6 +67,7 @@ export default function App() {
 
   const current = exchanges[index];
   const currentFrames = current?.frames ?? [];
+  const currentSnapshot = demoSnapshots.find(snapshot => snapshot.exchange === current?.exchange) ?? null;
   const wanfeng = currentFrames.find(frame => frame.actorNode === 'fighter:wanfeng') ?? null;
   const opponent = currentFrames.find(frame => frame.actorNode === 'fighter:opponent') ?? null;
   const regime = currentFrames[0]?.regime ?? 'free';
@@ -83,14 +85,19 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [playing, speed, index, exchanges.length]);
 
-  function next() {
+  function moveTo(nextIndex) {
     setPlaying(false);
-    setIndex(value => Math.min(exchanges.length - 1, value + 1));
+    setIndex(Math.max(0, Math.min(exchanges.length - 1, nextIndex)));
   }
 
   function reset() {
     setPlaying(false);
     setIndex(0);
+    setResetToken(value => value + 1);
+  }
+
+  function replayCurrent() {
+    setPlaying(false);
     setResetToken(value => value + 1);
   }
 
@@ -100,11 +107,11 @@ export default function App() {
         <div>
           <p className="eyebrow">UGIS × RCL × Three.js</p>
           <h1>3D 剑客竞技场 · 语义回放原型</h1>
-          <p className="subtitle">UGIS 选路线，RCL 保持证据链，Three.js 只负责把动作表现出来。</p>
+          <p className="subtitle">UGIS 选路线，RCL 保持证据链，Three.js 按 Provider Snapshot 重放动作。</p>
         </div>
         <div className="status-cluster">
           <span className="status-dot" />
-          <span>ActionRoot → BridgeRoot → PlanRoot</span>
+          <span>ActionRoot → BridgeRoot → PlanRoot → SnapshotRoot</span>
         </div>
       </header>
 
@@ -115,11 +122,14 @@ export default function App() {
               <span className={`regime regime-${regime}`}>{REGIME_LABELS[regime]}</span>
               <strong>Exchange {current?.exchange ?? '—'}</strong>
             </div>
-            <span className="projection-id">{demoTimeline.format}</span>
+            <span className="projection-id" title={currentSnapshot?.root ?? ''}>
+              Snapshot {shortRoot(currentSnapshot?.root)}
+            </span>
           </div>
           <div className="canvas-wrap">
             <Arena
               frames={currentFrames}
+              snapshot={currentSnapshot}
               sequenceToken={`${resetToken}:${index}`}
               resetToken={resetToken}
             />
@@ -131,10 +141,12 @@ export default function App() {
 
           <div className="controls">
             <button type="button" onClick={reset}>重置</button>
+            <button type="button" onClick={() => moveTo(index - 1)} disabled={index === 0}>上一交换</button>
             <button type="button" className="primary" onClick={() => setPlaying(value => !value)}>
               {playing ? '暂停' : '播放'}
             </button>
-            <button type="button" onClick={next} disabled={index === exchanges.length - 1}>下一交换</button>
+            <button type="button" onClick={() => moveTo(index + 1)} disabled={index === exchanges.length - 1}>下一交换</button>
+            <button type="button" onClick={replayCurrent}>重放当前</button>
             <label>
               速度
               <select value={speed} onChange={event => setSpeed(Number(event.target.value))}>
@@ -148,16 +160,18 @@ export default function App() {
 
           <div className="timeline" aria-label="交换时间轴">
             {exchanges.map((group, groupIndex) => (
-              <div
+              <button
+                type="button"
                 key={group.exchange}
                 className={`timeline-step ${groupIndex === index ? 'active' : ''} ${groupIndex < index ? 'complete' : ''}`}
+                onClick={() => moveTo(groupIndex)}
               >
                 <span>{REGIME_LABELS[group.frames[0]?.regime]}</span>
                 <strong>{group.exchange}</strong>
-              </div>
+              </button>
             ))}
           </div>
-          <p className="forward-note">v0.1 只允许向前回放；任意跳转 / 倒放将在 Provider Snapshot（场景快照）进入后开放。</p>
+          <p className="forward-note">Provider Snapshot 已启用：跳转会先恢复目标 exchange 的 before 快照，再正向重放该动作；这不是倒放动画。</p>
         </div>
 
         <aside className="inspector">
@@ -168,6 +182,11 @@ export default function App() {
             </div>
             <span>{index + 1}/{exchanges.length}</span>
           </div>
+          <section className="snapshot-card">
+            <strong>Provider Snapshot</strong>
+            <span title={currentSnapshot?.root ?? ''}>{shortRoot(currentSnapshot?.root)}</span>
+            <small>before → after 状态连续，Root 由 RCL realityRoot 计算</small>
+          </section>
           <FighterInspector frame={wanfeng} side="wanfeng-side" />
           <FighterInspector frame={opponent} side="opponent-side" />
           <section className="boundary-card">
