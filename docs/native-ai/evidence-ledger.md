@@ -889,3 +889,5 @@ Reproduction: `npm run test:selfhost-tensor-shape-semantics` and
 `npm run evidence:selfhost-tensor-shape-semantics`. This grants only bounded
 RCL semantic admission. Numerical storage kernels, alias safety, device
 placement, GPU execution, canonical promotion, scale and K400 remain closed.
+Local receipt root: `abda0f6e083dbb3a5737c64f24e22b80a5f2ae62caa990787908d18fc1255c84`;
+implementation source commit: `ff96b1809c75ce47a8a15f18b50b757f00f96a32`.

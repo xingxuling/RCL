@@ -39,3 +39,7 @@ Authority files:
 
 The evidence is a candidate receipt only. It does not promote `RCL_GAP_AI_001`
 to canonical Core or close the remaining Tensor backend and scale gates.
+
+Local evidence receipt root: `abda0f6e083dbb3a5737c64f24e22b80a5f2ae62caa990787908d18fc1255c84`.
+The implementation source commit bound by that receipt is
+`ff96b1809c75ce47a8a15f18b50b757f00f96a32`.

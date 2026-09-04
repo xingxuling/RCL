@@ -1,0 +1,319 @@
+{
+  "format": "rcl.ai001.tensor-shape-semantics-local-evidence.v0.1",
+  "status": "PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE",
+  "implementationCommit": "ff96b1809c75ce47a8a15f18b50b757f00f96a32",
+  "candidate": {
+    "format": "rcl.selfhost.tensor-shape-semantics.v0.1",
+    "manifest": {
+      "format": "rcl.tensor-shape-semantics.v0.1",
+      "dtypePolicy": [
+        "f64"
+      ],
+      "tensors": [
+        {
+          "id": "x",
+          "shape": [
+            2,
+            3
+          ],
+          "strides": [
+            3,
+            1
+          ],
+          "dtype": "f64",
+          "layout": "row-major",
+          "device": "cpu",
+          "storageIdentity": "storage:x",
+          "elementCount": 6
+        },
+        {
+          "id": "bias",
+          "shape": [
+            1,
+            3
+          ],
+          "strides": [
+            3,
+            1
+          ],
+          "dtype": "f64",
+          "layout": "row-major",
+          "device": "cpu",
+          "storageIdentity": "storage:bias",
+          "elementCount": 3
+        },
+        {
+          "id": "weight",
+          "shape": [
+            3,
+            2
+          ],
+          "strides": [
+            2,
+            1
+          ],
+          "dtype": "f64",
+          "layout": "row-major",
+          "device": "cpu",
+          "storageIdentity": "storage:weight",
+          "elementCount": 6
+        }
+      ],
+      "operations": [
+        {
+          "id": "op:add",
+          "kind": "add",
+          "inputs": [
+            "x",
+            "bias"
+          ],
+          "output": {
+            "id": "out:add",
+            "shape": [
+              2,
+              3
+            ],
+            "strides": [
+              3,
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:add",
+            "elementCount": 6
+          },
+          "axis": 0
+        },
+        {
+          "id": "op:mm",
+          "kind": "matmul",
+          "inputs": [
+            "x",
+            "weight"
+          ],
+          "output": {
+            "id": "out:mm",
+            "shape": [
+              2,
+              2
+            ],
+            "strides": [
+              2,
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:mm",
+            "elementCount": 4
+          },
+          "axis": 0
+        },
+        {
+          "id": "op:sum",
+          "kind": "sum",
+          "inputs": [
+            "x"
+          ],
+          "output": {
+            "id": "out:sum",
+            "shape": [
+              2
+            ],
+            "strides": [
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:sum",
+            "elementCount": 2
+          },
+          "axis": 1
+        },
+        {
+          "id": "op:reshape",
+          "kind": "reshape",
+          "inputs": [
+            "x"
+          ],
+          "output": {
+            "id": "out:reshape",
+            "shape": [
+              3,
+              2
+            ],
+            "strides": [
+              2,
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:reshape",
+            "elementCount": 6
+          },
+          "axis": 0
+        },
+        {
+          "id": "op:transpose",
+          "kind": "transpose",
+          "inputs": [
+            "x"
+          ],
+          "output": {
+            "id": "out:transpose",
+            "shape": [
+              3,
+              2
+            ],
+            "strides": [
+              2,
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:transpose",
+            "elementCount": 6
+          },
+          "axis": 0
+        },
+        {
+          "id": "op:softmax",
+          "kind": "softmax",
+          "inputs": [
+            "x"
+          ],
+          "output": {
+            "id": "out:softmax",
+            "shape": [
+              2,
+              3
+            ],
+            "strides": [
+              3,
+              1
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "storageIdentity": "storage:out:softmax",
+            "elementCount": 6
+          },
+          "axis": 0
+        }
+      ],
+      "outputs": [
+        "out:mm",
+        "out:softmax"
+      ],
+      "operationInventory": [
+        {
+          "name": "add",
+          "count": 1
+        },
+        {
+          "name": "matmul",
+          "count": 1
+        },
+        {
+          "name": "reshape",
+          "count": 1
+        },
+        {
+          "name": "softmax",
+          "count": 1
+        },
+        {
+          "name": "sum",
+          "count": 1
+        },
+        {
+          "name": "transpose",
+          "count": 1
+        }
+      ],
+      "modelSourceSha256": "fa4d7510d46f0d5cfe718b25a2de3f649ab7fc31c13d317b51cc086fd3374864",
+      "contractRoot": "3dc3f3f123d72e8ef698f5c2a82a31295806e66e37c18696be0ecea129260741",
+      "manifestCanonical": "{\"contractRoot\":\"3dc3f3f123d72e8ef698f5c2a82a31295806e66e37c18696be0ecea129260741\",\"dtypePolicy\":[\"f64\"],\"format\":\"rcl.tensor-shape-semantics.v0.1\",\"modelSourceSha256\":\"fa4d7510d46f0d5cfe718b25a2de3f649ab7fc31c13d317b51cc086fd3374864\",\"operationInventory\":[{\"count\":1,\"name\":\"add\"},{\"count\":1,\"name\":\"matmul\"},{\"count\":1,\"name\":\"reshape\"},{\"count\":1,\"name\":\"softmax\"},{\"count\":1,\"name\":\"sum\"},{\"count\":1,\"name\":\"transpose\"}],\"operations\":[{\"axis\":0,\"id\":\"op:add\",\"inputs\":[\"x\",\"bias\"],\"kind\":\"add\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"out:add\",\"layout\":\"row-major\",\"shape\":[2,3],\"storageIdentity\":\"storage:out:add\",\"strides\":[3,1]}},{\"axis\":0,\"id\":\"op:mm\",\"inputs\":[\"x\",\"weight\"],\"kind\":\"matmul\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":4,\"id\":\"out:mm\",\"layout\":\"row-major\",\"shape\":[2,2],\"storageIdentity\":\"storage:out:mm\",\"strides\":[2,1]}},{\"axis\":1,\"id\":\"op:sum\",\"inputs\":[\"x\"],\"kind\":\"sum\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":2,\"id\":\"out:sum\",\"layout\":\"row-major\",\"shape\":[2],\"storageIdentity\":\"storage:out:sum\",\"strides\":[1]}},{\"axis\":0,\"id\":\"op:reshape\",\"inputs\":[\"x\"],\"kind\":\"reshape\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"out:reshape\",\"layout\":\"row-major\",\"shape\":[3,2],\"storageIdentity\":\"storage:out:reshape\",\"strides\":[2,1]}},{\"axis\":0,\"id\":\"op:transpose\",\"inputs\":[\"x\"],\"kind\":\"transpose\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"out:transpose\",\"layout\":\"row-major\",\"shape\":[3,2],\"storageIdentity\":\"storage:out:transpose\",\"strides\":[2,1]}},{\"axis\":0,\"id\":\"op:softmax\",\"inputs\":[\"x\"],\"kind\":\"softmax\",\"output\":{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"out:softmax\",\"layout\":\"row-major\",\"shape\":[2,3],\"storageIdentity\":\"storage:out:softmax\",\"strides\":[3,1]}}],\"outputs\":[\"out:mm\",\"out:softmax\"],\"tensors\":[{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"x\",\"layout\":\"row-major\",\"shape\":[2,3],\"storageIdentity\":\"storage:x\",\"strides\":[3,1]},{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":3,\"id\":\"bias\",\"layout\":\"row-major\",\"shape\":[1,3],\"storageIdentity\":\"storage:bias\",\"strides\":[3,1]},{\"device\":\"cpu\",\"dtype\":\"f64\",\"elementCount\":6,\"id\":\"weight\",\"layout\":\"row-major\",\"shape\":[3,2],\"storageIdentity\":\"storage:weight\",\"strides\":[2,1]}]}",
+      "manifestRoot": "28832e15056df7242414a85e522ebebf08db11fcd8122d4fcc554bc14cc31474"
+    },
+    "sourceSha256": "514bf629b3040c8a8967fcc7a5b39870b5f1b03cac49eae34b8c66f5bc91f83d",
+    "semantic": {
+      "tensorCount": 3,
+      "operationCount": 6,
+      "outputCount": 2
+    },
+    "evaluation": {
+      "tensorInventoryValid": true,
+      "operationInventoryValid": true,
+      "outputsValid": true,
+      "manifestRootValid": true,
+      "accepted": true
+    },
+    "lowering": {
+      "status": "accepted"
+    },
+    "native": {
+      "sourceRoot": "2f6476419c5d0143a34cf461b0a59a76c9416bf068a6bb9231413770a47ff0f2",
+      "semanticStateRoot": "ff4c0dd84f5b9af9610cb41c4d8d5acfa079d1d9122ae6f87c6b9d3a363ca4a9",
+      "stateRootVerified": true
+    },
+    "boundary": "RCL_OWNS_TYPED_TENSOR_DESCRIPTOR_SHAPE_LAYOUT_BROADCAST_MATMUL_REDUCTION_ADMISSION; NUMERICAL_STORAGE_KERNEL_DEVICE_PLACEMENT_AND_CANONICAL_PROMOTION_REMAIN_EXTERNAL",
+    "reportRoot": "eba3d277446c4802ba2eb77da96c37ce766c016ec2d745af624d1155407c6cc5"
+  },
+  "negativeCases": {
+    "shape": {
+      "tensorInventoryValid": true,
+      "operationInventoryValid": false,
+      "outputsValid": true,
+      "manifestRootValid": true,
+      "accepted": false
+    },
+    "stride": {
+      "tensorInventoryValid": false,
+      "operationInventoryValid": true,
+      "outputsValid": true,
+      "manifestRootValid": true,
+      "accepted": false
+    },
+    "metadata": {
+      "tensorInventoryValid": true,
+      "operationInventoryValid": false,
+      "outputsValid": true,
+      "manifestRootValid": true,
+      "accepted": false
+    },
+    "reference": {
+      "tensorInventoryValid": true,
+      "operationInventoryValid": false,
+      "outputsValid": true,
+      "manifestRootValid": true,
+      "accepted": false
+    },
+    "manifestRoot": {
+      "tensorInventoryValid": true,
+      "operationInventoryValid": true,
+      "outputsValid": true,
+      "manifestRootValid": false,
+      "accepted": false
+    }
+  },
+  "claimsGranted": [
+    "RCL_OWNS_TYPED_TENSOR_DESCRIPTOR_ADMISSION",
+    "RCL_OWNS_SHAPE_STRIDE_LAYOUT_DTYPE_DEVICE_INTENT_RULES",
+    "RCL_OWNS_BROADCAST_MATMUL_TRANSPOSE_RESHAPE_REDUCTION_SHAPE_RULES",
+    "RCL_SELFHOST_NATIVE_ROOT_VERIFIED"
+  ],
+  "claimsNotGranted": [
+    "AI001_CANONICAL_PROMOTION",
+    "NUMERICAL_KERNEL_PARITY",
+    "GPU_EXECUTION",
+    "K400_PASS"
+  ],
+  "reproduction": "npm run test:selfhost-tensor-shape-semantics",
+  "evidenceBoundary": "RCL_SEMANTIC_ADMISSION_ONLY; NUMERICAL_STORAGE_KERNEL_DEVICE_PLACEMENT_AND_CANONICAL_PROMOTION_REMAIN_EXTERNAL",
+  "reportRoot": "abda0f6e083dbb3a5737c64f24e22b80a5f2ae62caa990787908d18fc1255c84"
+}
