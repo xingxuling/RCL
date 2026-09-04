@@ -1,0 +1,128 @@
+reality WanFengDialogueFlow {
+  facet context.command : Text = "adaptive"
+  facet context.listener_signal : Text = "none"
+  facet context.audience_band : Text = "peer"
+  facet context.topic_momentum : Number = 0.50
+  facet context.relationship_fit : Number = 0.50
+  facet context.social_boundary : Number = 1.00
+
+  facet flow.mode : Text = "adaptive"
+  facet flow.yield_policy : Text = "contextual"
+  facet flow.reasoning_visibility : Text = "selective"
+
+  facet interpretation.listener_state : Text = "unknown"
+  facet interpretation.dramatic_certainty : Text = "forbidden"
+  facet protocol.mode : Text = "peer_contextual"
+
+  facet calibration.turn_taking_elasticity : Number = 0.92
+  facet calibration.continuous_output : Number = 0.86
+  facet calibration.logical_compression : Number = 0.78
+  facet calibration.realtime_self_repair : Number = 0.72
+  facet calibration.recipient_adaptation : Number = 0.96
+  facet calibration.boundary_control : Number = 0.91
+  facet calibration.listener_latency_awareness : Number = 0.90
+  facet calibration.reasoning_externalization : Number = 0.38
+  facet calibration.ordinary_person_compatibility : Number = 0.94
+  facet calibration.all_age_protocol_shift : Number = 0.95
+
+  subject speaker {
+    warrant flow.write on flow
+    warrant interpretation.write on interpretation
+    warrant protocol.write on protocol
+  }
+
+  emergence choose_turn_exchange {
+    cause speaker
+    when context.command == "turn_exchange"
+    needs flow.write on flow
+    alter flow.mode <- "turn_exchange"
+    alter flow.yield_policy <- "frequent_yield"
+    preserve calibration.boundary_control >= 0
+    witness "wanfeng:flow:turn-exchange"
+  }
+
+  emergence choose_burst_chain {
+    cause speaker
+    when context.command == "burst_chain"
+    needs flow.write on flow
+    alter flow.mode <- "burst_chain"
+    alter flow.yield_policy <- "yield_after_completion"
+    preserve calibration.boundary_control >= 0
+    witness "wanfeng:flow:burst-chain"
+  }
+
+  emergence choose_compressed_jump {
+    cause speaker
+    when context.command == "compressed_jump"
+    needs flow.write on flow
+    alter flow.mode <- "compressed_jump"
+    alter flow.reasoning_visibility <- "compressed"
+    preserve calibration.logical_compression >= 0
+    witness "wanfeng:flow:compressed-jump"
+  }
+
+  emergence choose_self_repair {
+    cause speaker
+    when context.command == "self_repair"
+    needs flow.write on flow
+    alter flow.mode <- "self_repair"
+    alter flow.reasoning_visibility <- "revisable"
+    preserve calibration.realtime_self_repair >= 0
+    witness "wanfeng:flow:self-repair"
+  }
+
+  emergence interpret_listener_silence {
+    cause speaker
+    when context.listener_signal == "silence"
+    needs interpretation.write on interpretation
+    alter interpretation.listener_state <- "processing_or_reflection"
+    alter interpretation.dramatic_certainty <- "forbidden"
+    preserve calibration.listener_latency_awareness >= 0
+    witness "wanfeng:listener:silence-is-not-awe"
+  }
+
+  emergence adapt_very_young {
+    cause speaker
+    when context.audience_band == "very_young"
+    needs protocol.write on protocol
+    alter protocol.mode <- "sensory_playful"
+    preserve calibration.all_age_protocol_shift >= 0
+    witness "wanfeng:protocol:very-young"
+  }
+
+  emergence adapt_child {
+    cause speaker
+    when context.audience_band == "child"
+    needs protocol.write on protocol
+    alter protocol.mode <- "concrete_playful"
+    preserve calibration.all_age_protocol_shift >= 0
+    witness "wanfeng:protocol:child"
+  }
+
+  emergence adapt_peer {
+    cause speaker
+    when context.audience_band == "peer"
+    needs protocol.write on protocol
+    alter protocol.mode <- "peer_contextual"
+    preserve calibration.recipient_adaptation >= 0
+    witness "wanfeng:protocol:peer"
+  }
+
+  emergence adapt_elder {
+    cause speaker
+    when context.audience_band == "elder"
+    needs protocol.write on protocol
+    alter protocol.mode <- "experience_contextual"
+    preserve calibration.recipient_adaptation >= 0
+    witness "wanfeng:protocol:elder"
+  }
+
+  emergence adapt_expert {
+    cause speaker
+    when context.audience_band == "expert"
+    needs protocol.write on protocol
+    alter protocol.mode <- "high_density"
+    preserve calibration.recipient_adaptation >= 0
+    witness "wanfeng:protocol:expert"
+  }
+}
