@@ -865,6 +865,47 @@ residency, GPU-native Autodiff/AdamW, GPU training, parallel execution,
 throughput, VRAM, portability, RCL-10M, RCL-1B and K400 promotion remain
 closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
+## K18 AMD OpenCL full-graph/training-step residency candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE`.
+K18 keeps RCL as the canonical owner of generic Tensor graph, masking,
+numeric and training-step semantics while adding a bounded OpenCL residency
+lowering candidate. The graph is `matmul -> add -> additive masked-softmax`,
+with three repeated forward steps. Each node's ephemeral output buffer is
+allocated once, reused across all steps and released before close; no
+intermediate readback is allowed and one final readback is required.
+
+| Evidence | Result |
+|---|---:|
+| K18 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, BF16 `[1,2]`, 3-node graph, 3 steps |
+| Exact output | BF16 bits `3f00 3f00` |
+| CPU differential | exact independent BF16/FP32 reference |
+| Deterministic replay | execution root `564c6e5bd85b47a3b1ad776fc26060d732e5b1d5948bb0afbf815a674299369b` repeated exactly |
+| Residency telemetry | 0 intermediate / 1 final readback; 9 dispatches; 7 allocations / 7 releases; 4 H2D / 1 D2H; resource reuse and training-step residency true |
+| Negative controls | unknown operation, zero steps, intermediate readback and shape drift fail closed |
+| Protocol regressions | K18/K17/K16/K15 `3/3 PASS`; K14 `3/3`, K13 `6/6`, K12 `4/4`, K11/K10/K09/K08 green |
+| Hosted and post-merge | exact-head PR #138 and merged `main@b7e4c70` K18/K09-K17/Authority green; Canonical/Universal receipts recorded in the JSON |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-tensor-training-graph-residency-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-tensor-training-graph-residency-contract.v0.1.json`
+- `examples/native-ai/gpu-opencl-tensor-training-graph-residency-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`
+- `tests/k18-opencl-tensor-training-graph-residency.test.mjs`
+- `examples/native-ai/evidence/gpu-opencl-tensor-training-graph-residency-v0.1/k18-opencl-tensor-training-graph-residency-local-evidence.json`
+
+Reproduction: `npm run test:k18-opencl-tensor-training-graph-residency`.
+Claims are limited to `OPENCL_AMD_FULL_GRAPH_RESIDENCY_CANDIDATE`,
+`OPENCL_AMD_TRAINING_STEP_RESOURCE_REUSE_CANDIDATE` and
+`OPENCL_AMD_GRAPH_ADD_CANDIDATE`. GPU training, GPU-native Autodiff/AdamW,
+full-graph training semantics, parallel execution, throughput, VRAM,
+portability, RCL-10M/RCL-1B and K400 completion remain closed. The K400
+matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
 ## AI001 self-hosted Tensor shape-semantics candidate
 
 Status: `PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE`.

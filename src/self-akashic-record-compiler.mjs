@@ -164,7 +164,10 @@ export const DEFAULT_SELF_AKASHIC_RECORD_SPEC = Object.freeze({
   scan: {
     includeDirs: ['src', 'docs', 'tests', 'examples'],
     excludeDirs: ['node_modules', 'output', 'build', 'native', '.git'],
-    maxFiles: 900,
+    // Keep the repository scan bounded while leaving room for the growing
+    // docs/examples surfaces; the previous 900-file cap truncated tests after
+    // AI001 added evidence artifacts and made the self-record self-inconsistent.
+    maxFiles: 2_000,
   },
   thresholds: {
     minSelfClosureScore: 0.86,
