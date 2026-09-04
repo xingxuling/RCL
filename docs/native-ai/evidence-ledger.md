@@ -906,6 +906,47 @@ full-graph training semantics, parallel execution, throughput, VRAM,
 portability, RCL-10M/RCL-1B and K400 completion remain closed. The K400
 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
+## K19 GPU-native reverse/AdamW persistent session arena candidate
+
+Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`.
+K19 keeps RCL as the canonical owner of generic Tensor graph, BF16/FP32
+numeric semantics, reverse-mode Autodiff, AdamW state and checkpoint identity.
+It runs two repeated optimizer steps through one persistent AMD OpenCL session
+with the bounded `session-arena-v0.1` temporary-buffer pool. Only the generic
+matmul is explicitly GPU-placed; `sub`, `mul` and `mean` remain explicit host
+reference nodes, and no fallback is permitted.
+
+| Evidence | Result |
+|---|---:|
+| K19 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, generic `[2,1]` matmul, 2 steps |
+| Persistent transport | 14 requests / 11 dispatches over one provider session |
+| Arena telemetry | 10 allocations / 40 reuses / 10 releases; 46 allocated bytes; zero pooled at close |
+| Per-kernel baseline | 50 allocations / 232 bytes / zero reuse |
+| CPU differential | exact loss, parameters, optimizer states and checkpoint root |
+| Deterministic replay | PASS; checkpoint resume exact |
+| Focused local suite | `3/3 PASS` |
+| Negative controls | unsupported arena, CPU arena, placement, provider and backend mismatch fail closed |
+| Hosted boundary | PR workflow pending; hosted runners may replay or report unavailable AMD |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-native-reverse-adamw-session-arena-evidence-v0.1.md`
+- `examples/native-ai/gpu-native-reverse-adamw-session-arena-contract.v0.1.json`
+- `examples/native-ai/gpu-native-reverse-adamw-session-arena-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs`
+- `tests/k19-gpu-native-reverse-adamw-session-arena.test.mjs`
+- `examples/native-ai/evidence/gpu-native-reverse-adamw-session-arena-v0.1/k19-gpu-native-reverse-adamw-session-arena-local-evidence.json`
+
+Reproduction: `npm run test:k19-gpu-native-reverse-adamw-session-arena`.
+Claims are limited to bounded persistent GPU reverse/AdamW transport and arena
+reuse. GPU training, full-graph training semantics, GPU-native non-matmul
+Autodiff, throughput, VRAM, portability, production model claims and K400
+promotion remain closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377
+UNTESTED`.
+
 ## AI001 self-hosted Tensor shape-semantics candidate
 
 Status: `PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE`.

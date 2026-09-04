@@ -1,0 +1,146 @@
+{
+  "schema": "rcl.native-ai.gpu-native-reverse-adamw-session-arena.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K19",
+  "status": "PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING",
+  "canonicalOwner": "RCL",
+  "baseMain": "0846e3c1babe518d85a46cfae7b07fc16ff7a76d",
+  "implementationCommit": "065ed48965ce67e34e5b1ad9f45897d9770913fe",
+  "branch": "codex/k19-gpu-training-residency-v01",
+  "contract": "examples/native-ai/gpu-native-reverse-adamw-session-arena-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-native-reverse-adamw-session-arena-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "rustEngine": "native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs",
+  "test": "tests/k19-gpu-native-reverse-adamw-session-arena.test.mjs",
+  "evidenceCommand": "npm run test:k19-gpu-native-reverse-adamw-session-arena",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+  },
+  "localEvidence": {
+    "tests": {
+      "contract": "PASS",
+      "differentialAndArena": "PASS",
+      "boundary": "PASS",
+      "suite": "3/3 PASS"
+    },
+    "request": {
+      "graph": "generic RCL Tensor SSA: matmul -> sub -> mul -> mean",
+      "shape": "[2,1] matmul",
+      "steps": 2,
+      "forwardDtype": "bf16",
+      "gradientDtype": "f32",
+      "masterAndOptimizerDtype": "f32",
+      "gpuPlacement": "matmul",
+      "hostReferencePlacement": ["sub", "mul", "mean"],
+      "fallback": "forbidden"
+    },
+    "arena": {
+      "bufferAllocationMode": "session-arena-v0.1",
+      "providerTransport": "persistent-session-v0.1",
+      "steps": 2,
+      "requests": 14,
+      "dispatches": 11,
+      "allocations": 10,
+      "allocationBytes": 46,
+      "reuses": 40,
+      "releases": 10,
+      "pooledBuffersAtClose": 0,
+      "pooledBytesAtClose": 0,
+      "peakPooledBuffers": 10,
+      "peakPooledBytes": 46,
+      "gpuMatmulNodesInFinalReceipt": 1,
+      "gpuBackwardMatmulNodesInFinalReceipt": 2,
+      "gpuOptimizerElements": 2,
+      "executionRoots": [
+        "2aa9f0c061ff1e3f57af5a269c37211b1bac695776d6c01c7d35cebd7738e173"
+      ],
+      "backwardExecutionRoots": [
+        "0604680adc9cc481596f24e596c93d3d10a39c6902d940e52f91a27aa853c257",
+        "30e834e9291c6483751acf11ccee2e20577754a2c4d1b8b1d1b5dc5f96ef4d97"
+      ],
+      "optimizerExecutionRoots": [
+        "e2c858f6685da0a9a0068892da02e6c076bf16a5d81f5a87f02d40d0397e6bf5",
+        "15d5618fc8bffff34cdcb848f63691b50bf33b86737b20d089fd4d753b97dd98"
+      ],
+      "initialLoss": 0.045166016,
+      "finalLoss": 0.020629883,
+      "checkpointRoot": "sha256:a9a5481ee0c3406385cad7ce2d7f855b48d1bcbb81a9017771ddbca5fc2394e8"
+    },
+    "perKernelBaseline": {
+      "bufferAllocationMode": "per-kernel-v0.1",
+      "allocations": 50,
+      "allocationBytes": 232,
+      "reuses": 0,
+      "releases": 50,
+      "checkpointRoot": "sha256:a9a5481ee0c3406385cad7ce2d7f855b48d1bcbb81a9017771ddbca5fc2394e8"
+    },
+    "differential": {
+      "cpuReferenceTrainingPath": true,
+      "initialLossExact": true,
+      "finalLossExact": true,
+      "parametersExact": true,
+      "optimizerStatesExact": true,
+      "checkpointRootExact": true,
+      "lossDecreased": true,
+      "deterministicReplay": true,
+      "checkpointResumeExact": true
+    },
+    "negativeAndBoundary": {
+      "unsupportedArenaMode": "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+      "cpuArenaUnavailable": "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+      "missingPlacement": "RCL_ACCELERATOR_PLACEMENT_REQUIRED",
+      "cpuMatmulPlacement": "RCL_ACCELERATOR_GPU_PLACEMENT_REQUIRED",
+      "providerUnavailable": "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+      "backendGraphMismatch": "RCL_ACCELERATOR_BACKEND_GRAPH_MISMATCH"
+    },
+    "verification": {
+      "pythonSyntax": "PASS",
+      "rustCargoCheckLocked": "PASS",
+      "nodeSyntax": "PASS",
+      "diffCheck": "PASS",
+      "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+    }
+  },
+  "hostedReplay": {
+    "status": "PENDING_PR_WORKFLOW",
+    "boundary": "Hosted runners prove replay or explicit unavailable-backend fail-closed behavior; they do not inherit this local AMD device receipt"
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale evidence only; no cell promotion"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_GPU_REVERSE_ADAMW_PERSISTENT_SESSION_CANDIDATE",
+    "OPENCL_AMD_GPU_REVERSE_ADAMW_ARENA_REUSE_CANDIDATE",
+    "OPENCL_AMD_GENERIC_MULTI_STEP_REVERSE_ADAMW_TRANSPORT_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_FULL_GRAPH_TRAINING_SEMANTICS",
+    "GPU_NATIVE_NON_MATMUL_AUTODIFF",
+    "GENERIC_GPU_BACKEND",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_RCL_GENERIC_REVERSE_ADAMW_WITH_PERSISTENT_SESSION_AND_BOUNDED_ARENA",
+  "reportRoot": "081fc02df542c08faa85753944ca5668f1aafb0db5f48544bdcf8e314505f1e7"
+}

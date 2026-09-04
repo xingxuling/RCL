@@ -615,3 +615,38 @@ claims and K400 promotion remain closed. Authority:
 `tests/k18-opencl-tensor-training-graph-residency.test.mjs` and
 `examples/native-ai/evidence/gpu-opencl-tensor-training-graph-residency-v0.1/k18-opencl-tensor-training-graph-residency-local-evidence.json`.
 The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K19 GPU-native reverse/AdamW persistent session arena candidate
+
+Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`.
+K19 exercises the existing RCL-owned generic Tensor Autodiff and AdamW path for
+two repeated optimizer steps through one persistent AMD OpenCL provider session
+configured with the bounded `session-arena-v0.1` temporary-buffer pool. The
+fixture has one explicitly GPU-placed BF16 matmul; `sub`, `mul` and `mean`
+remain explicit RCL CPU-reference operations. RCL retains graph, numeric,
+reverse-mode, master-weight, optimizer-state, checkpoint and differential
+ownership; the provider owns only OpenCL lowering, transport and temporary
+buffer reuse, with no fallback.
+
+On the real AMD `gfx1152` device (OpenCL `2.0 AMD-APP (3661.0)`), the local
+`3/3` suite recorded 14 provider requests, 11 dispatches, 10 allocations,
+40 buffer reuses and 10 releases (46 allocated bytes); the arena closed with
+zero pooled buffers and bytes. The per-kernel baseline needed 50 allocations
+and 232 bytes. Arena and per-kernel runs shared checkpoint root
+`sha256:a9a5481ee0c3406385cad7ce2d7f855b48d1bcbb81a9017771ddbca5fc2394e8`,
+and the CPU reference matched loss, parameters, optimizer state, deterministic
+replay and one-step checkpoint resume exactly. Loss moved from `0.045166016`
+to `0.020629883`.
+
+This is a bounded transport/residency candidate, not full-graph GPU training,
+GPU-native non-matmul Autodiff, throughput, VRAM, portability, production
+Transformer training or K400 promotion. Unsupported arena mode, CPU arena use,
+missing/cpu matmul placement, missing provider and backend/graph mismatch all
+fail closed. Authority:
+`docs/native-ai/gpu-native-reverse-adamw-session-arena-evidence-v0.1.md`,
+`examples/native-ai/gpu-native-reverse-adamw-session-arena-contract.v0.1.json`,
+`examples/native-ai/gpu-native-reverse-adamw-session-arena-genome.rcl`,
+`tests/k19-gpu-native-reverse-adamw-session-arena.test.mjs` and
+`examples/native-ai/evidence/gpu-native-reverse-adamw-session-arena-v0.1/k19-gpu-native-reverse-adamw-session-arena-local-evidence.json`.
+Reproduction: `npm run test:k19-gpu-native-reverse-adamw-session-arena`.
+The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
