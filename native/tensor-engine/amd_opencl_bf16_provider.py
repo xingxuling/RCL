@@ -1233,16 +1233,23 @@ def _graph_resource_id(node: dict[str, Any]) -> str:
     return _residency_identity(node, "outputResource")
 
 
-def _graph_dimensions(node: dict[str, Any]) -> tuple[int, int, int]:
-    values = [node.get("rows"), node.get("columns"), node.get("shared")]
+def _graph_dimensions(node: dict[str, Any]) -> tuple[int, int, int | None]:
+    values = [node.get("rows"), node.get("columns")]
     if any(not isinstance(value, int) or isinstance(value, bool) for value in values):
-        raise fail("RCL_OPENCL_TENSOR_GRAPH_SHAPE", "graph matmul dimensions must be integers")
-    rows, columns, shared = values
+        raise fail("RCL_OPENCL_TENSOR_GRAPH_SHAPE", "graph dimensions must be integers")
+    rows, columns = values
     if any(value < 1 or value > MAX_DIMENSION for value in values):
         raise fail(
             "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
-            f"graph matmul dimensions must be within 1..={MAX_DIMENSION}",
+            f"graph dimensions must be within 1..={MAX_DIMENSION}",
         )
+    shared = node.get("shared")
+    if shared is not None:
+        if not isinstance(shared, int) or isinstance(shared, bool) or shared < 1 or shared > MAX_DIMENSION:
+            raise fail(
+                "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
+                f"graph shared dimension must be within 1..={MAX_DIMENSION}",
+            )
     return rows, columns, shared
 
 
@@ -1323,12 +1330,39 @@ def run_tensor_residency_graph(
                     "RCL_OPENCL_TENSOR_GRAPH_READBACK",
                     "the final graph node requires an explicit readback",
                 )
+            operation = node.get("operation", "matmul")
+            if operation not in ("matmul", "masked-softmax"):
+                raise fail(
+                    "RCL_OPENCL_TENSOR_GRAPH_OPERATION",
+                    "graph operation must be matmul or masked-softmax",
+                )
             rows, columns, shared = _graph_dimensions(node)
             left, left_ref = _graph_input(node, "left", runtime, resources)
             right, right_ref = _graph_input(node, "right", runtime, resources)
             if left.get("dtype") != "bf16" or right.get("dtype") != "bf16":
-                raise fail("RCL_OPENCL_TENSOR_DTYPE", "graph matmul inputs must be bf16")
-            if left.get("shape") != [rows, shared] or right.get("shape") != [shared, columns]:
+                raise fail("RCL_OPENCL_TENSOR_DTYPE", "graph inputs must be bf16")
+            if operation == "matmul":
+                if shared is None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
+                        f"graph matmul node {node_id} requires a shared dimension",
+                    )
+                expected_left_shape = [rows, shared]
+                expected_right_shape = [shared, columns]
+            else:
+                if shared is not None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
+                        f"graph masked-softmax node {node_id} must omit shared",
+                    )
+                if node.get("maskMode") != "additive":
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_GRAPH_MASK_MODE",
+                        "graph masked-softmax requires additive maskMode",
+                    )
+                expected_left_shape = [rows, columns]
+                expected_right_shape = [rows, columns]
+            if left.get("shape") != expected_left_shape or right.get("shape") != expected_right_shape:
                 raise fail(
                     "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
                     f"graph node {node_id} input shapes do not match its dimensions",
@@ -1341,8 +1375,9 @@ def run_tensor_residency_graph(
             output_buffer = None
             try:
                 code = CLInt()
-                kernel = cl.create_kernel(runtime.program, b"rcl_bf16_matmul", ctypes.byref(code))
-                check(code.value, "clCreateKernel:tensor-graph-residency")
+                kernel_name = b"rcl_bf16_matmul" if operation == "matmul" else b"rcl_bf16_masked_softmax"
+                kernel = cl.create_kernel(runtime.program, kernel_name, ctypes.byref(code))
+                check(code.value, f"clCreateKernel:tensor-graph-residency:{operation}")
                 output_buffer = cl.create_buffer(
                     runtime.context,
                     CL_MEM_READ_WRITE,
@@ -1354,6 +1389,7 @@ def run_tensor_residency_graph(
                 runtime.allocation_count += 1
                 runtime.allocation_bytes += output_size
                 buffers = [left["buffer"], right["buffer"], output_buffer]
+                scalar_values = (rows, columns, shared) if operation == "matmul" else (rows, columns)
                 for argument_index, buffer in enumerate(buffers):
                     argument = CLHandle(buffer)
                     check(
@@ -1363,9 +1399,9 @@ def run_tensor_residency_graph(
                             ctypes.sizeof(argument),
                             ctypes.byref(argument),
                         ),
-                        f"clSetKernelArg:tensor-graph-residency:{argument_index}",
+                        f"clSetKernelArg:tensor-graph-residency:{operation}:{argument_index}",
                     )
-                for argument_index, value in enumerate((rows, columns, shared), start=len(buffers)):
+                for argument_index, value in enumerate(scalar_values, start=len(buffers)):
                     argument = CLUint(value)
                     check(
                         cl.set_kernel_arg(
@@ -1374,14 +1410,15 @@ def run_tensor_residency_graph(
                             ctypes.sizeof(argument),
                             ctypes.byref(argument),
                         ),
-                        f"clSetKernelArg:tensor-graph-residency:scalar:{argument_index}",
+                        f"clSetKernelArg:tensor-graph-residency:{operation}:scalar:{argument_index}",
                     )
-                global_values = (CLSize * 2)(rows, columns)
+                work_dim = 2 if operation == "matmul" else 1
+                global_values = (CLSize * work_dim)(rows, columns) if work_dim == 2 else (CLSize * 1)(rows)
                 check(
-                    cl.enqueue_kernel(runtime.queue, kernel, 2, None, global_values, None, 0, None, None),
-                    "clEnqueueNDRangeKernel:tensor-graph-residency",
+                    cl.enqueue_kernel(runtime.queue, kernel, work_dim, None, global_values, None, 0, None, None),
+                    f"clEnqueueNDRangeKernel:tensor-graph-residency:{operation}",
                 )
-                check(cl.finish(runtime.queue), "clFinish:tensor-graph-residency")
+                check(cl.finish(runtime.queue), f"clFinish:tensor-graph-residency:{operation}")
                 resources[output_resource] = {
                     "buffer": output_buffer,
                     "size": output_size,
@@ -1404,28 +1441,37 @@ def run_tensor_residency_graph(
                             None,
                             None,
                         ),
-                        "clEnqueueReadBuffer:tensor-graph-residency-final",
+                        f"clEnqueueReadBuffer:tensor-graph-residency-final:{operation}",
                     )
-                    check(cl.finish(runtime.queue), "clFinish:read:tensor-graph-residency-final")
+                    check(cl.finish(runtime.queue), f"clFinish:read:tensor-graph-residency-final:{operation}")
                     output_bits = [int(value) for value in host_output]
                     if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
                         raise fail("RCL_OPENCL_BF16_NONFINITE", "graph OpenCL BF16 output is non-finite")
                     runtime.tensor_device_to_host_transfers += 1
+                if operation == "masked-softmax":
+                    digest.update(operation.encode("ascii"))
+                    digest.update(node.get("maskMode", "").encode("ascii"))
                 digest.update(node_id.encode("utf-8"))
                 digest.update(output_resource.encode("utf-8"))
                 digest.update(left_ref.encode("utf-8"))
                 digest.update(right_ref.encode("utf-8"))
-                digest.update(bytes((rows, columns, shared)))
-                receipts.append({
+                if operation == "matmul":
+                    digest.update(bytes((rows, columns, shared)))
+                else:
+                    digest.update(bytes((rows, columns)))
+                receipt = {
                     "nodeId": node_id,
-                    "operation": "matmul",
+                    "operation": operation,
                     "left": left_ref,
                     "right": right_ref,
                     "outputResource": output_resource,
                     "shape": [rows, columns],
                     "readback": readback,
                     "deviceResidentAfter": index < len(nodes) - 1,
-                })
+                }
+                if operation == "masked-softmax":
+                    receipt["maskMode"] = "additive"
+                receipts.append(receipt)
             except Exception:
                 if output_buffer is not None:
                     cl.release_mem(output_buffer)
