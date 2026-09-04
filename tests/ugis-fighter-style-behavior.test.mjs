@@ -73,12 +73,24 @@ test('guard silhouettes remain style-specific even without trail effects', () =>
 });
 
 test('locomotion body language differs before any attack starts', () => {
+  const wanfengIdle = createFighterLogic('player');
+  wanfengIdle.styleId = 'wanfeng';
+  wanfengIdle.moveMagnitude = 0;
+  wanfengIdle.grounded = true;
+  const wanfengIdlePose = sampleFighterPose({ logic: wanfengIdle, elapsed: 0.31, styleId: 'wanfeng' });
+
   const wanfeng = createFighterLogic('player');
   wanfeng.styleId = 'wanfeng';
   wanfeng.moveMagnitude = 1;
   wanfeng.moveIntent = 'strafe';
   wanfeng.grounded = true;
   const wanfengPose = sampleFighterPose({ logic: wanfeng, elapsed: 0.31, styleId: 'wanfeng' });
+
+  const kendoIdle = createFighterLogic('player');
+  kendoIdle.styleId = 'kendo';
+  kendoIdle.moveMagnitude = 0;
+  kendoIdle.grounded = true;
+  const kendoIdlePose = sampleFighterPose({ logic: kendoIdle, elapsed: 0.31, styleId: 'kendo' });
 
   const kendo = createFighterLogic('player');
   kendo.styleId = 'kendo';
@@ -87,8 +99,13 @@ test('locomotion body language differs before any attack starts', () => {
   kendo.grounded = true;
   const kendoPose = sampleFighterPose({ logic: kendo, elapsed: 0.31, styleId: 'kendo' });
 
-  assert.ok(Math.abs(wanfengPose.pelvis[2]) > Math.abs(kendoPose.pelvis[2]) + 0.025);
-  assert.ok(Math.abs(wanfengPose.chest[1]) > Math.abs(kendoPose.chest[1]) + 0.04);
+  const wanfengRollDelta = Math.abs(wanfengPose.pelvis[2] - wanfengIdlePose.pelvis[2]);
+  const kendoRollDelta = Math.abs(kendoPose.pelvis[2] - kendoIdlePose.pelvis[2]);
+  const wanfengYawDelta = Math.abs(wanfengPose.chest[1] - wanfengIdlePose.chest[1]);
+  const kendoYawDelta = Math.abs(kendoPose.chest[1] - kendoIdlePose.chest[1]);
+
+  assert.ok(wanfengRollDelta > kendoRollDelta * 1.7, `roll delta ${wanfengRollDelta} vs ${kendoRollDelta}`);
+  assert.ok(wanfengYawDelta > kendoYawDelta + 0.02, `yaw delta ${wanfengYawDelta} vs ${kendoYawDelta}`);
 });
 
 test('style behavior references only existing attack ids', () => {
