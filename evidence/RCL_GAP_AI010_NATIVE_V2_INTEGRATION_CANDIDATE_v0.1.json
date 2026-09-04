@@ -1,0 +1,68 @@
+{
+  "format": "rcl.ai010-k333.semantic-state-root-v2-integration-candidate.v0.1",
+  "status": "CANDIDATE_LOCAL_LINUX_REPLAY",
+  "date": "2026-09-04",
+  "candidateBranch": "codex/rcl-ai010-state-root-v2-v01",
+  "gaps": [
+    "RCL_GAP_AI_010",
+    "RCL_GAP_K333_FLOAT_STATE_ROOT_CANONICALIZATION"
+  ],
+  "algorithm": {
+    "candidate": "rcl.semantic-state-root.v2-candidate",
+    "numberEncoding": "IEEE754_BINARY64_HEX_16_LOWERCASE",
+    "negativeZero": "NORMALIZE_TO_POSITIVE_ZERO",
+    "defaultNativeAlgorithmUnchanged": "rcl.semantic-state-root.v1"
+  },
+  "localReplay": {
+    "environment": "HermesUbuntu",
+    "node": "22.22.3",
+    "compiler": "GCC 13.3.0",
+    "tests": {
+      "command": "node --test --test-concurrency=1 tests/semantic-state-root-v2-native-candidate.test.mjs",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "checks": {
+      "javascriptSyntax": "PASS",
+      "gitDiffCheck": "PASS"
+    }
+  },
+  "coverage": {
+    "frozenNumberRootCases": 10,
+    "adjacentMaxSafeIntegerDistinction": true,
+    "nestedNumericSequence": true,
+    "ordinaryVerificationMembraneAdmission": true,
+    "structuredNumericFields": [
+      "sequence",
+      "Span",
+      "ParseState",
+      "Symbol",
+      "SemanticFacet",
+      "IRStore",
+      "LiteralExpr",
+      "TypedRef"
+    ]
+  },
+  "sourceSha256": {
+    "scripts/materialize-semantic-state-root-v2-vm-candidate.mjs": "24dc84c518b14bc0e3b9acf615dfa21f4779ddb22124e54a2058acd6e2972eb8",
+    "tests/semantic-state-root-v2-native-candidate.test.mjs": "a18cd479a6c32659ea88114ba59e38a486587f08894eab26f452f6599b91b142",
+    "src/canonical-f64.mjs": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31",
+    "src/semantic-state-root.mjs": "28b6a5629f78fa03b12558d3c70fdb203dfdfd0f3ce757c754d2453b6699d06b"
+  },
+  "authorityBoundary": {
+    "canonicalPromotionPerformed": false,
+    "windowsCandidateReplayPerformed": false,
+    "hostedCiAuthorityPerformed": false,
+    "historicalRootMigrationPerformed": false,
+    "providerExecutionClaimedAsCore": false
+  },
+  "notProven": [
+    "Windows candidate compiler/build and native parity",
+    "hosted CI authority binding",
+    "canonical v1-to-v2 migration",
+    "full structured-value promotion",
+    "large-state performance envelope"
+  ],
+  "receiptRoot": "9c5d8f7b55b36d64629d6c781cf736b531adb0e98d6569a8e545327f978c3bfe"
+}
