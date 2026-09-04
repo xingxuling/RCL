@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import GameScene from './GameScene.jsx';
 import { ATTACKS, GAME_LIMITS } from './gameRules.js';
+import {
+  AI_DIFFICULTIES,
+  resetUgisAiMemory,
+  setUgisAiDifficulty,
+} from './ugisAi.js';
 
 const REGIME_LABELS = {
   free: '自由间合',
@@ -60,6 +65,13 @@ export default function App() {
   const [paused, setPaused] = useState(false);
   const [showHelp, setShowHelp] = useState(true);
   const [impactSerial, setImpactSerial] = useState(0);
+  const [difficultyId, setDifficultyId] = useState('normal');
+
+  const difficulty = AI_DIFFICULTIES[difficultyId];
+
+  useEffect(() => {
+    setUgisAiDifficulty(difficultyId);
+  }, [difficultyId]);
 
   useEffect(() => {
     if (hud.hitSerial > impactSerial) setImpactSerial(hud.hitSerial);
@@ -79,6 +91,17 @@ export default function App() {
   }, [hud.ended, hud.winner]);
 
   function restart() {
+    resetUgisAiMemory();
+    setPaused(false);
+    setHud(INITIAL_HUD);
+    setShowHelp(true);
+    setResetSignal(value => value + 1);
+  }
+
+  function changeDifficulty(event) {
+    const next = event.target.value;
+    setDifficultyId(next);
+    setUgisAiDifficulty(next);
     setPaused(false);
     setHud(INITIAL_HUD);
     setShowHelp(true);
@@ -108,13 +131,23 @@ export default function App() {
             <Meter value={hud.enemyHp} max={GAME_LIMITS.maxHp} className="enemy-meter" label="敌方生命" />
             <div className="enemy-subline">
               <span>{hud.enemyAction}</span>
-              <span>{regimeLabel} · {hud.distance.toFixed(1)}m</span>
+              <span>{difficulty.label} · {regimeLabel} · {hud.distance.toFixed(1)}m</span>
             </div>
           </div>
 
-          <button type="button" className="pause-button" onClick={() => setPaused(value => !value)}>
-            {paused ? '继续' : '暂停'}
-          </button>
+          <div className="top-actions">
+            <label className={`difficulty-picker difficulty-${difficultyId}`} title={difficulty.summary}>
+              <span>AI 难度</span>
+              <select value={difficultyId} onChange={changeDifficulty}>
+                {Object.values(AI_DIFFICULTIES).map(item => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
+              </select>
+            </label>
+            <button type="button" className="pause-button" onClick={() => setPaused(value => !value)}>
+              {paused ? '继续' : '暂停'}
+            </button>
+          </div>
         </header>
 
         <div className={`regime-banner regime-${hud.regime}`}>{regimeLabel}</div>
@@ -155,15 +188,16 @@ export default function App() {
 
         {showHelp && !hud.ended && (
           <div className="help-card" onClick={() => setShowHelp(false)} role="button" tabIndex={0}>
-            <span>不是回放了，这次可以自己打。</span>
+            <span>默认是「普通」：AI 不再读心，可以被假动作和节奏变化骗到。</span>
             <strong>WASD 移动 · J 连斩 · L 瞬步 · U/I/O 万风技</strong>
-            <small>敌方只显示 UGIS 当前高层路线，不显示研究证据树。</small>
+            <small>想找虐可以把右上角调到「天机」——那就是上一版的不讲武德研究 AI。</small>
           </div>
         )}
 
         {paused && !hud.ended && (
           <div className="pause-overlay">
             <strong>暂停</strong>
+            <p className="difficulty-summary">当前：{difficulty.label} · {difficulty.summary}</p>
             <button type="button" onClick={() => setPaused(false)}>继续战斗</button>
             <button type="button" onClick={restart}>重新开始</button>
           </div>
