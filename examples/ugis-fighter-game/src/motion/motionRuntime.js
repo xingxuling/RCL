@@ -1,3 +1,4 @@
+import { AUTHORED_ACTION_CLIPS } from './authoredActionSets.js';
 import { MOTION_CLIPS } from './motionClips.js';
 import { KENDO_MOTION_CLIPS } from './kendoMotionClips.js';
 
@@ -14,9 +15,14 @@ export const RIG_BONES = Object.freeze([
 function clonePose(pose) {
   const out = {};
   for (const bone of RIG_BONES) out[bone] = [...(pose[bone] ?? [0, 0, 0])];
+  out.bodyOffsetX = pose.bodyOffsetX ?? 0;
   out.bodyOffsetY = pose.bodyOffsetY ?? 0;
+  out.bodyOffsetZ = pose.bodyOffsetZ ?? 0;
+  out.visualYaw = pose.visualYaw ?? 0;
   out.swordGlow = pose.swordGlow ?? 0;
   out.guardFx = Boolean(pose.guardFx);
+  out.weaponMode = pose.weaponMode ?? null;
+  out.actionFamily = pose.actionFamily ?? null;
   return out;
 }
 
@@ -39,8 +45,9 @@ function applyPatch(base, patch) {
   for (const bone of RIG_BONES) {
     if (patch[bone]) out[bone] = mergeRotation(out[bone], patch[bone]);
   }
-  if (typeof patch.bodyOffsetY === 'number') out.bodyOffsetY = patch.bodyOffsetY;
-  if (typeof patch.swordGlow === 'number') out.swordGlow = patch.swordGlow;
+  for (const key of ['bodyOffsetX', 'bodyOffsetY', 'bodyOffsetZ', 'visualYaw', 'swordGlow']) {
+    if (typeof patch[key] === 'number') out[key] = patch[key];
+  }
   if (typeof patch.guardFx === 'boolean') out.guardFx = patch.guardFx;
   return out;
 }
@@ -53,9 +60,14 @@ function interpolatePose(a, b, t) {
     const br = b[bone] ?? ar;
     out[bone] = [lerp(ar[0], br[0], k), lerp(ar[1], br[1], k), lerp(ar[2], br[2], k)];
   }
+  out.bodyOffsetX = lerp(a.bodyOffsetX ?? 0, b.bodyOffsetX ?? 0, k);
   out.bodyOffsetY = lerp(a.bodyOffsetY ?? 0, b.bodyOffsetY ?? 0, k);
+  out.bodyOffsetZ = lerp(a.bodyOffsetZ ?? 0, b.bodyOffsetZ ?? 0, k);
+  out.visualYaw = lerp(a.visualYaw ?? 0, b.visualYaw ?? 0, k);
   out.swordGlow = lerp(a.swordGlow ?? 0, b.swordGlow ?? 0, k);
   out.guardFx = k < 0.5 ? Boolean(a.guardFx) : Boolean(b.guardFx);
+  out.weaponMode = k < 0.5 ? a.weaponMode : b.weaponMode;
+  out.actionFamily = k < 0.5 ? a.actionFamily : b.actionFamily;
   return out;
 }
 
@@ -66,7 +78,8 @@ function wanfengBasePose() {
     shoulderR: r(-5, -3, -6), upperArmR: r(-47, -7, -22), forearmR: r(-56, 0, 9), handR: r(0, 0, -5),
     thighL: r(-5, 0, 3), shinL: r(8, 0, 0), footL: r(-3, 0, 0),
     thighR: r(5, 0, -3), shinR: r(8, 0, 0), footR: r(-3, 0, 0),
-    swordGrip: r(0, 0, -4), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
+    swordGrip: r(0, 0, -4), bodyOffsetX: 0, bodyOffsetY: 0, bodyOffsetZ: 0, visualYaw: 0,
+    swordGlow: 0, guardFx: false, weaponMode: 'one-hand-flow', actionFamily: null,
   };
 }
 
@@ -77,7 +90,8 @@ function kendoBasePose() {
     shoulderR: r(-3, 0, -3), upperArmR: r(-48, -1, -15), forearmR: r(-70, 0, 7), handR: r(0, 0, -1),
     thighL: r(-2, 0, 1), shinL: r(5, 0, 0), footL: r(-2, 0, 0),
     thighR: r(2, 0, -1), shinR: r(5, 0, 0), footR: r(-2, 0, 0),
-    swordGrip: r(-3, 0, 0), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
+    swordGrip: r(-3, 0, 0), bodyOffsetX: 0, bodyOffsetY: 0, bodyOffsetZ: 0, visualYaw: 0,
+    swordGlow: 0, guardFx: false, weaponMode: 'two-hand-center', actionFamily: null,
   };
 }
 
@@ -101,7 +115,10 @@ function sampleClip(clip, normalizedTime, base) {
   }
   const span = Math.max(1e-6, right.t - left.t);
   const localT = Math.max(0, Math.min(1, (t - left.t) / span));
-  return interpolatePose(applyPatch(base, left.pose), applyPatch(base, right.pose), localT);
+  const sampled = interpolatePose(applyPatch(base, left.pose), applyPatch(base, right.pose), localT);
+  sampled.weaponMode = clip.weaponMode ?? sampled.weaponMode;
+  sampled.actionFamily = clip.family ?? null;
+  return sampled;
 }
 
 function applyWanFengLocomotion(pose, logic, elapsed, magnitude) {
@@ -193,7 +210,7 @@ function applyLocomotion(pose, logic, elapsed, styleId) {
 
 function wanfengGuardPose() {
   return {
-    pelvis: r(2, -12, -2), spine: r(-3, 6, 1), chest: r(-5, 14, 4),
+    pelvis: r(2, -12, -2), spine: r(-3, 6, 1), chest: r(-5, 14, 4), visualYaw: -0.14,
     shoulderR: r(-12, -3, -14), upperArmR: r(-80, -8, -38), forearmR: r(-80, 0, 22), handR: r(2, 0, -10),
     shoulderL: r(-10, 4, 12), upperArmL: r(-70, 10, 38), forearmL: r(-84, 0, -20), handL: r(0, 0, 7),
     swordGrip: r(4, -12, -12), guardFx: true,
@@ -202,7 +219,7 @@ function wanfengGuardPose() {
 
 function kendoGuardPose() {
   return {
-    pelvis: r(1, 0, 0), spine: r(-3, 0, 0), chest: r(-5, 0, 0), head: r(0, 0, 0),
+    pelvis: r(1, 0, 0), spine: r(-3, 0, 0), chest: r(-5, 0, 0), head: r(0, 0, 0), visualYaw: 0,
     shoulderR: r(-10, 0, -5), upperArmR: r(-76, 0, -18), forearmR: r(-92, 0, 28), handR: r(3, 0, -4),
     shoulderL: r(-10, 0, 5), upperArmL: r(-70, 0, 20), forearmL: r(-88, 0, -24), handL: r(2, 0, 4),
     swordGrip: r(2, 0, -2), guardFx: true,
@@ -231,6 +248,7 @@ export function sampleFighterPose({ logic, elapsed = 0, enemy = false, styleId }
   if (logic.guard) {
     const guarded = applyPatch(base, guardPose(resolvedStyleId));
     guarded.swordGlow = resolvedStyleId === 'kendo' ? 0.08 : 0.16;
+    guarded.weaponMode = resolvedStyleId === 'kendo' ? 'two-hand-center' : 'one-hand-flow';
     return guarded;
   }
 
@@ -255,6 +273,7 @@ export function sampleFighterPose({ logic, elapsed = 0, enemy = false, styleId }
       dash.thighR = r(-15, 0, -1);
       dash.bodyOffsetY = -0.035;
       dash.swordGlow = 0.12;
+      dash.weaponMode = 'two-hand-center';
     } else {
       dash.pelvis[0] -= 0.13;
       dash.pelvis[1] += 0.07 * (logic.flowSide || 1);
@@ -268,18 +287,22 @@ export function sampleFighterPose({ logic, elapsed = 0, enemy = false, styleId }
       dash.thighL = r(24, 0, 2);
       dash.thighR = r(-20, 0, -2);
       dash.bodyOffsetY = -0.05;
+      dash.visualYaw = 0.14 * (logic.flowSide || 1);
       dash.swordGlow = 0.22;
+      dash.weaponMode = 'one-hand-flow';
     }
     return dash;
   }
 
-  const clip = logic.action ? (MOTION_CLIPS[logic.action] ?? KENDO_MOTION_CLIPS[logic.action]) : null;
+  const clip = logic.action
+    ? (AUTHORED_ACTION_CLIPS[logic.action] ?? MOTION_CLIPS[logic.action] ?? KENDO_MOTION_CLIPS[logic.action])
+    : null;
   if (clip) {
     const p = Math.max(0, Math.min(1, logic.actionTime / Math.max(0.001, logic.actionDuration || 1)));
     const pose = sampleClip(clip, p, base);
     const [a, b] = clip.active;
     const isSkill = logic.action.startsWith('skill_') || logic.action.startsWith('kendo_skill_');
-    pose.swordGlow = p >= a && p <= b ? (isSkill ? 1 : 0.4) : 0.08;
+    pose.swordGlow = p >= a && p <= b ? (isSkill ? 1 : 0.5) : 0.08;
     return pose;
   }
 
