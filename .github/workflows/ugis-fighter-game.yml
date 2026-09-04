@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'examples/ugis-fighter-game/**'
-      - 'tests/ugis-fighter-game.test.mjs'
+      - 'tests/ugis-fighter*.test.mjs'
       - '.github/workflows/ugis-fighter-game.yml'
   workflow_dispatch:
 
@@ -31,9 +31,9 @@ jobs:
       - name: Install game dependencies
         run: npm install --ignore-scripts
 
-      - name: Run game semantic boundary tests
+      - name: Run game semantic and style-behavior tests
         working-directory: .
-        run: node --test tests/ugis-fighter-game.test.mjs
+        run: node --test tests/ugis-fighter*.test.mjs
 
       - name: Build playable Vite bundle
         run: npm run build

@@ -13,6 +13,14 @@ import {
   createFighterLogic,
   observeRegime,
 } from './gameRules.js';
+import {
+  attackLateralFactor,
+  canQueueCombo,
+  comboPolicy,
+  nextFlowSide,
+  shapeMovement,
+  shouldReleaseQueuedCombo,
+} from './styles/styleBehavior.js';
 import { aiAttackFor, getSwordStyle, playerAttackFor } from './styles/swordStyles.js';
 import { chooseUgisRoute, directiveForRoute } from './ugisAi.js';
 
@@ -52,9 +60,17 @@ function relativeBasis(actor, target) {
   return { forward: forward.clone(), right: right.clone() };
 }
 
-function startAttack(logic, attackId, direction) {
-  if (!attackCanStart(logic, attackId)) return false;
+function directionFromStyle(basis, shaped) {
+  const direction = new THREE.Vector3();
+  direction.addScaledVector(basis.forward, shaped.forward);
+  direction.addScaledVector(basis.right, shaped.lateral);
+  if (direction.lengthSq() > 1) direction.normalize();
+  return direction;
+}
+
+function commitAttack(logic, attackId, direction, rightDirection, styleId) {
   const attack = ATTACKS[attackId];
+  if (!attack || logic.hitstun > 0 || logic.energy < attack.energyCost) return false;
   logic.energy = Math.max(0, logic.energy - attack.energyCost);
   logic.action = attackId;
   logic.actionTime = 0;
@@ -63,6 +79,15 @@ function startAttack(logic, attackId, direction) {
   logic.actionSoundPlayed = false;
   logic.actionDirX = direction.x;
   logic.actionDirZ = direction.z;
+  logic.actionRightX = rightDirection?.x ?? -direction.z;
+  logic.actionRightZ = rightDirection?.z ?? direction.x;
+  logic.styleId = styleId;
+  logic.flowSide = nextFlowSide(styleId, logic.flowSide ?? 1, attackId);
+  logic.queuedAttackId = null;
+  logic.queuedDirX = 0;
+  logic.queuedDirZ = 0;
+  logic.queuedRightX = 0;
+  logic.queuedRightZ = 0;
   logic.guard = false;
   logic.moveIntent = 'attack';
   logic.lastActionLabel = attack.label;
@@ -71,7 +96,46 @@ function startAttack(logic, attackId, direction) {
   return true;
 }
 
-function startDash(logic, direction) {
+function startAttack(logic, attackId, direction, rightDirection, styleId) {
+  if (!attackCanStart(logic, attackId)) return false;
+  return commitAttack(logic, attackId, direction, rightDirection, styleId);
+}
+
+function queueLightAttack(logic, style, direction, rightDirection) {
+  if (!logic.action || !style.lightCombo.includes(logic.action)) return false;
+  const duration = Math.max(0.001, logic.actionDuration || ATTACKS[logic.action]?.duration || 1);
+  const normalized = logic.actionTime / duration;
+  const policy = comboPolicy(style.id);
+  const earlyBuffer = Math.max(0, policy.queueFrom - policy.bufferWindow / duration);
+  if (normalized < earlyBuffer) return false;
+
+  const nextIndex = logic.comboStep % style.lightCombo.length;
+  const nextAttackId = style.lightCombo[nextIndex];
+  logic.queuedAttackId = nextAttackId;
+  logic.queuedDirX = direction.x;
+  logic.queuedDirZ = direction.z;
+  logic.queuedRightX = rightDirection.x;
+  logic.queuedRightZ = rightDirection.z;
+  logic.comboStep = (logic.comboStep + 1) % style.lightCombo.length;
+  logic.comboTimer = policy.resetWindow;
+  return true;
+}
+
+function releaseQueuedAttack(logic) {
+  if (!logic.queuedAttackId) return false;
+  const attackId = logic.queuedAttackId;
+  const direction = new THREE.Vector3(logic.queuedDirX, 0, logic.queuedDirZ);
+  const right = new THREE.Vector3(logic.queuedRightX, 0, logic.queuedRightZ);
+  const styleId = logic.styleId || 'wanfeng';
+  logic.action = null;
+  logic.actionTime = 0;
+  logic.actionDuration = 0;
+  logic.actionHit = false;
+  logic.actionSoundPlayed = false;
+  return commitAttack(logic, attackId, direction, right, styleId);
+}
+
+function startDash(logic, direction, styleId = 'wanfeng') {
   if (logic.hitstun > 0 || logic.action || logic.dashCooldown > 0) return false;
   logic.action = 'dash';
   logic.actionTime = 0;
@@ -82,21 +146,31 @@ function startDash(logic, direction) {
   logic.dashCooldown = GAME_LIMITS.dashCooldown;
   logic.invuln = 0.14;
   logic.guard = false;
+  logic.styleId = styleId;
   logic.moveIntent = 'dash';
-  logic.lastActionLabel = '瞬步';
+  logic.lastActionLabel = styleId === 'kendo' ? '踏进' : '瞬步';
   sfx.dash(logic.role);
   return true;
 }
 
-function resetLogic(target, role) {
+function resetLogic(target, role, styleId = role === 'player' ? 'wanfeng' : 'kendo') {
   Object.assign(target, createFighterLogic(role), {
     knockbackX: 0,
     knockbackZ: 0,
     aiGuardTimer: 0,
     actionDuration: 0,
     actionSoundPlayed: false,
+    actionRightX: 1,
+    actionRightZ: 0,
+    queuedAttackId: null,
+    queuedDirX: 0,
+    queuedDirZ: 0,
+    queuedRightX: 0,
+    queuedRightZ: 0,
     stepTravel: 0,
     moveIntent: 'idle',
+    styleId,
+    flowSide: role === 'player' ? 1 : -1,
   });
 }
 
@@ -107,7 +181,10 @@ function updateTimers(logic, delta) {
   logic.comboTimer = Math.max(0, logic.comboTimer - delta);
   logic.flash = Math.max(0, logic.flash - delta);
   logic.aiGuardTimer = Math.max(0, (logic.aiGuardTimer || 0) - delta);
-  if (logic.comboTimer <= 0 && !logic.action) logic.comboStep = 0;
+  if (logic.comboTimer <= 0 && !logic.action) {
+    logic.comboStep = 0;
+    logic.queuedAttackId = null;
+  }
 }
 
 function updateVertical(logic, root, delta) {
@@ -306,8 +383,8 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
   };
 
   useEffect(() => {
-    resetLogic(player.current, 'player');
-    resetLogic(enemy.current, 'enemy');
+    resetLogic(player.current, 'player', playerStyleId);
+    resetLogic(enemy.current, 'enemy', opponentStyleId);
     Object.assign(match.current, {
       hitstop: 0,
       cameraShake: 0,
@@ -413,6 +490,7 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
     logic.actionTime += delta;
     logic.moveMagnitude = attack.move > 0 ? 0.55 : 0;
     logic.moveIntent = 'attack';
+    const normalized = Math.max(0, Math.min(1, logic.actionTime / Math.max(0.001, attack.duration)));
 
     if (!logic.actionSoundPlayed && logic.actionTime >= attack.activeStart * 0.55) {
       logic.actionSoundPlayed = true;
@@ -422,20 +500,30 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
     const moveWindow = Math.min(1, logic.actionTime / Math.max(0.08, attack.activeStart));
     if (logic.actionTime <= attack.activeEnd) {
       const stepSpeed = attack.move / Math.max(0.1, attack.activeEnd);
-      root.position.x += logic.actionDirX * stepSpeed * delta * (0.55 + 0.45 * moveWindow);
-      root.position.z += logic.actionDirZ * stepSpeed * delta * (0.55 + 0.45 * moveWindow);
+      const lateral = attackLateralFactor(logic.styleId, attack.id, logic.flowSide, normalized);
+      const dx = logic.actionDirX + (logic.actionRightX || 0) * lateral;
+      const dz = logic.actionDirZ + (logic.actionRightZ || 0) * lateral;
+      root.position.x += dx * stepSpeed * delta * (0.55 + 0.45 * moveWindow);
+      root.position.z += dz * stepSpeed * delta * (0.55 + 0.45 * moveWindow);
     }
     if (logic.actionTime >= attack.activeStart && logic.actionTime <= attack.activeEnd) {
       tryHit(logic, root, otherLogic, otherRoot, attack);
     }
+
+    if (logic.queuedAttackId && shouldReleaseQueuedCombo(logic.styleId, normalized)) {
+      releaseQueuedAttack(logic);
+      return;
+    }
+
     if (logic.actionTime >= attack.duration) {
       logic.action = null;
       logic.actionTime = 0;
       logic.actionDuration = 0;
       logic.actionHit = false;
       logic.actionSoundPlayed = false;
+      logic.queuedAttackId = null;
       logic.moveMagnitude = 0;
-      logic.moveIntent = 'idle';
+      logic.moveIntent = logic.styleId === 'kendo' ? 'center_hold' : 'idle';
     }
   }
 
@@ -475,15 +563,19 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
     }
 
     const pBasis = relativeBasis(pRoot, eRoot);
-    const playerMove = TMP_C.set(0, 0, 0);
-    if (isDown(keyboard, 'KeyW')) playerMove.add(pBasis.forward);
-    if (isDown(keyboard, 'KeyS')) playerMove.sub(pBasis.forward);
-    if (isDown(keyboard, 'KeyD')) playerMove.add(pBasis.right);
-    if (isDown(keyboard, 'KeyA')) playerMove.sub(pBasis.right);
-    if (playerMove.lengthSq() > 0) playerMove.normalize();
+    const rawForward = (isDown(keyboard, 'KeyW') ? 1 : 0) - (isDown(keyboard, 'KeyS') ? 1 : 0);
+    const rawLateral = (isDown(keyboard, 'KeyD') ? 1 : 0) - (isDown(keyboard, 'KeyA') ? 1 : 0);
 
     p.guard = (isDown(keyboard, 'KeyF') || isDown(keyboard, 'ShiftLeft') || isDown(keyboard, 'ShiftRight'))
       && !p.action && p.hitstun <= 0;
+
+    const playerShaped = shapeMovement(playerStyleId, {
+      forward: rawForward,
+      lateral: rawLateral,
+      flowSide: p.flowSide,
+      guarding: p.guard,
+    });
+    const playerMove = directionFromStyle(pBasis, playerShaped);
 
     if (consumePressed(keyboard, 'KeyK') && p.grounded && p.hitstun <= 0) {
       p.verticalVelocity = GAME_LIMITS.jumpVelocity;
@@ -494,35 +586,43 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
     }
 
     if (consumePressed(keyboard, 'KeyL')) {
-      const dashDir = playerMove.lengthSq() > 0 ? playerMove.clone() : pBasis.forward.clone();
-      if (startDash(p, dashDir)) {
+      const dashShape = rawForward || rawLateral
+        ? playerShaped
+        : shapeMovement(playerStyleId, { forward: 1, lateral: 0, flowSide: p.flowSide });
+      const dashDir = directionFromStyle(pBasis, dashShape);
+      if (startDash(p, dashDir, playerStyleId)) {
         p.route = 'disengage_reentry';
         p.routeLabel = ROUTE_LABELS.disengage_reentry;
       }
     }
 
     if (consumePressed(keyboard, 'KeyJ')) {
-      const comboIndex = p.comboTimer > 0 ? p.comboStep % playerStyle.lightCombo.length : 0;
-      const attackId = playerAttackFor(playerStyleId, 'light', comboIndex);
-      if (startAttack(p, attackId, pBasis.forward)) {
-        p.comboStep = (p.comboStep + 1) % playerStyle.lightCombo.length;
-        p.comboTimer = 0.72;
+      if (p.action && playerStyle.lightCombo.includes(p.action)) {
+        queueLightAttack(p, playerStyle, pBasis.forward, pBasis.right);
+      } else {
+        const comboIndex = p.comboTimer > 0 ? p.comboStep % playerStyle.lightCombo.length : 0;
+        const attackId = playerAttackFor(playerStyleId, 'light', comboIndex);
+        if (startAttack(p, attackId, pBasis.forward, pBasis.right, playerStyleId)) {
+          p.comboStep = (comboIndex + 1) % playerStyle.lightCombo.length;
+          p.comboTimer = comboPolicy(playerStyleId).resetWindow;
+        }
       }
     }
-    if (consumePressed(keyboard, 'KeyH')) startAttack(p, playerAttackFor(playerStyleId, 'heavy'), pBasis.forward);
-    if (consumePressed(keyboard, 'KeyU')) startAttack(p, playerAttackFor(playerStyleId, 'skill_u'), pBasis.forward);
-    if (consumePressed(keyboard, 'KeyI')) startAttack(p, playerAttackFor(playerStyleId, 'skill_i'), pBasis.forward);
-    if (consumePressed(keyboard, 'KeyO')) startAttack(p, playerAttackFor(playerStyleId, 'skill_o'), pBasis.forward);
+    if (consumePressed(keyboard, 'KeyH')) startAttack(p, playerAttackFor(playerStyleId, 'heavy'), pBasis.forward, pBasis.right, playerStyleId);
+    if (consumePressed(keyboard, 'KeyU')) startAttack(p, playerAttackFor(playerStyleId, 'skill_u'), pBasis.forward, pBasis.right, playerStyleId);
+    if (consumePressed(keyboard, 'KeyI')) startAttack(p, playerAttackFor(playerStyleId, 'skill_i'), pBasis.forward, pBasis.right, playerStyleId);
+    if (consumePressed(keyboard, 'KeyO')) startAttack(p, playerAttackFor(playerStyleId, 'skill_o'), pBasis.forward, pBasis.right, playerStyleId);
 
     if (!p.action && p.hitstun <= 0) {
-      const lateral = playerMove.lengthSq() > 0 ? playerMove.dot(pBasis.right) : 0;
-      const forward = playerMove.lengthSq() > 0 ? playerMove.dot(pBasis.forward) : 0;
-      const intent = Math.abs(lateral) > Math.abs(forward) * 0.9 ? 'strafe' : forward < -0.15 ? 'retreat' : 'forward';
-      const speed = Math.abs(lateral) > 0.6 ? GAME_LIMITS.strafeSpeed : GAME_LIMITS.moveSpeed;
-      if (playerMove.lengthSq() > 0) applyMovement(p, pRoot, playerMove, speed, delta, intent);
-      else {
+      const lateral = playerShaped.lateral;
+      const forward = playerShaped.forward;
+      const intent = Math.abs(lateral) > Math.abs(forward) * 0.72 ? 'strafe' : forward < -0.15 ? 'retreat' : forward > 0.05 ? 'forward' : 'idle';
+      const baseSpeed = intent === 'strafe' ? GAME_LIMITS.strafeSpeed : GAME_LIMITS.moveSpeed;
+      if (playerMove.lengthSq() > 0.0001) {
+        applyMovement(p, pRoot, playerMove, baseSpeed * playerShaped.speedScale, delta, intent);
+      } else {
         p.moveMagnitude = 0;
-        p.moveIntent = p.guard ? 'guard' : 'idle';
+        p.moveIntent = p.guard ? (playerStyleId === 'kendo' ? 'center_guard' : 'flow_guard') : 'idle';
       }
     }
 
@@ -548,28 +648,39 @@ function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wa
 
     const eBasis = relativeBasis(eRoot, pRoot);
     const directive = m.aiDirective;
-    const aiMove = TMP_C.set(0, 0, 0);
-    if (directive.movement === 'approach') aiMove.add(eBasis.forward);
-    else if (directive.movement === 'retreat') aiMove.sub(eBasis.forward);
-    else if (directive.movement === 'strafe') aiMove.addScaledVector(eBasis.right, m.aiTick % 2 ? 1 : -1);
-    if (aiMove.lengthSq() > 0) aiMove.normalize();
-
+    const aiRawForward = directive.movement === 'approach' ? 1 : directive.movement === 'retreat' ? -1 : 0;
+    const aiRawLateral = directive.movement === 'strafe' ? (m.aiTick % 2 ? 1 : -1) : 0;
     e.guard = e.aiGuardTimer > 0 && !e.action && e.hitstun <= 0;
+    const aiShaped = shapeMovement(opponentStyleId, {
+      forward: aiRawForward,
+      lateral: aiRawLateral,
+      flowSide: e.flowSide,
+      guarding: e.guard,
+    });
+    const aiMove = directionFromStyle(eBasis, aiShaped);
+
     if (!e.action && e.hitstun <= 0) {
-      if (directive.action === 'dash' && e.dashCooldown <= 0) startDash(e, eBasis.forward);
-      else if (directive.action === 'dash-back' && e.dashCooldown <= 0) startDash(e, eBasis.forward.clone().multiplyScalar(-1));
-      else if (directive.action === 'thrust' && distance < 2.45) {
+      if (directive.action === 'dash' && e.dashCooldown <= 0) {
+        const dashShape = shapeMovement(opponentStyleId, { forward: 1, lateral: 0, flowSide: e.flowSide });
+        startDash(e, directionFromStyle(eBasis, dashShape), opponentStyleId);
+      } else if (directive.action === 'dash-back' && e.dashCooldown <= 0) {
+        const dashShape = shapeMovement(opponentStyleId, { forward: -1, lateral: 0, flowSide: e.flowSide });
+        startDash(e, directionFromStyle(eBasis, dashShape), opponentStyleId);
+      } else if (directive.action === 'thrust' && distance < 2.45) {
         const attackId = aiAttackFor(opponentStyleId, 'thrust');
-        if (attackId) startAttack(e, attackId, eBasis.forward);
+        if (attackId) startAttack(e, attackId, eBasis.forward, eBasis.right, opponentStyleId);
       } else if (directive.action === 'heavy' && distance < 2.2) {
         const attackId = aiAttackFor(opponentStyleId, 'heavy');
-        if (attackId) startAttack(e, attackId, eBasis.forward);
-      } else if (aiMove.lengthSq() > 0) {
-        const intent = directive.movement === 'retreat' ? 'retreat' : directive.movement === 'strafe' ? 'strafe' : 'forward';
-        applyMovement(e, eRoot, aiMove, GAME_LIMITS.moveSpeed * 0.92, delta, intent);
+        if (attackId) startAttack(e, attackId, eBasis.forward, eBasis.right, opponentStyleId);
+      } else if (aiMove.lengthSq() > 0.0001) {
+        const intent = Math.abs(aiShaped.lateral) > Math.abs(aiShaped.forward) * 0.72
+          ? 'strafe'
+          : aiShaped.forward < -0.15 ? 'retreat' : 'forward';
+        const baseSpeed = intent === 'strafe' ? GAME_LIMITS.strafeSpeed : GAME_LIMITS.moveSpeed;
+        applyMovement(e, eRoot, aiMove, baseSpeed * aiShaped.speedScale * 0.92, delta, intent);
       } else {
         e.moveMagnitude = 0;
-        e.moveIntent = e.guard ? 'guard' : 'idle';
+        e.moveIntent = e.guard ? (opponentStyleId === 'kendo' ? 'center_guard' : 'flow_guard') : 'idle';
       }
     }
 
