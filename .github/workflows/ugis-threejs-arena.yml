@@ -1,0 +1,42 @@
+name: UGIS Three.js Arena
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/ugis-threejs-arena/**'
+      - 'tests/ugis-threejs-arena-fixture.test.mjs'
+      - '.github/workflows/ugis-threejs-arena.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: examples/ugis-threejs-arena
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install browser example dependencies
+        run: npm install --ignore-scripts
+
+      - name: Validate evidence-linked timeline
+        run: npm run validate
+
+      - name: Build Vite production bundle
+        run: npm run build
+
+      - name: Run RCL root fixture test
+        working-directory: .
+        run: node --test tests/ugis-threejs-arena-fixture.test.mjs
