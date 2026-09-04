@@ -171,6 +171,7 @@ export {
   RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT,
   RCL_APPLICATION_FRAMEWORK_CATALOG_FORMAT,
   RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_VERIFY_FORMAT,
   RCL_APPLICATION_FRAMEWORK_TARGETS,
   RCL_APPLICATION_FRAMEWORK_CATALOG,
   DEFAULT_RCL_APPLICATION_FRAMEWORK_SPEC,
@@ -180,6 +181,7 @@ export {
   compileRclApplicationFramework,
   traceRclApplicationFramework,
   buildRclApplicationFramework,
+  verifyRclApplicationFrameworkBuild,
   assessRclApplicationFrameworkCatalog,
 } from './application-framework.mjs';
 

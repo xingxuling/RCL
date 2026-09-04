@@ -12,6 +12,7 @@ import {
   listRclApplicationFrameworks,
   normalizeRclApplicationFrameworkSpec,
   traceRclApplicationFramework,
+  verifyRclApplicationFrameworkBuild,
 } from '../src/index.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -103,6 +104,18 @@ test('application framework builder writes inspectable multi-target candidate ar
   assert.equal(JSON.parse(fs.readFileSync(path.join(outputPath, 'semantic-trace.json'), 'utf8')).externalRuntimeExecuted, false);
   assert.match(fs.readFileSync(path.join(outputPath, 'web', 'index.html'), 'utf8'), /window\.RCLNativeUI/u);
   assert.match(fs.readFileSync(path.join(outputPath, 'android', 'MainActivity.java'), 'utf8'), /extends Activity/u);
+  const verified = verifyRclApplicationFrameworkBuild(outputPath);
+  assert.equal(verified.status, 'PASS');
+  assert.deepEqual(verified.errors, []);
+  assert.equal(verified.evidenceLevel, 'STATIC_ARTIFACT_VERIFY');
+
+  const tamperedPath = path.join(outputPath, 'application-framework.json');
+  const tampered = JSON.parse(fs.readFileSync(tamperedPath, 'utf8'));
+  tampered.targets.web.loweringRoot = '0'.repeat(64);
+  fs.writeFileSync(tamperedPath, `${JSON.stringify(tampered, null, 2)}\n`, 'utf8');
+  const failed = verifyRclApplicationFrameworkBuild(outputPath);
+  assert.equal(failed.status, 'FAIL');
+  assert.ok(failed.errors.includes('TARGET_ROOT:web'));
 });
 
 test('CLI exposes framework discovery and candidate artifact generation', () => {
@@ -127,4 +140,15 @@ test('CLI exposes framework discovery and candidate artifact generation', () => 
   assert.equal(built.traceStatus, 'PASS');
   assert.equal(built.evidenceBoundary.browserSession, 'NOT_RUN');
   assert.equal(fs.existsSync(path.join(outputPath, 'application-framework-build.json')), true);
+
+  const verified = JSON.parse(execFileSync(process.execPath, [
+    'src/cli.mjs',
+    'application-framework-verify',
+    outputPath,
+  ], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }));
+  assert.equal(verified.status, 'PASS');
+  assert.equal(verified.evidenceLevel, 'STATIC_ARTIFACT_VERIFY');
 });

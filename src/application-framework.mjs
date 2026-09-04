@@ -13,6 +13,7 @@ export const RCL_APPLICATION_FRAMEWORK_SPEC_FORMAT = 'rcl.application-framework-
 export const RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT = 'rcl.application-framework-trace.v0.1';
 export const RCL_APPLICATION_FRAMEWORK_CATALOG_FORMAT = 'rcl.application-framework-catalog.v0.1';
 export const RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT = 'rcl.application-framework-build.v0.1';
+export const RCL_APPLICATION_FRAMEWORK_VERIFY_FORMAT = 'rcl.application-framework-verify.v0.1';
 
 export const RCL_APPLICATION_FRAMEWORK_TARGETS = Object.freeze(['web', 'android']);
 
@@ -470,6 +471,99 @@ export function buildRclApplicationFramework({ rclPath, outputPath, specPath = n
   };
   writeJson(path.join(root, 'application-framework-build.json'), { ...result, root: realityRoot(result) });
   return Object.freeze({ ...result, root: realityRoot(result) });
+}
+
+export function verifyRclApplicationFrameworkBuild(outputPath) {
+  if (typeof outputPath !== 'string' || outputPath.length === 0) throw new TypeError('RCL_APPLICATION_FRAMEWORK_OUTPUT_PATH');
+  const root = path.resolve(outputPath);
+  const errors = [];
+  const readJson = relative => {
+    try {
+      return JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
+    } catch {
+      errors.push(`MISSING_OR_INVALID:${relative}`);
+      return null;
+    }
+  };
+  const build = readJson('application-framework-build.json');
+  const compiled = readJson('application-framework.json');
+  const trace = readJson('semantic-trace.json');
+  const checkRoot = (label, actual, expected) => {
+    if (actual !== expected) errors.push(`${label}:ROOT_MISMATCH`);
+  };
+  if (compiled) {
+    if (compiled.format !== RCL_APPLICATION_FRAMEWORK_FORMAT) errors.push('COMPILED_FORMAT');
+    checkRoot('compiled', compiled.root, realityRoot({
+      format: compiled.format,
+      version: compiled.version,
+      frameworkId: compiled.frameworkId,
+      sourceRoot: compiled.sourceRoot,
+      uiProgramRoot: compiled.uiProgramRoot,
+      targetRoots: compiled.targetRoots,
+    }));
+    for (const [target, value] of Object.entries(compiled.targets ?? {})) {
+      if (compiled.targetRoots?.[target] !== value.loweringRoot) errors.push(`TARGET_ROOT:${target}`);
+      if (compiled.uiProgramRoot !== value.uiProgramRoot) errors.push(`TARGET_UI_ROOT:${target}`);
+    }
+  }
+  if (trace) {
+    if (trace.format !== RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT) errors.push('TRACE_FORMAT');
+    if (trace.status !== 'PASS' || trace.semanticParity !== true) errors.push('TRACE_NOT_PASS');
+    const comparableTraces = Object.fromEntries(Object.entries(trace.traces ?? {}).map(([target, value]) => [target, comparableTrace(value)]));
+    checkRoot('trace', trace.root, realityRoot({
+      format: trace.format,
+      version: trace.version,
+      frameworkId: trace.frameworkId,
+      status: trace.status,
+      semanticParity: trace.semanticParity,
+      uiProgramRoot: trace.uiProgramRoot,
+      traces: comparableTraces,
+    }));
+  }
+  if (build) {
+    if (build.format !== RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT) errors.push('BUILD_FORMAT');
+    const { root: _buildRoot, ...buildPayload } = build;
+    checkRoot('build', build.root, realityRoot(buildPayload));
+    if (compiled && build.compilationRoot !== compiled.root) errors.push('COMPILATION_ROOT_LINK');
+    if (trace && build.traceRoot !== trace.root) errors.push('TRACE_ROOT_LINK');
+    if (compiled && JSON.stringify(build.targetRoots) !== JSON.stringify(compiled.targetRoots)) errors.push('TARGET_ROOTS_LINK');
+    for (const relative of build.files ?? []) {
+      if (typeof relative !== 'string') {
+        errors.push('FILE_ENTRY_TYPE');
+        continue;
+      }
+      const candidate = path.resolve(root, relative);
+      if (candidate !== root && !candidate.startsWith(`${root}${path.sep}`)) {
+        errors.push(`FILE_OUTSIDE_OUTPUT:${relative}`);
+      } else if (!fs.existsSync(candidate)) {
+        errors.push(`FILE_MISSING:${relative}`);
+      }
+    }
+  }
+  const report = {
+    format: RCL_APPLICATION_FRAMEWORK_VERIFY_FORMAT,
+    version: RCL_APPLICATION_FRAMEWORK_VERSION,
+    status: errors.length === 0 ? 'PASS' : 'FAIL',
+    evidenceLevel: 'STATIC_ARTIFACT_VERIFY',
+    outputPath: root,
+    promotionStatus: 'CANDIDATE_ONLY',
+    verified: {
+      buildManifest: Boolean(build),
+      compilationManifest: Boolean(compiled),
+      semanticTrace: Boolean(trace),
+      listedFiles: Boolean(build) && errors.every(error => !error.startsWith('FILE_')),
+      rootedLinks: errors.every(error => !error.includes('ROOT')),
+    },
+    errors,
+    evidenceBoundary: {
+      hostSemanticReplay: trace?.evidenceLevel ?? 'NOT_AVAILABLE',
+      browserSession: 'NOT_RUN',
+      androidDevice: 'NOT_RUN',
+      apkOrAab: 'NOT_BUILT',
+      productionRelease: 'NOT_DEPLOYED',
+    },
+  };
+  return Object.freeze({ ...report, root: realityRoot(report) });
 }
 
 export function assessRclApplicationFrameworkCatalog() {
