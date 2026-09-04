@@ -144,7 +144,7 @@
       "k10BatchedDispatch": "1_PASS",
       "k09PersistentDispatch": "1_PASS",
       "k08AmdOpenclBf16": "3_PASS",
-      "hostedAndPostMergeScope": "PASS_EXACT_HEAD_AND_MAIN_POSTMERGE_K18_K17_K16_K15_K14_K13_K12_K11_K10_K09_K08_AUTHORITY; CANONICAL_UNIVERSAL_REPO_LEVEL_FAILURE_RECORDED"
+      "hostedAndPostMergeScope": "PASS_EXACT_HEAD_AND_MAIN_POSTMERGE_K18_K17_K16_K15_K14_K13_K12_K11_K10_K09_K08_AUTHORITY; HISTORICAL_REPO_LEVEL_FAILURES_REPAIRED_BY_AI002_GAP_REPAIR"
     },
     "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
   },
@@ -204,6 +204,31 @@
     },
     "boundary": "Main replay is bound to the merged SHA; the local AMD device receipt remains separate and no hosted runner is treated as local hardware"
   },
+  "gapRepairVerification": {
+    "status": "PASS_MAIN_AFTER_AI002_GAP_REPAIR",
+    "mainSha": "607be5683262e2bbd3db4b175288cd3841cf97d1",
+    "sourceHead": "3fdc95509999f071f15d8764d9a90c014759a3ef",
+    "k18Run": {
+      "runId": 33900738676,
+      "jobs": [
+        {"name": "training-graph-residency (ubuntu-latest)", "jobId": 101113949139, "conclusion": "SUCCESS"},
+        {"name": "training-graph-residency (windows-latest)", "jobId": 101113948816, "conclusion": "SUCCESS"}
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerification": {"runId": 33900738417, "jobId": 101113947782, "conclusion": "SUCCESS"},
+    "universalStress": {
+      "runId": 33900738302,
+      "jobs": [101113946992, 101113947416],
+      "conclusion": "SUCCESS"
+    },
+    "selfAkashic": {
+      "tests": "4/4 PASS",
+      "scanMaxFiles": 2000,
+      "orderedIncludeDirs": ["src", "docs", "tests", "examples"]
+    },
+    "boundary": "The repair closes the repository scan regression and records successful bounded replay; it does not promote K400 or claim GPU training, production Transformer training or local AMD hardware on hosted runners"
+  },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
     "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -219,7 +244,7 @@
     "ROBUST": "PASS_LOCAL_FAIL_CLOSED_OPERATION_STEP_SHAPE_AND_READBACK",
     "PERFORMANCE": "DEVICE_RESIDENCY_AND_TRANSFER_TELEMETRY_ONLY_NO_THROUGHPUT_OR_VRAM_CLAIM",
     "AI_GENERATE": "NOT_APPLICABLE",
-    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE_K18_SCOPE_WITH_REPO_LEVEL_CANONICAL_UNIVERSAL_FAILURES_RECORDED"
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE_K18_SCOPE_WITH_HISTORICAL_REPO_FAILURES_REPAIRED_BY_AI002_GAP_REPAIR"
   },
   "claimsGranted": [
     "OPENCL_AMD_FULL_GRAPH_RESIDENCY_CANDIDATE",
@@ -245,5 +270,5 @@
     "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
   ],
   "authority": "CANDIDATE_ONLY_RCL_ORDERED_GENERIC_FORWARD_GRAPH_REUSED_ACROSS_BOUNDED_STEPS_WITH_SINGLE_FINAL_READBACK",
-  "reportRoot": "1de74754e4eea35acce8df3636fb6f796e8689045dbad40eddd3910af8d99e1b"
+  "reportRoot": "8231042d0040113ca35ef01b1c0c2569a45c982b0bc5660b746d4537f8d0b551"
 }

@@ -88,17 +88,19 @@ as `main@87a300130fc52559b005c15d88d5743a5f55d671`.
 After the follow-up AI001 merge, K18 post-merge replay passed on
 `main@b7e4c70839cb5ef896807a77b5e5f88082155be0`: K18 run `33899325135`
 passed Ubuntu job `101109415949` and Windows job `101109415327`, with K09-K17
-and Authority green. The repository-wide Canonical run `33899325240` failed
-only in three existing v0.57 self-Akashic tests because its 900-file bounded
-scan truncated the test surface to 35 after AI001 evidence artifacts were
-merged. Universal run `33899325206` failed only in the Windows K01 fixed-point
-budget: all 41/41 staged self-host steps passed, but C0 -> C1 -> C2 exceeded
-the declared 240000 ms limit. Neither failure involved K18. A minimal bounded
-scan-cap repair is included in this evidence branch; K01 remains an explicit
-repository-level performance failure until its timeout is independently
-resolved. Hosted runners prove repository replay or explicit unavailable-
-backend fail-closed behavior; they do not inherit the local AMD device
-receipt.
+and Authority green. That historical replay recorded three self-Akashic scan
+failures and a separate Windows K01 budget failure; neither involved K18.
+AI002 repair #139 then fixed the bounded self-Akashic scan ordering/cap and
+passed the current repository gates on final head
+`3fdc95509999f071f15d8764d9a90c014759a3ef`: K18 workflow `33900738676`,
+Canonical `33900738417` and Universal `33900738302` all succeeded. The
+self-Akashic suite is now `4/4 PASS`, with a bounded 2,000-file scan ordered
+as `src`, `docs`, `tests`, `examples`; the earlier failures are therefore
+historical, not current-main failures. Evidence-only PR #141 subsequently
+merged as `main@14f3aa957d2c4eec787a53099453873073ed480c` with its repository
+checks green. Hosted runners prove repository replay or explicit
+unavailable-backend fail-closed behavior; they do not inherit the local AMD
+device receipt.
 
 ## Authority files
 

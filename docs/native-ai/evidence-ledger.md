@@ -885,7 +885,7 @@ intermediate readback is allowed and one final readback is required.
 | Residency telemetry | 0 intermediate / 1 final readback; 9 dispatches; 7 allocations / 7 releases; 4 H2D / 1 D2H; resource reuse and training-step residency true |
 | Negative controls | unknown operation, zero steps, intermediate readback and shape drift fail closed |
 | Protocol regressions | K18/K17/K16/K15 `3/3 PASS`; K14 `3/3`, K13 `6/6`, K12 `4/4`, K11/K10/K09/K08 green |
-| Hosted and post-merge | exact-head PR #138 and merged `main@b7e4c70` K18/K09-K17/Authority green; Canonical/Universal receipts recorded in the JSON |
+| Hosted and post-merge | exact-head PR #138 and merged `main@b7e4c70` K18/K09-K17/Authority green; AI002 repair #139 then passed K18 (`33900738676`), Canonical (`33900738417`) and Universal (`33900738302`) on final head `3fdc955`; evidence-only #141 merged as `main@14f3aa9` with repository checks green |
 | License audit | PASS, no new dependencies or donor code |
 
 Authority files:
