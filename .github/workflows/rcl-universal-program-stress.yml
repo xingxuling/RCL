@@ -52,6 +52,10 @@ on:
       - 'scripts/verify-k04-server-candidate.mjs'
       - 'scripts/run-k04-independent-ai-generation.mjs'
       - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
+      - 'scripts/run-k04-game-independent-ai-generation.mjs'
+      - 'scripts/verify-k04-game-ai-generation-receipt.mjs'
+      - 'scripts/verify-k04-game-candidate.mjs'
+      - 'tests/k04-game-ai-generation-receipt.test.mjs'
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
@@ -157,6 +161,10 @@ on:
       - 'scripts/verify-k04-server-candidate.mjs'
       - 'scripts/run-k04-independent-ai-generation.mjs'
       - 'scripts/verify-k04-server-ai-generation-receipt.mjs'
+      - 'scripts/run-k04-game-independent-ai-generation.mjs'
+      - 'scripts/verify-k04-game-ai-generation-receipt.mjs'
+      - 'scripts/verify-k04-game-candidate.mjs'
+      - 'tests/k04-game-ai-generation-receipt.test.mjs'
       - 'scripts/run-k327-independent-compiler-ai-generation.mjs'
       - 'scripts/verify-k327-compiler-ai-generation-receipt.mjs'
       - 'scripts/verify-k327-compiler-candidate.mjs'
@@ -260,6 +268,8 @@ jobs:
         run: npm run verify:k03-ai-generate
       - name: K04 independent Server AI generation receipt replay
         run: node --test tests/k04-server*.test.mjs && npm run verify:k04-server-ai-generate
+      - name: K04 independent 2D Game AI generation receipt replay
+        run: node --test tests/k04-game-ai-generation-receipt.test.mjs && npm run verify:k04-game-ai-generate
       - name: K327 independent Compiler AI generation receipt replay
         run: node --test tests/k327-compiler*.test.mjs && npm run verify:k327-compiler-ai-generate
       - name: K329/K332 independent Compiler Simulation Scientific AI receipt replay
