@@ -46,6 +46,15 @@ RCL source
 
 当前候选 API 还提供 `buildRclApplicationFramework({ rclPath, outputPath, specPath })`，把上述结果写成可检查的 `web/index.html`、`web/server.mjs`、`android/MainActivity.java`、lowering manifests、semantic trace 和根哈希报告。
 
+CLI 入口已经接上：
+
+```text
+rcl application-frameworks
+rcl application-framework-build <file.rcl> <output-dir> [framework-spec.json]
+```
+
+它们只暴露候选目录和候选产物生成，不改变 candidate-only、host replay、设备与发布证据边界。
+
 它不负责：
 
 - 定义 HTML/CSS 或 Android View 语法；
