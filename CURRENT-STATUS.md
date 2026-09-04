@@ -658,3 +658,47 @@ fail closed. Authority:
 `examples/native-ai/evidence/gpu-native-reverse-adamw-session-arena-v0.1/k19-gpu-native-reverse-adamw-session-arena-local-evidence.json`.
 Reproduction: `npm run test:k19-gpu-native-reverse-adamw-session-arena`.
 The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K20 GPU-native same-shape elementwise backward candidate
+
+K20 is `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_ELEMENTWISE_BACKWARD_CANDIDATE`.
+It keeps RCL canonical for the generic Tensor graph, same-shape `sub`/`mul`
+semantics, BF16/FP32 numeric policy, reverse-mode Autodiff, FP32 AdamW state,
+checkpoint identity and CPU differential authority. An explicit
+`gpuNonMatmulMode: "elementwise-v0.1"` opt-in lowers same-shape `sub` and `mul`
+forward and reverse rules to the existing AMD OpenCL provider/session arena;
+the two `mean` reductions remain explicit CPU-reference nodes and fallback is
+forbidden.
+
+On the real AMD `gfx1152` device, the bounded two-step graph recorded 38
+provider requests, 27 dispatches, 10 allocations, 104 buffer reuses and 10
+releases (46 allocated bytes), with zero pooled buffers at close. The
+per-kernel baseline used 114 allocations / 616 bytes / zero reuse. Exact CPU
+loss, parameters, optimizer states, checkpoint root
+`sha256:a9a5481ee0c3406385cad7ce2d7f855b48d1bcbb81a9017771ddbca5fc2394e8`,
+deterministic replay and checkpoint-resume parity held; loss moved from
+`0.045166016` to `0.020629883`. Local K20 is `3/3 PASS`; K19 regression is
+`3/3 PASS`; Python syntax, locked Rust cargo check, Node syntax, diff and
+license checks passed. Evidence root is
+`e9b23db5384611447773510ba72933ebdc3b426df611966b3de1428ac04aa346`, bound
+to implementation commit `43066124987b4d1be0652b3e88bc72b214d15434`.
+
+PR #153 exact head passed K20 Ubuntu job `101150937092` and Windows job
+`101150937334`, Canonical `101150936665`, Authority `101150936997`, Universal
+focused `101154886576` and rerun-attempt-2 K01 Windows `101154885107`; it
+merged as `main@0013c5244a86bf7422bdfb9972cbda4dab4e29ed`. Post-merge Canonical
+run `33914184965`, Universal run `33914184882` and Authority run `33914184884`
+were green for that merge commit. The hosted replay does not inherit the local
+AMD device receipt; the unrelated Vercel status was externally rate-limited.
+
+This remains a bounded candidate, not `GPU_TRAINING`, full-graph training,
+general non-matmul backward, broadcast/reduction GPU coverage, throughput,
+VRAM, portability, RCL-10M/RCL-1B, production Transformer or K400 completion.
+`RCL_GAP_GPU_NON_MATMUL_BACKWARD`, `RCL_GAP_AI_016`, device-resident
+parameter/activation state and the production Transformer lifecycle remain
+open. Authority: `docs/native-ai/gpu-native-elementwise-backward-evidence-v0.1.md`,
+`examples/native-ai/gpu-native-elementwise-backward-contract.v0.1.json`,
+`examples/native-ai/gpu-native-elementwise-backward-genome.rcl`,
+`tests/k20-gpu-native-elementwise-backward.test.mjs` and
+`examples/native-ai/evidence/gpu-native-elementwise-backward-v0.1/k20-gpu-native-elementwise-backward-local-evidence.json`.
+The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
