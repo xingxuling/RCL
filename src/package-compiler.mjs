@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DEFAULT_PACKAGE_OUTPUT_ROOT = path.join(PROJECT_ROOT, 'output', 'packages');
 const SECRET_PATTERNS = [/\.env($|\.)/i, /id_rsa/i, /id_ed25519/i, /\.pem$/i, /\.p12$/i, /\.jks$/i, /keystore/i, /google-services\.json$/i];
+const RUNTIME_DIAGNOSTIC_FILES = new Set(['build/android-debug-build-report.json']);
 
 function sha256Bytes(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -76,6 +77,7 @@ function walkFiles(root) {
 function relativeManifestFiles(root) {
   return walkFiles(root)
     .filter(file => !file.endsWith('rcl-package.json'))
+    .filter(file => !RUNTIME_DIAGNOSTIC_FILES.has(path.relative(root, file).replaceAll(path.sep, '/')))
     .map(file => ({ path: path.relative(root, file).replaceAll(path.sep, '/'), bytes: fs.statSync(file).size, sha256: sha256File(file) }));
 }
 
