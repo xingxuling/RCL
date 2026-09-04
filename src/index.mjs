@@ -186,6 +186,34 @@ export {
 } from './application-framework.mjs';
 
 export {
+  RCL_APPLICATION_DATA_RUNTIME_VERSION,
+  RCL_APPLICATION_DATA_RESOURCE_FORMAT,
+  RCL_APPLICATION_DATA_REQUEST_FORMAT,
+  RCL_APPLICATION_DATA_MUTATION_FORMAT,
+  RCL_APPLICATION_DATA_SYNC_FORMAT,
+  RCL_APPLICATION_DATA_SNAPSHOT_FORMAT,
+  RCL_APPLICATION_DATA_PERSISTENCE_FORMAT,
+  normalizeApplicationDataResourceSpec,
+  createApplicationDataResource,
+  beginApplicationDataRequest,
+  cancelApplicationDataRequest,
+  settleApplicationDataRequest,
+  setApplicationDataConnectivity,
+  readApplicationDataCache,
+  createApplicationDataMutation,
+  settleApplicationDataMutation,
+  createApplicationDataSyncPlan,
+  settleApplicationDataSync,
+  createApplicationDataSnapshot,
+  restoreApplicationDataSnapshot,
+  persistApplicationDataSnapshot,
+  recoverApplicationDataSnapshot,
+  executeApplicationDataRequest,
+  ApplicationDataRuntime,
+  createApplicationDataRuntime,
+} from './application-data-runtime.mjs';
+
+export {
   RCL_NATIVE_FRAMEWORK_ATLAS_VERSION,
   RCL_NATIVE_FRAMEWORK_ATLAS_FORMAT,
   RCL_NATIVE_FRAMEWORK_CLASSIFICATIONS,

@@ -1,11 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { realityRoot } from './canonical.mjs';
+import {
+  createApplicationDataResource,
+  normalizeApplicationDataResourceSpec,
+} from './application-data-runtime.mjs';
 import { emitNativeUiAndroidActivity, lowerNativeUiToAndroid } from './ui/android-ui-backend.mjs';
 import { compileNativeUiProgram } from './ui/ui-compiler.mjs';
 import { nativeUiRoot } from './ui/ui-ir.mjs';
 import { emitNativeUiWebHtml, emitNativeUiWebServer, lowerNativeUiToWeb } from './ui/web-ui-backend.mjs';
 import { runNativeUiSemanticTrace } from './ui/ui-event.mjs';
+import {
+  buildCanonicalAccessibilityTree,
+  createUiResourceBinding,
+  createUiResourceBundle,
+} from './ui/ui-resource-accessibility.mjs';
 
 export const RCL_APPLICATION_FRAMEWORK_VERSION = '0.1.0-alpha.1';
 export const RCL_APPLICATION_FRAMEWORK_FORMAT = 'rcl.application-framework.v0.1';
@@ -82,22 +91,24 @@ const RAW_APPLICATION_FRAMEWORK_CATALOG = [
     semanticOwner: 'RCL',
     title: 'Native UI semantic program',
     purpose: 'Stable UI semantic substrate shared by application frameworks and platform lowerings.',
-    developerValue: ['typed local state and derived state', 'role-scoped view tree', 'reactive bindings', 'fail-closed event validation'],
+    developerValue: ['typed local state and derived state', 'role-scoped view tree', 'reactive bindings', 'fail-closed event validation', 'rooted resource and accessibility projections'],
     userValue: ['state changes are reflected through one semantic projection', 'accessibility labels are part of the UI contract'],
     composes: [
       'rcl.native-ui.event-graph.v0.1',
       'rcl.native-ui.style-sheet.v0.1',
       'rcl.native-ui.navigation.v0.1',
       'rcl.native-ui.device-adaptation.v0.1',
+      'rcl.native-ui.resource-accessibility.v0.1',
     ],
     providers: ['Web DOM/CSS/browser runtime', 'Android Views/Java/Gradle project'],
-    gaps: ['resources', 'complete accessibility tree and focus traversal', 'animation', 'list virtualization', 'broader device adaptation'],
+    gaps: ['animation', 'list virtualization', 'broader device adaptation', 'platform accessibility/resource provider evidence'],
     evidence: [
       'examples/native-ui/counter.rcl',
       'examples/native-ui/navigation.rcl',
       'examples/native-ui/device-adaptation.rcl',
       'tests/native-ui-parser-ir.test.mjs',
       'tests/native-ui-runtime-style-layout.test.mjs',
+      'src/ui/ui-resource-accessibility.mjs',
     ],
     promotion: 'Require repeated K400 UI stress coverage, negative controls and runtime/device evidence before standard promotion.',
   },
@@ -109,16 +120,18 @@ const RAW_APPLICATION_FRAMEWORK_CATALOG = [
     title: 'Native Application Framework Profile',
     purpose: 'One RCL UI source to canonical UI IR, target lowerings and shared semantic replay.',
     developerValue: ['one compile entrypoint for Web and Android', 'default target configuration', 'automatic target-root collection', 'cross-target semantic parity replay'],
-    userValue: ['reactive interactions', 'lifecycle and local-state restoration hooks', 'navigation and available-width adaptation', 'consistent semantics across target organs'],
-    composes: ['rcl.native-ui.program.v0.1'],
-    providers: ['rcl.native-ui.web-lowering.v0.1', 'rcl.native-ui.android-lowering.v0.1'],
-    gaps: ['async effects and data fetching', 'persistence and offline sync', 'complete accessibility/focus model', 'resource and media lifecycle', 'production-grade target packaging'],
+    userValue: ['reactive interactions', 'lifecycle and local-state restoration hooks', 'navigation and available-width adaptation', 'consistent semantics across target organs', 'stale/offline/conflict states remain visible'],
+    composes: ['rcl.native-ui.program.v0.1', 'rcl.native-ui.resource-accessibility.v0.1', 'rcl.std.application-data.v0.1'],
+    providers: ['rcl.native-ui.web-lowering.v0.1', 'rcl.native-ui.android-lowering.v0.1', 'rcl.provider-runtime.v2', 'resource-wal-runtime'],
+    gaps: ['durable provider transaction and exactly-once sync semantics', 'platform accessibility/resource behavior', 'production-grade target packaging'],
     evidence: [
       'src/ui/ui-compiler.mjs',
       'src/ui/ui-ir.mjs',
       'src/ui/ui-event.mjs',
       'src/ui/web-ui-backend.mjs',
       'src/ui/android-ui-backend.mjs',
+      'src/application-data-runtime.mjs',
+      'src/ui/ui-resource-accessibility.mjs',
       'tests/native-ui-backends-equivalence.test.mjs',
     ],
     promotion: 'Keep as a Framework Profile until K400 coverage expands beyond the bounded K02/K03 UI cells and real target evidence is rerun.',
@@ -214,34 +227,64 @@ const RAW_APPLICATION_FRAMEWORK_CATALOG = [
     promotion: 'Keep as Example; examples supply stress evidence but do not define framework ownership by themselves.',
   },
   {
-    id: 'rcl.gap.application-async-data.v0.1',
-    classification: 'RCL_GAP',
-    status: 'UNRESOLVED',
-    semanticOwner: 'Not assigned',
-    title: 'Async effects, data and persistence',
-    purpose: 'Missing general contract for loading, cancellation, persistence, offline state, synchronization and data ownership in apps.',
-    developerValue: ['would remove repeated ad hoc host bridges'],
-    userValue: ['would support real data-driven applications instead of bounded local state'],
-    composes: [],
+    id: 'rcl.std.application-data.v0.1',
+    classification: 'STD_CANDIDATE',
+    status: 'CANDIDATE_ONLY',
+    semanticOwner: 'RCL data lifecycle semantics; Provider owns external execution',
+    title: 'Application Data Lifecycle Standard',
+    purpose: 'Reusable state-machine semantics for async requests, cancellation, stale data, optimistic mutations, offline cache, conflict-aware sync and rooted snapshots.',
+    developerValue: ['one data lifecycle contract instead of ad hoc fetch state', 'deterministic race and stale-response rejection', 'WAL-backed snapshot hooks'],
+    userValue: ['loading/offline/error/conflict states can be rendered consistently', 'cached data remains visible without pretending it is fresh'],
+    composes: ['rcl.provider-runtime.v2', 'resource-wal-runtime'],
     providers: ['network/storage/database providers remain implementation organs'],
-    gaps: ['needs primitive/IR/runtime design and negative controls'],
-    evidence: ['docs/ui-native-genome/native-ui-semantics.md', 'src/provider-runtime-v2.mjs'],
-    promotion: 'Do not silently solve with fetch/database code. Record donor advantage, candidate genome, K400 cells and replay evidence first.',
+    gaps: ['durable exactly-once provider transactions', 'provider query semantics and production sync conflict resolution'],
+    evidence: ['src/application-data-runtime.mjs', 'tests/application-data-runtime.test.mjs'],
+    promotion: 'Keep as a Standard Candidate until multiple application families replay the same race/offline/conflict invariants and target evidence is collected.',
   },
   {
-    id: 'rcl.gap.application-accessibility-resources.v0.1',
-    classification: 'RCL_GAP',
-    status: 'UNRESOLVED',
-    semanticOwner: 'Not assigned',
-    title: 'Complete accessibility, focus and resource semantics',
-    purpose: 'Missing general contracts for focus traversal, accessibility trees, media/resource identity and lifecycle.',
-    developerValue: ['would make accessible and media-rich UI reusable rather than target-specific'],
-    userValue: ['keyboard/screen-reader access and reliable resources are direct UX quality gains'],
+    id: 'rcl.std.native-ui.resource-accessibility.v0.1',
+    classification: 'STD_CANDIDATE',
+    status: 'CANDIDATE_ONLY',
+    semanticOwner: 'RCL portable resource/accessibility semantics; platform APIs remain Providers',
+    title: 'Portable UI Resource and Accessibility Standard',
+    purpose: 'Root resource identity, locale resolution, resource binding, canonical accessibility tree and deterministic focus order across UI targets.',
+    developerValue: ['resource and accessibility contracts are available at compile time', 'one semantic tree can feed Web and Android adapters'],
+    userValue: ['stable labels, focus order and locale fallback before platform rendering'],
     composes: ['rcl.native-ui.program.v0.1'],
-    providers: ['browser accessibility APIs', 'Android accessibility/resource APIs'],
-    gaps: ['current UI only carries accessibility labels and has an empty resources extension point'],
-    evidence: ['docs/ui-native-genome/native-ui-semantics.md', 'src/ui/ui-schema.mjs', 'src/ui/ui-compiler.mjs'],
-    promotion: 'Extract only the irreducible cross-target semantics; leave API/pixel/device mechanisms to providers.',
+    providers: ['browser ARIA/accessibility APIs', 'Android accessibility/resource APIs', 'font/media/resource packagers'],
+    gaps: ['platform screen-reader behavior', 'media decode/stream lifecycle', 'fonts and device packaging'],
+    evidence: ['src/ui/ui-resource-accessibility.mjs', 'tests/native-ui-resource-accessibility.test.mjs'],
+    promotion: 'Keep portable semantics here; never reimplement a browser or Android accessibility engine in RCL Core.',
+  },
+  {
+    id: 'rcl.gap.application-data-durable-sync.v0.2',
+    classification: 'RCL_GAP',
+    status: 'PARTIALLY_REDUCED',
+    semanticOwner: 'RCL contract candidate; durable transaction/provider truth remains unassigned',
+    title: 'Durable provider transaction and sync proof',
+    purpose: 'Close the remaining gap between a rooted application data state machine and a durable concurrent backend with exactly-once effects and authoritative conflict resolution.',
+    developerValue: ['production data writes need durable retry/idempotency and conflict receipts'],
+    userValue: ['offline edits must not disappear or silently overwrite authoritative data'],
+    composes: ['rcl.std.application-data.v0.1'],
+    providers: ['database/storage/network providers'],
+    gaps: ['durable queue/transaction proof', 'concurrent conflict authority', 'cross-device replay evidence'],
+    evidence: ['src/application-data-runtime.mjs', 'src/provider-runtime-v2.mjs', 'src/resource-wal-runtime.mjs'],
+    promotion: 'Keep open until a provider-backed, multi-process, crash/retry and conflict replay exists; the semantic candidate does not claim this proof.',
+  },
+  {
+    id: 'rcl.gap.application-platform-resource-runtime.v0.2',
+    classification: 'RCL_GAP',
+    status: 'PARTIALLY_REDUCED',
+    semanticOwner: 'RCL portable contract candidate; platform runtime remains Provider',
+    title: 'Platform accessibility and resource runtime proof',
+    purpose: 'Close the remaining gap between a canonical UI accessibility/resource tree and real browser/Android screen-reader, media, font and lifecycle behavior.',
+    developerValue: ['target adapters need runtime acceptance beyond static lowering'],
+    userValue: ['real keyboard, screen-reader and media behavior must be dependable'],
+    composes: ['rcl.std.native-ui.resource-accessibility.v0.1'],
+    providers: ['browser accessibility APIs', 'Android accessibility/resource APIs', 'device/media providers'],
+    gaps: ['browser/Android runtime receipts', 'physical-device coverage', 'media/font lifecycle implementation'],
+    evidence: ['src/ui/ui-resource-accessibility.mjs', 'docs/ui-native-genome/rcl-gap-register.md'],
+    promotion: 'Do not move platform engine behavior into RCL; close this row through target/device evidence and provider contracts.',
   },
 ];
 
@@ -262,6 +305,9 @@ export const DEFAULT_RCL_APPLICATION_FRAMEWORK_SPEC = deepFreeze({
   language: 'zh-CN',
   web: {},
   android: {},
+  dataResources: [],
+  resourceBundle: null,
+  resourceBindings: [],
 });
 
 export function listRclApplicationFrameworks(filter = {}) {
@@ -296,6 +342,15 @@ export function normalizeRclApplicationFrameworkSpec(input = {}) {
   const language = input.language === null || input.language === undefined ? 'zh-CN' : nonEmptyString(input.language, 'RCL_APPLICATION_FRAMEWORK_LANGUAGE');
   const traceEvents = input.traceEvents === undefined ? [] : clone(input.traceEvents);
   if (!Array.isArray(traceEvents)) throw new TypeError('RCL_APPLICATION_FRAMEWORK_TRACE_EVENTS');
+  const rawDataResources = input.dataResources === undefined ? [] : input.dataResources;
+  if (!Array.isArray(rawDataResources)) throw new TypeError('RCL_APPLICATION_FRAMEWORK_DATA_RESOURCES');
+  const dataResources = rawDataResources.map(normalizeApplicationDataResourceSpec);
+  const resourceBundle = input.resourceBundle === null || input.resourceBundle === undefined
+    ? null
+    : clone(assertPlainObject(input.resourceBundle, 'RCL_APPLICATION_FRAMEWORK_RESOURCE_BUNDLE'));
+  const rawResourceBindings = input.resourceBindings === undefined ? [] : input.resourceBindings;
+  if (!Array.isArray(rawResourceBindings)) throw new TypeError('RCL_APPLICATION_FRAMEWORK_RESOURCE_BINDINGS');
+  const resourceBindings = rawResourceBindings.map((binding) => clone(assertPlainObject(binding, 'RCL_APPLICATION_FRAMEWORK_RESOURCE_BINDING')));
   return deepFreeze({
     format: RCL_APPLICATION_FRAMEWORK_SPEC_FORMAT,
     version: input.version ?? RCL_APPLICATION_FRAMEWORK_VERSION,
@@ -308,6 +363,9 @@ export function normalizeRclApplicationFrameworkSpec(input = {}) {
     web,
     android,
     traceEvents,
+    dataResources,
+    resourceBundle,
+    resourceBindings,
   });
 }
 
@@ -319,6 +377,19 @@ export function compileRclApplicationFramework(source, input = {}) {
   if (typeof source !== 'string') throw new TypeError('RCL_APPLICATION_FRAMEWORK_SOURCE');
   const spec = normalizeRclApplicationFrameworkSpec(input);
   const ui = compileNativeUiProgram(source, spec.uiId);
+  const accessibilityTree = buildCanonicalAccessibilityTree(ui);
+  const resourceBundle = spec.resourceBundle === null ? null : createUiResourceBundle(spec.resourceBundle);
+  if (spec.resourceBindings.length > 0 && resourceBundle === null) {
+    throw new Error('RCL_APPLICATION_FRAMEWORK_RESOURCE_BUNDLE_REQUIRED');
+  }
+  const resourceBindings = spec.resourceBindings.map((binding) => {
+    const bundleRoot = binding.bundleRoot ?? resourceBundle?.bundleRoot;
+    if (bundleRoot !== resourceBundle?.bundleRoot) throw new Error('RCL_APPLICATION_FRAMEWORK_RESOURCE_BINDING_BUNDLE_MISMATCH');
+    return createUiResourceBinding({ ...binding, bundleRoot });
+  });
+  const dataResources = spec.dataResources.map(createApplicationDataResource);
+  const dataResourceRoots = dataResources.map(resource => resource.root);
+  const resourceBindingRoots = resourceBindings.map(binding => binding.bindingRoot);
   const outputs = {};
   if (spec.targets.includes('web')) {
     outputs.web = lowerNativeUiToWeb(ui, {
@@ -345,14 +416,26 @@ export function compileRclApplicationFramework(source, input = {}) {
     sourceRoot: nativeUiRoot(source),
     uiProgram: ui,
     uiProgramRoot: ui.semanticRoot,
+    accessibilityTree,
+    accessibilityRoot: accessibilityTree.accessibilityRoot,
+    resourceBundle,
+    resourceBundleRoot: resourceBundle?.bundleRoot ?? null,
+    resourceBindings,
+    resourceBindingRoots,
+    dataResources,
+    dataResourceRoots,
     traceEvents: clone(spec.traceEvents),
     targets: outputs,
     targetRoots: Object.fromEntries(Object.entries(outputs).map(([target, value]) => [target, value.loweringRoot])),
     evidenceBoundary: {
       compile: 'RCL parser/type/UI IR validation',
+      data: 'RCL application data lifecycle state machine and rooted snapshot semantics',
+      dataProvider: 'Provider owns network/storage/database execution; compilation performs none',
+      resources: 'RCL resource identity/locale/binding and canonical accessibility tree',
       lower: 'host backend lowering reports',
       execute: 'not performed by compilation',
-      runtime: 'Web browser/Android device evidence remains separate',
+      runtime: 'Web browser/Android device and data-provider evidence remains separate',
+      persistence: 'host WAL/provider durability boundary; no durable commit claimed',
       promotion: 'human review and K400 evidence required',
     },
   };
@@ -362,6 +445,10 @@ export function compileRclApplicationFramework(source, input = {}) {
     frameworkId: report.frameworkId,
     sourceRoot: report.sourceRoot,
     uiProgramRoot: report.uiProgramRoot,
+    accessibilityRoot: report.accessibilityRoot,
+    resourceBundleRoot: report.resourceBundleRoot,
+    resourceBindingRoots: report.resourceBindingRoots,
+    dataResourceRoots: report.dataResourceRoots,
     targetRoots: report.targetRoots,
   }) });
 }
@@ -390,6 +477,12 @@ export function traceRclApplicationFramework(compiled, events = null, options = 
     physicalDeviceExecuted: false,
     semanticParity,
     uiProgramRoot: compiled.uiProgramRoot,
+    accessibilityRoot: compiled.accessibilityRoot ?? compiled.accessibilityTree?.accessibilityRoot ?? null,
+    resourceBundleRoot: compiled.resourceBundleRoot ?? null,
+    resourceBindingRoots: compiled.resourceBindingRoots ?? [],
+    dataResourceRoots: compiled.dataResourceRoots ?? [],
+    externalDataExecution: false,
+    platformAccessibilityExecuted: false,
     targets: targetNames,
     traces,
   };
@@ -400,6 +493,12 @@ export function traceRclApplicationFramework(compiled, events = null, options = 
     status: report.status,
     semanticParity: report.semanticParity,
     uiProgramRoot: report.uiProgramRoot,
+    accessibilityRoot: report.accessibilityRoot,
+    resourceBundleRoot: report.resourceBundleRoot,
+    resourceBindingRoots: report.resourceBindingRoots,
+    dataResourceRoots: report.dataResourceRoots,
+    externalDataExecution: report.externalDataExecution,
+    platformAccessibilityExecuted: report.platformAccessibilityExecuted,
     traces: Object.fromEntries(Object.entries(traces).map(([target, trace]) => [target, comparableTrace(trace)])),
   }) });
 }
@@ -424,10 +523,38 @@ export function buildRclApplicationFramework({ rclPath, outputPath, specPath = n
     : JSON.parse(fs.readFileSync(path.resolve(specPath), 'utf8'));
   const compiled = compileRclApplicationFramework(source, spec);
   const trace = traceRclApplicationFramework(compiled);
-  const files = ['program.rcl', 'application-framework.json', 'semantic-trace.json'];
+  const files = ['program.rcl', 'application-framework.json', 'semantic-trace.json', 'ui/accessibility-tree.json', 'data/resources.json'];
   writeText(path.join(root, 'program.rcl'), source);
   writeJson(path.join(root, 'application-framework.json'), compiled);
   writeJson(path.join(root, 'semantic-trace.json'), trace);
+  writeJson(path.join(root, 'ui', 'accessibility-tree.json'), compiled.accessibilityTree);
+  const dataManifest = {
+    format: 'rcl.application-data-resources-manifest.v0.1',
+    version: RCL_APPLICATION_FRAMEWORK_VERSION,
+    applicationFrameworkRoot: compiled.root,
+    resources: compiled.dataResources,
+    resourceRoots: compiled.dataResourceRoots,
+    providerExecutionPerformed: false,
+    durableCommitPerformed: false,
+  };
+  writeJson(path.join(root, 'data', 'resources.json'), { ...dataManifest, root: realityRoot(dataManifest) });
+  if (compiled.resourceBundle) {
+    writeJson(path.join(root, 'ui', 'resource-bundle.json'), compiled.resourceBundle);
+    files.push('ui/resource-bundle.json');
+  }
+  if (compiled.resourceBundle || compiled.resourceBindings.length > 0) {
+    const resourceBindingManifest = {
+      format: 'rcl.native-ui.resource-bindings-manifest.v0.1',
+      version: RCL_APPLICATION_FRAMEWORK_VERSION,
+      applicationFrameworkRoot: compiled.root,
+      bundleRoot: compiled.resourceBundleRoot,
+      bindings: compiled.resourceBindings,
+      bindingRoots: compiled.resourceBindingRoots,
+      platformResourceProviderRequired: true,
+    };
+    writeJson(path.join(root, 'ui', 'resource-bindings.json'), { ...resourceBindingManifest, root: realityRoot(resourceBindingManifest) });
+    files.push('ui/resource-bindings.json');
+  }
   if (compiled.targets.web) {
     writeJson(path.join(root, 'web', 'lowering.json'), compiled.targets.web);
     writeText(path.join(root, 'web', 'index.html'), emitNativeUiWebHtml(compiled.targets.web));
@@ -444,9 +571,12 @@ export function buildRclApplicationFramework({ rclPath, outputPath, specPath = n
     `This directory contains candidate Native UI artifacts from one canonical UI semantic root.\n\n` +
     `- Web: web/index.html and web/server.mjs\n` +
     `- Android: android/MainActivity.java and android/lowering.json\n` +
+    `- UI accessibility: ui/accessibility-tree.json\n` +
+    `- Application data: data/resources.json\n` +
+    (compiled.resourceBundle ? `- UI resources: ui/resource-bundle.json and ui/resource-bindings.json\n` : '') +
     `- Host semantic replay: semantic-trace.json\n` +
     `- Compilation: application-framework.json\n\n` +
-    `The Web file is a standalone browser artifact and the Android file is a source/lowering artifact. No browser session, Android device, APK build or production release is claimed by this builder.\n`);
+    `RCL owns the data lifecycle and portable UI/resource semantics. Providers still own network, storage, browser, Android and device execution; no durable commit, browser session, Android device, APK build or production release is claimed by this builder.\n`);
   files.push('README.md');
   const result = {
     format: RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT,
@@ -485,9 +615,28 @@ export function verifyRclApplicationFrameworkBuild(outputPath) {
       return null;
     }
   };
+  const readOptionalJson = relative => {
+    if (!fs.existsSync(path.join(root, relative))) return null;
+    try {
+      return JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
+    } catch {
+      errors.push(`MISSING_OR_INVALID:${relative}`);
+      return null;
+    }
+  };
+  const rootedValue = (value, key) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    const withoutRoot = { ...value };
+    delete withoutRoot[key];
+    return realityRoot(withoutRoot);
+  };
   const build = readJson('application-framework-build.json');
   const compiled = readJson('application-framework.json');
   const trace = readJson('semantic-trace.json');
+  const accessibilityArtifact = readOptionalJson('ui/accessibility-tree.json');
+  const dataManifest = readOptionalJson('data/resources.json');
+  const resourceBundleArtifact = readOptionalJson('ui/resource-bundle.json');
+  const resourceBindingManifest = readOptionalJson('ui/resource-bindings.json');
   const checkRoot = (label, actual, expected) => {
     if (actual !== expected) errors.push(`${label}:ROOT_MISMATCH`);
   };
@@ -499,8 +648,41 @@ export function verifyRclApplicationFrameworkBuild(outputPath) {
       frameworkId: compiled.frameworkId,
       sourceRoot: compiled.sourceRoot,
       uiProgramRoot: compiled.uiProgramRoot,
+      accessibilityRoot: compiled.accessibilityRoot,
+      resourceBundleRoot: compiled.resourceBundleRoot,
+      resourceBindingRoots: compiled.resourceBindingRoots,
+      dataResourceRoots: compiled.dataResourceRoots,
       targetRoots: compiled.targetRoots,
     }));
+    try {
+      const expectedAccessibility = buildCanonicalAccessibilityTree(compiled.uiProgram);
+      if (compiled.accessibilityRoot !== expectedAccessibility.accessibilityRoot) errors.push('ACCESSIBILITY_ROOT');
+      if (compiled.accessibilityTree?.accessibilityRoot !== expectedAccessibility.accessibilityRoot) errors.push('ACCESSIBILITY_TREE_ROOT');
+    } catch {
+      errors.push('ACCESSIBILITY_TREE_INVALID');
+    }
+    if (!Array.isArray(compiled.dataResources) || !Array.isArray(compiled.dataResourceRoots)) {
+      errors.push('DATA_RESOURCES_INVALID');
+    } else {
+      if (compiled.dataResources.length !== compiled.dataResourceRoots.length) errors.push('DATA_RESOURCE_ROOT_COUNT');
+      compiled.dataResources.forEach((resource, index) => {
+        if (compiled.dataResourceRoots[index] !== rootedValue(resource, 'root')) errors.push(`DATA_RESOURCE_ROOT:${index}`);
+      });
+    }
+    if (compiled.resourceBundle === null) {
+      if (compiled.resourceBundleRoot !== null) errors.push('RESOURCE_BUNDLE_NULL_ROOT');
+    } else if (compiled.resourceBundleRoot !== rootedValue(compiled.resourceBundle, 'bundleRoot')) {
+      errors.push('RESOURCE_BUNDLE_ROOT');
+    }
+    if (!Array.isArray(compiled.resourceBindings) || !Array.isArray(compiled.resourceBindingRoots)) {
+      errors.push('RESOURCE_BINDINGS_INVALID');
+    } else {
+      if (compiled.resourceBindings.length !== compiled.resourceBindingRoots.length) errors.push('RESOURCE_BINDING_ROOT_COUNT');
+      compiled.resourceBindings.forEach((binding, index) => {
+        if (compiled.resourceBindingRoots[index] !== rootedValue(binding, 'bindingRoot')) errors.push(`RESOURCE_BINDING_ROOT:${index}`);
+        if (compiled.resourceBundleRoot !== binding.bundleRoot) errors.push(`RESOURCE_BINDING_BUNDLE_ROOT:${index}`);
+      });
+    }
     for (const [target, value] of Object.entries(compiled.targets ?? {})) {
       if (compiled.targetRoots?.[target] !== value.loweringRoot) errors.push(`TARGET_ROOT:${target}`);
       if (compiled.uiProgramRoot !== value.uiProgramRoot) errors.push(`TARGET_UI_ROOT:${target}`);
@@ -518,7 +700,31 @@ export function verifyRclApplicationFrameworkBuild(outputPath) {
       semanticParity: trace.semanticParity,
       uiProgramRoot: trace.uiProgramRoot,
       traces: comparableTraces,
+      accessibilityRoot: trace.accessibilityRoot,
+      resourceBundleRoot: trace.resourceBundleRoot,
+      resourceBindingRoots: trace.resourceBindingRoots,
+      dataResourceRoots: trace.dataResourceRoots,
+      externalDataExecution: trace.externalDataExecution,
+      platformAccessibilityExecuted: trace.platformAccessibilityExecuted,
     }));
+  }
+  if (compiled && accessibilityArtifact) {
+    if (accessibilityArtifact.accessibilityRoot !== compiled.accessibilityRoot) errors.push('ACCESSIBILITY_ARTIFACT_LINK');
+  }
+  if (compiled && dataManifest) {
+    const { root: _manifestRoot, ...manifestPayload } = dataManifest;
+    checkRoot('data-manifest', dataManifest.root, realityRoot(manifestPayload));
+    if (dataManifest.applicationFrameworkRoot !== compiled.root) errors.push('DATA_MANIFEST_FRAMEWORK_LINK');
+    if (JSON.stringify(dataManifest.resourceRoots) !== JSON.stringify(compiled.dataResourceRoots)) errors.push('DATA_MANIFEST_ROOTS_LINK');
+  }
+  if (compiled && resourceBundleArtifact) {
+    if (resourceBundleArtifact.bundleRoot !== compiled.resourceBundleRoot) errors.push('RESOURCE_BUNDLE_ARTIFACT_LINK');
+  }
+  if (compiled && resourceBindingManifest) {
+    const { root: _manifestRoot, ...manifestPayload } = resourceBindingManifest;
+    checkRoot('resource-binding-manifest', resourceBindingManifest.root, realityRoot(manifestPayload));
+    if (resourceBindingManifest.applicationFrameworkRoot !== compiled.root) errors.push('RESOURCE_BINDING_MANIFEST_FRAMEWORK_LINK');
+    if (JSON.stringify(resourceBindingManifest.bindingRoots) !== JSON.stringify(compiled.resourceBindingRoots)) errors.push('RESOURCE_BINDING_MANIFEST_ROOTS_LINK');
   }
   if (build) {
     if (build.format !== RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT) errors.push('BUILD_FORMAT');

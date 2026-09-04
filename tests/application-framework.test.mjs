@@ -53,6 +53,76 @@ test('native application framework compiles one canonical UI root to selected ta
   assert.match(compiled.root, /^[0-9a-f]{64}$/u);
 });
 
+test('application framework integrates data lifecycle and portable resource/accessibility contracts', () => {
+  const compiled = compileRclApplicationFramework(SOURCE, {
+    appId: 'counter-data',
+    dataResources: [{
+      resourceId: 'todos',
+      queryKey: 'todos:list',
+      providerId: 'api',
+      target: 'todo-service',
+      initialData: [{ id: 1, title: 'first' }],
+    }],
+    resourceBundle: {
+      bundleId: 'counter-ui',
+      defaultLocale: 'en-US',
+      resources: {
+        'increment.label': {
+          type: 'Text',
+          defaultValue: 'Increment',
+          translations: { 'zh-CN': '增加' },
+        },
+      },
+    },
+    resourceBindings: [{
+      nodeId: 'IncrementButton',
+      property: 'label',
+      resourceId: 'increment.label',
+    }],
+  });
+  assert.equal(compiled.dataResources.length, 1);
+  assert.equal(compiled.dataResources[0].status, 'ready');
+  assert.equal(compiled.dataResourceRoots[0], compiled.dataResources[0].root);
+  assert.equal(compiled.resourceBundle.bundleRoot, compiled.resourceBundleRoot);
+  assert.equal(compiled.resourceBindings[0].bundleRoot, compiled.resourceBundleRoot);
+  assert.equal(compiled.resourceBindingRoots[0], compiled.resourceBindings[0].bindingRoot);
+  assert.equal(compiled.accessibilityTree.format, 'rcl.native-ui.accessibility-tree.v0.1');
+  assert.equal(compiled.accessibilityRoot, compiled.accessibilityTree.accessibilityRoot);
+
+  const outputPath = fs.mkdtempSync(path.join(ROOT, 'output', 'test-application-framework-contracts-'));
+  const specPath = path.join(outputPath, 'framework-spec.json');
+  fs.writeFileSync(specPath, `${JSON.stringify({
+    appId: 'counter-data',
+    dataResources: [{
+      resourceId: 'todos',
+      queryKey: 'todos:list',
+      providerId: 'api',
+      target: 'todo-service',
+      initialData: [{ id: 1, title: 'first' }],
+    }],
+    resourceBundle: {
+      bundleId: 'counter-ui',
+      defaultLocale: 'en-US',
+      resources: {
+        'increment.label': { type: 'Text', defaultValue: 'Increment', translations: { 'zh-CN': '增加' } },
+      },
+    },
+    resourceBindings: [{ nodeId: 'IncrementButton', property: 'label', resourceId: 'increment.label' }],
+  }, null, 2)}\n`, 'utf8');
+  const built = buildRclApplicationFramework({
+    rclPath: path.join(ROOT, 'examples/native-ui/counter.rcl'),
+    outputPath,
+    specPath,
+  });
+  assert.ok(built.files.includes('data/resources.json'));
+  assert.ok(built.files.includes('ui/accessibility-tree.json'));
+  assert.ok(built.files.includes('ui/resource-bundle.json'));
+  assert.ok(built.files.includes('ui/resource-bindings.json'));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(outputPath, 'data', 'resources.json'), 'utf8')).resourceRoots.length, 1);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(outputPath, 'ui', 'accessibility-tree.json'), 'utf8')).accessibilityRoot, compiled.accessibilityRoot);
+  assert.equal(verifyRclApplicationFrameworkBuild(outputPath).status, 'PASS');
+});
+
 test('framework trace proves host semantic parity while preserving execution boundaries', () => {
   const compiled = compileRclApplicationFramework(SOURCE, {
     appId: 'counter',

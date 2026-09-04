@@ -59,7 +59,7 @@ Web / Android / React / Three.js / Database / GPU / RNCS / IDE
 
 | 要写的东西 | 推荐组合 | 作用 |
 | --- | --- | --- |
-| Todo、记账、设置、表单、移动端 Dashboard | Core + Engine + Typeforge + Weave + Trace | RCL 负责数据/事件/UI 语义，Weave 负责 Web/Android UI lowering |
+| Todo、记账、设置、表单、移动端 Dashboard | Core + Engine + Typeforge + Weave + Trace | RCL 负责数据生命周期/事件/UI 语义，Weave 负责 Web/Android UI lowering；网络/存储仍接 Provider |
 | CRM、客户管理、商品目录、库存系统 | Core + Reality + Typeforge + Weave + Gate | 类型数据模型 + 受治理业务变更 + UI + 数据库/文件 Provider |
 | 审批、订单状态、权限任务系统 | Core + Reality + Typeforge + Trace | authority、invariant、candidate transition、commit 和可回放证据 |
 | 科学笔记、实验面板、知识探索器 | Core + Typeforge + Reality + Atlas + Weave | 数量、知识、实验、模拟语义，加上可交互 UI |
@@ -67,7 +67,7 @@ Web / Android / React / Three.js / Database / GPU / RNCS / IDE
 | 编译器、语言工具、运行时服务 | Core + Engine + Typeforge + Trace | 编译、类型、Bytecode/VM、调试和 replay |
 | 2D/3D 游戏或可视化工具 | Core + Reality + Weave + Forge + Gate | Weave 管菜单/HUD/状态；Three.js、游戏引擎或 GPU 保留为 Provider |
 
-这些是“适合写什么”的架构组合，不是对所有场景已经完成的能力声明。当前 async/data/persistence、完整 accessibility、resource/media、复杂 3D surface 仍需要独立 GAP 和 Stress Cell 证据。
+这些是“适合写什么”的架构组合，不是对所有场景已经完成的能力声明。async/data 与 portable resource/accessibility 已有 candidate standard 和框架产物；durable provider sync、平台 screen-reader/media/font lifecycle、复杂 3D surface 仍需要独立 GAP 和 Stress Cell 证据。
 
 ## 1. RCL Core / 核心语
 
@@ -144,7 +144,7 @@ RNCS bridge 只是把已经由 RCL 解释出的 transition 转成下游输入，
 
 **技术 ID**：`rcl.ui.native-app.v0.1`
 
-**拥有的语义**：UI state、derived values、view roles、bindings、typed local events、layout、style、lifecycle、navigation 和 width adaptation。
+**拥有的语义**：UI state、derived values、view roles、bindings、typed local events、layout、style、lifecycle、navigation、width adaptation，以及 portable resource/accessibility projection。
 
 **适合写什么**：Todo、计数器、记账、设置、表单、管理后台、移动端 Dashboard，以及同一套语义需要投射到 Web 和 Android 的应用。
 
@@ -157,10 +157,12 @@ RNCS bridge 只是把已经由 RCL 解释出的 transition 转成下游输入，
 - [`src/ui/web-ui-backend.mjs`](../../src/ui/web-ui-backend.mjs)
 - [`src/ui/android-ui-backend.mjs`](../../src/ui/android-ui-backend.mjs)
 - [`src/application-framework.mjs`](../../src/application-framework.mjs)
+- [`src/application-data-runtime.mjs`](../../src/application-data-runtime.mjs)
+- [`src/ui/ui-resource-accessibility.mjs`](../../src/ui/ui-resource-accessibility.mjs)
 
 Weave 不是“RCL 调度 React”。正确关系是：Weave 拥有 UI meaning，React/DOM/Android/Three.js 可以作为具体的 lowering 或 provider organ。
 
-当前未完成的 `RCL_GAP` 包括 async/data/persistence、完整 accessibility/focus、resource/media lifecycle、复杂 virtualization/constraint layout 和完整 production target evidence。
+应用级 async/data 的 portable lifecycle 与 resource/accessibility 的 portable tree 已进入 candidate standard，并由 `application-framework-build` 输出 rooted manifests。当前未完成的 `RCL_GAP` 是 durable exactly-once provider sync、平台 screen-reader/resource/media/font lifecycle、复杂 virtualization/constraint layout、更多 device adaptation 和完整 production target evidence。
 
 ## 6. RCL Trace / 迹流
 
