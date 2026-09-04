@@ -1954,6 +1954,7 @@ export {
   createUiResourceBinding,
   buildCanonicalAccessibilityTree,
 } from './ui/ui-resource-accessibility.mjs';
+
 export {
   MOTHER_STRUCTURE_IR_VERSION,
   MOTHER_STRUCTURE_IR_FORMAT,
