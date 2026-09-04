@@ -2,7 +2,7 @@
   "schema": "rcl.native-ai.gpu-opencl-buffer-arena.evidence.v0.1",
   "campaign": "RCL Native LLM Campaign",
   "task": "K13",
-  "status": "PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE",
   "canonicalOwner": "RCL",
   "baseMain": "3058de9ba252061ba24fd544659e1ec8771a97c1",
   "implementationCommit": "f6f3de9a06fd191b6eef214a5649967a5e1aea2f",
@@ -76,8 +76,79 @@
     },
     "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
   },
-  "hostedReplay": { "status": "PENDING" },
-  "postMergeVerification": { "status": "PENDING" },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD",
+    "head": "0840e9d83a05a9a4b69e99059c42aace82860f51",
+    "pullRequest": 115,
+    "k13Run": {
+      "runId": 33859229990,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 100979564767, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 100979565011, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33859230064,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 100979565349, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 100979565185, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33859230080, "jobId": 100979565390, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33859229958, "jobId": 100979564685, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33859230119, "jobId": 100979565691, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33859229985,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 100979564762, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 100979565056, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33859230051, "jobId": 100979565158, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33859230044, "jobId": 100979565007, "conclusion": "SUCCESS" }
+  },
+  "postMergeVerification": {
+    "status": "PASS_MAIN_POSTMERGE",
+    "mainSha": "251b20a758326fd3a17056c424584145dde15e89",
+    "k13Run": {
+      "runId": 33860059592,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 100982201758, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 100982202056, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33860059548,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 100982201512, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 100982201729, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33860059794, "jobId": 100982201974, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33860059684, "jobId": 100982201644, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33860059750, "jobId": 100982202035, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33860059606,
+      "attempt": 3,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 100985761900, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 100985759783, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS",
+      "retryHistory": [
+        { "attempt": 1, "jobId": 100982201753, "conclusion": "FAILURE", "failure": "native C0 -> C1 -> C2 exceeded 240000 ms" },
+        { "attempt": 2, "jobId": 100984249764, "conclusion": "FAILURE", "failure": "native C0 -> C1 -> C2 exceeded 240000 ms" },
+        { "attempt": 3, "jobId": 100985759783, "conclusion": "SUCCESS" }
+      ]
+    },
+    "canonicalVerificationRun": { "runId": 33860059582, "jobId": 100982201654, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33860059629, "jobId": 100982201817, "conclusion": "SUCCESS" }
+  },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
     "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -93,7 +164,7 @@
     "ROBUST": "PASS_LOCAL",
     "PERFORMANCE": "ALLOCATION_COUNT_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
     "AI_GENERATE": "NOT_APPLICABLE",
-    "EVIDENCE": "CANDIDATE_HOSTED_PENDING"
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE"
   },
   "claimsGranted": ["OPENCL_AMD_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE"],
   "claimsNotGranted": [
@@ -109,5 +180,5 @@
   ],
   "gaps": ["RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY", "RCL_GAP_GPU_TRAINING_THROUGHPUT", "RCL_GAP_RCL10M_TOKENIZER_DATASET"],
   "authority": "CANDIDATE_ONLY_ALLOCATION_REUSE_NO_VALUE_RESIDENCY_TRANSFER_ELISION_THROUGHPUT_OR_RCL10M_PROMOTION",
-  "reportRoot": "d5f0e93171a70b5d7b51248ef65299b25f10ab92c7f1a36fb88977a7118ca920"
+  "reportRoot": "4742b4db475fd636926ca741c49c41f0f17ede6af38dcee225b69ab60f237135"
 }

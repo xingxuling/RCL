@@ -669,7 +669,7 @@ closed. Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
 
 ## K13 AMD OpenCL session buffer arena candidate
 
-Status: `PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE`.
 RCL owns an explicit exact-size/flags buffer reuse profile, resource bounds and
 the no-residency boundary. The AMD OpenCL provider owns only `cl_mem` lifecycle
 and kernel execution. Every operation still uploads inputs and reads outputs.
@@ -691,8 +691,8 @@ and kernel execution. Every operation still uploads inputs and reads outputs.
 | K12/K11/K10/K09 regressions | `4/4`, `1/1`, `1/1`, `1/1` PASS |
 | Strict Clippy | BLOCKED by 8 pre-existing warnings; no PASS claim |
 | License audit | PASS, no new dependencies or external donor code |
-| Hosted exact-head replay | PENDING |
-| Post-merge main replay | PENDING |
+| Hosted exact-head replay | PASS, PR #115 head `0840e9d`, K13 `33859229990` Ubuntu+Windows, K12 `33859230064`, K11 `33859230080`, K10 `33859229958`, K09 `33859230119`, Universal `33859229985`, Canonical `33859230051`, Authority `33859230044` |
+| Post-merge main replay | PASS, merge `251b20a`, K13 `33860059592` Ubuntu+Windows, K12 `33860059548`, K11 `33860059794`, K10 `33860059684`, K09 `33860059750`, Universal `33860059606` attempt 3, Canonical `33860059582`, Authority `33860059629`; Universal attempts 1/2 hit the existing Windows K01 fixed-point timeout and were rerun successfully |
 
 Authority files:
 
