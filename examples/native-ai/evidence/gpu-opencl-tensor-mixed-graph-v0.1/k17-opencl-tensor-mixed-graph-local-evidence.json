@@ -1,0 +1,220 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-tensor-mixed-graph.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K17",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_MIXED_GRAPH_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "baseMain": "53843eb39bae49d8a2dc9cb2ffe6948b212dc9a8",
+  "implementationCommit": "7717296f38326ea30ba82951adecbf95254e851e",
+  "mergeCommit": "edc166ae9acb50741c490678e66d078fb821ec5a",
+  "branch": "codex/k17-opencl-tensor-mixed-graph-v01",
+  "pullRequest": 130,
+  "contract": "examples/native-ai/gpu-opencl-tensor-mixed-graph-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-tensor-mixed-graph-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "rustProbe": "native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs",
+  "test": "tests/k17-opencl-tensor-mixed-graph.test.mjs",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "probe": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "request": {
+        "operation": "matmul -> masked-softmax",
+        "shape": [1, 2],
+        "inputDtype": "bf16",
+        "computeDtype": "f32",
+        "outputDtype": "bf16",
+        "maskMode": "additive",
+        "intermediateReadback": false,
+        "finalReadback": true
+      },
+      "outputBits": ["3f00", "3f00"],
+      "nodes": [
+        {
+          "nodeId": "node:mixed.projection",
+          "operation": "matmul",
+          "outputResource": "resource:logits",
+          "shape": [1, 2],
+          "left": "tensor:storage:left:sha256:7a621e272024d41996ab045aebdb7a5b9aa88a08b5da8dc8dcb6bd8ea64ee4e7",
+          "right": "tensor:storage:projection:sha256:685b5ba019e9cf54b1445eef8a60f07190b0d2d9c832fcd8966d9cd3eceaf35b",
+          "readback": false,
+          "deviceResidentAfter": true
+        },
+        {
+          "nodeId": "node:mixed.masked-softmax",
+          "operation": "masked-softmax",
+          "outputResource": "resource:probabilities",
+          "shape": [1, 2],
+          "left": "resource:logits",
+          "right": "tensor:storage:mask:sha256:f8eb9a4de97ed2c4cbd4e508853bafb7b6e6881e58ae6973f29afa6671ae7353",
+          "maskMode": "additive",
+          "readback": true,
+          "deviceResidentAfter": false
+        }
+      ],
+      "intermediateReadbackCount": 0,
+      "finalReadbackCount": 1,
+      "telemetry": {
+        "bufferAllocationBytes": 24,
+        "bufferAllocationCount": 5,
+        "bufferReleaseCount": 5,
+        "maxResidentBytes": 2097152,
+        "maxResidentTensors": 64,
+        "residentBytes": 0,
+        "residentTensorCount": 0,
+        "tensorBindCount": 3,
+        "tensorDeviceToHostTransfers": 1,
+        "tensorHostToDeviceTransfers": 3,
+        "tensorReleaseCount": 3,
+        "tensorReplacementCount": 0,
+        "tensorResidencyHitCount": 0,
+        "tensorValueResidency": true
+      },
+      "executionRoot": "fc1ac696f0e92dd4798d4344bd886dc040eb6d21db177bfb0527d2641c9d1a9f",
+      "exactCpuDifferential": true,
+      "deterministicReplay": true
+    },
+    "negativeAndBoundary": {
+      "unknownOperation": "RCL_K17_GRAPH_OPERATION",
+      "wrongMaskMode": "RCL_K17_GRAPH_MASK_MODE",
+      "intermediateReadback": "RCL_K15_GRAPH_READBACK",
+      "maskShapeDrift": "RCL_K15_GRAPH_SHAPE",
+      "providerFallback": "forbidden",
+      "mixedGraphNodeCount": 2,
+      "maxGraphNodesInheritedFromK15": 8
+    },
+    "regressions": {
+      "pythonSyntax": "PASS",
+      "rustCargoCheckLocked": "PASS",
+      "diffCheck": "PASS",
+      "k17MixedGraph": "3_PASS",
+      "k16MaskedSoftmax": "3_PASS",
+      "k15TensorGraphResidency": "3_PASS",
+      "k14TensorResidency": "3_PASS",
+      "k13BufferArena": "6_PASS",
+      "k12CrossNodeGradientBatch": "4_PASS",
+      "k11GradientPairBatch": "1_PASS",
+      "k10BatchedDispatch": "1_PASS",
+      "k09PersistentDispatch": "1_PASS",
+      "k08AmdOpenclBf16": "3_PASS",
+      "hostedAndPostMergeScope": "PASS_K17_K16_K15_K14_K13_K12_K11_K10_K09_K08_AMD_AUTHORITY_CANONICAL_UNIVERSAL"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD_K17_SCOPE_AND_REGRESSIONS",
+    "head": "7717296f38326ea30ba82951adecbf95254e851e",
+    "pullRequest": 130,
+    "k17Run": {
+      "runId": 33888428249,
+      "jobs": [
+        { "name": "mixed-graph (ubuntu-latest)", "jobId": 101073861304, "conclusion": "SUCCESS" },
+        { "name": "mixed-graph (windows-latest)", "jobId": 101073861627, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "regressionRuns": {
+      "k08AmdOpenclBf16": { "runId": 33888428474, "jobs": [101073861926, 101073862375], "conclusion": "SUCCESS" },
+      "k09": { "runId": 33888428562, "jobId": 101073862490, "conclusion": "SUCCESS" },
+      "k10": { "runId": 33888428413, "jobId": 101073862004, "conclusion": "SUCCESS" },
+      "k11": { "runId": 33888428295, "jobId": 101073861562, "conclusion": "SUCCESS" },
+      "k12": { "runId": 33888428501, "jobs": [101073862415, 101073862821], "conclusion": "SUCCESS" },
+      "k13": { "runId": 33888428380, "jobs": [101073861968, 101073862174], "conclusion": "SUCCESS" },
+      "k14": { "runId": 33888428503, "jobs": [101073862528, 101073862946], "conclusion": "SUCCESS" },
+      "k15": { "runId": 33888428472, "jobs": [101073862146, 101073862598], "conclusion": "SUCCESS" },
+      "k16": { "runId": 33888428290, "jobs": [101073861247, 101073861647], "conclusion": "SUCCESS" },
+      "authority": { "runId": 33888428561, "jobId": 101073862520, "conclusion": "SUCCESS" }
+    },
+    "canonicalVerificationRun": { "runId": 33888428400, "jobId": 101073862241, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33888428583,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 101073862913, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 101073863455, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    }
+  },
+  "postMergeVerification": {
+    "status": "PASS_MAIN_POSTMERGE_K17_SCOPE_AND_REGRESSIONS",
+    "mainSha": "edc166ae9acb50741c490678e66d078fb821ec5a",
+    "k17Run": {
+      "runId": 33888641562,
+      "jobs": [
+        { "name": "mixed-graph (ubuntu-latest)", "jobId": 101074573538, "conclusion": "SUCCESS" },
+        { "name": "mixed-graph (windows-latest)", "jobId": 101074573198, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "regressionRuns": {
+      "k09": { "runId": 33888641730, "jobId": 101074573937, "conclusion": "SUCCESS" },
+      "k10": { "runId": 33888642807, "jobId": 101074578423, "conclusion": "SUCCESS" },
+      "k11": { "runId": 33888641736, "jobId": 101074573768, "conclusion": "SUCCESS" },
+      "k12": { "runId": 33888641767, "jobs": [101074574278, 101074574627], "conclusion": "SUCCESS" },
+      "k13": { "runId": 33888641663, "jobs": [101074573416, 101074573963], "conclusion": "SUCCESS" },
+      "k14": { "runId": 33888641745, "jobs": [101074573886, 101074574088], "conclusion": "SUCCESS" },
+      "k15": { "runId": 33888641640, "jobs": [101074573369, 101074573814], "conclusion": "SUCCESS" },
+      "k16": { "runId": 33888641742, "jobs": [101074574128, 101074574280], "conclusion": "SUCCESS" },
+      "authority": { "runId": 33888641613, "jobId": 101074573397, "conclusion": "SUCCESS" }
+    },
+    "canonicalVerificationRun": { "runId": 33888641692, "jobId": 101074573704, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33888641683,
+      "jobs": [
+        { "name": "k01-windows-verification", "jobId": 101074573606, "conclusion": "SUCCESS" },
+        { "name": "focused-verification", "jobId": 101074573922, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    }
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale cells only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT_BF16_BITS_AND_CPU_DIFFERENTIAL",
+    "ROBUST": "PASS_LOCAL_FAIL_CLOSED_OPERATION_MASK_SHAPE_AND_READBACK",
+    "PERFORMANCE": "DEVICE_RESIDENCY_AND_TRANSFER_TELEMETRY_ONLY_NO_THROUGHPUT_OR_VRAM_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE_K17_SCOPE"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_ORDERED_TENSOR_MIXED_GRAPH_CANDIDATE",
+    "OPENCL_AMD_GRAPH_MASKED_SOFTMAX_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_FULL_GRAPH_EXECUTION",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "GPU_TRAINING",
+    "GPU_NATIVE_AUTODIFF",
+    "GPU_NATIVE_ADAMW",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_RCL_ORDERED_MATMUL_TO_ADDITIVE_MASKED_SOFTMAX_LOWERED_TO_AMD_OPENCL_WITH_BF16_STORAGE_FP32_COMPUTE",
+  "reportRoot": "2551806b4e6f9276570b27dec3a4d584aefd5b3c605f1f834ece8eeebcb20cf4"
+}
