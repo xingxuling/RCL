@@ -1,0 +1,38 @@
+name: K16 AMD OpenCL Masked Softmax
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k16-opencl-masked-softmax.test.mjs'
+      - 'examples/native-ai/gpu-opencl-masked-softmax-*'
+      - 'package.json'
+      - '.github/workflows/k16-opencl-masked-softmax.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k16-opencl-masked-softmax.test.mjs'
+      - 'examples/native-ai/gpu-opencl-masked-softmax-*'
+      - 'package.json'
+      - '.github/workflows/k16-opencl-masked-softmax.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  masked-softmax:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Run K16 masked softmax verification
+        run: npm run test:k16-opencl-masked-softmax

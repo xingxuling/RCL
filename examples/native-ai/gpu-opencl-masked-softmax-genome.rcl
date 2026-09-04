@@ -1,0 +1,16 @@
+# K16: RCL-owned generic masked softmax semantics lowered to an explicit
+# AMD OpenCL auxiliary kernel. The provider owns execution only.
+reality OpenClMaskedSoftmaxCandidate {
+  facet contract.id : Text = "rcl-k16-opencl-amd-bf16-masked-softmax-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.operation : Text = "GENERIC_TENSOR_ADDITIVE_MASKED_SOFTMAX"
+  facet contract.input_dtype : Text = "BF16"
+  facet contract.compute_dtype : Text = "FP32"
+  facet contract.output_dtype : Text = "BF16_RNE"
+  facet contract.mask_mode : Text = "ADDITIVE"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_ROW_KERNEL_ONLY"
+  facet contract.fallback : Text = "FORBIDDEN"
+  facet contract.max_rows : Number = 64
+  facet contract.max_columns : Number = 64
+  facet evidence.authority : Text = "CANDIDATE_ONLY_GPU_NATIVE_MASKED_SOFTMAX"
+}

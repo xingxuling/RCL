@@ -1,0 +1,64 @@
+{
+  "format": "rcl.k16.opencl-amd-bf16-masked-softmax-contract.v0.1",
+  "status": "OPENCL_AMD_BF16_MASKED_SOFTMAX_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "GENERIC_TENSOR_BF16_ADDITIVE_MASKED_SOFTMAX_FP32_COMPUTE",
+  "semanticBoundary": {
+    "operation": "generic Tensor masked softmax over the final axis",
+    "owner": "RCL",
+    "maskMode": "additive",
+    "inputDtype": "bf16",
+    "computeDtype": "f32",
+    "outputDtype": "bf16 with RNE",
+    "providerRole": "auxiliary OpenCL row kernel and buffer dispatch only",
+    "fallback": "forbidden"
+  },
+  "shapePolicy": {
+    "rank": 2,
+    "maxRows": 64,
+    "maxColumns": 64,
+    "maskShape": "exactly equal to logits shape",
+    "nonFiniteInputs": "rejected"
+  },
+  "kernel": {
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "name": "rcl_bf16_masked_softmax",
+    "algorithm": "row-wise stable max-subtracted exp, FP32 sum and division",
+    "dispatch": "one work-item per row"
+  },
+  "requiredEvidence": [
+    "RCL genome compiles",
+    "real AMD OpenCL execution or explicit unavailable-device boundary",
+    "independent CPU BF16/FP32 masked-softmax differential",
+    "stable row normalization",
+    "additive mask affects logits on device",
+    "unsupported backend and malformed input fail closed",
+    "deterministic replay root",
+    "no silent CPU fallback"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_BF16_MASKED_SOFTMAX_LOWERING_CANDIDATE",
+    "OPENCL_AMD_GPU_NATIVE_ADDITIVE_MASK_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_FULL_GRAPH_EXECUTION",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "GPU_TRAINING",
+    "GPU_NATIVE_AUTODIFF",
+    "GPU_NATIVE_ADAMW",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_EXPLICIT_GPU_NATIVE_MASKED_SOFTMAX_WITH_ADDITIVE_MASK"
+}
