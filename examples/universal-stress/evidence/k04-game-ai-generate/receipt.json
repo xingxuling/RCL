@@ -1,0 +1,504 @@
+{
+  "format": "rcl.k04.game-ai-generation-receipt.v0.1",
+  "generatedAt": "2026-09-04T23:18:57.126Z",
+  "contractRoot": "01476a78932eca90a8d260e994320cf4baad2b24a8fed63d72d08baca1a3745a",
+  "requiredTrials": 3,
+  "successfulTrials": 3,
+  "uniqueGeneratorSessions": 3,
+  "eligibleCells": [
+    "K188"
+  ],
+  "runtimeEvidenceBinding": {
+    "reportRoot": "6502cf4cd8880d24d8b0ddc9f98862b91490cbb214868c6f5a056d3184b91e1d"
+  },
+  "trials": [
+    {
+      "format": "rcl.k04.game-ai-trial-receipt.v0.1",
+      "trialId": "K04-GAME-REPAIR-01",
+      "mutationClass": "fixed-step-horizontal-velocity",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a06eb4-b819-7cb2-b8d6-0e46a989e4f3",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "alter player.vx <- 5",
+        "new": "alter player.vx <- 4",
+        "diagnosis": "The right-movement transaction sets player.vx to 5, producing player.x 274 after 50 fixed-step frames from x 24. The canonical fixed-step velocity is likely 4, matching the left/right movement magnitude symmetry and the stated invariant."
+      },
+      "promptRoot": "736f16e5f82a54745e293579312709af2e2b56551c67133936878ed78e304670",
+      "mutatedSourceSha256": "a7ecaa9a93635fbb02cf80bbb88633d1eb952e6bbb5f7e17bcedc429f74dd6f5",
+      "candidateSourceSha256": "48aaf23049b63dbe074836dbfa2b4582959efdb36a425fe99116932d52dbeb47",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "c0b4ec9ff5eb35c3cf0b307a80a5a8bd2cfaa7b554c701eabdaf74aaf084de48",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a06eb4-b819-7cb2-b8d6-0e46a989e4f3"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "0dacf0c6bb96ceb81a95fa3047812fff05af2b2ef1c73a4026309d6d67e86e4e"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "366dc8bea3c0c453f79140f643dd8fd88dbf67f68193f8e4ac5b7510447a1c23"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 38462,
+            "cached_input_tokens": 4864,
+            "output_tokens": 447,
+            "reasoning_output_tokens": 142
+          }
+        }
+      ],
+      "finalMessageSha256": "366dc8bea3c0c453f79140f643dd8fd88dbf67f68193f8e4ac5b7510447a1c23",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "739b354b1cc2d556b826dc902b2f4818a5c81769fc72e2b0b3dd94a03f83214e"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5",
+        "checks": {
+          "express": {
+            "pass": true,
+            "details": {
+              "program": "K04StarRunner",
+              "ruleCount": 7
+            }
+          },
+          "compile": {
+            "pass": true,
+            "details": {
+              "schema": "rcl.2d-game-runtime-manifest.v0.1",
+              "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48"
+            }
+          },
+          "lower": {
+            "pass": true,
+            "details": {
+              "coverageMode": "lowered-execution"
+            }
+          },
+          "execute": {
+            "pass": true,
+            "details": {
+              "state": {
+                "game.status": "running",
+                "game.score": 1,
+                "game.frame": 50,
+                "game.last_action": "tick",
+                "game.star_collected": true,
+                "game.star_x": 220,
+                "game.star_y": 124,
+                "player.x": 224,
+                "player.y": 124,
+                "player.vx": 4,
+                "player.vy": -10.5,
+                "player.grounded": false
+              },
+              "frameCount": 54
+            }
+          },
+          "correct": {
+            "pass": true,
+            "details": {
+              "replayPass": true,
+              "resetPass": true,
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          },
+          "robust": {
+            "pass": true,
+            "details": {
+              "preserveNegative": true,
+              "authorityNegative": true
+            }
+          },
+          "performance": {
+            "pass": true,
+            "details": {
+              "budgetMs": 1000
+            }
+          },
+          "evidence": {
+            "pass": true,
+            "details": {
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          }
+        }
+      },
+      "receiptRoot": "f2b2ddf80f73b1dc2a1e6097aa8506c5f6f6fa05d37caf57e2dbdc010ba0ce36"
+    },
+    {
+      "format": "rcl.k04.game-ai-trial-receipt.v0.1",
+      "trialId": "K04-GAME-REPAIR-02",
+      "mutationClass": "start-state-guard",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a06eb5-c88b-7d52-9eba-16ddee298b79",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "when game.status == \"paused\"",
+        "new": "when game.status == \"ready\"",
+        "diagnosis": "The startGame guard is inverted from the stated invariant. Candidate admits start only from paused, which leaves the canonical ready-state start transaction rejected; observed execution remains ready after attempted start, then jump is still admitted. The smallest canonical repair is to restore the startGame guard to ready without touching unrelated transitions or literals."
+      },
+      "promptRoot": "b3c9c05188bcbc7614adc88ea62b5c4d23a83b61d41d753eacd4d6db69beb003",
+      "mutatedSourceSha256": "098d59fbf5729248871dcb92980d71e3e3fa8ecc78bcadc3486339257160d44f",
+      "candidateSourceSha256": "48aaf23049b63dbe074836dbfa2b4582959efdb36a425fe99116932d52dbeb47",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "5ac81ae353fc47072c4a6a726a5fcd63282e440ad580ce21fd8d6afb3f89af34",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a06eb5-c88b-7d52-9eba-16ddee298b79"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "1ccd5a725f3683e7997eb1a2bb5ebdc64a66c80006bf2de22548ad83ce07af77"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "baddcc9b82c41f337ba78bb9d2db539f014e9ea92f2aed125197802db6956c59"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 38460,
+            "cached_input_tokens": 20224,
+            "output_tokens": 383,
+            "reasoning_output_tokens": 76
+          }
+        }
+      ],
+      "finalMessageSha256": "baddcc9b82c41f337ba78bb9d2db539f014e9ea92f2aed125197802db6956c59",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "4516bff44ea75d09c920c141a583fff9324a98dfd671c2efaa44c5e7fabfc4ae"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5",
+        "checks": {
+          "express": {
+            "pass": true,
+            "details": {
+              "program": "K04StarRunner",
+              "ruleCount": 7
+            }
+          },
+          "compile": {
+            "pass": true,
+            "details": {
+              "schema": "rcl.2d-game-runtime-manifest.v0.1",
+              "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48"
+            }
+          },
+          "lower": {
+            "pass": true,
+            "details": {
+              "coverageMode": "lowered-execution"
+            }
+          },
+          "execute": {
+            "pass": true,
+            "details": {
+              "state": {
+                "game.status": "running",
+                "game.score": 1,
+                "game.frame": 50,
+                "game.last_action": "tick",
+                "game.star_collected": true,
+                "game.star_x": 220,
+                "game.star_y": 124,
+                "player.x": 224,
+                "player.y": 124,
+                "player.vx": 4,
+                "player.vy": -10.5,
+                "player.grounded": false
+              },
+              "frameCount": 54
+            }
+          },
+          "correct": {
+            "pass": true,
+            "details": {
+              "replayPass": true,
+              "resetPass": true,
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          },
+          "robust": {
+            "pass": true,
+            "details": {
+              "preserveNegative": true,
+              "authorityNegative": true
+            }
+          },
+          "performance": {
+            "pass": true,
+            "details": {
+              "budgetMs": 1000
+            }
+          },
+          "evidence": {
+            "pass": true,
+            "details": {
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          }
+        }
+      },
+      "receiptRoot": "332a104b424d652d1cb702d43600e17aa73e695dd41bcda80cfc8be7d2394b5a"
+    },
+    {
+      "format": "rcl.k04.game-ai-trial-receipt.v0.1",
+      "trialId": "K04-GAME-REPAIR-03",
+      "mutationClass": "collectible-score-transaction",
+      "generator": {
+        "kind": "codex-cli-ephemeral-independent-repair",
+        "cliVersion": "codex-cli 0.135.0",
+        "threadId": "01a06eb6-df29-7c33-b592-c8458a46c1db",
+        "ephemeral": true,
+        "ignoredUserConfig": true,
+        "ignoredRules": true,
+        "sandbox": "read-only",
+        "authoritativeRepositoryWritable": false
+      },
+      "independence": {
+        "oracleEditVisibleToGenerator": false,
+        "canonicalFilesVisibleToGenerator": false,
+        "developmentAgentAuthoredEdit": false,
+        "generatorReceivedMutatedCandidatesOnly": true,
+        "evaluatorAppliedExactSchemaEdit": true
+      },
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "alter game.score <- game.score + 2",
+        "new": "alter game.score <- game.score + 1",
+        "diagnosis": "The collectible score transaction is RCL-owned in collectStar. Observed replay reaches one collection with game.star_collected true but game.score is 2, violating the invariant that one collectible collision increments score exactly once. The smallest canonical repair is changing the transaction amount from +2 to +1."
+      },
+      "promptRoot": "5f6b5ce2783eb8dcccb253ea7c0da0fafd702ce6536c535f4b37a054fdcfdb7e",
+      "mutatedSourceSha256": "ceea87c0c7f85427cc2d713f0eb81c09a1bef74bf101e275cecca582227b5830",
+      "candidateSourceSha256": "48aaf23049b63dbe074836dbfa2b4582959efdb36a425fe99116932d52dbeb47",
+      "restoredCanonicalBytes": true,
+      "generatorEventLogSha256": "e0fea4bd41977ffe99aea3cf38c503ef1a6c2d09456febf285f7ba1360cba585",
+      "generatorEvents": [
+        {
+          "type": "thread.started",
+          "threadId": "01a06eb6-df29-7c33-b592-c8458a46c1db"
+        },
+        {
+          "type": "turn.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "de77da1adf4f6f04e53aa4a02612dd8a57d1ae0e3a837c5ed676e330d828736e"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.started"
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "command_execution",
+          "exitCode": 0,
+          "textRoot": null
+        },
+        {
+          "type": "item.completed",
+          "itemType": "agent_message",
+          "exitCode": null,
+          "textRoot": "6371cc302129b4deaf9bc62b1981257b577d9e5cf8b8dafc0a550a87e7867eba"
+        },
+        {
+          "type": "turn.completed",
+          "usage": {
+            "input_tokens": 38470,
+            "cached_input_tokens": 34560,
+            "output_tokens": 603,
+            "reasoning_output_tokens": 295
+          }
+        }
+      ],
+      "finalMessageSha256": "6371cc302129b4deaf9bc62b1981257b577d9e5cf8b8dafc0a550a87e7867eba",
+      "diagnostic": {
+        "status": "FAIL",
+        "reportRoot": "664de30dc1038f6495d93798dc33f7cceda220c23ee95d57cd067d3628983f7f"
+      },
+      "verification": {
+        "successful": true,
+        "status": "PASS",
+        "reportRoot": "3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5",
+        "checks": {
+          "express": {
+            "pass": true,
+            "details": {
+              "program": "K04StarRunner",
+              "ruleCount": 7
+            }
+          },
+          "compile": {
+            "pass": true,
+            "details": {
+              "schema": "rcl.2d-game-runtime-manifest.v0.1",
+              "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48"
+            }
+          },
+          "lower": {
+            "pass": true,
+            "details": {
+              "coverageMode": "lowered-execution"
+            }
+          },
+          "execute": {
+            "pass": true,
+            "details": {
+              "state": {
+                "game.status": "running",
+                "game.score": 1,
+                "game.frame": 50,
+                "game.last_action": "tick",
+                "game.star_collected": true,
+                "game.star_x": 220,
+                "game.star_y": 124,
+                "player.x": 224,
+                "player.y": 124,
+                "player.vx": 4,
+                "player.vy": -10.5,
+                "player.grounded": false
+              },
+              "frameCount": 54
+            }
+          },
+          "correct": {
+            "pass": true,
+            "details": {
+              "replayPass": true,
+              "resetPass": true,
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          },
+          "robust": {
+            "pass": true,
+            "details": {
+              "preserveNegative": true,
+              "authorityNegative": true
+            }
+          },
+          "performance": {
+            "pass": true,
+            "details": {
+              "budgetMs": 1000
+            }
+          },
+          "evidence": {
+            "pass": true,
+            "details": {
+              "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+            }
+          }
+        }
+      },
+      "receiptRoot": "2be4320bc399f2bf3c4f8f2f8f584c322191aff3021601ba751240db9a8ef3d0"
+    }
+  ],
+  "localVerdict": "PASS_INDEPENDENT_GENERATOR_LOCAL_GAME_REPLAY_GITHUB_REQUIRED",
+  "aiGenerateStatus": "CANDIDATE",
+  "githubReplayRequired": true,
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K04StarRunner source and binds one deterministic lowered-execution runtime receipt. It does not prove arbitrary game generation, native Godot/Unity/console semantics, browser execution or K400 completion.",
+  "reportRoot": "140bbd7be8a3410190460142a648be4d4ac3f257d5ef48fc105e27caf3a187c5"
+}

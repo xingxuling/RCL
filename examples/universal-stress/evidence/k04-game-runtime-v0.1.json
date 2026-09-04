@@ -1,0 +1,78 @@
+{
+  "format": "rcl.k04.game-runtime-evidence.v0.1",
+  "status": "PASS",
+  "coverageMode": "lowered-execution",
+  "sourceSha256": "48aaf23049b63dbe074836dbfa2b4582959efdb36a425fe99116932d52dbeb47",
+  "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48",
+  "checks": {
+    "express": {
+      "pass": true,
+      "details": {
+        "program": "K04StarRunner",
+        "ruleCount": 7
+      }
+    },
+    "compile": {
+      "pass": true,
+      "details": {
+        "schema": "rcl.2d-game-runtime-manifest.v0.1",
+        "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48"
+      }
+    },
+    "lower": {
+      "pass": true,
+      "details": {
+        "coverageMode": "lowered-execution"
+      }
+    },
+    "execute": {
+      "pass": true,
+      "details": {
+        "state": {
+          "game.status": "running",
+          "game.score": 1,
+          "game.frame": 50,
+          "game.last_action": "tick",
+          "game.star_collected": true,
+          "game.star_x": 220,
+          "game.star_y": 124,
+          "player.x": 224,
+          "player.y": 124,
+          "player.vx": 4,
+          "player.vy": -10.5,
+          "player.grounded": false
+        },
+        "frameCount": 54
+      }
+    },
+    "correct": {
+      "pass": true,
+      "details": {
+        "replayPass": true,
+        "resetPass": true,
+        "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+      }
+    },
+    "robust": {
+      "pass": true,
+      "details": {
+        "preserveNegative": true,
+        "authorityNegative": true
+      }
+    },
+    "performance": {
+      "pass": true,
+      "details": {
+        "budgetMs": 1000
+      }
+    },
+    "evidence": {
+      "pass": true,
+      "details": {
+        "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70"
+      }
+    }
+  },
+  "evidenceBoundary": "This receipt covers one deterministic JavaScript fixed-step 2D game runtime and its Canvas projection. It does not claim native Godot/Unity/console parity, browser execution, arbitrary game generation or universal K400 completion.",
+  "reportRoot": "6502cf4cd8880d24d8b0ddc9f98862b91490cbb214868c6f5a056d3184b91e1d"
+}

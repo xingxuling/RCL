@@ -1,0 +1,53 @@
+{
+  "format": "rcl.k04.game-ai-generation-contract.v0.1",
+  "frozenBeforeTrials": true,
+  "eligibleCells": ["K188"],
+  "canonical": {
+    "sourcePath": "examples/k04-2d-game.rcl",
+    "sourceSha256": "48aaf23049b63dbe074836dbfa2b4582959efdb36a425fe99116932d52dbeb47",
+    "specPath": "examples/k04-2d-game.game.json",
+    "specSha256": "da8ab884cb50e52a6f374ca0876e8c9e76509e2c4f196ca69a2e87ca1649a4f6",
+    "candidateReportRoot": "3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5"
+  },
+  "runtimeEvidence": {
+    "path": "examples/universal-stress/evidence/k04-game-runtime-v0.1.json",
+    "reportRoot": "6502cf4cd8880d24d8b0ddc9f98862b91490cbb214868c6f5a056d3184b91e1d"
+  },
+  "requiredTrials": 3,
+  "generator": {
+    "kind": "codex-cli-ephemeral-independent-repair",
+    "minimumCliVersion": "0.135.0"
+  },
+  "trials": [
+    {
+      "id": "K04-GAME-REPAIR-01",
+      "mutationClass": "fixed-step-horizontal-velocity",
+      "semanticInvariant": "The right-movement transaction sets the canonical velocity used by the fixed-step runtime."
+    },
+    {
+      "id": "K04-GAME-REPAIR-02",
+      "mutationClass": "start-state-guard",
+      "semanticInvariant": "The start transaction is admitted only from the canonical ready state."
+    },
+    {
+      "id": "K04-GAME-REPAIR-03",
+      "mutationClass": "collectible-score-transaction",
+      "semanticInvariant": "One collectible collision increments the RCL-owned score exactly once."
+    }
+  ],
+  "independence": {
+    "uniqueEphemeralReadOnlySessions": 3,
+    "canonicalSourceHidden": true,
+    "oracleEditHidden": true,
+    "mutatedCandidateOnly": true,
+    "evaluatorAppliesExactSchemaEdit": true
+  },
+  "admission": {
+    "requiredSuccessfulTrials": 3,
+    "requiredUniqueGeneratorSessions": 3,
+    "exactCanonicalBytesRestored": true,
+    "runtimeEvidenceRequired": true,
+    "githubFocusedReplayRequired": true
+  },
+  "evidenceBoundary": "This contract proves only three independent exact repairs of the frozen K04StarRunner source and binds one deterministic lowered-execution runtime receipt. It does not prove arbitrary game generation, native Godot/Unity/console semantics, browser execution or K400 completion."
+}

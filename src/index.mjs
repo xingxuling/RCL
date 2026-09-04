@@ -223,6 +223,21 @@ export {
   assessRclNativeFrameworkAtlas,
 } from './native-framework-atlas.mjs';
 
+export {
+  RCL_2D_GAME_COMPILER_VERSION,
+  RCL_2D_GAME_FORMAT,
+  RCL_2D_GAME_RUNTIME_MANIFEST_FORMAT,
+  canonicalJson as canonicalGameJson,
+  evidenceRoot as gameEvidenceRoot,
+  normalizeRcl2DGameSpec,
+  compileRcl2DGameFromProgram,
+  compileRcl2DGame,
+  renderRcl2DGameFrame,
+  simulateRcl2DGame,
+  emitRcl2DGameHtml,
+  buildRcl2DGame,
+} from './game-2d-compiler.mjs';
+
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
 export {

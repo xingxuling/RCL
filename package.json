@@ -385,7 +385,13 @@
     "evidence:k321-k322-compiler-algorithm-cli-ai-generate": "node scripts/run-k321-k322-independent-ai-generation.mjs",
     "verify:k321-k322-compiler-algorithm-cli": "node scripts/verify-k321-k322-compiler-algorithm-cli-receipt.mjs",
     "evidence:k400": "node scripts/build-k400-evidence.mjs && node scripts/universal-program-stress-report.mjs examples/universal-stress/k400-current-evidence.json output/universal-stress-k400",
-    "test:logical-time": "node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs"
+    "test:logical-time": "node --test --test-concurrency=1 tests/logical-time-scheduler.test.mjs",
+    "test:k04-game": "node --test --test-concurrency=1 tests/game-2d-compiler.test.mjs tests/universal-stress-k04-game-adapter.test.mjs",
+    "build:k04-game": "node scripts/build-k04-2d-game.mjs",
+    "evidence:k04-game": "node scripts/run-k04-direct-evidence.mjs",
+    "evidence:k04-game-runtime": "node scripts/run-k04-game-runtime-evidence.mjs",
+    "evidence:k04-game-ai-generate": "node scripts/run-k04-game-independent-ai-generation.mjs",
+    "verify:k04-game-ai-generate": "node scripts/verify-k04-game-ai-generation-receipt.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,152 @@
+{
+  "schema": "rcl.universal-stress.k04.direct-evidence.v0.1",
+  "taskId": "K04",
+  "cellId": "game-runtime::game",
+  "goal": "2D game",
+  "compiler": {
+    "status": "PASS",
+    "compilerVersion": "0.1.0",
+    "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48",
+    "generatedProject": {
+      "status": "GAME_PROJECT_GENERATED",
+      "root": "output/universal-stress-k04",
+      "program": "K04StarRunner",
+      "manifestRoot": "6e3ffc44619138635e49d438395b71854d87eaaa27318b03c657c74c112c5f48",
+      "coverageMode": "lowered-execution"
+    }
+  },
+  "gameRuntime": {
+    "status": "EXECUTED",
+    "runtime": "RCL deterministic fixed-step 2D game runtime",
+    "frames": 54,
+    "elapsedMs": 21.4342,
+    "finalFrameRoot": "c5dd2fbcd593ca8f3fd170b9ce713fbf4d3ef272d5032878078d37045f970b70",
+    "renderedFrameFormat": "rcl.2d-game-frame.v0.1"
+  },
+  "hostSimulation": {
+    "positive": {
+      "finalState": {
+        "game.status": "running",
+        "game.score": 1,
+        "game.frame": 50,
+        "game.last_action": "tick",
+        "game.star_collected": true,
+        "game.star_x": 220,
+        "game.star_y": 124,
+        "player.x": 224,
+        "player.y": 124,
+        "player.vx": 4,
+        "player.vy": -10.5,
+        "player.grounded": false
+      },
+      "realizedRules": [
+        "startGame",
+        "moveRight",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "advanceFrame",
+        "collectStar",
+        "jump",
+        "advanceFrame"
+      ],
+      "frameCount": 54,
+      "pass": true
+    },
+    "replay": {
+      "pass": true
+    },
+    "reset": {
+      "finalState": {
+        "game.status": "ready",
+        "game.score": 0,
+        "game.frame": 0,
+        "game.last_action": "reset",
+        "game.star_collected": false,
+        "game.star_x": 220,
+        "game.star_y": 124,
+        "player.x": 24,
+        "player.y": 136,
+        "player.vx": 0,
+        "player.vy": 0,
+        "player.grounded": true
+      },
+      "pass": true
+    },
+    "preserveNegative": {
+      "threw": true,
+      "error": "Error: RCL_2D_GAME_PRESERVE_FAILED:moveRight",
+      "pass": true
+    },
+    "authorityNegative": {
+      "threw": true,
+      "error": "Error: RCL_2D_GAME_AUTHORITY_DENIED:startGame:game.write",
+      "pass": true
+    }
+  },
+  "gates": {
+    "EXPRESS": "PASS",
+    "COMPILE": "PASS",
+    "LOWER": "PASS",
+    "EXECUTE": "PASS",
+    "CORRECT": "PASS",
+    "ROBUST": "PASS",
+    "PERFORMANCE": "PASS",
+    "AI_GENERATE": "UNVERIFIED",
+    "EVIDENCE": "PASS"
+  },
+  "coverageMode": "lowered-execution",
+  "overall": "BLOCKED",
+  "limitations": [
+    "The game runtime is a deterministic JavaScript execution organ with a Canvas projection; this is not a claim of a native Godot or console runtime.",
+    "The Canvas browser artifact is generated and not automatically upgraded to browser execution evidence.",
+    "AI_GENERATE remains independently unverified.",
+    "One K04 vertical slice does not establish universal game-language capability."
+  ],
+  "evidenceRoot": "102a156ad06c6574e8c339ad12ec5befc146e5bc7ca7489a1d09d387841ab60f"
+}
