@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerSourcePair } from '../src/canonical-source-archive.mjs';
 import { K01_AI_GENERATION_MUTATIONS } from './run-k01-independent-ai-generation.mjs';
 import { verifyK01CompilerCandidate } from './verify-k01-compiler-candidate.mjs';
 
@@ -83,12 +84,7 @@ export function verifyK01AiGenerationReceipt(options = {}) {
   };
   const contract = readJson(contractPath);
   const report = readJson(receiptPath);
-  const canonical = {
-    'candidate-core.rcl': fs.readFileSync(path.join(ROOT, contract.canonical.corePath), 'utf8'),
-    'candidate-main.rcl': fs.readFileSync(path.join(ROOT, contract.canonical.mainPath), 'utf8'),
-  };
-  if (sha256(canonical['candidate-core.rcl']) !== contract.canonical.coreSha256
-    || sha256(canonical['candidate-main.rcl']) !== contract.canonical.mainSha256) throw new Error('RCL_K01_CANONICAL_INPUT_DRIFT');
+  const canonical = readCanonicalCompilerSourcePair(contract).files;
   if (report.contractRoot !== evidenceRoot(contract)) throw new Error('RCL_K01_CONTRACT_ROOT_MISMATCH');
   if (report.reportRoot !== evidenceRoot({ ...report, generatedAt: undefined, reportRoot: undefined })) throw new Error('RCL_K01_REPORT_ROOT_MISMATCH');
   if (report.requiredTrials !== contract.requiredTrials || report.trials.length !== contract.requiredTrials) throw new Error('RCL_K01_TRIAL_COUNT_MISMATCH');

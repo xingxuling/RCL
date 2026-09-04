@@ -1724,3 +1724,151 @@ export {
   validateLogicalTimeSnapshot,
   restoreLogicalTimeScheduler,
 } from './logical-time-scheduler.mjs';
+
+export {
+  RCL_ASIL_GOVERNED_ENVELOPE_VERSION,
+  RCL_ASIL_GOVERNED_ENVELOPE_FORMAT,
+  createAsilGovernedEnvelope,
+} from './asil-governed-envelope.mjs';
+
+export {
+  RCL_ATOMIC_CHECKPOINT_VERSION,
+  RCL_ATOMIC_CHECKPOINT_FORMAT,
+  exactF64Bits,
+  createAtomicCheckpoint,
+  verifyAtomicCheckpoint,
+  writeAtomicCheckpoint,
+} from './atomic-checkpoint.mjs';
+
+export {
+  RCL_CANDIDATE_VERIFIER_VERSION,
+  RCL_CANDIDATE_VERIFICATION_FORMAT,
+  verifyCandidateEnvelope,
+  assertCandidateEnvelope,
+} from './candidate-verifier.mjs';
+
+export {
+  RCL_CANONICAL_F64_VERSION,
+  RCL_CANONICAL_F64_FORMAT,
+  RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM,
+  canonicalF64Hex,
+  f64FromCanonicalHex,
+  canonicalF64,
+  semanticStateCanonicalV2,
+  semanticStateRootV2,
+} from './canonical-f64.mjs';
+
+export {
+  RCL_CANONICAL_SOURCE_ARCHIVE_FORMAT,
+  DEFAULT_CANONICAL_SOURCE_ARCHIVE_PATH,
+  readCanonicalCompilerSourcePair,
+} from './canonical-source-archive.mjs';
+
+export {
+  RCL_ELASTIC_NEURAL_ORGAN_VERSION,
+  RCL_ELASTIC_NEURAL_ORGAN_MANIFEST_FORMAT,
+  RCL_ELASTIC_NEURAL_ORGAN_TRANSITION_FORMAT,
+  createElasticNeuralOrganManifest,
+  ElasticNeuralOrganLifecycle,
+} from './elastic-neural-organ-runtime.mjs';
+
+export {
+  RCL_EXTERNAL_AGENT_IO_VERSION,
+  createExternalAgentIoRequest,
+  settleExternalAgentIo,
+} from './external-agent-io-protocol.mjs';
+
+export {
+  RCL_EXTERNAL_EFFECT_PROTOCOL_VERSION,
+  createExternalEffectPlan,
+  authorizeExternalEffect,
+  ExternalEffectSettlementLedger,
+} from './external-effect-protocol.mjs';
+
+export {
+  RCL_PHYSICAL_PROPERTY_LAW_VERSION,
+  physicalQuantity,
+  addPhysicalQuantities,
+  multiplyPhysicalQuantities,
+  createPhysicalPropertySet,
+  createWorldLawSet,
+  bindPropertyLaw,
+  createPropertyTransitionProposal,
+} from './physical-property-law.mjs';
+
+export {
+  RCL_PHYSICAL_TIME_PROTOCOL_VERSION,
+  createPhysicalTimeObservation,
+  verifyPhysicalTimeMonotonicity,
+  createDeadlineInterruptContract,
+  settleDeadlineInterrupt,
+} from './physical-time-protocol.mjs';
+
+export {
+  RCL_TRANSFORMER_LIFECYCLE_VERSION,
+  RCL_TRANSFORMER_LIFECYCLE_FORMAT,
+  TRANSFORMER_PHASES,
+  createTransformerLifecycle,
+  advanceTransformerLifecycle,
+  transformerLifecycleGapReport,
+} from './production-transformer-lifecycle.mjs';
+
+export {
+  RCL_REPRESENTATION_GOVERNANCE_VERSION,
+  createRepresentationRef,
+  createRepresentationPolicy,
+  createRepresentationEquivalenceReceipt,
+  createRepresentationTransition,
+} from './representation-governance.mjs';
+
+export {
+  RCL_SECOND_WORLD_GOVERNANCE_VERSION,
+  createWorldTimeContract,
+  createRepresentationFlowTime,
+  createFactWorldTreeRef,
+  createConsistencyProfile,
+  createAuthorityLease,
+  verifyLeaseUse,
+  createRealityHorizon,
+  createInterestGraph,
+  createReplicationPolicy,
+  createTransportRequirement,
+  createPowerBudget,
+  createResourceGovernorPolicy,
+} from './second-world-governance.mjs';
+
+export {
+  linkedRecordPlanFromTypedCompiler,
+  renderRclLinkedRecordLowerer,
+} from './selfhost-linked-typed-record-lowering.mjs';
+
+export {
+  buildLinkedTypeGraphAdmission,
+  renderRclTypeGraphAdmission,
+} from './selfhost-type-graph-admission.mjs';
+
+export {
+  RCL_SEMANTIC_DECOMPRESSION_VERSION,
+  RCL_SEMANTIC_DECOMPRESSION_FORMAT,
+  createSemanticProfileTransition,
+} from './semantic-decompression.mjs';
+
+export {
+  RCL_NATIVE_STATE_ROOT_ALGORITHM,
+  RCL_NATIVE_STATE_ROOT_ALGORITHMS,
+  RCLSemanticStateRootError,
+  canonicalJson,
+  semanticValue,
+  semanticStateRoot,
+  verifyNativeSemanticStateRoot,
+} from './semantic-state-root.mjs';
+
+export {
+  RCL_UI_RESOURCE_ACCESSIBILITY_VERSION,
+  RCL_UI_RESOURCE_BUNDLE_FORMAT,
+  RCL_UI_ACCESSIBILITY_TREE_FORMAT,
+  createUiResourceBundle,
+  resolveUiResource,
+  createUiResourceBinding,
+  buildCanonicalAccessibilityTree,
+} from './ui/ui-resource-accessibility.mjs';

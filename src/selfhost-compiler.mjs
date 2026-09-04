@@ -37,13 +37,13 @@ export function bootstrapSelfHostedCompiler(options = {}) {
     fs.writeFileSync(c0Path, c0);
     const first = runNativeCompiler(c0Path, sourcePath, c1Path, {
       outputState: 'compiler.output',
-      timeout: options.timeout ?? 120_000,
+      timeout: options.timeout ?? 300_000,
       maxBuffer: options.maxBuffer ?? 64 * 1024 * 1024,
       compilerPath: options.compilerPath,
     });
     const second = runNativeCompiler(c1Path, sourcePath, c2Path, {
       outputState: 'compiler.output',
-      timeout: options.timeout ?? 120_000,
+      timeout: options.timeout ?? 300_000,
       maxBuffer: options.maxBuffer ?? 64 * 1024 * 1024,
       compilerPath: options.compilerPath,
     });
