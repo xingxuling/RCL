@@ -1,0 +1,79 @@
+{
+  "format": "rcl.gap.ai011.selfhost-compact-tensor-plan-candidate.v0.1",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "semanticOwner": "RCL",
+  "planningExecutionOwner": "RCL native VM",
+  "backendExecutionOwner": "external Tensor backend remains separate",
+  "sourceHashes": {
+    "examples/native-ai/tensor-plan-liveness-genome.rcl": "bfa37667dc51e67d3df479d2d36d2ed3f9c51a91cf6bacffdafdfc54105a6468",
+    "src/selfhost-tensor-plan-liveness.mjs": "d9d64316c77ceeff954b7cfe6d193a239d6480072dc0abef1de757abd76ced2e",
+    "tests/selfhost-tensor-plan-liveness.test.mjs": "cc1cd0fd1b3a42c792283a42b8b3935967c87ce3d23de031af7b981343497b0e",
+    "docs/native-ai/AI011_SELFHOST_COMPACT_TENSOR_PLAN_CANDIDATE_v0.1.md": "088eac8f53924415e2f242eda60277e76b1b1d899608462c909ed87f4fbc9315"
+  },
+  "localVerification": {
+    "command": "node --test --test-concurrency=1 tests/selfhost-tensor-plan-liveness.test.mjs",
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "nativeStateRootVerified": true,
+    "sourceSelfhostCli": "node src/cli.mjs native examples/native-ai/tensor-plan-liveness-genome.rcl",
+    "sourceSelfhostCliPassed": true
+  },
+  "graphs": {
+    "linear": {
+      "graphRoot": "a1e48663ac01f196a02a45acf1abc0c4d47871a51b1e07699d15e229d49726e8",
+      "renderedSourceSha256": "714e05c9c9181f0ef9937d53aced17234a6b1bca60a35b9a1418251f6c8cc0e9",
+      "semanticStateRoot": "e2c62e11f66a03d45a2418fdef21e4f49485816bd016e9284e843c7d9a442e06",
+      "sourceRoot": "b7492fc19d72b21752502fb4c8fff6eae871bfc3faac980b489050210820bf84",
+      "slotCount": 3,
+      "allocatedBytes": 40,
+      "livePeakBytes": 32,
+      "reusedCount": 4,
+      "lastUse": [["x", 2], ["w", 2], ["h", 4], ["b", 4], ["y", 5], ["z", 6], ["loss", 7]],
+      "assignments": [["x", "input", 0, false, 16, 2], ["w", "input", 1, false, 16, 2], ["h", "matmul", 0, true, 16, 4], ["b", "input", 1, true, 16, 4], ["y", "add", 0, true, 16, 5], ["z", "relu", 1, true, 16, 6], ["loss", "sum", 2, false, 8, 7]]
+    },
+    "deadValueAndSizeMismatch": {
+      "graphRoot": "0def7704d4bdb71dea026152075c117dc81dca48c93abea7534260e9aba5df81",
+      "renderedSourceSha256": "545a92e4b91449bb17fd3ec2695482ed622c97746eb7e3fe73b268daf45539c8",
+      "semanticStateRoot": "d588f3290979b59c6acf390bf13872b529179cb1780efdc9f4ccf9d04ff0316e",
+      "sourceRoot": "a9ff77394a040a584a82f62bc66989b62c37cd1f4c79adb6e71d9e6aaff8f9a8",
+      "slotCount": 3,
+      "allocatedBytes": 28,
+      "livePeakBytes": 24,
+      "reusedCount": 1,
+      "assignments": [["input", "input", 0, false, 8, 2], ["dead", "temporary", 1, false, 16, 1], ["live", "unary", 0, true, 8, 3], ["out", "reduce", 2, false, 4, 4]]
+    },
+    "invalid": {
+      "graphRoot": "810e6472adfbcfa20ee9eb11170f93f59606608dab2f1dd53a08f402d6a3e3c2",
+      "semanticStateRoot": "325b00e5c24fbaa67c57c4e0c7f1a137b6eee4682c161dda4e6f22f43e5e8d71",
+      "graphValid": false,
+      "status": "rejected",
+      "assignments": [],
+      "allocatedBytes": 0,
+      "slotCount": 0
+    }
+  },
+  "checks": {
+    "orderedGraphValidation": true,
+    "lastUseIncludesFinalOutputs": true,
+    "deadValuesReleased": true,
+    "exactSizeOnlyReuse": true,
+    "deterministicSlotSelection": true,
+    "failClosedInvalidGraph": true,
+    "executionCrossedNativeRclVm": true
+  },
+  "claimsNotGranted": [
+    "shape_stride_layout_alias_safety",
+    "large_plan_compact_loop_lowering",
+    "backend_no_post_last_use_proof",
+    "process_rss_reduction",
+    "gpu_residency",
+    "throughput",
+    "autodiff",
+    "model_training",
+    "K400_PROMOTION"
+  ],
+  "nextGap": "Absorb shape/stride/layout-aware alias safety and compact lowering for large real Tensor plans, then bind backend no-post-last-use proof and broader replay.",
+  "reportRoot": "974a1f3780cd748d45bf43888851187f821077d458286fa30c7b43bbf7fc57cf"
+}

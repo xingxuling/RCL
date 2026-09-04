@@ -354,6 +354,7 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 - AI002: graph-governance candidate now owns ordered graph validation, reverse-edge rules, StopGradient filtering and deterministic per-parameter contribution grouping; numeric reverse execution, shape-aware rules, broader corpus and promotion remain open;
 - AI009: RCL-owned generic operation admission and manifest binding now have a native self-host candidate; typed/shape-aware graph construction, canonical promotion and backend performance remain open;
 - AI008: bounded raw `.rcltype` parsing now has a native RCL candidate with reference-parser parity; multi-module linking, union/nested typed-expression lowering, fixed-point inclusion and promotion remain open;
+- AI011: ordered graph validation, last-use analysis, dead-value release and exact-size slot reuse have a native RCL candidate; shape-aware alias safety, large-plan compact lowering, backend post-last-use proof and promotion remain open;
 - AI010 + K333: canonical cross-runtime float/scientific-number state roots. The v2 candidate now covers nested semantic numeric serialization and preserves the v1 default; Windows replay, historical-root migration and canonical promotion remain open;
 - AI022: missing production lifecycle semantics not already represented by bounded candidates;
 - UI001/UI004: stable Web/native-UI profile semantics still needing broader absorption;
