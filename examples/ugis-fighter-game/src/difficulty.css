@@ -1,0 +1,70 @@
+.top-actions {
+  pointer-events: auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.difficulty-picker {
+  min-width: 112px;
+  padding: 6px 8px;
+  border: 1px solid rgba(129,156,196,.28);
+  border-radius: 9px;
+  background: rgba(9,13,20,.82);
+  display: grid;
+  gap: 3px;
+  backdrop-filter: blur(8px);
+}
+
+.difficulty-picker > span {
+  color: #718198;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.difficulty-picker select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #eef4ff;
+  background: transparent;
+  font: 700 12px inherit;
+  cursor: pointer;
+}
+
+.difficulty-picker select option {
+  color: #eef4ff;
+  background: #0c131f;
+}
+
+.difficulty-picker.difficulty-novice { border-color: rgba(103,223,160,.34); }
+.difficulty-picker.difficulty-normal { border-color: rgba(77,151,255,.42); }
+.difficulty-picker.difficulty-hard { border-color: rgba(255,184,80,.42); }
+.difficulty-picker.difficulty-master { border-color: rgba(255,111,121,.45); }
+.difficulty-picker.difficulty-tianji {
+  border-color: rgba(197,115,255,.55);
+  box-shadow: 0 0 18px rgba(137,73,213,.16);
+}
+
+.difficulty-summary {
+  max-width: 420px;
+  margin: 0 0 8px;
+  color: #8e9eb3;
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .battle-top {
+    grid-template-columns: minmax(130px, 1fr) minmax(250px, 2fr);
+  }
+  .top-actions {
+    position: absolute;
+    top: 82px;
+    right: 0;
+  }
+  .difficulty-picker { min-width: 96px; }
+}
