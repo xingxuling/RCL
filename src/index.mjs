@@ -1915,6 +1915,13 @@ export {
 } from './selfhost-typed-module-parser.mjs';
 
 export {
+  SELFHOST_AUTODIFF_GRAPH_GOVERNANCE_PATH,
+  SELFHOST_AUTODIFF_GRAPH_GOVERNANCE_FORMAT,
+  renderSelfHostedAutodiffGraphGovernance,
+  runSelfHostedAutodiffGraphGovernance,
+} from './selfhost-autodiff-graph-governance.mjs';
+
+export {
   RCL_SEMANTIC_DECOMPRESSION_VERSION,
   RCL_SEMANTIC_DECOMPRESSION_FORMAT,
   createSemanticProfileTransition,

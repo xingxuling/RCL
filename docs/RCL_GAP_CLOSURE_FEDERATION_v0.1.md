@@ -349,7 +349,8 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 
 ### RCL-owned work still open
 
-- AI001/002/009/011/012: Canonical promotion/self-host lowering breadth for Tensor/Autodiff/model topology;
+- AI001/009/011/012: Canonical promotion/self-host lowering breadth for Tensor/Autodiff/model topology;
+- AI002: graph-governance candidate now owns ordered graph validation, reverse-edge rules, StopGradient filtering and deterministic per-parameter contribution grouping; numeric reverse execution, shape-aware rules, broader corpus and promotion remain open;
 - AI008: bounded raw `.rcltype` parsing now has a native RCL candidate with reference-parser parity; multi-module linking, union/nested typed-expression lowering, fixed-point inclusion and promotion remain open;
 - AI010 + K333: canonical cross-runtime float/scientific-number state roots. The v2 candidate now covers nested semantic numeric serialization and preserves the v1 default; Windows replay, historical-root migration and canonical promotion remain open;
 - AI022: missing production lifecycle semantics not already represented by bounded candidates;
