@@ -350,7 +350,7 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 ### RCL-owned work still open
 
 - AI001/002/008/009/011/012: Canonical promotion/self-host lowering breadth for Tensor/Autodiff/model topology;
-- AI010 + K333: canonical cross-runtime float/scientific-number state roots;
+- AI010 + K333: canonical cross-runtime float/scientific-number state roots. The v2 candidate now covers nested semantic numeric serialization and preserves the v1 default; Windows replay, historical-root migration and canonical promotion remain open;
 - AI022: missing production lifecycle semantics not already represented by bounded candidates;
 - UI001/UI004: stable Web/native-UI profile semantics still needing broader absorption;
 - K326: the reusable semantic contract for rooted snapshots, serializable optimistic conflicts, atomic write sets and Provider durable/recovery receipt admission is now a local candidate; durable storage, isolation implementation, query planning and crash recovery remain Provider-owned and open.

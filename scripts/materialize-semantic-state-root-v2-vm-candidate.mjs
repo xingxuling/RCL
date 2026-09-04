@@ -19,6 +19,10 @@ export function materializeSemanticStateRootV2Candidate(sourceText = fs.readFile
   source = replaceOnce(source,
 `static void value_json_sb(StringBuilder *sb, const Value *value);`,
 `static int semantic_state_root_v2_enabled(void);
+static void semantic_f64_json_sb(StringBuilder *sb, double value);
+static void semantic_number_json_sb(StringBuilder *sb, double value);
+static void semantic_integer_json_sb(StringBuilder *sb, int64_t value);
+static void semantic_unsigned_integer_json_sb(StringBuilder *sb, uint64_t value);
 static void value_json_sb(StringBuilder *sb, const Value *value);`, 'helper-forward');
   source = replaceOnce(source,
 `static void semantic_value_json_sb(StringBuilder *sb, const Value *value);`,
@@ -39,6 +43,38 @@ static void semantic_f64_json_sb(StringBuilder *sb, double value) {
   sb_append(sb, "\\\"}");
 }
 
+static void semantic_number_json_sb(StringBuilder *sb, double value) {
+  if (semantic_state_root_v2_enabled()) {
+    semantic_f64_json_sb(sb, value);
+    return;
+  }
+  if (!isfinite(value)) { sb_append(sb, "null"); return; }
+  if (value == 0.0) { sb_append(sb, "0"); return; }
+  char number[64];
+  snprintf(number, sizeof(number), "%.15g", value);
+  sb_append(sb, number);
+}
+
+static void semantic_integer_json_sb(StringBuilder *sb, int64_t value) {
+  if (semantic_state_root_v2_enabled()) {
+    semantic_f64_json_sb(sb, (double)value);
+    return;
+  }
+  char number[64];
+  snprintf(number, sizeof(number), "%" PRId64, value);
+  sb_append(sb, number);
+}
+
+static void semantic_unsigned_integer_json_sb(StringBuilder *sb, uint64_t value) {
+  if (semantic_state_root_v2_enabled()) {
+    semantic_f64_json_sb(sb, (double)value);
+    return;
+  }
+  char number[64];
+  snprintf(number, sizeof(number), "%" PRIu64, value);
+  sb_append(sb, number);
+}
+
 static void semantic_value_json_sb(StringBuilder *sb, const Value *value);`, 'helper');
 
   source = replaceOnce(source,
@@ -57,10 +93,29 @@ static void semantic_value_json_sb(StringBuilder *sb, const Value *value);`, 'he
 `static void semantic_value_json_sb(StringBuilder *sb, const Value *value) {
   switch (value->type) {
     case VALUE_NUMBER:
-      if (semantic_state_root_v2_enabled()) semantic_f64_json_sb(sb, value->number);
-      else value_json_sb(sb, value);
+      semantic_number_json_sb(sb, value->number);
       break;`, 'semantic-number');
 
+  for (const [needle, replacement] of [
+    ['snprintf(number, sizeof(number), "%" PRId64, span->column); sb_append(sb, number);', 'semantic_integer_json_sb(sb, span->column);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, span->length); sb_append(sb, number);', 'semantic_integer_json_sb(sb, span->length);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, span->line); sb_append(sb, number);', 'semantic_integer_json_sb(sb, span->line);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, span->offset); sb_append(sb, number);', 'semantic_integer_json_sb(sb, span->offset);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, parse_state->index); sb_append(sb, number);', 'semantic_integer_json_sb(sb, parse_state->index);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, symbol->slot); sb_append(sb, number);', 'semantic_integer_json_sb(sb, symbol->slot);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, semantic->slot); sb_append(sb, number);', 'semantic_integer_json_sb(sb, semantic->slot);'],
+    ['snprintf(number, sizeof(number), "%" PRId64, ir->slot); sb_append(sb, number);', 'semantic_integer_json_sb(sb, ir->slot);'],
+  ]) source = source.replaceAll(needle, replacement);
+  for (const newline of ['\n', '\r\n']) {
+    source = source.replaceAll(
+      'snprintf(number, sizeof(number), "%" PRIu64, value->typed_ref->object_id);' + newline + '      sb_append(sb, number);',
+      'semantic_unsigned_integer_json_sb(sb, value->typed_ref->object_id);',
+    );
+  }
+  source = source.replace(
+    'if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); snprintf(number, sizeof(number), "%.15g", n); sb_append(sb, number); }',
+    'if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); semantic_number_json_sb(sb, n); }',
+  );
   source = replaceOnce(source,
 `  fputs(",\\\"stateRootAlgorithm\\\":\\\"rcl.semantic-state-root.v1\\\"", out);`,
 `  fputs(",\\\"stateRootAlgorithm\\\":", out);
