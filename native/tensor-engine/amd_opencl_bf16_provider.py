@@ -26,6 +26,10 @@ ELEMENTWISE_REQUEST_FORMAT = "rcl.opencl-bf16-elementwise-request.v0.1"
 ELEMENTWISE_RESULT_FORMAT = "rcl.opencl-bf16-elementwise-result.v0.1"
 ELEMENTWISE_GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-elementwise-gradient-request.v0.1"
 ELEMENTWISE_GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-elementwise-gradient-result.v0.1"
+REDUCTION_REQUEST_FORMAT = "rcl.opencl-bf16-reduction-request.v0.1"
+REDUCTION_RESULT_FORMAT = "rcl.opencl-bf16-reduction-result.v0.1"
+REDUCTION_GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-reduction-gradient-request.v0.1"
+REDUCTION_GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-reduction-gradient-result.v0.1"
 ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
 ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
 MASKED_SOFTMAX_REQUEST_FORMAT = "rcl.opencl-bf16-masked-softmax-request.v0.1"
@@ -361,6 +365,42 @@ __kernel void rcl_bf16_mul_grad_right(
   uint length = rows * columns;
   if (index >= length) return;
   output[index] = upstream[index] * rcl_bf16_to_f32(left[index]);
+}
+
+__kernel void rcl_bf16_mean(
+    __global const ushort* input,
+    __global ushort* output,
+    uint rows,
+    uint columns,
+    uint axis
+) {
+  uint index = get_global_id(0);
+  uint output_length = axis == 0 ? columns : rows;
+  if (index >= output_length) return;
+  float accumulator = 0.0f;
+  uint width = axis == 0 ? rows : columns;
+  for (uint offset = 0; offset < width; offset++) {
+    uint source_index = axis == 0
+      ? offset * columns + index
+      : index * columns + offset;
+    accumulator += rcl_bf16_to_f32(input[source_index]);
+  }
+  output[index] = (ushort)rcl_bf16_rne(accumulator / (float)width);
+}
+
+__kernel void rcl_bf16_mean_grad(
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns,
+    uint axis
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  uint coordinate = axis == 0 ? index % columns : index / columns;
+  uint width = axis == 0 ? rows : columns;
+  output[index] = upstream[coordinate] / (float)width;
 }
 
 __kernel void rcl_adamw_update(
@@ -2205,6 +2245,148 @@ def run_elementwise_gradient(
     return elementwise_gradient_result(operation, device, output, rows, columns)
 
 
+def reduction_dimensions(request: dict[str, Any]) -> tuple[int, int, int]:
+    values = [request.get("rows"), request.get("columns"), request.get("axis")]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in values):
+        raise fail("RCL_OPENCL_SHAPE", "reduction dimensions and axis must be integers")
+    rows, columns, axis = values
+    if any(value < 1 or value > MAX_DIMENSION for value in (rows, columns)):
+        raise fail("RCL_OPENCL_SHAPE", "reduction dimensions must be within 1..=64")
+    if rows * columns > MAX_ELEMENTS:
+        raise fail("RCL_OPENCL_SHAPE", f"reduction element count must be within 1..={MAX_ELEMENTS}")
+    if axis not in (0, 1):
+        raise fail("RCL_OPENCL_REDUCTION_AXIS", "rank-2 mean reduction axis must be 0 or 1")
+    return rows, columns, axis
+
+
+def reduction_result(
+    operation: str,
+    device: dict[str, str],
+    output: list[int],
+    rows: int,
+    columns: int,
+    axis: int,
+    input_bits: list[int],
+) -> dict[str, Any]:
+    output_bits = [bits_hex(int(value)) for value in output]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-reduction-v0.1\0")
+    digest.update(operation.encode("ascii"))
+    digest.update(device["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<III", rows, columns, axis))
+    for bits in input_bits + [int(value) for value in output]:
+        digest.update(bits_hex(bits).encode("ascii"))
+    output_shape = [columns] if axis == 0 else [rows]
+    return {
+        "format": REDUCTION_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_REDUCTION_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "axis": axis,
+        "outputShape": output_shape,
+        "device": device,
+        "outputBits": output_bits,
+        "outputData": [bf16_value(int(bits, 16)) for bits in output_bits],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
+def run_reduction(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    if request.get("format") != REDUCTION_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 reduction request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    operation = request.get("operation")
+    if operation != "mean":
+        raise fail("RCL_OPENCL_OPERATION", "reduction operation must be mean")
+    rows, columns, axis = reduction_dimensions(request)
+    input_bits = parse_bits(request.get("inputBits"), "input")
+    if len(input_bits) != rows * columns:
+        raise fail("RCL_OPENCL_SHAPE", "reduction BF16 bit payload length must match rows*columns")
+    output_length = columns if axis == 0 else rows
+    device, outputs = run_opencl_kernel(
+        "rcl_bf16_mean",
+        [("u16", input_bits)],
+        [("u16", output_length)],
+        [(CLUint, rows), (CLUint, columns), (CLUint, axis)],
+        (output_length,),
+        runtime,
+    )
+    output = [int(value) for value in outputs[0]]
+    if any(bits & 0x7F80 == 0x7F80 for bits in output):
+        raise fail("RCL_OPENCL_BF16_NONFINITE", "OpenCL reduction output is non-finite")
+    return reduction_result(operation, device, output, rows, columns, axis, input_bits)
+
+
+def reduction_gradient_result(
+    operation: str,
+    device: dict[str, str],
+    output: list[float],
+    rows: int,
+    columns: int,
+    axis: int,
+) -> dict[str, Any]:
+    output_hex = [f"{f32_bits(value):08x}" for value in output]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-reduction-gradient-v0.1\0")
+    digest.update(operation.encode("ascii"))
+    digest.update(device["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<III", rows, columns, axis))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": REDUCTION_GRADIENT_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_REDUCTION_GRADIENT_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "axis": axis,
+        "shape": [rows, columns],
+        "device": device,
+        "outputBits": output_hex,
+        "outputData": [f32_value(int(bits, 16)) for bits in output_hex],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
+def run_reduction_gradient(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    if request.get("format") != REDUCTION_GRADIENT_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 reduction gradient request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    operation = request.get("operation")
+    if operation != "mean-gradient":
+        raise fail("RCL_OPENCL_OPERATION", "reduction gradient operation must be mean-gradient")
+    rows, columns, axis = reduction_dimensions(request)
+    upstream_length = columns if axis == 0 else rows
+    upstream = parse_f32_bits(request.get("upstreamF32Bits"), "upstream", upstream_length)
+    device, outputs = run_opencl_kernel(
+        "rcl_bf16_mean_grad",
+        [("f32", upstream)],
+        [("f32", rows * columns)],
+        [(CLUint, rows), (CLUint, columns), (CLUint, axis)],
+        (rows * columns,),
+        runtime,
+    )
+    output = [float(value) for value in outputs[0]]
+    if any(not (value == value and abs(value) != float("inf")) for value in output):
+        raise fail("RCL_OPENCL_F32_NONFINITE", "OpenCL reduction gradient output is non-finite")
+    return reduction_gradient_result(operation, device, output, rows, columns, axis)
+
+
 def run_adamw(
     request: dict[str, Any],
     runtime: OpenCLRuntime | None = None,
@@ -2405,6 +2587,10 @@ def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[s
         return run_elementwise(request, runtime)
     if request_format == ELEMENTWISE_GRADIENT_REQUEST_FORMAT:
         return run_elementwise_gradient(request, runtime)
+    if request_format == REDUCTION_REQUEST_FORMAT:
+        return run_reduction(request, runtime)
+    if request_format == REDUCTION_GRADIENT_REQUEST_FORMAT:
+        return run_reduction_gradient(request, runtime)
     if request_format == ADAMW_REQUEST_FORMAT:
         return run_adamw(request, runtime)
     if request_format == MASKED_SOFTMAX_REQUEST_FORMAT:

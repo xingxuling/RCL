@@ -134,10 +134,12 @@ struct Telemetry {
     backward_edge_count: usize,
     gpu_matmul_nodes: usize,
     gpu_elementwise_nodes: usize,
+    gpu_reduction_nodes: usize,
     host_cpu_nodes: usize,
     gpu_execution_roots: Vec<String>,
     gpu_backward_matmul_nodes: usize,
     gpu_backward_elementwise_nodes: usize,
+    gpu_backward_reduction_nodes: usize,
     gpu_backward_execution_roots: Vec<String>,
     gpu_optimizer_elements: usize,
     gpu_optimizer_execution_roots: Vec<String>,
@@ -1165,10 +1167,12 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
             backward_edge_count,
             gpu_matmul_nodes: final_result.telemetry.gpu_matmul_nodes,
             gpu_elementwise_nodes: final_result.telemetry.gpu_elementwise_nodes,
+            gpu_reduction_nodes: final_result.telemetry.gpu_reduction_nodes,
             host_cpu_nodes: final_result.telemetry.host_cpu_nodes,
             gpu_execution_roots: final_result.telemetry.gpu_execution_roots.clone(),
             gpu_backward_matmul_nodes: final_result.telemetry.gpu_backward_matmul_nodes,
             gpu_backward_elementwise_nodes: final_result.telemetry.gpu_backward_elementwise_nodes,
+            gpu_backward_reduction_nodes: final_result.telemetry.gpu_backward_reduction_nodes,
             gpu_backward_execution_roots: final_result
                 .telemetry
                 .gpu_backward_execution_roots
