@@ -1,0 +1,37 @@
+name: UGIS Fighter v0.4 Source Export
+
+on:
+  push:
+    branches:
+      - artifact/ugis-fighter-v0.4-export
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact export branch
+        uses: actions/checkout@v4
+
+      - name: Assemble source package
+        run: |
+          set -euo pipefail
+          ROOT="UGIS-Fighter-v0.4-source"
+          mkdir -p "$ROOT/examples" "$ROOT/tests" "$ROOT/.github/workflows"
+          cp -R examples/ugis-fighter-game "$ROOT/examples/"
+          cp tests/ugis-fighter*.test.mjs "$ROOT/tests/"
+          cp .github/workflows/ugis-fighter-game.yml "$ROOT/.github/workflows/"
+          cp .github/workflows/ugis-fighter-static-publish.yml "$ROOT/.github/workflows/"
+          printf '%s\n' '9e306ad8eaed7460ff241c03278396c7d57936a0' > "$ROOT/SOURCE_COMMIT.txt"
+          printf '%s\n' 'Source snapshot: UGIS Fighter v0.4 seven-style prototype' > "$ROOT/EXPORT_NOTE.txt"
+          zip -r UGIS-Fighter-v0.4-source.zip "$ROOT"
+
+      - name: Upload source zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: UGIS-Fighter-v0.4-source
+          path: UGIS-Fighter-v0.4-source.zip
+          if-no-files-found: error
+          retention-days: 7
