@@ -702,3 +702,46 @@ open. Authority: `docs/native-ai/gpu-native-elementwise-backward-evidence-v0.1.m
 `tests/k20-gpu-native-elementwise-backward.test.mjs` and
 `examples/native-ai/evidence/gpu-native-elementwise-backward-v0.1/k20-gpu-native-elementwise-backward-local-evidence.json`.
 The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K21 GPU-native reduction forward/backward candidate
+
+K21 is `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REDUCTION_BACKWARD_CANDIDATE`.
+It keeps RCL canonical for generic Tensor graph, rank-2 `mean` reduction
+semantics, BF16/FP32 numeric policy, reverse-mode Autodiff, FP32 AdamW state,
+checkpoint identity and CPU differential authority. An explicit
+`gpuNonMatmulMode: "reduction-v0.1"` opt-in lowers rank-2 `mean` on axis `0` or
+`1` to AMD OpenCL forward/reverse kernels over the existing persistent
+session arena; `reshape` remains an explicit CPU-reference node and fallback
+is forbidden.
+
+On the real AMD `gfx1152` device, two repeated steps recorded 30 provider
+requests, 27 dispatches, 13 allocations, 69 buffer reuses and 13 releases
+(146 allocated bytes), with zero pooled buffers at close. The per-kernel
+baseline used 82 allocations / 856 bytes / zero reuse. Exact CPU loss,
+parameters, optimizer states, checkpoint root
+`sha256:923decbf054c5e21a551de3043be519696343d78851368720a7b596a8d77f0fe`,
+deterministic replay and checkpoint-resume parity held; loss moved from
+`0.94921875` to `0.6484375`. Local K21 is `3/3 PASS`; K20 and K19 regressions
+are each `3/3 PASS`; Python syntax, locked Rust cargo check, Node syntax, diff
+and license checks passed. Evidence root is
+`12fd0fb9b5256b065ae4e0627e35da5f05c2ac8fd93d7fd5d8031aa78fcfd3a8`.
+
+PR #162 exact head `7993601d8c299b0cedb779742f28e0cf974c8941` passed K21
+Ubuntu/Windows, Canonical, Universal and Authority checks, and merged as
+`main@f435fcb9a9a1245049cad2044a4eb173f901ba40`. Post-merge Canonical run
+`33924571163`, Universal run `33924571164`, Authority run `33924571102` and
+the K09-K18 regression workflows were green for that exact merge commit.
+Hosted replay is repository evidence only; the unrelated Vercel status was
+externally rate-limited.
+
+This remains a bounded candidate, not `GPU_TRAINING`, arbitrary-rank/general
+reduction coverage, full-graph training, broadcast, softmax/logsumexp,
+throughput, VRAM, portability, production Transformer or K400 completion.
+`RCL_GAP_GPU_NON_MATMUL_BACKWARD`, device-resident parameter/activation state
+and the production Transformer lifecycle remain open. Authority:
+`docs/native-ai/gpu-reduction-backward-evidence-v0.1.md`,
+`examples/native-ai/gpu-reduction-backward-contract.v0.1.json`,
+`examples/native-ai/gpu-reduction-backward-genome.rcl`,
+`tests/k21-gpu-reduction-backward.test.mjs` and
+`examples/native-ai/evidence/gpu-reduction-backward-v0.1/k21-gpu-reduction-backward-local-evidence.json`.
+The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.

@@ -992,6 +992,51 @@ coverage, full-graph training semantics, GPU training, throughput, VRAM,
 generic GPU portability, production model claims and K400 promotion remain
 closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
+## K21 GPU-native reduction forward/backward candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REDUCTION_BACKWARD_CANDIDATE`.
+K21 keeps RCL as the canonical owner of generic Tensor graph, rank-2 `mean`
+reduction, BF16/FP32 numeric semantics, reverse-mode Autodiff, AdamW state and
+checkpoint identity. An explicit `gpuNonMatmulMode: "reduction-v0.1"` opt-in
+lowers rank-2 `mean` axis `0`/`1` forward and reverse rules to AMD OpenCL;
+`reshape` remains CPU-reference and fallback is forbidden. Two repeated steps
+use one persistent provider session and the bounded `session-arena-v0.1` pool.
+
+| Evidence | Result |
+|---|---:|
+| K21 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, rank-2 `[2,2]` graph, 2 steps |
+| GPU forward nodes | 1 matmul + 2 reduction nodes |
+| GPU reverse nodes | 2 matmul-gradient + 2 reduction-gradient nodes |
+| Persistent transport | 30 requests / 27 dispatches over one provider session |
+| Arena telemetry | 13 allocations / 69 reuses / 13 releases; 146 allocated bytes; zero pooled at close |
+| Per-kernel baseline | 82 allocations / 856 bytes / zero reuse |
+| CPU differential | exact loss, parameters, optimizer states and checkpoint root |
+| Deterministic replay | PASS; checkpoint resume exact |
+| Focused local suite | `3/3 PASS`; K20 and K19 regressions each `3/3 PASS` |
+| Negative controls | unsupported/missing mode, invalid axis, CPU arena, provider and backend mismatch fail closed |
+| Hosted boundary | PR #162 exact head passed K21 Ubuntu `101187035418`, Windows `101187035503`, Canonical `101187038001`, Authority `101187037823`, Universal focused `101187038106` and K01 Windows `101187037870`; post-merge Canonical/Universal/Authority and K09-K18 regressions were green |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-reduction-backward-evidence-v0.1.md`
+- `examples/native-ai/gpu-reduction-backward-contract.v0.1.json`
+- `examples/native-ai/gpu-reduction-backward-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `native/tensor-engine/src/autodiff.rs`
+- `native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs`
+- `tests/k21-gpu-reduction-backward.test.mjs`
+- `examples/native-ai/evidence/gpu-reduction-backward-v0.1/k21-gpu-reduction-backward-local-evidence.json`
+
+Reproduction: `npm run test:k21-gpu-reduction-backward`.
+Claims are limited to bounded rank-2 GPU `mean` axis `0`/`1` forward and
+reverse lowering plus persistent session/arena reuse. Arbitrary-rank/axis
+reductions, broadcast, softmax/logsumexp, full-graph training semantics, GPU
+training, throughput, VRAM, portability, production model claims and K400
+promotion remain closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377
+UNTESTED`.
+
 ## AI001 self-hosted Tensor shape-semantics candidate
 
 Status: `PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE`.
