@@ -6,6 +6,7 @@ on:
     paths:
       - 'examples/ugis-threejs-arena/**'
       - 'tests/ugis-threejs-arena-fixture.test.mjs'
+      - 'tests/ugis-threejs-arena-snapshot.test.mjs'
       - '.github/workflows/ugis-threejs-arena.yml'
   workflow_dispatch:
 
@@ -31,12 +32,12 @@ jobs:
       - name: Install browser example dependencies
         run: npm install --ignore-scripts
 
-      - name: Validate evidence-linked timeline
+      - name: Validate evidence-linked timeline and provider snapshots
         run: npm run validate
 
       - name: Build Vite production bundle
         run: npm run build
 
-      - name: Run RCL root fixture test
+      - name: Run RCL arena fixture and snapshot tests
         working-directory: .
-        run: node --test tests/ugis-threejs-arena-fixture.test.mjs
+        run: node --test tests/ugis-threejs-arena-fixture.test.mjs tests/ugis-threejs-arena-snapshot.test.mjs
