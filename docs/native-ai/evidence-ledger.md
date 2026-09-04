@@ -864,3 +864,30 @@ Claims are limited to `OPENCL_AMD_ORDERED_TENSOR_MIXED_GRAPH_CANDIDATE` and
 residency, GPU-native Autodiff/AdamW, GPU training, parallel execution,
 throughput, VRAM, portability, RCL-10M, RCL-1B and K400 promotion remain
 closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## AI001 self-hosted Tensor shape-semantics candidate
+
+Status: `PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE`.
+The RCL-owned genome validates typed Tensor descriptor identity, positive
+dimensions, exact element counts, row-major stride identity, dtype/layout/device
+agreement, ordered references, right-aligned broadcast, matmul, transpose,
+reshape and axis-reduction output shapes. The native self-hosted compiler and
+VM verify the semantic state root. Focused local evidence is `3/3 PASS`, with
+shape, stride, metadata, missing-reference and manifest-root mutations rejected
+before backend execution.
+
+Authority files:
+
+- `docs/native-ai/AI001_SELFHOST_TENSOR_SHAPE_SEMANTICS_CANDIDATE_v0.1.md`
+- `examples/native-ai/tensor-shape-semantics-genome.rcl`
+- `examples/native-ai/tensor-shape-semantics-contract.v0.1.json`
+- `src/selfhost-tensor-shape-semantics.mjs`
+- `tests/selfhost-tensor-shape-semantics.test.mjs`
+- `examples/native-ai/evidence/tensor-shape-semantics-v0.1/ai001-tensor-shape-semantics-local-evidence.json`
+
+Reproduction: `npm run test:selfhost-tensor-shape-semantics` and
+`npm run evidence:selfhost-tensor-shape-semantics`. This grants only bounded
+RCL semantic admission. Numerical storage kernels, alias safety, device
+placement, GPU execution, canonical promotion, scale and K400 remain closed.
+Local receipt root: `f7e9ffdd96412791363ba2cc8e619bb967429f84877ef7bbefe6e72425a919b1`;
+implementation source commit: `1ababfaba826a36904fe2ad859634ddee053e8ee`.

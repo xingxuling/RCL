@@ -1942,6 +1942,16 @@ export {
 } from './selfhost-tensor-plan-liveness.mjs';
 
 export {
+  SELFHOST_TENSOR_SHAPE_SEMANTICS_PATH,
+  SELFHOST_TENSOR_SHAPE_SEMANTICS_FORMAT,
+  normalizeTensorShapeSemantics,
+  manifestFromTensorShapeSemantics,
+  renderSelfHostedTensorShapeSemantics,
+  runSelfHostedTensorShapeSemantics,
+  tensorShapeSemanticsCanonical,
+} from './selfhost-tensor-shape-semantics.mjs';
+
+export {
   RCL_SEMANTIC_DECOMPRESSION_VERSION,
   RCL_SEMANTIC_DECOMPRESSION_FORMAT,
   createSemanticProfileTransition,
