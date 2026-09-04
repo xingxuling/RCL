@@ -20,7 +20,8 @@ export class SgaProviderBridgeError extends Error {
 }
 
 export function createPythonSgaMultiviewInvoker(options = {}) {
-  const python = options.pythonExecutable ?? options.python ?? 'python3';
+  const defaultPython = process.platform === 'win32' ? 'python' : 'python3';
+  const python = options.pythonExecutable ?? options.python ?? defaultPython;
   const moduleDir = options.sgaModuleDir ?? options.moduleDir;
   if (typeof moduleDir !== 'string' || moduleDir.length === 0) {
     throw new SgaProviderBridgeError('SGA_PYTHON_MODULE_DIR_REQUIRED', 'sgaModuleDir is required for the Python SGA provider');

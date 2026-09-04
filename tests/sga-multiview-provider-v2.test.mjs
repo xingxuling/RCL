@@ -141,7 +141,7 @@ test('Python SGA invoker does not create __pycache__ in a source-bound checkout'
     );
     const invoke = createPythonSgaMultiviewInvoker({
       sgaModuleDir: directory,
-      pythonExecutable: process.env.PYTHON ?? 'python3',
+      pythonExecutable: process.env.PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3'),
     });
     const result = await invoke({ goal: 'x', base_structure: {} });
     assert.equal(result.format, 'sga.multiview-candidate-set.v0.1');

@@ -87,7 +87,9 @@ export async function invokeCreativeCandidate(payload, options = {}) {
     invokeGenerator: options.invokeGenerator,
     pythonProvider: options.invokeGenerator ? undefined : {
       sgaModuleDir: options.sgaModuleDir ?? process.env.TAOWIND_SGA_MULTIVIEW_MODULE_DIR,
-      pythonExecutable: options.pythonExecutable ?? process.env.TAOWIND_PYTHON ?? 'python3',
+      pythonExecutable: options.pythonExecutable
+        ?? process.env.TAOWIND_PYTHON
+        ?? (process.platform === 'win32' ? 'python' : 'python3'),
       timeoutMs: options.providerTimeoutMs ?? 10_000,
     },
     timeoutMs: options.runtimeTimeoutMs ?? 12_000,
