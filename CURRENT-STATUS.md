@@ -456,7 +456,7 @@ RCL-10M and K400 remain closed. Authority:
 
 ## K15 AMD OpenCL ordered Tensor graph residency candidate
 
-Status: `PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
 K15 extends the opt-in K14 `tensor-residency-v0.1` session with an RCL-owned
 ordered graph envelope for two through eight rank-2 BF16 matmul nodes. A node
 may consume a resident Tensor identity/value root or an ephemeral resource
@@ -473,8 +473,13 @@ ephemeral resources before session close. Telemetry recorded five allocations
 (`22` bytes), five releases, three Tensor uploads and one device-to-host
 transfer. K15 is `3/3 PASS` locally; K14 Tensor residency and K13 allocation
 arena remain required regressions. Intermediate-readback and use-before-
-produce-resource negatives fail closed. Hosted replay and post-merge checks
-are pending this candidate PR. This remains a bounded lowering candidate:
+produce-resource negatives fail closed. Hosted PR #119 exact-head replay
+passed K15 and all K09-K14 regressions plus Authority; post-merge `main`
+`d2efae85c7f4ce047ff05f09d39f61abf01aec74` passed the same K15/K09-K14 scope.
+The repository-wide Canonical and Universal checks remain independently
+failed on the pre-existing K337/K338/K340 compiler RBC drift (including both
+hosted retries and the post-merge run); these failures do not involve K15.
+This remains a bounded lowering candidate:
 canonical Tensor output/full-graph/training-step residency, GPU training,
 throughput, VRAM, portability, RCL-10M and K400 promotion remain closed.
 Authority:

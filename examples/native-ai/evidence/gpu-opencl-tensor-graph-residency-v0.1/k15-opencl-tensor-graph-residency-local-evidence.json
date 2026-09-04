@@ -2,10 +2,10 @@
   "schema": "rcl.native-ai.gpu-opencl-tensor-graph-residency.evidence.v0.1",
   "campaign": "RCL K08 AI Model Factory Campaign",
   "task": "K15",
-  "status": "PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
   "canonicalOwner": "RCL",
   "baseMain": "07109ade4394056286df0f6593b9eba4f2dbecb9",
-  "implementationCommit": "PENDING_IMPLEMENTATION_COMMIT",
+  "implementationCommit": "f3884aa91c3efed8e5413a66e6175f91f6690e79",
   "branch": "codex/k15-opencl-graph-residency-v01",
   "contract": "examples/native-ai/gpu-opencl-tensor-graph-residency-contract.v0.1.json",
   "genome": "examples/native-ai/gpu-opencl-tensor-graph-residency-genome.rcl",
@@ -60,27 +60,122 @@
       "diffCheck": "PASS",
       "k15": "3_PASS",
       "k14TensorResidency": "PASS",
-      "k13BufferArena": "PASS_EXPECTED_REGRESSION_SUITE"
+      "k13BufferArena": "PASS_EXPECTED_REGRESSION_SUITE",
+      "hostedAndPostMergeScope": "PASS_K15_K14_K13_K12_K11_K10_K09_AUTHORITY; CANONICAL_AND_UNIVERSAL_REPOSITORY_WIDE_K337_K338_K340_RBC_DRIFT"
     },
     "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
   },
   "hostedReplay": {
-    "status": "NOT_RUN_IMPLEMENTATION_PR_PENDING",
-    "pullRequest": null,
-    "k15Run": null,
-    "k14RegressionRun": null,
-    "k13RegressionRun": null,
-    "canonicalVerificationRun": null,
-    "authorityRun": null
+    "status": "PASS_EXACT_HEAD_K15_SCOPE_WITH_PREEXISTING_REPOSITORY_DRIFT",
+    "head": "f3884aa91c3efed8e5413a66e6175f91f6690e79",
+    "pullRequest": 119,
+    "k15Run": {
+      "runId": 33872613505,
+      "jobs": [
+        { "name": "tensor-graph-residency (ubuntu-latest)", "jobId": 101021932833, "conclusion": "SUCCESS" },
+        { "name": "tensor-graph-residency (windows-latest)", "jobId": 101021932503, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k14RegressionRun": {
+      "runId": 33872613619,
+      "jobs": [
+        { "name": "tensor-residency (ubuntu-latest)", "jobId": 101021933038, "conclusion": "SUCCESS" },
+        { "name": "tensor-residency (windows-latest)", "jobId": 101021932643, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k13RegressionRun": {
+      "runId": 33872613579,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 101021933022, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 101021932631, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33872613544,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 101021932593, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 101021932926, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33872613674, "jobId": 101021933631, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33872613532, "jobId": 101021932734, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33872613644, "jobId": 101021933298, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33872613548,
+      "attempt": 2,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 101023496277, "conclusion": "FAILURE" },
+        { "name": "k01-windows-verification", "jobId": 101023496549, "conclusion": "FAILURE" }
+      ],
+      "conclusion": "FAILURE",
+      "failure": "Pre-existing K337/K338/K340 compiler RBC drift; no K15 failure. Attempt 1 also failed the same K340 drift (jobs 101021932656 and 101021933091)."
+    },
+    "canonicalVerificationRun": {
+      "runId": 33872613517,
+      "jobId": 101021932614,
+      "conclusion": "FAILURE",
+      "failure": "Pre-existing K337/K338/K340 compiler RBC drift in the repository test suite; no K15 failure."
+    },
+    "authorityRun": { "runId": 33872613566, "jobId": 101021932714, "conclusion": "SUCCESS" }
   },
   "postMergeVerification": {
-    "status": "NOT_RUN_IMPLEMENTATION_PR_PENDING",
-    "mainSha": null,
-    "k15Run": null,
-    "k14RegressionRun": null,
-    "k13RegressionRun": null,
-    "canonicalVerificationRun": null,
-    "authorityRun": null
+    "status": "PASS_MAIN_POSTMERGE_K15_SCOPE_WITH_PREEXISTING_REPOSITORY_DRIFT",
+    "mainSha": "d2efae85c7f4ce047ff05f09d39f61abf01aec74",
+    "k15Run": {
+      "runId": 33873655233,
+      "jobs": [
+        { "name": "tensor-graph-residency (ubuntu-latest)", "jobId": 101025337719, "conclusion": "SUCCESS" },
+        { "name": "tensor-graph-residency (windows-latest)", "jobId": 101025337997, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k14RegressionRun": {
+      "runId": 33873655058,
+      "jobs": [
+        { "name": "tensor-residency (ubuntu-latest)", "jobId": 101025337650, "conclusion": "SUCCESS" },
+        { "name": "tensor-residency (windows-latest)", "jobId": 101025337165, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k13RegressionRun": {
+      "runId": 33873655241,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 101025337868, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 101025338194, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33873655485,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 101025339476, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 101025339716, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33873655108, "jobId": 101025337561, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33873655097, "jobId": 101025337344, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33873655344, "jobId": 101025338371, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33873655301,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 101025338030, "conclusion": "FAILURE" },
+        { "name": "k01-windows-verification", "jobId": 101025338014, "conclusion": "FAILURE" }
+      ],
+      "conclusion": "FAILURE",
+      "failure": "Pre-existing K340 compiler RBC drift in focused and Windows K01 jobs; no K15 failure."
+    },
+    "canonicalVerificationRun": {
+      "runId": 33873655180,
+      "jobId": 101025337678,
+      "conclusion": "FAILURE",
+      "failure": "Pre-existing K337/K338/K340 compiler RBC drift in the repository test suite; no K15 failure."
+    },
+    "authorityRun": { "runId": 33873655103, "jobId": 101025337604, "conclusion": "SUCCESS" }
   },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -97,7 +192,7 @@
     "ROBUST": "PASS_LOCAL_FAIL_CLOSED_GRAPH_ORDER_AND_READBACK",
     "PERFORMANCE": "ALLOCATION_AND_TRANSFER_COUNTS_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
     "AI_GENERATE": "NOT_APPLICABLE",
-    "EVIDENCE": "LOCAL_ONLY_PENDING_HOSTED_AND_POSTMERGE"
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE_K15_SCOPE_WITH_PREEXISTING_K337_K338_K340_DRIFT"
   },
   "claimsGranted": [
     "OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
@@ -122,5 +217,5 @@
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
   "authority": "CANDIDATE_ONLY_ORDERED_GPU_TENSOR_GRAPH_WITH_EPHEMERAL_INTERMEDIATES_AND_ONE_FINAL_READBACK",
-  "reportRoot": "d45c441845d6832280666ffc09c3743950f3c83841973973205033d4b5af9a52"
+  "reportRoot": "07cdc119d4c8b2c46ac6d9b48d19fea35f583bd5e793b31be0bb995977f22039"
 }
