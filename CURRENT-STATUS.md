@@ -487,3 +487,34 @@ Authority:
 `examples/native-ai/gpu-opencl-tensor-graph-residency-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-tensor-graph-residency-genome.rcl` and
 `examples/native-ai/evidence/gpu-opencl-tensor-graph-residency-v0.1/k15-opencl-tensor-graph-residency-local-evidence.json`.
+
+## K16 AMD OpenCL BF16 additive masked softmax candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_MASKED_SOFTMAX_CANDIDATE`.
+K16 adds an RCL-owned generic additive masked-softmax genome and contract. The
+semantic boundary is BF16 input/storage, FP32 stable max-subtracted exp/sum/
+divide, and BF16 round-to-nearest-even output; the provider owns only the
+explicit AMD OpenCL row-kernel lowering and buffer dispatch, with fallback
+forbidden. On the real AMD `gfx1152` device, the rank-2 `2 x 3` fixture
+returned exact bits `3f80 31c1 3283 323f 3f3b 3e8a`, normalized rows, exact
+independent CPU BF16/FP32 differential and deterministic execution root
+`959537aaf0115e819ad927a3d1fc3ec6eff6a9dbba086c964460f5036f4c9e03`. The
+negative suite rejects unsupported backend, non-additive mask mode, non-finite
+BF16 input and malformed shape; local K16 is `3/3 PASS`.
+
+Implementation commit `efdd97291fcae73221253834a2d960890418a948` was merged
+by PR #125 as `main@c13a573e997cf59d8f80c79bb79ca69b238ae56f`. Exact-head PR
+K16, K08 AMD, K09–K15 regression, Authority, Canonical and Universal checks
+passed on Ubuntu and Windows. The same K16/K09–K15/Authority,
+Canonical/Universal scope passed post-merge on the new main; exact run/job
+receipts are retained in the evidence JSON and are not broader authority than
+the bounded K16 contract. This remains a bounded
+lowering candidate: full graph or training-step residency, GPU-native
+Autodiff/AdamW, GPU training, throughput, VRAM, portability, RCL-10M/RCL-1B
+and K400 promotion remain closed. Authority:
+`docs/native-ai/gpu-opencl-masked-softmax-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-masked-softmax-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-masked-softmax-genome.rcl`,
+`native/tensor-engine/amd_opencl_bf16_provider.py`,
+`tests/k16-opencl-masked-softmax.test.mjs` and
+`examples/native-ai/evidence/gpu-opencl-masked-softmax-v0.1/k16-opencl-masked-softmax-local-evidence.json`.

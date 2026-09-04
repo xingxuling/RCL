@@ -790,3 +790,38 @@ wall-time/throughput, VRAM reduction, generic portability, RCL-10M, RCL-1B and
 K400 promotion remain closed. Hosted and post-merge K15-scope evidence is bound
 above; repository-wide Canonical/Universal failures are preserved as
 pre-existing K337/K338/K340 compiler RBC drift and do not alter the K15 ruling.
+
+## K16 AMD OpenCL BF16 additive masked softmax candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_MASKED_SOFTMAX_CANDIDATE`.
+RCL owns generic additive masked-softmax semantics, stable row normalization,
+BF16 storage, FP32 compute and BF16 RNE output. The AMD OpenCL provider owns
+only the bounded row-kernel lowerer and buffer dispatch; fallback is forbidden.
+
+| Evidence | Result |
+|---|---:|
+| K16 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, rank-2 `2 x 3` fixture |
+| Exact output | BF16 bits `3f80 31c1 3283 323f 3f3b 3e8a` |
+| CPU differential | exact independent BF16/FP32 stable-softmax oracle |
+| Deterministic replay | execution root `959537aaf0115e819ad927a3d1fc3ec6eff6a9dbba086c964460f5036f4c9e03` repeated exactly |
+| Negative controls | wrong backend, mask mode, non-finite input and malformed shape fail closed |
+| K16 protocol suite | `3/3 PASS` |
+| K08 AMD and K09–K15 regressions | green locally, exact-head PR #125 and post-merge `c13a573` scope; Canonical/Universal/Authority also SUCCESS |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-masked-softmax-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-masked-softmax-contract.v0.1.json`
+- `examples/native-ai/gpu-opencl-masked-softmax-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `tests/k16-opencl-masked-softmax.test.mjs`
+- `examples/native-ai/evidence/gpu-opencl-masked-softmax-v0.1/k16-opencl-masked-softmax-local-evidence.json`
+
+Reproduction: `npm run test:k16-opencl-masked-softmax`.
+Claims are limited to `OPENCL_AMD_BF16_MASKED_SOFTMAX_LOWERING_CANDIDATE` and
+`OPENCL_AMD_GPU_NATIVE_ADDITIVE_MASK_CANDIDATE`. Full graph execution or
+residency, GPU-native Autodiff/AdamW, GPU training, throughput, VRAM,
+portability, RCL-10M, RCL-1B and K400 promotion remain closed. The K400 matrix
+remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
