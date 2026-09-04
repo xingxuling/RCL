@@ -44,6 +44,8 @@ RCL source
 - 用同一组事件做跨 target host semantic replay；
 - 明确报告哪些只是编译/lowering/host replay，哪些还没有真实浏览器、Android 设备或发布证据。
 
+当前候选 API 还提供 `buildRclApplicationFramework({ rclPath, outputPath, specPath })`，把上述结果写成可检查的 `web/index.html`、`web/server.mjs`、`android/MainActivity.java`、lowering manifests、semantic trace 和根哈希报告。
+
 它不负责：
 
 - 定义 HTML/CSS 或 Android View 语法；

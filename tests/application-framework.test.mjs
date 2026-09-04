@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   assessRclApplicationFrameworkCatalog,
+  buildRclApplicationFramework,
   compileRclApplicationFramework,
   getRclApplicationFramework,
   listRclApplicationFrameworks,
@@ -76,4 +77,29 @@ test('framework selection fails closed for unsupported or empty target sets', ()
   assert.throws(() => normalizeRclApplicationFrameworkSpec({ targets: [] }), /RCL_APPLICATION_FRAMEWORK_TARGETS_EMPTY/u);
   assert.throws(() => normalizeRclApplicationFrameworkSpec({ targets: ['ios'] }), /RCL_APPLICATION_FRAMEWORK_TARGET:ios/u);
   assert.throws(() => compileRclApplicationFramework(SOURCE, { targets: ['web'], web: { document: { tag: 'main' } } }), /RCL_UI_BACKEND_MORPHOLOGY_FORBIDDEN:web/u);
+});
+
+test('application framework builder writes inspectable multi-target candidate artifacts', () => {
+  const outputPath = fs.mkdtempSync(path.join(ROOT, 'output', 'test-application-framework-'));
+  const result = buildRclApplicationFramework({
+    rclPath: path.join(ROOT, 'examples/native-ui/counter.rcl'),
+    outputPath,
+  });
+  assert.equal(result.status, 'CANDIDATE_ARTIFACTS_GENERATED');
+  assert.equal(result.traceStatus, 'PASS');
+  for (const relative of [
+    'program.rcl',
+    'application-framework.json',
+    'application-framework-build.json',
+    'semantic-trace.json',
+    'web/lowering.json',
+    'web/index.html',
+    'web/server.mjs',
+    'android/lowering.json',
+    'android/MainActivity.java',
+    'README.md',
+  ]) assert.equal(fs.existsSync(path.join(outputPath, relative)), true, relative);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(outputPath, 'semantic-trace.json'), 'utf8')).externalRuntimeExecuted, false);
+  assert.match(fs.readFileSync(path.join(outputPath, 'web', 'index.html'), 'utf8'), /window\.RCLNativeUI/u);
+  assert.match(fs.readFileSync(path.join(outputPath, 'android', 'MainActivity.java'), 'utf8'), /extends Activity/u);
 });

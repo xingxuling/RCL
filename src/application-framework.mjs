@@ -1,8 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { realityRoot } from './canonical.mjs';
-import { lowerNativeUiToAndroid } from './ui/android-ui-backend.mjs';
+import { emitNativeUiAndroidActivity, lowerNativeUiToAndroid } from './ui/android-ui-backend.mjs';
 import { compileNativeUiProgram } from './ui/ui-compiler.mjs';
 import { nativeUiRoot } from './ui/ui-ir.mjs';
-import { lowerNativeUiToWeb } from './ui/web-ui-backend.mjs';
+import { emitNativeUiWebHtml, emitNativeUiWebServer, lowerNativeUiToWeb } from './ui/web-ui-backend.mjs';
 import { runNativeUiSemanticTrace } from './ui/ui-event.mjs';
 
 export const RCL_APPLICATION_FRAMEWORK_VERSION = '0.1.0-alpha.1';
@@ -10,6 +12,7 @@ export const RCL_APPLICATION_FRAMEWORK_FORMAT = 'rcl.application-framework.v0.1'
 export const RCL_APPLICATION_FRAMEWORK_SPEC_FORMAT = 'rcl.application-framework-spec.v0.1';
 export const RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT = 'rcl.application-framework-trace.v0.1';
 export const RCL_APPLICATION_FRAMEWORK_CATALOG_FORMAT = 'rcl.application-framework-catalog.v0.1';
+export const RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT = 'rcl.application-framework-build.v0.1';
 
 export const RCL_APPLICATION_FRAMEWORK_TARGETS = Object.freeze(['web', 'android']);
 
@@ -398,6 +401,75 @@ export function traceRclApplicationFramework(compiled, events = null, options = 
     uiProgramRoot: report.uiProgramRoot,
     traces: Object.fromEntries(Object.entries(traces).map(([target, trace]) => [target, comparableTrace(trace)])),
   }) });
+}
+
+function writeText(file, content) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, content, 'utf8');
+}
+
+function writeJson(file, value) {
+  writeText(file, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+export function buildRclApplicationFramework({ rclPath, outputPath, specPath = null } = {}) {
+  if (typeof rclPath !== 'string' || rclPath.length === 0) throw new TypeError('RCL_APPLICATION_FRAMEWORK_RCL_PATH');
+  if (typeof outputPath !== 'string' || outputPath.length === 0) throw new TypeError('RCL_APPLICATION_FRAMEWORK_OUTPUT_PATH');
+  const sourcePath = path.resolve(rclPath);
+  const root = path.resolve(outputPath);
+  const source = fs.readFileSync(sourcePath, 'utf8');
+  const spec = specPath === null || specPath === undefined
+    ? {}
+    : JSON.parse(fs.readFileSync(path.resolve(specPath), 'utf8'));
+  const compiled = compileRclApplicationFramework(source, spec);
+  const trace = traceRclApplicationFramework(compiled);
+  const files = ['program.rcl', 'application-framework.json', 'semantic-trace.json'];
+  writeText(path.join(root, 'program.rcl'), source);
+  writeJson(path.join(root, 'application-framework.json'), compiled);
+  writeJson(path.join(root, 'semantic-trace.json'), trace);
+  if (compiled.targets.web) {
+    writeJson(path.join(root, 'web', 'lowering.json'), compiled.targets.web);
+    writeText(path.join(root, 'web', 'index.html'), emitNativeUiWebHtml(compiled.targets.web));
+    writeText(path.join(root, 'web', 'server.mjs'), emitNativeUiWebServer(compiled.targets.web));
+    files.push('web/lowering.json', 'web/index.html', 'web/server.mjs');
+  }
+  if (compiled.targets.android) {
+    writeJson(path.join(root, 'android', 'lowering.json'), compiled.targets.android);
+    writeText(path.join(root, 'android', 'MainActivity.java'), emitNativeUiAndroidActivity(compiled.targets.android));
+    files.push('android/lowering.json', 'android/MainActivity.java');
+  }
+  writeText(path.join(root, 'README.md'), `# RCL Application Framework Candidate\n\n` +
+    `Framework: ${compiled.frameworkId}\n\n` +
+    `This directory contains candidate Native UI artifacts from one canonical UI semantic root.\n\n` +
+    `- Web: web/index.html and web/server.mjs\n` +
+    `- Android: android/MainActivity.java and android/lowering.json\n` +
+    `- Host semantic replay: semantic-trace.json\n` +
+    `- Compilation: application-framework.json\n\n` +
+    `The Web file is a standalone browser artifact and the Android file is a source/lowering artifact. No browser session, Android device, APK build or production release is claimed by this builder.\n`);
+  files.push('README.md');
+  const result = {
+    format: RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT,
+    version: RCL_APPLICATION_FRAMEWORK_VERSION,
+    status: 'CANDIDATE_ARTIFACTS_GENERATED',
+    outputPath: root,
+    sourcePath,
+    frameworkId: compiled.frameworkId,
+    uiProgramRoot: compiled.uiProgramRoot,
+    targetRoots: compiled.targetRoots,
+    compilationRoot: compiled.root,
+    traceRoot: trace.root,
+    traceStatus: trace.status,
+    files,
+    evidenceBoundary: {
+      hostSemanticReplay: trace.evidenceLevel,
+      browserSession: 'NOT_RUN',
+      androidDevice: 'NOT_RUN',
+      apkOrAab: 'NOT_BUILT',
+      productionRelease: 'NOT_DEPLOYED',
+    },
+  };
+  writeJson(path.join(root, 'application-framework-build.json'), { ...result, root: realityRoot(result) });
+  return Object.freeze({ ...result, root: realityRoot(result) });
 }
 
 export function assessRclApplicationFrameworkCatalog() {
