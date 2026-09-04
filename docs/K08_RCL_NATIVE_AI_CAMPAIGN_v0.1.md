@@ -227,3 +227,19 @@ The next highest-value sequence is fixed by the Model Factory campaign:
 1. build ENGINE-E3 Optimizer Genome for SGD, Momentum, Adam and AdamW with unified optimizer state;
 2. prove rooted `train(N) == train(K) -> save -> reload -> train(N-K)` parity including dataset cursor and RNG/seed identity;
 3. only then begin Transformer primitives and the first Decoder-only block.
+
+The sequence above is the historical entry gate for the campaign. The repository has since executed the bounded optimizer, Transformer, Tiny-LM and accelerator candidates below; the claims remain candidate-scoped until their stated evidence gates are satisfied.
+
+## 13. Current Model Factory frontier
+
+K08-G remains the hosted-bound native reverse-mode Autodiff candidate. K08-S and K08-R extend the same generic Tensor ownership boundary with BF16 execution and an AdamW multi-block / GQA+RoPE reference path. These are RCL-owned model, Tensor, gradient, optimizer and device semantics lowered to Rust and the available execution providers; no model-special opcode or provider output is treated as canonical semantics.
+
+The K09-K15 accelerator sequence now contains bounded OpenCL candidates for persistent execution, batched execution, gradient pairs, cross-node execution, buffer arenas, Tensor-input residency and ordered intermediate graph residency. K15 is the current frontier: on the local AMD gfx1152 device it executed a two-node BF16 graph with output `4040`, zero intermediate readbacks and one final readback, five allocations / `22` bytes / five releases, three host-to-device uploads and one device-to-host readback. The local K15 suite is `3/3` passing. Hosted PR #119 and its post-merge `d2efae8` replay passed the K15 plus K09-K14 and Authority scopes on Ubuntu/Windows where applicable.
+
+The hosted Canonical and Universal suites still report repository-wide pre-existing K337/K338/K340 compiler drift; those failures do not involve K15. A later documentation-only main run also exposed an unrelated Android package-compiler environment mismatch (test 797: expected `verified`, received `rejected`). These are retained as evidence boundaries, not silently repaired or attributed to the accelerator candidate.
+
+K15 grants only an ordered ephemeral graph-residency candidate and an intermediate device-resource candidate. It does not grant full-graph or training-step residency, GPU training, parallel execution, throughput, VRAM, portability, RCL-10M/RCL-1B or production-model claims. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`, verdict `INCOMPLETE`; no K400 cell is promoted by K15.
+
+## 14. Next absorption gate
+
+The next highest-leverage technical gap is GPU-native softmax and masking, followed by a stricter full graph / training-step residency boundary. The implementation must preserve generic RCL Tensor and attention semantics, add positive/negative/boundary and CPU differential evidence, and keep unavailable hardware explicitly `NOT_RUN` or `BLOCKED`. A local accelerator result is not GPU-training proof, and compilation or hosted replay cannot substitute for final weights, sustained training, autoregressive generation or production corpus evidence.
