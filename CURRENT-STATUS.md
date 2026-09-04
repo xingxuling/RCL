@@ -589,13 +589,18 @@ Ubuntu/Windows (`33896733771`); PR #138 merged as
 `main@87a300130fc52559b005c15d88d5743a5f55d671`. After AI001 PR #136 merged,
 K18 post-merge `main@b7e4c70839cb5ef896807a77b5e5f88082155be0` passed K18 on
 Ubuntu/Windows (`33899325135`), with K09-K17 and Authority replay green.
-The repository-wide Canonical run `33899325240` then failed three existing
-v0.57 self-Akashic tests because the 900-file scan cap truncated the test
-surface to 35; Universal run `33899325206` failed only because the Windows
-K01 native fixed-point replay exceeded 240000 ms after all 41/41 stages passed.
-Neither failure involved K18; the bounded scan-cap repair is included in this
-evidence branch, while the K01 timeout remains a separate repository-level
-performance issue.
+That historical replay recorded three self-Akashic failures from the bounded
+900-file scan and a separate Windows K01 budget failure. AI002 gap-repair PR
+#139 then fixed the scan ordering/budget regression and re-ran the repository
+gates successfully: final head `3fdc95509999f071f15d8764d9a90c014759a3ef`
+merged as `main@607be5683262e2bbd3db4b175288cd3841cf97d1`, Canonical
+`33900738417` and Universal `33900738302` were green, and K18's Ubuntu/Windows
+workflow `33900738676` was green. The self-Akashic suite is now `4/4 PASS`;
+the configured scan is bounded at 2,000 files and visits `src`, `docs`,
+`tests`, then `examples`, so the historical failures are not current main
+failures. Evidence PR #141 subsequently merged as
+`main@14f3aa957d2c4eec787a53099453873073ed480c` with its Canonical, Universal
+and Authority checks green.
 
 This remains a bounded lowering candidate. Only full-graph residency,
 training-step resource reuse and the generic `add` path are granted. GPU
