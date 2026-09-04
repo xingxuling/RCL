@@ -68,6 +68,7 @@ function FighterBody({ accent, swordRef, bodyRef }) {
 }
 
 function Fighter({
+  externalRef,
   nodeId,
   frame,
   initialPosition,
@@ -76,7 +77,6 @@ function Fighter({
   accent,
   sequenceToken,
 }) {
-  const groupRef = useRef();
   const swordRef = useRef();
   const bodyRef = useRef();
   const motion = useRef({
@@ -89,7 +89,7 @@ function Fighter({
   const elapsed = useRef(0);
 
   useEffect(() => {
-    const actor = groupRef.current;
+    const actor = externalRef.current;
     const target = targetRef.current;
     if (!actor || !target || !frame) return;
 
@@ -113,10 +113,10 @@ function Fighter({
     };
     poseTarget.current.set(...swordPoseForRoute(frame.routeId));
     elapsed.current = 0;
-  }, [frame, sequenceToken, sideSign, targetRef]);
+  }, [externalRef, frame, sequenceToken, sideSign, targetRef]);
 
   useFrame((_, delta) => {
-    const actor = groupRef.current;
+    const actor = externalRef.current;
     const target = targetRef.current;
     if (!actor) return;
 
@@ -135,29 +135,30 @@ function Fighter({
 
     elapsed.current += delta;
     if (bodyRef.current) {
-      bodyRef.current.position.y = Math.sin(elapsed.current * 7.5) * 0.018;
+      bodyRef.current.position.y = Math.sin(elapsed.current * 7.5 + sideSign) * 0.018;
     }
     if (swordRef.current) {
+      const blend = Math.min(1, delta * 7);
       swordRef.current.rotation.x = THREE.MathUtils.lerp(
         swordRef.current.rotation.x,
         poseTarget.current.x,
-        Math.min(1, delta * 7),
+        blend,
       );
       swordRef.current.rotation.y = THREE.MathUtils.lerp(
         swordRef.current.rotation.y,
         poseTarget.current.y,
-        Math.min(1, delta * 7),
+        blend,
       );
       swordRef.current.rotation.z = THREE.MathUtils.lerp(
         swordRef.current.rotation.z,
         poseTarget.current.z,
-        Math.min(1, delta * 7),
+        blend,
       );
     }
   });
 
   return (
-    <group ref={groupRef} name={nodeId} position={initialPosition.toArray()}>
+    <group ref={externalRef} name={nodeId} position={initialPosition.toArray()}>
       <FighterBody accent={accent} swordRef={swordRef} bodyRef={bodyRef} />
     </group>
   );
@@ -192,6 +193,7 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
 
       <Fighter
         key={`wanfeng-${resetToken}`}
+        externalRef={wanfengRef}
         nodeId="fighter:wanfeng"
         frame={wanfengFrame}
         initialPosition={WANFENG_START}
@@ -199,77 +201,21 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
         sideSign={1}
         accent="#4a91ff"
         sequenceToken={sequenceToken}
-        ref={wanfengRef}
       />
-      <group ref={wanfengRef} visible={false} />
-
-      <FighterProxy
+      <Fighter
         key={`opponent-${resetToken}`}
         externalRef={opponentRef}
+        nodeId="fighter:opponent"
         frame={opponentFrame}
         initialPosition={OPPONENT_START}
         targetRef={wanfengRef}
+        sideSign={-1}
+        accent="#e29a4b"
         sequenceToken={sequenceToken}
       />
       <CameraRig />
     </>
   );
-}
-
-function FighterProxy({ externalRef, frame, initialPosition, targetRef, sequenceToken }) {
-  return (
-    <group ref={externalRef} name="fighter:opponent" position={initialPosition.toArray()}>
-      <ProxyAnimatedBody
-        frame={frame}
-        targetRef={targetRef}
-        sequenceToken={sequenceToken}
-        externalRef={externalRef}
-      />
-    </group>
-  );
-}
-
-function ProxyAnimatedBody({ frame, targetRef, sequenceToken, externalRef }) {
-  const swordRef = useRef();
-  const bodyRef = useRef();
-  const motion = useRef({ from: OPPONENT_START.clone(), to: OPPONENT_START.clone(), progress: 1, duration: 0.9 });
-  const poseTarget = useRef(new THREE.Vector3());
-  const elapsed = useRef(0);
-
-  useEffect(() => {
-    const actor = externalRef.current;
-    const target = targetRef.current;
-    if (!actor || !target || !frame) return;
-    const from = actor.position.clone();
-    const direction = resolveSemanticMotion(frame.motion.direction, from, target.position, -1);
-    const distance = motionDistance(frame.motion.magnitudeMilli);
-    let to = clampArena(preserveSeparation(from.clone().addScaledVector(direction, distance), target.position));
-    motion.current = { from, to, progress: 0, duration: 0.72 + Math.min(0.42, distance * 0.22) };
-    poseTarget.current.set(...swordPoseForRoute(frame.routeId));
-    elapsed.current = 0;
-  }, [frame, sequenceToken, targetRef, externalRef]);
-
-  useFrame((_, delta) => {
-    const actor = externalRef.current;
-    const target = targetRef.current;
-    if (!actor) return;
-    if (target) actor.lookAt(target.position.x, actor.position.y + 0.95, target.position.z);
-    const state = motion.current;
-    if (state.progress < 1) {
-      state.progress = Math.min(1, state.progress + delta / state.duration);
-      const t = state.progress * state.progress * (3 - 2 * state.progress);
-      actor.position.lerpVectors(state.from, state.to, t);
-    }
-    elapsed.current += delta;
-    if (bodyRef.current) bodyRef.current.position.y = Math.sin(elapsed.current * 7.1 + 1) * 0.018;
-    if (swordRef.current) {
-      swordRef.current.rotation.x = THREE.MathUtils.lerp(swordRef.current.rotation.x, poseTarget.current.x, Math.min(1, delta * 7));
-      swordRef.current.rotation.y = THREE.MathUtils.lerp(swordRef.current.rotation.y, poseTarget.current.y, Math.min(1, delta * 7));
-      swordRef.current.rotation.z = THREE.MathUtils.lerp(swordRef.current.rotation.z, poseTarget.current.z, Math.min(1, delta * 7));
-    }
-  });
-
-  return <FighterBody accent="#e29a4b" swordRef={swordRef} bodyRef={bodyRef} />;
 }
 
 export default function Arena({ frames, sequenceToken, resetToken }) {
