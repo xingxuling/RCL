@@ -5,12 +5,22 @@ import * as THREE from 'three';
 import { ATTACKS } from '../gameRules.js';
 
 const WORLD = new THREE.Vector3();
+const TRAIL_STYLE = Object.freeze({
+  wanfeng:{ color:'#6de3ff', opacity:.66, width:.032, points:18 },
+  kendo:{ color:'#ffd0a0', opacity:.58, width:.022, points:12 },
+  epee:{ color:'#c9e5ff', opacity:.62, width:.016, points:14 },
+  destreza:{ color:'#dfc2ff', opacity:.64, width:.020, points:17 },
+  liechtenauer:{ color:'#c8e6a0', opacity:.62, width:.030, points:14 },
+  fiore:{ color:'#f0c88b', opacity:.61, width:.031, points:13 },
+  miaodao:{ color:'#ffe36d', opacity:.68, width:.040, points:19 },
+});
 
 export default function SwordTipTrail({ tipRef, logicRef, styleId = 'wanfeng' }) {
   const meshRef = useRef();
   const pointsRef = useRef([]);
   const actionRef = useRef(null);
   const geometry = useMemo(() => new THREE.BufferGeometry(), []);
+  const trail = TRAIL_STYLE[styleId] ?? TRAIL_STYLE.wanfeng;
 
   useFrame(() => {
     const logic = logicRef.current;
@@ -37,8 +47,7 @@ export default function SwordTipTrail({ tipRef, logicRef, styleId = 'wanfeng' })
     const previous = points.at(-1);
     if (!previous || previous.distanceToSquared(local) > 0.0005) points.push(local);
 
-    const maxPoints = styleId === 'wanfeng' ? 18 : 12;
-    if (points.length > maxPoints) points.splice(0, points.length - maxPoints);
+    if (points.length > trail.points) points.splice(0, points.length - trail.points);
     if (points.length < 2) {
       mesh.visible = false;
       return;
@@ -46,11 +55,10 @@ export default function SwordTipTrail({ tipRef, logicRef, styleId = 'wanfeng' })
 
     const vertices = [];
     const indices = [];
-    const baseWidth = styleId === 'wanfeng' ? 0.032 : 0.022;
     for (let i = 0; i < points.length; i += 1) {
       const p = points[i];
       const fade = (i + 1) / points.length;
-      const width = baseWidth * (0.35 + fade * 0.9);
+      const width = trail.width * (0.35 + fade * 0.9);
       vertices.push(p.x, p.y + width, p.z, p.x, p.y - width, p.z);
       if (i < points.length - 1) {
         const a = i * 2;
@@ -69,9 +77,9 @@ export default function SwordTipTrail({ tipRef, logicRef, styleId = 'wanfeng' })
   return (
     <mesh ref={meshRef} geometry={geometry} visible={false} frustumCulled={false}>
       <meshBasicMaterial
-        color={styleId === 'wanfeng' ? '#6de3ff' : '#ffd0a0'}
+        color={trail.color}
         transparent
-        opacity={styleId === 'wanfeng' ? 0.66 : 0.58}
+        opacity={trail.opacity}
         side={THREE.DoubleSide}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
