@@ -2,16 +2,18 @@ import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import {
-  clampArena,
-  motionDistance,
-  preserveSeparation,
-  resolveSemanticMotion,
-  swordPoseForRoute,
-} from './semanticMotion.js';
+import { swordPoseForRoute } from './semanticMotion.js';
 
-const WANFENG_START = new THREE.Vector3(-2.15, 0, 0.35);
-const OPPONENT_START = new THREE.Vector3(2.15, 0, -0.35);
+const FALLBACK_POSITIONS = {
+  'fighter:wanfeng': new THREE.Vector3(-2.15, 0, 0.35),
+  'fighter:opponent': new THREE.Vector3(2.15, 0, -0.35),
+};
+
+function snapshotVector(snapshot, phase, nodeId) {
+  const position = snapshot?.[phase]?.[nodeId];
+  if (!position) return FALLBACK_POSITIONS[nodeId].clone();
+  return new THREE.Vector3(position.x_milli / 1000, 0, position.z_milli / 1000);
+}
 
 function CameraRig() {
   const { camera } = useThree();
@@ -71,40 +73,27 @@ function Fighter({
   externalRef,
   nodeId,
   frame,
-  initialPosition,
+  snapshot,
   targetRef,
-  sideSign,
   accent,
+  bobPhase,
   sequenceToken,
 }) {
   const swordRef = useRef();
   const bodyRef = useRef();
-  const motion = useRef({
-    from: initialPosition.clone(),
-    to: initialPosition.clone(),
-    progress: 1,
-    duration: 0.9,
-  });
+  const initial = snapshotVector(snapshot, 'before', nodeId);
+  const motion = useRef({ from: initial.clone(), to: initial.clone(), progress: 1, duration: 0.9 });
   const poseTarget = useRef(new THREE.Vector3(0.05, 0, -0.18));
   const elapsed = useRef(0);
 
   useEffect(() => {
     const actor = externalRef.current;
-    const target = targetRef.current;
-    if (!actor || !target || !frame) return;
+    if (!actor || !frame || !snapshot) return;
 
-    const from = actor.position.clone();
-    const direction = resolveSemanticMotion(
-      frame.motion.direction,
-      from,
-      target.position,
-      sideSign,
-    );
-    const distance = motionDistance(frame.motion.magnitudeMilli);
-    let to = from.clone().addScaledVector(direction, distance);
-    to = preserveSeparation(to, target.position);
-    to = clampArena(to);
-
+    const from = snapshotVector(snapshot, 'before', nodeId);
+    const to = snapshotVector(snapshot, 'after', nodeId);
+    actor.position.copy(from);
+    const distance = from.distanceTo(to);
     motion.current = {
       from,
       to,
@@ -113,7 +102,7 @@ function Fighter({
     };
     poseTarget.current.set(...swordPoseForRoute(frame.routeId));
     elapsed.current = 0;
-  }, [externalRef, frame, sequenceToken, sideSign, targetRef]);
+  }, [externalRef, frame, nodeId, sequenceToken, snapshot]);
 
   useFrame((_, delta) => {
     const actor = externalRef.current;
@@ -135,36 +124,24 @@ function Fighter({
 
     elapsed.current += delta;
     if (bodyRef.current) {
-      bodyRef.current.position.y = Math.sin(elapsed.current * 7.5 + sideSign) * 0.018;
+      bodyRef.current.position.y = Math.sin(elapsed.current * 7.5 + bobPhase) * 0.018;
     }
     if (swordRef.current) {
       const blend = Math.min(1, delta * 7);
-      swordRef.current.rotation.x = THREE.MathUtils.lerp(
-        swordRef.current.rotation.x,
-        poseTarget.current.x,
-        blend,
-      );
-      swordRef.current.rotation.y = THREE.MathUtils.lerp(
-        swordRef.current.rotation.y,
-        poseTarget.current.y,
-        blend,
-      );
-      swordRef.current.rotation.z = THREE.MathUtils.lerp(
-        swordRef.current.rotation.z,
-        poseTarget.current.z,
-        blend,
-      );
+      swordRef.current.rotation.x = THREE.MathUtils.lerp(swordRef.current.rotation.x, poseTarget.current.x, blend);
+      swordRef.current.rotation.y = THREE.MathUtils.lerp(swordRef.current.rotation.y, poseTarget.current.y, blend);
+      swordRef.current.rotation.z = THREE.MathUtils.lerp(swordRef.current.rotation.z, poseTarget.current.z, blend);
     }
   });
 
   return (
-    <group ref={externalRef} name={nodeId} position={initialPosition.toArray()}>
+    <group ref={externalRef} name={nodeId} position={initial.toArray()}>
       <FighterBody accent={accent} swordRef={swordRef} bodyRef={bodyRef} />
     </group>
   );
 }
 
-function ArenaScene({ frames, sequenceToken, resetToken }) {
+function ArenaScene({ frames, snapshot, sequenceToken, resetToken }) {
   const wanfengRef = useRef();
   const opponentRef = useRef();
   const wanfengFrame = frames.find(frame => frame.actorNode === 'fighter:wanfeng') ?? null;
@@ -175,13 +152,7 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
       <color attach="background" args={['#0a0f18']} />
       <fog attach="fog" args={['#0a0f18', 8.5, 17]} />
       <ambientLight intensity={0.8} />
-      <directionalLight
-        castShadow
-        intensity={2.1}
-        position={[4, 8, 4]}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
+      <directionalLight castShadow intensity={2.1} position={[4, 8, 4]} shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
       <pointLight intensity={14} distance={9} position={[-4, 2.4, -2]} color="#7db8ff" />
       <pointLight intensity={11} distance={9} position={[4, 2.2, 2]} color="#ffbf7a" />
 
@@ -196,10 +167,10 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
         externalRef={wanfengRef}
         nodeId="fighter:wanfeng"
         frame={wanfengFrame}
-        initialPosition={WANFENG_START}
+        snapshot={snapshot}
         targetRef={opponentRef}
-        sideSign={1}
         accent="#4a91ff"
+        bobPhase={1}
         sequenceToken={sequenceToken}
       />
       <Fighter
@@ -207,10 +178,10 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
         externalRef={opponentRef}
         nodeId="fighter:opponent"
         frame={opponentFrame}
-        initialPosition={OPPONENT_START}
+        snapshot={snapshot}
         targetRef={wanfengRef}
-        sideSign={-1}
         accent="#e29a4b"
+        bobPhase={-1}
         sequenceToken={sequenceToken}
       />
       <CameraRig />
@@ -218,7 +189,7 @@ function ArenaScene({ frames, sequenceToken, resetToken }) {
   );
 }
 
-export default function Arena({ frames, sequenceToken, resetToken }) {
+export default function Arena({ frames, snapshot, sequenceToken, resetToken }) {
   return (
     <Canvas
       shadows
@@ -226,7 +197,7 @@ export default function Arena({ frames, sequenceToken, resetToken }) {
       camera={{ position: [0, 4.9, 7.8], fov: 48, near: 0.1, far: 50 }}
       gl={{ antialias: true }}
     >
-      <ArenaScene frames={frames} sequenceToken={sequenceToken} resetToken={resetToken} />
+      <ArenaScene frames={frames} snapshot={snapshot} sequenceToken={sequenceToken} resetToken={resetToken} />
     </Canvas>
   );
 }
