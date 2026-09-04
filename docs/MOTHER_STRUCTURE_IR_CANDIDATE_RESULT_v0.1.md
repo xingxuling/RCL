@@ -77,11 +77,37 @@ evidence, not proof that the two are semantically identical or should share one
 syntax, owner, or registry entry. All cluster rows retain
 `causalClaim=false`, `identityClaim=false`, and `promotion=NOT_AUTOMATIC`.
 
+## Integration Court result
+
+The candidate corpus then passed the local Integration Court with verdict
+`CANDIDATE_ONLY_HOLD`. Its root is:
+
+`074ad0f5e20f5b2fe6e68630b126492873f88f92e77914622a4c2e115ab1715e`
+
+All 33 corpus rows passed the candidate-only boundary checks. The four target
+structures passed positive, negative, identifier-rename, structural-mutation,
+and independent-recurrence checks:
+
+- Framework candidate: `rcl.rule.authorized_transition`;
+- std candidates: `rcl.facet.declaration`,
+  `rcl.authority.subject_warrant`, and `rcl.rule.foresee_realize`;
+- Pack: 20 bounded UI/package/Forge/evidence/platform rows;
+- Example: `rcl.reckon.function_contract`;
+- Auxiliary Language / Provider: 8 implementation and runtime-mechanics rows.
+
+The Court re-evaluated the existing K400 evidence through the canonical 20 x
+20 matrix. The 23 claimed cells passed all nine gates, but 377 cells remain
+`UNTESTED`; therefore K400 remains `INCOMPLETE`, and no candidate is promoted.
+No formal `RCL_GAP` was asserted. The machine-readable Court report is written
+as `output/mother-structure-ir-v0.1/integration-court.json` by the evidence
+builder.
+
 ## Verification
 
-- Mother Structure candidate tests: 8 passed, 0 failed.
+- Mother Structure candidate and Integration Court tests: 13 passed, 0 failed.
 - Existing RCL native-ui/package/Forge/K400 focused suite: 58 passed, 0 failed.
 - DWAC world-knowledge tests: 12 passed, 0 failed.
+- Full candidate-worktree suite: 1105 tests, 1102 passed, 0 failed, 3 skipped.
 - K400 evidence schema: 400 cells, 23 claims, 0 validation errors.
 
 These results prove extraction, recurrence accounting, graph integrity, and

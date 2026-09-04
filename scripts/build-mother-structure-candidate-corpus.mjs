@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import {
   buildMotherStructureCorpus,
   buildMotherStructureIR,
+  runMotherStructureIntegrationCourt,
+  verifyMotherStructureIntegrationCourt,
   verifyMotherStructureCorpus,
 } from '../src/index.mjs';
 
@@ -14,6 +16,9 @@ const OUTPUT_DIR = path.resolve(process.argv[2] ?? 'output/mother-structure-ir-v
 const EXTERNAL_CORPUS = process.env.MOTHER_STRUCTURE_ARCHAEOLOGY_CORPUS
   ? path.resolve(process.env.MOTHER_STRUCTURE_ARCHAEOLOGY_CORPUS)
   : path.resolve(REPO_ROOT, '..', '..', '_inspect', 'rcl-framework-archaeology-v0.1', 'corpus.json');
+const K400_EVIDENCE = process.env.MOTHER_STRUCTURE_K400_EVIDENCE
+  ? path.resolve(process.env.MOTHER_STRUCTURE_K400_EVIDENCE)
+  : path.join(REPO_ROOT, 'examples', 'universal-stress', 'k400-current-evidence.json');
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -60,6 +65,12 @@ function readExternalRecords() {
   return { records, path: EXTERNAL_CORPUS, sourceSha256: sha256(raw), available: true };
 }
 
+function readK400Evidence() {
+  if (!fs.existsSync(K400_EVIDENCE)) return { value: null, path: null, sourceSha256: null, available: false };
+  const raw = fs.readFileSync(K400_EVIDENCE, 'utf8');
+  return { value: JSON.parse(raw), path: K400_EVIDENCE, sourceSha256: sha256(raw), available: true };
+}
+
 const roots = [
   path.join(REPO_ROOT, 'examples', 'universal-stress'),
   path.join(REPO_ROOT, 'examples', 'native-ui'),
@@ -99,6 +110,15 @@ if (external.records.length) inputs.push({ records: external.records });
 const corpus = buildMotherStructureCorpus(inputs);
 const verification = verifyMotherStructureCorpus(corpus);
 if (!verification.ok) throw new Error(`Mother Structure corpus verification failed: ${verification.errors.join('; ')}`);
+const k400Evidence = readK400Evidence();
+const integrationCourt = runMotherStructureIntegrationCourt({
+  corpus,
+  k400Evidence: k400Evidence.value ?? undefined,
+});
+const integrationCourtVerification = verifyMotherStructureIntegrationCourt(integrationCourt);
+if (!integrationCourtVerification.ok) {
+  throw new Error(`Mother Structure Integration Court verification failed: ${integrationCourtVerification.errors.join('; ')}`);
+}
 
 const summary = {
   format: corpus.format,
@@ -115,6 +135,14 @@ const summary = {
     sourceSha256: external.sourceSha256,
     recordsAdded: external.records.length,
   },
+  k400Evidence: {
+    available: k400Evidence.available,
+    path: k400Evidence.path ? path.relative(REPO_ROOT, k400Evidence.path).replaceAll(path.sep, '/') : null,
+    sourceSha256: k400Evidence.sourceSha256,
+    status: integrationCourt.k400.status,
+    claimedCellCount: integrationCourt.k400.claimedCellCount,
+    completionVerdict: integrationCourt.k400.completion?.verdict ?? null,
+  },
   observationCount: corpus.summary.observationCount,
   structureCount: corpus.summary.structureCount,
   classificationCounts: corpus.summary.classificationCounts,
@@ -127,10 +155,27 @@ const summary = {
   })),
   unmodeledTopLevelKinds: corpus.coverage.unmodeledTopLevelKinds,
   unresolvedDirectiveCount: corpus.coverage.unresolvedDirectiveCount,
+  integrationCourt: {
+    status: integrationCourt.status,
+    verdict: integrationCourt.verdict,
+    root: integrationCourt.root,
+    localChecksPass: integrationCourt.summary.localChecksPass,
+    targetChecksPass: integrationCourt.summary.targetChecksPass,
+    targetStructureIds: integrationCourt.targetStructureIds,
+    decisionCount: integrationCourt.summary.decisionCount,
+    retainedFrameworkCandidates: integrationCourt.summary.retainedFrameworkCandidates,
+    retainedStdCandidates: integrationCourt.summary.retainedStdCandidates,
+    retainedPacks: integrationCourt.summary.retainedPacks,
+    retainedExamples: integrationCourt.summary.retainedExamples,
+    retainedAuxiliary: integrationCourt.summary.retainedAuxiliary,
+    heldGapCandidates: integrationCourt.summary.heldGapCandidates,
+  },
   verification,
+  integrationCourtVerification,
 };
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 fs.writeFileSync(path.join(OUTPUT_DIR, 'corpus.json'), `${JSON.stringify(corpus, null, 2)}\n`, 'utf8');
 fs.writeFileSync(path.join(OUTPUT_DIR, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+fs.writeFileSync(path.join(OUTPUT_DIR, 'integration-court.json'), `${JSON.stringify(integrationCourt, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(summary, null, 2));
