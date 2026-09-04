@@ -89,7 +89,7 @@ function negativeCases() {
   };
 }
 
-const implementationCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+const implementationCommit = execFileSync('git', ['log', '-1', '--format=%H', '--', 'src/selfhost-tensor-shape-semantics.mjs'], { cwd: ROOT, encoding: 'utf8' }).trim();
 const positive = run(fixture());
 const payload = {
   format: 'rcl.ai001.tensor-shape-semantics-local-evidence.v0.1',
