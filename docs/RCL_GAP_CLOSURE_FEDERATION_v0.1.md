@@ -353,7 +353,7 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 - AI010 + K333: canonical cross-runtime float/scientific-number state roots;
 - AI022: missing production lifecycle semantics not already represented by bounded candidates;
 - UI001/UI004: stable Web/native-UI profile semantics still needing broader absorption;
-- K326: any semantic contract not already covered for durable/concurrent DB behavior.
+- K326: the reusable semantic contract for rooted snapshots, serializable optimistic conflicts, atomic write sets and Provider durable/recovery receipt admission is now a local candidate; durable storage, isolation implementation, query planning and crash recovery remain Provider-owned and open.
 
 ### Provider / infrastructure / data evidence, not Core semantics
 

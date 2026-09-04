@@ -12,7 +12,7 @@ This campaign does not claim that RCL is a SQL engine. It freezes one bounded `c
 - SQL contributes the donor semantics `PRIMARY KEY`, `FOREIGN KEY`, `SELECT`, equi-join, aggregate and atomic rollback.
 - Existing source-capability SQL frontends remain auxiliary ingestion organs and do not own this candidate's canonical semantics.
 - No SQLite, PostgreSQL, MySQL, DuckDB, Python or opaque Provider participates in compilation or execution.
-- `RCL_GAP_K326_DURABLE_CONCURRENT_RELATIONAL_RUNTIME` remains open for durable storage, isolation levels, concurrency control, query planning and recovery.
+- `RCL_GAP_K326_DURABLE_CONCURRENT_RELATIONAL_RUNTIME` is split: the RCL-owned semantic protocol candidate now covers rooted snapshots, serializable optimistic conflicts, atomic write sets and Provider receipt/recovery admission; durable storage, isolation implementation, query planning and crash recovery remain Provider-owned and open.
 
 No Silent RCL Bypass record: the task needed bounded relational execution; existing RCL primitives express it directly, so no execution-language workaround was required. SQL remains the named donor rather than a hidden owner.
 
@@ -67,4 +67,8 @@ No dependency, copied implementation, external dataset or database engine was ad
 
 ## Claim boundary
 
-This candidate grants no SQL grammar, durable database, persistence, concurrency, isolation-level, WAL, crash recovery, cost-based optimizer, external database service, distributed database, arbitrary schema/query, unrelated K400 cell or K400 completion claim.
+The frozen K326 profile and this follow-on candidate grant no SQL grammar, durable database engine, Provider persistence implementation, lock-based or multi-version isolation implementation, WAL, crash recovery, cost-based optimizer, external database service, distributed database, arbitrary schema/query, unrelated K400 cell or K400 completion claim.
+
+## Follow-on RCL semantic candidate
+
+`src/relational-transaction-protocol.mjs` and `tests/relational-transaction-protocol.test.mjs` close the reusable semantic slice of the remaining K326 gap without changing the frozen K326 nine-gate claim. The candidate defines schema/snapshot/query/transaction roots, read-set binding, serializable optimistic conflict rejection, atomic insert/replace/delete application, Provider durable-commit binding and Provider recovery admission. See `docs/RCL_RELATIONAL_TRANSACTION_PROTOCOL_v0.1.md` for the API and federation boundary.
