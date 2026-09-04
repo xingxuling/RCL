@@ -1,0 +1,84 @@
+{
+  "format": "taowind.sga-rcl-creative-vertical-receipt.v0.1",
+  "status": "PASS",
+  "date": "2026-08-31",
+  "route": [
+    "SGA candidate.multiview.generate.v1",
+    "JSON artifact transport",
+    "RCL CreationProposal<Text>",
+    "mechanical fixture evaluator -> scoreCreation"
+  ],
+  "source_bindings": {
+    "sga_generator_git_blob": "3ab2e6e4864d3bd4055e9ad781d2a26b69fc6acc",
+    "sga_generator_test_git_blob": "df92c93757d29ff6dda5c2c9bc52534950b80216",
+    "rcl_cognition_git_blob": "cf76e23eb1b65817a1b8fb3026ededeb06fd1185",
+    "rcl_planes_git_blob": "46a5f7d8b8deab3646253befebb42579fd5b7abc",
+    "rcl_creative_proposal_api_git_blob": "d477b114a5e3131ac7016b8fd443d3335b25fe5d",
+    "rcl_sga_lowering_adapter_git_blob": "aa93837ccb39be1a4958d0306a821cbc9ef58cbd",
+    "rcl_sga_lowering_test_git_blob": "302327608e0aa5afe3778ef7b170f816b6f9e12b"
+  },
+  "tests": {
+    "sga_multiview_exact_file_unit": {"tests": 6, "pass": 6, "fail": 0},
+    "rcl_sga_lowering_exact_file_unit": {"tests": 6, "pass": 6, "fail": 0},
+    "rcl_creative_proposal_gate_prior": {
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "receipt_root": "edcd2a115ed19e2f0fcd6a5a06e20b3a8520f82e3bcadf068cc87947049ec258"
+    }
+  },
+  "cross_language_execution": {
+    "sga_candidate_set_sha256": "118c918cefe9c34230ec6fc20d3515500c86171c2ae5382afcecb0e2ef508fa4",
+    "proof_sha256": "c47a77c606e6404783861497d981762d07c4a7a902d8d33bf9db4c6cf5b05192",
+    "source_root": "6d8bcb8593ffc68db91c04f18d4d1b0c40340b1e4bd481e25fbbee192e2f7c7f",
+    "set_root": "44517a46594362a736bd7e5834a919f7cbf96a8a1111efdc74ef7b0c7283f229",
+    "candidate_count": 4,
+    "candidate_roots": [
+      "ab2dfdb790b1b56c49c6356924d32a20a43a353b19ff8a9e60a2a5dfd9130f6a",
+      "09321510ae8767ff4eb05b6a3d5979ed7aea7ccd12bbf4dc7725366979116451",
+      "58d838bd522491300e02d6ae81d75602360fefae481d066482d7217c5576e19c",
+      "6a091cdbd2c8870e72e89155a22531c2b5d64f5f5c52f09a492f756527abf58b"
+    ],
+    "rcl_proposal_count": 4,
+    "rcl_proposal_kinds": ["CreationProposal", "CreationProposal", "CreationProposal", "CreationProposal"],
+    "rcl_proposals_unscored": true,
+    "candidate_roots_preserved": true,
+    "mechanical_fixture_score": 0.815,
+    "sga_candidate_evidence_preserved": true,
+    "evaluator_evidence_attached": true
+  },
+  "bug_found_and_fixed": {
+    "initial_result": "5/6 PASS",
+    "failure": "adapter materialized missing score key as undefined, converting missing-required-score semantics into a range error",
+    "fix": "copy only evaluator score keys actually present, allowing RCL scoreCreation to enforce RCL_CREATION_SCORE_REQUIRED",
+    "post_fix_result": "6/6 PASS"
+  },
+  "authority_boundary": {
+    "candidate_only": true,
+    "sga_self_scoring_forbidden": true,
+    "canonical_promotion_performed": false,
+    "rcl_evidence_commit_performed": false,
+    "rncs_commit_performed": false,
+    "usce_final_route_choice_performed": false
+  },
+  "proven": [
+    "real Python SGA generator output was consumed by real Node RCL lowering code",
+    "SGA roots survive the cross-language boundary",
+    "SGA emits no evaluator-owned score fields",
+    "RCL ingests each SGA value as an unscored CreationProposal<Text>",
+    "unscored proposals carry no score and no selection",
+    "independent evaluator provenance is attached only at explicit scoring time",
+    "missing score dimensions fail closed after the adapter fix"
+  ],
+  "not_proven": [
+    "general imagination quality",
+    "aesthetic judgment",
+    "scientific truth",
+    "future success probability",
+    "semantic quality of the four candidates",
+    "USCE route integration",
+    "Canonical federation promotion",
+    "RNCS execution"
+  ],
+  "receipt_root": "5f08e7436c54931587a4505b0f6c9ce81c35438a60b4ed3c0ba80bcb8df80214"
+}

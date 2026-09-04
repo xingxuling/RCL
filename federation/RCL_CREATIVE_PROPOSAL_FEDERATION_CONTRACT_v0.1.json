@@ -1,0 +1,56 @@
+{
+  "schema_id": "rcl.creative-proposal-federation-contract.v0.1",
+  "status": "CANDIDATE_ONLY",
+  "canonical_owner": "rcl",
+  "semantic_surface": "creative-reality",
+  "gap_closed": "RCL_GAP_UNSCORED_EXTERNAL_CREATION_PROPOSAL",
+  "capabilities": [
+    {
+      "capability_id": "creative.proposal.ingest.v1",
+      "effect_class": "CANDIDATE_SEMANTIC_ENVELOPE",
+      "description": "Represent one externally generated candidate value as an unscored CreationProposal without inventing novelty, utility, feasibility or risk judgments.",
+      "required_inputs": ["base_type", "candidate_value"],
+      "optional_inputs": ["target", "evidence", "based_on", "formed_at_root"],
+      "forbidden_outputs": ["score", "selection", "authority_commit", "world_fact"]
+    },
+    {
+      "capability_id": "creative.proposal.score.v1",
+      "effect_class": "CANDIDATE_EVALUATION_ENVELOPE",
+      "description": "Convert a CreationProposal into the existing scored Create<T> candidate shape only when an evaluator explicitly supplies all four score dimensions.",
+      "required_inputs": ["proposal", "novelty", "utility", "feasibility", "risk"],
+      "optional_inputs": ["evidence", "based_on", "formed_at_root"],
+      "forbidden_outputs": ["automatic_selection", "authority_commit", "world_fact"]
+    }
+  ],
+  "lifecycle": [
+    "external candidate value",
+    "CreationProposal<T>",
+    "independent evaluator",
+    "scored Create<T> candidate",
+    "optional selectCreation",
+    "USCE final route choice",
+    "RNCS governed execution if separately authorized"
+  ],
+  "ownership_boundary": {
+    "rcl_owns": [
+      "CreationProposal semantics",
+      "Create<T> scored candidate semantics",
+      "Creative Reality projection",
+      "score envelope",
+      "selection envelope",
+      "authority/evidence boundary"
+    ],
+    "candidate_generator_owns": ["candidate value generation", "donor provenance"],
+    "evaluator_owns": ["declared evaluation judgments only"],
+    "usce_owns": ["final subject route choice"],
+    "rncs_owns": ["reality state transition / commit"]
+  },
+  "invariants": [
+    "unscored proposal carries no confidence-bearing score",
+    "all four score dimensions are explicit before scoring",
+    "unscored proposal cannot be selected",
+    "candidate generator cannot self-certify its own winning score",
+    "proposal or scored candidate cannot commit RCL evidence or RNCS state by construction"
+  ],
+  "claim_boundary": "This contract closes an external-candidate semantic seam. It does not prove imagination quality, aesthetics, scientific truth, future success, artifact acceptance, AGI, or autonomous execution."
+}
