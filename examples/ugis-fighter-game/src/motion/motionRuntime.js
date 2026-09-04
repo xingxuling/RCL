@@ -1,4 +1,5 @@
 import { MOTION_CLIPS } from './motionClips.js';
+import { KENDO_MOTION_CLIPS } from './kendoMotionClips.js';
 
 const D = Math.PI / 180;
 const r = (x = 0, y = 0, z = 0) => [x * D, y * D, z * D];
@@ -204,12 +205,13 @@ export function sampleFighterPose({ logic, elapsed = 0, enemy = false }) {
     return dash;
   }
 
-  const clip = logic.action ? MOTION_CLIPS[logic.action] : null;
+  const clip = logic.action ? (MOTION_CLIPS[logic.action] ?? KENDO_MOTION_CLIPS[logic.action]) : null;
   if (clip) {
     const p = Math.max(0, Math.min(1, logic.actionTime / Math.max(0.001, logic.actionDuration || 1)));
     const pose = sampleClip(clip, p, base);
     const [a, b] = clip.active;
-    pose.swordGlow = p >= a && p <= b ? (logic.action.startsWith('skill_') ? 1 : 0.4) : 0.08;
+    const isSkill = logic.action.startsWith('skill_') || logic.action.startsWith('kendo_skill_');
+    pose.swordGlow = p >= a && p <= b ? (isSkill ? 1 : 0.4) : 0.08;
     return pose;
   }
 
