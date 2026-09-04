@@ -397,7 +397,7 @@ Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
 
 ## K13 AMD OpenCL session buffer arena candidate
 
-Status: `PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE`.
 K13 adds an opt-in RCL-owned `session-arena-v0.1` allocation profile over the
 existing persistent AMD OpenCL organ. Buffers are reusable only when OpenCL
 memory flags and exact byte length match, with bounds of `64` pooled buffers and
@@ -409,11 +409,16 @@ reuses with exact output/root parity. The one-step two-block GQA+RoPE path kept
 into `41` allocations / `1,804` bytes plus `1029` reuses. Forward/backward
 roots, losses, parameters, optimizer states, checkpoint and CPU parity remained
 exact. K13 is `6/6 PASS`, Rust Tensor is `7/7`, K08 Tensor is `16 PASS + 1
-declared skip`, K12 is `4/4` and K11/K10/K09 regressions are green. This is
-allocation-count evidence only: inputs are still uploaded and outputs read back
-for every operation, so Tensor residency, transfer elision, wall-time,
-throughput, generic portability, GPU training, RCL-10M and K400 promotion remain
-closed. Hosted and post-merge verification are pending. Authority:
+declared skip`, K12 is `4/4` and K11/K10/K09 regressions are green. Hosted
+exact-head PR #115 passed on `0840e9d83a05a9a4b69e99059c42aace82860f51`, with
+K13 Ubuntu/Windows, Universal, Canonical, Authority and K09-K12 checks green.
+Post-merge main `251b20a758326fd3a17056c424584145dde15e89` also passed K13 on
+Ubuntu/Windows, K09-K12, Canonical and Authority; Universal passed on official
+attempt 3 after attempts 1 and 2 hit the existing Windows K01 fixed-point
+`240000 ms` timeout. This is allocation-count evidence only: inputs are still
+uploaded and outputs read back for every operation, so Tensor residency,
+transfer elision, wall-time, throughput, generic portability, GPU training,
+RCL-10M and K400 promotion remain closed. Authority:
 `docs/native-ai/gpu-opencl-buffer-arena-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-buffer-arena-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-buffer-arena-genome.rcl` and

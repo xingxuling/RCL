@@ -66,6 +66,11 @@ test('K13 contract keeps allocation reuse separate from Tensor value residency',
   const evidence = JSON.parse(fs.readFileSync(EVIDENCE, 'utf8'));
   assert.equal(evidence.implementationCommit, 'f6f3de9a06fd191b6eef214a5649967a5e1aea2f');
   assert.equal(evidence.reportRoot, evidenceRoot({ ...evidence, reportRoot: undefined }));
+  assert.equal(evidence.hostedReplay.status, 'PASS_EXACT_HEAD');
+  assert.equal(evidence.hostedReplay.pullRequest, 115);
+  assert.equal(evidence.postMergeVerification.status, 'PASS_MAIN_POSTMERGE');
+  assert.equal(evidence.postMergeVerification.mainSha, '251b20a758326fd3a17056c424584145dde15e89');
+  assert.equal(evidence.postMergeVerification.universalStressRun.attempt, 3);
   assert.equal(evidence.k400.matrixAfter, '23 PASS / 0 BLOCKED / 377 UNTESTED');
   assert.equal(evidence.k400.verdict, 'INCOMPLETE');
 });
