@@ -1,0 +1,39 @@
+name: UGIS Fighter Game
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/ugis-fighter-game/**'
+      - 'tests/ugis-fighter-game.test.mjs'
+      - '.github/workflows/ugis-fighter-game.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: examples/ugis-fighter-game
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install game dependencies
+        run: npm install --ignore-scripts
+
+      - name: Run game semantic boundary tests
+        working-directory: .
+        run: node --test tests/ugis-fighter-game.test.mjs
+
+      - name: Build playable Vite bundle
+        run: npm run build
