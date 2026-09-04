@@ -6,11 +6,13 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
+import { evidenceRoot } from '../src/universal-program-stress.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROVIDER = path.join(ROOT, 'native', 'tensor-engine', 'amd_opencl_bf16_provider.py');
 const GENOME = path.join(ROOT, 'examples', 'native-ai', 'gpu-opencl-buffer-arena-genome.rcl');
 const CONTRACT = path.join(ROOT, 'examples', 'native-ai', 'gpu-opencl-buffer-arena-contract.v0.1.json');
+const EVIDENCE = path.join(ROOT, 'examples', 'native-ai', 'evidence', 'gpu-opencl-buffer-arena-v0.1', 'k13-opencl-buffer-arena-local-evidence.json');
 const PYTHON = process.env.RCL_PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
 
 const request = {
@@ -61,6 +63,11 @@ test('K13 contract keeps allocation reuse separate from Tensor value residency',
   assert.equal(contract.semanticBoundary.inputTransfer, 'host-to-device on every operation');
   assert.equal(contract.semanticBoundary.outputTransfer, 'device-to-host on every operation');
   assert.ok(contract.claimsNotGranted.includes('OPENCL_TENSOR_VALUE_RESIDENCY'));
+  const evidence = JSON.parse(fs.readFileSync(EVIDENCE, 'utf8'));
+  assert.equal(evidence.implementationCommit, 'f6f3de9a06fd191b6eef214a5649967a5e1aea2f');
+  assert.equal(evidence.reportRoot, evidenceRoot({ ...evidence, reportRoot: undefined }));
+  assert.equal(evidence.k400.matrixAfter, '23 PASS / 0 BLOCKED / 377 UNTESTED');
+  assert.equal(evidence.k400.verdict, 'INCOMPLETE');
 });
 
 test('K13 real OpenCL session arena reuses bounded allocations without semantic drift', () => {

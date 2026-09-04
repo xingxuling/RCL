@@ -666,3 +666,42 @@ generic portability, GPU training promotion, RCL-10M, RCL-1B and K400 remain
 closed. Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
 `RCL_GAP_GPU_TRAINING_THROUGHPUT` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K13 AMD OpenCL session buffer arena candidate
+
+Status: `PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING`.
+RCL owns an explicit exact-size/flags buffer reuse profile, resource bounds and
+the no-residency boundary. The AMD OpenCL provider owns only `cl_mem` lifecycle
+and kernel execution. Every operation still uploads inputs and reads outputs.
+
+| Evidence | Result |
+|---|---:|
+| K13 genome/contract compilation | PASS_LOCAL |
+| Real AMD two-operation protocol smoke | allocations `6 -> 3`, reuses `0 -> 3`, exact outputs/roots |
+| GQA+RoPE buffer acquisitions | `1070 == 41 allocations + 1029 reuses` |
+| Newly allocated byte accounting | `31,828 -> 1,804` cumulative bytes |
+| Arena peak / bound | `41 / 64` buffers; `1,804 / 2,097,152` bytes |
+| Explicit close receipt | `41` released; pool `0` buffers / `0` bytes |
+| Arena versus per-kernel execution roots/state/checkpoint | EXACT |
+| CPU checkpoint differential | EXACT |
+| Unsupported/unavailable/receipt drift | FAIL_CLOSED |
+| K13 integration/protocol suite | `6/6 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| K12/K11/K10/K09 regressions | `4/4`, `1/1`, `1/1`, `1/1` PASS |
+| Strict Clippy | BLOCKED by 8 pre-existing warnings; no PASS claim |
+| License audit | PASS, no new dependencies or external donor code |
+| Hosted exact-head replay | PENDING |
+| Post-merge main replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-buffer-arena-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-buffer-arena-genome.rcl`
+- `examples/native-ai/gpu-opencl-buffer-arena-contract.v0.1.json`
+- `examples/native-ai/evidence/gpu-opencl-buffer-arena-v0.1/k13-opencl-buffer-arena-local-evidence.json`
+
+Reproduction: `npm run test:k13-opencl-buffer-arena`. Claims are limited to
+`OPENCL_AMD_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE`. Tensor value residency,
+transfer elision, wall-time/throughput improvement, generic portability, GPU
+training promotion, RCL-10M, RCL-1B and K400 remain closed.

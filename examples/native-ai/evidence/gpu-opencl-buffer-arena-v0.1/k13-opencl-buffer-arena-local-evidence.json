@@ -1,0 +1,113 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-buffer-arena.evidence.v0.1",
+  "campaign": "RCL Native LLM Campaign",
+  "task": "K13",
+  "status": "PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING",
+  "canonicalOwner": "RCL",
+  "baseMain": "3058de9ba252061ba24fd544659e1ec8771a97c1",
+  "implementationCommit": "f6f3de9a06fd191b6eef214a5649967a5e1aea2f",
+  "branch": "codex/k13-opencl-buffer-arena-v01",
+  "contract": "examples/native-ai/gpu-opencl-buffer-arena-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-buffer-arena-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "twoOperationProtocolSmoke": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "perKernel": { "bufferAcquisitions": 6, "allocations": 6, "reuses": 0, "releases": 6, "pooledBuffers": 0 },
+      "sessionArena": { "bufferAcquisitions": 6, "allocations": 3, "reuses": 3, "closeReceiptReleases": 3, "closedPooledBuffers": 0, "closedPooledBytes": 0 },
+      "outputBitsAndExecutionRoots": "exact"
+    },
+    "gpuTrainingIntegration": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "suite": "tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs",
+      "tests": "3/3",
+      "logicalProviderRequests": 338,
+      "crossNodeGradientBatches": 18,
+      "crossNodeGradientNodes": 36,
+      "perKernel": { "bufferAcquisitions": 1070, "allocations": 1070, "allocationBytes": 31828, "reuses": 0, "releases": 1070 },
+      "sessionArena": {
+        "bufferAcquisitions": 1070,
+        "allocations": 41,
+        "allocationBytes": 1804,
+        "reuses": 1029,
+        "closeReceiptReleases": 41,
+        "closedPooledBuffers": 0,
+        "closedPooledBytes": 0,
+        "peakPooledBuffers": 41,
+        "peakPooledBytes": 1804,
+        "maxArenaBuffers": 64,
+        "maxArenaBytes": 2097152,
+        "tensorValueResidency": false
+      },
+      "allocationReduction": 1029,
+      "allocationByteReduction": 30024,
+      "perKernelVersusArenaRootsLossParametersOptimizerStatesCheckpoint": "exact",
+      "cpuLossParametersOptimizerStatesCheckpoint": "exact"
+    },
+    "negativeAndBoundary": {
+      "unsupportedMode": "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+      "cpuOrNonPersistentMode": "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+      "missingOrInvalidStats": "fail-closed in Rust session receipt validation",
+      "monotonicityBoundsAndNoResidency": "fail-closed in Rust session receipt validation",
+      "providerFallback": "forbidden"
+    },
+    "regressions": {
+      "k13Suite": "6/6 PASS",
+      "rustTensorUnitTests": "7/7 PASS",
+      "k08TensorSuite": "16 PASS, 1 declared skip, 0 FAIL",
+      "k12CrossNodeGradientBatch": "4/4 PASS",
+      "k11GradientPair": "1/1 PASS",
+      "k10BatchedDispatch": "1/1 PASS",
+      "k09PersistentDispatch": "1/1 PASS",
+      "diffCheck": "PASS"
+    },
+    "strictClippy": {
+      "status": "BLOCKED_PREEXISTING_WARNINGS",
+      "warningCount": 8,
+      "scope": "existing manual range, needless deref/borrow, complex type and argument-count warnings"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "hostedReplay": { "status": "PENDING" },
+  "postMergeVerification": { "status": "PENDING" },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance stress evidence only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT",
+    "ROBUST": "PASS_LOCAL",
+    "PERFORMANCE": "ALLOCATION_COUNT_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_HOSTED_PENDING"
+  },
+  "claimsGranted": ["OPENCL_AMD_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE"],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_VALUE_RESIDENCY",
+    "OPENCL_TRANSFER_ELISION",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": ["RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY", "RCL_GAP_GPU_TRAINING_THROUGHPUT", "RCL_GAP_RCL10M_TOKENIZER_DATASET"],
+  "authority": "CANDIDATE_ONLY_ALLOCATION_REUSE_NO_VALUE_RESIDENCY_TRANSFER_ELISION_THROUGHPUT_OR_RCL10M_PROMOTION",
+  "reportRoot": "d5f0e93171a70b5d7b51248ef65299b25f10ab92c7f1a36fb88977a7118ca920"
+}
