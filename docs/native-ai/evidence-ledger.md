@@ -705,3 +705,42 @@ Reproduction: `npm run test:k13-opencl-buffer-arena`. Claims are limited to
 `OPENCL_AMD_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE`. Tensor value residency,
 transfer elision, wall-time/throughput improvement, generic portability, GPU
 training promotion, RCL-10M, RCL-1B and K400 remain closed.
+
+## K14 AMD OpenCL Tensor value residency candidate
+
+Status: `PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
+K14 adds an opt-in RCL-owned Rust probe and `tensor-residency-v0.1` provider
+session. `storageIdentity` and a deterministic value root over dtype, shape and
+canonical BF16 bits are the admission key. The provider can retain only
+read-only input `cl_mem`; an exact identity/value-root hit elides the repeated
+host-to-device upload, while changed roots fail closed. Matmul outputs remain
+explicitly read back on every operation.
+
+| Evidence | Result |
+|---|---:|
+| K14 genome/contract compilation | PASS_LOCAL |
+| Real AMD residency probe | two uploads, two exact hits, two matmuls, exact `4130` outputs |
+| Transfer accounting | `2` host-to-device uploads; `2` device-to-host readbacks |
+| Lifetime accounting | `4` allocations / `4` releases; `0` resident buffers after close |
+| Bounds | `64` tensors / `2,097,152` bytes declared and validated |
+| Stale identity negative | `RCL_OPENCL_TENSOR_VALUE_STALE` |
+| K14 protocol suite | `3/3 PASS` |
+| Rust Tensor unit tests | `7/7 PASS` |
+| K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| License audit | PASS, no new dependencies or donor code |
+| Hosted and post-merge replay | PENDING |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-tensor-residency-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-tensor-residency-contract.v0.1.json`
+- `examples/native-ai/gpu-opencl-tensor-residency-genome.rcl`
+- `native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`
+- `examples/native-ai/evidence/gpu-opencl-tensor-residency-v0.1/k14-opencl-tensor-residency-local-evidence.json`
+
+Reproduction: `npm run test:k14-opencl-tensor-residency`. Claims are limited
+to `OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE` and
+`OPENCL_AMD_INPUT_TRANSFER_ELISION_CANDIDATE`. Output/full-graph or
+training-step residency, wall-time/throughput improvement, VRAM reduction,
+generic portability, GPU training promotion, RCL-10M, RCL-1B and K400 remain
+closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.

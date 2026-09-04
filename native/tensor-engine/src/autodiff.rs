@@ -20,8 +20,11 @@ const MAX_PROVIDER_BATCH_REQUESTS: usize = 64;
 const MAX_CROSS_NODE_GRADIENT_NODES: usize = MAX_PROVIDER_BATCH_REQUESTS / 2;
 const CROSS_NODE_GRADIENT_BATCH_MODE: &str = "cross-node-frontier-v0.1";
 pub const SESSION_BUFFER_ARENA_MODE: &str = "session-arena-v0.1";
+pub const SESSION_TENSOR_RESIDENCY_MODE: &str = "tensor-residency-v0.1";
 const MAX_PROVIDER_ARENA_BUFFERS: usize = 64;
 const MAX_PROVIDER_ARENA_BYTES: usize = 2 * 1024 * 1024;
+const MAX_PROVIDER_RESIDENT_TENSORS: usize = 64;
+const MAX_PROVIDER_RESIDENT_BYTES: usize = 2 * 1024 * 1024;
 
 pub type ComputationGraph = ExecutionPlan;
 pub type Operation = PlanNode;
@@ -297,6 +300,26 @@ fn provider_error_code(value: &Value) -> &'static str {
         Some("RCL_OPENCL_SHAPE") => "RCL_OPENCL_SHAPE",
         Some("RCL_OPENCL_KERNEL_BUILD") => "RCL_OPENCL_KERNEL_BUILD",
         Some("RCL_OPENCL_BATCH") => "RCL_OPENCL_BATCH",
+        Some("RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE") => {
+            "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE"
+        },
+        Some("RCL_OPENCL_TENSOR_IDENTITY") => "RCL_OPENCL_TENSOR_IDENTITY",
+        Some("RCL_OPENCL_TENSOR_VALUE_ROOT") => "RCL_OPENCL_TENSOR_VALUE_ROOT",
+        Some("RCL_OPENCL_TENSOR_VALUE_ROOT_MISMATCH") => {
+            "RCL_OPENCL_TENSOR_VALUE_ROOT_MISMATCH"
+        },
+        Some("RCL_OPENCL_TENSOR_VALUE_STALE") => "RCL_OPENCL_TENSOR_VALUE_STALE",
+        Some("RCL_OPENCL_TENSOR_VALUE_BITS_REQUIRED") => {
+            "RCL_OPENCL_TENSOR_VALUE_BITS_REQUIRED"
+        },
+        Some("RCL_OPENCL_TENSOR_RESIDENCY_LIMIT") => "RCL_OPENCL_TENSOR_RESIDENCY_LIMIT",
+        Some("RCL_OPENCL_TENSOR_NOT_RESIDENT") => "RCL_OPENCL_TENSOR_NOT_RESIDENT",
+        Some("RCL_OPENCL_TENSOR_SHAPE") => "RCL_OPENCL_TENSOR_SHAPE",
+        Some("RCL_OPENCL_TENSOR_DTYPE") => "RCL_OPENCL_TENSOR_DTYPE",
+        Some("RCL_OPENCL_TENSOR_ACCESS") => "RCL_OPENCL_TENSOR_ACCESS",
+        Some("RCL_OPENCL_TENSOR_REPLACEMENT") => "RCL_OPENCL_TENSOR_REPLACEMENT",
+        Some("RCL_OPENCL_TENSOR_READBACK_REQUIRED") => "RCL_OPENCL_TENSOR_READBACK_REQUIRED",
+        Some("RCL_OPENCL_TENSOR_OPERATION") => "RCL_OPENCL_TENSOR_OPERATION",
         _ => "RCL_ACCELERATOR_EXECUTION_FAILED",
     }
 }
@@ -327,6 +350,17 @@ pub struct OpenClProviderSession {
     max_arena_buffers: usize,
     max_arena_bytes: usize,
     tensor_value_residency: bool,
+    tensor_residency_enabled: bool,
+    resident_tensor_count: usize,
+    resident_bytes: usize,
+    max_resident_tensors: usize,
+    max_resident_bytes: usize,
+    tensor_bind_count: usize,
+    tensor_residency_hit_count: usize,
+    tensor_replacement_count: usize,
+    tensor_host_to_device_transfers: usize,
+    tensor_device_to_host_transfers: usize,
+    tensor_release_count: usize,
     buffer_arena_closed: bool,
 }
 
@@ -355,7 +389,10 @@ impl OpenClProviderSession {
                 "python3".into()
             }
         });
-        if !matches!(buffer_mode, None | Some(SESSION_BUFFER_ARENA_MODE)) {
+        if !matches!(
+            buffer_mode,
+            None | Some(SESSION_BUFFER_ARENA_MODE) | Some(SESSION_TENSOR_RESIDENCY_MODE)
+        ) {
             return Err(EngineError::new(
                 "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
                 format!(
@@ -414,6 +451,17 @@ impl OpenClProviderSession {
             max_arena_buffers: 0,
             max_arena_bytes: 0,
             tensor_value_residency: false,
+            tensor_residency_enabled: buffer_mode == Some(SESSION_TENSOR_RESIDENCY_MODE),
+            resident_tensor_count: 0,
+            resident_bytes: 0,
+            max_resident_tensors: 0,
+            max_resident_bytes: 0,
+            tensor_bind_count: 0,
+            tensor_residency_hit_count: 0,
+            tensor_replacement_count: 0,
+            tensor_host_to_device_transfers: 0,
+            tensor_device_to_host_transfers: 0,
+            tensor_release_count: 0,
             buffer_arena_closed: false,
         })
     }
@@ -490,12 +538,56 @@ impl OpenClProviderSession {
         self.tensor_value_residency
     }
 
+    pub fn tensor_residency_enabled(&self) -> bool {
+        self.tensor_residency_enabled
+    }
+
+    pub fn resident_tensor_count(&self) -> usize {
+        self.resident_tensor_count
+    }
+
+    pub fn resident_bytes(&self) -> usize {
+        self.resident_bytes
+    }
+
+    pub fn max_resident_tensors(&self) -> usize {
+        self.max_resident_tensors
+    }
+
+    pub fn max_resident_bytes(&self) -> usize {
+        self.max_resident_bytes
+    }
+
+    pub fn tensor_bind_count(&self) -> usize {
+        self.tensor_bind_count
+    }
+
+    pub fn tensor_residency_hit_count(&self) -> usize {
+        self.tensor_residency_hit_count
+    }
+
+    pub fn tensor_replacement_count(&self) -> usize {
+        self.tensor_replacement_count
+    }
+
+    pub fn tensor_host_to_device_transfers(&self) -> usize {
+        self.tensor_host_to_device_transfers
+    }
+
+    pub fn tensor_device_to_host_transfers(&self) -> usize {
+        self.tensor_device_to_host_transfers
+    }
+
+    pub fn tensor_release_count(&self) -> usize {
+        self.tensor_release_count
+    }
+
     fn update_session_stats(&mut self, response: &Value) -> Result<(), EngineError> {
         let Some(stats) = response.get("sessionStats") else {
-            if self.buffer_arena_enabled {
+            if self.buffer_arena_enabled || self.tensor_residency_enabled {
                 return Err(EngineError::new(
                     "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_MISSING",
-                    "OpenCL buffer arena response omitted sessionStats",
+                    "OpenCL provider response omitted required sessionStats",
                 ));
             }
             return Ok(());
@@ -511,6 +603,8 @@ impl OpenClProviderSession {
             })?;
         let expected = if self.buffer_arena_enabled {
             SESSION_BUFFER_ARENA_MODE
+        } else if self.tensor_residency_enabled {
+            SESSION_TENSOR_RESIDENCY_MODE
         } else {
             "per-kernel-v0.1"
         };
@@ -551,6 +645,35 @@ impl OpenClProviderSession {
                     "OpenCL provider sessionStats omitted tensorValueResidency",
                 )
             })?;
+        let resident_tensor_count = count(stats, "residentTensorCount")?;
+        let resident_bytes = count(stats, "residentBytes")?;
+        let max_resident_tensors = count(stats, "maxResidentTensors")?;
+        let max_resident_bytes = count(stats, "maxResidentBytes")?;
+        let tensor_bind_count = count(stats, "tensorBindCount")?;
+        let tensor_residency_hit_count = count(stats, "tensorResidencyHitCount")?;
+        let tensor_replacement_count = count(stats, "tensorReplacementCount")?;
+        let tensor_host_to_device_transfers = count(stats, "tensorHostToDeviceTransfers")?;
+        let tensor_device_to_host_transfers = count(stats, "tensorDeviceToHostTransfers")?;
+        let tensor_release_count = count(stats, "tensorReleaseCount")?;
+        let residency_stats_valid = if self.tensor_residency_enabled {
+            tensor_value_residency
+                && max_resident_tensors == MAX_PROVIDER_RESIDENT_TENSORS
+                && max_resident_bytes == MAX_PROVIDER_RESIDENT_BYTES
+                && resident_tensor_count <= max_resident_tensors
+                && resident_bytes <= max_resident_bytes
+        } else {
+            !tensor_value_residency
+                && resident_tensor_count == 0
+                && resident_bytes == 0
+                && max_resident_tensors == MAX_PROVIDER_RESIDENT_TENSORS
+                && max_resident_bytes == MAX_PROVIDER_RESIDENT_BYTES
+                && tensor_bind_count == 0
+                && tensor_residency_hit_count == 0
+                && tensor_replacement_count == 0
+                && tensor_host_to_device_transfers == 0
+                && tensor_device_to_host_transfers == 0
+                && tensor_release_count == 0
+        };
         if allocation_count < self.buffer_allocation_count
             || allocation_bytes < self.buffer_allocation_bytes
             || reuse_count < self.buffer_reuse_count
@@ -561,7 +684,13 @@ impl OpenClProviderSession {
             || max_arena_bytes != MAX_PROVIDER_ARENA_BYTES
             || pooled_buffer_count > max_arena_buffers
             || pooled_bytes > max_arena_bytes
-            || tensor_value_residency
+            || tensor_bind_count < self.tensor_bind_count
+            || tensor_residency_hit_count < self.tensor_residency_hit_count
+            || tensor_replacement_count < self.tensor_replacement_count
+            || tensor_host_to_device_transfers < self.tensor_host_to_device_transfers
+            || tensor_device_to_host_transfers < self.tensor_device_to_host_transfers
+            || tensor_release_count < self.tensor_release_count
+            || !residency_stats_valid
             || (!self.buffer_arena_enabled
                 && (reuse_count != 0 || pooled_buffer_count != 0 || pooled_bytes != 0))
         {
@@ -581,6 +710,16 @@ impl OpenClProviderSession {
         self.max_arena_buffers = max_arena_buffers;
         self.max_arena_bytes = max_arena_bytes;
         self.tensor_value_residency = tensor_value_residency;
+        self.resident_tensor_count = resident_tensor_count;
+        self.resident_bytes = resident_bytes;
+        self.max_resident_tensors = max_resident_tensors;
+        self.max_resident_bytes = max_resident_bytes;
+        self.tensor_bind_count = tensor_bind_count;
+        self.tensor_residency_hit_count = tensor_residency_hit_count;
+        self.tensor_replacement_count = tensor_replacement_count;
+        self.tensor_host_to_device_transfers = tensor_host_to_device_transfers;
+        self.tensor_device_to_host_transfers = tensor_device_to_host_transfers;
+        self.tensor_release_count = tensor_release_count;
         Ok(())
     }
 
@@ -805,6 +944,39 @@ impl OpenClProviderSession {
         Ok(responses)
     }
 
+    pub fn execute_tensor_residency(&mut self, payload: &Value) -> Result<Value, EngineError> {
+        if !self.tensor_residency_enabled {
+            return Err(EngineError::new(
+                "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+                "Tensor value residency requires the tensor-residency-v0.1 session mode",
+            ));
+        }
+        let operation = payload
+            .get("operation")
+            .and_then(Value::as_str)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_OPENCL_TENSOR_OPERATION",
+                    "Tensor residency request omitted operation",
+                )
+            })?;
+        let response = self.execute(payload)?;
+        if response.get("format").and_then(Value::as_str)
+            != Some("rcl.opencl-amd-tensor-residency-result.v0.1")
+            || response.get("status").and_then(Value::as_str)
+                != Some("PASS_LOCAL_GPU_TENSOR_RESIDENCY_CANDIDATE")
+            || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+            || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+            || response.get("operation").and_then(Value::as_str) != Some(operation)
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL provider did not return an admitted Tensor residency result",
+            ));
+        }
+        Ok(response)
+    }
+
     pub fn close_buffer_arena(&mut self) -> Result<(), EngineError> {
         if !self.buffer_arena_enabled || self.buffer_arena_closed {
             return Ok(());
@@ -826,6 +998,33 @@ impl OpenClProviderSession {
             return Err(EngineError::new(
                 "RCL_ACCELERATOR_BUFFER_ARENA_CLOSE_INVALID",
                 "OpenCL provider did not return a complete buffer arena close receipt",
+            ));
+        }
+        self.buffer_arena_closed = true;
+        Ok(())
+    }
+
+    pub fn close_tensor_residency(&mut self) -> Result<(), EngineError> {
+        if !self.tensor_residency_enabled || self.buffer_arena_closed {
+            return Ok(());
+        }
+        let response = self.send(&json!({
+            "format": "rcl.opencl-amd-session-close-request.v0.1",
+            "backend": "opencl-amd",
+        }))?;
+        if response.get("format").and_then(Value::as_str)
+            != Some("rcl.opencl-amd-session-close-result.v0.1")
+            || response.get("status").and_then(Value::as_str)
+                != Some("PASS_LOCAL_GPU_SESSION_CLOSE_CANDIDATE")
+            || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+            || response.get("closed").and_then(Value::as_bool) != Some(true)
+            || self.resident_tensor_count != 0
+            || self.resident_bytes != 0
+            || self.buffer_release_count != self.buffer_allocation_count
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_TENSOR_RESIDENCY_CLOSE_INVALID",
+                "OpenCL provider did not return a complete Tensor residency close receipt",
             ));
         }
         self.buffer_arena_closed = true;

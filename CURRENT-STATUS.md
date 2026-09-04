@@ -423,3 +423,30 @@ RCL-10M and K400 promotion remain closed. Authority:
 `examples/native-ai/gpu-opencl-buffer-arena-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-buffer-arena-genome.rcl` and
 `examples/native-ai/evidence/gpu-opencl-buffer-arena-v0.1/k13-opencl-buffer-arena-local-evidence.json`.
+
+## K14 AMD OpenCL Tensor value residency candidate
+
+Status: `PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
+K14 adds a separate opt-in `tensor-residency-v0.1` session and an RCL-owned
+Rust probe bridge. RCL computes a deterministic value root from
+`dtype + shape + canonical BF16 bits` and binds it beside `storageIdentity`;
+the auxiliary provider owns only the read-only OpenCL `cl_mem` lifetime and
+kernel lowering. An exact identity/value-root bind is a hit with no new
+host-to-device upload. A changed value root without an explicit replacement
+fails closed. Each bounded matmul still performs an explicit device-to-host
+readback, so this candidate does not claim output or full-graph residency.
+
+Real local AMD `gfx1152` evidence records two first-bind uploads, two exact
+identity/value-root hits, two resident-input transfers, two output readbacks,
+two resident Tensor releases and exact `4130` BF16 outputs for two matmuls.
+The close receipt reports four total OpenCL allocations/releases (two resident
+inputs and two transient outputs) with zero resident buffers after close.
+K14 is `3/3 PASS`; Rust Tensor is `7/7`; K08 Tensor is `16 PASS + 1 declared
+skip`; K13 and the earlier GPU dispatch candidates remain green. The local
+candidate has no hosted or post-merge replay yet. Tensor output/full-graph or
+training-step residency, wall-time/throughput, VRAM, generic portability,
+GPU-training promotion, RCL-10M and K400 remain closed. Authority:
+`docs/native-ai/gpu-opencl-tensor-residency-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-tensor-residency-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-tensor-residency-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-tensor-residency-v0.1/k14-opencl-tensor-residency-local-evidence.json`.
