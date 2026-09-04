@@ -1,3 +1,5 @@
+import { EXPANDED_STYLE_ATTACKS } from './styles/expandedStyleAttacks.js';
+
 export const UGIS_ROUTES = Object.freeze([
   'hold_measure',
   'take_line',
@@ -98,6 +100,8 @@ export const ATTACKS = Object.freeze({
     damage: 178, range: 2.62, arcDeg: 68, knockback: 1.28, hitstun: 0.70,
     move: 0.72, energyCost: 68, energyGain: 0, hitstop: 0.155, routeIntent: 'close_resolution',
   },
+
+  ...EXPANDED_STYLE_ATTACKS,
 
   ai_thrust: {
     id: 'ai_thrust', label: '取线突进', duration: 0.5, activeStart: 0.16, activeEnd: 0.29,
