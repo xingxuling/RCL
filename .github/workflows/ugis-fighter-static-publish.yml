@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'examples/ugis-fighter-game/**'
+      - 'tests/ugis-fighter*.test.mjs'
       - '.github/workflows/ugis-fighter-static-publish.yml'
   workflow_dispatch:
 
@@ -31,8 +32,8 @@ jobs:
         working-directory: examples/ugis-fighter-game
         run: npm install --ignore-scripts
 
-      - name: Run semantic tests
-        run: node --test tests/ugis-fighter-game.test.mjs
+      - name: Run semantic and style-behavior tests
+        run: node --test tests/ugis-fighter*.test.mjs
 
       - name: Build portable production bundle
         working-directory: examples/ugis-fighter-game
