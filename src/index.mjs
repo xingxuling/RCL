@@ -1872,3 +1872,16 @@ export {
   createUiResourceBinding,
   buildCanonicalAccessibilityTree,
 } from './ui/ui-resource-accessibility.mjs';
+export {
+  MOTHER_STRUCTURE_IR_VERSION,
+  MOTHER_STRUCTURE_IR_FORMAT,
+  MOTHER_STRUCTURE_CORPUS_FORMAT,
+  MOTHER_STRUCTURE_STATUS,
+  MOTHER_STRUCTURE_CLASSIFICATIONS,
+  buildMotherStructureIR,
+  buildMotherStructureIRFromSource,
+  classifyMotherStructure,
+  buildMotherStructureCorpus,
+  verifyMotherStructureIR,
+  verifyMotherStructureCorpus,
+} from './mother-structure-ir.mjs';
