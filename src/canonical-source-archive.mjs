@@ -31,6 +31,11 @@ function readTextIfPresent(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+function readBytesIfPresent(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return fs.readFileSync(filePath);
+}
+
 function expectedCanonical(contract) {
   if (!contract?.canonical?.corePath || !contract?.canonical?.mainPath
     || !/^[0-9a-f]{64}$/u.test(contract.canonical.coreSha256)
@@ -62,6 +67,49 @@ function readArchive(archivePath) {
     throw new Error('RCL_CANONICAL_SOURCE_ARCHIVE_INVALID');
   }
   return manifest;
+}
+
+function expectedCompilerArtifact(contract) {
+  if (!contract?.canonical?.compilerRbcPath
+    || !/^[0-9a-f]{64}$/u.test(contract.canonical.compilerRbcSha256)) {
+    throw new Error('RCL_CANONICAL_COMPILER_ARTIFACT_CONTRACT_INVALID');
+  }
+  return {
+    path: resolveRooted(contract.canonical.compilerRbcPath, 'RCL_CANONICAL_COMPILER_ARTIFACT_PATH_INVALID'),
+    sha256: contract.canonical.compilerRbcSha256,
+  };
+}
+
+export function readCanonicalCompilerArtifact(contract, options = {}) {
+  const expected = expectedCompilerArtifact(contract);
+  const live = readBytesIfPresent(expected.path);
+  if (live && sha256(live) === expected.sha256) {
+    return Object.freeze({
+      sourceMode: 'live',
+      path: expected.path,
+      sha256: expected.sha256,
+      archiveId: null,
+    });
+  }
+
+  const archivePath = path.resolve(options.archivePath ?? DEFAULT_CANONICAL_SOURCE_ARCHIVE_PATH);
+  const manifest = readArchive(archivePath);
+  const contractRoot = options.contractRoot ?? evidenceRoot(contract);
+  const record = (manifest.artifacts ?? []).find((candidate) => candidate.contractRoots?.includes(contractRoot)
+    && candidate.path
+    && candidate.sha256 === expected.sha256);
+  if (!record) throw new Error('RCL_CANONICAL_COMPILER_ARTIFACT_ARCHIVE_MISSING');
+
+  const archiveFile = resolveRooted(record.path, 'RCL_CANONICAL_COMPILER_ARTIFACT_ARCHIVE_PATH_INVALID');
+  const bytes = readBytesIfPresent(archiveFile);
+  if (bytes === null || sha256(bytes) !== record.sha256) throw new Error('RCL_CANONICAL_COMPILER_ARTIFACT_HASH_MISMATCH');
+  return Object.freeze({
+    sourceMode: 'archive',
+    path: archiveFile,
+    sha256: record.sha256,
+    archiveId: record.id ?? null,
+    sourceCommit: record.sourceCommit ?? null,
+  });
 }
 
 export function readCanonicalCompilerSourcePair(contract, options = {}) {

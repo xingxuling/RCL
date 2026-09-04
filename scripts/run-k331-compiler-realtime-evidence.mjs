@@ -11,6 +11,7 @@ import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { LogicalTimeScheduler, LogicalTimeSchedulerError } from '../src/logical-time-scheduler.mjs';
 import { verifyNativeSemanticStateRoot } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k331-compiler-realtime-runtime-contract.v0.1.json');
@@ -79,7 +80,7 @@ export function runK331CompilerRealtimeEvidence(options = {}) {
   if (contract.format !== 'rcl.k331.compiler-realtime-runtime-contract.v0.1'
     || contract.frozenBeforeAcquisition !== true) throw new Error('RCL_K331_RUNTIME_CONTRACT_INVALID');
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const rclcPath = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclc.exe' : 'rclc');
   const rclvmPath = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
   for (const requiredPath of [sourcePath, compilerRbcPath, rclcPath, rclvmPath]) {

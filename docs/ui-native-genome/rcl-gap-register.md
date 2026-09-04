@@ -48,7 +48,7 @@ The current repository status already records the K03 API-35 emulator transactio
 
 ### UI004 — `CANDIDATE_CLOSED_RCL_SEMANTIC_SLICE`
 
-PR #114 adds `src/ui/ui-resource-accessibility.mjs`:
+PR #114 adds `src/ui/ui-resource-accessibility.mjs`; the application-framework candidate now composes it and emits `ui/accessibility-tree.json` plus optional resource manifests:
 
 - content-addressed resource bundle identity;
 - locale identity and deterministic locale/base/default fallback;
@@ -61,6 +61,8 @@ PR #114 adds `src/ui/ui-resource-accessibility.mjs`:
 New UI004 tests: **5 / 5 PASS**. Combined with the existing UI regression set: **35 / 35 PASS**.
 
 This is a candidate semantic closure only. Web ARIA, Android accessibility services, screen readers, fonts, platform resource packaging and OS-specific behavior remain Provider/device evidence.
+
+The same portable tree is now linked from `rcl.ui.native-app.v0.1`; this makes UI004 inspectable in a real application build without claiming that a browser or device consumed the tree.
 
 ### UI005 — `AUXILIARY_EVIDENCE_ORGAN`
 

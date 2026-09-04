@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k337-k338-compiler-governance-reactive-runtime-contract.v0.1.json');
@@ -33,7 +34,7 @@ export function evaluateK337K338CompilerGovernanceReactiveSource(options = {}) {
   const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
   const sourcePath = path.resolve(options.sourcePath ?? path.join(ROOT, contract.canonical.sourcePath));
   const source = fs.readFileSync(sourcePath, 'utf8');
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-k337-k338-candidate-'));
   const outputPath = path.join(directory, 'candidate.rbc');
   const checks = {};
@@ -81,7 +82,7 @@ export function verifyK337K338CompilerGovernanceReactiveCandidate(options = {}) 
   if (options.sourcePath) return candidate;
   const evidence = JSON.parse(fs.readFileSync(EVIDENCE_PATH, 'utf8'));
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const { reportRoot, ...evidenceWithoutRoot } = evidence;
 
   check(contract.format === 'rcl.k337-k338.compiler-governance-reactive-runtime-contract.v0.1', 'RCL_K337_K338_CONTRACT_FORMAT');

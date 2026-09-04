@@ -122,4 +122,5 @@ test('android-debug-apk target emits diagnostic build report and local environme
   const rerun = buildAndroidDebugPackage(outDir, { executeBuild: false });
   assert.equal(rerun.status, 'diagnostic-only');
   assert.equal(verifyRclPackage(outDir).status, 'verified');
+  assert.equal(manifest.files.some(item => item.path === 'build/android-debug-build-report.json'), false);
 });

@@ -164,6 +164,65 @@ export {
   RCL_NATIVE_UI_ANDROID_FORMAT,
 } from './ui/ui-schema.mjs';
 
+export {
+  RCL_APPLICATION_FRAMEWORK_VERSION,
+  RCL_APPLICATION_FRAMEWORK_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_SPEC_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_CATALOG_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_BUILD_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_VERIFY_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_TARGETS,
+  RCL_APPLICATION_FRAMEWORK_CATALOG,
+  DEFAULT_RCL_APPLICATION_FRAMEWORK_SPEC,
+  listRclApplicationFrameworks,
+  getRclApplicationFramework,
+  normalizeRclApplicationFrameworkSpec,
+  compileRclApplicationFramework,
+  traceRclApplicationFramework,
+  buildRclApplicationFramework,
+  verifyRclApplicationFrameworkBuild,
+  assessRclApplicationFrameworkCatalog,
+} from './application-framework.mjs';
+
+export {
+  RCL_APPLICATION_DATA_RUNTIME_VERSION,
+  RCL_APPLICATION_DATA_RESOURCE_FORMAT,
+  RCL_APPLICATION_DATA_REQUEST_FORMAT,
+  RCL_APPLICATION_DATA_MUTATION_FORMAT,
+  RCL_APPLICATION_DATA_SYNC_FORMAT,
+  RCL_APPLICATION_DATA_SNAPSHOT_FORMAT,
+  RCL_APPLICATION_DATA_PERSISTENCE_FORMAT,
+  normalizeApplicationDataResourceSpec,
+  createApplicationDataResource,
+  beginApplicationDataRequest,
+  cancelApplicationDataRequest,
+  settleApplicationDataRequest,
+  setApplicationDataConnectivity,
+  readApplicationDataCache,
+  createApplicationDataMutation,
+  settleApplicationDataMutation,
+  createApplicationDataSyncPlan,
+  settleApplicationDataSync,
+  createApplicationDataSnapshot,
+  restoreApplicationDataSnapshot,
+  persistApplicationDataSnapshot,
+  recoverApplicationDataSnapshot,
+  executeApplicationDataRequest,
+  ApplicationDataRuntime,
+  createApplicationDataRuntime,
+} from './application-data-runtime.mjs';
+
+export {
+  RCL_NATIVE_FRAMEWORK_ATLAS_VERSION,
+  RCL_NATIVE_FRAMEWORK_ATLAS_FORMAT,
+  RCL_NATIVE_FRAMEWORK_CLASSIFICATIONS,
+  RCL_NATIVE_FRAMEWORK_ATLAS,
+  listRclNativeFrameworks,
+  getRclNativeFramework,
+  assessRclNativeFrameworkAtlas,
+} from './native-framework-atlas.mjs';
+
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
 
@@ -1762,6 +1821,7 @@ export {
   RCL_CANONICAL_SOURCE_ARCHIVE_FORMAT,
   DEFAULT_CANONICAL_SOURCE_ARCHIVE_PATH,
   readCanonicalCompilerSourcePair,
+  readCanonicalCompilerArtifact,
 } from './canonical-source-archive.mjs';
 
 export {
@@ -1872,3 +1932,26 @@ export {
   createUiResourceBinding,
   buildCanonicalAccessibilityTree,
 } from './ui/ui-resource-accessibility.mjs';
+export {
+  MOTHER_STRUCTURE_IR_VERSION,
+  MOTHER_STRUCTURE_IR_FORMAT,
+  MOTHER_STRUCTURE_CORPUS_FORMAT,
+  MOTHER_STRUCTURE_STATUS,
+  MOTHER_STRUCTURE_CLASSIFICATIONS,
+  buildMotherStructureIR,
+  buildMotherStructureIRFromSource,
+  classifyMotherStructure,
+  buildMotherStructureCorpus,
+  verifyMotherStructureIR,
+  verifyMotherStructureCorpus,
+} from './mother-structure-ir.mjs';
+
+export {
+  MOTHER_STRUCTURE_INTEGRATION_COURT_VERSION,
+  MOTHER_STRUCTURE_INTEGRATION_COURT_FORMAT,
+  MOTHER_STRUCTURE_INTEGRATION_COURT_STATUS,
+  MOTHER_STRUCTURE_INTEGRATION_COURT_EVIDENCE_LEVEL,
+  MOTHER_STRUCTURE_INTEGRATION_COURT_TARGETS,
+  runMotherStructureIntegrationCourt,
+  verifyMotherStructureIntegrationCourt,
+} from './mother-structure-integration-court.mjs';
