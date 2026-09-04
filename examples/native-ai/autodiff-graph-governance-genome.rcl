@@ -1,0 +1,236 @@
+# AI002: RCL-owned computation-graph and reverse-mode semantic planning.
+# Numeric derivatives remain execution-provider work. This source owns graph
+# identity, ordered references, differentiability, StopGradient, reverse-edge
+# order and deterministic per-parameter contribution aggregation.
+reality AutodiffGraphGovernanceGenome {
+  reckon one_text(value : Text) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_text(first : Text, second : Text) -> Sequence = sequence_append(one_text(first), second)
+  reckon three_text(first : Text, second : Text, third : Text) -> Sequence = sequence_append(sequence_append(one_text(first), second), third)
+
+  reckon make_parameter(id : Text, gradient_identity : Text) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), "Parameter"), id), gradient_identity)
+  reckon parameter_id(parameter : Sequence) -> Text = sequence_get(parameter, 1)
+  reckon parameter_gradient_identity(parameter : Sequence) -> Text = sequence_get(parameter, 2)
+
+  reckon make_operation(id : Text, kind : Text, inputs : Sequence, output : Text) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(sequence_append(empty_sequence(), "Operation"), id),
+          kind),
+        inputs),
+      output)
+  reckon operation_id(operation : Sequence) -> Text = sequence_get(operation, 1)
+  reckon operation_kind(operation : Sequence) -> Text = sequence_get(operation, 2)
+  reckon operation_inputs(operation : Sequence) -> Sequence = sequence_get(operation, 3)
+  reckon operation_output(operation : Sequence) -> Text = sequence_get(operation, 4)
+
+  reckon make_stop_gradient(id : Text) -> Sequence = sequence_append(sequence_append(empty_sequence(), "StopGradient"), id)
+  reckon stop_gradient_id(stop : Sequence) -> Text = sequence_get(stop, 1)
+
+  reckon make_backward_edge(operation : Sequence, input_index : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), "BackwardEdge"),
+                operation_id(operation)),
+              operation_kind(operation)),
+            operation_output(operation)),
+          sequence_get(operation_inputs(operation), input_index)),
+        input_index),
+      reverse_rule(operation_kind(operation)))
+  reckon edge_input(edge : Sequence) -> Text = sequence_get(edge, 4)
+  reckon edge_rule(edge : Sequence) -> Text = sequence_get(edge, 6)
+
+  reckon make_accumulator(parameter : Sequence, contributions : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), "GradientAccumulator"),
+          parameter_id(parameter)),
+        contributions),
+      length(contributions))
+  reckon accumulator_parameter(accumulator : Sequence) -> Text = sequence_get(accumulator, 1)
+  reckon accumulator_contributions(accumulator : Sequence) -> Sequence = sequence_get(accumulator, 2)
+  reckon accumulator_count(accumulator : Sequence) -> Number = sequence_get(accumulator, 3)
+
+  reckon contains_text(values : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(values), false,
+      sequence_get(values, index) == target or contains_text(values, target, index + 1))
+
+  reckon contains_parameter(parameters : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(parameters), false,
+      parameter_id(sequence_get(parameters, index)) == target or contains_parameter(parameters, target, index + 1))
+
+  reckon contains_operation_id(operations : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      operation_id(sequence_get(operations, index)) == target or contains_operation_id(operations, target, index + 1, limit))
+
+  reckon contains_operation_output(operations : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      operation_output(sequence_get(operations, index)) == target or contains_operation_output(operations, target, index + 1, limit))
+
+  reckon parameter_ids_valid(parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(parameters), true,
+      parameter_id(sequence_get(parameters, index)) != "" and
+      parameter_gradient_identity(sequence_get(parameters, index)) != "" and
+      parameter_ids_valid(parameters, index + 1))
+
+  reckon contains_parameter_before(parameters : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      parameter_id(sequence_get(parameters, index)) == target or
+      contains_parameter_before(parameters, target, index + 1, limit))
+
+  reckon parameter_ids_unique(parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(parameters), true,
+      contains_parameter_before(parameters, parameter_id(sequence_get(parameters, index)), 0, index) == false and
+      parameter_ids_unique(parameters, index + 1))
+
+  reckon operation_ids_unique(operations : Sequence, index : Number) -> Truth =
+    choose(index >= length(operations), true,
+      contains_operation_id(operations, operation_id(sequence_get(operations, index)), 0, index) == false and
+      operation_ids_unique(operations, index + 1))
+
+  reckon operation_outputs_unique(operations : Sequence, index : Number) -> Truth =
+    choose(index >= length(operations), true,
+      contains_operation_output(operations, operation_output(sequence_get(operations, index)), 0, index) == false and
+      operation_outputs_unique(operations, index + 1))
+
+  reckon operation_differentiable(kind : Text) -> Truth =
+    kind == "add" or kind == "sub" or kind == "mul" or kind == "div" or
+    kind == "matmul" or kind == "transpose" or kind == "reshape" or
+    kind == "broadcast" or kind == "sum" or kind == "mean" or
+    kind == "exp" or kind == "log" or kind == "sqrt" or kind == "abs" or
+    kind == "activation" or kind == "softmax" or kind == "stop-gradient"
+
+  reckon reverse_rule(kind : Text) -> Text =
+    choose(kind == "add", "identity+unbroadcast",
+      choose(kind == "sub", "identity+negate+unbroadcast",
+        choose(kind == "mul", "peer-product+unbroadcast",
+          choose(kind == "div", "quotient-rule+unbroadcast",
+            choose(kind == "matmul", "adjoint-matmul",
+              choose(kind == "transpose", "inverse-permutation",
+                choose(kind == "reshape", "restore-input-shape",
+                  choose(kind == "broadcast", "reduce-to-input-shape",
+                    choose(kind == "sum", "broadcast-to-input-shape",
+                      choose(kind == "mean", "scaled-broadcast-to-input-shape",
+                        choose(kind == "exp", "multiply-forward-output",
+                          choose(kind == "log", "divide-forward-input",
+                            choose(kind == "sqrt", "divide-twice-forward-output",
+                              choose(kind == "abs", "frozen-zero-subgradient-sign",
+                                choose(kind == "activation", "activation-local-derivative",
+                                  choose(kind == "softmax", "jacobian-vector-product", "stop-propagation"))))))))))))))))
+
+  reckon input_ref_valid(parameters : Sequence, operations : Sequence, value : Text, current : Number) -> Truth =
+    contains_parameter(parameters, value, 0) or contains_operation_output(operations, value, 0, current)
+
+  reckon input_refs_valid(parameters : Sequence, operations : Sequence, inputs : Sequence, index : Number, current : Number) -> Truth =
+    choose(index >= length(inputs), true,
+      input_ref_valid(parameters, operations, sequence_get(inputs, index), current) and
+      input_refs_valid(parameters, operations, inputs, index + 1, current))
+
+  reckon operations_valid(parameters : Sequence, operations : Sequence, index : Number) -> Truth =
+    choose(index >= length(operations), true,
+      operation_id(sequence_get(operations, index)) != "" and
+      operation_kind(sequence_get(operations, index)) != "" and
+      operation_output(sequence_get(operations, index)) != "" and
+      contains_parameter(parameters, operation_output(sequence_get(operations, index)), 0) == false and
+      operation_differentiable(operation_kind(sequence_get(operations, index))) and
+      input_refs_valid(parameters, operations, operation_inputs(sequence_get(operations, index)), 0, index) and
+      operations_valid(parameters, operations, index + 1))
+
+  reckon stop_gradients_valid(parameters : Sequence, operations : Sequence, stops : Sequence, index : Number) -> Truth =
+    choose(index >= length(stops), true,
+      (contains_parameter(parameters, stop_gradient_id(sequence_get(stops, index)), 0) or
+        contains_operation_output(operations, stop_gradient_id(sequence_get(stops, index)), 0, length(operations))) and
+      stop_gradients_valid(parameters, operations, stops, index + 1))
+
+  reckon graph_valid(parameters : Sequence, operations : Sequence, stops : Sequence, loss : Text) -> Truth =
+    length(parameters) > 0 and length(operations) > 0 and loss != "" and
+    parameter_ids_valid(parameters, 0) and parameter_ids_unique(parameters, 0) and
+    operation_ids_unique(operations, 0) and operation_outputs_unique(operations, 0) and
+    operations_valid(parameters, operations, 0) and
+    operation_output(sequence_get(operations, length(operations) - 1)) == loss and
+    stop_gradients_valid(parameters, operations, stops, 0)
+
+  reckon contains_stop_gradient(stops : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(stops), false,
+      stop_gradient_id(sequence_get(stops, index)) == target or
+      contains_stop_gradient(stops, target, index + 1))
+
+  reckon operation_backward_edges(operation : Sequence, stops : Sequence, input_index : Number, edges : Sequence) -> Sequence =
+    choose(operation_kind(operation) == "stop-gradient" or input_index >= length(operation_inputs(operation)),
+      edges,
+      choose(contains_stop_gradient(stops, sequence_get(operation_inputs(operation), input_index), 0),
+        operation_backward_edges(operation, stops, input_index + 1, edges),
+        operation_backward_edges(
+          operation,
+          stops,
+          input_index + 1,
+          sequence_append(edges, make_backward_edge(operation, input_index)))))
+
+  reckon backward_edges(operations : Sequence, stops : Sequence, index : Number, edges : Sequence) -> Sequence =
+    choose(index < 0,
+      edges,
+      backward_edges(
+        operations,
+        stops,
+        index - 1,
+        sequence_concat(edges, operation_backward_edges(sequence_get(operations, index), stops, 0, empty_sequence()))))
+
+  reckon parameter_contributions(parameter : Sequence, edges : Sequence, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(edges), result,
+      parameter_contributions(
+        parameter,
+        edges,
+        index + 1,
+        choose(edge_input(sequence_get(edges, index)) == parameter_id(parameter),
+          sequence_append(result, sequence_get(edges, index)),
+          result)))
+
+  reckon accumulators(parameters : Sequence, edges : Sequence, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(parameters), result,
+      accumulators(
+        parameters,
+        edges,
+        index + 1,
+        sequence_append(result, make_accumulator(
+          sequence_get(parameters, index),
+          parameter_contributions(sequence_get(parameters, index), edges, 0, empty_sequence())))))
+
+  reckon default_parameters() -> Sequence =
+    sequence_append(
+      sequence_append(empty_sequence(), make_parameter("x", "parameter:x")),
+      make_parameter("w", "parameter:w"))
+  reckon default_operations() -> Sequence =
+    sequence_append(
+      sequence_append(empty_sequence(), make_operation("project", "matmul", two_text("x", "w"), "projected")),
+      make_operation("loss", "mean", one_text("projected"), "loss"))
+  reckon default_stop_gradients() -> Sequence = empty_sequence()
+  reckon default_loss() -> Text = "loss"
+  reckon parameters() -> Sequence = default_parameters()
+  reckon operations() -> Sequence = default_operations()
+  reckon stop_gradients() -> Sequence = default_stop_gradients()
+  reckon loss() -> Text = default_loss()
+
+  facet contract.id : Text = "rcl-gap-ai002-graph-governance-v0.1"
+  facet contract.profile : Text = "RCL_OWNED_REVERSE_MODE_GRAPH_PLAN_CANDIDATE"
+  facet graph.parameters : Sequence = parameters()
+  facet graph.operations : Sequence = operations()
+  facet graph.stop_gradients : Sequence = stop_gradients()
+  facet graph.loss : Text = loss()
+  facet graph.valid : Truth = graph_valid(graph.parameters, graph.operations, graph.stop_gradients, graph.loss)
+  facet backward.edges : Sequence = choose(graph.valid, backward_edges(graph.operations, graph.stop_gradients, length(graph.operations) - 1, empty_sequence()), empty_sequence())
+  facet gradient.accumulators : Sequence = choose(graph.valid, accumulators(graph.parameters, backward.edges, 0, empty_sequence()), empty_sequence())
+  facet backward.edge_count : Number = length(backward.edges)
+  facet gradient.accumulator_count : Number = length(gradient.accumulators)
+  facet evaluation.graph_valid : Truth = graph.valid
+  facet evaluation.backward_edges_exist : Truth = graph.valid and backward.edge_count > 0
+  facet evaluation.deterministic_accumulation : Truth = graph.valid and gradient.accumulator_count == length(graph.parameters)
+  facet evaluation.stop_gradient_blocks : Truth = length(operation_backward_edges(make_operation("stop", "stop-gradient", one_text("x"), "stopped"), one_text("x"), 0, empty_sequence())) == 0
+  facet evidence.execution_path : Text = "RCL_GRAPH_VALIDATION_TO_REVERSE_RULES_TO_DETERMINISTIC_GRADIENT_ACCUMULATORS_TO_PROVIDER_KERNEL"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_NUMERIC_KERNEL_OR_K400_PROMOTION"
+}

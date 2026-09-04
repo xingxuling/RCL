@@ -1,0 +1,81 @@
+{
+  "format": "rcl.gap.ai002.selfhost-autodiff-graph-governance-candidate.v0.1",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "semanticOwner": "RCL",
+  "numericExecutionOwner": "external Autodiff/Tensor Provider remains separate",
+  "sourceHashes": {
+    "examples/native-ai/autodiff-graph-governance-genome.rcl": "62f0a9fd21401da9f3e574aa046fd6c48e694f5b1ab55511c1613cde64bced91",
+    "src/selfhost-autodiff-graph-governance.mjs": "02eb9363a8b3d936aaf9f51df5fd977fd1d2dde56e60a842c3439641da297e86",
+    "tests/selfhost-autodiff-graph-governance.test.mjs": "c047e7223cdc46fb7a32ca2762f4f519ecf5fc1abd5fc0fb384306de3bdaa53a",
+    "docs/native-ai/AI002_SELFHOST_AUTODIFF_GRAPH_GOVERNANCE_CANDIDATE_v0.1.md": "6df12aff72d2b9b60bb278f1d8c42789863077e8e7a43db82b4ea710da613b40"
+  },
+  "localVerification": {
+    "command": "node --test --test-concurrency=1 tests/selfhost-autodiff-graph-governance.test.mjs",
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "nativeStateRootVerified": true,
+    "sourceSelfhostCli": "node src/cli.mjs native examples/native-ai/autodiff-graph-governance-genome.rcl",
+    "sourceSelfhostCliPassed": true
+  },
+  "graphs": {
+    "simple": {
+      "graphRoot": "abe247a48373dd93faa6d9a99b70cfbc091dc0a0756249ec4c660b5aabea7ea7",
+      "renderedSourceSha256": "7f0a91fea47ef699351879f47586cbd43ebed95ebf2b27d287f617c20e6182a2",
+      "sourceRoot": "2d5262b1a2fd575adb5a3b10b8ef5b3d1893de6b7172332ebde388aeef0fa891",
+      "semanticStateRoot": "8bee019395ecaa5e2b0d1e68e94ce63c5dcc5610380159d3ba20e1e7ac6d6774",
+      "valid": true,
+      "edgeCount": 3,
+      "edgeTargets": [["loss", "projected", "scaled-broadcast-to-input-shape"], ["project", "x", "adjoint-matmul"], ["project", "w", "adjoint-matmul"]],
+      "accumulatorCounts": [["x", 1], ["w", 1]],
+      "evaluation": {"graphValid": true, "backwardEdgesExist": true, "deterministicAccumulation": true, "stopGradientBlocks": true}
+    },
+    "multiUse": {
+      "graphRoot": "74b4528a61e5427c765a5957820d476ebbaa666182e62b589e016f2dc05b0a9a",
+      "renderedSourceSha256": "86eb2b9feff641e00df476df501a63e332ea395f2b2a35d1d560d5cbe9dfa30c",
+      "sourceRoot": "0f708b43fcfbb39cf54bc2dde876bcf0c97a414770fd9877b516a2e430d61528",
+      "semanticStateRoot": "f129f312927957c4ce795c17932742fce4e2bc9030bf5a2225ab9e0fcc352a4f",
+      "valid": true,
+      "edgeCount": 5,
+      "edgeTargets": [["loss", "right", "scaled-broadcast-to-input-shape"], ["right", "a", "identity+unbroadcast"], ["right", "left", "identity+unbroadcast"], ["left", "a", "peer-product+unbroadcast"], ["left", "b", "peer-product+unbroadcast"]],
+      "accumulatorCounts": [["a", 2], ["b", 1]],
+      "evaluation": {"graphValid": true, "backwardEdgesExist": true, "deterministicAccumulation": true, "stopGradientBlocks": true}
+    },
+    "stopGradient": {
+      "graphRoot": "f02c85eae246c0e9318cc17a598e41b3e7f2e8890b59ceada44a76df4da8a170",
+      "renderedSourceSha256": "b55dc95d5d355c8d22efe49ca511356c1e7e0f3ad34917a071a68fcaacefd8c0",
+      "sourceRoot": "d3b20a8fe643eefb10dab9acb7d1a90dec901e257d3ff1cbcb05b26768048239",
+      "semanticStateRoot": "2fba5c4315d5c1b88fe26e550cfebb3288f92e473cfc7a042fb8f5a3aeee9ce0",
+      "valid": true,
+      "edgeCount": 3,
+      "edgeTargets": [["loss", "right", "scaled-broadcast-to-input-shape"], ["right", "left", "identity+unbroadcast"], ["left", "b", "peer-product+unbroadcast"]],
+      "accumulatorCounts": [["a", 0], ["b", 1]],
+      "evaluation": {"graphValid": true, "backwardEdgesExist": true, "deterministicAccumulation": true, "stopGradientBlocks": true}
+    },
+    "invalid": {
+      "graphRoot": "a5d7eff65bab595d0f4e1a1b81ed6172fc8588ee82c6e94b3491c0b59843915e",
+      "renderedSourceSha256": "3ff45f34ad128e861b41a42ed7ca98b2475ff1fdc648e0efe6cb9ccf88065655",
+      "sourceRoot": "a49e3094f45b1c8cb75a24b7138ae15c0cfd44f046546744fb2bbb379269c1a9",
+      "semanticStateRoot": "2f28816182af8a4333fbe07418368ce17ee117bc309de183549e841289650397",
+      "valid": false,
+      "edgeCount": 0,
+      "edgeTargets": [],
+      "accumulatorCounts": [],
+      "evaluation": {"graphValid": false, "backwardEdgesExist": false, "deterministicAccumulation": false, "stopGradientBlocks": true}
+    }
+  },
+  "checks": {
+    "parameterIdentityPresence": true,
+    "duplicateIdentityRejection": true,
+    "orderedForwardReferenceRejection": true,
+    "differentiableOperationPolicy": true,
+    "reverseEdgeOrder": true,
+    "stopGradientFiltering": true,
+    "deterministicContributionGrouping": true,
+    "executionCrossedNativeRclVm": true
+  },
+  "claimsNotGranted": ["numeric_derivative_correctness", "shape_aware_reverse_rules", "tensor_kernel_execution", "optimizer_execution", "gpu_execution", "distributed_autodiff", "production_training", "K400_PROMOTION"],
+  "nextGap": "Absorb shape-aware reverse rules and broader graph reachability/topological normalization, then bind numeric reverse execution differential evidence and canonical promotion.",
+  "reportRoot": "224a1243978adefe33edf72a242648b05596b0c351b406fb351cb1d85c4a6aa6"
+}
