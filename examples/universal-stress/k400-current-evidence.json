@@ -2588,6 +2588,141 @@
       ]
     },
     {
+      "id": "game-runtime::game",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedSha": "3a40aa4ad05be267aaf8b90540ba1590d5af2891",
+      "lastVerifiedDate": "2026-09-04",
+      "knownLimits": [
+        "Evidence is limited to the K04StarRunner deterministic JavaScript fixed-step runtime and generated Canvas projection.",
+        "Native Godot, Unity, console, browser execution, broad game-genre coverage and arbitrary game generation remain unverified.",
+        "RCL owns state, transition guards, authority and preserve semantics; the JavaScript runtime is a lowered execution organ."
+      ],
+      "relatedKillerTasks": [
+        "K04"
+      ],
+      "requiredGenes": [
+        "fixed-step-physics",
+        "transactional-input",
+        "collision-and-collection",
+        "scene-projection",
+        "authority-preservation"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/k04-game-ai-generation-contract.v0.1.json",
+            "examples/universal-stress/evidence/k04-game-ai-generate/receipt.json",
+            "examples/universal-stress/evidence/k04-game-ai-generate/github-replay.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Three independent K04 game repairs restored canonical bytes; GitHub run 33930267375."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json",
+            "examples/universal-stress/evidence/k04-game-runtime-v0.1.json"
+          ],
+          "note": "Deterministic fixed-step K04 game runtime receipt examples/universal-stress/evidence/k04-game-runtime-v0.1.json."
+        }
+      },
+      "changes": [
+        {
+          "id": "fixed-step-2d-physics",
+          "kind": "candidate-gene",
+          "scope": [
+            "game-runtime",
+            "realtime-runtime",
+            "embedded-runtime",
+            "simulation-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "Fixed-step state integration is reusable beyond one game title."
+        },
+        {
+          "id": "transactional-input-and-collision",
+          "kind": "candidate-gene",
+          "scope": [
+            "game-runtime",
+            "browser",
+            "android",
+            "rncs-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "Input, collision and governed state commit share an interactive runtime contract."
+        },
+        {
+          "id": "scene-projection",
+          "kind": "candidate-gene",
+          "scope": [
+            "game-runtime",
+            "browser",
+            "rncs-runtime",
+            "simulation-runtime"
+          ],
+          "generalPrimitive": true,
+          "justification": "State-bound 2D scene projection is not game-title-specific."
+        }
+      ]
+    },
+    {
       "id": "compiler-runtime::algorithm",
       "coverageMode": "native-semantic",
       "lastVerifiedSha": "9c3980a58811fa21c26c2ce9e34f37e05db36356",
@@ -2852,6 +2987,7 @@
     "examples/universal-stress/evidence/k04-game-runtime-v0.1.json",
     "examples/universal-stress/k04-game-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k04-game-ai-generate/receipt.json",
+    "examples/universal-stress/evidence/k04-game-ai-generate/github-replay.json",
     "examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json",
     "examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json",
     "examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json",
@@ -2930,7 +3066,7 @@
     "K03 real emulator receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf closes EXECUTE, CORRECT and PERFORMANCE for K083, K085 and K098; their independent AI_GENERATE receipt is separately admitted.",
     "K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run 32871776578.",
     "K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run 32876898001.",
-    "K04 has deterministic fixed-step game execution and a 3/3 local independent game repair candidate; K188 remains UNTESTED until GitHub-hosted replay is bound.",
+    "K04 closes K188 through deterministic fixed-step game execution, three independent game repairs and GitHub run 33930267375.",
     "K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run 32880432503.",
     "K326 closes compiler-runtime::database through 20/20 native relational-transaction rounds, 3/3 independent repairs and GitHub run 33093366736.",
     "K336 closes compiler-runtime::automation through 20/20 native governed-workflow rounds, 3/3 independent repairs and GitHub run 33135430077.",
