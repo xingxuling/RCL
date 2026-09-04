@@ -51,9 +51,10 @@ CLI 入口已经接上：
 ```text
 rcl application-frameworks
 rcl application-framework-build <file.rcl> <output-dir> [framework-spec.json]
+rcl application-framework-verify <output-dir>
 ```
 
-它们只暴露候选目录和候选产物生成，不改变 candidate-only、host replay、设备与发布证据边界。
+它们只暴露候选目录、候选产物生成和静态产物校验，不改变 candidate-only、host replay、设备与发布证据边界。
 
 它不负责：
 
