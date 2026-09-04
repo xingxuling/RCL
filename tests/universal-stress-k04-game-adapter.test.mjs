@@ -47,3 +47,16 @@ test('K04 cannot pass when host execution or negative controls are missing', () 
   assert.equal(claim.status, STRESS_STATUS.BLOCKED);
   assert.deepEqual(summarizeK04Blockers(input), ['GAME_RUNTIME_NOT_EXECUTED', 'AUTHORITY_NEGATIVE_NOT_CLOSED', 'AI_GENERATE_UNVERIFIED']);
 });
+
+test('K04 admits a separately verified independent AI generation gate without relabeling direct evidence', () => {
+  const input = evidence();
+  const aiGenerateGate = {
+    status: STRESS_STATUS.PASS,
+    evidence: ['examples/universal-stress/k04-game-ai-generation-contract.v0.1.json', 'examples/universal-stress/evidence/k04-game-ai-generate/receipt.json', 'examples/universal-stress/evidence/k04-game-ai-generate/github-replay.json'],
+    note: 'Three independent K04 game repairs restored canonical bytes and were hosted-replay bound.',
+  };
+  const claim = buildK04ClaimFromDirectEvidence(input, { aiGenerateGate });
+  assert.equal(claim.status, STRESS_STATUS.PASS);
+  assert.equal(claim.gates.AI_GENERATE.status, STRESS_STATUS.PASS);
+  assert.deepEqual(summarizeK04Blockers(input, { aiGenerateGate }), []);
+});

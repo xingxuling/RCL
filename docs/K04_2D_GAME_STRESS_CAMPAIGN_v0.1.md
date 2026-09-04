@@ -2,7 +2,7 @@
 
 Cell: game-runtime::game  
 Coverage mode: lowered-execution  
-First-slice result: BLOCKED until the direct evidence runner is executed in the repository; the independent AI_GENERATE gate remains unverified.
+First-slice result: BLOCKED until the direct evidence runner and the hosted independent AI_GENERATE replay are both bound to the repository. The local generator receipt is candidate-only until that hosted authority exists.
 
 ## Goal
 
@@ -48,10 +48,12 @@ The included K04StarRunner specimen provides:
 ~~~
 node scripts/build-k04-2d-game.mjs
 node scripts/run-k04-direct-evidence.mjs
+node scripts/run-k04-game-runtime-evidence.mjs
+node scripts/run-k04-game-independent-ai-generation.mjs
 node --test --test-concurrency=1 tests/game-2d-compiler.test.mjs tests/universal-stress-k04-game-adapter.test.mjs
 ~~~
 
-The evidence runner writes examples/k04-direct-evidence-2026-08-08.json. It must be run against the checked-out repository before its report is treated as an execution receipt.
+The evidence runner writes examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json. It must be run against the checked-out repository before its report is treated as an execution receipt.
 
 ## Nine gates
 
@@ -71,7 +73,7 @@ EVIDENCE     PASS
 OVERALL      BLOCKED
 ~~~
 
-AI_GENERATE is not satisfied by the fact that the implementation was AI-assisted. It requires an independently specified, reproducible generation or repair trial that preserves prior game and language evidence.
+AI_GENERATE is not satisfied by the fact that the implementation was AI-assisted. The frozen contract `examples/universal-stress/k04-game-ai-generation-contract.v0.1.json` requires three fresh Codex CLI sessions, exact canonical-byte restoration and a GitHub hosted replay. The checked-in local receipt is `CANDIDATE` only until `github-replay.json` is bound.
 
 ## What this does not claim
 

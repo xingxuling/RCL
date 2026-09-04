@@ -3,7 +3,7 @@ import { COVERAGE_MODE, STRESS_STATUS, evaluateStressCell } from './universal-pr
 
 export const K04_CELL_ID = 'game-runtime::game';
 
-export function buildK04ClaimFromDirectEvidence(evidence) {
+export function buildK04ClaimFromDirectEvidence(evidence, options = {}) {
   if (!evidence || evidence.schema !== 'rcl.universal-stress.k04.direct-evidence.v0.1') {
     throw new Error('RCL_STRESS_K04_INVALID_EVIDENCE');
   }
@@ -12,6 +12,13 @@ export function buildK04ClaimFromDirectEvidence(evidence) {
     evidence: [evidence.evidenceRoot],
     note: 'K04 direct evidence ' + evidence.evidenceRoot,
   }]));
+  if (options.aiGenerateGate) {
+    gates.AI_GENERATE = {
+      status: options.aiGenerateGate.status,
+      evidence: [...(options.aiGenerateGate.evidence ?? [])],
+      ...(options.aiGenerateGate.note ? { note: options.aiGenerateGate.note } : {}),
+    };
+  }
   return evaluateStressCell({
     id: K04_CELL_ID,
     environment: 'game-runtime',
@@ -45,12 +52,12 @@ export function loadK04Claim(filePath) {
   return buildK04ClaimFromDirectEvidence(JSON.parse(fs.readFileSync(filePath, 'utf8')));
 }
 
-export function summarizeK04Blockers(evidence) {
+export function summarizeK04Blockers(evidence, options = {}) {
   const blockers = [];
   if (evidence.gameRuntime?.status !== 'EXECUTED') blockers.push('GAME_RUNTIME_NOT_EXECUTED');
   if (evidence.hostSimulation?.positive?.pass !== true) blockers.push('POSITIVE_REPLAY_NOT_CLOSED');
   if (evidence.hostSimulation?.preserveNegative?.pass !== true) blockers.push('PRESERVE_NEGATIVE_NOT_CLOSED');
   if (evidence.hostSimulation?.authorityNegative?.pass !== true) blockers.push('AUTHORITY_NEGATIVE_NOT_CLOSED');
-  if (evidence.gates?.AI_GENERATE !== STRESS_STATUS.PASS) blockers.push('AI_GENERATE_UNVERIFIED');
+  if ((options.aiGenerateGate?.status ?? evidence.gates?.AI_GENERATE) !== STRESS_STATUS.PASS) blockers.push('AI_GENERATE_UNVERIFIED');
   return blockers;
 }

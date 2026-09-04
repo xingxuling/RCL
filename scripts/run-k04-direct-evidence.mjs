@@ -13,7 +13,7 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const rclPath = process.argv[2] ?? path.join(root, 'examples', 'k04-2d-game.rcl');
 const specPath = process.argv[3] ?? path.join(root, 'examples', 'k04-2d-game.game.json');
 const outputPath = process.argv[4] ?? path.join(root, 'output', 'universal-stress-k04');
-const evidencePath = process.argv[5] ?? path.join(root, 'examples', 'k04-direct-evidence-2026-08-08.json');
+const evidencePath = process.argv[5] ?? path.join(root, 'examples', 'universal-stress', 'evidence', 'k04-game-direct-evidence-v0.1.json');
 
 function collectEvents() {
   return [
@@ -93,7 +93,13 @@ const withoutRoot = {
     status: 'PASS',
     compilerVersion: manifest.compilerVersion,
     manifestRoot: manifest.manifestRoot,
-    generatedProject: { ...generated, root: 'output/universal-stress-k04' },
+    generatedProject: {
+      status: generated.status,
+      root: 'output/universal-stress-k04',
+      program: generated.program,
+      manifestRoot: generated.manifestRoot,
+      coverageMode: generated.coverageMode,
+    },
   },
   gameRuntime: {
     status: hostPositivePass ? 'EXECUTED' : 'FAILED',
@@ -125,7 +131,9 @@ const withoutRoot = {
     'One K04 vertical slice does not establish universal game-language capability.',
   ],
 };
-const report = { ...withoutRoot, evidenceRoot: evidenceRoot(withoutRoot) };
+const stableWithoutRoot = structuredClone(withoutRoot);
+delete stableWithoutRoot.gameRuntime.elapsedMs;
+const report = { ...withoutRoot, evidenceRoot: evidenceRoot(stableWithoutRoot) };
 fs.mkdirSync(path.dirname(evidencePath), { recursive: true });
 fs.writeFileSync(evidencePath, JSON.stringify(report, null, 2) + '\n', 'utf8');
 console.log(JSON.stringify(report, null, 2));

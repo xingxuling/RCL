@@ -1,0 +1,98 @@
+reality K04StarRunner {
+  facet game.status : Text = "ready"
+  facet game.score : Number = 0
+  facet game.frame : Number = 0
+  facet game.last_action : Text = "boot"
+  facet game.star_collected : Truth = false
+  facet game.star_x : Number = 220
+  facet game.star_y : Number = 124
+  facet player.x : Number = 24
+  facet player.y : Number = 136
+  facet player.vx : Number = 0
+  facet player.vy : Number = 0
+  facet player.grounded : Truth = true
+
+  subject player {
+    warrant game.write on game
+  }
+
+  emergence startGame {
+    cause player
+    when game.status == "ready"
+    needs game.write on game
+    alter game.status <- "running"
+    alter game.last_action <- "start"
+    preserve game.score >= 0
+    witness "rcl:k04:start"
+  }
+
+  emergence moveRight {
+    cause player
+    when game.status == "running"
+    needs game.write on game
+    alter player.vx <- 4
+    alter game.last_action <- "right"
+    preserve player.x >= 0
+    witness "rcl:k04:right"
+  }
+
+  emergence moveLeft {
+    cause player
+    when game.status == "running"
+    needs game.write on game
+    alter player.vx <- -4
+    alter game.last_action <- "left"
+    preserve player.x >= 0
+    witness "rcl:k04:left"
+  }
+
+  emergence jump {
+    cause player
+    when player.grounded == true
+    needs game.write on game
+    alter player.vy <- -12
+    alter player.grounded <- false
+    alter game.last_action <- "jump"
+    preserve player.vy <= 0
+    witness "rcl:k04:jump"
+  }
+
+  emergence advanceFrame {
+    cause player
+    when game.status == "running"
+    needs game.write on game
+    alter game.frame <- game.frame + 1
+    alter game.last_action <- "tick"
+    preserve game.frame >= 0
+    witness "rcl:k04:tick"
+  }
+
+  emergence collectStar {
+    cause player
+    when player.x >= game.star_x
+    needs game.write on game
+    alter game.score <- game.score + 1
+    alter game.star_collected <- true
+    alter game.last_action <- "collect"
+    preserve game.score >= 0
+    witness "rcl:k04:collect"
+  }
+
+  emergence resetGame {
+    cause player
+    when game.score >= 0
+    needs game.write on game
+    alter game.status <- "ready"
+    alter game.score <- 0
+    alter game.frame <- 0
+    alter game.last_action <- "reset"
+    alter game.star_collected <- false
+    alter player.x <- 24
+    alter player.y <- 136
+    alter player.vx <- 0
+    alter player.vy <- 0
+    alter player.grounded <- true
+    preserve game.score >= 0
+    witness "rcl:k04:reset"
+  }
+}

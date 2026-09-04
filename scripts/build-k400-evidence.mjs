@@ -14,6 +14,7 @@ import { verifyK03AndroidEmulatorEvidence } from './verify-k03-android-emulator-
 import { verifyK03AiGenerationReceipt } from './verify-k03-ai-generation-receipt.mjs';
 import { verifyK04ServerRuntimeEvidence } from './verify-k04-server-runtime-evidence.mjs';
 import { verifyK04ServerAiGenerationReceipt } from './verify-k04-server-ai-generation-receipt.mjs';
+import { verifyK04GameAiGenerationReceipt } from './verify-k04-game-ai-generation-receipt.mjs';
 import { verifyK327CompilerAiGenerationReceipt } from './verify-k327-compiler-ai-generation-receipt.mjs';
 import { verifyK326CompilerDatabaseReceipt } from './verify-k326-compiler-database-receipt.mjs';
 import { verifyK336CompilerAutomationReceipt } from './verify-k336-compiler-automation-receipt.mjs';
@@ -49,6 +50,11 @@ const k04ServerRuntimePath = 'examples/universal-stress/evidence/k04-server-runt
 const k04ServerAiContractPath = 'examples/universal-stress/k04-server-ai-generation-contract.v0.1.json';
 const k04ServerAiReceiptPath = 'examples/universal-stress/evidence/k04-server-ai-generate/receipt.json';
 const k04ServerAiGithubReplayPath = 'examples/universal-stress/evidence/k04-server-ai-generate/github-replay.json';
+const k04GameDirectEvidencePath = 'examples/universal-stress/evidence/k04-game-direct-evidence-v0.1.json';
+const k04GameRuntimePath = 'examples/universal-stress/evidence/k04-game-runtime-v0.1.json';
+const k04GameAiContractPath = 'examples/universal-stress/k04-game-ai-generation-contract.v0.1.json';
+const k04GameAiReceiptPath = 'examples/universal-stress/evidence/k04-game-ai-generate/receipt.json';
+const k04GameAiGithubReplayPath = 'examples/universal-stress/evidence/k04-game-ai-generate/github-replay.json';
 const k327CompilerAiContractPath = 'examples/universal-stress/k327-compiler-ai-generation-contract.v0.1.json';
 const k327CompilerAiReceiptPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/receipt.json';
 const k327CompilerAiGithubReplayPath = 'examples/universal-stress/evidence/k327-compiler-ai-generate/github-replay.json';
@@ -122,6 +128,7 @@ function directGates(receipt, receiptPath, notes = {}) {
 const nativeUi = readJson(nativeUiPath);
 const k02 = readJson(k02Path);
 const k03 = readJson(k03Path);
+const k04Game = readJson(k04GameDirectEvidencePath);
 const k08 = readJson(k08Path);
 const k08TensorMlp = readJson(k08TensorMlpPath);
 const k08TensorLiveness = readJson(k08TensorLivenessPath);
@@ -139,6 +146,8 @@ const k04ServerRuntime = await verifyK04ServerRuntimeEvidence();
 if (!k04ServerRuntime.admitted) throw new Error('RCL_K400_K04_SERVER_RUNTIME_EVIDENCE_NOT_ADMITTED');
 const k04ServerAi = await verifyK04ServerAiGenerationReceipt();
 const k04ServerAiAdmitted = k04ServerAi.aiGenerateAdmission === 'PASS';
+const k04GameAi = verifyK04GameAiGenerationReceipt();
+const k04GameAiAdmitted = k04GameAi.aiGenerateAdmission === 'PASS';
 const k327CompilerAi = verifyK327CompilerAiGenerationReceipt();
 const k327CompilerAiAdmitted = k327CompilerAi.aiGenerateAdmission === 'PASS';
 const k326Ai = verifyK326CompilerDatabaseReceipt();
@@ -297,6 +306,55 @@ if (k04ServerAiAdmitted) {
       }],
     });
   }
+}
+
+if (k04GameAiAdmitted) {
+  const gameGates = Object.fromEntries(UNIVERSAL_STRESS_GATES.map((gate) => [gate, {
+    status: gate === 'AI_GENERATE' ? STRESS_STATUS.PASS : (k04Game.gates?.[gate] ?? STRESS_STATUS.UNVERIFIED),
+    evidence: gate === 'AI_GENERATE'
+      ? [k04GameAiContractPath, k04GameAiReceiptPath, k04GameAiGithubReplayPath, k04GameRuntimePath]
+      : [k04GameDirectEvidencePath, k04GameRuntimePath],
+    note: gate === 'AI_GENERATE'
+      ? `Three independent K04 game repairs restored canonical bytes; GitHub run ${k04GameAi.githubAuthority.runId}.`
+      : `Deterministic fixed-step K04 game runtime receipt ${k04GameRuntimePath}.`,
+  }]));
+  directClaims.push({
+    id: 'game-runtime::game',
+    coverageMode: COVERAGE_MODE.LOWERED_EXECUTION,
+    lastVerifiedSha: k04GameAi.githubAuthority.sourceCommit,
+    lastVerifiedDate: k04GameAi.githubAuthority.verifiedAt.slice(0, 10),
+    knownLimits: [
+      'Evidence is limited to the K04StarRunner deterministic JavaScript fixed-step runtime and generated Canvas projection.',
+      'Native Godot, Unity, console, browser execution, broad game-genre coverage and arbitrary game generation remain unverified.',
+      'RCL owns state, transition guards, authority and preserve semantics; the JavaScript runtime is a lowered execution organ.',
+    ],
+    relatedKillerTasks: ['K04'],
+    requiredGenes: ['fixed-step-physics', 'transactional-input', 'collision-and-collection', 'scene-projection', 'authority-preservation'],
+    gates: gameGates,
+    changes: [
+      {
+        id: 'fixed-step-2d-physics',
+        kind: 'candidate-gene',
+        scope: ['game-runtime', 'realtime-runtime', 'embedded-runtime', 'simulation-runtime'],
+        generalPrimitive: true,
+        justification: 'Fixed-step state integration is reusable beyond one game title.',
+      },
+      {
+        id: 'transactional-input-and-collision',
+        kind: 'candidate-gene',
+        scope: ['game-runtime', 'browser', 'android', 'rncs-runtime'],
+        generalPrimitive: true,
+        justification: 'Input, collision and governed state commit share an interactive runtime contract.',
+      },
+      {
+        id: 'scene-projection',
+        kind: 'candidate-gene',
+        scope: ['game-runtime', 'browser', 'rncs-runtime', 'simulation-runtime'],
+        generalPrimitive: true,
+        justification: 'State-bound 2D scene projection is not game-title-specific.',
+      },
+    ],
+  });
 }
 
 if (k321K322Admitted) {
@@ -687,6 +745,11 @@ const evidence = {
     k04ServerAiContractPath,
     k04ServerAiReceiptPath,
     ...(k04ServerAiAdmitted ? [k04ServerAiGithubReplayPath] : []),
+    k04GameDirectEvidencePath,
+    k04GameRuntimePath,
+    k04GameAiContractPath,
+    k04GameAiReceiptPath,
+    ...(k04GameAiAdmitted ? [k04GameAiGithubReplayPath] : []),
     k327CompilerAiContractPath,
     k327CompilerAiReceiptPath,
     ...(k327CompilerAiAdmitted ? [k327CompilerAiGithubReplayPath] : []),
@@ -775,6 +838,9 @@ const evidence = {
     k04ServerAiAdmitted
       ? `K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run ${k04ServerAi.githubAuthority.runId}.`
       : 'K04 has 20/20 rooted loopback runtime rounds and a 3/3 local independent Server repair candidate; K124 and K138 remain UNTESTED until GitHub-hosted replay is bound.',
+    k04GameAiAdmitted
+      ? `K04 closes K188 through deterministic fixed-step game execution, three independent game repairs and GitHub run ${k04GameAi.githubAuthority.runId}.`
+      : 'K04 has deterministic fixed-step game execution and a 3/3 local independent game repair candidate; K188 remains UNTESTED until GitHub-hosted replay is bound.',
     k327CompilerAiAdmitted
       ? `K327 closes compiler-runtime::compiler through 3/3 new independent builtin-lowering repairs, separately admitted fixed-point reuse and GitHub Linux/Windows run ${k327CompilerAi.githubAuthority.runId}.`
       : 'K327 has a 3/3 local independent compiler builtin-lowering repair candidate; it remains UNTESTED until GitHub focused and Windows replay are bound.',
