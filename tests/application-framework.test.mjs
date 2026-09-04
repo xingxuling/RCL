@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -102,4 +103,28 @@ test('application framework builder writes inspectable multi-target candidate ar
   assert.equal(JSON.parse(fs.readFileSync(path.join(outputPath, 'semantic-trace.json'), 'utf8')).externalRuntimeExecuted, false);
   assert.match(fs.readFileSync(path.join(outputPath, 'web', 'index.html'), 'utf8'), /window\.RCLNativeUI/u);
   assert.match(fs.readFileSync(path.join(outputPath, 'android', 'MainActivity.java'), 'utf8'), /extends Activity/u);
+});
+
+test('CLI exposes framework discovery and candidate artifact generation', () => {
+  const list = JSON.parse(execFileSync(process.execPath, ['src/cli.mjs', 'application-frameworks'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }));
+  assert.equal(list.assessment.status, 'CANDIDATE_ONLY');
+  assert.deepEqual(list.assessment.frameworkCandidates, ['rcl.ui.native-app.v0.1']);
+
+  const outputPath = fs.mkdtempSync(path.join(ROOT, 'output', 'cli-application-framework-'));
+  const built = JSON.parse(execFileSync(process.execPath, [
+    'src/cli.mjs',
+    'application-framework-build',
+    path.join(ROOT, 'examples/native-ui/counter.rcl'),
+    outputPath,
+  ], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }));
+  assert.equal(built.status, 'CANDIDATE_ARTIFACTS_GENERATED');
+  assert.equal(built.traceStatus, 'PASS');
+  assert.equal(built.evidenceBoundary.browserSession, 'NOT_RUN');
+  assert.equal(fs.existsSync(path.join(outputPath, 'application-framework-build.json')), true);
 });
