@@ -1,0 +1,69 @@
+{
+  "format": "ugis.action-ir.v0.1",
+  "version": "0.1.0",
+  "source": {
+    "projection": "ugis.sword_arena.v0.3",
+    "exchange": 1,
+    "regime": "free",
+    "route_id": "hold_measure",
+    "route_name_zh": "守间合",
+    "wanfeng_form": null
+  },
+  "subjects": {
+    "actor": "fighter:a",
+    "opponent": "fighter:b"
+  },
+  "intent": {
+    "locomotion": {
+      "mode": "hold",
+      "direction": "neutral",
+      "magnitude_milli": 120,
+      "reference_frame": "actor-local-opponent-facing",
+      "preserve_live_base": true
+    },
+    "facing": {
+      "mode": "track-opponent",
+      "reference": "fighter:b"
+    },
+    "measure": {"mode": "maintain"},
+    "line": {"mode": "observe"},
+    "contact": {"mode": "avoid"},
+    "resolution": {
+      "mode": "control",
+      "terminal_route": false,
+      "competition_only": true
+    }
+  },
+  "timeline": {
+    "unit": "normalized-milli",
+    "phases": [
+      {"id": "prepare", "start_milli": 0, "end_milli": 220},
+      {"id": "execute", "start_milli": 220, "end_milli": 730},
+      {"id": "recover", "start_milli": 730, "end_milli": 1000}
+    ]
+  },
+  "constraints": [
+    "preserve-axis",
+    "preserve-live-base",
+    "respect-boundary",
+    "competition-resolution-only",
+    "no-anatomical-targeting",
+    "no-harm-optimization"
+  ],
+  "provider_hints": {
+    "animation_tags": ["stance.live", "locomotion.measure-hold"],
+    "root_motion_policy": "provider-resolves-from-reference-frame",
+    "weapon_visual_policy": "abstract-training-weapon",
+    "contact_visual_policy": "competition-cue-only"
+  },
+  "evidence": {
+    "potential_milli": 0,
+    "route_cost_milli": 0,
+    "safe_corridor_milli": 0,
+    "measure_control_milli": 0,
+    "measure_route_fit_milli": 0,
+    "measure_observation_quality_milli": 0,
+    "exchange_utility_milli": 0
+  },
+  "root": "282785e8df9bfd9e528fd07f91f3c1c76dc17d01d390b23dc0c84c39abc05719"
+}
