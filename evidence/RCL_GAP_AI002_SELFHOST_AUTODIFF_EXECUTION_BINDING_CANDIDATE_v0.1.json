@@ -1,0 +1,192 @@
+{
+  "format": "rcl.gap.ai002.selfhost-autodiff-execution-binding.local-evidence.v0.1",
+  "status": "PASS_LOCAL_RCL_ADMISSION_PROVIDER_BINDING_CANDIDATE",
+  "sourceCommit": "0b46847d703920073aabc101cc9939d887f93976",
+  "semanticOwner": "RCL typed Tensor shape semantics + RCL Autodiff graph governance",
+  "executionOwner": "rcl-tensor-autodiff-rust-v0.1",
+  "checks": {
+    "shapeAdmission": true,
+    "graphAdmission": true,
+    "storageAdmission": true,
+    "providerExecution": true,
+    "reverseEdgeParity": true,
+    "gradientShapeValid": true,
+    "gradientParameterParity": true
+  },
+  "report": {
+    "request": {
+      "format": "rcl.autodiff-graph-execution-request.v0.1",
+      "loss": "loss",
+      "tensorCount": 2,
+      "operationCount": 4,
+      "parameterCount": 2,
+      "stopGradientCount": 0
+    },
+    "admission": {
+      "shape": {
+        "accepted": true,
+        "reportRoot": "d4d219d7605af86ee2a9fa9b3efe9bd9cc3e98edc0ceae0b663c6f30329d9671",
+        "nativeStateRoot": "338c6b36d1b0f3d11de94c4030382579792a30bdd7234d239ecba19089657580"
+      },
+      "graph": {
+        "accepted": true,
+        "reportRoot": "6d35ae3a9a95b52677fb433d72049d8a15502112b3c9ba07cfdc68a4c26f764b",
+        "nativeStateRoot": "296678fbfd8b2f1dd21e82abbf6db2db63353c5d02223f549c9dd9a3dab8ed4f"
+      },
+      "storage": {
+        "accepted": true,
+        "errors": []
+      },
+      "accepted": true
+    },
+    "execution": {
+      "owner": "rcl-tensor-autodiff-rust-v0.1",
+      "status": "executed",
+      "attempted": true,
+      "loss": 0.8833333333333333,
+      "lossTensor": {
+        "id": "loss",
+        "shape": [],
+        "dtype": "f64",
+        "layout": "row-major",
+        "device": "cpu",
+        "gradientIdentity": "derived:sum:loss",
+        "storageIdentity": "sha256:e09e65ec3f1c93f8cadddf96b950680ce41eb134f60aa5763c4538acb5fb03ae"
+      },
+      "gradients": [
+        {
+          "parameter": {
+            "tensorId": "x",
+            "gradientIdentity": "parameter:x"
+          },
+          "tensor": {
+            "id": "gradient:x",
+            "shape": [
+              2
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "gradientIdentity": "gradient:parameter:x:loss:derived:sum:loss",
+            "storageIdentity": "sha256:bff6924dc9a2e0be0228afe021e55eaacc53501633f099b82d97c226e7e7e156"
+          },
+          "storage": {
+            "identity": "sha256:bff6924dc9a2e0be0228afe021e55eaacc53501633f099b82d97c226e7e7e156",
+            "kind": "cpu-dense",
+            "data": [
+              2.1666666666666665,
+              2.5
+            ]
+          }
+        },
+        {
+          "parameter": {
+            "tensorId": "y",
+            "gradientIdentity": "parameter:y"
+          },
+          "tensor": {
+            "id": "gradient:y",
+            "shape": [
+              2
+            ],
+            "dtype": "f64",
+            "layout": "row-major",
+            "device": "cpu",
+            "gradientIdentity": "gradient:parameter:y:loss:derived:sum:loss",
+            "storageIdentity": "sha256:a6f2caa5f2cd1cbcaee06e88f20206340e86365bd8db425a050b0e70728cf52a"
+          },
+          "storage": {
+            "identity": "sha256:a6f2caa5f2cd1cbcaee06e88f20206340e86365bd8db425a050b0e70728cf52a",
+            "kind": "cpu-dense",
+            "data": [
+              -0.22222222222222224,
+              0.5249999999999999
+            ]
+          }
+        }
+      ],
+      "backwardEdges": [
+        {
+          "nodeId": "node:loss",
+          "operation": "sum",
+          "output": "loss",
+          "input": "terms",
+          "inputIndex": 0,
+          "gradientIdentity": "derived:add:terms"
+        },
+        {
+          "nodeId": "node:terms",
+          "operation": "add",
+          "output": "terms",
+          "input": "xy",
+          "inputIndex": 0,
+          "gradientIdentity": "derived:mul:xy"
+        },
+        {
+          "nodeId": "node:terms",
+          "operation": "add",
+          "output": "terms",
+          "input": "x_over_y",
+          "inputIndex": 1,
+          "gradientIdentity": "derived:div:x_over_y"
+        },
+        {
+          "nodeId": "node:x_over_y",
+          "operation": "div",
+          "output": "x_over_y",
+          "input": "x",
+          "inputIndex": 0,
+          "gradientIdentity": "parameter:x"
+        },
+        {
+          "nodeId": "node:x_over_y",
+          "operation": "div",
+          "output": "x_over_y",
+          "input": "y",
+          "inputIndex": 1,
+          "gradientIdentity": "parameter:y"
+        },
+        {
+          "nodeId": "node:xy",
+          "operation": "mul",
+          "output": "xy",
+          "input": "x",
+          "inputIndex": 0,
+          "gradientIdentity": "parameter:x"
+        },
+        {
+          "nodeId": "node:xy",
+          "operation": "mul",
+          "output": "xy",
+          "input": "y",
+          "inputIndex": 1,
+          "gradientIdentity": "parameter:y"
+        }
+      ],
+      "accumulator": {
+        "tensorCount": 6,
+        "accumulationCount": 7,
+        "mergeCount": 2,
+        "accumulatedElements": 15
+      },
+      "edgeParity": true,
+      "gradientShapeValid": true,
+      "gradientParameterParity": true,
+      "planRoot": "1b7f126a1e6f30aaec9f58586c026918f124342538bb19de2026f8fe196e1a9f"
+    }
+  },
+  "stressCases": [
+    "STRESS_AI_REVERSE_ACCUMULATION",
+    "STRESS_AI_INVALID_SHAPE",
+    "STRESS_AI_TENSOR_PLAN_SSA",
+    "STRESS_AI_AUTODIFF_NO_MODEL_OPCODE"
+  ],
+  "claimsNotGranted": [
+    "RCL_CANONICAL_PROMOTION",
+    "GPU_TRAINING",
+    "GPU_NATIVE_BACKWARD",
+    "PRODUCTION_TRANSFORMER",
+    "K400_PROMOTION"
+  ],
+  "reportRoot": "cac978860270ec3b53f38946caea7948df898c7a299483173eb79e16172080c0"
+}

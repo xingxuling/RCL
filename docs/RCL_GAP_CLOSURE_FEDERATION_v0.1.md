@@ -353,10 +353,9 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 - AI001: RCL-owned typed Tensor descriptor and shape-rule admission now has a native self-hosted candidate; numerical kernels, alias safety, device lowering and canonical promotion remain open;
 - AI011: bounded compact tensor-plan liveness admission now has a native self-hosted candidate; broader graph lowering, scheduling, residency and canonical promotion remain open;
 - AI012: rooted model-topology-to-generic-graph admission now has a native self-hosted candidate; typed/shape-aware graph construction, numerical lowering and canonical promotion remain open;
-- AI002: graph-governance candidate now owns ordered graph validation, reverse-edge rules, StopGradient filtering and deterministic per-parameter contribution grouping; numeric reverse execution, shape-aware rules, broader corpus and promotion remain open;
+- AI002: RCL shape admission and graph governance now bind an ordered reverse plan to the generic Rust CPU-f64 Autodiff provider; shape/edge/gradient-shape/parameter-identity parity and fail-closed provider-profile checks are locally evidenced, while broader graph corpus, GPU-native reverse execution, canonical promotion and production scale remain open;
 - AI009: RCL-owned generic operation admission and manifest binding now have a native self-host candidate; typed/shape-aware graph construction, canonical promotion and backend performance remain open;
 - AI008: bounded raw `.rcltype` parsing now has a native RCL candidate with reference-parser parity; multi-module linking, union/nested typed-expression lowering, fixed-point inclusion and promotion remain open;
-- AI011: ordered graph validation, last-use analysis, dead-value release and exact-size slot reuse have a native RCL candidate; shape-aware alias safety, large-plan compact lowering, backend post-last-use proof and promotion remain open;
 - AI010 + K333: canonical cross-runtime float/scientific-number state roots. The v2 candidate now covers nested semantic numeric serialization and preserves the v1 default; Windows replay, historical-root migration and canonical promotion remain open;
 - AI022: missing production lifecycle semantics not already represented by bounded candidates;
 - UI001/UI004: stable Web/native-UI profile semantics still needing broader absorption;

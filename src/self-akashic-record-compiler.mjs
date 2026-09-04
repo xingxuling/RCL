@@ -48,7 +48,11 @@ function tryReadJson(filePath) {
 }
 
 function listFiles(root, options = {}) {
-  const includeDirs = new Set(options.includeDirs ?? ['src', 'docs', 'tests', 'examples']);
+  // Preserve the configured top-level order so the bounded scan protects the
+  // semantic source, evidence and test surfaces before optional examples.
+  // Alphabetical directory order used to let `examples/` consume the global
+  // budget and silently truncate `tests/` as the repository grew.
+  const includeDirs = [...new Set(options.includeDirs ?? ['src', 'docs', 'tests', 'examples'])];
   const excludeDirs = new Set(options.excludeDirs ?? ['node_modules', 'output', 'build', 'native', '.git']);
   const maxFiles = Number(options.maxFiles ?? 900);
   const out = [];
@@ -58,14 +62,16 @@ function listFiles(root, options = {}) {
     const first = rel.split('/')[0];
     if (rel && excludeDirs.has(first)) return;
     if (depth === 0) {
-      for (const name of fs.readdirSync(dir).sort()) {
-        const p = path.join(dir, name);
+      const entries = fs.readdirSync(dir).sort().map(name => ({ name, path: path.join(dir, name) }));
+      for (const { name, path: p } of entries) {
         const stat = fs.statSync(p);
-        if (stat.isDirectory()) {
-          if (includeDirs.has(name)) walk(p, depth + 1);
-        } else if (['package.json', 'package-lock.json', 'README.md', 'CHANGELOG.md', 'CONTEXT.md', 'release-manifest.json'].includes(name) || /^release.*\.json$/.test(name)) {
+        if (!stat.isDirectory() && (['package.json', 'package-lock.json', 'README.md', 'CHANGELOG.md', 'CONTEXT.md', 'release-manifest.json'].includes(name) || /^release.*\.json$/.test(name))) {
           out.push(p);
         }
+      }
+      for (const name of includeDirs) {
+        const entry = entries.find(candidate => candidate.name === name);
+        if (entry && fs.statSync(entry.path).isDirectory()) walk(entry.path, depth + 1);
       }
       return;
     }

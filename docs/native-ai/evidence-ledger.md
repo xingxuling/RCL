@@ -891,3 +891,41 @@ RCL semantic admission. Numerical storage kernels, alias safety, device
 placement, GPU execution, canonical promotion, scale and K400 remain closed.
 Local receipt root: `f7e9ffdd96412791363ba2cc8e619bb967429f84877ef7bbefe6e72425a919b1`;
 implementation source commit: `1ababfaba826a36904fe2ad859634ddee053e8ee`.
+
+## AI002 self-hosted Autodiff execution-binding candidate
+
+Status: `PASS_LOCAL_RCL_ADMISSION_PROVIDER_BINDING_CANDIDATE`.
+The existing RCL typed Tensor shape genome and RCL Autodiff graph-governance
+genome are composed into a pre-provider admission path. A valid typed graph is
+then lowered to the generic Rust CPU-f64 Autodiff provider; the candidate
+accepts the numeric result only when the provider reverse-edge order, every
+gradient shape and gradient parameter order/identity match the RCL-owned plan.
+Shape drift, storage/profile drift and an unregistered provider are rejected
+without an implicit fallback.
+
+| Evidence | Result |
+|---|---:|
+| RCL typed shape admission | PASS |
+| RCL graph-governance admission | PASS |
+| CPU-f64 provider execution | PASS |
+| Reverse-edge parity | PASS |
+| Gradient-shape parity | PASS |
+| Gradient parameter order/identity | PASS |
+| Negative pre-provider controls | PASS |
+| Focused local suite | `4/4 PASS` |
+
+Authority files:
+
+- `docs/native-ai/AI002_SELFHOST_AUTODIFF_EXECUTION_BINDING_CANDIDATE_v0.1.md`
+- `src/selfhost-autodiff-graph-execution.mjs`
+- `tests/selfhost-autodiff-graph-execution.test.mjs`
+- `scripts/build-selfhost-autodiff-graph-execution-evidence.mjs`
+- `evidence/RCL_GAP_AI002_SELFHOST_AUTODIFF_EXECUTION_BINDING_CANDIDATE_v0.1.json`
+
+Reproduction: `npm run test:selfhost-autodiff-graph-execution` and
+`npm run evidence:selfhost-autodiff-graph-execution`. Evidence root:
+`cac978860270ec3b53f38946caea7948df898c7a299483173eb79e16172080c0`;
+implementation source commit:
+`0b46847d703920073aabc101cc9939d887f93976`.
+This grants no GPU-native reverse execution, production Transformer, canonical
+promotion or K400 promotion.
