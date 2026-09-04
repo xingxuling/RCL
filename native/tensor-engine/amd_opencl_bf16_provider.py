@@ -32,6 +32,8 @@ SESSION_CLOSE_REQUEST_FORMAT = "rcl.opencl-amd-session-close-request.v0.1"
 SESSION_CLOSE_RESULT_FORMAT = "rcl.opencl-amd-session-close-result.v0.1"
 TENSOR_RESIDENCY_REQUEST_FORMAT = "rcl.opencl-amd-tensor-residency-request.v0.1"
 TENSOR_RESIDENCY_RESULT_FORMAT = "rcl.opencl-amd-tensor-residency-result.v0.1"
+TRAINING_GRAPH_REQUEST_FORMAT = "rcl.opencl-amd-tensor-training-graph-residency-request.v0.1"
+TRAINING_GRAPH_RESULT_FORMAT = "rcl.opencl-amd-tensor-training-graph-residency-result.v0.1"
 BACKEND = "opencl-amd"
 MAX_DIMENSION = 64
 MAX_ELEMENTS = 4096
@@ -44,6 +46,7 @@ MAX_RESIDENT_TENSORS = 64
 MAX_RESIDENT_BYTES = 2 * 1024 * 1024
 MAX_GRAPH_OPERATIONS = 8
 MAX_GRAPH_BYTES = 2 * 1024 * 1024
+MAX_TRAINING_GRAPH_STEPS = 16
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -259,6 +262,21 @@ __kernel void rcl_bf16_masked_softmax(
                 + rcl_bf16_to_f32(mask[row * columns + column]);
     output[row * columns + column] = (ushort)rcl_bf16_rne(exp(value - maximum) / sum);
   }
+}
+
+__kernel void rcl_bf16_add(
+    __global const ushort* left,
+    __global const ushort* right,
+    __global ushort* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  float value = rcl_bf16_to_f32(left[index])
+             + rcl_bf16_to_f32(right[index]);
+  output[index] = (ushort)rcl_bf16_rne(value);
 }
 
 __kernel void rcl_adamw_update(
@@ -1509,6 +1527,339 @@ def run_tensor_residency_graph(
     }
 
 
+def run_tensor_training_graph(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    """Execute one generic BF16 graph repeatedly while its resources stay resident.
+
+    This is a bounded forward-graph residency envelope. It deliberately does
+    not perform reverse-mode autodiff or optimizer updates; those remain owned
+    by the canonical RCL Tensor/Autodiff organs. Input Tensors are bound once,
+    every graph output buffer is allocated once, and only the final step's
+    final output is read back.
+    """
+    if request.get("format") != TRAINING_GRAPH_REQUEST_FORMAT:
+        raise fail(
+            "RCL_OPENCL_TENSOR_TRAINING_GRAPH_FORMAT",
+            "unsupported OpenCL Tensor training-graph request format",
+        )
+    if request.get("backend") != BACKEND:
+        raise fail(
+            "RCL_OPENCL_BACKEND_UNAVAILABLE",
+            "requested backend is not opencl-amd; silent CPU fallback is forbidden",
+        )
+    steps = request.get("steps")
+    if (
+        not isinstance(steps, int)
+        or isinstance(steps, bool)
+        or steps < 1
+        or steps > MAX_TRAINING_GRAPH_STEPS
+    ):
+        raise fail(
+            "RCL_OPENCL_TENSOR_TRAINING_GRAPH_STEPS",
+            f"training graph steps must be within 1..={MAX_TRAINING_GRAPH_STEPS}",
+        )
+    nodes = request.get("nodes")
+    if (
+        not isinstance(nodes, list)
+        or len(nodes) < 2
+        or len(nodes) > MAX_GRAPH_OPERATIONS
+        or any(not isinstance(node, dict) for node in nodes)
+    ):
+        raise fail(
+            "RCL_OPENCL_TENSOR_TRAINING_GRAPH_LIMIT",
+            f"training graph nodes must contain 2..={MAX_GRAPH_OPERATIONS} objects",
+        )
+
+    resources: dict[str, dict[str, Any]] = {}
+    resolved: list[dict[str, Any]] = []
+    receipts: list[dict[str, Any]] = []
+    output_bits: list[int] | None = None
+    dispatch_count = 0
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-tensor-training-graph-residency-v0.1\0")
+    digest.update(runtime.device_info["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<II", steps, len(nodes)))
+    try:
+        for index, node in enumerate(nodes):
+            node_id = _graph_node_id(node)
+            output_resource = _graph_resource_id(node)
+            if output_resource in resources:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_RESOURCE",
+                    f"training graph outputResource {output_resource} is duplicated",
+                )
+            readback = node.get("readback", False)
+            if not isinstance(readback, bool):
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_READBACK",
+                    "training graph readback must be boolean",
+                )
+            if index < len(nodes) - 1 and readback:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_READBACK",
+                    "only the final training graph node may request a readback",
+                )
+            if index == len(nodes) - 1 and readback is not True:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_READBACK",
+                    "the final training graph node requires an explicit readback",
+                )
+            operation = node.get("operation", "matmul")
+            if operation not in ("matmul", "add", "masked-softmax"):
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_OPERATION",
+                    "training graph operation must be matmul, add or masked-softmax",
+                )
+            rows, columns, shared = _graph_dimensions(node)
+            left, left_ref = _graph_input(node, "left", runtime, resources)
+            right, right_ref = _graph_input(node, "right", runtime, resources)
+            if left.get("dtype") != "bf16" or right.get("dtype") != "bf16":
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_DTYPE",
+                    "training graph inputs must be bf16",
+                )
+            if operation == "matmul":
+                if shared is None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_TRAINING_GRAPH_SHAPE",
+                        f"training graph matmul node {node_id} requires a shared dimension",
+                    )
+                expected_left_shape = [rows, shared]
+                expected_right_shape = [shared, columns]
+            elif operation == "masked-softmax":
+                if shared is not None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_TRAINING_GRAPH_SHAPE",
+                        f"training graph masked-softmax node {node_id} must omit shared",
+                    )
+                if node.get("maskMode") != "additive":
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_TRAINING_GRAPH_MASK_MODE",
+                        "training graph masked-softmax requires additive maskMode",
+                    )
+                expected_left_shape = [rows, columns]
+                expected_right_shape = [rows, columns]
+            else:
+                if shared is not None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_TRAINING_GRAPH_SHAPE",
+                        f"training graph add node {node_id} must omit shared",
+                    )
+                if node.get("maskMode") is not None:
+                    raise fail(
+                        "RCL_OPENCL_TENSOR_TRAINING_GRAPH_MASK_MODE",
+                        f"training graph add node {node_id} must omit maskMode",
+                    )
+                expected_left_shape = [rows, columns]
+                expected_right_shape = [rows, columns]
+            if left.get("shape") != expected_left_shape or right.get("shape") != expected_right_shape:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_SHAPE",
+                    f"training graph node {node_id} input shapes do not match its dimensions",
+                )
+            output_size = rows * columns * ctypes.sizeof(ctypes.c_uint16)
+            if output_size > MAX_GRAPH_BYTES:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_TRAINING_GRAPH_LIMIT",
+                    "training graph output exceeds the bounded byte budget",
+                )
+            code = CLInt()
+            output_buffer = runtime.cl.create_buffer(
+                runtime.context,
+                CL_MEM_READ_WRITE,
+                output_size,
+                None,
+                ctypes.byref(code),
+            )
+            check(code.value, "clCreateBuffer:tensor-training-graph-output")
+            runtime.allocation_count += 1
+            runtime.allocation_bytes += output_size
+            resources[output_resource] = {
+                "buffer": output_buffer,
+                "size": output_size,
+                "dtype": "bf16",
+                "shape": [rows, columns],
+                "resourceId": output_resource,
+            }
+            resolved.append({
+                "nodeId": node_id,
+                "operation": operation,
+                "left": left,
+                "leftRef": left_ref,
+                "right": right,
+                "rightRef": right_ref,
+                "output": resources[output_resource],
+                "outputResource": output_resource,
+                "rows": rows,
+                "columns": columns,
+                "shared": shared,
+                "readback": readback,
+                "maskMode": node.get("maskMode"),
+            })
+            receipt = {
+                "nodeId": node_id,
+                "operation": operation,
+                "left": left_ref,
+                "right": right_ref,
+                "outputResource": output_resource,
+                "shape": [rows, columns],
+                "readback": readback,
+                "deviceResidentAfter": index < len(nodes) - 1,
+                "deviceResidentAcrossSteps": True,
+                "resourceReuseAcrossSteps": steps > 1,
+                "stepCount": steps,
+            }
+            if operation == "masked-softmax":
+                receipt["maskMode"] = "additive"
+            receipts.append(receipt)
+
+        for step in range(steps):
+            for index, node in enumerate(resolved):
+                cl = runtime.cl
+                kernel = None
+                try:
+                    code = CLInt()
+                    kernel_name = {
+                        "matmul": b"rcl_bf16_matmul",
+                        "add": b"rcl_bf16_add",
+                        "masked-softmax": b"rcl_bf16_masked_softmax",
+                    }[node["operation"]]
+                    kernel = cl.create_kernel(runtime.program, kernel_name, ctypes.byref(code))
+                    check(code.value, f"clCreateKernel:tensor-training-graph:{node['operation']}")
+                    buffers = [node["left"]["buffer"], node["right"]["buffer"], node["output"]["buffer"]]
+                    for argument_index, buffer in enumerate(buffers):
+                        argument = CLHandle(buffer)
+                        check(
+                            cl.set_kernel_arg(
+                                kernel,
+                                argument_index,
+                                ctypes.sizeof(argument),
+                                ctypes.byref(argument),
+                            ),
+                            f"clSetKernelArg:tensor-training-graph:{node['operation']}:{argument_index}",
+                        )
+                    if node["operation"] == "matmul":
+                        scalar_values = (node["rows"], node["columns"], node["shared"])
+                        work_dim = 2
+                        global_values = (CLSize * 2)(node["rows"], node["columns"])
+                    elif node["operation"] == "masked-softmax":
+                        scalar_values = (node["rows"], node["columns"])
+                        work_dim = 1
+                        global_values = (CLSize * 1)(node["rows"])
+                    else:
+                        scalar_values = (node["rows"], node["columns"])
+                        work_dim = 1
+                        global_values = (CLSize * 1)(node["rows"] * node["columns"])
+                    for argument_index, value in enumerate(scalar_values, start=len(buffers)):
+                        argument = CLUint(value)
+                        check(
+                            cl.set_kernel_arg(
+                                kernel,
+                                argument_index,
+                                ctypes.sizeof(argument),
+                                ctypes.byref(argument),
+                            ),
+                            f"clSetKernelArg:tensor-training-graph:{node['operation']}:scalar:{argument_index}",
+                        )
+                    check(
+                        cl.enqueue_kernel(
+                            runtime.queue,
+                            kernel,
+                            work_dim,
+                            None,
+                            global_values,
+                            None,
+                            0,
+                            None,
+                            None,
+                        ),
+                        f"clEnqueueNDRangeKernel:tensor-training-graph:{node['operation']}",
+                    )
+                    check(cl.finish(runtime.queue), f"clFinish:tensor-training-graph:{node['operation']}")
+                    dispatch_count += 1
+                    if step == steps - 1 and index == len(resolved) - 1:
+                        host_output = (ctypes.c_uint16 * (node["rows"] * node["columns"]))()
+                        output_size = node["output"]["size"]
+                        check(
+                            cl.enqueue_read(
+                                runtime.queue,
+                                node["output"]["buffer"],
+                                1,
+                                0,
+                                output_size,
+                                ctypes.cast(host_output, ctypes.c_void_p),
+                                0,
+                                None,
+                                None,
+                            ),
+                            "clEnqueueReadBuffer:tensor-training-graph-final",
+                        )
+                        check(cl.finish(runtime.queue), "clFinish:read:tensor-training-graph-final")
+                        output_bits = [int(value) for value in host_output]
+                        if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
+                            raise fail(
+                                "RCL_OPENCL_BF16_NONFINITE",
+                                "training graph OpenCL BF16 output is non-finite",
+                            )
+                        runtime.tensor_device_to_host_transfers += 1
+                finally:
+                    if kernel is not None:
+                        cl.release_kernel(kernel)
+
+        if output_bits is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_TRAINING_GRAPH_READBACK",
+                "training graph did not produce a final readback",
+            )
+        output_hex = [bits_hex(bits) for bits in output_bits]
+        for receipt in receipts:
+            digest.update(receipt["nodeId"].encode("utf-8"))
+            digest.update(receipt["operation"].encode("ascii"))
+            digest.update(receipt["outputResource"].encode("utf-8"))
+            digest.update(receipt["left"].encode("utf-8"))
+            digest.update(receipt["right"].encode("utf-8"))
+            digest.update(bytes(receipt["shape"]))
+            if receipt["operation"] == "masked-softmax":
+                digest.update(b"additive")
+        for bits in output_hex:
+            digest.update(bits.encode("ascii"))
+        graph_root = digest.hexdigest()
+        return {
+            "format": TRAINING_GRAPH_RESULT_FORMAT,
+            "status": "PASS_LOCAL_GPU_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE",
+            "backend": BACKEND,
+            "gpuExecuted": True,
+            "gpuClaim": False,
+            "operation": "training-graph",
+            "steps": steps,
+            "nodes": receipts,
+            "outputResource": receipts[-1]["outputResource"],
+            "outputBits": output_hex,
+            "executionRoot": graph_root,
+            "intermediateReadbackCount": 0,
+            "finalReadbackCount": 1,
+            "resourceCount": len(resources),
+            "releasedResourceCount": len(resources),
+            "device": runtime.device_info,
+            "telemetry": {
+                "trainingStepResidency": True,
+                "resourceReuseAcrossSteps": steps > 1,
+                "graphNodeCount": len(nodes),
+                "stepCount": steps,
+                "dispatchCount": dispatch_count,
+                "intermediateReadbackCount": 0,
+                "finalReadbackCount": 1,
+            },
+        }
+    finally:
+        for resource in resources.values():
+            runtime.cl.release_mem(resource["buffer"])
+            runtime.release_count += 1
+        resources.clear()
+
+
 def run_tensor_residency(
     request: dict[str, Any],
     runtime: OpenCLRuntime,
@@ -1791,6 +2142,13 @@ def run_batch(
 
 def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[str, Any]:
     request_format = request.get("format")
+    if request_format == TRAINING_GRAPH_REQUEST_FORMAT:
+        if runtime is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_RESIDENCY_UNAVAILABLE",
+                "Tensor training-graph residency requires a persistent provider session",
+            )
+        return run_tensor_training_graph(request, runtime)
     if request_format == TENSOR_RESIDENCY_REQUEST_FORMAT:
         if runtime is None:
             raise fail(

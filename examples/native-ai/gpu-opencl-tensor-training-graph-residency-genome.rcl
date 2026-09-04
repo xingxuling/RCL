@@ -1,0 +1,19 @@
+# K18: RCL-owned generic Tensor graph whose output resources are reused across
+# bounded forward steps. Reverse Autodiff and optimizer semantics stay RCL
+# canonical but are intentionally outside this accelerator residency organ.
+reality OpenClTensorTrainingGraphResidencyCandidate {
+  facet contract.id : Text = "rcl-k18-opencl-amd-tensor-training-graph-residency-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.graph_order : Text = "RCL_DECLARED_ORDERED_GENERIC_TENSOR_NODES"
+  facet contract.operations : Text = "MATMUL_ELEMENTWISE_ADD_AND_ADDITIVE_MASKED_SOFTMAX"
+  facet contract.tensor_identity : Text = "STORAGE_IDENTITY_PLUS_VALUE_ROOT"
+  facet contract.training_step : Text = "REPEATED_FORWARD_GRAPH_EXECUTION_ONLY_NO_AUTODIFF_OR_OPTIMIZER"
+  facet contract.resource_lifetime : Text = "ONE_OUTPUT_BUFFER_PER_NODE_REUSED_ACROSS_BOUNDED_STEPS"
+  facet contract.intermediate_readbacks : Text = "FORBIDDEN"
+  facet contract.final_readback : Text = "REQUIRED_EXACTLY_ONCE_AFTER_FINAL_STEP"
+  facet contract.mode : Text = "TENSOR_RESIDENCY_V0_1_OPT_IN"
+  facet contract.max_graph_nodes : Number = 8
+  facet contract.max_steps : Number = 16
+  facet contract.fallback : Text = "FORBIDDEN"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_BOUNDED_GENERIC_FORWARD_GRAPH_WITH_SINGLE_ALLOCATION_PER_NODE_AND_FINAL_READBACK"
+}
