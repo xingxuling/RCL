@@ -1,0 +1,299 @@
+# AI001: RCL-owned typed Tensor descriptor and shape-semantics admission.
+# This genome validates descriptors and operation/result shapes before a
+# numerical backend is allowed to execute them. It intentionally does not
+# implement storage kernels, device placement, or canonical promotion.
+reality TensorShapeSemanticsGenome {
+  reckon one_text(value : Text) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon one_number(value : Number) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_numbers(first : Number, second : Number) -> Sequence = sequence_append(one_number(first), second)
+  reckon one_sequence(value : Sequence) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_sequence(first : Sequence, second : Sequence) -> Sequence = sequence_append(one_sequence(first), second)
+
+  reckon make_tensor(id : Text, shape : Sequence, strides : Sequence, dtype : Text, layout : Text, device : Text, storage : Text, element_count : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(
+                  sequence_append(one_text("Tensor"), id),
+                  shape),
+                strides),
+              dtype),
+            layout),
+          device),
+        storage),
+      element_count)
+
+  reckon tensor_kind(tensor : Sequence) -> Text = sequence_get(tensor, 0)
+  reckon tensor_id(tensor : Sequence) -> Text = sequence_get(tensor, 1)
+  reckon tensor_shape(tensor : Sequence) -> Sequence = sequence_get(tensor, 2)
+  reckon tensor_strides(tensor : Sequence) -> Sequence = sequence_get(tensor, 3)
+  reckon tensor_dtype(tensor : Sequence) -> Text = sequence_get(tensor, 4)
+  reckon tensor_layout(tensor : Sequence) -> Text = sequence_get(tensor, 5)
+  reckon tensor_device(tensor : Sequence) -> Text = sequence_get(tensor, 6)
+  reckon tensor_storage(tensor : Sequence) -> Text = sequence_get(tensor, 7)
+  reckon tensor_element_count(tensor : Sequence) -> Number = sequence_get(tensor, 8)
+
+  reckon empty_tensor() -> Sequence = make_tensor("", empty_sequence(), empty_sequence(), "", "", "", "", 0)
+
+  reckon make_operation(id : Text, kind : Text, inputs : Sequence, output : Sequence, axis : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(one_text("Operation"), id),
+            kind),
+          inputs),
+        output),
+      axis)
+
+  reckon operation_kind(operation : Sequence) -> Text = sequence_get(operation, 2)
+  reckon operation_id(operation : Sequence) -> Text = sequence_get(operation, 1)
+  reckon operation_inputs(operation : Sequence) -> Sequence = sequence_get(operation, 3)
+  reckon operation_output(operation : Sequence) -> Sequence = sequence_get(operation, 4)
+  reckon operation_axis(operation : Sequence) -> Number = sequence_get(operation, 5)
+
+  reckon shape_product(shape : Sequence, index : Number, product : Number) -> Number =
+    choose(index >= length(shape), product,
+      shape_product(shape, index + 1, product * sequence_get(shape, index)))
+
+  reckon shape_dimensions_valid(shape : Sequence, index : Number) -> Truth =
+    choose(index >= length(shape), true,
+      sequence_get(shape, index) >= 1 and shape_dimensions_valid(shape, index + 1))
+
+  reckon suffix_product(shape : Sequence, index : Number) -> Number =
+    choose(index >= length(shape), 1,
+      sequence_get(shape, index) * suffix_product(shape, index + 1))
+
+  reckon row_major_strides_from(shape : Sequence, index : Number, strides : Sequence) -> Sequence =
+    choose(index >= length(shape), strides,
+      row_major_strides_from(shape, index + 1,
+        sequence_append(strides, suffix_product(shape, index + 1))))
+
+  reckon row_major_strides(shape : Sequence) -> Sequence = row_major_strides_from(shape, 0, empty_sequence())
+
+  reckon sequence_equal(left : Sequence, right : Sequence, index : Number) -> Truth =
+    choose(length(left) != length(right), false,
+      choose(index >= length(left), true,
+        sequence_get(left, index) == sequence_get(right, index) and
+        sequence_equal(left, right, index + 1)))
+
+  reckon contains_text(values : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(values), false,
+      sequence_get(values, index) == target or contains_text(values, target, index + 1))
+
+  reckon dtype_allowed(dtype : Text, policy : Sequence, index : Number) -> Truth =
+    choose(index >= length(policy), false,
+      sequence_get(policy, index) == dtype or dtype_allowed(dtype, policy, index + 1))
+
+  reckon tensor_descriptor_valid(tensor : Sequence, policy : Sequence) -> Truth =
+    length(tensor) == 9 and
+    tensor_kind(tensor) == "Tensor" and
+    tensor_id(tensor) != "" and
+    length(tensor_shape(tensor)) < 9 and
+    shape_dimensions_valid(tensor_shape(tensor), 0) and
+    sequence_equal(tensor_strides(tensor), row_major_strides(tensor_shape(tensor)), 0) and
+    dtype_allowed(tensor_dtype(tensor), policy, 0) and
+    tensor_layout(tensor) == "row-major" and
+    tensor_device(tensor) != "" and
+    tensor_storage(tensor) != "" and
+    tensor_element_count(tensor) == shape_product(tensor_shape(tensor), 0, 1)
+
+  reckon contains_tensor_id(tensors : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      tensor_id(sequence_get(tensors, index)) == target or
+      contains_tensor_id(tensors, target, index + 1, limit))
+
+  reckon tensor_ids_unique(tensors : Sequence, index : Number) -> Truth =
+    choose(index >= length(tensors), true,
+      contains_tensor_id(tensors, tensor_id(sequence_get(tensors, index)), 0, index) == false and
+      tensor_ids_unique(tensors, index + 1))
+
+  reckon tensor_descriptors_valid(tensors : Sequence, policy : Sequence, index : Number) -> Truth =
+    choose(index >= length(tensors), true,
+      tensor_descriptor_valid(sequence_get(tensors, index), policy) and
+      tensor_descriptors_valid(tensors, policy, index + 1))
+
+  reckon find_tensor(tensors : Sequence, target : Text, index : Number) -> Sequence =
+    choose(index >= length(tensors), empty_tensor(),
+      choose(tensor_id(sequence_get(tensors, index)) == target,
+        sequence_get(tensors, index),
+        find_tensor(tensors, target, index + 1)))
+
+  reckon input_ref(inputs : Sequence, index : Number) -> Text =
+    choose(index >= length(inputs), "", sequence_get(inputs, index))
+
+  reckon input_tensor(inputs : Sequence, available : Sequence, index : Number) -> Sequence =
+    find_tensor(available, input_ref(inputs, index), 0)
+
+  reckon input_refs_valid(inputs : Sequence, available : Sequence, index : Number) -> Truth =
+    choose(index >= length(inputs), true,
+      contains_tensor_id(available, sequence_get(inputs, index), 0, length(available)) and
+      input_refs_valid(inputs, available, index + 1))
+
+  reckon rank_max(left : Sequence, right : Sequence) -> Number =
+    choose(length(left) >= length(right), length(left), length(right))
+
+  reckon aligned_dimension(shape : Sequence, rank : Number, axis : Number) -> Number =
+    choose(axis < rank - length(shape), 1,
+      sequence_get(shape, axis - (rank - length(shape))))
+
+  reckon broadcast_dimensions_valid(left : Sequence, right : Sequence, rank : Number, axis : Number) -> Truth =
+    choose(axis >= rank, true,
+      (aligned_dimension(left, rank, axis) == aligned_dimension(right, rank, axis) or
+       aligned_dimension(left, rank, axis) == 1 or
+       aligned_dimension(right, rank, axis) == 1) and
+      broadcast_dimensions_valid(left, right, rank, axis + 1))
+
+  reckon broadcast_shape_from(left : Sequence, right : Sequence, rank : Number, axis : Number, output : Sequence) -> Sequence =
+    choose(axis >= rank, output,
+      broadcast_shape_from(left, right, rank, axis + 1,
+        sequence_append(output,
+          choose(aligned_dimension(left, rank, axis) >= aligned_dimension(right, rank, axis),
+            aligned_dimension(left, rank, axis), aligned_dimension(right, rank, axis)))))
+
+  reckon broadcast_shape(left : Sequence, right : Sequence) -> Sequence =
+    broadcast_shape_from(left, right, rank_max(left, right), 0, empty_sequence())
+
+  reckon metadata_match(left : Sequence, right : Sequence, output : Sequence) -> Truth =
+    tensor_dtype(left) == tensor_dtype(right) and
+    tensor_dtype(left) == tensor_dtype(output) and
+    tensor_layout(left) == tensor_layout(right) and
+    tensor_layout(left) == tensor_layout(output) and
+    tensor_device(left) == tensor_device(right) and
+    tensor_device(left) == tensor_device(output)
+
+  reckon binary_shape_valid(left : Sequence, right : Sequence, output : Sequence) -> Truth =
+    metadata_match(left, right, output) and
+    broadcast_dimensions_valid(tensor_shape(left), tensor_shape(right), rank_max(tensor_shape(left), tensor_shape(right)), 0) and
+    sequence_equal(tensor_shape(output), broadcast_shape(tensor_shape(left), tensor_shape(right)), 0)
+
+  reckon matmul_shape_valid(left : Sequence, right : Sequence, output : Sequence) -> Truth =
+    metadata_match(left, right, output) and
+    length(tensor_shape(left)) == 2 and length(tensor_shape(right)) == 2 and
+    sequence_get(tensor_shape(left), 1) == sequence_get(tensor_shape(right), 0) and
+      sequence_equal(tensor_shape(output),
+      two_numbers(sequence_get(tensor_shape(left), 0), sequence_get(tensor_shape(right), 1)), 0)
+
+  reckon remove_axis(shape : Sequence, axis : Number, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(shape), output,
+      remove_axis(shape, axis, index + 1,
+        choose(index == axis, output, sequence_append(output, sequence_get(shape, index)))))
+
+  reckon reduction_shape_valid(input : Sequence, output : Sequence, axis : Number) -> Truth =
+    metadata_match(input, input, output) and
+    axis >= 0 and axis < length(tensor_shape(input)) and
+    sequence_equal(tensor_shape(output), remove_axis(tensor_shape(input), axis, 0, empty_sequence()), 0)
+
+  reckon same_shape_valid(input : Sequence, output : Sequence) -> Truth =
+    metadata_match(input, input, output) and sequence_equal(tensor_shape(input), tensor_shape(output), 0)
+
+  reckon reshape_shape_valid(input : Sequence, output : Sequence) -> Truth =
+    metadata_match(input, input, output) and
+    shape_dimensions_valid(tensor_shape(output), 0) and
+    shape_product(tensor_shape(input), 0, 1) == shape_product(tensor_shape(output), 0, 1)
+
+  reckon operation_kind_valid(kind : Text) -> Truth =
+    kind == "add" or kind == "sub" or kind == "mul" or kind == "div" or
+    kind == "broadcast" or kind == "matmul" or kind == "transpose" or
+    kind == "reshape" or kind == "sum" or kind == "mean" or kind == "max" or
+    kind == "exp" or kind == "log" or kind == "sqrt" or kind == "abs" or
+    kind == "softmax"
+
+  reckon operation_shape_valid(operation : Sequence, available : Sequence) -> Truth =
+    choose(operation_kind(operation) == "matmul",
+      matmul_shape_valid(input_tensor(operation_inputs(operation), available, 0),
+        input_tensor(operation_inputs(operation), available, 1), operation_output(operation)),
+      choose(operation_kind(operation) == "transpose",
+        length(tensor_shape(input_tensor(operation_inputs(operation), available, 0))) == 2 and
+        metadata_match(input_tensor(operation_inputs(operation), available, 0), input_tensor(operation_inputs(operation), available, 0), operation_output(operation)) and
+        sequence_equal(tensor_shape(operation_output(operation)),
+          two_numbers(
+            sequence_get(tensor_shape(input_tensor(operation_inputs(operation), available, 0)), 1),
+            sequence_get(tensor_shape(input_tensor(operation_inputs(operation), available, 0)), 0)), 0),
+        choose(operation_kind(operation) == "reshape",
+          reshape_shape_valid(input_tensor(operation_inputs(operation), available, 0), operation_output(operation)),
+          choose(operation_kind(operation) == "sum" or operation_kind(operation) == "mean" or operation_kind(operation) == "max",
+            reduction_shape_valid(input_tensor(operation_inputs(operation), available, 0), operation_output(operation), operation_axis(operation)),
+            choose(operation_kind(operation) == "add" or operation_kind(operation) == "sub" or operation_kind(operation) == "mul" or operation_kind(operation) == "div" or operation_kind(operation) == "broadcast",
+              binary_shape_valid(input_tensor(operation_inputs(operation), available, 0), input_tensor(operation_inputs(operation), available, 1), operation_output(operation)),
+              same_shape_valid(input_tensor(operation_inputs(operation), available, 0), operation_output(operation)))))))
+
+  reckon operation_arity_valid(operation : Sequence) -> Truth =
+    choose(operation_kind(operation) == "matmul" or operation_kind(operation) == "add" or operation_kind(operation) == "sub" or operation_kind(operation) == "mul" or operation_kind(operation) == "div" or operation_kind(operation) == "broadcast",
+      length(operation_inputs(operation)) == 2,
+      length(operation_inputs(operation)) == 1)
+
+  reckon operation_valid(operation : Sequence, available : Sequence, policy : Sequence) -> Truth =
+    length(operation) == 6 and
+    operation_id(operation) != "" and
+    operation_kind_valid(operation_kind(operation)) and
+    operation_arity_valid(operation) and
+    input_refs_valid(operation_inputs(operation), available, 0) and
+    tensor_descriptor_valid(operation_output(operation), policy) and
+    contains_tensor_id(available, tensor_id(operation_output(operation)), 0, length(available)) == false and
+    operation_shape_valid(operation, available)
+
+  reckon operation_ids_unique(operations : Sequence, index : Number) -> Truth =
+    choose(index >= length(operations), true,
+      contains_operation_id(operations, operation_id(sequence_get(operations, index)), 0, index) == false and
+      operation_ids_unique(operations, index + 1))
+
+  reckon contains_operation_id(operations : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      operation_id(sequence_get(operations, index)) == target or
+      contains_operation_id(operations, target, index + 1, limit))
+
+  reckon operations_valid(tensors : Sequence, operations : Sequence, policy : Sequence, index : Number, available : Sequence) -> Truth =
+    choose(index >= length(operations), true,
+      operation_valid(sequence_get(operations, index), available, policy) and
+      operations_valid(tensors, operations, policy, index + 1,
+        sequence_append(available, operation_output(sequence_get(operations, index)))))
+
+  reckon all_available(tensors : Sequence, operations : Sequence, index : Number) -> Sequence =
+    choose(index >= length(operations), tensors,
+      all_available(sequence_append(tensors, operation_output(sequence_get(operations, index))), operations, index + 1))
+
+  reckon outputs_valid(outputs : Sequence, available : Sequence, index : Number) -> Truth =
+    choose(index >= length(outputs), true,
+      contains_tensor_id(available, sequence_get(outputs, index), 0, length(available)) and
+      outputs_valid(outputs, available, index + 1))
+
+  reckon default_dtypes() -> Sequence = sequence_append(sequence_append(sequence_append(empty_sequence(), "f64"), "f32"), "bf16")
+
+  reckon default_tensors() -> Sequence = empty_sequence()
+  reckon default_operations() -> Sequence = empty_sequence()
+  reckon default_outputs() -> Sequence = empty_sequence()
+  reckon tensors() -> Sequence = default_tensors()
+  reckon operations() -> Sequence = default_operations()
+  reckon declared_outputs() -> Sequence = default_outputs()
+  reckon allowed_dtypes() -> Sequence = default_dtypes()
+
+  facet contract.id : Text = "rcl-gap-ai001-tensor-shape-semantics-v0.1"
+  facet contract.profile : Text = "RCL_OWNED_TYPED_TENSOR_SHAPE_SEMANTICS_ADMISSION_CANDIDATE"
+  facet binding.semantic_owner : Text = "RCL"
+  facet binding.model_source_sha256 : Text = ""
+  facet binding.contract_root : Text = ""
+  facet binding.manifest_canonical : Text = "{}"
+  facet binding.manifest_root : Text = ""
+  facet binding.manifest_root_computed : Text = sha256_text(binding.manifest_canonical)
+  facet tensor.count : Number = length(tensors())
+  facet operation.count : Number = length(operations())
+  facet output.count : Number = length(declared_outputs())
+  facet evaluation.tensor_inventory_valid : Truth = tensor.count > 0 and tensor_descriptors_valid(tensors(), allowed_dtypes(), 0) and tensor_ids_unique(tensors(), 0)
+  facet evaluation.operation_inventory_valid : Truth = operation.count > 0 and operation_ids_unique(operations(), 0) and operations_valid(tensors(), operations(), allowed_dtypes(), 0, tensors())
+  facet evaluation.outputs_valid : Truth = output.count > 0 and outputs_valid(declared_outputs(), all_available(tensors(), operations(), 0), 0)
+  facet evaluation.manifest_root_valid : Truth = binding.manifest_root_computed == binding.manifest_root
+  facet evaluation.accepted : Truth =
+    binding.semantic_owner == "RCL" and
+    evaluation.manifest_root_valid and
+    evaluation.tensor_inventory_valid and
+    evaluation.operation_inventory_valid and
+    evaluation.outputs_valid
+  facet lowering.status : Text = choose(evaluation.accepted, "accepted", "rejected")
+  facet evidence.execution_path : Text = "RCL_TYPED_TENSOR_DESCRIPTOR_TO_SHAPE_LAYOUT_BROADCAST_MATMUL_REDUCTION_ADMISSION_TO_NATIVE_SELFHOST_VM"
+  facet evidence.boundary : Text = "RCL_OWNS_TYPED_DESCRIPTOR_AND_SHAPE_SEMANTICS;_NUMERICAL_STORAGE_KERNEL_DEVICE_PLACEMENT_AND_CANONICAL_PROMOTION_REMAIN_EXTERNAL"
+  facet evidence.claim : Text = "AI001_BOUNDED_RCL_OWNED_TYPED_TENSOR_SHAPE_SEMANTICS_ADMISSION_CANDIDATE_ONLY"
+}

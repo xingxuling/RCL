@@ -1,0 +1,47 @@
+{
+  "format": "rcl.ai001.tensor-shape-semantics-contract.v0.1",
+  "canonicalOwner": "RCL",
+  "profile": "RCL_OWNED_TYPED_TENSOR_SHAPE_SEMANTICS_ADMISSION_CANDIDATE",
+  "allowedDtypes": [
+    "f64",
+    "f32",
+    "bf16"
+  ],
+  "operationFamilies": [
+    "broadcast-elementwise",
+    "matmul",
+    "transpose",
+    "reshape",
+    "axis-reduction",
+    "unary-shape-preserving"
+  ],
+  "requiredInvariants": [
+    "positive dimensions and exact element count",
+    "row-major stride identity",
+    "dtype/layout/device agreement",
+    "right-aligned broadcast compatibility",
+    "matmul shared dimension and output shape",
+    "axis removal for reduction output",
+    "ordered operation inputs and unique identities",
+    "root-bound manifest before self-hosted admission"
+  ],
+  "boundary": {
+    "rclOwns": [
+      "typed Tensor descriptor identity",
+      "shape, stride, dtype, layout and device-intent admission",
+      "broadcast, matmul, transpose, reshape and reduction shape rules"
+    ],
+    "external": [
+      "numeric storage kernels",
+      "device placement",
+      "allocation and alias safety",
+      "canonical promotion"
+    ]
+  },
+  "claimsNotGranted": [
+    "AI001_CANONICAL_PROMOTION",
+    "GPU_EXECUTION",
+    "NUMERICAL_KERNEL_PARITY",
+    "K400_PASS"
+  ]
+}
