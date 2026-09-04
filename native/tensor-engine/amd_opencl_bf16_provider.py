@@ -26,10 +26,15 @@ ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
 ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
 BATCH_REQUEST_FORMAT = "rcl.opencl-amd-batch-request.v0.1"
 BATCH_RESULT_FORMAT = "rcl.opencl-amd-batch-result.v0.1"
+SESSION_CLOSE_REQUEST_FORMAT = "rcl.opencl-amd-session-close-request.v0.1"
+SESSION_CLOSE_RESULT_FORMAT = "rcl.opencl-amd-session-close-result.v0.1"
 BACKEND = "opencl-amd"
 MAX_DIMENSION = 64
 MAX_ELEMENTS = 4096
 MAX_BATCH_REQUESTS = 64
+SESSION_BUFFER_ARENA_MODE = "session-arena-v0.1"
+MAX_ARENA_BUFFERS = 64
+MAX_ARENA_BYTES = 2 * 1024 * 1024
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -348,6 +353,21 @@ class OpenCL:
                 ctypes.c_void_p,
             ],
         )
+        self.enqueue_write = self._fn(
+            "clEnqueueWriteBuffer",
+            CLInt,
+            [
+                CLHandle,
+                CLHandle,
+                CLBool,
+                CLSize,
+                CLSize,
+                ctypes.c_void_p,
+                CLUint,
+                ctypes.c_void_p,
+                ctypes.c_void_p,
+            ],
+        )
         self.enqueue_read = self._fn(
             "clEnqueueReadBuffer",
             CLInt,
@@ -467,10 +487,25 @@ def select_amd_device(cl: OpenCL) -> tuple[CLHandle, CLHandle]:
 class OpenCLRuntime:
     """One bounded OpenCL context/program reused by a provider session."""
 
-    def __init__(self) -> None:
+    def __init__(self, buffer_mode: str | None = None) -> None:
+        if buffer_mode not in {None, SESSION_BUFFER_ARENA_MODE}:
+            raise fail(
+                "RCL_OPENCL_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+                f"unsupported OpenCL buffer allocation mode {buffer_mode}",
+            )
         self.cl = OpenCL()
         self.platform, self.device = select_amd_device(self.cl)
         self.device_info = self.cl.device_receipt(self.platform, self.device)
+        self.buffer_mode = buffer_mode
+        self.buffer_pool: dict[tuple[int, int], list[CLHandle]] = {}
+        self.pooled_buffer_count = 0
+        self.pooled_bytes = 0
+        self.peak_pooled_buffers = 0
+        self.peak_pooled_bytes = 0
+        self.allocation_count = 0
+        self.allocation_bytes = 0
+        self.reuse_count = 0
+        self.release_count = 0
         self.context = self.queue = self.program = None
         try:
             properties = (ctypes.c_ssize_t * 3)(CL_CONTEXT_PLATFORM, self.platform.value, 0)
@@ -520,7 +555,72 @@ class OpenCLRuntime:
             self.close()
             raise
 
+    def arena_enabled(self) -> bool:
+        return self.buffer_mode == SESSION_BUFFER_ARENA_MODE
+
+    def acquire_buffer(self, flags: int, size: int) -> CLHandle:
+        key = (flags, size)
+        pooled = self.buffer_pool.get(key)
+        if pooled:
+            buffer = pooled.pop()
+            if not pooled:
+                del self.buffer_pool[key]
+            self.pooled_buffer_count -= 1
+            self.pooled_bytes -= size
+            self.reuse_count += 1
+            return buffer
+        code = CLInt()
+        buffer = self.cl.create_buffer(
+            self.context,
+            flags,
+            size,
+            None,
+            ctypes.byref(code),
+        )
+        check(code.value, "clCreateBuffer:arena")
+        self.allocation_count += 1
+        self.allocation_bytes += size
+        return buffer
+
+    def recycle_buffer(self, buffer: CLHandle, flags: int, size: int) -> None:
+        if (
+            self.arena_enabled()
+            and self.pooled_buffer_count < MAX_ARENA_BUFFERS
+            and self.pooled_bytes + size <= MAX_ARENA_BYTES
+        ):
+            self.buffer_pool.setdefault((flags, size), []).append(buffer)
+            self.pooled_buffer_count += 1
+            self.pooled_bytes += size
+            self.peak_pooled_buffers = max(self.peak_pooled_buffers, self.pooled_buffer_count)
+            self.peak_pooled_bytes = max(self.peak_pooled_bytes, self.pooled_bytes)
+            return
+        self.cl.release_mem(buffer)
+        self.release_count += 1
+
+    def session_stats(self) -> dict[str, Any]:
+        return {
+            "bufferAllocationMode": self.buffer_mode or "per-kernel-v0.1",
+            "bufferAllocationCount": self.allocation_count,
+            "bufferAllocationBytes": self.allocation_bytes,
+            "bufferReuseCount": self.reuse_count,
+            "bufferReleaseCount": self.release_count,
+            "pooledBufferCount": self.pooled_buffer_count,
+            "pooledBytes": self.pooled_bytes,
+            "peakPooledBuffers": self.peak_pooled_buffers,
+            "peakPooledBytes": self.peak_pooled_bytes,
+            "maxArenaBuffers": MAX_ARENA_BUFFERS,
+            "maxArenaBytes": MAX_ARENA_BYTES,
+            "tensorValueResidency": False,
+        }
+
     def close(self) -> None:
+        for pooled in self.buffer_pool.values():
+            for buffer in pooled:
+                self.cl.release_mem(buffer)
+                self.release_count += 1
+        self.buffer_pool.clear()
+        self.pooled_buffer_count = 0
+        self.pooled_bytes = 0
         if self.program is not None:
             self.cl.release_program(self.program)
             self.program = None
@@ -544,8 +644,9 @@ def run_opencl_kernel(
     active_runtime = runtime or OpenCLRuntime()
     cl = active_runtime.cl
     kernel = None
-    buffers: list[CLHandle] = []
+    buffers: list[tuple[CLHandle, int, int]] = []
     host_outputs: list[Any] = []
+    completed = False
     try:
         code = CLInt()
         kernel = cl.create_kernel(active_runtime.program, kernel_name.encode("ascii"), ctypes.byref(code))
@@ -554,32 +655,60 @@ def run_opencl_kernel(
         for kind, values in input_specs:
             array_type = ctypes.c_uint16 if kind == "u16" else ctypes.c_float
             host_data = (array_type * len(values))(*values)
-            flags = CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR
-            buffer = cl.create_buffer(
-                active_runtime.context,
-                flags,
-                ctypes.sizeof(host_data),
-                ctypes.cast(host_data, ctypes.c_void_p),
-                ctypes.byref(code),
-            )
-            check(code.value, f"clCreateBuffer:input:{kind}")
-            buffers.append(buffer)
+            size = ctypes.sizeof(host_data)
+            flags = CL_MEM_READ_ONLY
+            if active_runtime.arena_enabled():
+                buffer = active_runtime.acquire_buffer(flags, size)
+                buffers.append((buffer, flags, size))
+                check(
+                    cl.enqueue_write(
+                        active_runtime.queue,
+                        buffer,
+                        1,
+                        0,
+                        size,
+                        ctypes.cast(host_data, ctypes.c_void_p),
+                        0,
+                        None,
+                        None,
+                    ),
+                    f"clEnqueueWriteBuffer:{kernel_name}:{kind}",
+                )
+            else:
+                buffer = cl.create_buffer(
+                    active_runtime.context,
+                    flags | CL_MEM_COPY_HOST_PTR,
+                    size,
+                    ctypes.cast(host_data, ctypes.c_void_p),
+                    ctypes.byref(code),
+                )
+                check(code.value, f"clCreateBuffer:input:{kind}")
+                active_runtime.allocation_count += 1
+                active_runtime.allocation_bytes += size
+                buffers.append((buffer, flags, size))
 
         for kind, length in output_specs:
             array_type = ctypes.c_uint16 if kind == "u16" else ctypes.c_float
             host_data = (array_type * length)()
-            buffer = cl.create_buffer(
-                active_runtime.context,
-                CL_MEM_WRITE_ONLY,
-                ctypes.sizeof(host_data),
-                None,
-                ctypes.byref(code),
-            )
-            check(code.value, f"clCreateBuffer:output:{kind}")
-            buffers.append(buffer)
+            size = ctypes.sizeof(host_data)
+            flags = CL_MEM_WRITE_ONLY
+            if active_runtime.arena_enabled():
+                buffer = active_runtime.acquire_buffer(flags, size)
+            else:
+                buffer = cl.create_buffer(
+                    active_runtime.context,
+                    flags,
+                    size,
+                    None,
+                    ctypes.byref(code),
+                )
+                check(code.value, f"clCreateBuffer:output:{kind}")
+                active_runtime.allocation_count += 1
+                active_runtime.allocation_bytes += size
+            buffers.append((buffer, flags, size))
             host_outputs.append(host_data)
 
-        for index, buffer in enumerate(buffers):
+        for index, (buffer, _, _) in enumerate(buffers):
             argument = CLHandle(buffer)
             check(
                 cl.set_kernel_arg(kernel, index, ctypes.sizeof(argument), ctypes.byref(argument)),
@@ -599,7 +728,7 @@ def run_opencl_kernel(
         )
         check(cl.finish(active_runtime.queue), f"clFinish:{kernel_name}")
         for index, (host_data, (_, length)) in enumerate(zip(host_outputs, output_specs)):
-            output_buffer = buffers[len(input_specs) + index]
+            output_buffer = buffers[len(input_specs) + index][0]
             check(
                 cl.enqueue_read(
                     active_runtime.queue,
@@ -617,10 +746,15 @@ def run_opencl_kernel(
             check(cl.finish(active_runtime.queue), f"clFinish:read:{kernel_name}:{index}")
             if len(host_data) != length:
                 raise fail("RCL_OPENCL_SHAPE", f"OpenCL output length mismatch for {kernel_name}")
+        completed = True
         return active_runtime.device_info, [list(host_data) for host_data in host_outputs]
     finally:
-        for buffer in reversed(buffers):
-            cl.release_mem(buffer)
+        for buffer, flags, size in reversed(buffers):
+            if completed and active_runtime.arena_enabled():
+                active_runtime.recycle_buffer(buffer, flags, size)
+            else:
+                cl.release_mem(buffer)
+                active_runtime.release_count += 1
         if kernel is not None:
             cl.release_kernel(kernel)
         if owned_runtime:
@@ -871,7 +1005,7 @@ def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[s
     }
 
 
-def serve_session() -> int:
+def serve_session(buffer_mode: str | None = None) -> int:
     """Serve newline-delimited requests while reusing one OpenCL runtime."""
     runtime: OpenCLRuntime | None = None
     for raw in sys.stdin:
@@ -880,8 +1014,19 @@ def serve_session() -> int:
         try:
             request = json.loads(raw)
             if runtime is None:
-                runtime = OpenCLRuntime()
-            response = run(request, runtime)
+                runtime = OpenCLRuntime(buffer_mode)
+            if request.get("format") == SESSION_CLOSE_REQUEST_FORMAT:
+                runtime.close()
+                response = {
+                    "format": SESSION_CLOSE_RESULT_FORMAT,
+                    "status": "PASS_LOCAL_GPU_SESSION_CLOSE_CANDIDATE",
+                    "backend": BACKEND,
+                    "closed": True,
+                    "sessionStats": runtime.session_stats(),
+                }
+                runtime = None
+            else:
+                response = run(request, runtime)
         except ProviderError as error:
             response = {"status": "error", "code": error.code, "message": error.message}
             if error.code in {
@@ -895,6 +1040,8 @@ def serve_session() -> int:
                 runtime = None
         except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
             response = {"status": "error", "code": "RCL_OPENCL_REQUEST", "message": str(error)}
+        if runtime is not None:
+            response["sessionStats"] = runtime.session_stats()
         print(json.dumps(response, separators=(",", ":"), ensure_ascii=False), flush=True)
     if runtime is not None:
         runtime.close()
@@ -903,7 +1050,19 @@ def serve_session() -> int:
 
 def main() -> int:
     if len(sys.argv) > 1 and sys.argv[1] == "--session":
-        return serve_session()
+        if len(sys.argv) == 2:
+            return serve_session()
+        if len(sys.argv) == 4 and sys.argv[2] == "--buffer-mode":
+            return serve_session(sys.argv[3])
+        print(
+            json.dumps({
+                "status": "error",
+                "code": "RCL_OPENCL_REQUEST",
+                "message": "session accepts only --buffer-mode <mode>",
+            }),
+            file=sys.stderr,
+        )
+        return 2
     try:
         argument = sys.argv[1] if len(sys.argv) > 1 else "-"
         raw = sys.stdin.read() if argument == "-" else open(argument, encoding="utf-8").read()

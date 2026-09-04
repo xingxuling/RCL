@@ -394,3 +394,27 @@ Authority `33189905662` also passed. Authority:
 Open gaps: `RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY`,
 `RCL_GAP_GPU_TRAINING_THROUGHPUT` and
 `RCL_GAP_RCL10M_TOKENIZER_DATASET`.
+
+## K13 AMD OpenCL session buffer arena candidate
+
+Status: `PASS_LOCAL_OPENCL_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE_HOSTED_PENDING`.
+K13 adds an opt-in RCL-owned `session-arena-v0.1` allocation profile over the
+existing persistent AMD OpenCL organ. Buffers are reusable only when OpenCL
+memory flags and exact byte length match, with bounds of `64` pooled buffers and
+`2,097,152` pooled bytes. A final close receipt proves every pooled allocation
+was released before context teardown. On real AMD `gfx1152`, the two-operation
+protocol smoke changed six allocations into three allocations plus three
+reuses with exact output/root parity. The one-step two-block GQA+RoPE path kept
+`1070` buffer acquisitions but changed `1070` new allocations / `31,828` bytes
+into `41` allocations / `1,804` bytes plus `1029` reuses. Forward/backward
+roots, losses, parameters, optimizer states, checkpoint and CPU parity remained
+exact. K13 is `6/6 PASS`, Rust Tensor is `7/7`, K08 Tensor is `16 PASS + 1
+declared skip`, K12 is `4/4` and K11/K10/K09 regressions are green. This is
+allocation-count evidence only: inputs are still uploaded and outputs read back
+for every operation, so Tensor residency, transfer elision, wall-time,
+throughput, generic portability, GPU training, RCL-10M and K400 promotion remain
+closed. Hosted and post-merge verification are pending. Authority:
+`docs/native-ai/gpu-opencl-buffer-arena-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-buffer-arena-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-buffer-arena-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-buffer-arena-v0.1/k13-opencl-buffer-arena-local-evidence.json`.

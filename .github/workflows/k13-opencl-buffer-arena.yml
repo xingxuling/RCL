@@ -1,0 +1,48 @@
+name: K13 AMD OpenCL Buffer Arena
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k13-opencl-buffer-arena.test.mjs'
+      - 'examples/native-ai/gpu-opencl-buffer-arena-*'
+      - 'package.json'
+      - '.github/workflows/k13-opencl-buffer-arena.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k08-gpu-gqa-rope-native-backward-adamw.test.mjs'
+      - 'tests/k13-opencl-buffer-arena.test.mjs'
+      - 'examples/native-ai/gpu-opencl-buffer-arena-*'
+      - 'package.json'
+      - '.github/workflows/k13-opencl-buffer-arena.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  buffer-arena:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Build tensor engine
+        run: cargo build --release --locked --manifest-path native/tensor-engine/Cargo.toml --bin rcl-bf16-autodiff-adamw --bin rcl-rope-frame
+      - name: Run K13 buffer arena verification
+        run: npm run test:k13-opencl-buffer-arena
+      - name: Run K12 cross-node gradient regression
+        run: npm run test:k12-opencl-cross-node-gradient-batch
