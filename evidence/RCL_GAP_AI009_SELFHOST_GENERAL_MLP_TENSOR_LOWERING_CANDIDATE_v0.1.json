@@ -1,0 +1,67 @@
+{
+  "format": "rcl.gap.ai009.selfhost-general-mlp-tensor-lowering-candidate.v0.1",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "semanticOwner": "RCL",
+  "admissionExecutionOwner": "RCL native self-host compiler and VM",
+  "tensorExecutionOwner": "external Rust Tensor backend remains separate",
+  "sourceArtifacts": {
+    "genome": "examples/native-ai/general-mlp-tensor-lowering-genome.rcl",
+    "adapter": "src/selfhost-general-mlp-tensor-lowering.mjs",
+    "tests": "tests/selfhost-general-mlp-tensor-lowering.test.mjs"
+  },
+  "localVerification": {
+    "command": "npm run test:selfhost-general-mlp-tensor-lowering",
+    "tests": 3,
+    "pass": 3,
+    "fail": 0,
+    "nativeStateRootVerified": true,
+    "positivePlanNodeCount": 29980,
+    "positivePlanOperationTotal": 29980,
+    "positiveManifestRootValid": true,
+    "negativeModelSpecialRejected": true,
+    "negativeManifestRootDriftRejected": true
+  },
+  "positiveCase": {
+    "planFormat": "rcl.tensor-execution-plan.v0.1",
+    "nodeCount": 29980,
+    "initialTensorCount": 40,
+    "outputCount": 18,
+    "operationInventory": [
+      { "name": "abs", "count": 1668 },
+      { "name": "add", "count": 5004 },
+      { "name": "div", "count": 3332 },
+      { "name": "matmul", "count": 4164 },
+      { "name": "mul", "count": 8324 },
+      { "name": "sub", "count": 4160 },
+      { "name": "sum", "count": 1664 },
+      { "name": "transpose", "count": 1664 }
+    ],
+    "modelSourceSha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0",
+    "contractRoot": "fb2524725b1450e3e7570e2898bd6e7cdc141fa10f54dd3b03cf21366b184182",
+    "manifestRoot": "ce67454822d44bb226cc496c7c3392591bdaee44ebc9bf4c3a35e2a74a5be3d5",
+    "sourceSha256": "755dd6f468d87909fcd00d5e78469d3a2e92574e4d51f101d0724b1e2a496b6d",
+    "nativeSourceRoot": "54eabc37195efbda5b88c2e951764022bdfa8e37284af34bffe933de5dd58829",
+    "nativeSemanticStateRoot": "1f285bd37e2e79f0f583bc125ab9bd983853ffa213783e63b20cead7610d5d4a"
+  },
+  "checks": {
+    "genericOperationPolicy": true,
+    "positiveCardinalityBinding": true,
+    "manifestRootBinding": true,
+    "nativeSelfHostExecution": true,
+    "failClosedModelSpecialOperation": true,
+    "failClosedManifestRootDrift": true,
+    "deterministicReport": true
+  },
+  "claimsNotGranted": [
+    "FULL_SELF_HOSTED_TYPED_TENSOR_GRAPH_CONSTRUCTION",
+    "TENSOR_BACKEND_PERFORMANCE",
+    "GPU",
+    "AUTODIFF",
+    "ADAMW",
+    "TRANSFORMER",
+    "PRODUCTION_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "nextGap": "Replace manifest-only admission with self-hosted typed/shape-aware graph construction and bind it to the existing Tensor backend through differential replay.",
+  "reportRoot": "e1626bf3d9a188eb36e2b60a621f524bf44e27df003560fe010a06c7425d26ec"
+}

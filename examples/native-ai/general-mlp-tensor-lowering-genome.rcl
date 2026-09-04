@@ -1,0 +1,120 @@
+# AI009: RCL-owned generic Tensor lowering admission for the General MLP.
+# The large Tensor SSA plan is still emitted by an auxiliary code generator.
+# RCL owns the operation vocabulary, plan cardinality, generic-only boundary,
+# and source/contract manifest binding before a backend is allowed to consume it.
+reality GeneralMlpTensorLoweringGenome {
+  reckon one_text(value : Text) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_text(first : Text, second : Text) -> Sequence = sequence_append(one_text(first), second)
+  reckon three_text(first : Text, second : Text, third : Text) -> Sequence = sequence_append(two_text(first, second), third)
+  reckon four_text(first : Text, second : Text, third : Text, fourth : Text) -> Sequence = sequence_append(three_text(first, second, third), fourth)
+  reckon five_text(first : Text, second : Text, third : Text, fourth : Text, fifth : Text) -> Sequence = sequence_append(four_text(first, second, third, fourth), fifth)
+  reckon six_text(first : Text, second : Text, third : Text, fourth : Text, fifth : Text, sixth : Text) -> Sequence = sequence_append(five_text(first, second, third, fourth, fifth), sixth)
+  reckon seven_text(first : Text, second : Text, third : Text, fourth : Text, fifth : Text, sixth : Text, seventh : Text) -> Sequence = sequence_append(six_text(first, second, third, fourth, fifth, sixth), seventh)
+  reckon eight_text(first : Text, second : Text, third : Text, fourth : Text, fifth : Text, sixth : Text, seventh : Text, eighth : Text) -> Sequence = sequence_append(seven_text(first, second, third, fourth, fifth, sixth, seventh), eighth)
+
+  reckon one_number(value : Number) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_values(first : Sequence, second : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), first), second)
+
+  reckon make_operation(name : Text, count : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), count)
+  reckon operation_name(item : Sequence) -> Text = sequence_get(item, 0)
+  reckon operation_count(item : Sequence) -> Number = sequence_get(item, 1)
+
+  reckon allowed_operation(name : Text) -> Truth =
+    name == "abs" or
+    name == "add" or
+    name == "div" or
+    name == "matmul" or
+    name == "mul" or
+    name == "sub" or
+    name == "sum" or
+    name == "transpose"
+
+  reckon forbidden_operation(name : Text) -> Truth =
+    name == "xor_special" or
+    name == "majority_special" or
+    name == "mlp_special" or
+    name == "train_mlp" or
+    name == "provider_call"
+
+  reckon contains_operation(items : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(items), false,
+      operation_name(sequence_get(items, index)) == target or
+      contains_operation(items, target, index + 1))
+
+  reckon operation_items_valid(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      operation_name(sequence_get(items, index)) != "" and
+      allowed_operation(operation_name(sequence_get(items, index))) and
+      forbidden_operation(operation_name(sequence_get(items, index))) == false and
+      operation_count(sequence_get(items, index)) >= 1 and
+      operation_items_valid(items, index + 1))
+
+  reckon operation_total(items : Sequence, index : Number, total : Number) -> Number =
+    choose(index >= length(items), total,
+      operation_total(items, index + 1, total + operation_count(sequence_get(items, index))))
+
+  reckon required_generic_operations(items : Sequence) -> Truth =
+    contains_operation(items, "abs", 0) and
+    contains_operation(items, "add", 0) and
+    contains_operation(items, "div", 0) and
+    contains_operation(items, "matmul", 0) and
+    contains_operation(items, "mul", 0) and
+    contains_operation(items, "sub", 0) and
+    contains_operation(items, "sum", 0) and
+    contains_operation(items, "transpose", 0)
+
+  reckon default_inventory() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), make_operation("abs", 1)),
+                make_operation("add", 1)),
+              make_operation("div", 1)),
+            make_operation("matmul", 1)),
+          make_operation("mul", 1)),
+        make_operation("sub", 1)),
+      make_operation("sum", 1))
+
+  reckon operation_inventory() -> Sequence = default_inventory()
+
+  facet contract.id : Text = "rcl-gap-ai009-selfhost-general-mlp-tensor-lowering-v0.1"
+  facet contract.profile : Text = "RCL_OWNED_GENERIC_TENSOR_LOWERING_ADMISSION_CANDIDATE"
+  facet binding.semantic_owner : Text = "RCL"
+  facet binding.model_source_sha256 : Text = ""
+  facet binding.contract_root : Text = ""
+  facet binding.manifest_canonical : Text = "{}"
+  facet binding.manifest_root : Text = ""
+  facet binding.manifest_root_computed : Text = sha256_text(binding.manifest_canonical)
+
+  facet plan.format : Text = "rcl.tensor-execution-plan.v0.1"
+  facet plan.node_count : Number = 0
+  facet plan.initial_tensor_count : Number = 0
+  facet plan.output_count : Number = 0
+  facet plan.operation_inventory : Sequence = operation_inventory()
+  facet plan.operation_total : Number = operation_total(plan.operation_inventory, 0, 0)
+  facet plan.inventory_valid : Truth =
+    length(plan.operation_inventory) > 0 and
+    operation_items_valid(plan.operation_inventory, 0) and
+    required_generic_operations(plan.operation_inventory)
+
+  facet evaluation.manifest_root_valid : Truth = binding.manifest_root_computed == binding.manifest_root
+  facet evaluation.generic_only : Truth = plan.inventory_valid
+  facet evaluation.plan_cardinality_valid : Truth =
+    plan.node_count > 0 and
+    plan.operation_total == plan.node_count and
+    plan.initial_tensor_count > 0 and
+    plan.output_count > 0
+  facet evaluation.accepted : Truth =
+    plan.format == "rcl.tensor-execution-plan.v0.1" and
+    evaluation.manifest_root_valid and
+    evaluation.generic_only and
+    evaluation.plan_cardinality_valid
+  facet lowering.status : Text = choose(evaluation.accepted, "accepted", "rejected")
+  facet evidence.execution_path : Text = "RCL_MANIFEST_HASH_TO_GENERIC_OPERATION_POLICY_TO_TENSOR_PLAN_CARDINALITY_TO_NATIVE_SELFHOST_VM"
+  facet evidence.boundary : Text = "RCL_OWNS_ADMISSION_AND_BINDING;_AUXILIARY_EMITTER_AND_TENSOR_BACKEND_REMAIN_EXTERNAL"
+  facet evidence.claim : Text = "AI009_BOUNDED_RCL_OWNED_GENERIC_LOWERING_ADMISSION_CANDIDATE_ONLY"
+}
