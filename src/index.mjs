@@ -1939,6 +1939,9 @@ export {
   renderSelfHostedTensorPlanLiveness,
   runSelfHostedTensorPlanLiveness,
   tensorPlanLivenessCanonical,
+} from './selfhost-tensor-plan-liveness.mjs';
+
+export {
   SELFHOST_TENSOR_SHAPE_SEMANTICS_PATH,
   SELFHOST_TENSOR_SHAPE_SEMANTICS_FORMAT,
   normalizeTensorShapeSemantics,
