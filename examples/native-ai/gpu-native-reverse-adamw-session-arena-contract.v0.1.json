@@ -1,0 +1,97 @@
+{
+  "format": "rcl.k19.gpu-native-reverse-adamw-session-arena-contract.v0.1",
+  "status": "OPENCL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "GENERIC_RCL_TENSOR_MULTI_STEP_GPU_REVERSE_ADAMW_PERSISTENT_SESSION_ARENA",
+  "semanticBoundary": {
+    "rclOwns": [
+      "Tensor graph semantics",
+      "BF16 round-to-nearest-even and FP32 accumulation",
+      "reverse-mode Autodiff",
+      "FP32 master weights and AdamW state",
+      "checkpoint and differential authority"
+    ],
+    "providerOwns": [
+      "AMD OpenCL kernel lowering",
+      "persistent provider process/context/program",
+      "bounded reusable temporary buffer arena"
+    ],
+    "fallback": "forbidden"
+  },
+  "lowering": {
+    "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+    "providerLanguage": "Python ctypes OpenCL",
+    "gpuPrimitives": [
+      "matmul",
+      "matmul-gradient-left",
+      "matmul-gradient-right",
+      "adamw-update"
+    ],
+    "requiredPlacements": {
+      "matmul": "gpu",
+      "nonMatmul": "cpu-reference-explicit"
+    }
+  },
+  "transport": {
+    "format": "rcl.opencl-amd-session-ndjson.v0.1",
+    "mode": "session-arena-v0.1",
+    "reusedResources": [
+      "provider-process",
+      "OpenCL-context",
+      "OpenCL-program",
+      "temporary cl_mem buffers across repeated reverse/optimizer steps"
+    ],
+    "boundedSteps": 2,
+    "arenaLimits": {
+      "maxBuffers": 64,
+      "maxBytes": 2097152
+    }
+  },
+  "precisionPolicy": {
+    "forwardInputDtype": "bf16",
+    "forwardMatmulAccumulationDtype": "f32",
+    "gradientDtype": "f32",
+    "masterWeightDtype": "f32",
+    "optimizerStateDtype": "f32",
+    "nonFinite": "rejected"
+  },
+  "requiredEvidence": [
+    "generic-rcl-tensor-graph",
+    "two-repeated-training-steps",
+    "real-amd-opencl-forward-and-reverse-optimizer-dispatch",
+    "persistent-session-transport",
+    "arena-reuse-across-reverse-and-optimizer-steps",
+    "arena-close-releases-all-allocations",
+    "cpu-reference-differential",
+    "deterministic-checkpoint-parity",
+    "missing-placement-fails-closed",
+    "provider-unavailable-fails-closed",
+    "backend-mismatch-fails-closed",
+    "unsupported-arena-mode-fails-closed",
+    "hosted-replay-or-explicit-unavailable-boundary"
+  ],
+  "claimsGrantedOnAdmission": [
+    "OPENCL_AMD_GPU_REVERSE_ADAMW_PERSISTENT_SESSION_CANDIDATE",
+    "OPENCL_AMD_GPU_REVERSE_ADAMW_ARENA_REUSE_CANDIDATE",
+    "OPENCL_AMD_GENERIC_MULTI_STEP_REVERSE_ADAMW_TRANSPORT_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_FULL_GRAPH_TRAINING_SEMANTICS",
+    "GPU_NATIVE_NON_MATMUL_AUTODIFF",
+    "GENERIC_GPU_BACKEND",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "gapRegister": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ]
+}
