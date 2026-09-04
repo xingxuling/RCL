@@ -746,3 +746,44 @@ to `OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE` and
 training-step residency, wall-time/throughput improvement, VRAM reduction,
 generic portability, GPU training promotion, RCL-10M, RCL-1B and K400 remain
 closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K15 AMD OpenCL ordered Tensor graph residency candidate
+
+Status: `PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
+RCL owns the ordered graph, Tensor `storageIdentity` and deterministic
+`valueRoot`, shape/dtype checks, resource order and readback policy. The AMD
+OpenCL provider owns only ephemeral `cl_mem` allocation, kernel arguments and
+ordered dispatch. The candidate reuses the K14 Tensor residency session; it
+does not create a second Tensor identity or a model-special operation.
+
+| Evidence | Result |
+|---|---:|
+| K15 genome/contract compilation | PASS_LOCAL |
+| Real AMD ordered graph | two BF16 matmul nodes on `gfx1152`, exact output `4040` |
+| Intermediate residency | first `[1,2]` resource remains device-resident until node two |
+| Readback policy | `0` intermediate; `1` final explicit device-to-host readback |
+| Resource lifetime | `2` ephemeral allocations / `2` resource releases; close complete |
+| Session allocation telemetry | `5` buffers / `22` bytes / `5` releases |
+| Tensor transfer telemetry | `3` host-to-device uploads / `1` device-to-host readback |
+| Graph order negatives | intermediate readback and use-before-produce fail closed |
+| K15 protocol suite | `3/3 PASS` |
+| Rust release bridge build | PASS with locked dependencies |
+| K14/K13 regressions | required and green locally; hosted replay pending |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-opencl-tensor-graph-residency-evidence-v0.1.md`
+- `examples/native-ai/gpu-opencl-tensor-graph-residency-contract.v0.1.json`
+- `examples/native-ai/gpu-opencl-tensor-graph-residency-genome.rcl`
+- `native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `examples/native-ai/evidence/gpu-opencl-tensor-graph-residency-v0.1/k15-opencl-tensor-graph-residency-local-evidence.json`
+
+Reproduction: `npm run test:k15-opencl-tensor-graph-residency`.
+Claims are limited to `OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE`
+and `OPENCL_AMD_INTERMEDIATE_DEVICE_RESOURCE_CANDIDATE`. Canonical Tensor
+output/full-graph/training-step residency, GPU training, parallel execution,
+wall-time/throughput, VRAM reduction, generic portability, RCL-10M, RCL-1B and
+K400 promotion remain closed. Hosted replay and post-merge verification are
+pending the implementation PR.

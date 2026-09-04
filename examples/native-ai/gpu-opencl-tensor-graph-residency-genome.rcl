@@ -1,0 +1,17 @@
+# K15: RCL-owned ordered Tensor graph and bounded ephemeral output residency.
+# Intermediate resources are device-lifetime objects only; they never mint a
+# canonical Tensor value identity or silently promote GPU training semantics.
+reality OpenClTensorGraphResidencyCandidate {
+  facet contract.id : Text = "rcl-k15-opencl-amd-tensor-graph-residency-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.graph_order : Text = "RCL_DECLARED_ORDERED_TWO_TO_EIGHT_MATMUL_NODES"
+  facet contract.tensor_identity : Text = "STORAGE_IDENTITY_PLUS_VALUE_ROOT"
+  facet contract.intermediate_resource : Text = "EPHEMERAL_ORDERED_DEVICE_RESOURCE_NOT_CANONICAL_TENSOR_VALUE"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_CL_MEM_ALLOCATION_ARGUMENT_BINDING_AND_ORDERED_DISPATCH_ONLY"
+  facet contract.mode : Text = "TENSOR_RESIDENCY_V0_1_OPT_IN"
+  facet contract.max_graph_nodes : Number = 8
+  facet contract.intermediate_readbacks : Text = "FORBIDDEN"
+  facet contract.final_readback : Text = "REQUIRED_EXACTLY_ONCE"
+  facet contract.fallback : Text = "FORBIDDEN"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_ORDERED_GPU_TENSOR_GRAPH_WITH_EPHEMERAL_INTERMEDIATES_AND_ONE_FINAL_READBACK"
+}

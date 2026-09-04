@@ -1,0 +1,56 @@
+{
+  "format": "rcl.k15.opencl-amd-tensor-graph-residency-contract.v0.1",
+  "status": "OPENCL_AMD_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-ORDERED-TENSOR-GRAPH-RESIDENCY",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "graphOrder": "RCL declares the ordered node list and each node's inputs, dimensions and readback policy",
+    "tensorIdentity": "storageIdentity plus deterministic valueRoot remains the canonical Tensor reference",
+    "intermediateResource": "ephemeral ordered device resource, not canonical Tensor value",
+    "providerRole": "auxiliary OpenCL cl_mem allocation, kernel argument binding and ordered dispatch organ only",
+    "fallback": "forbidden"
+  },
+  "residency": {
+    "mode": "tensor-residency-v0.1",
+    "optIn": true,
+    "maxGraphNodes": 8,
+    "maxOutputBytesPerNode": 2097152,
+    "intermediateReadbacks": "forbidden",
+    "finalReadback": "required exactly once",
+    "resourceLifetime": "one graph request; every ephemeral output resource is released before session close",
+    "inputLifetime": "resident Tensor inputs remain bound for the enclosing provider session",
+    "outputResource": "ephemeral ordered device resource, not canonical Tensor value"
+  },
+  "acceptance": [
+    "RCL validates a bounded ordered graph of two through eight rank-2 BF16 matmul nodes",
+    "each graph node consumes resident Tensor references or a resource produced by an earlier node",
+    "intermediate outputs remain device-resident and no intermediate device-to-host readback is permitted",
+    "the final node performs exactly one explicit device-to-host readback",
+    "all graph output resources and resident Tensor inputs are released before session close",
+    "resource order, shape mismatch, duplicate identities and unavailable AMD OpenCL fail closed"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_INTERMEDIATE_DEVICE_RESOURCE_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_OUTPUT_RESIDENCY",
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "GPU_TRAINING",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_ORDERED_GPU_TENSOR_GRAPH_WITH_EPHEMERAL_INTERMEDIATES_AND_ONE_FINAL_READBACK"
+}
