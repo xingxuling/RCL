@@ -13,6 +13,7 @@ import {
   createFighterLogic,
   observeRegime,
 } from './gameRules.js';
+import { aiAttackFor, getSwordStyle, playerAttackFor } from './styles/swordStyles.js';
 import { chooseUgisRoute, directiveForRoute } from './ugisAi.js';
 
 const PLAYER_START = new THREE.Vector3(-2.3, 0, 0.45);
@@ -258,12 +259,14 @@ function ChaseCamera({ playerRoot, enemyRoot, matchRef }) {
   return null;
 }
 
-function GameWorld({ onHud, resetSignal = 0, paused = false }) {
+function GameWorld({ onHud, resetSignal = 0, paused = false, playerStyleId = 'wanfeng', opponentStyleId = 'kendo' }) {
   const keyboard = useKeyboardInput();
   const playerRoot = useRef();
   const enemyRoot = useRef();
   const player = useRef(createFighterLogic('player'));
   const enemy = useRef(createFighterLogic('enemy'));
+  const playerStyle = getSwordStyle(playerStyleId);
+  const opponentStyle = getSwordStyle(opponentStyleId);
   const match = useRef({
     hitstop: 0,
     cameraShake: 0,
@@ -326,7 +329,7 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     }
     publishHud();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetSignal]);
+  }, [resetSignal, playerStyleId, opponentStyleId]);
 
   function applyMovement(logic, root, direction, speed, delta, intent = 'forward') {
     if (!root || logic.hitstun > 0 || logic.action) return;
@@ -499,17 +502,17 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     }
 
     if (consumePressed(keyboard, 'KeyJ')) {
-      const combo = ['light1', 'light2', 'light3'];
-      const attackId = combo[p.comboTimer > 0 ? p.comboStep % 3 : 0];
+      const comboIndex = p.comboTimer > 0 ? p.comboStep % playerStyle.lightCombo.length : 0;
+      const attackId = playerAttackFor(playerStyleId, 'light', comboIndex);
       if (startAttack(p, attackId, pBasis.forward)) {
-        p.comboStep = (p.comboStep + 1) % 3;
+        p.comboStep = (p.comboStep + 1) % playerStyle.lightCombo.length;
         p.comboTimer = 0.72;
       }
     }
-    if (consumePressed(keyboard, 'KeyH')) startAttack(p, 'heavy', pBasis.forward);
-    if (consumePressed(keyboard, 'KeyU')) startAttack(p, 'skill_u', pBasis.forward);
-    if (consumePressed(keyboard, 'KeyI')) startAttack(p, 'skill_i', pBasis.forward);
-    if (consumePressed(keyboard, 'KeyO')) startAttack(p, 'skill_o', pBasis.forward);
+    if (consumePressed(keyboard, 'KeyH')) startAttack(p, playerAttackFor(playerStyleId, 'heavy'), pBasis.forward);
+    if (consumePressed(keyboard, 'KeyU')) startAttack(p, playerAttackFor(playerStyleId, 'skill_u'), pBasis.forward);
+    if (consumePressed(keyboard, 'KeyI')) startAttack(p, playerAttackFor(playerStyleId, 'skill_i'), pBasis.forward);
+    if (consumePressed(keyboard, 'KeyO')) startAttack(p, playerAttackFor(playerStyleId, 'skill_o'), pBasis.forward);
 
     if (!p.action && p.hitstun <= 0) {
       const lateral = playerMove.lengthSq() > 0 ? playerMove.dot(pBasis.right) : 0;
@@ -555,9 +558,13 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     if (!e.action && e.hitstun <= 0) {
       if (directive.action === 'dash' && e.dashCooldown <= 0) startDash(e, eBasis.forward);
       else if (directive.action === 'dash-back' && e.dashCooldown <= 0) startDash(e, eBasis.forward.clone().multiplyScalar(-1));
-      else if (directive.action === 'thrust' && distance < 2.45) startAttack(e, 'ai_thrust', eBasis.forward);
-      else if (directive.action === 'heavy' && distance < 2.2) startAttack(e, 'ai_heavy', eBasis.forward);
-      else if (aiMove.lengthSq() > 0) {
+      else if (directive.action === 'thrust' && distance < 2.45) {
+        const attackId = aiAttackFor(opponentStyleId, 'thrust');
+        if (attackId) startAttack(e, attackId, eBasis.forward);
+      } else if (directive.action === 'heavy' && distance < 2.2) {
+        const attackId = aiAttackFor(opponentStyleId, 'heavy');
+        if (attackId) startAttack(e, attackId, eBasis.forward);
+      } else if (aiMove.lengthSq() > 0) {
         const intent = directive.movement === 'retreat' ? 'retreat' : directive.movement === 'strafe' ? 'strafe' : 'forward';
         applyMovement(e, eRoot, aiMove, GAME_LIMITS.moveSpeed * 0.92, delta, intent);
       } else {
@@ -584,15 +591,26 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
   return (
     <>
       <ArenaEnvironment />
-      <HumanoidFighter logicRef={player} rootRef={playerRoot} accent="#3b92ff" />
-      <HumanoidFighter logicRef={enemy} rootRef={enemyRoot} accent="#df7c36" enemy />
+      <HumanoidFighter
+        logicRef={player}
+        rootRef={playerRoot}
+        accent={playerStyle.accent}
+        styleId={playerStyleId}
+      />
+      <HumanoidFighter
+        logicRef={enemy}
+        rootRef={enemyRoot}
+        accent={opponentStyle.accent}
+        styleId={opponentStyleId}
+        enemy
+      />
       <HitSpark event={spark} />
       <ChaseCamera playerRoot={playerRoot} enemyRoot={enemyRoot} matchRef={match} />
     </>
   );
 }
 
-export default function GameScene({ onHud, resetSignal, paused }) {
+export default function GameScene({ onHud, resetSignal, paused, playerStyleId = 'wanfeng', opponentStyleId = 'kendo' }) {
   return (
     <Canvas
       shadows
@@ -600,7 +618,13 @@ export default function GameScene({ onHud, resetSignal, paused }) {
       camera={{ position: [-5, 3, 6], fov: 50, near: 0.1, far: 45 }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
     >
-      <GameWorld onHud={onHud} resetSignal={resetSignal} paused={paused} />
+      <GameWorld
+        onHud={onHud}
+        resetSignal={resetSignal}
+        paused={paused}
+        playerStyleId={playerStyleId}
+        opponentStyleId={opponentStyleId}
+      />
     </Canvas>
   );
 }
