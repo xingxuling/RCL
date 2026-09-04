@@ -947,6 +947,51 @@ Autodiff, throughput, VRAM, portability, production model claims and K400
 promotion remain closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377
 UNTESTED`.
 
+## K20 GPU-native elementwise forward/backward candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_ELEMENTWISE_BACKWARD_CANDIDATE`.
+K20 keeps RCL as the canonical owner of generic Tensor graph, same-shape
+elementwise `sub`/`mul`, BF16/FP32 numeric semantics, reverse-mode Autodiff,
+AdamW state and checkpoint identity. An explicit
+`gpuNonMatmulMode: "elementwise-v0.1"` opt-in lowers those two operations to
+AMD OpenCL forward and reverse kernels; `mean` remains an explicit
+CPU-reference node. Two repeated steps use one persistent provider session
+and the bounded `session-arena-v0.1` temporary-buffer pool, with no fallback.
+
+| Evidence | Result |
+|---|---:|
+| K20 genome/contract compilation | PASS_LOCAL |
+| Real AMD OpenCL execution | `gfx1152`, generic `[2,1]` graph, 2 steps |
+| GPU forward nodes | 1 matmul + 2 same-shape elementwise nodes |
+| GPU reverse nodes | 2 matmul-gradient + 4 elementwise-gradient nodes |
+| Persistent transport | 38 requests / 27 dispatches over one provider session |
+| Arena telemetry | 10 allocations / 104 reuses / 10 releases; 46 allocated bytes; zero pooled at close |
+| Per-kernel baseline | 114 allocations / 616 bytes / zero reuse |
+| CPU differential | exact loss, parameters, optimizer states and checkpoint root |
+| Deterministic replay | PASS; checkpoint resume exact |
+| Focused local suite | `3/3 PASS`; K19 regression `3/3 PASS` |
+| Negative controls | unsupported/missing mode, CPU arena, provider and backend mismatch fail closed |
+| Hosted boundary | PR #153 exact head passed K20 Ubuntu `101150937092`, Windows `101150937334`, Canonical `101150936665`, Authority `101150936997`, Universal focused `101154886576` and rerun K01 Windows `101154885107`; post-merge Canonical/Universal/Authority were also green |
+| License audit | PASS, no new dependencies or donor code |
+
+Authority files:
+
+- `docs/native-ai/gpu-native-elementwise-backward-evidence-v0.1.md`
+- `examples/native-ai/gpu-native-elementwise-backward-contract.v0.1.json`
+- `examples/native-ai/gpu-native-elementwise-backward-genome.rcl`
+- `native/tensor-engine/amd_opencl_bf16_provider.py`
+- `native/tensor-engine/src/autodiff.rs`
+- `native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs`
+- `tests/k20-gpu-native-elementwise-backward.test.mjs`
+- `examples/native-ai/evidence/gpu-native-elementwise-backward-v0.1/k20-gpu-native-elementwise-backward-local-evidence.json`
+
+Reproduction: `npm run test:k20-gpu-native-elementwise-backward`.
+Claims are limited to bounded same-shape GPU `sub`/`mul` forward and reverse
+lowering plus persistent session/arena reuse. Broadcast, general non-matmul
+coverage, full-graph training semantics, GPU training, throughput, VRAM,
+generic GPU portability, production model claims and K400 promotion remain
+closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
 ## AI001 self-hosted Tensor shape-semantics candidate
 
 Status: `PASS_LOCAL_SELFHOST_TYPED_TENSOR_SHAPE_SEMANTICS_CANDIDATE`.
