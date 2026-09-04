@@ -908,7 +908,7 @@ matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
 ## K19 GPU-native reverse/AdamW persistent session arena candidate
 
-Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE`.
 K19 keeps RCL as the canonical owner of generic Tensor graph, BF16/FP32
 numeric semantics, reverse-mode Autodiff, AdamW state and checkpoint identity.
 It runs two repeated optimizer steps through one persistent AMD OpenCL session
@@ -927,7 +927,7 @@ reference nodes, and no fallback is permitted.
 | Deterministic replay | PASS; checkpoint resume exact |
 | Focused local suite | `3/3 PASS` |
 | Negative controls | unsupported arena, CPU arena, placement, provider and backend mismatch fail closed |
-| Hosted boundary | PR workflow pending; hosted runners may replay or report unavailable AMD |
+| Hosted boundary | PR #145 exact head `2470ffc` passed K19 Ubuntu `101130689327`, K19 Windows `101130689995`, Canonical `101130688962`, Universal focused `101130689973`, Universal K01 Windows `101130689882` and Authority `101130689109`; hosted runners do not inherit the local AMD receipt |
 | License audit | PASS, no new dependencies or donor code |
 
 Authority files:
