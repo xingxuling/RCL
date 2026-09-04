@@ -31,11 +31,7 @@ function ease(t) {
 
 function mergeRotation(base, patch) {
   if (!patch) return [...base];
-  return [
-    patch[0] ?? base[0],
-    patch[1] ?? base[1],
-    patch[2] ?? base[2],
-  ];
+  return [patch[0] ?? base[0], patch[1] ?? base[1], patch[2] ?? base[2]];
 }
 
 function applyPatch(base, patch) {
@@ -63,25 +59,30 @@ function interpolatePose(a, b, t) {
   return out;
 }
 
-function basePose(enemy = false) {
-  if (enemy) {
-    return {
-      pelvis: r(0, 0, 0), spine: r(-1, 0, 0), chest: r(-2, 0, 0), head: r(0, 0, 0),
-      shoulderL: r(-3, 0, 3), upperArmL: r(-38, 0, 12), forearmL: r(-58, 0, -5), handL: r(0, 0, 0),
-      shoulderR: r(-3, 0, -3), upperArmR: r(-40, 0, -12), forearmR: r(-58, 0, 5), handR: r(0, 0, 0),
-      thighL: r(-2, 0, 1), shinL: r(4, 0, 0), footL: r(-2, 0, 0),
-      thighR: r(2, 0, -1), shinR: r(4, 0, 0), footR: r(-2, 0, 0),
-      swordGrip: r(-2, 0, 0), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
-    };
-  }
+function wanfengBasePose() {
   return {
-    pelvis: r(0, -5, -1), spine: r(-1, 3, 0), chest: r(-2, 8, 2), head: r(0, -4, 0),
-    shoulderL: r(-5, 2, 6), upperArmL: r(-32, 5, 18), forearmL: r(-62, 0, -6), handL: r(0, 0, 0),
-    shoulderR: r(-5, -2, -5), upperArmR: r(-46, -6, -20), forearmR: r(-56, 0, 8), handR: r(0, 0, -4),
-    thighL: r(-4, 0, 2), shinL: r(7, 0, 0), footL: r(-3, 0, 0),
-    thighR: r(4, 0, -2), shinR: r(7, 0, 0), footR: r(-3, 0, 0),
-    swordGrip: r(0, 0, -3), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
+    pelvis: r(0, -7, -2), spine: r(-1, 4, 0), chest: r(-2, 10, 3), head: r(0, -5, 0),
+    shoulderL: r(-5, 3, 7), upperArmL: r(-31, 7, 20), forearmL: r(-62, 0, -6), handL: r(0, 0, 0),
+    shoulderR: r(-5, -3, -6), upperArmR: r(-47, -7, -22), forearmR: r(-56, 0, 9), handR: r(0, 0, -5),
+    thighL: r(-5, 0, 3), shinL: r(8, 0, 0), footL: r(-3, 0, 0),
+    thighR: r(5, 0, -3), shinR: r(8, 0, 0), footR: r(-3, 0, 0),
+    swordGrip: r(0, 0, -4), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
   };
+}
+
+function kendoBasePose() {
+  return {
+    pelvis: r(0, 0, 0), spine: r(-2, 0, 0), chest: r(-3, 0, 0), head: r(0, 0, 0),
+    shoulderL: r(-3, 0, 3), upperArmL: r(-46, 1, 15), forearmL: r(-70, 0, -7), handL: r(0, 0, 1),
+    shoulderR: r(-3, 0, -3), upperArmR: r(-48, -1, -15), forearmR: r(-70, 0, 7), handR: r(0, 0, -1),
+    thighL: r(-2, 0, 1), shinL: r(5, 0, 0), footL: r(-2, 0, 0),
+    thighR: r(2, 0, -1), shinR: r(5, 0, 0), footR: r(-2, 0, 0),
+    swordGrip: r(-3, 0, 0), bodyOffsetY: 0, swordGlow: 0, guardFx: false,
+  };
+}
+
+function basePose(styleId = 'wanfeng') {
+  return styleId === 'kendo' ? kendoBasePose() : wanfengBasePose();
 }
 
 function sampleClip(clip, normalizedTime, base) {
@@ -103,7 +104,68 @@ function sampleClip(clip, normalizedTime, base) {
   return interpolatePose(applyPatch(base, left.pose), applyPatch(base, right.pose), localT);
 }
 
-function applyLocomotion(pose, logic, elapsed, enemy) {
+function applyWanFengLocomotion(pose, logic, elapsed, magnitude) {
+  const phase = elapsed * 8.45;
+  const intent = logic.moveIntent || 'forward';
+  const stride = Math.sin(phase) * magnitude;
+  const plant = Math.sin(phase * 2) * 0.5 + 0.5;
+  const strideScale = intent === 'strafe' ? 0.48 : intent === 'retreat' ? -0.76 : 0.88;
+  const leg = stride * strideScale;
+
+  pose.pelvis[0] += Math.abs(Math.sin(phase)) * 0.042 * magnitude;
+  pose.pelvis[1] += stride * (intent === 'strafe' ? 0.075 : 0.045);
+  pose.pelvis[2] += (intent === 'strafe' ? Math.sin(phase) * 0.082 : Math.sin(phase) * 0.026) * magnitude;
+  pose.chest[1] -= pose.pelvis[1] * 0.58;
+  pose.chest[2] -= pose.pelvis[2] * 0.68;
+  pose.head[1] += Math.sin(phase * 0.5) * 0.025;
+  pose.thighL[0] += leg;
+  pose.thighR[0] -= leg;
+  pose.shinL[0] += Math.max(0, -leg) * 0.86;
+  pose.shinR[0] += Math.max(0, leg) * 0.86;
+  pose.footL[0] -= Math.max(0, leg) * 0.28;
+  pose.footR[0] -= Math.max(0, -leg) * 0.28;
+  pose.bodyOffsetY = -0.03 * Math.abs(Math.sin(phase * 2)) * magnitude;
+
+  if (plant < 0.18) {
+    pose.footL[0] *= 0.32;
+    pose.shinL[0] *= 0.68;
+  } else if (plant > 0.82) {
+    pose.footR[0] *= 0.32;
+    pose.shinR[0] *= 0.68;
+  }
+  return pose;
+}
+
+function applyKendoLocomotion(pose, logic, elapsed, magnitude) {
+  const phase = elapsed * 7.15;
+  const intent = logic.moveIntent || 'forward';
+  const stride = Math.sin(phase) * magnitude;
+  const plant = Math.sin(phase * 2) * 0.5 + 0.5;
+  const strideScale = intent === 'strafe' ? 0.22 : intent === 'retreat' ? -0.58 : 0.69;
+  const leg = stride * strideScale;
+
+  pose.pelvis[0] += Math.abs(Math.sin(phase)) * 0.022 * magnitude;
+  pose.pelvis[2] += (intent === 'strafe' ? Math.sin(phase) * 0.022 : 0);
+  pose.chest[2] -= pose.pelvis[2] * 0.36;
+  pose.thighL[0] += leg;
+  pose.thighR[0] -= leg;
+  pose.shinL[0] += Math.max(0, -leg) * 0.72;
+  pose.shinR[0] += Math.max(0, leg) * 0.72;
+  pose.footL[0] -= Math.max(0, leg) * 0.18;
+  pose.footR[0] -= Math.max(0, -leg) * 0.18;
+  pose.bodyOffsetY = -0.014 * Math.abs(Math.sin(phase * 2)) * magnitude;
+
+  if (plant < 0.16) {
+    pose.footL[0] *= 0.42;
+    pose.shinL[0] *= 0.78;
+  } else if (plant > 0.84) {
+    pose.footR[0] *= 0.42;
+    pose.shinR[0] *= 0.78;
+  }
+  return pose;
+}
+
+function applyLocomotion(pose, logic, elapsed, styleId) {
   if (!logic.grounded) {
     pose.bodyOffsetY = -0.04;
     pose.thighL = r(-26, 0, 3);
@@ -115,51 +177,40 @@ function applyLocomotion(pose, logic, elapsed, enemy) {
 
   const magnitude = Math.max(0, Math.min(1, logic.moveMagnitude || 0));
   if (magnitude <= 0.02) {
-    const breath = Math.sin(elapsed * 2.15);
-    pose.spine[0] += breath * 0.006;
-    pose.chest[0] += breath * 0.01;
-    pose.chest[2] += Math.sin(elapsed * 1.65 + 0.4) * 0.006;
-    pose.head[1] += Math.sin(elapsed * 0.8) * 0.01;
-    pose.swordGrip[2] += Math.sin(elapsed * 1.7) * 0.012;
+    const breath = Math.sin(elapsed * (styleId === 'kendo' ? 1.72 : 2.15));
+    pose.spine[0] += breath * (styleId === 'kendo' ? 0.003 : 0.006);
+    pose.chest[0] += breath * (styleId === 'kendo' ? 0.005 : 0.01);
+    pose.chest[2] += Math.sin(elapsed * 1.65 + 0.4) * (styleId === 'kendo' ? 0.002 : 0.006);
+    pose.head[1] += Math.sin(elapsed * 0.8) * (styleId === 'kendo' ? 0.003 : 0.01);
+    pose.swordGrip[2] += Math.sin(elapsed * 1.7) * (styleId === 'kendo' ? 0.003 : 0.012);
     return pose;
   }
 
-  const phase = elapsed * (enemy ? 7.6 : 8.2);
-  const intent = logic.moveIntent || 'forward';
-  const stride = Math.sin(phase) * magnitude;
-  const plant = Math.sin(phase * 2) * 0.5 + 0.5;
-  const strideScale = intent === 'strafe' ? 0.38 : intent === 'retreat' ? -0.72 : 0.82;
-  const leg = stride * strideScale;
-
-  pose.pelvis[0] += Math.abs(Math.sin(phase)) * 0.035 * magnitude;
-  pose.pelvis[2] += (intent === 'strafe' ? Math.sin(phase) * 0.055 : 0);
-  pose.chest[2] -= pose.pelvis[2] * 0.55;
-  pose.thighL[0] += leg;
-  pose.thighR[0] -= leg;
-  pose.shinL[0] += Math.max(0, -leg) * 0.8;
-  pose.shinR[0] += Math.max(0, leg) * 0.8;
-  pose.footL[0] -= Math.max(0, leg) * 0.25;
-  pose.footR[0] -= Math.max(0, -leg) * 0.25;
-  pose.bodyOffsetY = -0.025 * Math.abs(Math.sin(phase * 2)) * magnitude;
-
-  if (plant < 0.18) {
-    pose.footL[0] *= 0.35;
-    pose.shinL[0] *= 0.7;
-  } else if (plant > 0.82) {
-    pose.footR[0] *= 0.35;
-    pose.shinR[0] *= 0.7;
-  }
-
-  return pose;
+  return styleId === 'kendo'
+    ? applyKendoLocomotion(pose, logic, elapsed, magnitude)
+    : applyWanFengLocomotion(pose, logic, elapsed, magnitude);
 }
 
-function guardPose(enemy = false) {
+function wanfengGuardPose() {
   return {
-    pelvis: r(2, enemy ? 0 : -4, 0), spine: r(-3, enemy ? 0 : 3, 0), chest: r(-5, enemy ? 0 : 6, 0),
-    shoulderR: r(-12, -2, -12), upperArmR: r(-82, -5, -34), forearmR: r(-82, 0, 20), handR: r(2, 0, -8),
-    shoulderL: r(-10, 3, 11), upperArmL: r(-72, 8, 34), forearmL: r(-86, 0, -18), handL: r(0, 0, 6),
-    swordGrip: r(4, 0, -10), guardFx: true,
+    pelvis: r(2, -12, -2), spine: r(-3, 6, 1), chest: r(-5, 14, 4),
+    shoulderR: r(-12, -3, -14), upperArmR: r(-80, -8, -38), forearmR: r(-80, 0, 22), handR: r(2, 0, -10),
+    shoulderL: r(-10, 4, 12), upperArmL: r(-70, 10, 38), forearmL: r(-84, 0, -20), handL: r(0, 0, 7),
+    swordGrip: r(4, -12, -12), guardFx: true,
   };
+}
+
+function kendoGuardPose() {
+  return {
+    pelvis: r(1, 0, 0), spine: r(-3, 0, 0), chest: r(-5, 0, 0), head: r(0, 0, 0),
+    shoulderR: r(-10, 0, -5), upperArmR: r(-76, 0, -18), forearmR: r(-92, 0, 28), handR: r(3, 0, -4),
+    shoulderL: r(-10, 0, 5), upperArmL: r(-70, 0, 20), forearmL: r(-88, 0, -24), handL: r(2, 0, 4),
+    swordGrip: r(2, 0, -2), guardFx: true,
+  };
+}
+
+function guardPose(styleId) {
+  return styleId === 'kendo' ? kendoGuardPose() : wanfengGuardPose();
 }
 
 function hitPose(enemy, heavy) {
@@ -173,12 +224,13 @@ function hitPose(enemy, heavy) {
   };
 }
 
-export function sampleFighterPose({ logic, elapsed = 0, enemy = false }) {
-  const base = applyLocomotion(clonePose(basePose(enemy)), logic, elapsed, enemy);
+export function sampleFighterPose({ logic, elapsed = 0, enemy = false, styleId }) {
+  const resolvedStyleId = styleId ?? (enemy ? 'kendo' : 'wanfeng');
+  const base = applyLocomotion(clonePose(basePose(resolvedStyleId)), logic, elapsed, resolvedStyleId);
 
   if (logic.guard) {
-    const guarded = applyPatch(base, guardPose(enemy));
-    guarded.swordGlow = 0.12;
+    const guarded = applyPatch(base, guardPose(resolvedStyleId));
+    guarded.swordGlow = resolvedStyleId === 'kendo' ? 0.08 : 0.16;
     return guarded;
   }
 
@@ -191,17 +243,33 @@ export function sampleFighterPose({ logic, elapsed = 0, enemy = false }) {
 
   if (logic.action === 'dash') {
     const dash = clonePose(base);
-    dash.pelvis[0] -= 0.13;
-    dash.spine[0] -= 0.08;
-    dash.chest[0] -= 0.12;
-    dash.upperArmR = r(-54, -6, -28);
-    dash.forearmR = r(-42, 0, 8);
-    dash.upperArmL = r(18, 6, 30);
-    dash.forearmL = r(-20, 0, -4);
-    dash.thighL = r(24, 0, 2);
-    dash.thighR = r(-20, 0, -2);
-    dash.bodyOffsetY = -0.05;
-    dash.swordGlow = 0.2;
+    if (resolvedStyleId === 'kendo') {
+      dash.pelvis[0] -= 0.09;
+      dash.spine[0] -= 0.04;
+      dash.chest[0] -= 0.05;
+      dash.upperArmR = r(-58, 0, -12);
+      dash.forearmR = r(-62, 0, 10);
+      dash.upperArmL = r(-48, 0, 12);
+      dash.forearmL = r(-64, 0, -10);
+      dash.thighL = r(18, 0, 1);
+      dash.thighR = r(-15, 0, -1);
+      dash.bodyOffsetY = -0.035;
+      dash.swordGlow = 0.12;
+    } else {
+      dash.pelvis[0] -= 0.13;
+      dash.pelvis[1] += 0.07 * (logic.flowSide || 1);
+      dash.spine[0] -= 0.08;
+      dash.chest[0] -= 0.12;
+      dash.chest[1] -= 0.06 * (logic.flowSide || 1);
+      dash.upperArmR = r(-54, -6, -28);
+      dash.forearmR = r(-42, 0, 8);
+      dash.upperArmL = r(18, 6, 30);
+      dash.forearmL = r(-20, 0, -4);
+      dash.thighL = r(24, 0, 2);
+      dash.thighR = r(-20, 0, -2);
+      dash.bodyOffsetY = -0.05;
+      dash.swordGlow = 0.22;
+    }
     return dash;
   }
 
