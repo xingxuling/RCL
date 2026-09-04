@@ -10,7 +10,7 @@ PASS. This advances the frozen RCL-1B target directly. The same model topology f
 
 ## 柳清莲 Gate
 
-PASS. Claim boundaries are explicit. Multi-block forward/loss and cross-block gradients are admitted; multi-block AdamW replay, RCL-10M, GPU and RCL-1B remain closed.
+PASS. Claim boundaries are explicit. Multi-block forward/loss and cross-block gradients are admitted, and K08-R separately provides a hosted CPU-f64 two-block AdamW replay candidate; BF16/mixed-precision scale, RCL-10M, GPU and RCL-1B remain closed.
 
 ## 洞哥 Grounding
 
@@ -34,7 +34,7 @@ PASS. The topology lowers entirely to generic Tensor primitives and existing Rev
 
 ## 测试文明
 
-PASS. Hosted run `32848996210` passes 9/9 on Ubuntu `97805250272` and Windows `97805250421`. Tests cover source self-host parity, one/two-block parametric construction, independent oracle, order observability, all-parameter gradients, finite difference across both blocks, generic LM loss, invalid boundaries, duplicate parameter identity and model-special injection.
+PASS. Hosted run `32848996210` passes 9/9 on Ubuntu `97805250272` and Windows `97805250421` for the topology/gradient slice. The later K08-R hosted run `33888428286` passes 8/8 on Ubuntu `101073862101` and Windows `101073862513` for the CPU-f64 two-block AdamW replay. Tests cover source self-host parity, one/two-block parametric construction, independent oracle, order observability, all-parameter gradients, finite difference across both blocks, generic LM loss, exact optimizer continuation, invalid boundaries, duplicate parameter identity and model-special injection.
 
 ## 安全文明
 
@@ -48,7 +48,7 @@ PASS for hosted-candidate merge. Public claims must not imply that 24 blocks, RC
 
 `ADMIT_MULTI_BLOCK_LM_CANDIDATE_GITHUB_REPLAY_BOUND`
 
-The canonical meaning is ordered model topology under RCL ownership. Future graph compaction, block scheduling, activation checkpointing and fused kernels are execution/performance organs and must preserve the admitted model semantics.
+The canonical meaning is ordered model topology and bounded multi-block optimizer continuation under RCL ownership. Future graph compaction, block scheduling, activation checkpointing and fused kernels are execution/performance organs and must preserve the admitted model semantics.
 
 ## Rollback
 
