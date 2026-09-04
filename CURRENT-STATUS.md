@@ -426,7 +426,7 @@ RCL-10M and K400 promotion remain closed. Authority:
 
 ## K14 AMD OpenCL Tensor value residency candidate
 
-Status: `PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
 K14 adds a separate opt-in `tensor-residency-v0.1` session and an RCL-owned
 Rust probe bridge. RCL computes a deterministic value root from
 `dtype + shape + canonical BF16 bits` and binds it beside `storageIdentity`;
@@ -442,10 +442,13 @@ two resident Tensor releases and exact `4130` BF16 outputs for two matmuls.
 The close receipt reports four total OpenCL allocations/releases (two resident
 inputs and two transient outputs) with zero resident buffers after close.
 K14 is `3/3 PASS`; Rust Tensor is `7/7`; K08 Tensor is `16 PASS + 1 declared
-skip`; K13 and the earlier GPU dispatch candidates remain green. The local
-candidate has no hosted or post-merge replay yet. Tensor output/full-graph or
-training-step residency, wall-time/throughput, VRAM, generic portability,
-GPU-training promotion, RCL-10M and K400 remain closed. Authority:
+skip`; K13 and the earlier GPU dispatch candidates remain green. Hosted PR #117
+replay passed on Ubuntu and Windows, and post-merge main `418f50f43d446b696a74f2086cf8fafb28c4fb5a`
+passed K14 plus the K09-K13, Canonical, Universal and Authority checks. Strict
+Clippy remains blocked by eight pre-existing warnings, with no K14-specific
+warning observed. Tensor output/full-graph or training-step residency,
+wall-time/throughput, VRAM, generic portability, GPU-training promotion,
+RCL-10M and K400 remain closed. Authority:
 `docs/native-ai/gpu-opencl-tensor-residency-evidence-v0.1.md`,
 `examples/native-ai/gpu-opencl-tensor-residency-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-tensor-residency-genome.rcl` and

@@ -2,7 +2,7 @@
 
 ## Ruling
 
-`PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`
+`PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`
 
 RCL owns `storageIdentity`, the deterministic value-root recipe, binding order,
 replacement/stale-value policy and the resource/close checks. The AMD OpenCL
@@ -30,7 +30,9 @@ improvement.
   forbidden.
 - K14 passed `3/3`; Rust Tensor passed `7/7`; K08 Tensor passed `16` with one
   declared skip; K13 and prior GPU dispatch regressions remain green.
-- Strict Clippy was not rerun for this candidate; no Clippy PASS is claimed.
+- Strict Clippy was run and is blocked by eight pre-existing warnings (manual
+  range, needless deref/borrow, complex type and argument-count warnings); no
+  K14-specific warning was observed and no Clippy PASS is claimed.
 - License audit: no dependency, external source or donor code was added.
 
 ## No Silent RCL Bypass ruling
@@ -58,15 +60,20 @@ improvement.
 | ROBUST | PASS_LOCAL_FAIL_CLOSED_STALE_IDENTITY |
 | PERFORMANCE | TRANSFER_COUNT_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM |
 | AI_GENERATE | NOT_APPLICABLE |
-| EVIDENCE | CANDIDATE_LOCAL_HOSTED_PENDING |
+| EVIDENCE | CANDIDATE_HOSTED_AND_POSTMERGE |
 
 The candidate grants only
 `OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE` and
 `OPENCL_AMD_INPUT_TRANSFER_ELISION_CANDIDATE`. It does not grant output or
 full-graph Tensor residency, training-step reuse, parallel execution,
 wall-time/throughput improvement, VRAM reduction, generic portability, GPU
-training promotion, RCL-10M, RCL-1B or K400 PASS. Hosted replay and post-merge
-verification are still pending for this candidate.
+training promotion, RCL-10M, RCL-1B or K400 PASS. Hosted exact-head replay for
+PR #117 passed on Ubuntu and Windows (K14 run `33866569331`), with K13/K12
+regressions and Canonical/Universal/Authority checks green. Post-merge main
+`418f50f43d446b696a74f2086cf8fafb28c4fb5a` passed K14 on Ubuntu and Windows
+(run `33867880127`) plus the same regression and repository checks. These
+hosted runners do not provide the local AMD device; the real `gfx1152`
+execution remains the separate local hardware receipt above.
 
 Authority files:
 

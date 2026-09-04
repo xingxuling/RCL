@@ -708,7 +708,7 @@ training promotion, RCL-10M, RCL-1B and K400 remain closed.
 
 ## K14 AMD OpenCL Tensor value residency candidate
 
-Status: `PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE`.
 K14 adds an opt-in RCL-owned Rust probe and `tensor-residency-v0.1` provider
 session. `storageIdentity` and a deterministic value root over dtype, shape and
 canonical BF16 bits are the admission key. The provider can retain only
@@ -727,8 +727,10 @@ explicitly read back on every operation.
 | K14 protocol suite | `3/3 PASS` |
 | Rust Tensor unit tests | `7/7 PASS` |
 | K08 Tensor suite | `16 PASS, 1 declared skip, 0 FAIL` |
+| Strict Clippy | BLOCKED by 8 pre-existing warnings; no K14-specific warning observed |
 | License audit | PASS, no new dependencies or donor code |
-| Hosted and post-merge replay | PENDING |
+| Hosted exact-head replay | PASS, PR #117; K14 run `33866569331` (Ubuntu/Windows), regressions and repository checks green |
+| Post-merge main replay | PASS, main `418f50f43d446b696a74f2086cf8fafb28c4fb5a`; K14 run `33867880127` (Ubuntu/Windows), regressions and repository checks green |
 
 Authority files:
 
