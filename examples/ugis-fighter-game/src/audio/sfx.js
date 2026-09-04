@@ -37,6 +37,15 @@ const ATTACK_SAMPLE = Object.freeze({
   skill_u: ['slash1', 1.18, 0.62],
   skill_i: ['slash2', 0.92, 0.68],
   skill_o: ['slash3', 0.70, 0.78],
+
+  kendo_light1: ['slash1', 1.00, 0.46],
+  kendo_light2: ['slash1', 0.94, 0.50],
+  kendo_light3: ['slash2', 0.86, 0.58],
+  kendo_heavy: ['slash3', 0.76, 0.67],
+  kendo_skill_u: ['slash1', 1.04, 0.58],
+  kendo_skill_i: ['slash2', 0.84, 0.65],
+  kendo_skill_o: ['slash3', 0.64, 0.80],
+
   ai_thrust: ['slash1', 1.12, 0.43],
   ai_heavy: ['slash3', 0.82, 0.58],
 });
@@ -152,11 +161,13 @@ class SfxRuntime {
     const [sample, rate, volume] = spec;
     const played = this.play(sample, { volume: role === 'enemy' ? volume * 0.82 : volume, rate });
     if (!played) this.noiseBurst({ duration: 0.12, volume: 0.16, frequency: 2200, type: 'bandpass' });
-    if (attackId.startsWith('skill_')) {
+    const skill = attackId.startsWith('skill_') || attackId.startsWith('kendo_skill_');
+    if (skill) {
+      const ultimate = attackId.endsWith('_o');
       this.noiseBurst({
-        duration: attackId === 'skill_o' ? 0.32 : 0.20,
-        volume: attackId === 'skill_o' ? 0.34 : 0.22,
-        frequency: attackId === 'skill_o' ? 1050 : 1800,
+        duration: ultimate ? 0.32 : 0.20,
+        volume: ultimate ? 0.34 : 0.22,
+        frequency: attackId.startsWith('kendo_') ? (ultimate ? 900 : 1450) : (ultimate ? 1050 : 1800),
         type: 'bandpass',
       });
     }
