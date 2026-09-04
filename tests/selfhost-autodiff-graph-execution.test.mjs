@@ -61,6 +61,7 @@ test('AI002 binds RCL shape and reverse graph admissions to native numeric execu
   assert.equal(report.execution.attempted, true);
   assert.equal(report.execution.edgeParity, true);
   assert.equal(report.execution.gradientShapeValid, true);
+  assert.equal(report.execution.gradientParameterParity, true);
   assert.equal(report.execution.loss, 0.8833333333333333);
   const gradients = new Map(report.execution.gradients.map((item) => [item.parameter.tensorId, item.storage.data]));
   assert.deepEqual(gradients.get('x'), [2.1666666666666665, 2.5]);

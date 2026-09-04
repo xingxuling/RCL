@@ -1,7 +1,3 @@
-import crypto from 'node:crypto';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import {
   runSelfHostedTensorShapeSemantics,
 } from './selfhost-tensor-shape-semantics.mjs';
@@ -14,14 +10,8 @@ import {
 } from '../scripts/run-k08-native-autodiff.mjs';
 import { canonicalJson, evidenceRoot } from './universal-program-stress.mjs';
 
-const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-
 export const SELFHOST_AUTODIFF_GRAPH_EXECUTION_FORMAT = 'rcl.selfhost.autodiff-graph-execution.v0.1';
 export const SELFHOST_AUTODIFF_GRAPH_EXECUTION_OWNER = 'rcl-tensor-autodiff-rust-v0.1';
-
-function sha256(value) {
-  return crypto.createHash('sha256').update(value).digest('hex');
-}
 
 function isObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -335,6 +325,7 @@ export function runSelfHostedAutodiffGraphExecution(input = {}, options = {}) {
     attempted: false,
     edgeParity: false,
     gradientShapeValid: false,
+    gradientParameterParity: false,
   };
   if (!semanticAccepted) {
     report.execution.reason = 'admission-rejected-or-unsupported-provider-profile';
@@ -350,12 +341,19 @@ export function runSelfHostedAutodiffGraphExecution(input = {}, options = {}) {
       const parameterShapes = new Map(request.tensors.map((tensor) => [tensor.id, tensor.shape]));
       const gradientShapeValid = (response.gradients ?? []).every((gradient) =>
         canonicalJson(gradient.tensor?.shape ?? []) === canonicalJson(parameterShapes.get(gradient.parameter?.tensorId) ?? null));
+      const gradientParameterParity = (response.gradients ?? []).length === request.parameters.length
+        && request.parameters.every((parameter, index) => {
+          const gradient = response.gradients[index];
+          return gradient?.parameter?.tensorId === parameter.tensorId
+            && gradient?.parameter?.gradientIdentity === parameter.gradientIdentity;
+        });
       return {
         response,
         expected,
         actual,
         edgeParity: canonicalJson(actual) === canonicalJson(expected),
         gradientShapeValid,
+        gradientParameterParity,
       };
     });
     if (provider.error) {
@@ -369,6 +367,7 @@ export function runSelfHostedAutodiffGraphExecution(input = {}, options = {}) {
       report.execution = {
         owner: request.executionOwner,
         status: provider.value.response.status === 'ok' && provider.value.edgeParity && provider.value.gradientShapeValid
+          && provider.value.gradientParameterParity
           ? 'executed'
           : 'rejected',
         attempted: true,
@@ -379,6 +378,7 @@ export function runSelfHostedAutodiffGraphExecution(input = {}, options = {}) {
         accumulator: provider.value.response.accumulator,
         edgeParity: provider.value.edgeParity,
         gradientShapeValid: provider.value.gradientShapeValid,
+        gradientParameterParity: provider.value.gradientParameterParity,
         planRoot: evidenceRoot({
           expectedEdges: provider.value.expected,
           graphRoot: governance.value.graphRoot,
@@ -401,4 +401,4 @@ export function autodiffGraphExecutionCanonical(report) {
   });
 }
 
-export { normalizeRequest, providerRequest, storageAdmission, sha256 };
+export { normalizeRequest, providerRequest, storageAdmission };

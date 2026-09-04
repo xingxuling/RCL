@@ -68,7 +68,7 @@ const sourceCommit = execFileSync('git', ['log', '-1', '--format=%H', '--', 'src
 }).trim();
 const evidence = {
   format: 'rcl.gap.ai002.selfhost-autodiff-execution-binding.local-evidence.v0.1',
-  status: report.execution.status === 'executed' && report.admission.accepted && report.execution.edgeParity && report.execution.gradientShapeValid
+  status: report.execution.status === 'executed' && report.admission.accepted && report.execution.edgeParity && report.execution.gradientShapeValid && report.execution.gradientParameterParity
     ? 'PASS_LOCAL_RCL_ADMISSION_PROVIDER_BINDING_CANDIDATE'
     : 'FAIL_LOCAL_RCL_ADMISSION_PROVIDER_BINDING_CANDIDATE',
   sourceCommit,
@@ -81,6 +81,7 @@ const evidence = {
     providerExecution: report.execution.status === 'executed',
     reverseEdgeParity: report.execution.edgeParity,
     gradientShapeValid: report.execution.gradientShapeValid,
+    gradientParameterParity: report.execution.gradientParameterParity,
   },
   report: {
     request: report.request,
@@ -107,4 +108,3 @@ fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
 fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
 console.log(JSON.stringify({ status: evidence.status, sourceCommit, reportRoot: evidence.reportRoot, output: path.relative(ROOT, OUTPUT_PATH).replaceAll('\\', '/') }, null, 2));
 if (evidence.status.startsWith('FAIL')) process.exitCode = 1;
-
