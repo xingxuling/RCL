@@ -1,0 +1,126 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-tensor-graph-residency.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K15",
+  "status": "PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "baseMain": "07109ade4394056286df0f6593b9eba4f2dbecb9",
+  "implementationCommit": "PENDING_IMPLEMENTATION_COMMIT",
+  "branch": "codex/k15-opencl-graph-residency-v01",
+  "contract": "examples/native-ai/gpu-opencl-tensor-graph-residency-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-tensor-graph-residency-genome.rcl",
+  "bridge": "native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "probe": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "graphOutputBits": ["4040"],
+      "intermediateReadbackCount": 0,
+      "finalReadbackCount": 1,
+      "graphExecutionRoot": "76fc4bb4c8a4df61ef5853982a53b89c7b387699cd29e69fb28ea129681a4a3c",
+      "exactOutputParity": true,
+      "nodeShapes": [[1, 2], [1, 1]],
+      "nodeDeviceResidentAfter": [true, false],
+      "resourceCount": 2,
+      "releasedResourceCount": 2,
+      "telemetry": {
+        "bufferAllocationCount": 5,
+        "bufferAllocationBytes": 22,
+        "bufferReleaseCount": 5,
+        "tensorValueResidency": true,
+        "residentTensorCountAfterClose": 0,
+        "residentBytesAfterClose": 0,
+        "maxResidentTensors": 64,
+        "maxResidentBytes": 2097152,
+        "tensorBindCount": 3,
+        "tensorResidencyHitCount": 0,
+        "tensorReplacementCount": 0,
+        "tensorHostToDeviceTransfers": 3,
+        "tensorDeviceToHostTransfers": 1,
+        "tensorReleaseCount": 3
+      }
+    },
+    "negativeAndBoundary": {
+      "intermediateReadback": "RCL_OPENCL_TENSOR_GRAPH_READBACK",
+      "useBeforeProduceResource": "RCL_OPENCL_TENSOR_GRAPH_RESOURCE",
+      "maxGraphNodes": 8,
+      "providerFallback": "forbidden"
+    },
+    "regressions": {
+      "rustBridgeBuild": "PASS",
+      "pythonSyntax": "PASS",
+      "diffCheck": "PASS",
+      "k15": "3_PASS",
+      "k14TensorResidency": "PASS",
+      "k13BufferArena": "PASS_EXPECTED_REGRESSION_SUITE"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "hostedReplay": {
+    "status": "NOT_RUN_IMPLEMENTATION_PR_PENDING",
+    "pullRequest": null,
+    "k15Run": null,
+    "k14RegressionRun": null,
+    "k13RegressionRun": null,
+    "canonicalVerificationRun": null,
+    "authorityRun": null
+  },
+  "postMergeVerification": {
+    "status": "NOT_RUN_IMPLEMENTATION_PR_PENDING",
+    "mainSha": null,
+    "k15Run": null,
+    "k14RegressionRun": null,
+    "k13RegressionRun": null,
+    "canonicalVerificationRun": null,
+    "authorityRun": null
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale cells only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT_OUTPUT_BITS",
+    "ROBUST": "PASS_LOCAL_FAIL_CLOSED_GRAPH_ORDER_AND_READBACK",
+    "PERFORMANCE": "ALLOCATION_AND_TRANSFER_COUNTS_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "LOCAL_ONLY_PENDING_HOSTED_AND_POSTMERGE"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_INTERMEDIATE_DEVICE_RESOURCE_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_OUTPUT_RESIDENCY",
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "GPU_TRAINING",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_ORDERED_GPU_TENSOR_GRAPH_WITH_EPHEMERAL_INTERMEDIATES_AND_ONE_FINAL_READBACK",
+  "reportRoot": "d45c441845d6832280666ffc09c3743950f3c83841973973205033d4b5af9a52"
+}

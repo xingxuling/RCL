@@ -1,0 +1,52 @@
+name: K15 AMD OpenCL Tensor Graph Residency
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k15-opencl-tensor-graph-residency.test.mjs'
+      - 'tests/k14-opencl-tensor-residency.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-graph-residency-*'
+      - 'examples/native-ai/evidence/gpu-opencl-tensor-graph-residency-*'
+      - 'package.json'
+      - '.github/workflows/k15-opencl-tensor-graph-residency.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k15-opencl-tensor-graph-residency.test.mjs'
+      - 'tests/k14-opencl-tensor-residency.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-graph-residency-*'
+      - 'examples/native-ai/evidence/gpu-opencl-tensor-graph-residency-*'
+      - 'package.json'
+      - '.github/workflows/k15-opencl-tensor-graph-residency.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tensor-graph-residency:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Build Tensor graph residency bridge
+        run: cargo build --release --locked --manifest-path native/tensor-engine/Cargo.toml --bin rcl-opencl-tensor-residency
+      - name: Run K15 graph residency verification
+        run: npm run test:k15-opencl-tensor-graph-residency
+      - name: Run K14 Tensor residency regression
+        run: npm run test:k14-opencl-tensor-residency
+      - name: Run K13 allocation reuse regression
+        run: npm run test:k13-opencl-buffer-arena

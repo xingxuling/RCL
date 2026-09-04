@@ -40,6 +40,8 @@ MAX_ARENA_BUFFERS = 64
 MAX_ARENA_BYTES = 2 * 1024 * 1024
 MAX_RESIDENT_TENSORS = 64
 MAX_RESIDENT_BYTES = 2 * 1024 * 1024
+MAX_GRAPH_OPERATIONS = 8
+MAX_GRAPH_BYTES = 2 * 1024 * 1024
 
 CL_SUCCESS = 0
 CL_DEVICE_NOT_FOUND = -1
@@ -55,6 +57,7 @@ CL_DEVICE_EXTENSIONS = 0x1030
 CL_CONTEXT_PLATFORM = 0x1084
 CL_MEM_READ_ONLY = 1
 CL_MEM_WRITE_ONLY = 2
+CL_MEM_READ_WRITE = 0
 CL_MEM_COPY_HOST_PTR = 1 << 5
 CL_PROGRAM_BUILD_LOG = 0x1183
 
@@ -1189,6 +1192,247 @@ def run_tensor_residency_matmul(
     }
 
 
+def _graph_node_id(node: dict[str, Any]) -> str:
+    value = node.get("nodeId")
+    if not isinstance(value, str) or not value or len(value) > 256:
+        raise fail("RCL_OPENCL_TENSOR_GRAPH_IDENTITY", "graph nodeId must be a non-empty identity string")
+    return value
+
+
+def _graph_resource_id(node: dict[str, Any]) -> str:
+    return _residency_identity(node, "outputResource")
+
+
+def _graph_dimensions(node: dict[str, Any]) -> tuple[int, int, int]:
+    values = [node.get("rows"), node.get("columns"), node.get("shared")]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in values):
+        raise fail("RCL_OPENCL_TENSOR_GRAPH_SHAPE", "graph matmul dimensions must be integers")
+    rows, columns, shared = values
+    if any(value < 1 or value > MAX_DIMENSION for value in values):
+        raise fail(
+            "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
+            f"graph matmul dimensions must be within 1..={MAX_DIMENSION}",
+        )
+    return rows, columns, shared
+
+
+def _graph_input(
+    node: dict[str, Any],
+    side: str,
+    runtime: OpenCLRuntime,
+    resources: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any], str]:
+    resource_field = f"{side}Resource"
+    tensor_field = f"{side}TensorIdentity"
+    root_field = f"{side}ValueRoot"
+    if resource_field in node:
+        if tensor_field in node or root_field in node:
+            raise fail(
+                "RCL_OPENCL_TENSOR_GRAPH_INPUT",
+                f"{side} input cannot mix a resource reference with a Tensor identity",
+            )
+        resource_id = _residency_identity(node, resource_field)
+        resource = resources.get(resource_id)
+        if resource is None:
+            raise fail(
+                "RCL_OPENCL_TENSOR_GRAPH_RESOURCE",
+                f"{side} resource {resource_id} is not available at this graph point",
+            )
+        return resource, resource_id
+    identity = _residency_identity(node, tensor_field)
+    value_root = _residency_root(node, root_field)
+    return runtime.resident_tensor(identity, value_root), f"tensor:{identity}:{value_root}"
+
+
+def run_tensor_residency_graph(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime,
+) -> dict[str, Any]:
+    if request.get("backend") != BACKEND:
+        raise fail(
+            "RCL_OPENCL_BACKEND_UNAVAILABLE",
+            "requested backend is not opencl-amd; silent CPU fallback is forbidden",
+        )
+    nodes = request.get("nodes")
+    if (
+        not isinstance(nodes, list)
+        or len(nodes) < 2
+        or len(nodes) > MAX_GRAPH_OPERATIONS
+        or any(not isinstance(node, dict) for node in nodes)
+    ):
+        raise fail(
+            "RCL_OPENCL_TENSOR_GRAPH_LIMIT",
+            f"graph nodes must contain 2..={MAX_GRAPH_OPERATIONS} objects",
+        )
+    resources: dict[str, dict[str, Any]] = {}
+    receipts: list[dict[str, Any]] = []
+    output_bits: list[int] | None = None
+    output_resource = ""
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-tensor-graph-residency-v0.1\0")
+    digest.update(runtime.device_info["deviceName"].encode("utf-8"))
+    try:
+        for index, node in enumerate(nodes):
+            node_id = _graph_node_id(node)
+            output_resource = _graph_resource_id(node)
+            if output_resource in resources:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_GRAPH_RESOURCE",
+                    f"graph outputResource {output_resource} is duplicated",
+                )
+            readback = node.get("readback", False)
+            if not isinstance(readback, bool):
+                raise fail("RCL_OPENCL_TENSOR_GRAPH_READBACK", "graph readback must be boolean")
+            if index < len(nodes) - 1 and readback:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_GRAPH_READBACK",
+                    "only the final graph node may request a readback",
+                )
+            if index == len(nodes) - 1 and readback is not True:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_GRAPH_READBACK",
+                    "the final graph node requires an explicit readback",
+                )
+            rows, columns, shared = _graph_dimensions(node)
+            left, left_ref = _graph_input(node, "left", runtime, resources)
+            right, right_ref = _graph_input(node, "right", runtime, resources)
+            if left.get("dtype") != "bf16" or right.get("dtype") != "bf16":
+                raise fail("RCL_OPENCL_TENSOR_DTYPE", "graph matmul inputs must be bf16")
+            if left.get("shape") != [rows, shared] or right.get("shape") != [shared, columns]:
+                raise fail(
+                    "RCL_OPENCL_TENSOR_GRAPH_SHAPE",
+                    f"graph node {node_id} input shapes do not match its dimensions",
+                )
+            output_size = rows * columns * ctypes.sizeof(ctypes.c_uint16)
+            if output_size > MAX_GRAPH_BYTES:
+                raise fail("RCL_OPENCL_TENSOR_GRAPH_LIMIT", "graph output exceeds the bounded byte budget")
+            cl = runtime.cl
+            kernel = None
+            output_buffer = None
+            try:
+                code = CLInt()
+                kernel = cl.create_kernel(runtime.program, b"rcl_bf16_matmul", ctypes.byref(code))
+                check(code.value, "clCreateKernel:tensor-graph-residency")
+                output_buffer = cl.create_buffer(
+                    runtime.context,
+                    CL_MEM_READ_WRITE,
+                    output_size,
+                    None,
+                    ctypes.byref(code),
+                )
+                check(code.value, "clCreateBuffer:tensor-graph-residency-output")
+                runtime.allocation_count += 1
+                runtime.allocation_bytes += output_size
+                buffers = [left["buffer"], right["buffer"], output_buffer]
+                for argument_index, buffer in enumerate(buffers):
+                    argument = CLHandle(buffer)
+                    check(
+                        cl.set_kernel_arg(
+                            kernel,
+                            argument_index,
+                            ctypes.sizeof(argument),
+                            ctypes.byref(argument),
+                        ),
+                        f"clSetKernelArg:tensor-graph-residency:{argument_index}",
+                    )
+                for argument_index, value in enumerate((rows, columns, shared), start=len(buffers)):
+                    argument = CLUint(value)
+                    check(
+                        cl.set_kernel_arg(
+                            kernel,
+                            argument_index,
+                            ctypes.sizeof(argument),
+                            ctypes.byref(argument),
+                        ),
+                        f"clSetKernelArg:tensor-graph-residency:scalar:{argument_index}",
+                    )
+                global_values = (CLSize * 2)(rows, columns)
+                check(
+                    cl.enqueue_kernel(runtime.queue, kernel, 2, None, global_values, None, 0, None, None),
+                    "clEnqueueNDRangeKernel:tensor-graph-residency",
+                )
+                check(cl.finish(runtime.queue), "clFinish:tensor-graph-residency")
+                resources[output_resource] = {
+                    "buffer": output_buffer,
+                    "size": output_size,
+                    "dtype": "bf16",
+                    "shape": [rows, columns],
+                    "resourceId": output_resource,
+                }
+                output_buffer = None
+                if readback:
+                    host_output = (ctypes.c_uint16 * (rows * columns))()
+                    check(
+                        cl.enqueue_read(
+                            runtime.queue,
+                            resources[output_resource]["buffer"],
+                            1,
+                            0,
+                            output_size,
+                            ctypes.cast(host_output, ctypes.c_void_p),
+                            0,
+                            None,
+                            None,
+                        ),
+                        "clEnqueueReadBuffer:tensor-graph-residency-final",
+                    )
+                    check(cl.finish(runtime.queue), "clFinish:read:tensor-graph-residency-final")
+                    output_bits = [int(value) for value in host_output]
+                    if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
+                        raise fail("RCL_OPENCL_BF16_NONFINITE", "graph OpenCL BF16 output is non-finite")
+                    runtime.tensor_device_to_host_transfers += 1
+                digest.update(node_id.encode("utf-8"))
+                digest.update(output_resource.encode("utf-8"))
+                digest.update(left_ref.encode("utf-8"))
+                digest.update(right_ref.encode("utf-8"))
+                digest.update(bytes((rows, columns, shared)))
+                receipts.append({
+                    "nodeId": node_id,
+                    "operation": "matmul",
+                    "left": left_ref,
+                    "right": right_ref,
+                    "outputResource": output_resource,
+                    "shape": [rows, columns],
+                    "readback": readback,
+                    "deviceResidentAfter": index < len(nodes) - 1,
+                })
+            except Exception:
+                if output_buffer is not None:
+                    cl.release_mem(output_buffer)
+                    runtime.release_count += 1
+                raise
+            finally:
+                if kernel is not None:
+                    cl.release_kernel(kernel)
+    finally:
+        for resource in resources.values():
+            runtime.cl.release_mem(resource["buffer"])
+            runtime.release_count += 1
+        resources.clear()
+    if output_bits is None:
+        raise fail("RCL_OPENCL_TENSOR_GRAPH_READBACK", "graph did not produce a final readback")
+    output_hex = [bits_hex(bits) for bits in output_bits]
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": TENSOR_RESIDENCY_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_TENSOR_RESIDENCY_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "operation": "graph",
+        "nodes": receipts,
+        "outputResource": output_resource,
+        "outputBits": output_hex,
+        "executionRoot": digest.hexdigest(),
+        "readback": True,
+        "intermediateReadbackCount": 0,
+        "finalReadbackCount": 1,
+        "resourceCount": len(receipts),
+        "releasedResourceCount": len(receipts),
+        "device": runtime.device_info,
+    }
+
+
 def run_tensor_residency(
     request: dict[str, Any],
     runtime: OpenCLRuntime,
@@ -1207,7 +1451,9 @@ def run_tensor_residency(
         return run_tensor_residency_release(request, runtime)
     if operation == "matmul":
         return run_tensor_residency_matmul(request, runtime)
-    raise fail("RCL_OPENCL_TENSOR_OPERATION", "Tensor residency operation must be bind, matmul or release")
+    if operation == "graph":
+        return run_tensor_residency_graph(request, runtime)
+    raise fail("RCL_OPENCL_TENSOR_OPERATION", "Tensor residency operation must be bind, matmul, graph or release")
 
 
 def gradient_dimensions(request: dict[str, Any]) -> tuple[int, int, int, int]:

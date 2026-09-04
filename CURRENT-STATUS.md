@@ -453,3 +453,32 @@ RCL-10M and K400 remain closed. Authority:
 `examples/native-ai/gpu-opencl-tensor-residency-contract.v0.1.json`,
 `examples/native-ai/gpu-opencl-tensor-residency-genome.rcl` and
 `examples/native-ai/evidence/gpu-opencl-tensor-residency-v0.1/k14-opencl-tensor-residency-local-evidence.json`.
+
+## K15 AMD OpenCL ordered Tensor graph residency candidate
+
+Status: `PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
+K15 extends the opt-in K14 `tensor-residency-v0.1` session with an RCL-owned
+ordered graph envelope for two through eight rank-2 BF16 matmul nodes. A node
+may consume a resident Tensor identity/value root or an ephemeral resource
+produced by an earlier node. Intermediate device-to-host readbacks are
+forbidden; the final node must request exactly one explicit readback. The
+provider owns only the temporary OpenCL `cl_mem` resources and kernel lowering;
+an intermediate resource is not a canonical Tensor value or checkpoint
+identity.
+
+On the current AMD `gfx1152` host, the two-node graph returned exact output
+bits `4040`, kept the first `[1,2]` output device-resident until the second
+node, performed zero intermediate and one final readback, and released both
+ephemeral resources before session close. Telemetry recorded five allocations
+(`22` bytes), five releases, three Tensor uploads and one device-to-host
+transfer. K15 is `3/3 PASS` locally; K14 Tensor residency and K13 allocation
+arena remain required regressions. Intermediate-readback and use-before-
+produce-resource negatives fail closed. Hosted replay and post-merge checks
+are pending this candidate PR. This remains a bounded lowering candidate:
+canonical Tensor output/full-graph/training-step residency, GPU training,
+throughput, VRAM, portability, RCL-10M and K400 promotion remain closed.
+Authority:
+`docs/native-ai/gpu-opencl-tensor-graph-residency-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-tensor-graph-residency-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-tensor-graph-residency-genome.rcl` and
+`examples/native-ai/evidence/gpu-opencl-tensor-graph-residency-v0.1/k15-opencl-tensor-graph-residency-local-evidence.json`.
