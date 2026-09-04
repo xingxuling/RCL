@@ -2,7 +2,7 @@
   "schema": "rcl.native-ai.gpu-opencl-tensor-residency.evidence.v0.1",
   "campaign": "RCL K08 AI Model Factory Campaign",
   "task": "K14",
-  "status": "PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE",
   "canonicalOwner": "RCL",
   "baseMain": "37fe473eae197ee11251d1443222538317f6b2e7",
   "implementationCommit": "8182772d7aa65d7c832310da0aeaa1459373640d",
@@ -60,10 +60,94 @@
       "k08Tensor": "16_PASS_1_DECLARED_SKIP"
     },
     "strictClippy": {
-      "status": "NOT_RUN",
-      "scope": "K14 does not claim a new Clippy result"
+      "status": "BLOCKED_PREEXISTING_WARNINGS",
+      "warningCount": 8,
+      "scope": "existing manual range, needless deref/borrow, complex type and argument-count warnings; no K14-specific warning"
     },
     "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD",
+    "head": "fe1f261820e8ef78e6d969955e5b6c6c93be74d8",
+    "pullRequest": 117,
+    "k14Run": {
+      "runId": 33866569331,
+      "jobs": [
+        { "name": "tensor-residency (ubuntu-latest)", "jobId": 101002670216, "conclusion": "SUCCESS" },
+        { "name": "tensor-residency (windows-latest)", "jobId": 101002669899, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k13RegressionRun": {
+      "runId": 33866569411,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 101002670689, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 101002670838, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33866569339,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 101002669991, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 101002670291, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33866569299, "jobId": 101002670142, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33866569326, "jobId": 101002670136, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33866569334, "jobId": 101002670118, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33866569328,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 101002670366, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 101002670474, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33866569285, "jobId": 101002670239, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33866569288, "jobId": 101002670132, "conclusion": "SUCCESS" }
+  },
+  "postMergeVerification": {
+    "status": "PASS_MAIN_POSTMERGE",
+    "mainSha": "418f50f43d446b696a74f2086cf8fafb28c4fb5a",
+    "k14Run": {
+      "runId": 33867880127,
+      "jobs": [
+        { "name": "tensor-residency (ubuntu-latest)", "jobId": 101006765812, "conclusion": "SUCCESS" },
+        { "name": "tensor-residency (windows-latest)", "jobId": 101006765590, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k13RegressionRun": {
+      "runId": 33867880054,
+      "jobs": [
+        { "name": "buffer-arena (ubuntu-latest)", "jobId": 101006764966, "conclusion": "SUCCESS" },
+        { "name": "buffer-arena (windows-latest)", "jobId": 101006765400, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k12RegressionRun": {
+      "runId": 33867880074,
+      "jobs": [
+        { "name": "cross-node-gradient-batch (ubuntu-latest)", "jobId": 101006765161, "conclusion": "SUCCESS" },
+        { "name": "cross-node-gradient-batch (windows-latest)", "jobId": 101006764968, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "k11RegressionRun": { "runId": 33867880097, "jobId": 101006765188, "conclusion": "SUCCESS" },
+    "k10RegressionRun": { "runId": 33867880268, "jobId": 101006766497, "conclusion": "SUCCESS" },
+    "k09RegressionRun": { "runId": 33867880103, "jobId": 101006765727, "conclusion": "SUCCESS" },
+    "universalStressRun": {
+      "runId": 33867880229,
+      "jobs": [
+        { "name": "focused-verification", "jobId": 101006766027, "conclusion": "SUCCESS" },
+        { "name": "k01-windows-verification", "jobId": 101006766400, "conclusion": "SUCCESS" }
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "canonicalVerificationRun": { "runId": 33867880109, "jobId": 101006765619, "conclusion": "SUCCESS" },
+    "authorityRun": { "runId": 33867880083, "jobId": 101006766288, "conclusion": "SUCCESS" }
   },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -80,7 +164,7 @@
     "ROBUST": "PASS_LOCAL_FAIL_CLOSED_STALE_IDENTITY",
     "PERFORMANCE": "TRANSFER_COUNT_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
     "AI_GENERATE": "NOT_APPLICABLE",
-    "EVIDENCE": "CANDIDATE_LOCAL_HOSTED_PENDING"
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE"
   },
   "claimsGranted": [
     "OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE",
@@ -104,5 +188,5 @@
     "RCL_GAP_RCL10M_TOKENIZER_DATASET"
   ],
   "authority": "CANDIDATE_ONLY_READ_ONLY_TENSOR_INPUT_RESIDENCY_WITH_EXPLICIT_ROOTS_AND_READBACK",
-  "reportRoot": "93e36519dfdfa8641b3cb994a40be6d0186e9e10ab9eec4f46ce9f1dcb9df268"
+  "reportRoot": "ecba883c193514d737e17aa1516f14031c2f0094e5b5fb45ed35b851319409c8"
 }
