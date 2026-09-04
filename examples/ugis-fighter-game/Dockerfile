@@ -11,4 +11,4 @@ RUN npm run build
 ENV HOST=0.0.0.0
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT:-3000}"]
+CMD ["node", "server.mjs"]
