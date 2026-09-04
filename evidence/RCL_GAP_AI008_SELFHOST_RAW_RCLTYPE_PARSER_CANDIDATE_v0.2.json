@@ -1,0 +1,51 @@
+{
+  "format": "rcl.gap-ai008-selfhost-raw-rcltype-parser-gate.v0.2",
+  "status": "PASS_SCOPE_BOUND_LOCAL_CANDIDATE",
+  "date": "2026-09-04",
+  "gap": "RCL_GAP_AI_008",
+  "mother_gap_family": "SELFHOST_TYPED_LOWERING",
+  "source_scope": {
+    "selfhost/typed-module-parser.rcl_git_blob": "be4470011812d8be01dc4c0829d04b6548ecff8f",
+    "src/selfhost-typed-module-parser.mjs_git_blob": "38397f74a9bbc8e9aab68eb433204bd1eecf5cd0",
+    "tests/selfhost-typed-module-parser.test.mjs_git_blob": "c3da767515d9a5196641ff815b7c2a3a2b55dabb"
+  },
+  "targeted_test": {
+    "command": "node --test --test-concurrency=1 tests/selfhost-typed-module-parser.test.mjs",
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "native_vm_executed": true,
+    "native_state_root_verified": true,
+    "checks": [
+      "RCL native execution parses the Tensor .rcltype syntax and matches the reference parser",
+      "RCL native execution parses imports, generic records, tagged unions, aliases and interfaces",
+      "repeated parsing is deterministic and malformed syntax fails closed"
+    ]
+  },
+  "architecture": {
+    "rcl_owned_raw_parser": "selfhost/typed-module-parser.rcl",
+    "native_execution": "native VM executes the RCL parser candidate and verifies its state root",
+    "reference_oracle": "src/type-module-kernel.mjs parseTypedModuleSource",
+    "special_model_opcode_added": false,
+    "typed_module_vm_opcode_added": false
+  },
+  "boundary": {
+    "raw_rcltype_tokenization": true,
+    "module_import_syntax": true,
+    "record_union_alias_interface_syntax": true,
+    "generic_type_expression_syntax": true,
+    "rcl_owned_linking": false,
+    "generic_typed_expression_lowering": false,
+    "canonical_selfhost_compiler_fixed_point_changed": false,
+    "canonical_promotion_performed": false,
+    "provider_execution_as_core": false
+  },
+  "disposition": "AI008_RAW_RCLTYPE_PARSER_CANDIDATE_ABSORBED;_LINKER_AND_BROADER_TYPED_LOWERING_REMAIN_OPEN",
+  "next_layer": [
+    "feed multiple RCL-parsed module syntax units into an RCL-owned bounded linker candidate",
+    "extend self-host lowering from record literals to union and nested typed expressions using Stage17 typed-value donors",
+    "unify AI009 and AI012 graph construction on the SELFHOST_TYPED_LOWERING mother family"
+  ],
+  "claim_boundary": "This candidate proves native RCL execution of a bounded raw .rcltype parser with reference-parser parity. It does not prove the full typed-module linker, arbitrary generic typed-expression lowering, canonical self-host compiler fixed-point inclusion or canonical promotion.",
+  "receipt_root": "61bbc6fa901d58101a6354d9579fa86d192760517f2d73f951de6625e4031c2c"
+}

@@ -1908,6 +1908,13 @@ export {
 } from './selfhost-type-graph-admission.mjs';
 
 export {
+  SELFHOST_TYPED_MODULE_PARSER_PATH,
+  SELFHOST_TYPED_MODULE_PARSER_FORMAT,
+  renderSelfHostedTypedModuleParser,
+  parseTypedModuleSourceSelfHosted,
+} from './selfhost-typed-module-parser.mjs';
+
+export {
   RCL_SEMANTIC_DECOMPRESSION_VERSION,
   RCL_SEMANTIC_DECOMPRESSION_FORMAT,
   createSemanticProfileTransition,

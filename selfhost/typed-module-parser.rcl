@@ -1,0 +1,369 @@
+reality RCLSelfHostTypedModuleParserV01 {
+  facet typed.source : Text = ""
+
+  reckon make_typed_token(kind : Text, value : Text, line : Number, column : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), kind), value), line), column)
+
+  reckon typed_token_kind(tokens : Sequence, index : Number) -> Text = sequence_get(sequence_get(tokens, index), 0)
+  reckon typed_token_text(tokens : Sequence, index : Number) -> Text = sequence_get(sequence_get(tokens, index), 1)
+  reckon typed_token_line(tokens : Sequence, index : Number) -> Number = sequence_get(sequence_get(tokens, index), 2)
+  reckon typed_token_column(tokens : Sequence, index : Number) -> Number = sequence_get(sequence_get(tokens, index), 3)
+  reckon typed_token_span(tokens : Sequence, index : Number) -> Span = make_span(0, typed_token_line(tokens, index), typed_token_column(tokens, index), 0)
+
+  reckon require_kind(tokens : Sequence, index : Number, expected : Text, code : Text) -> Truth =
+    semantic_assert(typed_token_kind(tokens, index) == expected, code, typed_token_text(tokens, index), typed_token_span(tokens, index))
+
+  reckon require_token(tokens : Sequence, index : Number, expected : Text, code : Text) -> Truth =
+    semantic_assert(typed_token_text(tokens, index) == expected, code, expected, typed_token_span(tokens, index))
+
+  reckon typed_parse_failure(tokens : Sequence, index : Number, code : Text) -> Sequence =
+    choose(semantic_assert(false, code, typed_token_text(tokens, index), typed_token_span(tokens, index)),
+      make_state(index, empty_sequence()), make_state(index, empty_sequence()))
+
+  reckon make_state(index : Number, value : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), index), value)
+  reckon state_index(state : Sequence) -> Number = sequence_get(state, 0)
+  reckon state_value(state : Sequence) -> Sequence = sequence_get(state, 1)
+  reckon either(left : Truth, right : Truth) -> Truth = choose(left, true, right)
+
+  reckon is_two_symbol(value : Text) -> Truth =
+    value == "->" or value == "::"
+
+  reckon scan_identifier_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(is_identifier_part(char_at(source, index)), scan_identifier_end(source, index + 1), index))
+
+  reckon scan_comment_end(source : Text, index : Number) -> Number =
+    choose(index >= length(source), index,
+      choose(char_at(source, index) == "\n", index, scan_comment_end(source, index + 1)))
+
+  reckon tokenize_emit(source : Text, index : Number, line : Number, column : Number, output : Sequence, token : Sequence) -> Sequence =
+    tokenize_from(source, index, line, column, sequence_append(output, token))
+
+  reckon tokenize_from(source : Text, index : Number, line : Number, column : Number, output : Sequence) -> Sequence =
+    choose(index >= length(source),
+      sequence_append(output, make_typed_token("EOF", "<eof>", line, column)),
+      choose(is_whitespace(char_at(source, index)),
+        choose(char_at(source, index) == "\n",
+          tokenize_from(source, index + 1, line + 1, 1, output),
+          tokenize_from(source, index + 1, line, column + 1, output)),
+        choose(either(char_at(source, index) == "#", slice_text(source, index, 2) == "//"),
+          tokenize_from(source, scan_comment_end(source, index), line,
+            column + scan_comment_end(source, index) - index, output),
+          choose(is_identifier_start(char_at(source, index)),
+            tokenize_emit(source, scan_identifier_end(source, index + 1), line,
+              column + scan_identifier_end(source, index + 1) - index, output,
+              make_typed_token("IDENT", slice_text(source, index, scan_identifier_end(source, index + 1) - index), line, column)),
+            choose(is_two_symbol(slice_text(source, index, 2)),
+              tokenize_emit(source, index + 2, line, column + 2, output,
+                make_typed_token("SYMBOL", slice_text(source, index, 2), line, column)),
+              tokenize_emit(source, index + 1, line, column + 1, output,
+                make_typed_token("SYMBOL", char_at(source, index), line, column)))))))
+
+  reckon tokenize(source : Text) -> Sequence = tokenize_from(source, 0, 1, 1, empty_sequence())
+
+  reckon type_name(type : Sequence) -> Text = sequence_get(type, 0)
+  reckon type_args(type : Sequence) -> Sequence = sequence_get(type, 1)
+  reckon make_type(name : Text, args : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), args)
+
+  reckon join_type_args(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), type_canonical(sequence_get(items, index)),
+        type_canonical(sequence_get(items, index)) + "," + join_type_args(items, index + 1)))
+
+  reckon type_canonical(type : Sequence) -> Text =
+    choose(length(type_args(type)) == 0, type_name(type),
+      type_name(type) + "<" + join_type_args(type_args(type), 0) + ">")
+
+  reckon parse_type_path_tail(tokens : Sequence, index : Number, value : Text) -> Sequence =
+    choose(typed_token_text(tokens, index) == "." or typed_token_text(tokens, index) == "::",
+      parse_type_path_tail(tokens, index + 2,
+        value + choose(typed_token_text(tokens, index) == "::", "::", ".") + typed_token_text(tokens, index + 1)),
+      make_state(index, sequence_append(empty_sequence(), value)))
+
+  reckon parse_type_path(tokens : Sequence, index : Number) -> Sequence =
+    parse_type_path_tail(tokens, index + 1, typed_token_text(tokens, index))
+
+  reckon parse_type_after_path(tokens : Sequence, path_state : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, state_index(path_state)) == "<",
+      parse_type_args(tokens, state_index(path_state) + 1, sequence_get(state_value(path_state), 0), empty_sequence()),
+      make_state(state_index(path_state), make_type(sequence_get(state_value(path_state), 0), empty_sequence())))
+
+  reckon parse_type(tokens : Sequence, index : Number) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_TYPE_EXPECTED"),
+      parse_type_after_path(tokens, parse_type_path(tokens, index)),
+      make_state(index, make_type("<invalid>", empty_sequence())))
+
+  reckon parse_type_args_after_item(tokens : Sequence, item_state : Sequence, name : Text, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, state_index(item_state)) == ",",
+      parse_type_args(tokens, state_index(item_state) + 1, name, sequence_append(output, state_value(item_state))),
+      choose(require_token(tokens, state_index(item_state), ">", "RCL_TYPED_MODULE_TYPE_ARGS_CLOSE"),
+        make_state(state_index(item_state) + 1, make_type(name, sequence_append(output, state_value(item_state)))),
+        make_state(state_index(item_state), make_type(name, output))))
+
+  reckon parse_type_args(tokens : Sequence, index : Number, name : Text, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == ">",
+      make_state(index + 1, make_type(name, output)),
+      parse_type_args_after_item(tokens, parse_type(tokens, index), name, output))
+
+  reckon parse_type_params_close(tokens : Sequence, index : Number, output : Sequence, name : Text, kind : Text, exported : Truth) -> Sequence =
+    choose(require_token(tokens, index, ">", "RCL_TYPED_MODULE_TYPE_PARAMS_CLOSE"),
+      parse_decl_body_start(tokens, index + 1, name, output, kind, exported),
+      make_state(index, empty_sequence()))
+
+  reckon parse_type_params_after_item(tokens : Sequence, item_state : Sequence, output : Sequence, name : Text, kind : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, state_index(item_state)) == ",",
+      parse_type_params(tokens, state_index(item_state) + 1, sequence_append(output, typed_token_text(tokens, state_index(item_state) - 1)), name, kind, exported),
+      parse_type_params_close(tokens, state_index(item_state), sequence_append(output, typed_token_text(tokens, state_index(item_state) - 1)), name, kind, exported))
+
+  reckon parse_type_params(tokens : Sequence, index : Number, output : Sequence, name : Text, kind : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, index) == ">",
+      parse_decl_body_start(tokens, index + 1, name, output, kind, exported),
+      choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_TYPE_PARAM_EXPECTED"),
+        parse_type_params_after_item(tokens, make_state(index + 1, sequence_append(empty_sequence(), typed_token_text(tokens, index))), output, name, kind, exported),
+        make_state(index, empty_sequence())))
+
+  reckon make_field(name : Text, type : Text) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), type)
+  reckon field_name(field : Sequence) -> Text = sequence_get(field, 0)
+  reckon field_type(field : Sequence) -> Text = sequence_get(field, 1)
+
+  reckon make_variant(name : Text, payload : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), payload)
+  reckon variant_name(variant : Sequence) -> Text = sequence_get(variant, 0)
+  reckon variant_payload(variant : Sequence) -> Sequence = sequence_get(variant, 1)
+
+  reckon make_method(name : Text, params : Sequence, returns : Text) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), name), params), returns)
+  reckon method_name(method : Sequence) -> Text = sequence_get(method, 0)
+  reckon method_params(method : Sequence) -> Sequence = sequence_get(method, 1)
+  reckon method_returns(method : Sequence) -> Text = sequence_get(method, 2)
+
+  reckon make_decl(kind : Text, name : Text, exported : Truth, params : Sequence, body : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), kind), name), exported), params), body)
+  reckon decl_kind(decl : Sequence) -> Text = sequence_get(decl, 0)
+  reckon decl_name(decl : Sequence) -> Text = sequence_get(decl, 1)
+  reckon decl_exported(decl : Sequence) -> Truth = sequence_get(decl, 2)
+  reckon decl_params(decl : Sequence) -> Sequence = sequence_get(decl, 3)
+  reckon decl_body(decl : Sequence) -> Sequence = sequence_get(decl, 4)
+
+  reckon parse_record_field_after_type(tokens : Sequence, name : Text, type_state : Sequence, module_state : Sequence) -> Sequence =
+    parse_record_body(tokens, state_index(type_state), sequence_get(module_state, 0), sequence_get(module_state, 1),
+      sequence_get(module_state, 2), sequence_append(sequence_get(module_state, 3), make_field(name, type_canonical(state_value(type_state)))))
+
+  reckon parse_record_field(tokens : Sequence, index : Number, module_state : Sequence) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_RECORD_FIELD_NAME"),
+      parse_record_field_after_type(tokens, typed_token_text(tokens, index), parse_type(tokens, index + 2), module_state),
+      make_state(index, empty_sequence()))
+
+  reckon parse_record_body(tokens : Sequence, index : Number, name : Text, params : Sequence, exported : Truth, fields : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "}",
+      make_state(index + 1, make_decl("RecordDecl", name, exported, params, fields)),
+      choose(require_token(tokens, index + 1, ":", "RCL_TYPED_MODULE_RECORD_FIELD_COLON"),
+        parse_record_field(tokens, index, sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), params), exported), fields)),
+        make_state(index, empty_sequence())))
+
+  reckon parse_union_payload_after_type(tokens : Sequence, type_state : Sequence, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, state_index(type_state)) == ",",
+      parse_union_payload(tokens, state_index(type_state) + 1, sequence_append(output, type_canonical(state_value(type_state)))),
+      choose(require_token(tokens, state_index(type_state), char_at(")x", 0), "RCL_TYPED_MODULE_UNION_PAYLOAD_CLOSE"),
+        make_state(state_index(type_state) + 1, sequence_append(output, type_canonical(state_value(type_state)))),
+        make_state(state_index(type_state), output)))
+
+  reckon parse_union_payload(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == ")", make_state(index + 1, output),
+      parse_union_payload_after_type(tokens, parse_type(tokens, index), output))
+
+  reckon parse_union_variant_after_name(tokens : Sequence, index : Number, name : Text, module_state : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "(",
+      parse_union_variant_after_payload(tokens, parse_union_payload(tokens, index + 1, empty_sequence()), name, module_state),
+      parse_union_body(tokens, index, sequence_get(module_state, 0), sequence_get(module_state, 1), sequence_get(module_state, 2),
+        sequence_append(sequence_get(module_state, 3), make_variant(name, empty_sequence()))))
+
+  reckon parse_union_variant_after_payload(tokens : Sequence, payload_state : Sequence, name : Text, module_state : Sequence) -> Sequence =
+    parse_union_body(tokens, state_index(payload_state), sequence_get(module_state, 0), sequence_get(module_state, 1), sequence_get(module_state, 2),
+      sequence_append(sequence_get(module_state, 3), make_variant(name, state_value(payload_state))))
+
+  reckon parse_union_variant(tokens : Sequence, index : Number, module_state : Sequence) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_UNION_VARIANT_NAME"),
+      parse_union_variant_after_name(tokens, index + 1, typed_token_text(tokens, index), module_state),
+      make_state(index, empty_sequence()))
+
+  reckon parse_union_body(tokens : Sequence, index : Number, name : Text, params : Sequence, exported : Truth, variants : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "}",
+      make_state(index + 1, make_decl("UnionDecl", name, exported, params, variants)),
+      parse_union_variant(tokens, index, sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), params), exported), variants)))
+
+  reckon parse_interface_params_after_type(tokens : Sequence, type_state : Sequence, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, state_index(type_state)) == ",",
+      parse_interface_params(tokens, state_index(type_state) + 1, sequence_append(output, type_canonical(state_value(type_state)))),
+      choose(require_token(tokens, state_index(type_state), char_at(")x", 0), "RCL_TYPED_MODULE_INTERFACE_PARAMS_CLOSE"),
+        make_state(state_index(type_state) + 1, sequence_append(output, type_canonical(state_value(type_state)))),
+        make_state(state_index(type_state), output)))
+
+  reckon parse_interface_params(tokens : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == ")", make_state(index + 1, output),
+      parse_interface_params_after_type(tokens, parse_type(tokens, index), output))
+
+  reckon parse_interface_method_after_params(tokens : Sequence, return_state : Sequence, name : Text, params : Sequence, module_state : Sequence) -> Sequence =
+    parse_interface_body(tokens, state_index(return_state), sequence_get(module_state, 0), sequence_get(module_state, 1), sequence_get(module_state, 2),
+      sequence_append(sequence_get(module_state, 3), make_method(name, params, type_canonical(state_value(return_state)))))
+
+  reckon parse_interface_method_after_arrow(tokens : Sequence, index : Number, name : Text, params : Sequence, module_state : Sequence) -> Sequence =
+    choose(require_token(tokens, index, "->", "RCL_TYPED_MODULE_INTERFACE_ARROW"),
+      parse_interface_method_after_params(tokens, parse_type(tokens, index + 1), name, params, module_state),
+      make_state(index, empty_sequence()))
+
+  reckon parse_interface_method_after_name(tokens : Sequence, index : Number, name : Text, module_state : Sequence) -> Sequence =
+    choose(require_token(tokens, index, "(", "RCL_TYPED_MODULE_INTERFACE_PARAMS_OPEN"),
+      parse_interface_method_after_param_list(tokens, parse_interface_params(tokens, index + 1, empty_sequence()), name, module_state),
+      make_state(index, empty_sequence()))
+
+  reckon parse_interface_method_after_param_list(tokens : Sequence, params_state : Sequence, name : Text, module_state : Sequence) -> Sequence =
+    parse_interface_method_after_arrow(tokens, state_index(params_state), name, state_value(params_state), module_state)
+
+  reckon parse_interface_method(tokens : Sequence, index : Number, module_state : Sequence) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_INTERFACE_METHOD_NAME"),
+      parse_interface_method_after_name(tokens, index + 1, typed_token_text(tokens, index), module_state),
+      make_state(index, empty_sequence()))
+
+  reckon parse_interface_body(tokens : Sequence, index : Number, name : Text, params : Sequence, exported : Truth, methods : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "}",
+      make_state(index + 1, make_decl("InterfaceDecl", name, exported, params, methods)),
+      parse_interface_method(tokens, index, sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), name), params), exported), methods)))
+
+  reckon parse_decl_body_start(tokens : Sequence, index : Number, name : Text, params : Sequence, kind : Text, exported : Truth) -> Sequence =
+    choose(require_token(tokens, index, "{", "RCL_TYPED_MODULE_DECL_BODY_OPEN"),
+      choose(kind == "Record", parse_record_body(tokens, index + 1, name, params, exported, empty_sequence()),
+        choose(kind == "Union", parse_union_body(tokens, index + 1, name, params, exported, empty_sequence()),
+          parse_interface_body(tokens, index + 1, name, params, exported, empty_sequence()))),
+      make_state(index, empty_sequence()))
+
+  reckon parse_decl_header_after_name(tokens : Sequence, index : Number, name : Text, kind : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, index) == "<",
+      parse_type_params(tokens, index + 1, empty_sequence(), name, kind, exported),
+      parse_decl_body_start(tokens, index, name, empty_sequence(), kind, exported))
+
+  reckon parse_decl_header(tokens : Sequence, index : Number, kind : Text, exported : Truth) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_DECL_NAME"),
+      parse_decl_header_after_name(tokens, index + 1, typed_token_text(tokens, index), kind, exported),
+      make_state(index, empty_sequence()))
+
+  reckon parse_alias_after_type_params(tokens : Sequence, index : Number, name : Text, params : Sequence, exported : Truth) -> Sequence =
+    choose(require_token(tokens, index, "=", "RCL_TYPED_MODULE_ALIAS_EQUALS"),
+      parse_alias_after_type(tokens, parse_type(tokens, index + 1), name, params, exported),
+      make_state(index, empty_sequence()))
+
+  reckon parse_alias_after_type(tokens : Sequence, type_state : Sequence, name : Text, params : Sequence, exported : Truth) -> Sequence =
+    make_state(state_index(type_state), make_decl("AliasDecl", name, exported, params,
+      sequence_append(empty_sequence(), type_canonical(state_value(type_state)))))
+
+  reckon parse_alias_after_name(tokens : Sequence, index : Number, name : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, index) == "<",
+      parse_alias_type_params(tokens, index + 1, empty_sequence(), name, exported),
+      parse_alias_after_type_params(tokens, index, name, empty_sequence(), exported))
+
+  reckon parse_alias_type_params_after_item(tokens : Sequence, item_state : Sequence, output : Sequence, name : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, state_index(item_state)) == ",",
+      parse_alias_type_params(tokens, state_index(item_state) + 1, sequence_append(output, typed_token_text(tokens, state_index(item_state) - 1)), name, exported),
+      choose(require_token(tokens, state_index(item_state), ">", "RCL_TYPED_MODULE_ALIAS_PARAMS_CLOSE"),
+        parse_alias_after_type_params(tokens, state_index(item_state) + 1, name,
+          sequence_append(output, typed_token_text(tokens, state_index(item_state) - 1)), exported),
+        make_state(state_index(item_state), empty_sequence())))
+
+  reckon parse_alias_type_params(tokens : Sequence, index : Number, output : Sequence, name : Text, exported : Truth) -> Sequence =
+    choose(typed_token_text(tokens, index) == ">",
+      parse_alias_after_type_params(tokens, index + 1, name, output, exported),
+      choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_ALIAS_PARAM_EXPECTED"),
+        parse_alias_type_params_after_item(tokens, make_state(index + 1, sequence_append(empty_sequence(), typed_token_text(tokens, index))), output, name, exported),
+        make_state(index, empty_sequence())))
+
+  reckon parse_alias(tokens : Sequence, index : Number, exported : Truth) -> Sequence =
+    choose(require_kind(tokens, index + 1, "IDENT", "RCL_TYPED_MODULE_ALIAS_NAME"),
+      parse_alias_after_name(tokens, index + 2, typed_token_text(tokens, index + 1), exported),
+      make_state(index, empty_sequence()))
+
+  reckon parse_module_after_decl(tokens : Sequence, state : Sequence, module_name : Text, imports : Sequence, declarations : Sequence) -> Sequence =
+    parse_module_body(tokens, state_index(state), module_name, imports, sequence_append(declarations, state_value(state)))
+
+  reckon parse_module_decl_dispatch(tokens : Sequence, index : Number, exported : Truth, module_name : Text, imports : Sequence, declarations : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "record",
+      parse_module_after_decl(tokens, parse_decl_header(tokens, index + 1, "Record", exported), module_name, imports, declarations),
+      choose(typed_token_text(tokens, index) == "union",
+        parse_module_after_decl(tokens, parse_decl_header(tokens, index + 1, "Union", exported), module_name, imports, declarations),
+        choose(typed_token_text(tokens, index) == "interface",
+          parse_module_after_decl(tokens, parse_decl_header(tokens, index + 1, "Interface", exported), module_name, imports, declarations),
+          choose(typed_token_text(tokens, index) == "alias",
+            parse_module_after_decl(tokens, parse_alias(tokens, index, exported), module_name, imports, declarations),
+            typed_parse_failure(tokens, index, "RCL_TYPED_MODULE_DECL_EXPECTED")))))
+
+  reckon parse_module_after_import(tokens : Sequence, index : Number, module_name : Text, imports : Sequence, declarations : Sequence) -> Sequence =
+    choose(require_kind(tokens, index, "IDENT", "RCL_TYPED_MODULE_IMPORT_NAME"),
+      parse_module_body(tokens, index + 1, module_name, sequence_append(imports, typed_token_text(tokens, index)), declarations),
+      make_state(index, empty_sequence()))
+
+  reckon parse_module_body(tokens : Sequence, index : Number, module_name : Text, imports : Sequence, declarations : Sequence) -> Sequence =
+    choose(typed_token_text(tokens, index) == "<eof>",
+      make_state(index, sequence_append(sequence_append(sequence_append(empty_sequence(), module_name), imports), declarations)),
+      choose(typed_token_text(tokens, index) == "import",
+        parse_module_after_import(tokens, index + 1, module_name, imports, declarations),
+        choose(typed_token_text(tokens, index) == "export",
+          parse_module_decl_dispatch(tokens, index + 1, true, module_name, imports, declarations),
+          parse_module_decl_dispatch(tokens, index, false, module_name, imports, declarations))))
+
+  reckon parse_module_after_name(tokens : Sequence, index : Number, module_name : Text) -> Sequence =
+    parse_module_body(tokens, index, module_name, empty_sequence(), empty_sequence())
+
+  reckon parse_typed_module(tokens : Sequence) -> Sequence =
+    choose(require_token(tokens, 0, "module", "RCL_TYPED_MODULE_HEADER_REQUIRED"),
+      choose(require_kind(tokens, 1, "IDENT", "RCL_TYPED_MODULE_NAME"),
+        parse_module_after_name(tokens, 2, typed_token_text(tokens, 1)),
+        make_state(0, empty_sequence())),
+      make_state(0, empty_sequence()))
+
+  reckon import_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), sequence_get(items, index), sequence_get(items, index) + "," + import_texts(items, index + 1)))
+
+  reckon parameter_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), sequence_get(items, index), sequence_get(items, index) + "," + parameter_texts(items, index + 1)))
+
+  reckon field_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), field_name(sequence_get(items, index)) + ":" + field_type(sequence_get(items, index)),
+        field_name(sequence_get(items, index)) + ":" + field_type(sequence_get(items, index)) + ";" + field_texts(items, index + 1)))
+
+  reckon variant_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), variant_name(sequence_get(items, index)) + "(" + parameter_texts(variant_payload(sequence_get(items, index)), 0) + ")",
+        variant_name(sequence_get(items, index)) + "(" + parameter_texts(variant_payload(sequence_get(items, index)), 0) + ");" + variant_texts(items, index + 1)))
+
+  reckon method_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), method_name(sequence_get(items, index)) + "(" + parameter_texts(method_params(sequence_get(items, index)), 0) + ")->" + method_returns(sequence_get(items, index)),
+        method_name(sequence_get(items, index)) + "(" + parameter_texts(method_params(sequence_get(items, index)), 0) + ")->" + method_returns(sequence_get(items, index)) + ";" + method_texts(items, index + 1)))
+
+  reckon declaration_text(decl : Sequence) -> Text =
+    decl_kind(decl) + "|" + decl_name(decl) + "|" + choose(decl_exported(decl), "true", "false") + "|<" + parameter_texts(decl_params(decl), 0) + ">|" +
+      choose(decl_kind(decl) == "RecordDecl", field_texts(decl_body(decl), 0),
+        choose(decl_kind(decl) == "UnionDecl", variant_texts(decl_body(decl), 0),
+          choose(decl_kind(decl) == "AliasDecl", sequence_get(decl_body(decl), 0), method_texts(decl_body(decl), 0))))
+
+  reckon declaration_texts(items : Sequence, index : Number) -> Text =
+    choose(index >= length(items), "",
+      choose(index + 1 >= length(items), declaration_text(sequence_get(items, index)),
+        declaration_text(sequence_get(items, index)) + ";" + declaration_texts(items, index + 1)))
+
+  reckon typed_canonical(program : Sequence) -> Text =
+    sequence_get(program, 0) + "|imports:" + import_texts(sequence_get(program, 1), 0) + "|decls:" + declaration_texts(sequence_get(program, 2), 0)
+
+  facet typed.tokens : Sequence = tokenize(typed.source)
+  facet typed.program : Sequence = state_value(parse_typed_module(typed.tokens))
+  facet typed.module : Text = sequence_get(typed.program, 0)
+  facet typed.imports : Sequence = sequence_get(typed.program, 1)
+  facet typed.declarations : Sequence = sequence_get(typed.program, 2)
+  facet typed.canonical : Text = typed_canonical(typed.program)
+  facet typed.root : Text = sha256_text(typed.canonical)
+}
