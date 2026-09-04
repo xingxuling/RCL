@@ -53,11 +53,29 @@ Web / Android / React / Three.js / Database / GPU / RNCS / IDE
 
 新增的 technical ID 是 Atlas 提议 ID；`rcl.ui.native-app.v0.1` 是当前已有候选 ID。名称本身不构成 promotion，也不替代现有版本/格式契约。
 
+## 先看“我要写什么”，再选框架
+
+大多数应用不会直接选择 Core 或 Engine；它们是默认底座。开发者真正选择的是 Reality、Typeforge、Weave、Atlas，以及是否加上 Launchpad、Shipyard、Forge 和 Gate。
+
+| 要写的东西 | 推荐组合 | 作用 |
+| --- | --- | --- |
+| Todo、记账、设置、表单、移动端 Dashboard | Core + Engine + Typeforge + Weave + Trace | RCL 负责数据/事件/UI 语义，Weave 负责 Web/Android UI lowering |
+| CRM、客户管理、商品目录、库存系统 | Core + Reality + Typeforge + Weave + Gate | 类型数据模型 + 受治理业务变更 + UI + 数据库/文件 Provider |
+| 审批、订单状态、权限任务系统 | Core + Reality + Typeforge + Trace | authority、invariant、candidate transition、commit 和可回放证据 |
+| 科学笔记、实验面板、知识探索器 | Core + Typeforge + Reality + Atlas + Weave | 数量、知识、实验、模拟语义，加上可交互 UI |
+| Web/Android 快速 MVP、管理后台 | Core + Typeforge + Weave + Launchpad + Shipyard | 快速应用壳、证据入口、多目标构建与交付 |
+| 编译器、语言工具、运行时服务 | Core + Engine + Typeforge + Trace | 编译、类型、Bytecode/VM、调试和 replay |
+| 2D/3D 游戏或可视化工具 | Core + Reality + Weave + Forge + Gate | Weave 管菜单/HUD/状态；Three.js、游戏引擎或 GPU 保留为 Provider |
+
+这些是“适合写什么”的架构组合，不是对所有场景已经完成的能力声明。当前 async/data/persistence、完整 accessibility、resource/media、复杂 3D surface 仍需要独立 GAP 和 Stress Cell 证据。
+
 ## 1. RCL Core / 核心语
 
 **技术 ID**：`rcl.core.language.v0.1`
 
 **拥有的语义**：词法、语法、表达式、类型、subject、rule、emergence、source-to-IR 编译和诊断。
+
+**适合写什么**：业务规则、配置解释器、小型 CLI、编译器前端和任何需要明确表达式/规则的程序。普通应用通常间接使用它，不需要单独调用 Core API。
 
 **事实证据**：
 
@@ -75,6 +93,8 @@ Web / Android / React / Three.js / Database / GPU / RNCS / IDE
 
 **拥有的语义**：RCL expression evaluation、RBC opcode、bytecode 编译/解码、native VM 执行、semantic state root。
 
+**适合写什么**：确定性 CLI、嵌入式 RCL 执行、可回放状态机和不希望依赖外部解释器语义的运行时服务。
+
 **事实证据**：
 
 - [`src/runtime.mjs`](../../src/runtime.mjs)
@@ -91,6 +111,8 @@ Web / Android / React / Three.js / Database / GPU / RNCS / IDE
 
 **拥有的语义**：state、authority、warrant、needs、effects、invariant、candidate transition、commit、witness 和 evidence。
 
+**适合写什么**：审批流、订单/库存变更、权限任务、可审计的游戏经济和任何“谁能在什么条件下改变什么”的程序。
+
 **事实证据**：
 
 - [`src/effects.mjs`](../../src/effects.mjs)
@@ -105,6 +127,8 @@ RNCS bridge 只是把已经由 RCL 解释出的 transition 转成下游输入，
 **技术 ID**：`rcl.data.typed.v0.1`
 
 **拥有的语义**：record/union、泛型类型解析、typed module、typed reference、heap identity、GC snapshot、reference ABI 和 typed layout。
+
+**适合写什么**：CRM 客户对象、商品目录、库存、用户会话、配置格式和需要稳定数据身份的应用数据层。
 
 **事实证据**：
 
@@ -121,6 +145,8 @@ RNCS bridge 只是把已经由 RCL 解释出的 transition 转成下游输入，
 **技术 ID**：`rcl.ui.native-app.v0.1`
 
 **拥有的语义**：UI state、derived values、view roles、bindings、typed local events、layout、style、lifecycle、navigation 和 width adaptation。
+
+**适合写什么**：Todo、计数器、记账、设置、表单、管理后台、移动端 Dashboard，以及同一套语义需要投射到 Web 和 Android 的应用。
 
 **事实证据**：
 
@@ -142,6 +168,8 @@ Weave 不是“RCL 调度 React”。正确关系是：Weave 拥有 UI meaning�
 
 **拥有的语义**：RCL source map、execution trace、replay input、debug session、profiler evidence 和 state/effect trace identity。
 
+**适合写什么**：编译器/运行时调试、难复现 Bug、性能回归、跨目标差分测试和证据优先的 QA 流程。
+
 **事实证据**：
 
 - [`src/debug-replay-runtime.mjs`](../../src/debug-replay-runtime.mjs)
@@ -156,6 +184,8 @@ Trace/Replay 的语义可以属于 RCL；LSP、DAP、IDE panel 和 flamegraph �
 **技术 ID**：`rcl.knowledge.simulation.v0.1`
 
 **拥有候选语义**：quantity、measurement、knowledge claim、cognition、spacetime、experiment/result 和 bounded simulation contracts。
+
+**适合写什么**：科学笔记、实验面板、知识探索器、可解释的数量/测量应用和受边界约束的世界模拟。
 
 **事实证据**：
 
@@ -178,6 +208,13 @@ Atlas 目前是领域语义候选，不能把特定科学 solver、模型训练�
 | RCL Gate | 能力门 | Auxiliary Provider | 网络、文件、媒体、模型、硬件等外部能力边界 |
 
 这些层可以显著提高开发效率和用户体验，但不应因此获得 RCL Core 的语义所有权。
+
+具体来说：
+
+- **Launchpad / 启界**：从一个 MVP、管理后台或 goal-to-plan 产品壳开始；
+- **Shipyard / 交付坞**：把已经编译好的 Web/Android/RCLApp 目标整理成可验证交付物；
+- **Forge / 领域工坊**：快速启动 Media、Neural 或其他领域原型；
+- **Gate / 能力门**：当应用需要网络、数据库、文件、模型、GPU 或硬件时才接入。
 
 ## 关系链
 

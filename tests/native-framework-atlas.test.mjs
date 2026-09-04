@@ -36,6 +36,7 @@ test('native framework atlas keeps names unique and Weave retains its existing c
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(new Set(english).size, english.length);
   assert.equal(new Set(chinese).size, chinese.length);
+  assert.equal(RCL_NATIVE_FRAMEWORK_ATLAS.every(item => Array.isArray(item.exampleProducts) && item.exampleProducts.length >= 3), true);
   const weave = getRclNativeFramework('rcl.ui.native-app.v0.1');
   assert.equal(weave.friendlyNameEn, 'RCL Weave');
   assert.equal(weave.friendlyNameZh, '织界');
@@ -62,6 +63,14 @@ test('atlas makes the native ownership and downstream lowering boundary explicit
   assert.match(gate.semanticOwner, /RCL owns request\/authority\/evidence contract/u);
   assert.ok(gate.doNotAbsorb.includes('provider-specific correctness'));
   assert.equal(engine.semanticOwner, 'RCL');
+});
+
+test('atlas examples connect framework names to concrete application shapes', () => {
+  assert.ok(getRclNativeFramework('rcl.reality.transaction.v0.1').exampleProducts.includes('approval workflow'));
+  assert.ok(getRclNativeFramework('rcl.data.typed.v0.1').exampleProducts.includes('CRM/customer model'));
+  assert.ok(getRclNativeFramework('rcl.ui.native-app.v0.1').exampleProducts.includes('Web + Android dashboard'));
+  assert.ok(getRclNativeFramework('rcl.knowledge.simulation.v0.1').exampleProducts.includes('scientific notebook'));
+  assert.ok(getRclNativeFramework('rcl.provider.gate.v0.1').exampleProducts.includes('GPU/hardware capability'));
 });
 
 test('CLI exposes the machine-readable native framework atlas', () => {

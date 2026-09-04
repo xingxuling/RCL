@@ -246,6 +246,20 @@ const RAW_ATLAS = [
   },
 ];
 
+const EXAMPLE_PRODUCTS_BY_ID = {
+  'rcl.core.language.v0.1': ['business rules', 'configuration evaluator', 'compiler/tooling language', 'small CLI program'],
+  'rcl.core.runtime.v0.1': ['deterministic CLI utility', 'embedded RCL execution', 'state-machine service', 'replayable simulation'],
+  'rcl.reality.transaction.v0.1': ['approval workflow', 'order/inventory transition', 'permissioned task system', 'auditable game economy'],
+  'rcl.data.typed.v0.1': ['CRM/customer model', 'catalog and inventory model', 'typed configuration format', 'in-memory application data layer'],
+  'rcl.ui.native-app.v0.1': ['counter or todo app', 'expense tracker', 'settings/form app', 'Web + Android dashboard'],
+  'rcl.dev.trace.v0.1': ['reproducible bug case', 'compiler/runtime debugger', 'performance regression harness', 'evidence-bearing QA loop'],
+  'rcl.knowledge.simulation.v0.1': ['scientific notebook', 'experiment dashboard', 'knowledge graph explorer', 'bounded world/simulation model'],
+  'rcl.app.launchpad.v0.1': ['MVP product shell', 'admin panel starter', 'goal-to-plan application', 'evidence-first prototype'],
+  'rcl.delivery.shipyard.v0.1': ['Web/Android release bundle', 'verified RCL package', 'multi-target CLI distribution', 'RCLApp installation artifact'],
+  'rcl.forge.domain.v0.1': ['media prototype', 'neural/ML prototype', 'domain-specific app starter', 'deterministic generated demo'],
+  'rcl.provider.gate.v0.1': ['network-backed app', 'database/file integration', 'media or model feature', 'GPU/hardware capability'],
+};
+
 function deepFreeze(value) {
   if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
   Object.freeze(value);
@@ -264,6 +278,8 @@ for (const item of RAW_ATLAS) {
   if (!item.formalNameEn || !item.friendlyNameEn || !item.formalNameZh || !item.friendlyNameZh) {
     throw new Error(`RCL_NATIVE_FRAMEWORK_ATLAS_NAME_MISSING:${item.id}`);
   }
+  if (!EXAMPLE_PRODUCTS_BY_ID[item.id]) throw new Error(`RCL_NATIVE_FRAMEWORK_ATLAS_EXAMPLES_MISSING:${item.id}`);
+  item.exampleProducts = EXAMPLE_PRODUCTS_BY_ID[item.id];
 }
 
 export const RCL_NATIVE_FRAMEWORK_ATLAS = deepFreeze(RAW_ATLAS);
