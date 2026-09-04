@@ -558,3 +558,53 @@ K400 promotion remain closed. Authority:
 `tests/k17-opencl-tensor-mixed-graph.test.mjs` and
 `examples/native-ai/evidence/gpu-opencl-tensor-mixed-graph-v0.1/k17-opencl-tensor-mixed-graph-local-evidence.json`.
 The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
+
+## K18 AMD OpenCL full-graph/training-step residency candidate
+
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE`.
+K18 extends the RCL-owned ordered generic Tensor graph to a bounded
+`matmul -> add -> additive masked-softmax` graph reused across three forward
+steps. Each node allocates one ephemeral OpenCL output resource and reuses it
+for every step; intermediate readback is forbidden and exactly one final
+readback is required after the final step. RCL owns Tensor, graph, operation,
+mask, numerical and step semantics. The AMD OpenCL provider owns only the
+auxiliary `cl_mem` lifetime and dispatch organ; reverse Autodiff and AdamW
+remain outside this residency candidate.
+
+On the real AMD `gfx1152` device (OpenCL `2.0 AMD-APP (3661.0)`), the three
+step `[1,2]` fixture returned exact BF16 bits `3f00 3f00`, exact independent
+CPU differential and deterministic execution root
+`564c6e5bd85b47a3b1ad776fc26060d732e5b1d5948bb0afbf815a674299369b`.
+Telemetry recorded 9 dispatches, 7 allocations/releases, 4 Tensor binds, 4
+host-to-device transfers, one device-to-host transfer, zero intermediate and
+one final readback, `trainingStepResidency=true` and
+`resourceReuseAcrossSteps=true`. Local K18, K17, K16 and K15 are each `3/3
+PASS`; operation, zero-step, readback and shape drift fail closed, with no
+provider fallback.
+
+Exact head `251613f3b78efb255e778eaf307d25a1a082cf8f` passed PR #138 K18 on
+Ubuntu/Windows (`33896733771`); PR #138 merged as
+`main@87a300130fc52559b005c15d88d5743a5f55d671`. After AI001 PR #136 merged,
+K18 post-merge `main@b7e4c70839cb5ef896807a77b5e5f88082155be0` passed K18 on
+Ubuntu/Windows (`33899325135`), with K09-K17 and Authority replay green.
+The repository-wide Canonical run `33899325240` then failed three existing
+v0.57 self-Akashic tests because the 900-file scan cap truncated the test
+surface to 35; Universal run `33899325206` failed only because the Windows
+K01 native fixed-point replay exceeded 240000 ms after all 41/41 stages passed.
+Neither failure involved K18; the bounded scan-cap repair is included in this
+evidence branch, while the K01 timeout remains a separate repository-level
+performance issue.
+
+This remains a bounded lowering candidate. Only full-graph residency,
+training-step resource reuse and the generic `add` path are granted. GPU
+training, GPU-native Autodiff/AdamW, full-graph training semantics, parallel
+execution, throughput, VRAM, portability, RCL-10M/RCL-1B, production model
+claims and K400 promotion remain closed. Authority:
+`docs/native-ai/gpu-opencl-tensor-training-graph-residency-evidence-v0.1.md`,
+`examples/native-ai/gpu-opencl-tensor-training-graph-residency-contract.v0.1.json`,
+`examples/native-ai/gpu-opencl-tensor-training-graph-residency-genome.rcl`,
+`native/tensor-engine/amd_opencl_bf16_provider.py`,
+`native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs`,
+`tests/k18-opencl-tensor-training-graph-residency.test.mjs` and
+`examples/native-ai/evidence/gpu-opencl-tensor-training-graph-residency-v0.1/k18-opencl-tensor-training-graph-residency-local-evidence.json`.
+The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.

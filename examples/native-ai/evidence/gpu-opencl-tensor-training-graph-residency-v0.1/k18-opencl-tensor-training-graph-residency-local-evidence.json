@@ -1,0 +1,249 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-tensor-training-graph-residency.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K18",
+  "status": "PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "baseMain": "33efc4bd7b4edcd96d6426055ebc007700fea5bb",
+  "implementationCommit": "251613f3b78efb255e778eaf307d25a1a082cf8f",
+  "mergeCommit": "87a300130fc52559b005c15d88d5743a5f55d671",
+  "mainAfterFollowupMerge": "b7e4c70839cb5ef896807a77b5e5f88082155be0",
+  "branch": "codex/k18-opencl-full-graph-training-residency-v01",
+  "pullRequest": 138,
+  "contract": "examples/native-ai/gpu-opencl-tensor-training-graph-residency-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-tensor-training-graph-residency-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "rustProbe": "native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs",
+  "test": "tests/k18-opencl-tensor-training-graph-residency.test.mjs",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+  },
+  "localEvidence": {
+    "probe": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "request": {
+        "operation": "matmul -> add -> masked-softmax",
+        "shape": [1, 2],
+        "steps": 3,
+        "nodes": 3,
+        "inputDtype": "bf16",
+        "computeDtype": "f32",
+        "outputDtype": "bf16",
+        "maskMode": "additive",
+        "intermediateReadback": false,
+        "finalReadback": true
+      },
+      "outputBits": ["3f00", "3f00"],
+      "nodes": [
+        {
+          "nodeId": "node:training.projection",
+          "operation": "matmul",
+          "outputResource": "resource:logits",
+          "shape": [1, 2],
+          "left": "tensor:storage:left:sha256:7a621e272024d41996ab045aebdb7a5b9aa88a08b5da8dc8dcb6bd8ea64ee4e7",
+          "right": "tensor:storage:projection:sha256:685b5ba019e9cf54b1445eef8a60f07190b0d2d9c832fcd8966d9cd3eceaf35b",
+          "readback": false,
+          "deviceResidentAfter": true,
+          "deviceResidentAcrossSteps": true,
+          "resourceReuseAcrossSteps": true,
+          "stepCount": 3
+        },
+        {
+          "nodeId": "node:training.bias",
+          "operation": "add",
+          "outputResource": "resource:shifted",
+          "shape": [1, 2],
+          "left": "resource:logits",
+          "right": "tensor:storage:bias:sha256:05530d88d33d3a6890d3af70b49c13fdcc57973a5ece5da9e4ab4212c68be497",
+          "readback": false,
+          "deviceResidentAfter": true,
+          "deviceResidentAcrossSteps": true,
+          "resourceReuseAcrossSteps": true,
+          "stepCount": 3
+        },
+        {
+          "nodeId": "node:training.masked-softmax",
+          "operation": "masked-softmax",
+          "outputResource": "resource:probabilities",
+          "shape": [1, 2],
+          "left": "resource:shifted",
+          "right": "tensor:storage:mask:sha256:f8eb9a4de97ed2c4cbd4e508853bafb7b6e6881e58ae6973f29afa6671ae7353",
+          "maskMode": "additive",
+          "readback": true,
+          "deviceResidentAfter": false,
+          "deviceResidentAcrossSteps": true,
+          "resourceReuseAcrossSteps": true,
+          "stepCount": 3
+        }
+      ],
+      "intermediateReadbackCount": 0,
+      "finalReadbackCount": 1,
+      "telemetry": {
+        "bufferAllocationBytes": 32,
+        "bufferAllocationCount": 7,
+        "bufferReleaseCount": 7,
+        "dispatchCount": 9,
+        "graphNodeCount": 3,
+        "maxResidentBytes": 2097152,
+        "maxResidentTensors": 64,
+        "residentBytes": 0,
+        "residentTensorCount": 0,
+        "resourceReuseAcrossSteps": true,
+        "stepCount": 3,
+        "tensorBindCount": 4,
+        "tensorDeviceToHostTransfers": 1,
+        "tensorHostToDeviceTransfers": 4,
+        "tensorReleaseCount": 4,
+        "tensorReplacementCount": 0,
+        "tensorResidencyHitCount": 0,
+        "tensorValueResidency": true,
+        "trainingStepResidency": true
+      },
+      "graphTelemetry": {
+        "dispatchCount": 9,
+        "finalReadbackCount": 1,
+        "graphNodeCount": 3,
+        "intermediateReadbackCount": 0,
+        "resourceReuseAcrossSteps": true,
+        "stepCount": 3,
+        "trainingStepResidency": true
+      },
+      "executionRoot": "564c6e5bd85b47a3b1ad776fc26060d732e5b1d5948bb0afbf815a674299369b",
+      "exactCpuDifferential": true,
+      "deterministicReplay": true
+    },
+    "negativeAndBoundary": {
+      "unknownOperation": "RCL_K18_GRAPH_OPERATION",
+      "stepsZero": "RCL_K18_GRAPH_STEPS",
+      "intermediateReadback": "RCL_K18_GRAPH_READBACK",
+      "shapeDrift": "RCL_K18_GRAPH_SHAPE",
+      "providerFallback": "forbidden",
+      "maxGraphNodes": 8,
+      "maxSteps": 16
+    },
+    "regressions": {
+      "pythonSyntax": "PASS",
+      "rustProbeFormat": "PASS",
+      "rustCargoCheckLocked": "PASS",
+      "nodeSyntax": "PASS",
+      "diffCheck": "PASS",
+      "k18TrainingGraphResidency": "3_PASS",
+      "k17MixedGraph": "3_PASS",
+      "k16MaskedSoftmax": "3_PASS",
+      "k15TensorGraphResidency": "3_PASS",
+      "k14TensorResidency": "3_PASS",
+      "k13BufferArena": "6_PASS",
+      "k12CrossNodeGradientBatch": "4_PASS",
+      "k11GradientPairBatch": "1_PASS",
+      "k10BatchedDispatch": "1_PASS",
+      "k09PersistentDispatch": "1_PASS",
+      "k08AmdOpenclBf16": "3_PASS",
+      "hostedAndPostMergeScope": "PASS_EXACT_HEAD_AND_MAIN_POSTMERGE_K18_K17_K16_K15_K14_K13_K12_K11_K10_K09_K08_AUTHORITY; CANONICAL_UNIVERSAL_REPO_LEVEL_FAILURE_RECORDED"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD_K18_SCOPE",
+    "head": "251613f3b78efb255e778eaf307d25a1a082cf8f",
+    "pullRequest": 138,
+    "k18Run": {
+      "runId": 33896733771,
+      "jobs": [
+        {"name": "training-graph-residency (ubuntu-latest)", "jobId": 101101018227, "conclusion": "SUCCESS"},
+        {"name": "training-graph-residency (windows-latest)", "jobId": 101101018475, "conclusion": "SUCCESS"}
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "regressionRuns": {
+      "k08AmdOpenclBf16": {"runId": 33896733730, "conclusion": "SUCCESS"},
+      "k09": {"runId": 33896733858, "conclusion": "SUCCESS"},
+      "k10": {"runId": 33896733784, "conclusion": "SUCCESS"},
+      "k11": {"runId": 33896733718, "conclusion": "SUCCESS"},
+      "k12": {"runId": 33896733871, "conclusion": "SUCCESS"},
+      "k13": {"runId": 33896733896, "conclusion": "SUCCESS"},
+      "k14": {"runId": 33896733837, "conclusion": "SUCCESS"},
+      "k15": {"runId": 33896733885, "conclusion": "SUCCESS"},
+      "k16": {"runId": 33896733823, "conclusion": "SUCCESS"},
+      "k17": {"runId": 33896733747, "conclusion": "SUCCESS"},
+      "authority": {"runId": 33896733710, "conclusion": "SUCCESS"},
+      "canonicalVerification": {"runId": 33896733705, "conclusion": "SUCCESS"},
+      "universalStress": {"runId": 33896733723, "conclusion": "SUCCESS"}
+    },
+    "boundary": "Hosted runners prove replay or explicit unavailable-backend fail-closed behavior; they do not inherit this local AMD device receipt"
+  },
+  "postMergeVerification": {
+    "status": "PASS_MAIN_POSTMERGE_K18_SCOPE_AND_REGRESSIONS; CANONICAL_UNIVERSAL_REPO_LEVEL_FAILURE",
+    "mainSha": "b7e4c70839cb5ef896807a77b5e5f88082155be0",
+    "k18Run": {
+      "runId": 33899325135,
+      "jobs": [
+        {"name": "training-graph-residency (ubuntu-latest)", "jobId": 101109415949, "conclusion": "SUCCESS"},
+        {"name": "training-graph-residency (windows-latest)", "jobId": 101109415327, "conclusion": "SUCCESS"}
+      ],
+      "conclusion": "SUCCESS"
+    },
+    "regressionRuns": {
+      "k09": {"runId": 33899324994, "conclusion": "SUCCESS"},
+      "k10": {"runId": 33899325035, "conclusion": "SUCCESS"},
+      "k11": {"runId": 33899324842, "conclusion": "SUCCESS"},
+      "k12": {"runId": 33899325010, "conclusion": "SUCCESS"},
+      "k13": {"runId": 33899325266, "conclusion": "SUCCESS"},
+      "k14": {"runId": 33899325016, "conclusion": "SUCCESS"},
+      "k15": {"runId": 33899324960, "conclusion": "SUCCESS"},
+      "k16": {"runId": 33899325181, "conclusion": "SUCCESS"},
+      "k17": {"runId": 33899324983, "conclusion": "SUCCESS"},
+      "authority": {"runId": 33899325184, "conclusion": "SUCCESS"},
+      "canonicalVerification": {"runId": 33899325240, "jobId": 101109415867, "conclusion": "FAILURE", "failureReason": "3 existing v0.57 self-Akashic tests failed because the 900-file bounded scan truncated tests to 35 after AI001 evidence artifacts were merged; K18 tests were not involved"},
+      "universalStress": {"runId": 33899325206, "jobs": [101109416856, 101109417066], "conclusion": "FAILURE", "failureReason": "K01 Windows native C0->C1->C2 exceeded the declared 240000 ms budget; all 41/41 staged self-host steps passed and no K18 test failed"}
+    },
+    "boundary": "Main replay is bound to the merged SHA; the local AMD device receipt remains separate and no hosted runner is treated as local hardware"
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale cells only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT_BF16_BITS_AND_CPU_DIFFERENTIAL",
+    "ROBUST": "PASS_LOCAL_FAIL_CLOSED_OPERATION_STEP_SHAPE_AND_READBACK",
+    "PERFORMANCE": "DEVICE_RESIDENCY_AND_TRANSFER_TELEMETRY_ONLY_NO_THROUGHPUT_OR_VRAM_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_HOSTED_AND_POSTMERGE_K18_SCOPE_WITH_REPO_LEVEL_CANONICAL_UNIVERSAL_FAILURES_RECORDED"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_FULL_GRAPH_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_TRAINING_STEP_RESOURCE_REUSE_CANDIDATE",
+    "OPENCL_AMD_GRAPH_ADD_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "GPU_NATIVE_AUTODIFF",
+    "GPU_NATIVE_ADAMW",
+    "OPENCL_FULL_GRAPH_TRAINING_SEMANTICS",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_RCL_ORDERED_GENERIC_FORWARD_GRAPH_REUSED_ACROSS_BOUNDED_STEPS_WITH_SINGLE_FINAL_READBACK",
+  "reportRoot": "1de74754e4eea35acce8df3636fb6f796e8689045dbad40eddd3910af8d99e1b"
+}
