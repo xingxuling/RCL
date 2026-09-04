@@ -39,11 +39,12 @@ test('K04 mutations are effective before independent repair', () => {
   }
 });
 
-test('K04 local independent receipt binds the runtime evidence and remains honest before hosted replay', () => {
+test('K04 independent receipt binds runtime evidence and reports hosted replay state', () => {
   const result = verifyK04GameAiGenerationReceipt();
   assert.equal(result.localReceiptPresent, true);
   assert.equal(result.localAdmitted, true);
-  assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
+  const authorityPath = path.join(ROOT, 'examples', 'universal-stress', 'evidence', 'k04-game-ai-generate', 'github-replay.json');
+  assert.equal(result.aiGenerateAdmission, fs.existsSync(authorityPath) ? 'PASS' : 'UNVERIFIED');
   assert.equal(result.runtimeEvidenceBinding.reportRoot, JSON.parse(fs.readFileSync(RUNTIME_PATH, 'utf8')).reportRoot);
 });
 
