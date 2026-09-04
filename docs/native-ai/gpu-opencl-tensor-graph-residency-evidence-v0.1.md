@@ -2,7 +2,7 @@
 
 ## Current ruling
 
-`PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`
+`PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`
 
 RCL owns the ordered graph, Tensor `storageIdentity` and deterministic
 `valueRoot`, input shape/dtype, resource order and readback policy. The AMD
@@ -31,6 +31,11 @@ GPU training.
 - K15 passed `3/3`; the Rust bridge built with locked release dependencies and
   the provider passed Python syntax compilation. K14 Tensor residency and K13
   buffer-arena suites remain required regressions.
+- Hosted PR #119 exact-head replay passed K15 on Ubuntu/Windows and the K09-K14
+  regression chain plus Authority. Post-merge `main@d2efae8` passed the same
+  K15-scope checks. The repository-wide Canonical and Universal checks failed
+  only on the pre-existing K337/K338/K340 compiler RBC drift; those failures
+  are recorded in the JSON receipt and do not involve K15.
 - License audit: no dependency, external source or donor code was added.
 
 ## No Silent RCL Bypass ruling
@@ -58,7 +63,7 @@ GPU training.
 | ROBUST | PASS_LOCAL_FAIL_CLOSED_GRAPH_ORDER_AND_READBACK |
 | PERFORMANCE | ALLOCATION_AND_TRANSFER_COUNTS_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM |
 | AI_GENERATE | NOT_APPLICABLE |
-| EVIDENCE | LOCAL_ONLY_PENDING_HOSTED_AND_POSTMERGE |
+| EVIDENCE | CANDIDATE_HOSTED_AND_POSTMERGE_K15_SCOPE_WITH_PREEXISTING_K337_K338_K340_DRIFT |
 
 The candidate grants only
 `OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE` and

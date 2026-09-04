@@ -749,7 +749,7 @@ closed. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
 ## K15 AMD OpenCL ordered Tensor graph residency candidate
 
-Status: `PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
+Status: `PASS_LOCAL_AND_HOSTED_AND_POSTMERGE_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE`.
 RCL owns the ordered graph, Tensor `storageIdentity` and deterministic
 `valueRoot`, shape/dtype checks, resource order and readback policy. The AMD
 OpenCL provider owns only ephemeral `cl_mem` allocation, kernel arguments and
@@ -768,8 +768,10 @@ does not create a second Tensor identity or a model-special operation.
 | Graph order negatives | intermediate readback and use-before-produce fail closed |
 | K15 protocol suite | `3/3 PASS` |
 | Rust release bridge build | PASS with locked dependencies |
-| K14/K13 regressions | required and green locally; hosted replay pending |
+| K14/K13/K12/K11/K10/K09 regressions | green locally, hosted exact-head and post-merge main |
 | License audit | PASS, no new dependencies or donor code |
+| Hosted exact-head replay | K15/K09-K14 and Authority PASS on PR #119 at `f3884aa`; Canonical and Universal independently FAIL on pre-existing K337/K338/K340 compiler RBC drift |
+| Post-merge main replay | K15/K09-K14 and Authority PASS on `d2efae8`; Canonical and Universal independently FAIL on the same pre-existing K337/K338/K340 compiler RBC drift |
 
 Authority files:
 
@@ -785,5 +787,6 @@ Claims are limited to `OPENCL_AMD_ORDERED_TENSOR_GRAPH_RESIDENCY_CANDIDATE`
 and `OPENCL_AMD_INTERMEDIATE_DEVICE_RESOURCE_CANDIDATE`. Canonical Tensor
 output/full-graph/training-step residency, GPU training, parallel execution,
 wall-time/throughput, VRAM reduction, generic portability, RCL-10M, RCL-1B and
-K400 promotion remain closed. Hosted replay and post-merge verification are
-pending the implementation PR.
+K400 promotion remain closed. Hosted and post-merge K15-scope evidence is bound
+above; repository-wide Canonical/Universal failures are preserved as
+pre-existing K337/K338/K340 compiler RBC drift and do not alter the K15 ruling.
