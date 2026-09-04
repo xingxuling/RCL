@@ -1,0 +1,314 @@
+# AI011 / K08-E-F: RCL-owned compact Tensor execution-plan semantics.
+# The graph is generic: nodes carry an id, operation, input ids and exact
+# storage bytes. RCL owns ordered-graph validation, last-use analysis, slot
+# reuse and live-byte accounting. An execution backend only consumes the plan.
+reality TensorPlanLivenessGenome {
+  reckon one_text(value : Text) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_text(first : Text, second : Text) -> Sequence = sequence_append(one_text(first), second)
+  reckon one_number(value : Number) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon one_truth(value : Truth) -> Sequence = sequence_append(empty_sequence(), value)
+  reckon two_values(first : Sequence, second : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), first), second)
+  reckon three_values(first : Sequence, second : Sequence, third : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), first), second), third)
+  reckon six_values(a : Sequence, b : Sequence, c : Sequence, d : Sequence, e : Sequence, f : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), a), b), c), d), e), f)
+
+  reckon make_node(id : Text, operation : Text, inputs : Sequence, bytes : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), operation), inputs), bytes)
+  reckon node_id(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon node_operation(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon node_inputs(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon node_bytes(node : Sequence) -> Number = sequence_get(node, 3)
+
+  reckon make_last_use(id : Text, last : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), id), last)
+  reckon last_use_id(item : Sequence) -> Text = sequence_get(item, 0)
+  reckon last_use_value(item : Sequence) -> Number = sequence_get(item, 1)
+
+  reckon make_active(id : Text, slot : Number, bytes : Number, last : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), slot), bytes), last)
+  reckon active_id(item : Sequence) -> Text = sequence_get(item, 0)
+  reckon active_slot(item : Sequence) -> Number = sequence_get(item, 1)
+  reckon active_bytes_value(item : Sequence) -> Number = sequence_get(item, 2)
+  reckon active_last(item : Sequence) -> Number = sequence_get(item, 3)
+
+  reckon make_free(slot : Number, bytes : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), slot), bytes)
+  reckon free_slot(item : Sequence) -> Number = sequence_get(item, 0)
+  reckon free_bytes(item : Sequence) -> Number = sequence_get(item, 1)
+
+  reckon make_slot_choice(found : Truth, slot : Number, bytes : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), found), slot), bytes)
+
+  reckon make_assignment(id : Text, operation : Text, slot : Number, reused : Truth, bytes : Number, last : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(empty_sequence(), id),
+              operation),
+            slot),
+          reused),
+        bytes),
+      last)
+
+  reckon contains_text(values : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(values), false,
+      sequence_get(values, index) == target or contains_text(values, target, index + 1))
+
+  reckon contains_node_id(nodes : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      node_id(sequence_get(nodes, index)) == target or contains_node_id(nodes, target, index + 1, limit))
+
+  reckon unique_node_ids(nodes : Sequence, index : Number) -> Truth =
+    choose(index >= length(nodes), true,
+      contains_node_id(nodes, node_id(sequence_get(nodes, index)), 0, index) == false and
+      unique_node_ids(nodes, index + 1))
+
+  reckon input_refs_valid(nodes : Sequence, inputs : Sequence, index : Number, current : Number) -> Truth =
+    choose(index >= length(inputs), true,
+      contains_node_id(nodes, sequence_get(inputs, index), 0, current) and
+      input_refs_valid(nodes, inputs, index + 1, current))
+
+  reckon nodes_valid(nodes : Sequence, index : Number) -> Truth =
+    choose(index >= length(nodes), true,
+      node_id(sequence_get(nodes, index)) != "" and
+      node_operation(sequence_get(nodes, index)) != "" and
+      node_bytes(sequence_get(nodes, index)) > 0 and
+      input_refs_valid(nodes, node_inputs(sequence_get(nodes, index)), 0, index) and
+      nodes_valid(nodes, index + 1))
+
+  reckon outputs_valid(nodes : Sequence, outputs : Sequence, index : Number) -> Truth =
+    choose(index >= length(outputs), true,
+      contains_node_id(nodes, sequence_get(outputs, index), 0, length(nodes)) and
+      outputs_valid(nodes, outputs, index + 1))
+
+  reckon graph_valid(nodes : Sequence, outputs : Sequence) -> Truth =
+    length(nodes) > 0 and length(outputs) > 0 and
+    unique_node_ids(nodes, 0) and nodes_valid(nodes, 0) and outputs_valid(nodes, outputs, 0)
+
+  reckon last_use_from(nodes : Sequence, target : Text, index : Number, current : Number) -> Number =
+    choose(index >= length(nodes), current,
+      choose(contains_text(node_inputs(sequence_get(nodes, index)), target, 0),
+        last_use_from(nodes, target, index + 1, index),
+        last_use_from(nodes, target, index + 1, current)))
+
+  reckon last_use_for_node(nodes : Sequence, outputs : Sequence, index : Number) -> Number =
+    choose(contains_text(outputs, node_id(sequence_get(nodes, index)), 0),
+      length(nodes),
+      last_use_from(nodes, node_id(sequence_get(nodes, index)), index + 1, index))
+
+  reckon build_last_use(nodes : Sequence, outputs : Sequence, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(nodes), result,
+      build_last_use(
+        nodes,
+        outputs,
+        index + 1,
+        sequence_append(result, make_last_use(node_id(sequence_get(nodes, index)), last_use_for_node(nodes, outputs, index)))))
+
+  reckon lookup_last_use(table : Sequence, target : Text, index : Number) -> Number =
+    choose(index >= length(table), 0,
+      choose(last_use_id(sequence_get(table, index)) == target,
+        last_use_value(sequence_get(table, index)),
+        lookup_last_use(table, target, index + 1)))
+
+  reckon active_bytes(active : Sequence, index : Number, result : Number) -> Number =
+    choose(index >= length(active), result,
+      active_bytes(active, index + 1, result + active_bytes_value(sequence_get(active, index))))
+
+  reckon released_active(active : Sequence, inputs : Sequence, current : Number, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(active), result,
+      choose(active_last(sequence_get(active, index)) <= current,
+        released_active(active, inputs, current, index + 1, result),
+        released_active(active, inputs, current, index + 1, sequence_append(result, sequence_get(active, index)))))
+
+  reckon released_slots(active : Sequence, inputs : Sequence, current : Number, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(active), result,
+      choose(active_last(sequence_get(active, index)) <= current,
+        released_slots(active, inputs, current, index + 1,
+          sequence_append(result, make_free(active_slot(sequence_get(active, index)), active_bytes_value(sequence_get(active, index))))),
+        released_slots(active, inputs, current, index + 1, result)))
+
+  reckon find_reusable_slot(free : Sequence, bytes : Number, index : Number) -> Sequence =
+    choose(index >= length(free), make_slot_choice(false, -1, 0),
+      choose(free_bytes(sequence_get(free, index)) == bytes,
+        make_slot_choice(true, free_slot(sequence_get(free, index)), bytes),
+        find_reusable_slot(free, bytes, index + 1)))
+
+  reckon remove_slot(free : Sequence, target : Number, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(free), result,
+      choose(free_slot(sequence_get(free, index)) == target,
+        remove_slot(free, target, index + 1, result),
+        remove_slot(free, target, index + 1, sequence_append(result, sequence_get(free, index)))))
+
+  reckon current_node(nodes : Sequence, index : Number) -> Sequence = sequence_get(nodes, index)
+  reckon current_inputs(nodes : Sequence, index : Number) -> Sequence = node_inputs(current_node(nodes, index))
+  reckon current_id(nodes : Sequence, index : Number) -> Text = node_id(current_node(nodes, index))
+  reckon current_operation(nodes : Sequence, index : Number) -> Text = node_operation(current_node(nodes, index))
+  reckon current_bytes(nodes : Sequence, index : Number) -> Number = node_bytes(current_node(nodes, index))
+  reckon current_last_use(table : Sequence, nodes : Sequence, index : Number) -> Number = lookup_last_use(table, current_id(nodes, index), 0)
+
+  reckon schedule_state(assignments : Sequence, active : Sequence, free : Sequence, next_slot : Number, allocated : Number, peak : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(empty_sequence(), assignments),
+              active),
+            free),
+          next_slot),
+        allocated),
+      peak)
+
+  reckon schedule_from(nodes : Sequence, table : Sequence, index : Number, active : Sequence, free : Sequence, assignments : Sequence, next_slot : Number, allocated : Number, peak : Number) -> Sequence =
+    choose(index >= length(nodes),
+      schedule_state(assignments, active, free, next_slot, allocated, peak),
+      schedule_step(
+        nodes,
+        table,
+        index,
+        active,
+        free,
+        assignments,
+        next_slot,
+        allocated,
+        peak))
+
+  reckon schedule_step(nodes : Sequence, table : Sequence, index : Number, active : Sequence, free : Sequence, assignments : Sequence, next_slot : Number, allocated : Number, peak : Number) -> Sequence =
+    schedule_from(
+      nodes,
+      table,
+      index + 1,
+      sequence_append(
+        released_active(active, current_inputs(nodes, index), index, 0, empty_sequence()),
+        make_active(
+          current_id(nodes, index),
+          choose(sequence_get(find_reusable_slot(
+            sequence_concat(
+              free,
+              released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+            current_bytes(nodes, index), 0), 0),
+            sequence_get(find_reusable_slot(
+              sequence_concat(
+                free,
+                released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+              current_bytes(nodes, index), 0), 1),
+            next_slot),
+          current_bytes(nodes, index),
+          current_last_use(table, nodes, index))),
+      choose(sequence_get(find_reusable_slot(
+        sequence_concat(
+          free,
+          released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+        current_bytes(nodes, index), 0), 0),
+        remove_slot(
+          sequence_concat(
+            free,
+            released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+          sequence_get(find_reusable_slot(
+            sequence_concat(
+              free,
+              released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+            current_bytes(nodes, index), 0), 1),
+          0,
+          empty_sequence()),
+        sequence_concat(
+          free,
+          released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence()))),
+      sequence_append(
+        assignments,
+        make_assignment(
+          current_id(nodes, index),
+          current_operation(nodes, index),
+          choose(sequence_get(find_reusable_slot(
+            sequence_concat(
+              free,
+              released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+            current_bytes(nodes, index), 0), 0),
+            sequence_get(find_reusable_slot(
+              sequence_concat(
+                free,
+                released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+              current_bytes(nodes, index), 0), 1),
+            next_slot),
+          sequence_get(find_reusable_slot(
+            sequence_concat(
+              free,
+              released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+            current_bytes(nodes, index), 0), 0),
+          current_bytes(nodes, index),
+          current_last_use(table, nodes, index))),
+      choose(sequence_get(find_reusable_slot(
+        sequence_concat(
+          free,
+          released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+        current_bytes(nodes, index), 0), 0),
+        next_slot,
+        next_slot + 1),
+      choose(sequence_get(find_reusable_slot(
+        sequence_concat(
+          free,
+          released_slots(active, current_inputs(nodes, index), index, 0, empty_sequence())),
+        current_bytes(nodes, index), 0), 0),
+        allocated,
+        allocated + current_bytes(nodes, index)),
+      choose(
+        active_bytes(
+          released_active(active, current_inputs(nodes, index), index, 0, empty_sequence()),
+          0,
+          0) + current_bytes(nodes, index) > peak,
+        active_bytes(
+          released_active(active, current_inputs(nodes, index), index, 0, empty_sequence()),
+          0,
+          0) + current_bytes(nodes, index),
+        peak))
+
+  reckon count_reused(assignments : Sequence, index : Number, result : Number) -> Number =
+    choose(index >= length(assignments), result,
+      count_reused(assignments, index + 1,
+        choose(sequence_get(sequence_get(assignments, index), 3), result + 1, result)))
+
+  reckon default_graph() -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(
+              sequence_append(
+                sequence_append(empty_sequence(), make_node("x", "input", empty_sequence(), 16)),
+                make_node("w", "input", empty_sequence(), 16)),
+              make_node("h", "matmul", two_text("x", "w"), 16)),
+            make_node("b", "input", empty_sequence(), 16)),
+          make_node("y", "add", two_text("h", "b"), 16)),
+        make_node("z", "relu", one_text("y"), 16)),
+      make_node("loss", "sum", one_text("z"), 8))
+
+  reckon graph() -> Sequence = default_graph()
+
+  reckon requested_outputs() -> Sequence = one_text("loss")
+  reckon empty_state() -> Sequence = schedule_state(empty_sequence(), empty_sequence(), empty_sequence(), 0, 0, 0)
+
+  facet contract.id : Text = "rcl-gap-ai011-compact-tensor-plan-v0.1"
+  facet contract.profile : Text = "RCL_OWNED_ORDERED_LIVENESS_SLOT_REUSE_CANDIDATE"
+  facet graph.nodes : Sequence = graph()
+  facet graph.outputs : Sequence = requested_outputs()
+  facet graph.valid : Truth = graph_valid(graph.nodes, graph.outputs)
+  facet plan.last_use : Sequence = choose(graph.valid, build_last_use(graph.nodes, graph.outputs, 0, empty_sequence()), empty_sequence())
+  facet plan.state : Sequence = choose(graph.valid, schedule_from(graph.nodes, plan.last_use, 0, empty_sequence(), empty_sequence(), empty_sequence(), 0, 0, 0), empty_state())
+  facet plan.assignments : Sequence = sequence_get(plan.state, 0)
+  facet plan.active : Sequence = sequence_get(plan.state, 1)
+  facet plan.free : Sequence = sequence_get(plan.state, 2)
+  facet plan.slot_count : Number = sequence_get(plan.state, 3)
+  facet plan.allocated_bytes : Number = sequence_get(plan.state, 4)
+  facet plan.live_peak_bytes : Number = sequence_get(plan.state, 5)
+  facet plan.reused_count : Number = count_reused(plan.assignments, 0, 0)
+  facet plan.status : Text = choose(graph.valid, "ok", "rejected")
+  facet evaluation.compact_reuse : Truth = graph.valid and plan.slot_count < length(graph.nodes)
+  facet evaluation.positive_allocation : Truth = graph.valid and plan.allocated_bytes > 0 and plan.live_peak_bytes > 0
+  facet evaluation.output_retained : Truth = graph.valid and length(plan.active) > 0
+  facet evidence.execution_path : Text = "RCL_GRAPH_VALIDATION_TO_LAST_USE_TO_EXACT_SLOT_REUSE_TO_NATIVE_VM"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_NO_GPU_THROUGHPUT_OR_K400_PROMOTION"
+}

@@ -1922,6 +1922,14 @@ export {
 } from './selfhost-autodiff-graph-governance.mjs';
 
 export {
+  SELFHOST_TENSOR_PLAN_LIVENESS_PATH,
+  SELFHOST_TENSOR_PLAN_LIVENESS_FORMAT,
+  renderSelfHostedTensorPlanLiveness,
+  runSelfHostedTensorPlanLiveness,
+  tensorPlanLivenessCanonical,
+} from './selfhost-tensor-plan-liveness.mjs';
+
+export {
   RCL_SEMANTIC_DECOMPRESSION_VERSION,
   RCL_SEMANTIC_DECOMPRESSION_FORMAT,
   createSemanticProfileTransition,
