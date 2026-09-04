@@ -44,22 +44,10 @@ function FighterInspector({ frame, side }) {
         <span className="route-badge">{frame.routeNameZh}</span>
       </div>
       <dl>
-        <div>
-          <dt>路线</dt>
-          <dd>{frame.routeId}</dd>
-        </div>
-        <div>
-          <dt>式</dt>
-          <dd>{frame.wanfengForm ?? '—'}</dd>
-        </div>
-        <div>
-          <dt>运动</dt>
-          <dd>{frame.motion.direction} · {frame.motion.magnitudeMilli}/1000</dd>
-        </div>
-        <div>
-          <dt>线路 / 接触</dt>
-          <dd>{frame.cue.lineMode} / {frame.cue.contactMode}</dd>
-        </div>
+        <div><dt>路线</dt><dd>{frame.routeId}</dd></div>
+        <div><dt>式</dt><dd>{frame.wanfengForm ?? '—'}</dd></div>
+        <div><dt>运动</dt><dd>{frame.motion.direction} · {frame.motion.magnitudeMilli}/1000</dd></div>
+        <div><dt>线路 / 接触</dt><dd>{frame.cue.lineMode} / {frame.cue.contactMode}</dd></div>
       </dl>
       <div className="tag-row">
         {frame.animationTags.map(tag => <span key={tag}>{tag}</span>)}
@@ -95,19 +83,14 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [playing, speed, index, exchanges.length]);
 
-  function step(delta) {
+  function next() {
     setPlaying(false);
-    setIndex(value => Math.max(0, Math.min(exchanges.length - 1, value + delta)));
+    setIndex(value => Math.min(exchanges.length - 1, value + 1));
   }
 
   function reset() {
     setPlaying(false);
     setIndex(0);
-    setResetToken(value => value + 1);
-  }
-
-  function replayCurrent() {
-    setPlaying(false);
     setResetToken(value => value + 1);
   }
 
@@ -148,12 +131,10 @@ export default function App() {
 
           <div className="controls">
             <button type="button" onClick={reset}>重置</button>
-            <button type="button" onClick={() => step(-1)} disabled={index === 0}>上一交换</button>
             <button type="button" className="primary" onClick={() => setPlaying(value => !value)}>
               {playing ? '暂停' : '播放'}
             </button>
-            <button type="button" onClick={() => step(1)} disabled={index === exchanges.length - 1}>下一交换</button>
-            <button type="button" onClick={replayCurrent}>重放当前</button>
+            <button type="button" onClick={next} disabled={index === exchanges.length - 1}>下一交换</button>
             <label>
               速度
               <select value={speed} onChange={event => setSpeed(Number(event.target.value))}>
@@ -167,20 +148,16 @@ export default function App() {
 
           <div className="timeline" aria-label="交换时间轴">
             {exchanges.map((group, groupIndex) => (
-              <button
-                type="button"
+              <div
                 key={group.exchange}
-                className={groupIndex === index ? 'active' : ''}
-                onClick={() => {
-                  setPlaying(false);
-                  setIndex(groupIndex);
-                }}
+                className={`timeline-step ${groupIndex === index ? 'active' : ''} ${groupIndex < index ? 'complete' : ''}`}
               >
                 <span>{REGIME_LABELS[group.frames[0]?.regime]}</span>
                 <strong>{group.exchange}</strong>
-              </button>
+              </div>
             ))}
           </div>
+          <p className="forward-note">v0.1 只允许向前回放；任意跳转 / 倒放将在 Provider Snapshot（场景快照）进入后开放。</p>
         </div>
 
         <aside className="inspector">
