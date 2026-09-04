@@ -8,8 +8,14 @@ import {
   KENDO_AUTHORED_ACTIONS,
   WANFENG_AUTHORED_ACTIONS,
 } from '../examples/ugis-fighter-game/src/motion/authoredActionSets.js';
+import { EXPANDED_AUTHORED_ACTIONS } from '../examples/ugis-fighter-game/src/motion/expandedStyleAnimations.js';
 import { sampleFighterPose } from '../examples/ugis-fighter-game/src/motion/motionRuntime.js';
 import { SWORD_STYLES } from '../examples/ugis-fighter-game/src/styles/swordStyles.js';
+
+const ALL_AUTHORED_ACTIONS = Object.freeze({
+  ...AUTHORED_ACTION_CLIPS,
+  ...EXPANDED_AUTHORED_ACTIONS,
+});
 
 const authoredIdsFor = style => [
   ...style.lightCombo,
@@ -20,15 +26,16 @@ const authoredIdsFor = style => [
 test('every player-facing style attack has a dedicated authored animation resource', () => {
   for (const [styleId, style] of Object.entries(SWORD_STYLES)) {
     for (const attackId of authoredIdsFor(style)) {
-      assert.ok(AUTHORED_ACTION_CLIPS[attackId], `${styleId}: ${attackId}`);
-      assert.equal(AUTHORED_ACTION_CLIPS[attackId].source, 'taowind-authored-v0.3d');
-      assert.ok(AUTHORED_ACTION_CLIPS[attackId].keyframes.length >= 5, attackId);
+      const clip = ALL_AUTHORED_ACTIONS[attackId];
+      assert.ok(clip, `${styleId}: ${attackId}`);
+      assert.match(clip.source, /^taowind-authored-v0\.(3d|4)$/);
+      assert.ok(clip.keyframes.length >= 5, attackId);
     }
   }
 });
 
 test('authored animation active windows remain locked to game-rule hit windows', () => {
-  for (const [id, motion] of Object.entries(AUTHORED_ACTION_CLIPS)) {
+  for (const [id, motion] of Object.entries(ALL_AUTHORED_ACTIONS)) {
     const attack = ATTACKS[id];
     assert.ok(attack, id);
     assert.ok(Math.abs(motion.active[0] - attack.activeStart / attack.duration) < 1e-9, `${id} start`);
@@ -95,6 +102,7 @@ test('real sword trail samples the animated sword tip instead of drawing a fake 
   assert.equal(shell.includes('ringGeometry'), false);
   assert.equal(shell.includes('boxGeometry'), false);
   assert.ok(shell.includes('FighterRigV2'));
+  assert.ok(shell.includes('ExpandedStyleRig'));
 });
 
 test('V2 presentation consumes authored body translation and full-body yaw channels', async () => {
