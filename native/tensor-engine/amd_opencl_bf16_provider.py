@@ -24,6 +24,8 @@ GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-matmul-gradient-request.v0.1"
 GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-matmul-gradient-result.v0.1"
 ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
 ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
+MASKED_SOFTMAX_REQUEST_FORMAT = "rcl.opencl-bf16-masked-softmax-request.v0.1"
+MASKED_SOFTMAX_RESULT_FORMAT = "rcl.opencl-bf16-masked-softmax-result.v0.1"
 BATCH_REQUEST_FORMAT = "rcl.opencl-amd-batch-request.v0.1"
 BATCH_RESULT_FORMAT = "rcl.opencl-amd-batch-result.v0.1"
 SESSION_CLOSE_REQUEST_FORMAT = "rcl.opencl-amd-session-close-request.v0.1"
@@ -229,6 +231,34 @@ __kernel void rcl_bf16_matmul_grad_right(
                  * upstream[inner * columns + column];
   }
   output[row * columns + column] = accumulator;
+}
+
+__kernel void rcl_bf16_masked_softmax(
+    __global const ushort* logits,
+    __global const ushort* mask,
+    __global ushort* output,
+    uint rows,
+    uint columns
+) {
+  uint row = get_global_id(0);
+  if (row >= rows) return;
+  float maximum = -3.402823466e+38f;
+  for (uint column = 0; column < columns; column++) {
+    float value = rcl_bf16_to_f32(logits[row * columns + column])
+                + rcl_bf16_to_f32(mask[row * columns + column]);
+    maximum = fmax(maximum, value);
+  }
+  float sum = 0.0f;
+  for (uint column = 0; column < columns; column++) {
+    float value = rcl_bf16_to_f32(logits[row * columns + column])
+                + rcl_bf16_to_f32(mask[row * columns + column]);
+    sum += exp(value - maximum);
+  }
+  for (uint column = 0; column < columns; column++) {
+    float value = rcl_bf16_to_f32(logits[row * columns + column])
+                + rcl_bf16_to_f32(mask[row * columns + column]);
+    output[row * columns + column] = (ushort)rcl_bf16_rne(exp(value - maximum) / sum);
+  }
 }
 
 __kernel void rcl_adamw_update(
@@ -1603,6 +1633,75 @@ def run_adamw(
     }
 
 
+def run_masked_softmax(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    if request.get("format") != MASKED_SOFTMAX_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL masked softmax request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    if request.get("operation") != "masked-softmax":
+        raise fail("RCL_OPENCL_OPERATION", "masked softmax operation must be masked-softmax")
+    if request.get("maskMode") != "additive":
+        raise fail("RCL_OPENCL_MASK_MODE", "masked softmax requires an explicit additive mask mode")
+    dimensions = [request.get("rows"), request.get("columns")]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in dimensions):
+        raise fail("RCL_OPENCL_SHAPE", "masked softmax dimensions must be integers")
+    rows, columns = dimensions
+    if any(value < 1 or value > MAX_DIMENSION for value in dimensions):
+        raise fail("RCL_OPENCL_SHAPE", "masked softmax dimensions must be within 1..=64")
+    logits = parse_bits(request.get("logitsBits"), "logits")
+    mask = parse_bits(request.get("maskBits"), "mask")
+    expected = rows * columns
+    if len(logits) != expected or len(mask) != expected:
+        raise fail("RCL_OPENCL_SHAPE", "masked softmax bit payload lengths must match rows*columns")
+    for index, (logit_bits, mask_bits) in enumerate(zip(logits, mask)):
+        combined = ctypes.c_float(bf16_value(logit_bits) + bf16_value(mask_bits)).value
+        if not (combined == combined and abs(combined) != float("inf")):
+            raise fail("RCL_OPENCL_F32_NONFINITE", f"masked softmax additive value at index {index} is non-finite")
+    device, outputs = run_opencl_kernel(
+        "rcl_bf16_masked_softmax",
+        [("u16", logits), ("u16", mask)],
+        [("u16", expected)],
+        [(CLUint, rows), (CLUint, columns)],
+        (rows,),
+        runtime,
+    )
+    output_bits = [int(value) for value in outputs[0]]
+    if any(bits & 0x7F80 == 0x7F80 for bits in output_bits):
+        raise fail("RCL_OPENCL_BF16_NONFINITE", "OpenCL masked softmax output is non-finite")
+    output_hex = [bits_hex(bits) for bits in output_bits]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-masked-softmax-v0.1\0")
+    digest.update(device["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<II", rows, columns))
+    for bits in logits:
+        digest.update(bits_hex(bits).encode("ascii"))
+    for bits in mask:
+        digest.update(bits_hex(bits).encode("ascii"))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": MASKED_SOFTMAX_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_MASKED_SOFTMAX_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": "masked-softmax",
+        "maskMode": "additive",
+        "inputDtype": "bf16",
+        "computeDtype": "f32",
+        "outputDtype": "bf16",
+        "rows": rows,
+        "columns": columns,
+        "device": device,
+        "outputBits": output_hex,
+        "outputData": [bf16_value(bits) for bits in output_bits],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
 def run_batch(
     request: dict[str, Any],
     runtime: OpenCLRuntime | None = None,
@@ -1659,6 +1758,8 @@ def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[s
         return run_gradient(request, runtime)
     if request_format == ADAMW_REQUEST_FORMAT:
         return run_adamw(request, runtime)
+    if request_format == MASKED_SOFTMAX_REQUEST_FORMAT:
+        return run_masked_softmax(request, runtime)
     if request_format != REQUEST_FORMAT:
         raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 request format")
     if request.get("backend") != BACKEND:
