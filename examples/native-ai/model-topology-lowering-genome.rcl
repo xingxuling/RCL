@@ -1,0 +1,266 @@
+# AI012: RCL-owned admission from a model topology to a complete generic Tensor graph.
+# The bounded candidate binds block topology, parameter identity, stage coverage,
+# generic operation inventory and graph cardinality before a backend consumes it.
+# A hosted builder still constructs graph nodes; numeric Tensor/Autodiff execution
+# remains an execution-organ concern.
+reality ModelTopologyTensorLoweringGenome {
+  reckon make_block(index : Number, stage : Text, parameters : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), index),
+        stage),
+      parameters)
+  reckon block_index(block : Sequence) -> Number = sequence_get(block, 0)
+  reckon block_stage(block : Sequence) -> Text = sequence_get(block, 1)
+  reckon block_parameters(block : Sequence) -> Sequence = sequence_get(block, 2)
+
+  reckon make_stage(name : Text, count : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), count)
+  reckon stage_name(stage : Sequence) -> Text = sequence_get(stage, 0)
+  reckon stage_count(stage : Sequence) -> Number = sequence_get(stage, 1)
+
+  reckon make_operation(name : Text, count : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), name), count)
+  reckon operation_name(operation : Sequence) -> Text = sequence_get(operation, 0)
+  reckon operation_count(operation : Sequence) -> Number = sequence_get(operation, 1)
+
+  reckon contains_text(values : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(values), false,
+      sequence_get(values, index) == target or
+      contains_text(values, target, index + 1))
+
+  reckon contains_text_before(values : Sequence, target : Text, index : Number, limit : Number) -> Truth =
+    choose(index >= limit, false,
+      sequence_get(values, index) == target or
+      contains_text_before(values, target, index + 1, limit))
+
+  reckon unique_texts(values : Sequence, index : Number) -> Truth =
+    choose(index >= length(values), true,
+      contains_text_before(values, sequence_get(values, index), 0, index) == false and
+      unique_texts(values, index + 1))
+
+  reckon positive(value : Number) -> Truth = value > 0
+  reckon dimensions_valid() -> Truth =
+    model.vocabulary_size > 1 and
+    model.context_length > 1 and
+    model.hidden_size > 0 and
+    model.feed_forward_size > 0 and
+    model.query_heads > 0 and
+    model.kv_heads > 0 and
+    model.query_heads >= model.kv_heads and
+    model.query_heads % model.kv_heads == 0 and
+    model.head_dimension > 0 and
+    model.head_dimension % 2 == 0 and
+    model.hidden_size == model.query_heads * model.head_dimension
+
+  reckon block_parameter_items_valid(parameters : Sequence, topology_parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(parameters), true,
+      sequence_get(parameters, index) != "" and
+      contains_text(topology_parameters, sequence_get(parameters, index), 0) and
+      block_parameter_items_valid(parameters, topology_parameters, index + 1))
+
+  reckon block_items_valid(blocks : Sequence, topology_parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(blocks), true,
+      block_index(sequence_get(blocks, index)) == index and
+      block_stage(sequence_get(blocks, index)) != "" and
+      length(block_parameters(sequence_get(blocks, index))) > 0 and
+      block_parameter_items_valid(block_parameters(sequence_get(blocks, index)), topology_parameters, 0) and
+      block_items_valid(blocks, topology_parameters, index + 1))
+
+  reckon block_parameter_total(blocks : Sequence, index : Number, total : Number) -> Number =
+    choose(index >= length(blocks), total,
+      block_parameter_total(blocks, index + 1, total + length(block_parameters(sequence_get(blocks, index)))))
+
+  reckon topology_parameter_groups_valid(blocks : Sequence, embedding : Sequence, output : Sequence, parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(blocks),
+      block_parameter_items_valid(embedding, parameters, 0) and
+      block_parameter_items_valid(output, parameters, 0),
+      block_parameter_items_valid(block_parameters(sequence_get(blocks, index)), parameters, 0) and
+      topology_parameter_groups_valid(blocks, embedding, output, parameters, index + 1))
+
+  reckon make_stage_items_valid(stages : Sequence, index : Number) -> Truth =
+    choose(index >= length(stages), true,
+      stage_name(sequence_get(stages, index)) != "" and
+      stage_name(sequence_get(stages, index)) != "unclassified" and
+      stage_count(sequence_get(stages, index)) > 0 and
+      make_stage_items_valid(stages, index + 1))
+
+  reckon contains_stage(stages : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(stages), false,
+      stage_name(sequence_get(stages, index)) == target or
+      contains_stage(stages, target, index + 1))
+
+  reckon block_stage_coverage(blocks : Sequence, stages : Sequence, index : Number) -> Truth =
+    choose(index >= length(blocks), true,
+      contains_stage(stages, block_stage(sequence_get(blocks, index)), 0) and
+      block_stage_coverage(blocks, stages, index + 1))
+
+  reckon allowed_operation(name : Text) -> Truth =
+    name == "add" or
+    name == "activation" or
+    name == "broadcast" or
+    name == "div" or
+    name == "log" or
+    name == "matmul" or
+    name == "mean" or
+    name == "mul" or
+    name == "reshape" or
+    name == "softmax" or
+    name == "sqrt" or
+    name == "sub" or
+    name == "sum" or
+    name == "transpose"
+
+  reckon forbidden_operation(name : Text) -> Truth =
+    name == "provider_call" or
+    name == "transformer_special" or
+    name == "gqa_special" or
+    name == "lm_special" or
+    name == "model_special"
+
+  reckon operation_items_valid(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      operation_name(sequence_get(items, index)) != "" and
+      operation_count(sequence_get(items, index)) > 0 and
+      allowed_operation(operation_name(sequence_get(items, index))) and
+      forbidden_operation(operation_name(sequence_get(items, index))) == false and
+      operation_items_valid(items, index + 1))
+
+  reckon operation_total(items : Sequence, index : Number, total : Number) -> Number =
+    choose(index >= length(items), total,
+      operation_total(items, index + 1, total + operation_count(sequence_get(items, index))))
+
+  reckon contains_operation(items : Sequence, target : Text, index : Number) -> Truth =
+    choose(index >= length(items), false,
+      operation_name(sequence_get(items, index)) == target or
+      contains_operation(items, target, index + 1))
+
+  reckon required_operations_valid(required : Sequence, operations : Sequence, index : Number) -> Truth =
+    choose(index >= length(required), true,
+      contains_operation(operations, sequence_get(required, index), 0) and
+      required_operations_valid(required, operations, index + 1))
+
+  reckon graph_parameter_binding_valid(topology_parameters : Sequence, graph_parameters : Sequence, index : Number) -> Truth =
+    choose(index >= length(topology_parameters), true,
+      contains_text(graph_parameters, sequence_get(topology_parameters, index), 0) and
+      graph_parameter_binding_valid(topology_parameters, graph_parameters, index + 1))
+
+  reckon sequence_map_stage_names(stages : Sequence, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(stages), result,
+      sequence_map_stage_names(stages, index + 1, sequence_append(result, stage_name(sequence_get(stages, index)))))
+  reckon sequence_map_operation_names(operations : Sequence, index : Number, result : Sequence) -> Sequence =
+    choose(index >= length(operations), result,
+      sequence_map_operation_names(operations, index + 1, sequence_append(result, operation_name(sequence_get(operations, index)))))
+
+  reckon default_blocks() -> Sequence = empty_sequence()
+  reckon topology_blocks() -> Sequence = default_blocks()
+  reckon default_parameters() -> Sequence = empty_sequence()
+  reckon topology_parameters() -> Sequence = default_parameters()
+  reckon default_embedding_parameters() -> Sequence = empty_sequence()
+  reckon embedding_parameters() -> Sequence = default_embedding_parameters()
+  reckon default_output_parameters() -> Sequence = empty_sequence()
+  reckon output_parameters() -> Sequence = default_output_parameters()
+  reckon default_stages() -> Sequence = empty_sequence()
+  reckon graph_stages() -> Sequence = default_stages()
+  reckon default_operations() -> Sequence = empty_sequence()
+  reckon graph_operations() -> Sequence = default_operations()
+  reckon default_required_operations() -> Sequence = empty_sequence()
+  reckon required_operations() -> Sequence = default_required_operations()
+  reckon default_graph_parameter_ids() -> Sequence = empty_sequence()
+  reckon graph_parameter_ids() -> Sequence = default_graph_parameter_ids()
+
+  facet contract.id : Text = "rcl-gap-ai012-selfhost-model-topology-lowering-v0.1"
+  facet contract.profile : Text = "RCL_OWNED_MODEL_TO_GENERIC_TENSOR_AUTODIFF_GRAPH_ADMISSION_CANDIDATE"
+  facet binding.semantic_owner : Text = "RCL"
+  facet binding.topology_source_sha256 : Text = ""
+  facet binding.topology_contract_root : Text = ""
+  facet binding.topology_canonical : Text = "{}"
+  facet binding.topology_root : Text = ""
+  facet binding.topology_root_computed : Text = sha256_text(binding.topology_canonical)
+  facet binding.graph_canonical : Text = "{}"
+  facet binding.graph_root : Text = ""
+  facet binding.graph_root_computed : Text = sha256_text(binding.graph_canonical)
+
+  facet model.architecture : Text = ""
+  facet model.vocabulary_size : Number = 0
+  facet model.context_length : Number = 0
+  facet model.hidden_size : Number = 0
+  facet model.feed_forward_size : Number = 0
+  facet model.query_heads : Number = 0
+  facet model.kv_heads : Number = 0
+  facet model.head_dimension : Number = 0
+  facet model.block_count : Number = 0
+
+  facet topology.blocks : Sequence = topology_blocks()
+  facet topology.parameter_ids : Sequence = topology_parameters()
+  facet topology.embedding_parameter_ids : Sequence = embedding_parameters()
+  facet topology.output_parameter_ids : Sequence = output_parameters()
+  facet topology.required_operations : Sequence = required_operations()
+  facet topology.block_parameter_total : Number = block_parameter_total(topology.blocks, 0, 0)
+
+  facet graph.format : Text = ""
+  facet graph.node_count : Number = 0
+  facet graph.initial_tensor_count : Number = 0
+  facet graph.output_count : Number = 0
+  facet graph.parameters : Sequence = graph_parameter_ids()
+  facet graph.stages : Sequence = graph_stages()
+  facet graph.operations : Sequence = graph_operations()
+  facet graph.parameter_count : Number = length(graph.parameters)
+  facet graph.operation_total : Number = operation_total(graph.operations, 0, 0)
+
+  facet evaluation.topology_root_valid : Truth = binding.topology_root_computed == binding.topology_root
+  facet evaluation.graph_root_valid : Truth = binding.graph_root_computed == binding.graph_root
+  facet evaluation.topology_valid : Truth =
+    model.architecture == "decoder-lm" and
+    dimensions_valid() and
+    model.block_count > 0 and
+    model.block_count <= 64 and
+    length(topology.blocks) == model.block_count and
+    block_items_valid(topology.blocks, topology.parameter_ids, 0) and
+    unique_texts(topology.parameter_ids, 0) and
+    length(topology.embedding_parameter_ids) > 0 and
+    length(topology.output_parameter_ids) > 0 and
+    topology_parameter_groups_valid(topology.blocks, topology.embedding_parameter_ids, topology.output_parameter_ids, topology.parameter_ids, 0) and
+    length(topology.parameter_ids) == length(topology.embedding_parameter_ids) + topology.block_parameter_total + length(topology.output_parameter_ids)
+  facet evaluation.parameter_binding_valid : Truth =
+    graph.parameter_count == length(topology.parameter_ids) and
+    unique_texts(graph.parameters, 0) and
+    graph_parameter_binding_valid(topology.parameter_ids, graph.parameters, 0) and
+    graph_parameter_binding_valid(graph.parameters, topology.parameter_ids, 0)
+  facet evaluation.parameter_count_valid : Truth = graph.parameter_count == length(topology.parameter_ids)
+  facet evaluation.graph_parameters_unique : Truth = unique_texts(graph.parameters, 0)
+  facet evaluation.topology_parameters_in_graph : Truth = graph_parameter_binding_valid(topology.parameter_ids, graph.parameters, 0)
+  facet evaluation.graph_parameters_in_topology : Truth = graph_parameter_binding_valid(graph.parameters, topology.parameter_ids, 0)
+  facet evaluation.stage_coverage_valid : Truth =
+    length(graph.stages) > 0 and
+    unique_texts(sequence_map_stage_names(graph.stages, 0, empty_sequence()), 0) and
+    make_stage_items_valid(graph.stages, 0) and
+    contains_stage(graph.stages, "embedding", 0) and
+    contains_stage(graph.stages, "lm", 0) and
+    contains_stage(graph.stages, "loss", 0) and
+    block_stage_coverage(topology.blocks, graph.stages, 0)
+  facet evaluation.generic_operation_policy : Truth =
+    length(graph.operations) > 0 and
+    unique_texts(sequence_map_operation_names(graph.operations, 0, empty_sequence()), 0) and
+    operation_items_valid(graph.operations, 0) and
+    required_operations_valid(topology.required_operations, graph.operations, 0)
+  facet evaluation.graph_cardinality_valid : Truth =
+    graph.node_count > 0 and
+    graph.initial_tensor_count > 0 and
+    graph.output_count > 0 and
+    graph.operation_total == graph.node_count
+  facet evaluation.accepted : Truth =
+    graph.format == "rcl.tensor-execution-plan.v0.1" and
+    evaluation.topology_root_valid and
+    evaluation.graph_root_valid and
+    evaluation.topology_valid and
+    evaluation.parameter_binding_valid and
+    evaluation.stage_coverage_valid and
+    evaluation.generic_operation_policy and
+    evaluation.graph_cardinality_valid
+  facet lowering.status : Text = choose(evaluation.accepted, "accepted", "rejected")
+  facet topology.block_count : Number = length(topology.blocks)
+  facet evidence.execution_path : Text = "RCL_TOPOLOGY_ROOT_TO_PARAMETER_IDENTITY_TO_STAGE_COVERAGE_TO_GENERIC_GRAPH_POLICY_TO_NATIVE_SELFHOST_VM"
+  facet evidence.boundary : Text = "RCL_OWNS_TOPOLOGY_GRAPH_ADMISSION;_AUXILIARY_GRAPH_BUILDER_AND_TENSOR_AUTODIFF_BACKEND_REMAIN_EXTERNAL"
+  facet evidence.claim : Text = "AI012_BOUNDED_RCL_OWNED_MODEL_TO_GENERIC_GRAPH_ADMISSION_CANDIDATE_ONLY"
+}

@@ -1,0 +1,43 @@
+{
+  "format": "rcl.model-topology.v0.1",
+  "architecture": "decoder-lm",
+  "vocabularySize": 4,
+  "contextLength": 3,
+  "hiddenSize": 4,
+  "feedForwardSize": 5,
+  "queryHeads": 2,
+  "kvHeads": 1,
+  "headDimension": 2,
+  "blockCount": 2,
+  "blocks": [
+    {
+      "index": 0,
+      "stageName": "block.0",
+      "parameterIds": ["block.0.wq", "block.0.wk", "block.0.wv", "block.0.wo", "block.0.w1", "block.0.w2"]
+    },
+    {
+      "index": 1,
+      "stageName": "block.1",
+      "parameterIds": ["block.1.wq", "block.1.wk", "block.1.wv", "block.1.wo", "block.1.w1", "block.1.w2"]
+    }
+  ],
+  "embeddingParameterIds": ["tokenEmbedding"],
+  "outputParameterIds": ["lmHead"],
+  "parameterIds": [
+    "tokenEmbedding",
+    "block.0.wq", "block.0.wk", "block.0.wv", "block.0.wo", "block.0.w1", "block.0.w2",
+    "block.1.wq", "block.1.wk", "block.1.wv", "block.1.wo", "block.1.w1", "block.1.w2",
+    "lmHead"
+  ],
+  "requiredOperations": [
+    "add", "activation", "broadcast", "div", "log", "matmul", "mean", "mul",
+    "reshape", "softmax", "sqrt", "sub", "sum", "transpose"
+  ],
+  "claimsNotGranted": [
+    "FULL_SELF_HOSTED_TYPED_TENSOR_GRAPH_CONSTRUCTION",
+    "TENSOR_AUTODIFF_NUMERIC_EXECUTION",
+    "GPU",
+    "PRODUCTION_TRANSFORMER_TRAINING",
+    "K400_PROMOTION"
+  ]
+}

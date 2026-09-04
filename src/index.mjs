@@ -225,6 +225,18 @@ export {
 
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
+export {
+  SELFHOST_MODEL_TOPOLOGY_LOWERING_PATH,
+  SELFHOST_MODEL_TOPOLOGY_LOWERING_FORMAT,
+  MODEL_TOPOLOGY_FORMAT,
+  normalizeModelTopology,
+  modelTopologyGraphManifest,
+  buildModelTopologyLoweringManifest,
+  renderSelfHostedModelTopologyLowering,
+  runSelfHostedModelTopologyLowering,
+  modelTopologyLoweringCanonical,
+} from './selfhost-model-topology-lowering.mjs';
+
 
 export {
   RCL_APP_KERNEL_VERSION,
