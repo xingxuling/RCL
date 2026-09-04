@@ -1,0 +1,62 @@
+{
+  "format": "rcl.k17.opencl-amd-tensor-mixed-graph-contract.v0.1",
+  "status": "OPENCL_AMD_TENSOR_MIXED_GRAPH_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-ORDERED-MATMUL_MASKED_SOFTMAX_GRAPH",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "graphOrder": "RCL declares the ordered node list, operation, inputs, dimensions and readback policy",
+    "tensorIdentity": "storageIdentity plus deterministic valueRoot remains the canonical Tensor reference",
+    "intermediateResource": "ephemeral ordered device resource, not canonical Tensor value",
+    "operations": "generic Tensor matmul and additive masked softmax only",
+    "maskedSoftmax": "BF16 storage, FP32 stable row normalization, BF16 RNE output",
+    "providerRole": "auxiliary OpenCL cl_mem allocation, kernel argument binding and ordered dispatch organ only",
+    "fallback": "forbidden"
+  },
+  "residency": {
+    "mode": "tensor-residency-v0.1",
+    "optIn": true,
+    "maxGraphNodes": 8,
+    "maxOutputBytesPerNode": 2097152,
+    "intermediateReadbacks": "forbidden",
+    "finalReadback": "required exactly once",
+    "resourceLifetime": "one graph request; every ephemeral output resource is released before session close",
+    "inputLifetime": "resident Tensor inputs remain bound for the enclosing provider session",
+    "outputResource": "ephemeral ordered device resource, not canonical Tensor value"
+  },
+  "acceptance": [
+    "RCL validates a bounded ordered graph of two through eight generic Tensor nodes",
+    "matmul nodes require rank-2 BF16 dimensions and masked-softmax nodes require equal-shape logits/mask inputs",
+    "masked-softmax nodes require explicit additive maskMode and omit shared",
+    "each graph node consumes resident Tensor references or a resource produced by an earlier node",
+    "intermediate outputs remain device-resident and no intermediate device-to-host readback is permitted",
+    "the final node performs exactly one explicit device-to-host readback",
+    "all graph output resources and resident Tensor inputs are released before session close",
+    "operation, resource order, shape mismatch and unavailable AMD OpenCL fail closed"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_ORDERED_TENSOR_MIXED_GRAPH_CANDIDATE",
+    "OPENCL_AMD_GRAPH_MASKED_SOFTMAX_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_OUTPUT_RESIDENCY",
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "GPU_TRAINING",
+    "GPU_NATIVE_AUTODIFF",
+    "GPU_NATIVE_ADAMW",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_ORDERED_GPU_MATMUL_PLUS_ADDITIVE_MASKED_SOFTMAX_WITH_EPHEMERAL_INTERMEDIATES_AND_ONE_FINAL_READBACK"
+}

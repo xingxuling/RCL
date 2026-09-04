@@ -12,6 +12,8 @@ const REQUEST_FORMAT: &str = "rcl.k14.opencl-amd-tensor-residency-probe-request.
 const RESULT_FORMAT: &str = "rcl.k14.opencl-amd-tensor-residency-probe-result.v0.1";
 const GRAPH_REQUEST_FORMAT: &str = "rcl.k15.opencl-amd-tensor-graph-residency-probe-request.v0.1";
 const GRAPH_RESULT_FORMAT: &str = "rcl.k15.opencl-amd-tensor-graph-residency-probe-result.v0.1";
+const MIXED_GRAPH_REQUEST_FORMAT: &str = "rcl.k17.opencl-amd-tensor-mixed-graph-probe-request.v0.1";
+const MIXED_GRAPH_RESULT_FORMAT: &str = "rcl.k17.opencl-amd-tensor-mixed-graph-probe-result.v0.1";
 const BACKEND: &str = "opencl-amd";
 const MAX_TENSORS: usize = 64;
 const MAX_OPERATIONS: usize = 128;
@@ -92,9 +94,14 @@ struct GraphNodeSpec {
     right_tensor_id: Option<String>,
     #[serde(default)]
     right_resource: Option<String>,
+    #[serde(default)]
+    operation: Option<String>,
+    #[serde(default)]
+    mask_mode: Option<String>,
     rows: usize,
     columns: usize,
-    shared: usize,
+    #[serde(default)]
+    shared: Option<usize>,
     #[serde(default)]
     readback: bool,
 }
@@ -414,24 +421,65 @@ fn graph_payload(
                 "only the final graph node may request a readback",
             ));
         }
-        let dimensions = [node.rows, node.columns, node.shared];
-        if dimensions
-            .iter()
-            .any(|value| *value == 0 || *value > MAX_DIMENSION)
+        let operation = node.operation.as_deref().unwrap_or("matmul");
+        if !matches!(operation, "matmul" | "masked-softmax") {
+            return Err(ProbeError::new(
+                "RCL_K17_GRAPH_OPERATION",
+                format!("graph node {node_id} operation must be matmul or masked-softmax"),
+            ));
+        }
+        if node.rows == 0
+            || node.rows > MAX_DIMENSION
+            || node.columns == 0
+            || node.columns > MAX_DIMENSION
         {
             return Err(ProbeError::new(
                 "RCL_K15_GRAPH_SHAPE",
                 format!("graph node {node_id} dimensions must be within 1..={MAX_DIMENSION}"),
             ));
         }
+        let shared = if operation == "matmul" {
+            let shared = node.shared.ok_or_else(|| {
+                ProbeError::new(
+                    "RCL_K15_GRAPH_SHAPE",
+                    format!("graph matmul node {node_id} requires shared"),
+                )
+            })?;
+            if shared == 0 || shared > MAX_DIMENSION {
+                return Err(ProbeError::new(
+                    "RCL_K15_GRAPH_SHAPE",
+                    format!("graph node {node_id} dimensions must be within 1..={MAX_DIMENSION}"),
+                ));
+            }
+            shared
+        } else {
+            if node.shared.is_some() {
+                return Err(ProbeError::new(
+                    "RCL_K17_GRAPH_SHAPE",
+                    format!("graph masked-softmax node {node_id} must omit shared"),
+                ));
+            }
+            if node.mask_mode.as_deref() != Some("additive") {
+                return Err(ProbeError::new(
+                    "RCL_K17_GRAPH_MASK_MODE",
+                    format!("graph masked-softmax node {node_id} requires additive maskMode"),
+                ));
+            }
+            0
+        };
         let mut payload = json!({
             "nodeId": node_id,
             "outputResource": output_resource.clone(),
             "rows": node.rows,
             "columns": node.columns,
-            "shared": node.shared,
             "readback": node.readback,
         });
+        if operation == "matmul" {
+            payload["shared"] = json!(shared);
+        } else {
+            payload["operation"] = Value::String(operation.to_owned());
+            payload["maskMode"] = Value::String("additive".to_owned());
+        }
         let left_shape = graph_input_payload(
             node,
             "left",
@@ -448,9 +496,17 @@ fn graph_payload(
             used_tensor_ids,
             &mut payload,
         )?;
-        if left_shape != vec![node.rows, node.shared]
-            || right_shape != vec![node.shared, node.columns]
-        {
+        let expected_left_shape = if operation == "matmul" {
+            vec![node.rows, shared]
+        } else {
+            vec![node.rows, node.columns]
+        };
+        let expected_right_shape = if operation == "matmul" {
+            vec![shared, node.columns]
+        } else {
+            vec![node.rows, node.columns]
+        };
+        if left_shape != expected_left_shape || right_shape != expected_right_shape {
             return Err(ProbeError::new(
                 "RCL_K15_GRAPH_SHAPE",
                 format!("graph node {node_id} input shapes do not match its dimensions"),
@@ -468,7 +524,7 @@ fn graph_payload(
 }
 
 fn run_graph(request: GraphRequest) -> Result<Value, ProbeError> {
-    if request.format != GRAPH_REQUEST_FORMAT {
+    if request.format != GRAPH_REQUEST_FORMAT && request.format != MIXED_GRAPH_REQUEST_FORMAT {
         return Err(ProbeError::new(
             "RCL_K15_REQUEST_FORMAT",
             format!("unsupported request format {}", request.format),
@@ -532,9 +588,10 @@ fn run_graph(request: GraphRequest) -> Result<Value, ProbeError> {
         .get("outputBits")
         .cloned()
         .unwrap_or(Value::Null);
+    let mixed_graph = request.format == MIXED_GRAPH_REQUEST_FORMAT;
     Ok(json!({
-        "format": GRAPH_RESULT_FORMAT,
-        "status": "PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE",
+        "format": if mixed_graph { MIXED_GRAPH_RESULT_FORMAT } else { GRAPH_RESULT_FORMAT },
+        "status": if mixed_graph { "PASS_LOCAL_OPENCL_TENSOR_MIXED_GRAPH_CANDIDATE" } else { "PASS_LOCAL_OPENCL_TENSOR_GRAPH_RESIDENCY_CANDIDATE" },
         "canonicalOwner": "RCL",
         "backend": BACKEND,
         "device": device,
@@ -754,7 +811,7 @@ fn main() {
         .get("format")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let result = if format == GRAPH_REQUEST_FORMAT {
+    let result = if format == GRAPH_REQUEST_FORMAT || format == MIXED_GRAPH_REQUEST_FORMAT {
         let request = serde_json::from_value::<GraphRequest>(envelope).unwrap_or_else(|error| {
             fail(ProbeError::new("RCL_K15_REQUEST_JSON", error.to_string()))
         });

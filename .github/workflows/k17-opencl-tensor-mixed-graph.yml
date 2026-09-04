@@ -1,0 +1,42 @@
+name: K17 AMD OpenCL Tensor Mixed Graph
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/Cargo.toml'
+      - 'native/tensor-engine/Cargo.lock'
+      - 'tests/k17-opencl-tensor-mixed-graph.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-mixed-graph-*'
+      - 'package.json'
+      - '.github/workflows/k17-opencl-tensor-mixed-graph.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/Cargo.toml'
+      - 'native/tensor-engine/Cargo.lock'
+      - 'tests/k17-opencl-tensor-mixed-graph.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-mixed-graph-*'
+      - 'package.json'
+      - '.github/workflows/k17-opencl-tensor-mixed-graph.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  mixed-graph:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run K17 mixed graph verification
+        run: npm run test:k17-opencl-tensor-mixed-graph
