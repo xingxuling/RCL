@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k340-compiler-mixed-paradigm-runtime-contract.v0.1.json');
@@ -27,7 +28,7 @@ export function evaluateK340CompilerMixedParadigmSource(options = {}) {
   const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
   const sourcePath = path.resolve(options.sourcePath ?? path.join(ROOT, contract.canonical.sourcePath));
   const source = fs.readFileSync(sourcePath, 'utf8');
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-k340-candidate-'));
   const outputPath = path.join(directory, 'candidate.rbc');
   const checks = {};
@@ -78,7 +79,7 @@ export function verifyK340CompilerMixedParadigmCandidate(options = {}) {
   const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
   const { reportRoot, ...evidenceWithoutRoot } = evidence;
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const candidate = evaluateK340CompilerMixedParadigmSource({ sourcePath });
 
   check(contract.format === 'rcl.k340.compiler-mixed-paradigm-runtime-contract.v0.1', 'RCL_K340_CONTRACT_FORMAT');

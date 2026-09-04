@@ -9,10 +9,12 @@ import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { LogicalTimeScheduler, LogicalTimeSchedulerError } from '../src/logical-time-scheduler.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_SOURCE_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k331-compiler-realtime.rcl');
-const COMPILER_RBC_PATH = path.join(ROOT, 'selfhost', 'compiler.rbc');
+const RUNTIME_CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k331-compiler-realtime-runtime-contract.v0.1.json');
+const COMPILER_RBC_PATH = readCanonicalCompilerArtifact(JSON.parse(fs.readFileSync(RUNTIME_CONTRACT_PATH, 'utf8'))).path;
 
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function check(checks, name, condition, details = undefined) {

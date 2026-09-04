@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { verifyNativeSemanticStateRoot } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_CONTRACT_PATH = path.join(ROOT, 'examples', 'universal-stress', 'k321-k322-compiler-algorithm-cli-runtime-contract.v0.1.json');
@@ -75,7 +76,7 @@ export function runK321K322CompilerAlgorithmCliEvidence(options = {}) {
     || contract.frozenBeforeAcquisition !== true) throw new Error('RCL_K321_K322_RUNTIME_CONTRACT_INVALID');
 
   const sourcePath = path.join(ROOT, contract.canonical.sourcePath);
-  const compilerRbcPath = path.join(ROOT, contract.canonical.compilerRbcPath);
+  const compilerRbcPath = readCanonicalCompilerArtifact(contract).path;
   const rclcPath = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclc.exe' : 'rclc');
   const rclvmPath = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
   for (const requiredPath of [sourcePath, compilerRbcPath, rclcPath, rclvmPath]) {

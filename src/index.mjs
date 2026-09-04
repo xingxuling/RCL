@@ -1821,6 +1821,7 @@ export {
   RCL_CANONICAL_SOURCE_ARCHIVE_FORMAT,
   DEFAULT_CANONICAL_SOURCE_ARCHIVE_PATH,
   readCanonicalCompilerSourcePair,
+  readCanonicalCompilerArtifact,
 } from './canonical-source-archive.mjs';
 
 export {
