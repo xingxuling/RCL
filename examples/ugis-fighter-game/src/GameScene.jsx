@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import HumanoidFighter from './HumanoidFighter.jsx';
+import { sfx } from './audio/sfx.js';
 import { consumePressed, isDown, useKeyboardInput } from './input.js';
 import {
   ATTACKS,
@@ -58,9 +59,11 @@ function startAttack(logic, attackId, direction) {
   logic.actionTime = 0;
   logic.actionDuration = attack.duration;
   logic.actionHit = false;
+  logic.actionSoundPlayed = false;
   logic.actionDirX = direction.x;
   logic.actionDirZ = direction.z;
   logic.guard = false;
+  logic.moveIntent = 'attack';
   logic.lastActionLabel = attack.label;
   logic.route = attack.routeIntent;
   logic.routeLabel = ROUTE_LABELS[attack.routeIntent];
@@ -78,7 +81,9 @@ function startDash(logic, direction) {
   logic.dashCooldown = GAME_LIMITS.dashCooldown;
   logic.invuln = 0.14;
   logic.guard = false;
+  logic.moveIntent = 'dash';
   logic.lastActionLabel = '瞬步';
+  sfx.dash(logic.role);
   return true;
 }
 
@@ -88,6 +93,9 @@ function resetLogic(target, role) {
     knockbackZ: 0,
     aiGuardTimer: 0,
     actionDuration: 0,
+    actionSoundPlayed: false,
+    stepTravel: 0,
+    moveIntent: 'idle',
   });
 }
 
@@ -229,8 +237,8 @@ function ChaseCamera({ playerRoot, enemyRoot, matchRef }) {
     const back = 3.55 + Math.min(2.15, distance * 0.42);
     const side = 0.55;
     const shake = matchRef.current.cameraShake || 0;
-    const jitterX = (Math.sin(performance.now() * 0.045) * shake);
-    const jitterY = (Math.cos(performance.now() * 0.052) * shake * 0.7);
+    const jitterX = Math.sin(performance.now() * 0.045) * shake;
+    const jitterY = Math.cos(performance.now() * 0.052) * shake * 0.7;
 
     desired.current.set(
       player.position.x - fx * back + rx * side + jitterX,
@@ -320,11 +328,19 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetSignal]);
 
-  function applyMovement(logic, root, direction, speed, delta) {
+  function applyMovement(logic, root, direction, speed, delta, intent = 'forward') {
     if (!root || logic.hitstun > 0 || logic.action) return;
     root.position.x += direction.x * speed * delta;
     root.position.z += direction.z * speed * delta;
     logic.moveMagnitude = Math.min(1, direction.length());
+    logic.moveIntent = logic.moveMagnitude > 0.02 ? intent : 'idle';
+    if (logic.grounded && logic.moveMagnitude > 0.2) {
+      logic.stepTravel = (logic.stepTravel || 0) + speed * delta;
+      if (logic.stepTravel >= 0.72) {
+        logic.stepTravel = 0;
+        sfx.footstep(logic.role);
+      }
+    }
   }
 
   function tryHit(attacker, attackerRoot, defender, defenderRoot, attack) {
@@ -337,10 +353,7 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     defender.hp = Math.max(0, defender.hp - damage);
     defender.lastDamage = damage;
     defender.flash = guarded ? 0.06 : 0.14;
-    defender.hitstun = Math.max(
-      defender.hitstun,
-      attack.hitstun * (guarded ? 0.32 : 1),
-    );
+    defender.hitstun = Math.max(defender.hitstun, attack.hitstun * (guarded ? 0.32 : 1));
     attacker.energy = Math.min(GAME_LIMITS.maxEnergy, attacker.energy + attack.energyGain);
     if (guarded) defender.energy = Math.min(GAME_LIMITS.maxEnergy, defender.energy + GAME_LIMITS.guardEnergyGain);
 
@@ -355,6 +368,9 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     match.current.cameraShake = guarded ? 0.025 : Math.min(0.12, 0.035 + attack.damage / 1800);
     match.current.hitSerial += 1;
 
+    if (guarded) sfx.guard();
+    else sfx.hit(Math.max(0.5, attack.damage / 90));
+
     const hitX = (attackerRoot.position.x + defenderRoot.position.x) * 0.5;
     const hitZ = (attackerRoot.position.z + defenderRoot.position.z) * 0.5;
     setSpark({ id: match.current.hitSerial, x: hitX, y: 1.35 + defenderRoot.position.y, z: hitZ, guarded });
@@ -363,6 +379,7 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
       match.current.ended = true;
       match.current.winner = attacker.role === 'player' ? 'player' : 'enemy';
       defender.hitstun = 2;
+      if (attacker.role === 'player') sfx.victory();
     }
   }
 
@@ -375,10 +392,12 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
       root.position.x += logic.actionDirX * speed * delta;
       root.position.z += logic.actionDirZ * speed * delta;
       logic.moveMagnitude = 1;
+      logic.moveIntent = 'dash';
       if (logic.actionTime >= GAME_LIMITS.dashDuration) {
         logic.action = null;
         logic.actionTime = 0;
         logic.moveMagnitude = 0;
+        logic.moveIntent = 'idle';
       }
       return;
     }
@@ -390,6 +409,13 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     }
     logic.actionTime += delta;
     logic.moveMagnitude = attack.move > 0 ? 0.55 : 0;
+    logic.moveIntent = 'attack';
+
+    if (!logic.actionSoundPlayed && logic.actionTime >= attack.activeStart * 0.55) {
+      logic.actionSoundPlayed = true;
+      sfx.attack(attack.id, logic.role);
+    }
+
     const moveWindow = Math.min(1, logic.actionTime / Math.max(0.08, attack.activeStart));
     if (logic.actionTime <= attack.activeEnd) {
       const stepSpeed = attack.move / Math.max(0.1, attack.activeEnd);
@@ -404,7 +430,9 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
       logic.actionTime = 0;
       logic.actionDuration = 0;
       logic.actionHit = false;
+      logic.actionSoundPlayed = false;
       logic.moveMagnitude = 0;
+      logic.moveIntent = 'idle';
     }
   }
 
@@ -428,6 +456,8 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     if (paused || m.ended) {
       p.moveMagnitude = 0;
       e.moveMagnitude = 0;
+      p.moveIntent = 'idle';
+      e.moveIntent = 'idle';
       m.hudTimer += delta;
       if (m.hudTimer > 0.08) {
         m.hudTimer = 0;
@@ -456,6 +486,7 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
       p.verticalVelocity = GAME_LIMITS.jumpVelocity;
       p.grounded = false;
       p.guard = false;
+      p.moveIntent = 'jump';
       p.lastActionLabel = '跳跃';
     }
 
@@ -481,8 +512,15 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
     if (consumePressed(keyboard, 'KeyO')) startAttack(p, 'skill_o', pBasis.forward);
 
     if (!p.action && p.hitstun <= 0) {
-      const speed = (Math.abs(playerMove.dot(pBasis.right)) > 0.6 ? GAME_LIMITS.strafeSpeed : GAME_LIMITS.moveSpeed);
-      applyMovement(p, pRoot, playerMove, speed, delta);
+      const lateral = playerMove.lengthSq() > 0 ? playerMove.dot(pBasis.right) : 0;
+      const forward = playerMove.lengthSq() > 0 ? playerMove.dot(pBasis.forward) : 0;
+      const intent = Math.abs(lateral) > Math.abs(forward) * 0.9 ? 'strafe' : forward < -0.15 ? 'retreat' : 'forward';
+      const speed = Math.abs(lateral) > 0.6 ? GAME_LIMITS.strafeSpeed : GAME_LIMITS.moveSpeed;
+      if (playerMove.lengthSq() > 0) applyMovement(p, pRoot, playerMove, speed, delta, intent);
+      else {
+        p.moveMagnitude = 0;
+        p.moveIntent = p.guard ? 'guard' : 'idle';
+      }
     }
 
     const distance = planarDistance(pRoot.position, eRoot.position);
@@ -519,7 +557,13 @@ function GameWorld({ onHud, resetSignal = 0, paused = false }) {
       else if (directive.action === 'dash-back' && e.dashCooldown <= 0) startDash(e, eBasis.forward.clone().multiplyScalar(-1));
       else if (directive.action === 'thrust' && distance < 2.45) startAttack(e, 'ai_thrust', eBasis.forward);
       else if (directive.action === 'heavy' && distance < 2.2) startAttack(e, 'ai_heavy', eBasis.forward);
-      else applyMovement(e, eRoot, aiMove, GAME_LIMITS.moveSpeed * 0.92, delta);
+      else if (aiMove.lengthSq() > 0) {
+        const intent = directive.movement === 'retreat' ? 'retreat' : directive.movement === 'strafe' ? 'strafe' : 'forward';
+        applyMovement(e, eRoot, aiMove, GAME_LIMITS.moveSpeed * 0.92, delta, intent);
+      } else {
+        e.moveMagnitude = 0;
+        e.moveIntent = e.guard ? 'guard' : 'idle';
+      }
     }
 
     updateAction(p, pRoot, e, eRoot, delta);

@@ -10,6 +10,9 @@ import {
   createFighterLogic,
   observeRegime,
 } from '../examples/ugis-fighter-game/src/gameRules.js';
+import { MOTION_CLIPS, MOTION_ACTION_IDS } from '../examples/ugis-fighter-game/src/motion/motionClips.js';
+import { RIG_BONES, sampleFighterPose } from '../examples/ugis-fighter-game/src/motion/motionRuntime.js';
+import { SFX_ASSETS } from '../examples/ugis-fighter-game/src/audio/sfx.js';
 import {
   AI_DIFFICULTIES,
   chooseUgisRoute,
@@ -36,6 +39,76 @@ test('all combat actions lower into a known UGIS tactical intent', () => {
     assert.ok(attack.activeEnd > attack.activeStart);
     assert.ok(attack.range > 0);
     assert.ok(attack.damage > 0);
+  }
+});
+
+test('v0.3 motion clips cover every combat action and preserve game-rule active windows', () => {
+  assert.deepEqual(new Set(MOTION_ACTION_IDS), new Set(Object.keys(ATTACKS)));
+  for (const [id, attack] of Object.entries(ATTACKS)) {
+    const motion = MOTION_CLIPS[id];
+    assert.ok(motion, id);
+    assert.ok(motion.keyframes.length >= 4, id);
+    assert.equal(motion.keyframes[0].t, 0, id);
+    assert.equal(motion.keyframes.at(-1).t, 1, id);
+    for (let i = 1; i < motion.keyframes.length; i += 1) {
+      assert.ok(motion.keyframes[i].t > motion.keyframes[i - 1].t, `${id} keyframe ${i}`);
+    }
+    assert.ok(Math.abs(motion.active[0] - attack.activeStart / attack.duration) < 0.015, `${id} activeStart`);
+    assert.ok(Math.abs(motion.active[1] - attack.activeEnd / attack.duration) < 0.015, `${id} activeEnd`);
+  }
+});
+
+test('v0.3 rig exposes a full pelvis-to-sword and pelvis-to-foot chain', () => {
+  for (const bone of [
+    'pelvis', 'spine', 'chest', 'head',
+    'shoulderL', 'upperArmL', 'forearmL', 'handL',
+    'shoulderR', 'upperArmR', 'forearmR', 'handR',
+    'thighL', 'shinL', 'footL', 'thighR', 'shinR', 'footR', 'swordGrip',
+  ]) {
+    assert.ok(RIG_BONES.includes(bone), bone);
+  }
+  assert.equal(new Set(RIG_BONES).size, RIG_BONES.length);
+});
+
+test('Light1 pose visibly recruits pelvis/chest before sword arm instead of arm-only animation', () => {
+  const fighter = createFighterLogic('player');
+  fighter.action = 'light1';
+  fighter.actionDuration = ATTACKS.light1.duration;
+  fighter.grounded = true;
+  fighter.moveMagnitude = 0;
+
+  fighter.actionTime = ATTACKS.light1.duration * 0.22;
+  const anticipation = sampleFighterPose({ logic: fighter, elapsed: 1, enemy: false });
+  fighter.actionTime = ATTACKS.light1.duration * 0.46;
+  const strike = sampleFighterPose({ logic: fighter, elapsed: 1, enemy: false });
+
+  assert.notEqual(anticipation.pelvis[1], strike.pelvis[1]);
+  assert.notEqual(anticipation.chest[1], strike.chest[1]);
+  assert.notEqual(anticipation.upperArmR[2], strike.upperArmR[2]);
+  assert.ok(strike.swordGlow > 0.3);
+});
+
+test('motion and rig presentation code do not own UGIS decisions or resource mutation', async () => {
+  const files = [
+    '../examples/ugis-fighter-game/src/motion/motionRuntime.js',
+    '../examples/ugis-fighter-game/src/motion/motionClips.js',
+    '../examples/ugis-fighter-game/src/characters/FighterRig.jsx',
+  ];
+  for (const file of files) {
+    const text = await readFile(new URL(file, import.meta.url), 'utf8');
+    for (const forbidden of ['chooseUgisRoute', '.hp =', '.energy =', 'applyDamage']) {
+      assert.equal(text.includes(forbidden), false, `${file}: ${forbidden}`);
+    }
+  }
+});
+
+test('all external combat samples are pinned CC0 assets', () => {
+  assert.ok(Object.keys(SFX_ASSETS).length >= 7);
+  for (const [name, asset] of Object.entries(SFX_ASSETS)) {
+    assert.equal(asset.license, 'CC0-1.0', name);
+    assert.match(asset.url, /^https:\/\/cdn\.jsdelivr\.net\/gh\//, name);
+    assert.equal(asset.url.includes('@main/'), false, `${name} must pin a commit`);
+    assert.ok(asset.source.length > 8, name);
   }
 });
 
