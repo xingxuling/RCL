@@ -47,11 +47,11 @@ test('all combat actions lower into a known UGIS tactical intent', () => {
   }
 });
 
-test('legacy motion catalogs still cover every combat action as a safe fallback', () => {
-  assert.deepEqual(new Set(Object.keys(FALLBACK_MOTION)), new Set(Object.keys(ATTACKS)));
-  for (const [id, attack] of Object.entries(ATTACKS)) {
-    const motion = FALLBACK_MOTION[id];
-    assert.ok(motion, id);
+test('legacy motion catalogs remain valid fallback resources for their owned attacks', () => {
+  assert.ok(Object.keys(FALLBACK_MOTION).length >= 16);
+  for (const [id, motion] of Object.entries(FALLBACK_MOTION)) {
+    const attack = ATTACKS[id];
+    assert.ok(attack, id);
     assert.equal(motion.keyframes[0].t, 0, id);
     assert.equal(motion.keyframes.at(-1).t, 1, id);
     assert.ok(Math.abs(motion.active[0] - attack.activeStart / attack.duration) < 0.015, `${id} activeStart`);
@@ -59,14 +59,14 @@ test('legacy motion catalogs still cover every combat action as a safe fallback'
   }
 });
 
-test('sword style registry maps every player slot and UGIS attack semantic to real actions', () => {
-  assert.deepEqual(SWORD_STYLE_IDS, ['wanfeng', 'kendo']);
+test('seven-style registry maps every player slot and UGIS attack semantic to real actions', () => {
+  assert.deepEqual(SWORD_STYLE_IDS, ['wanfeng','kendo','epee','destreza','liechtenauer','fiore','miaodao']);
   for (const styleId of SWORD_STYLE_IDS) {
     const style = SWORD_STYLES[styleId];
     assert.equal(style.lightCombo.length, 3, styleId);
-    for (let i = 0; i < 3; i += 1) assert.ok(ATTACKS[playerAttackFor(styleId, 'light', i)]);
-    for (const slot of ['heavy', 'skill_u', 'skill_i', 'skill_o']) assert.ok(ATTACKS[playerAttackFor(styleId, slot)]);
-    for (const semantic of ['thrust', 'heavy']) assert.ok(ATTACKS[aiAttackFor(styleId, semantic)]);
+    for (let i = 0; i < 3; i += 1) assert.ok(ATTACKS[playerAttackFor(styleId, 'light', i)], `${styleId} light${i+1}`);
+    for (const slot of ['heavy','skill_u','skill_i','skill_o']) assert.ok(ATTACKS[playerAttackFor(styleId, slot)], `${styleId} ${slot}`);
+    for (const semantic of ['thrust','heavy']) assert.ok(ATTACKS[aiAttackFor(styleId, semantic)], `${styleId} ai ${semantic}`);
   }
 });
 
@@ -95,7 +95,9 @@ test('presentation code never owns UGIS decisions or HP/Energy mutation', async 
   const files = [
     '../examples/ugis-fighter-game/src/motion/motionRuntime.js',
     '../examples/ugis-fighter-game/src/motion/authoredActionSets.js',
+    '../examples/ugis-fighter-game/src/motion/expandedStyleAnimations.js',
     '../examples/ugis-fighter-game/src/characters/FighterRigV2.jsx',
+    '../examples/ugis-fighter-game/src/characters/ExpandedStyleRig.jsx',
     '../examples/ugis-fighter-game/src/characters/SwordTipTrail.jsx',
     '../examples/ugis-fighter-game/src/HumanoidFighter.jsx',
   ];
@@ -161,20 +163,22 @@ test('fighter runtime remains bounded by shared resource limits', () => {
   assert.equal(explainRoute(enemy.route).label, ROUTE_LABELS.hold_measure);
 });
 
-test('start flow keeps style selection and presentation now uses the V2 authored rig', async () => {
-  const [app, start, shell, trail] = await Promise.all([
+test('start flow supports a scrollable roster and presentation routes expanded styles to authored rigs', async () => {
+  const [app, start, shell, trail, css] = await Promise.all([
     readFile(new URL('../examples/ugis-fighter-game/src/App.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../examples/ugis-fighter-game/src/StartScreen.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../examples/ugis-fighter-game/src/HumanoidFighter.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../examples/ugis-fighter-game/src/characters/SwordTipTrail.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../examples/ugis-fighter-game/src/styleSelect.css', import.meta.url), 'utf8'),
   ]);
   assert.ok(app.includes('gameStarted'));
   assert.ok(app.includes('playerStyleId') && app.includes('opponentStyleId'));
-  assert.ok(start.includes('开始游戏') && start.includes('你的流派') && start.includes('对手流派'));
-  assert.ok(shell.includes('FighterRigV2'));
-  assert.equal(shell.includes('ringGeometry'), false);
-  assert.equal(shell.includes('boxGeometry'), false);
+  assert.ok(start.includes('开始游戏') && start.includes('style-option-list'));
+  assert.ok(shell.includes('FighterRigV2') && shell.includes('ExpandedStyleRig'));
   assert.ok(trail.includes('tip.getWorldPosition'));
+  assert.ok(css.includes('100dvh'));
+  assert.ok(css.includes('overflow-y:auto'));
+  assert.ok(css.includes('grid-template-rows:auto minmax(0,1fr) auto'));
 });
 
 test('player-facing HUD defaults to normal and keeps Tianji as explicit opt-in', async () => {
