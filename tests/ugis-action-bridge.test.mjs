@@ -9,6 +9,11 @@ import {
   verifyRclUgisActionBridge,
   verifyUgisActionIr,
 } from '../src/ugis-action-bridge.mjs';
+import {
+  executeThreeJsActionPlan,
+  planThreeJsActionProviderCall,
+  verifyThreeJsActionReceipt,
+} from '../src/threejs-action-provider.mjs';
 
 const fixture = JSON.parse(await readFile(
   new URL('./fixtures/ugis-action-ir-hold-measure.json', import.meta.url),
@@ -63,4 +68,30 @@ test('bridge root is deterministic and provider call remains evidence-linked', (
   assert.equal(call.evidenceRoot, a.root);
   assert.equal(call.capability, 'threejs.applyActionIntent');
   assert.deepEqual(call.input.animationTags, ['stance.live', 'locomotion.measure-hold']);
+});
+
+test('Three.js provider plan executes through adapter and returns evidence receipt', async () => {
+  const bridge = createRclUgisActionBridge(fixture, {
+    actorNode: 'scene:fighter-a',
+    targetNode: 'scene:fighter-b',
+  });
+  const call = rclUgisActionBridgeToProviderCall(bridge);
+  const plan = planThreeJsActionProviderCall(call);
+  const applied = [];
+  const adapter = {
+    faceTarget: async op => applied.push(op.op),
+    applyRootMotion: async op => applied.push(op.op),
+    playAnimationTags: async op => applied.push(op.op),
+    emitCompetitionCue: async op => applied.push(op.op),
+  };
+  const receipt = await executeThreeJsActionPlan(plan, adapter);
+  assert.deepEqual(applied, [
+    'face-target',
+    'root-motion-semantic',
+    'animation-tags',
+    'competition-cue',
+  ]);
+  assert.equal(receipt.source_action_root, fixture.root);
+  assert.equal(receipt.bridge_evidence_root, bridge.root);
+  assert.equal(verifyThreeJsActionReceipt(receipt, plan).ok, true);
 });
