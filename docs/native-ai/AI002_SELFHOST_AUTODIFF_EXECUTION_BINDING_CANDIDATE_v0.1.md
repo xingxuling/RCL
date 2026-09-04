@@ -37,9 +37,9 @@ controls in:
 `evidence/RCL_GAP_AI002_SELFHOST_AUTODIFF_EXECUTION_BINDING_CANDIDATE_v0.1.json`
 
 The local receipt root is
-`2224be93f1e1c098a126e8cc68144970bebb179b14f4475c133f2ffcb1f4b066`, bound to
+`cac978860270ec3b53f38946caea7948df898c7a299483173eb79e16172080c0`, bound to
 implementation commit
-`fb45a29eb3c995781b79478722ecf2dfea707c7c`.
+`0b46847d703920073aabc101cc9939d887f93976`.
 
 ## Not granted
 

@@ -924,8 +924,8 @@ Authority files:
 
 Reproduction: `npm run test:selfhost-autodiff-graph-execution` and
 `npm run evidence:selfhost-autodiff-graph-execution`. Evidence root:
-`2224be93f1e1c098a126e8cc68144970bebb179b14f4475c133f2ffcb1f4b066`;
+`cac978860270ec3b53f38946caea7948df898c7a299483173eb79e16172080c0`;
 implementation source commit:
-`fb45a29eb3c995781b79478722ecf2dfea707c7c`.
+`0b46847d703920073aabc101cc9939d887f93976`.
 This grants no GPU-native reverse execution, production Transformer, canonical
 promotion or K400 promotion.
