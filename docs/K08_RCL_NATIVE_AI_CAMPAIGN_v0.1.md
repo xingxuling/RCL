@@ -238,10 +238,31 @@ The K09-K19 accelerator sequence now contains bounded OpenCL candidates for pers
 
 K20 extends the sequence with an explicit `elementwise-v0.1` opt-in for same-shape GPU `sub`/`mul` forward and reverse rules over the existing persistent session arena. On the real AMD `gfx1152` device, two repeated steps recorded 38 provider requests, 27 dispatches, 10 allocations, 104 reuses and 10 releases (46 allocated bytes), compared with 114 allocations / 616 bytes in the per-kernel baseline; exact CPU loss, parameters, optimizer state, checkpoint root, deterministic replay and checkpoint-resume parity held, with local K20 `3/3` passing. PR #153 exact head `4306612` passed K20 Ubuntu/Windows, Canonical, Universal and Authority checks, the transient K01 Windows timeout passed on rerun attempt 2, and it merged as `main@0013c52`. Post-merge Canonical, Universal, Authority and K09-K18 regression workflows for that merged commit were green. Hosted evidence remains repository replay only and does not inherit the local AMD device receipt.
 
+K21 extends the sequence with an explicit `reduction-v0.1` opt-in for bounded
+rank-2 GPU `mean` forward and reverse rules on axis `0` or `1` over the
+existing persistent session arena. On the real AMD `gfx1152` device, two
+repeated steps recorded 30 provider requests, 27 dispatches, 13 allocations,
+69 reuses and 13 releases (146 allocated bytes), compared with 82 allocations
+/ 856 bytes / zero reuse in the per-kernel baseline; zero pooled buffers
+remained at close. Exact CPU loss, parameters, optimizer states, checkpoint
+root `sha256:923decbf054c5e21a551de3043be519696343d78851368720a7b596a8d77f0fe`,
+deterministic replay and checkpoint-resume parity held, with loss moving from
+`0.94921875` to `0.6484375`. Local K21 is `3/3 PASS`; K20 and K19 regressions
+are each `3/3 PASS`. Evidence root is
+`12fd0fb9b5256b065ae4e0627e35da5f05c2ac8fd93d7fd5d8031aa78fcfd3a8`.
+
+PR #162 exact head `7993601d8c299b0cedb779742f28e0cf974c8941` passed K21
+Ubuntu/Windows, Canonical, Universal and Authority checks, and merged as
+`main@f435fcb9a9a1245049cad2044a4eb173f901ba40`. Post-merge Canonical run
+`33924571163`, Universal run `33924571164`, Authority run `33924571102` and
+the K09-K18 regression workflows were green for that exact merge commit.
+Hosted evidence remains repository replay only and does not inherit the local
+AMD device receipt.
+
 The hosted Canonical and Universal suites are recorded as repository-wide evidence; any K337/K338/K340 compiler drift or unrelated Android package-compiler environment mismatch remains separate from K15/K16 and is not silently repaired or attributed to the accelerator candidates.
 
-K15 grants only an ordered ephemeral graph-residency candidate and an intermediate device-resource candidate; K16 grants only an AMD OpenCL BF16 additive masked-softmax lowering candidate and a GPU-native additive-mask candidate; K17 grants only the bounded ordered mixed-graph candidate; K18 grants only bounded full-graph residency, training-step resource reuse and the generic `add` path; K19 grants only bounded persistent-session reverse/AdamW transport and arena reuse; K20 grants only bounded same-shape GPU `sub`/`mul` forward/reverse lowering and the corresponding arena reuse. None grants GPU-native full-graph Autodiff, GPU training, full-graph training semantics, parallel execution, throughput, VRAM, portability, RCL-10M/RCL-1B or production-model claims. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`, verdict `INCOMPLETE`; no K400 cell is promoted by K15, K16, K17, K18, K19 or K20.
+K15 grants only an ordered ephemeral graph-residency candidate and an intermediate device-resource candidate; K16 grants only an AMD OpenCL BF16 additive masked-softmax lowering candidate and a GPU-native additive-mask candidate; K17 grants only the bounded ordered mixed-graph candidate; K18 grants only bounded full-graph residency, training-step resource reuse and the generic `add` path; K19 grants only bounded persistent-session reverse/AdamW transport and arena reuse; K20 grants only bounded same-shape GPU `sub`/`mul` forward/reverse lowering and the corresponding arena reuse; K21 grants only bounded rank-2 GPU `mean` forward/reverse lowering on axis `0` or `1` and the corresponding arena reuse. None grants GPU-native full-graph Autodiff, GPU training, full-graph training semantics, parallel execution, throughput, VRAM, portability, RCL-10M/RCL-1B or production-model claims. The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`, verdict `INCOMPLETE`; no K400 cell is promoted by K15, K16, K17, K18, K19, K20 or K21.
 
 ## 14. Next absorption gate
 
-The next highest-leverage technical gap is GPU-native full-graph reverse/optimizer integration and the remaining production graph lifecycle. K20 closes only bounded same-shape `sub`/`mul` forward/reverse lowering on top of K19's one-matmul graph; the next candidate must preserve generic RCL Tensor and attention semantics while extending device-resident parameter/activation state, broadcast/reduction and other GPU-native non-matmul backward rules, plus CPU differential evidence, then through real-corpus Transformer training and serving. A local accelerator result is not GPU-training proof, and compilation or hosted replay cannot substitute for final weights, sustained training, autoregressive generation or production corpus evidence.
+The next highest-leverage technical gap is GPU-native full-graph reverse/optimizer integration and the remaining production graph lifecycle. K21 closes only bounded rank-2 `mean` forward/reverse lowering on top of K20's same-shape elementwise path; the next candidate must preserve generic RCL Tensor and attention semantics while extending device-resident parameter/activation state, broadcast/general reduction and other GPU-native non-matmul backward rules, plus CPU differential evidence, then through real-corpus Transformer training and serving. A local accelerator result is not GPU-training proof, and compilation or hosted replay cannot substitute for final weights, sustained training, autoregressive generation or production corpus evidence.

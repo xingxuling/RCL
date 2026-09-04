@@ -1,0 +1,181 @@
+{
+  "schema": "rcl.native-ai.gpu-reduction-backward.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K21",
+  "status": "PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REDUCTION_BACKWARD_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "baseMain": "9e306ad8eaed7460ff241c03278396c7d57936a0",
+  "implementationCommit": "7993601d8c299b0cedb779742f28e0cf974c8941",
+  "evidenceCommit": "f435fcb9a9a1245049cad2044a4eb173f901ba40",
+  "pullRequest": 162,
+  "mergeCommit": "f435fcb9a9a1245049cad2044a4eb173f901ba40",
+  "branch": "codex/k21-evidence-v01",
+  "contract": "examples/native-ai/gpu-reduction-backward-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-reduction-backward-genome.rcl",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "rustEngine": "native/tensor-engine/src/bin/rcl-bf16-autodiff-adamw.rs",
+  "test": "tests/k21-gpu-reduction-backward.test.mjs",
+  "evidenceCommand": "npm run test:k21-gpu-reduction-backward",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "tests": {
+      "contract": "PASS",
+      "differentialAndArena": "PASS",
+      "boundary": "PASS",
+      "suite": "3/3 PASS"
+    },
+    "request": {
+      "graph": "generic RCL Tensor SSA: matmul -> mean(axis 0) -> reshape -> mean(axis 1)",
+      "shape": "rank-2 [2,2] matmul and rank-2 mean reductions",
+      "steps": 2,
+      "forwardDtype": "bf16",
+      "accumulationDtype": "f32",
+      "gradientDtype": "f32",
+      "masterAndOptimizerDtype": "f32",
+      "gpuPlacement": ["matmul", "mean(axis 0)", "mean(axis 1)"],
+      "hostReferencePlacement": ["reshape"],
+      "reductionMode": "reduction-v0.1",
+      "fallback": "forbidden"
+    },
+    "arena": {
+      "bufferAllocationMode": "session-arena-v0.1",
+      "providerTransport": "persistent-session-v0.1",
+      "steps": 2,
+      "requests": 30,
+      "dispatches": 27,
+      "allocations": 13,
+      "allocationBytes": 146,
+      "reuses": 69,
+      "releases": 13,
+      "pooledBuffersAtClose": 0,
+      "pooledBytesAtClose": 0,
+      "peakPooledBuffers": 13,
+      "peakPooledBytes": 146,
+      "gpuMatmulNodes": 1,
+      "gpuReductionNodes": 2,
+      "gpuBackwardMatmulNodes": 2,
+      "gpuBackwardReductionNodes": 2,
+      "executionRoots": [
+        "1253b91027409904656147496678329fe6921bee4716c83202126b90bee2f886",
+        "ad73146cbe10dc958ceaa65d114b584499ff17ade3b920db1698584e58734bea",
+        "fd11da8b7cf4576a0f551ddf730fd03253ed1e5f5bacf49091e47e7310da703f"
+      ],
+      "backwardExecutionRoots": [
+        "f63f6d9f8b366273a4a2058afcfea0d26bf30804163922b77974376b19ddf1ac",
+        "24a9858c10a2f0004ece0b936644de510e9bab5e4a7fb491762cc818db825b5d",
+        "0e6c967c184ee10acf7e33c26b2b2126aef84deffc7b86ba653f60f95a16f611",
+        "b2ddabf82368da7ee270584ee12bf07121fc909d306305b595d1ee3a0b9c0770"
+      ],
+      "initialLoss": 0.94921875,
+      "finalLoss": 0.6484375,
+      "checkpointRoot": "sha256:923decbf054c5e21a551de3043be519696343d78851368720a7b596a8d77f0fe"
+    },
+    "perKernelBaseline": {
+      "bufferAllocationMode": "per-kernel-v0.1",
+      "allocations": 82,
+      "allocationBytes": 856,
+      "reuses": 0,
+      "releases": 82,
+      "checkpointRoot": "sha256:923decbf054c5e21a551de3043be519696343d78851368720a7b596a8d77f0fe"
+    },
+    "differential": {
+      "cpuReferenceTrainingPath": true,
+      "initialLossExact": true,
+      "finalLossExact": true,
+      "parametersExact": true,
+      "optimizerStatesExact": true,
+      "checkpointRootExact": true,
+      "lossDecreased": true,
+      "deterministicReplay": true,
+      "checkpointResumeExact": true
+    },
+    "negativeAndBoundary": {
+      "unsupportedReductionMode": "RCL_ACCELERATOR_ELEMENTWISE_MODE_UNSUPPORTED",
+      "missingReductionMode": "RCL_ACCELERATOR_PLACEMENT_UNSUPPORTED",
+      "unsupportedAxis": "RCL_BF16_REDUCTION_AXIS",
+      "cpuArenaUnavailable": "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+      "providerUnavailable": "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+      "backendGraphMismatch": "RCL_ACCELERATOR_BACKEND_GRAPH_MISMATCH"
+    },
+    "verification": {
+      "pythonSyntax": "PASS",
+      "rustCargoCheckLocked": "PASS",
+      "nodeSyntax": "PASS",
+      "diffCheck": "PASS",
+      "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE",
+      "k20Regression": "3/3 PASS",
+      "k19Regression": "3/3 PASS"
+    }
+  },
+  "hostedReplay": {
+    "status": "PASS_EXACT_HEAD_PR_WORKFLOW",
+    "event": "pull_request",
+    "pullRequest": 162,
+    "head": "7993601d8c299b0cedb779742f28e0cf974c8941",
+    "workflowRun": 33923568976,
+    "jobs": {
+      "ubuntu-latest": { "jobId": 101187035418, "status": "SUCCESS" },
+      "windows-latest": { "jobId": 101187035503, "status": "SUCCESS" }
+    },
+    "repositoryVerification": {
+      "canonical": { "workflowRun": 33923569775, "jobId": 101187038001, "status": "SUCCESS" },
+      "universal": { "workflowRun": 33923569709, "focusedJobId": 101187038106, "k01WindowsJobId": 101187037870, "status": "SUCCESS" },
+      "authority": { "workflowRun": 33923569457, "jobId": 101187037823, "status": "SUCCESS" }
+    },
+    "merge": { "status": "MERGED", "mergeCommit": "f435fcb9a9a1245049cad2044a4eb173f901ba40" },
+    "externalStatuses": { "vercel": "FAILURE_EXTERNAL_BUILD_RATE_LIMIT_NOT_RCL" },
+    "boundary": "Hosted runners prove exact-head replay and repository-contract success; they do not inherit this local AMD device receipt"
+  },
+  "postMergeVerification": {
+    "head": "f435fcb9a9a1245049cad2044a4eb173f901ba40",
+    "canonical": { "workflowRun": 33924571163, "jobId": 101190152686, "status": "SUCCESS" },
+    "universal": { "workflowRun": 33924571164, "focusedJobId": 101190152971, "k01WindowsJobId": 101190152763, "status": "SUCCESS" },
+    "authority": { "workflowRun": 33924571102, "jobId": 101190152525, "status": "SUCCESS" },
+    "k09ToK18RegressionRuns": [33924571103, 33924571114, 33924571134, 33924571143, 33924571150, 33924571155, 33924571162, 33924571176, 33924571226, 33924571236],
+    "k09ToK18Regression": "PASS",
+    "boundary": "These checks bind the merged K21 commit before later unrelated main-branch work; they are post-merge repository evidence, not additional GPU-device evidence"
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale evidence only; no cell promotion"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_GPU_MEAN_FORWARD_CANDIDATE",
+    "OPENCL_AMD_GPU_MEAN_BACKWARD_CANDIDATE",
+    "OPENCL_AMD_GENERIC_REDUCTION_AUTODIFF_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "OPENCL_BF16_FULL_GRAPH",
+    "OPENCL_FULL_GRAPH_TRAINING_SEMANTICS",
+    "GPU_NATIVE_NON_MATMUL_AUTODIFF_GENERAL",
+    "GPU_NATIVE_BROADCAST_AUTODIFF",
+    "GPU_NATIVE_GENERAL_REDUCTION_AUTODIFF",
+    "GENERIC_GPU_BACKEND",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "DISTRIBUTED_TRAINING",
+    "K400_PROMOTION"
+  ],
+  "gaps": [
+    "RCL_GAP_AI_016",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_REVERSE_ADAMW_SESSION_RESIDENCY",
+    "RCL_GAP_GPU_NON_MATMUL_BACKWARD",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_RCL_GENERIC_RANK2_MEAN_AXIS0_AXIS1_FORWARD_BACKWARD_WITH_PERSISTENT_SESSION_AND_BOUNDED_ARENA",
+  "reportRoot": "4ea07c892f74a8f49618f04df17d95f346414b015d24495ba328b2c9aa60d0cd"
+}
