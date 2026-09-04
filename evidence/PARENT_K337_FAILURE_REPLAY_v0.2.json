@@ -1,0 +1,25 @@
+{
+  "schema_id": "parent.failure-replay.v0.1",
+  "argv": ["node", "--test", "--test-concurrency=1", "tests/k337-selfhost-warrant-static-validation.test.mjs"],
+  "shell": false,
+  "candidate": {
+    "returncode": 0,
+    "timed_out": false,
+    "stdout": "TAP version 13\n# Subtest: K337 self-host compiler rejects missing required warrant before RBC emission\nok 1 - K337 self-host compiler rejects missing required warrant before RBC emission\n  ---\n  duration_ms: 141.456257\n  type: 'test'\n  ...\n# Subtest: K337 self-host warrant semantics preserve exact and hierarchical scope grants\nok 2 - K337 self-host warrant semantics preserve exact and hierarchical scope grants\n  ---\n  duration_ms: 138.631743\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 348.793975\n",
+    "stderr": "",
+    "signature": "51c06b4db1a50ba81e6433e50962612fa5ecf1361496d77be4d27955db9c9328"
+  },
+  "baseline": {
+    "returncode": 1,
+    "timed_out": false,
+    "stdout": "TAP version 13\n# Subtest: K337 self-host compiler rejects missing required warrant before RBC emission\nnot ok 1 - K337 self-host compiler rejects missing required warrant before RBC emission\n  ---\n  duration_ms: 140.864924\n  type: 'test'\n  location: '/mnt/data/rcl_gap_baseline/RCL-main/tests/k337-selfhost-warrant-static-validation.test.mjs:33:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    0 !== 1\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 1\n  actual: 0\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file:///mnt/data/rcl_gap_baseline/RCL-main/tests/k337-selfhost-warrant-static-validation.test.mjs:43:12)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n# Subtest: K337 self-host warrant semantics preserve exact and hierarchical scope grants\nok 2 - K337 self-host warrant semantics preserve exact and hierarchical scope grants\n  ---\n  duration_ms: 137.139074\n  type: 'test'\n  ...\n1..2\n# tests 2\n# suites 0\n# pass 1\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 349.762753\n",
+    "stderr": "",
+    "signature": "6b9c011178a07f46fd36ecc3134fa5d5d44aba79318a8e2379bd7e5d16f5c9fa"
+  },
+  "verdict": "CANDIDATE_IMPROVEMENT",
+  "authority_boundary": {
+    "files_modified_by_tool": false,
+    "network_required": false,
+    "command_is_caller_declared": true
+  }
+}

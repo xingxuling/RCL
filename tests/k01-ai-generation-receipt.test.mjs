@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+import { readCanonicalCompilerSourcePair } from '../src/canonical-source-archive.mjs';
 import { K01_AI_GENERATION_MUTATIONS } from '../scripts/run-k01-independent-ai-generation.mjs';
 import { verifyK01AiGenerationReceipt, verifyK01GithubAuthorityBinding } from '../scripts/verify-k01-ai-generation-receipt.mjs';
 import { verifyK01CompilerCandidate } from '../scripts/verify-k01-compiler-candidate.mjs';
@@ -30,6 +31,15 @@ test('K01 independent compiler repair receipt replays all three unique sessions 
   } else {
     assert.equal(result.aiGenerateAdmission, 'UNVERIFIED');
   }
+});
+
+test('historical K01 canonical bytes replay from the content-addressed archive after compiler evolution', () => {
+  const contract = JSON.parse(fs.readFileSync('examples/universal-stress/k01-ai-generation-contract.v0.2.json', 'utf8'));
+  const pair = readCanonicalCompilerSourcePair(contract);
+  assert.equal(pair.sourceMode, 'archive');
+  assert.equal(pair.archiveId, 'k01-k327-v0.2-historical-canonical');
+  assert.equal(pair.files['candidate-core.rcl'].length > 0, true);
+  assert.equal(pair.files['candidate-main.rcl'].length > 0, true);
 });
 
 test('all three K01 compiler mutations are effective negative controls', () => {
