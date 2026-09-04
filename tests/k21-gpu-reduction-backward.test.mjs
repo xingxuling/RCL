@@ -327,7 +327,7 @@ test('K21 reduction mode, placement, provider and backend boundaries fail closed
   delete missingMode.autodiff.graph.bindings.gpuNonMatmulMode;
   assert.equal(execute(missingMode).value.code, 'RCL_ACCELERATOR_PLACEMENT_UNSUPPORTED');
 
-  const invalidAxis = requestFor({ arena: true });
+  const invalidAxis = requestFor({ backend: 'cpu-reference', device: 'cpu', hybrid: false, arena: false });
   invalidAxis.autodiff.graph.nodes.find((node) => node.id === 'columnMean').attributes.axis = 2;
   assert.equal(execute(invalidAxis).value.code, 'RCL_BF16_REDUCTION_AXIS');
 
