@@ -1,0 +1,52 @@
+name: UGIS Fighter Static Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/ugis-fighter-game/**'
+      - '.github/workflows/ugis-fighter-static-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ugis-fighter-static-publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: examples/ugis-fighter-game
+        run: npm install --ignore-scripts
+
+      - name: Run semantic tests
+        run: node --test tests/ugis-fighter-game.test.mjs
+
+      - name: Build portable production bundle
+        working-directory: examples/ugis-fighter-game
+        run: npm run build
+
+      - name: Stamp source commit
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > examples/ugis-fighter-game/dist/source-commit.txt
+
+      - name: Publish static branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./examples/ugis-fighter-game/dist
+          publish_branch: ugis-fighter-live
+          force_orphan: true
+          commit_message: 'deploy: UGIS fighter ${{ github.sha }}'
