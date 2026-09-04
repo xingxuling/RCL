@@ -185,6 +185,16 @@ export {
   assessRclApplicationFrameworkCatalog,
 } from './application-framework.mjs';
 
+export {
+  RCL_NATIVE_FRAMEWORK_ATLAS_VERSION,
+  RCL_NATIVE_FRAMEWORK_ATLAS_FORMAT,
+  RCL_NATIVE_FRAMEWORK_CLASSIFICATIONS,
+  RCL_NATIVE_FRAMEWORK_ATLAS,
+  listRclNativeFrameworks,
+  getRclNativeFramework,
+  assessRclNativeFrameworkAtlas,
+} from './native-framework-atlas.mjs';
+
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
 
