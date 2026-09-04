@@ -1,0 +1,44 @@
+name: K19 GPU-native reverse AdamW session arena
+
+on:
+  push:
+    branches:
+      - codex/k19-gpu-training-residency-v01
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k19-gpu-native-reverse-adamw-session-arena.test.mjs'
+      - 'examples/native-ai/gpu-native-reverse-adamw-session-arena-*'
+      - 'package.json'
+      - '.github/workflows/k19-gpu-native-reverse-adamw-session-arena.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k19-gpu-native-reverse-adamw-session-arena.test.mjs'
+      - 'examples/native-ai/gpu-native-reverse-adamw-session-arena-*'
+      - 'package.json'
+      - '.github/workflows/k19-gpu-native-reverse-adamw-session-arena.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k19-gpu-native-reverse-adamw-session-arena:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run K19 persistent GPU reverse/AdamW candidate
+        run: npm run test:k19-gpu-native-reverse-adamw-session-arena
