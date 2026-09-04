@@ -1,6 +1,6 @@
 use rcl_tensor_engine::{
-    AutodiffRequest, AutodiffResult, BF16_AUTODIFF_PRECISION, EngineError,
-    OpenClProviderSession, Parameter, backward_with_provider,
+    AutodiffRequest, AutodiffResult, BF16_AUTODIFF_PRECISION, EngineError, OpenClProviderSession,
+    Parameter, SESSION_BUFFER_ARENA_MODE, backward_with_provider,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -147,6 +147,18 @@ struct Telemetry {
     gpu_provider_cross_node_gradient_batches: usize,
     gpu_provider_cross_node_gradient_nodes: usize,
     gpu_provider_batch_mode: &'static str,
+    gpu_provider_buffer_allocation_mode: &'static str,
+    gpu_provider_buffer_allocations: usize,
+    gpu_provider_buffer_allocation_bytes: usize,
+    gpu_provider_buffer_reuses: usize,
+    gpu_provider_buffer_releases: usize,
+    gpu_provider_pooled_buffers: usize,
+    gpu_provider_pooled_bytes: usize,
+    gpu_provider_peak_pooled_buffers: usize,
+    gpu_provider_peak_pooled_bytes: usize,
+    gpu_provider_max_arena_buffers: usize,
+    gpu_provider_max_arena_bytes: usize,
+    gpu_provider_tensor_value_residency: bool,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -834,15 +846,16 @@ fn adamw_step_gpu(
             .zip(states[start..end].iter_mut())
             .zip(updates)
         {
-            telemetry.elements = telemetry
-                .elements
-                .checked_add(weights.len())
-                .ok_or_else(|| {
-                    TrainError::new(
-                        "RCL_BF16_AD_MEMORY_LIMIT",
-                        "GPU optimizer accounting overflowed",
-                    )
-                })?;
+            telemetry.elements =
+                telemetry
+                    .elements
+                    .checked_add(weights.len())
+                    .ok_or_else(|| {
+                        TrainError::new(
+                            "RCL_BF16_AD_MEMORY_LIMIT",
+                            "GPU optimizer accounting overflowed",
+                        )
+                    })?;
             telemetry.execution_roots.push(root);
             weights.copy_from_slice(&next_master);
             state.first_moment = next_first;
@@ -977,23 +990,44 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
     } else {
         None
     };
+    let gpu_buffer_arena = match request
+        .autodiff
+        .graph
+        .bindings
+        .get("gpuBufferAllocationMode")
+        .and_then(Value::as_str)
+    {
+        None | Some("per-kernel-v0.1") => false,
+        Some(SESSION_BUFFER_ARENA_MODE) => true,
+        Some(other) => {
+            return Err(TrainError::new(
+                "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+                format!("unsupported GPU buffer allocation mode {other}"),
+            ));
+        }
+    };
+    if gpu_buffer_arena && request.backend != GPU_TRAINING_BACKEND {
+        return Err(TrainError::new(
+            "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+            "session buffer arena requires the opencl-amd-gpu-training backend",
+        ));
+    }
     let mut gpu_provider_session = gpu_provider
         .as_ref()
-        .map(OpenClProviderSession::new)
+        .map(|path| {
+            OpenClProviderSession::new_with_buffer_allocation_mode(
+                path,
+                gpu_buffer_arena.then_some(SESSION_BUFFER_ARENA_MODE),
+            )
+        })
         .transpose()?;
     let mut gpu_optimizer_telemetry = GpuOptimizerTelemetry::default();
     sync_master(&mut request, &order, &master);
-    let initial_result = backward_with_provider(
-        &request.autodiff,
-        gpu_provider_session.as_mut(),
-    )?;
+    let initial_result = backward_with_provider(&request.autodiff, gpu_provider_session.as_mut())?;
     let initial_gradients = gradients(&initial_result, &order)?;
     for _ in 0..request.steps {
         sync_master(&mut request, &order, &master);
-        let step_result = backward_with_provider(
-            &request.autodiff,
-            gpu_provider_session.as_mut(),
-        )?;
+        let step_result = backward_with_provider(&request.autodiff, gpu_provider_session.as_mut())?;
         let step_gradients = gradients(&step_result, &order)?;
         if let Some(provider_session) = gpu_provider_session.as_mut() {
             adamw_step_gpu(
@@ -1009,11 +1043,19 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
         }
     }
     sync_master(&mut request, &order, &master);
-    let final_result = backward_with_provider(
-        &request.autodiff,
-        gpu_provider_session.as_mut(),
-    )?;
+    let final_result = backward_with_provider(&request.autodiff, gpu_provider_session.as_mut())?;
     let final_gradients = gradients(&final_result, &order)?;
+    if gpu_buffer_arena {
+        gpu_provider_session
+            .as_mut()
+            .ok_or_else(|| {
+                TrainError::new(
+                    "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+                    "session buffer arena requires a persistent provider session",
+                )
+            })?
+            .close_buffer_arena()?;
+    }
     let backward_edge_count = final_result.backward_edges.len();
     let parameter_elements = master.iter().map(Vec::len).sum::<usize>();
     let optimizer_state_elements = states
@@ -1147,6 +1189,57 @@ fn train(mut request: Request) -> Result<ResultReceipt, TrainError> {
             gpu_provider_cross_node_gradient_batches,
             gpu_provider_cross_node_gradient_nodes,
             gpu_provider_batch_mode,
+            gpu_provider_buffer_allocation_mode: if gpu_buffer_arena {
+                SESSION_BUFFER_ARENA_MODE
+            } else if gpu_provider_session.is_some() {
+                "per-kernel-v0.1"
+            } else {
+                "none"
+            },
+            gpu_provider_buffer_allocations: gpu_provider_session
+                .as_ref()
+                .map(|session| session.buffer_allocation_count())
+                .unwrap_or(0),
+            gpu_provider_buffer_allocation_bytes: gpu_provider_session
+                .as_ref()
+                .map(|session| session.buffer_allocation_bytes())
+                .unwrap_or(0),
+            gpu_provider_buffer_reuses: gpu_provider_session
+                .as_ref()
+                .map(|session| session.buffer_reuse_count())
+                .unwrap_or(0),
+            gpu_provider_buffer_releases: gpu_provider_session
+                .as_ref()
+                .map(|session| session.buffer_release_count())
+                .unwrap_or(0),
+            gpu_provider_pooled_buffers: gpu_provider_session
+                .as_ref()
+                .map(|session| session.pooled_buffer_count())
+                .unwrap_or(0),
+            gpu_provider_pooled_bytes: gpu_provider_session
+                .as_ref()
+                .map(|session| session.pooled_bytes())
+                .unwrap_or(0),
+            gpu_provider_peak_pooled_buffers: gpu_provider_session
+                .as_ref()
+                .map(|session| session.peak_pooled_buffers())
+                .unwrap_or(0),
+            gpu_provider_peak_pooled_bytes: gpu_provider_session
+                .as_ref()
+                .map(|session| session.peak_pooled_bytes())
+                .unwrap_or(0),
+            gpu_provider_max_arena_buffers: gpu_provider_session
+                .as_ref()
+                .map(|session| session.max_arena_buffers())
+                .unwrap_or(0),
+            gpu_provider_max_arena_bytes: gpu_provider_session
+                .as_ref()
+                .map(|session| session.max_arena_bytes())
+                .unwrap_or(0),
+            gpu_provider_tensor_value_residency: gpu_provider_session
+                .as_ref()
+                .map(|session| session.tensor_value_residency())
+                .unwrap_or(false),
         },
         gpu_claim: false,
     })

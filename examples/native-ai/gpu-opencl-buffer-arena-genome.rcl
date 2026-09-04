@@ -1,0 +1,15 @@
+# K13: bounded provider-session OpenCL buffer allocation reuse. RCL owns the
+# explicit allocation profile and bounds; the provider owns cl_mem management.
+reality OpenClBufferArenaCandidate {
+  facet contract.id : Text = "rcl-k13-opencl-amd-buffer-arena-v0.1"
+  facet contract.semantic_owner : Text = "RCL"
+  facet contract.provider_role : Text = "AUXILIARY_OPENCL_ALLOCATION_AND_KERNEL_ORGAN_ONLY"
+  facet contract.mode : Text = "SESSION_ARENA_V0_1_OPT_IN"
+  facet contract.reuse_key : Text = "MEMORY_FLAGS_AND_EXACT_BYTE_LENGTH"
+  facet contract.max_pooled_buffers : Number = 64
+  facet contract.max_pooled_bytes : Number = 2097152
+  facet contract.input_transfer : Text = "HOST_TO_DEVICE_EVERY_OPERATION"
+  facet contract.output_transfer : Text = "DEVICE_TO_HOST_EVERY_OPERATION"
+  facet contract.tensor_value_residency : Text = "FALSE"
+  facet evidence.authority : Text = "CANDIDATE_ONLY_ALLOCATION_REUSE_NO_VALUE_RESIDENCY_TRANSFER_ELISION_THROUGHPUT_OR_RCL10M_PROMOTION"
+}

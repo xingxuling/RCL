@@ -1,0 +1,51 @@
+{
+  "format": "rcl.k13.opencl-amd-buffer-arena-contract.v0.1",
+  "status": "OPENCL_AMD_SESSION_BUFFER_ARENA_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-SESSION-BUFFER-ALLOCATION-REUSE",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "operations": ["matmul", "reverse-matmul-gradient", "adamw"],
+    "providerRole": "auxiliary OpenCL allocation and kernel execution organ only",
+    "inputTransfer": "host-to-device on every operation",
+    "outputTransfer": "device-to-host on every operation",
+    "tensorValueResidency": false,
+    "fallback": "forbidden"
+  },
+  "arena": {
+    "mode": "session-arena-v0.1",
+    "optIn": true,
+    "reuseKey": ["OpenCL memory flags", "exact byte length"],
+    "maxPooledBuffers": 64,
+    "maxPooledBytes": 2097152,
+    "lifetime": "one bounded provider session",
+    "cleanup": "release every pooled cl_mem before context teardown"
+  },
+  "acceptance": [
+    "per-kernel and arena modes produce identical operation roots, losses, parameters, optimizer states and checkpoint root",
+    "arena allocation count is lower while allocation count plus reuse count preserves total buffer acquisitions",
+    "pool counts and bytes remain within declared bounds",
+    "unknown or unavailable allocation modes fail closed",
+    "provider and device failures remain fail-closed"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_SESSION_BUFFER_ALLOCATION_REUSE_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_VALUE_RESIDENCY",
+    "OPENCL_TRANSFER_ELISION",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_ALLOCATION_REUSE_NO_VALUE_RESIDENCY_TRANSFER_ELISION_THROUGHPUT_OR_RCL10M_PROMOTION"
+}

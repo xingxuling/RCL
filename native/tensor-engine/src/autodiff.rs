@@ -19,6 +19,9 @@ const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
 const MAX_PROVIDER_BATCH_REQUESTS: usize = 64;
 const MAX_CROSS_NODE_GRADIENT_NODES: usize = MAX_PROVIDER_BATCH_REQUESTS / 2;
 const CROSS_NODE_GRADIENT_BATCH_MODE: &str = "cross-node-frontier-v0.1";
+pub const SESSION_BUFFER_ARENA_MODE: &str = "session-arena-v0.1";
+const MAX_PROVIDER_ARENA_BUFFERS: usize = 64;
+const MAX_PROVIDER_ARENA_BYTES: usize = 2 * 1024 * 1024;
 
 pub type ComputationGraph = ExecutionPlan;
 pub type Operation = PlanNode;
@@ -312,10 +315,30 @@ pub struct OpenClProviderSession {
     gradient_batch_count: usize,
     cross_node_gradient_batch_count: usize,
     cross_node_gradient_node_count: usize,
+    buffer_arena_enabled: bool,
+    buffer_allocation_count: usize,
+    buffer_allocation_bytes: usize,
+    buffer_reuse_count: usize,
+    buffer_release_count: usize,
+    pooled_buffer_count: usize,
+    pooled_bytes: usize,
+    peak_pooled_buffers: usize,
+    peak_pooled_bytes: usize,
+    max_arena_buffers: usize,
+    max_arena_bytes: usize,
+    tensor_value_residency: bool,
+    buffer_arena_closed: bool,
 }
 
 impl OpenClProviderSession {
     pub fn new(provider_path: &PathBuf) -> Result<Self, EngineError> {
+        Self::new_with_buffer_allocation_mode(provider_path, None)
+    }
+
+    pub fn new_with_buffer_allocation_mode(
+        provider_path: &PathBuf,
+        buffer_mode: Option<&str>,
+    ) -> Result<Self, EngineError> {
         if !provider_path.is_file() {
             return Err(EngineError::new(
                 "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
@@ -332,9 +355,21 @@ impl OpenClProviderSession {
                 "python3".into()
             }
         });
-        let mut child = Command::new(python)
-            .arg(provider_path)
-            .arg("--session")
+        if !matches!(buffer_mode, None | Some(SESSION_BUFFER_ARENA_MODE)) {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+                format!(
+                    "unsupported OpenCL buffer allocation mode {}",
+                    buffer_mode.unwrap_or_default()
+                ),
+            ));
+        }
+        let mut command = Command::new(python);
+        command.arg(provider_path).arg("--session");
+        if let Some(mode) = buffer_mode {
+            command.arg("--buffer-mode").arg(mode);
+        }
+        let mut child = command
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -367,6 +402,19 @@ impl OpenClProviderSession {
             gradient_batch_count: 0,
             cross_node_gradient_batch_count: 0,
             cross_node_gradient_node_count: 0,
+            buffer_arena_enabled: buffer_mode == Some(SESSION_BUFFER_ARENA_MODE),
+            buffer_allocation_count: 0,
+            buffer_allocation_bytes: 0,
+            buffer_reuse_count: 0,
+            buffer_release_count: 0,
+            pooled_buffer_count: 0,
+            pooled_bytes: 0,
+            peak_pooled_buffers: 0,
+            peak_pooled_bytes: 0,
+            max_arena_buffers: 0,
+            max_arena_bytes: 0,
+            tensor_value_residency: false,
+            buffer_arena_closed: false,
         })
     }
 
@@ -392,6 +440,148 @@ impl OpenClProviderSession {
 
     pub fn cross_node_gradient_node_count(&self) -> usize {
         self.cross_node_gradient_node_count
+    }
+
+    pub fn buffer_arena_enabled(&self) -> bool {
+        self.buffer_arena_enabled
+    }
+
+    pub fn buffer_allocation_count(&self) -> usize {
+        self.buffer_allocation_count
+    }
+
+    pub fn buffer_allocation_bytes(&self) -> usize {
+        self.buffer_allocation_bytes
+    }
+
+    pub fn buffer_reuse_count(&self) -> usize {
+        self.buffer_reuse_count
+    }
+
+    pub fn buffer_release_count(&self) -> usize {
+        self.buffer_release_count
+    }
+
+    pub fn pooled_buffer_count(&self) -> usize {
+        self.pooled_buffer_count
+    }
+
+    pub fn pooled_bytes(&self) -> usize {
+        self.pooled_bytes
+    }
+
+    pub fn peak_pooled_buffers(&self) -> usize {
+        self.peak_pooled_buffers
+    }
+
+    pub fn peak_pooled_bytes(&self) -> usize {
+        self.peak_pooled_bytes
+    }
+
+    pub fn max_arena_buffers(&self) -> usize {
+        self.max_arena_buffers
+    }
+
+    pub fn max_arena_bytes(&self) -> usize {
+        self.max_arena_bytes
+    }
+
+    pub fn tensor_value_residency(&self) -> bool {
+        self.tensor_value_residency
+    }
+
+    fn update_session_stats(&mut self, response: &Value) -> Result<(), EngineError> {
+        let Some(stats) = response.get("sessionStats") else {
+            if self.buffer_arena_enabled {
+                return Err(EngineError::new(
+                    "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_MISSING",
+                    "OpenCL buffer arena response omitted sessionStats",
+                ));
+            }
+            return Ok(());
+        };
+        let mode = stats
+            .get("bufferAllocationMode")
+            .and_then(Value::as_str)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_INVALID",
+                    "OpenCL provider sessionStats omitted bufferAllocationMode",
+                )
+            })?;
+        let expected = if self.buffer_arena_enabled {
+            SESSION_BUFFER_ARENA_MODE
+        } else {
+            "per-kernel-v0.1"
+        };
+        if mode != expected {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_INVALID",
+                format!("OpenCL provider buffer mode {mode} does not match {expected}"),
+            ));
+        }
+        fn count(stats: &Value, field: &str) -> Result<usize, EngineError> {
+            stats
+                .get(field)
+                .and_then(Value::as_u64)
+                .and_then(|value| usize::try_from(value).ok())
+                .ok_or_else(|| {
+                    EngineError::new(
+                        "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_INVALID",
+                        format!("OpenCL provider sessionStats omitted valid {field}"),
+                    )
+                })
+        }
+        let allocation_count = count(stats, "bufferAllocationCount")?;
+        let allocation_bytes = count(stats, "bufferAllocationBytes")?;
+        let reuse_count = count(stats, "bufferReuseCount")?;
+        let release_count = count(stats, "bufferReleaseCount")?;
+        let pooled_buffer_count = count(stats, "pooledBufferCount")?;
+        let pooled_bytes = count(stats, "pooledBytes")?;
+        let peak_pooled_buffers = count(stats, "peakPooledBuffers")?;
+        let peak_pooled_bytes = count(stats, "peakPooledBytes")?;
+        let max_arena_buffers = count(stats, "maxArenaBuffers")?;
+        let max_arena_bytes = count(stats, "maxArenaBytes")?;
+        let tensor_value_residency = stats
+            .get("tensorValueResidency")
+            .and_then(Value::as_bool)
+            .ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_INVALID",
+                    "OpenCL provider sessionStats omitted tensorValueResidency",
+                )
+            })?;
+        if allocation_count < self.buffer_allocation_count
+            || allocation_bytes < self.buffer_allocation_bytes
+            || reuse_count < self.buffer_reuse_count
+            || release_count < self.buffer_release_count
+            || peak_pooled_buffers < self.peak_pooled_buffers
+            || peak_pooled_bytes < self.peak_pooled_bytes
+            || max_arena_buffers != MAX_PROVIDER_ARENA_BUFFERS
+            || max_arena_bytes != MAX_PROVIDER_ARENA_BYTES
+            || pooled_buffer_count > max_arena_buffers
+            || pooled_bytes > max_arena_bytes
+            || tensor_value_residency
+            || (!self.buffer_arena_enabled
+                && (reuse_count != 0 || pooled_buffer_count != 0 || pooled_bytes != 0))
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BUFFER_ARENA_RECEIPT_INVALID",
+                "OpenCL provider sessionStats violated monotonicity, bounds or the no-residency boundary",
+            ));
+        }
+        self.buffer_allocation_count = allocation_count;
+        self.buffer_allocation_bytes = allocation_bytes;
+        self.buffer_reuse_count = reuse_count;
+        self.buffer_release_count = release_count;
+        self.pooled_buffer_count = pooled_buffer_count;
+        self.pooled_bytes = pooled_bytes;
+        self.peak_pooled_buffers = peak_pooled_buffers;
+        self.peak_pooled_bytes = peak_pooled_bytes;
+        self.max_arena_buffers = max_arena_buffers;
+        self.max_arena_bytes = max_arena_bytes;
+        self.tensor_value_residency = tensor_value_residency;
+        Ok(())
     }
 
     fn send(&mut self, payload: &Value) -> Result<Value, EngineError> {
@@ -461,6 +651,7 @@ impl OpenClProviderSession {
                     .to_owned(),
             ));
         }
+        self.update_session_stats(&response)?;
         Ok(response)
     }
 
@@ -612,6 +803,33 @@ impl OpenClProviderSession {
                 )
             })?;
         Ok(responses)
+    }
+
+    pub fn close_buffer_arena(&mut self) -> Result<(), EngineError> {
+        if !self.buffer_arena_enabled || self.buffer_arena_closed {
+            return Ok(());
+        }
+        let response = self.send(&json!({
+            "format": "rcl.opencl-amd-session-close-request.v0.1",
+            "backend": "opencl-amd",
+        }))?;
+        if response.get("format").and_then(Value::as_str)
+            != Some("rcl.opencl-amd-session-close-result.v0.1")
+            || response.get("status").and_then(Value::as_str)
+                != Some("PASS_LOCAL_GPU_SESSION_CLOSE_CANDIDATE")
+            || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+            || response.get("closed").and_then(Value::as_bool) != Some(true)
+            || self.pooled_buffer_count != 0
+            || self.pooled_bytes != 0
+            || self.buffer_release_count != self.buffer_allocation_count
+        {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BUFFER_ARENA_CLOSE_INVALID",
+                "OpenCL provider did not return a complete buffer arena close receipt",
+            ));
+        }
+        self.buffer_arena_closed = true;
+        Ok(())
     }
 }
 
@@ -1104,7 +1322,10 @@ fn execute_opencl_matmul_gradient_pair(
     if responses.len() != 2 {
         return Err(EngineError::new(
             "RCL_ACCELERATOR_RESPONSE_INVALID",
-            format!("OpenCL provider returned {} gradient pair responses", responses.len()),
+            format!(
+                "OpenCL provider returned {} gradient pair responses",
+                responses.len()
+            ),
         ));
     }
     Ok((
@@ -1728,13 +1949,13 @@ fn node_input_gradients(
                 };
                 let ((left_gradient, left_root), (right_gradient, right_root)) =
                     execute_opencl_matmul_gradient_pair(
-                    &node.id,
-                    provider_path,
-                    &left,
-                    &right,
-                    output_gradient,
-                    provider_session.as_deref_mut(),
-                )?;
+                        &node.id,
+                        provider_path,
+                        &left,
+                        &right,
+                        output_gradient,
+                        provider_session.as_deref_mut(),
+                    )?;
                 execution.gpu_matmul_nodes += 2;
                 execution.gpu_execution_roots.push(left_root);
                 execution.gpu_execution_roots.push(right_root);
@@ -1968,6 +2189,33 @@ pub fn backward_with_provider(
         return Err(EngineError::new(
             "RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_UNAVAILABLE",
             "cross-node gradient batching requires explicit BF16 GPU-training placement and a persistent provider session",
+        ));
+    }
+    let buffer_arena = match request
+        .graph
+        .bindings
+        .get("gpuBufferAllocationMode")
+        .and_then(Value::as_str)
+    {
+        None | Some("per-kernel-v0.1") => false,
+        Some(SESSION_BUFFER_ARENA_MODE) => true,
+        Some(other) => {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+                format!("unsupported GPU buffer allocation mode {other}"),
+            ));
+        }
+    };
+    let session_arena = provider_session
+        .as_deref()
+        .map(OpenClProviderSession::buffer_arena_enabled)
+        .unwrap_or(false);
+    if buffer_arena != session_arena
+        || (buffer_arena && (!bf16 || !mode.gpu_backward() || provider_session.is_none()))
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE",
+            "session buffer arena requires explicit BF16 GPU-training placement and a matching persistent provider session",
         ));
     }
     let forward_started = Instant::now();

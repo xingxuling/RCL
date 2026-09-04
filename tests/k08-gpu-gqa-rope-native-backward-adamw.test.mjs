@@ -593,6 +593,16 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.equal(gpu.value.telemetry.gpuProviderGradientBatches, 108);
   assert.equal(gpu.value.telemetry.gpuProviderCrossNodeGradientBatches, 0);
   assert.equal(gpu.value.telemetry.gpuProviderCrossNodeGradientNodes, 0);
+  assert.equal(gpu.value.telemetry.gpuProviderBufferAllocationMode, 'per-kernel-v0.1');
+  assert.ok(gpu.value.telemetry.gpuProviderBufferAllocations > 0);
+  assert.equal(gpu.value.telemetry.gpuProviderBufferReuses, 0);
+  assert.equal(
+    gpu.value.telemetry.gpuProviderBufferReleases,
+    gpu.value.telemetry.gpuProviderBufferAllocations,
+  );
+  assert.equal(gpu.value.telemetry.gpuProviderPooledBuffers, 0);
+  assert.equal(gpu.value.telemetry.gpuProviderPooledBytes, 0);
+  assert.equal(gpu.value.telemetry.gpuProviderTensorValueResidency, false);
   assert.ok(gpu.value.telemetry.hostCpuNodes > 40);
   assert.ok(gpu.value.telemetry.gpuExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
   assert.ok(gpu.value.telemetry.gpuBackwardExecutionRoots.every((root) => /^[0-9a-f]{64}$/.test(root)));
@@ -639,6 +649,81 @@ test('K08 GPU-native multi-block GQA+RoPE backward and AdamW match CPU reference
   assert.equal(crossNode.value.initialLoss, gpu.value.initialLoss);
   assert.equal(crossNode.value.finalLoss, gpu.value.finalLoss);
   assert.equal(crossNode.value.checkpointRoot, gpu.value.checkpointRoot);
+
+  const arenaRequest = structuredClone(crossNodeRequest);
+  arenaRequest.autodiff.graph.bindings.gpuBufferAllocationMode = 'session-arena-v0.1';
+  const arena = execute(arenaRequest);
+  assert.equal(arena.status, 0, JSON.stringify(arena.value));
+  assert.equal(arena.value.telemetry.gpuProviderBufferAllocationMode, 'session-arena-v0.1');
+  assert.ok(arena.value.telemetry.gpuProviderBufferAllocations > 0);
+  assert.ok(
+    arena.value.telemetry.gpuProviderBufferAllocations
+      < crossNode.value.telemetry.gpuProviderBufferAllocations,
+  );
+  assert.ok(arena.value.telemetry.gpuProviderBufferReuses > 0);
+  assert.equal(
+    arena.value.telemetry.gpuProviderBufferAllocations
+      + arena.value.telemetry.gpuProviderBufferReuses,
+    crossNode.value.telemetry.gpuProviderBufferAllocations,
+  );
+  assert.equal(
+    arena.value.telemetry.gpuProviderBufferReleases,
+    arena.value.telemetry.gpuProviderBufferAllocations,
+  );
+  assert.equal(arena.value.telemetry.gpuProviderPooledBuffers, 0);
+  assert.equal(arena.value.telemetry.gpuProviderPooledBytes, 0);
+  assert.ok(arena.value.telemetry.gpuProviderPeakPooledBuffers > 0);
+  assert.ok(arena.value.telemetry.gpuProviderPeakPooledBytes > 0);
+  assert.ok(
+    arena.value.telemetry.gpuProviderPeakPooledBuffers
+      <= arena.value.telemetry.gpuProviderMaxArenaBuffers,
+  );
+  assert.ok(
+    arena.value.telemetry.gpuProviderPeakPooledBytes
+      <= arena.value.telemetry.gpuProviderMaxArenaBytes,
+  );
+  assert.equal(arena.value.telemetry.gpuProviderTensorValueResidency, false);
+  assert.deepEqual(arena.value.telemetry.gpuExecutionRoots, crossNode.value.telemetry.gpuExecutionRoots);
+  assert.deepEqual(
+    arena.value.telemetry.gpuBackwardExecutionRoots,
+    crossNode.value.telemetry.gpuBackwardExecutionRoots,
+  );
+  assert.deepEqual(arena.value.parameters, crossNode.value.parameters);
+  assert.deepEqual(arena.value.optimizerStates, crossNode.value.optimizerStates);
+  assert.equal(arena.value.initialLoss, crossNode.value.initialLoss);
+  assert.equal(arena.value.finalLoss, crossNode.value.finalLoss);
+  assert.equal(arena.value.checkpointRoot, crossNode.value.checkpointRoot);
+  if (process.env.RCL_K13_EVIDENCE === '1') {
+    console.log(`K13_EVIDENCE ${JSON.stringify({
+      perKernel: {
+        allocations: crossNode.value.telemetry.gpuProviderBufferAllocations,
+        allocationBytes: crossNode.value.telemetry.gpuProviderBufferAllocationBytes,
+        reuses: crossNode.value.telemetry.gpuProviderBufferReuses,
+        releases: crossNode.value.telemetry.gpuProviderBufferReleases,
+      },
+      arena: {
+        allocations: arena.value.telemetry.gpuProviderBufferAllocations,
+        allocationBytes: arena.value.telemetry.gpuProviderBufferAllocationBytes,
+        reuses: arena.value.telemetry.gpuProviderBufferReuses,
+        releases: arena.value.telemetry.gpuProviderBufferReleases,
+        pooledBuffers: arena.value.telemetry.gpuProviderPooledBuffers,
+        pooledBytes: arena.value.telemetry.gpuProviderPooledBytes,
+        peakPooledBuffers: arena.value.telemetry.gpuProviderPeakPooledBuffers,
+        peakPooledBytes: arena.value.telemetry.gpuProviderPeakPooledBytes,
+        maxArenaBuffers: arena.value.telemetry.gpuProviderMaxArenaBuffers,
+        maxArenaBytes: arena.value.telemetry.gpuProviderMaxArenaBytes,
+        tensorValueResidency: arena.value.telemetry.gpuProviderTensorValueResidency,
+      },
+      exact: {
+        forwardRoots: true,
+        backwardRoots: true,
+        losses: true,
+        parameters: true,
+        optimizerStates: true,
+        checkpointRoot: true,
+      },
+    })}`);
+  }
   if (process.env.RCL_K12_EVIDENCE === '1') {
     console.log(`K12_EVIDENCE ${JSON.stringify({
       legacy: {
@@ -723,5 +808,19 @@ test('K08 GPU-native multi-block GQA+RoPE resume, replay and backend boundaries 
   assert.equal(
     execute(unavailableBatchMode).value.code,
     'RCL_ACCELERATOR_CROSS_NODE_GRADIENT_BATCH_UNAVAILABLE',
+  );
+
+  const unsupportedBufferMode = requestFor(frame);
+  unsupportedBufferMode.autodiff.graph.bindings.gpuBufferAllocationMode = 'session-arena-unbounded';
+  assert.equal(
+    execute(unsupportedBufferMode).value.code,
+    'RCL_ACCELERATOR_BUFFER_ALLOCATION_MODE_UNSUPPORTED',
+  );
+
+  const unavailableBufferMode = cpuEquivalent(requestFor(frame));
+  unavailableBufferMode.autodiff.graph.bindings.gpuBufferAllocationMode = 'session-arena-v0.1';
+  assert.equal(
+    execute(unavailableBufferMode).value.code,
+    'RCL_ACCELERATOR_BUFFER_ARENA_UNAVAILABLE',
   );
 });
