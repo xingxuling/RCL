@@ -3,22 +3,22 @@ import { ROUTE_LABELS, UGIS_ROUTES, observeRegime } from './gameRules.js';
 export const AI_DIFFICULTIES = Object.freeze({
   novice: Object.freeze({
     id: 'novice', label: '新手', reactionSteps: [3, 4], commitmentSteps: [4, 5],
-    errorRate: 0.26, hesitationRate: 0.34, attackCooldownSteps: [3, 4], telepathy: false,
+    errorRate: 0.26, hesitationRate: 0.34, attackCooldownSteps: [7, 8], telepathy: false,
     summary: '反应约 0.5–0.7 秒，会明显误判，也会犹豫。',
   }),
   normal: Object.freeze({
     id: 'normal', label: '普通', reactionSteps: [2, 3], commitmentSteps: [3, 4],
-    errorRate: 0.12, hesitationRate: 0.18, attackCooldownSteps: [2, 3], telepathy: false,
+    errorRate: 0.12, hesitationRate: 0.18, attackCooldownSteps: [5, 6], telepathy: false,
     summary: '公平观察，反应约 0.34–0.51 秒，可以用假动作骗。',
   }),
   hard: Object.freeze({
     id: 'hard', label: '困难', reactionSteps: [1, 2], commitmentSteps: [2, 3],
-    errorRate: 0.06, hesitationRate: 0.08, attackCooldownSteps: [1, 2], telepathy: false,
+    errorRate: 0.06, hesitationRate: 0.08, attackCooldownSteps: [4, 5], telepathy: false,
     summary: '反应快，会预测，但仍然只看得到可观察动作。',
   }),
   master: Object.freeze({
     id: 'master', label: '宗师', reactionSteps: [1, 1], commitmentSteps: [2, 2],
-    errorRate: 0.02, hesitationRate: 0.03, attackCooldownSteps: [1, 1], telepathy: false,
+    errorRate: 0.02, hesitationRate: 0.03, attackCooldownSteps: [3, 4], telepathy: false,
     summary: '接近完整 UGIS，反应约 0.17 秒，极少失误。',
   }),
   tianji: Object.freeze({
