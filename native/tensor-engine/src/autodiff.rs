@@ -14,6 +14,7 @@ pub const AUTODIFF_SGD_TRAINING_RESPONSE_FORMAT: &str =
     "rcl.tensor-autodiff-sgd-training-result.v0.1";
 pub const BF16_AUTODIFF_PRECISION: &str = "bf16-rne-fp32-accumulation";
 pub const GPU_ELEMENTWISE_MODE: &str = "elementwise-v0.1";
+pub const GPU_REDUCTION_MODE: &str = "reduction-v0.1";
 const MAX_PARAMETERS: usize = 256;
 const MAX_TRAINING_STEPS: usize = 16_384;
 const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
@@ -97,10 +98,12 @@ pub struct AutodiffTelemetry {
     pub parameter_count: usize,
     pub gpu_matmul_nodes: usize,
     pub gpu_elementwise_nodes: usize,
+    pub gpu_reduction_nodes: usize,
     pub host_cpu_nodes: usize,
     pub gpu_execution_roots: Vec<String>,
     pub gpu_backward_matmul_nodes: usize,
     pub gpu_backward_elementwise_nodes: usize,
+    pub gpu_backward_reduction_nodes: usize,
     pub gpu_backward_execution_roots: Vec<String>,
 }
 
@@ -198,6 +201,7 @@ impl ExecutionMode {
 struct ForwardExecutionTelemetry {
     gpu_matmul_nodes: usize,
     gpu_elementwise_nodes: usize,
+    gpu_reduction_nodes: usize,
     host_cpu_nodes: usize,
     gpu_execution_roots: Vec<String>,
 }
@@ -255,8 +259,25 @@ fn gpu_elementwise_enabled(graph: &ComputationGraph) -> Result<bool, EngineError
     {
         None => Ok(false),
         Some(GPU_ELEMENTWISE_MODE) => Ok(true),
+        Some(GPU_REDUCTION_MODE) => Ok(false),
         Some(other) => Err(EngineError::new(
             "RCL_ACCELERATOR_ELEMENTWISE_MODE_UNSUPPORTED",
+            format!("unsupported GPU non-matmul mode {other}"),
+        )),
+    }
+}
+
+fn gpu_reduction_enabled(graph: &ComputationGraph) -> Result<bool, EngineError> {
+    match graph
+        .bindings
+        .get("gpuNonMatmulMode")
+        .and_then(Value::as_str)
+    {
+        None => Ok(false),
+        Some(GPU_ELEMENTWISE_MODE) => Ok(false),
+        Some(GPU_REDUCTION_MODE) => Ok(true),
+        Some(other) => Err(EngineError::new(
+            "RCL_ACCELERATOR_REDUCTION_MODE_UNSUPPORTED",
             format!("unsupported GPU non-matmul mode {other}"),
         )),
     }
@@ -273,6 +294,7 @@ fn validate_hybrid_placements(
         return Ok(());
     }
     let gpu_elementwise = gpu_elementwise_enabled(graph)?;
+    let gpu_reduction = gpu_reduction_enabled(graph)?;
     for node in &graph.nodes {
         let placement = node
             .attributes
@@ -287,6 +309,7 @@ fn validate_hybrid_placements(
         match (node.operation.as_str(), placement) {
             ("matmul", "gpu") => {}
             ("sub" | "mul", "gpu") if gpu_elementwise => {}
+            ("mean", "gpu") if gpu_reduction => {}
             ("matmul", _) => {
                 return Err(EngineError::new(
                     "RCL_ACCELERATOR_GPU_PLACEMENT_REQUIRED",
@@ -298,7 +321,7 @@ fn validate_hybrid_placements(
                 return Err(EngineError::new(
                     "RCL_ACCELERATOR_PLACEMENT_UNSUPPORTED",
                     format!(
-                        "node {} has unsupported placement {placement}; only explicit cpu-reference is allowed for non-matmul nodes unless gpuNonMatmulMode is elementwise-v0.1",
+                        "node {} has unsupported placement {placement}; only explicit cpu-reference is allowed for non-matmul nodes unless gpuNonMatmulMode is elementwise-v0.1 or reduction-v0.1",
                         node.id
                     ),
                 ));
@@ -1472,6 +1495,162 @@ fn execute_opencl_elementwise(
     ))
 }
 
+fn execute_opencl_reduction(
+    node_id: &str,
+    operation: &str,
+    provider_path: &PathBuf,
+    inputs: &[BoundTensor<'_>],
+    attributes: &Value,
+    mut provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<(ExecutionResult, String), EngineError> {
+    require_arity(inputs, 1)?;
+    if operation != "mean" {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_REDUCTION_OPERATION_UNSUPPORTED",
+            format!("GPU reduction node {node_id} has unsupported operation {operation}"),
+        ));
+    }
+    let input = &inputs[0];
+    if input.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_RANK",
+            format!("GPU reduction node {node_id} requires rank-2 tensors"),
+        ));
+    }
+    let rows = input.descriptor.shape[0];
+    let columns = input.descriptor.shape[1];
+    let axis = attribute_usize(attributes, "axis")?;
+    if axis > 1 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_AXIS",
+            format!("GPU reduction node {node_id} only supports axis 0 or 1"),
+        ));
+    }
+    if rows == 0 || columns == 0 || rows > 64 || columns > 64 || rows * columns > 4096 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_SHAPE",
+            format!("GPU reduction node {node_id} shape is outside the bounded rank-2 profile"),
+        ));
+    }
+    if !provider_path.is_file() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
+        ));
+    }
+    let output_shape = if axis == 0 {
+        vec![columns]
+    } else {
+        vec![rows]
+    };
+    let payload = json!({
+        "format": "rcl.opencl-bf16-reduction-request.v0.1",
+        "backend": "opencl-amd",
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "axis": axis,
+        "inputBits": opencl_bits(input, "input")?,
+        "nodeId": node_id,
+    });
+    let response = if let Some(session) = provider_session.as_deref_mut() {
+        session.execute(&payload)?
+    } else {
+        execute_opencl_json(provider_path, &payload)?
+    };
+    if response.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-bf16-reduction-result.v0.1")
+        || response.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_REDUCTION_REFERENCE_CANDIDATE")
+        || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+        || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        || response.get("operation").and_then(Value::as_str) != Some(operation)
+        || response.get("axis").and_then(Value::as_u64) != Some(axis as u64)
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider did not return an admitted GPU reduction result for node {node_id}"),
+        ));
+    }
+    let execution_root = opencl_execution_root(&response, node_id)?;
+    let output_bits = response
+        .get("outputBits")
+        .and_then(Value::as_array)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                format!("OpenCL provider omitted reduction outputBits for node {node_id}"),
+            )
+        })?;
+    if output_bits.len() != output_shape.iter().product::<usize>() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider returned the wrong reduction output length for node {node_id}"),
+        ));
+    }
+    let mut values = Vec::with_capacity(output_bits.len());
+    for value in output_bits {
+        let bits = value.as_str().ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL reduction outputBits must contain lowercase hexadecimal strings",
+            )
+        })?;
+        if bits.len() != 4 || bits.to_ascii_lowercase() != bits {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL reduction outputBits must contain four lowercase hexadecimal digits",
+            ));
+        }
+        let parsed = u16::from_str_radix(bits, 16).map_err(|_| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL reduction outputBits contains invalid hexadecimal digits",
+            )
+        })?;
+        if parsed & 0x7f80 == 0x7f80 {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL reduction outputBits contains a non-finite BF16 value",
+            ));
+        }
+        values.push(bf16_value(parsed) as f64);
+    }
+    let storage_identity = output_identity("bf16", &output_shape, &values);
+    Ok((
+        ExecutionResult {
+            format: RESPONSE_FORMAT,
+            status: "ok",
+            tensor: TensorDescriptor {
+                id: "result".into(),
+                shape: output_shape.clone(),
+                dtype: "bf16".into(),
+                layout: "row-major".into(),
+                device: "opencl-amd".into(),
+                gradient_identity: "derived:mean".into(),
+                storage_identity: storage_identity.clone(),
+            },
+            storage: DenseStorage {
+                identity: storage_identity,
+                kind: "opencl-host-staging".into(),
+                data: values,
+            },
+            telemetry: Telemetry {
+                backend: "rcl-tensor-opencl-amd-bf16-reduction-v0.1",
+                kernel: "rcl_bf16_mean".into(),
+                kernel_nanos: 0,
+                element_count: output_shape.iter().product(),
+                allocated_bytes: output_shape.iter().product::<usize>()
+                    * std::mem::size_of::<u16>(),
+            },
+        },
+        execution_root,
+    ))
+}
+
 fn execute_opencl_json(provider_path: &PathBuf, payload: &Value) -> Result<Value, EngineError> {
     if !provider_path.is_file() {
         return Err(EngineError::new(
@@ -1880,9 +2059,110 @@ fn execute_opencl_elementwise_gradient_pair(
     ))
 }
 
+fn execute_opencl_reduction_gradient(
+    node_id: &str,
+    provider_path: &PathBuf,
+    input: &BoundTensor<'_>,
+    output_gradient: &Gradient,
+    axis: usize,
+    mut provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<(Gradient, String), EngineError> {
+    if input.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_RANK",
+            format!("GPU reduction gradient node {node_id} requires rank-2 tensors"),
+        ));
+    }
+    if axis > 1 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_AXIS",
+            format!("GPU reduction gradient node {node_id} only supports axis 0 or 1"),
+        ));
+    }
+    let rows = input.descriptor.shape[0];
+    let columns = input.descriptor.shape[1];
+    if rows == 0 || columns == 0 || rows > 64 || columns > 64 || rows * columns > 4096 {
+        return Err(EngineError::new(
+            "RCL_BF16_REDUCTION_SHAPE",
+            format!("GPU reduction gradient node {node_id} shape is outside the bounded rank-2 profile"),
+        ));
+    }
+    let expected_output_shape = if axis == 0 {
+        vec![columns]
+    } else {
+        vec![rows]
+    };
+    if output_gradient.shape != expected_output_shape {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_REDUCTION_SHAPE",
+            format!("GPU reduction gradient node {node_id} has an incompatible upstream shape"),
+        ));
+    }
+    if !provider_path.is_file() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
+        ));
+    }
+    let payload = json!({
+        "format": "rcl.opencl-bf16-reduction-gradient-request.v0.1",
+        "backend": "opencl-amd",
+        "operation": "mean-gradient",
+        "rows": rows,
+        "columns": columns,
+        "axis": axis,
+        "upstreamF32Bits": output_gradient
+            .data
+            .iter()
+            .map(|value| opencl_f32_bits(*value, "upstream gradient"))
+            .collect::<Result<Vec<_>, _>>()?,
+        "nodeId": node_id,
+    });
+    let response = if let Some(session) = provider_session.as_deref_mut() {
+        session.execute(&payload)?
+    } else {
+        execute_opencl_json(provider_path, &payload)?
+    };
+    if response.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-bf16-reduction-gradient-result.v0.1")
+        || response.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_REDUCTION_GRADIENT_REFERENCE_CANDIDATE")
+        || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+        || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        || response.get("operation").and_then(Value::as_str) != Some("mean-gradient")
+        || response.get("axis").and_then(Value::as_u64) != Some(axis as u64)
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider did not return an admitted GPU reduction gradient for node {node_id}"),
+        ));
+    }
+    let root = opencl_execution_root(&response, node_id)?;
+    let data = decode_opencl_f32_output(
+        &response,
+        rows * columns,
+        "reduction gradient",
+    )?;
+    Ok((gradient(&[rows, columns], data)?, root))
+}
+
 fn is_gpu_matmul_gradient_node(node: &Operation, mode: &ExecutionMode) -> bool {
     mode.gpu_backward()
         && node.operation == "matmul"
+        && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
+}
+
+fn is_gpu_reduction_gradient_node(
+    node: &Operation,
+    mode: &ExecutionMode,
+    gpu_reduction: bool,
+) -> bool {
+    mode.gpu_backward()
+        && gpu_reduction
+        && node.operation == "mean"
         && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
 }
 
@@ -2066,6 +2346,7 @@ fn forward_tape(
     }
     let mut values = validate_graph(graph, bf16, mode)?;
     let gpu_elementwise = gpu_elementwise_enabled(graph)?;
+    let gpu_reduction = gpu_reduction_enabled(graph)?;
     let mut execution = ForwardExecutionTelemetry::default();
     let mut allocated = values
         .values()
@@ -2118,6 +2399,19 @@ fn forward_tape(
                                         provider_session.as_deref_mut(),
                                     )?;
                                     execution.gpu_elementwise_nodes += 1;
+                                    execution.gpu_execution_roots.push(root);
+                                    result
+                                }
+                                "mean" if gpu_reduction => {
+                                    let (result, root) = execute_opencl_reduction(
+                                        &node.id,
+                                        &node.operation,
+                                        provider_path,
+                                        &inputs,
+                                        &node.attributes,
+                                        provider_session.as_deref_mut(),
+                                    )?;
+                                    execution.gpu_reduction_nodes += 1;
                                     execution.gpu_execution_roots.push(root);
                                     result
                                 }
@@ -2331,6 +2625,7 @@ fn transpose_2d(value: &Gradient) -> Result<Gradient, EngineError> {
 struct BackwardExecutionTelemetry {
     gpu_matmul_nodes: usize,
     gpu_elementwise_nodes: usize,
+    gpu_reduction_nodes: usize,
     gpu_execution_roots: Vec<String>,
 }
 
@@ -2383,6 +2678,7 @@ fn node_input_gradients(
     mode: &ExecutionMode,
     bf16: bool,
     gpu_elementwise: bool,
+    gpu_reduction: bool,
     mut provider_session: Option<&mut OpenClProviderSession>,
     execution: &mut BackwardExecutionTelemetry,
 ) -> Result<Vec<Gradient>, EngineError> {
@@ -2600,6 +2896,39 @@ fn node_input_gradients(
                 ])
             }
         }
+        "mean" if is_gpu_reduction_gradient_node(node, mode, gpu_reduction) => {
+            let axis = attribute_usize(&node.attributes, "axis")?;
+            let provider_path = mode.provider_path().ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_PROVIDER_REQUIRED",
+                    "GPU reduction backward requires an explicit provider path",
+                )
+            })?;
+            let input_descriptor = tape.get(&node.inputs[0]).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_AUTODIFF_INPUT_MISSING",
+                    format!(
+                        "Backward node {} is missing input {}",
+                        node.id, node.inputs[0]
+                    ),
+                )
+            })?;
+            let input = BoundTensor {
+                descriptor: &input_descriptor.0,
+                data: input_descriptor.1.data.as_slice(),
+            };
+            let (input_gradient, root) = execute_opencl_reduction_gradient(
+                &node.id,
+                provider_path,
+                &input,
+                output_gradient,
+                axis,
+                provider_session.as_deref_mut(),
+            )?;
+            execution.gpu_reduction_nodes += 1;
+            execution.gpu_execution_roots.push(root);
+            Ok(vec![input_gradient])
+        }
         "sum" | "mean" => {
             let axis = attribute_usize(&node.attributes, "axis")?;
             let scale = if node.operation == "mean" {
@@ -2804,6 +3133,7 @@ pub fn backward_with_provider(
     };
     let mode = execution_mode(&request.graph)?;
     let gpu_elementwise = gpu_elementwise_enabled(&request.graph)?;
+    let gpu_reduction = gpu_reduction_enabled(&request.graph)?;
     let cross_node_gradient_batch = match request
         .graph
         .bindings
@@ -3018,6 +3348,7 @@ pub fn backward_with_provider(
             &mode,
             bf16,
             gpu_elementwise,
+            gpu_reduction,
             provider_session.as_deref_mut(),
             &mut backward_execution,
         )?;
@@ -3101,10 +3432,12 @@ pub fn backward_with_provider(
             parameter_count: request.parameters.len(),
             gpu_matmul_nodes: forward_execution.gpu_matmul_nodes,
             gpu_elementwise_nodes: forward_execution.gpu_elementwise_nodes,
+            gpu_reduction_nodes: forward_execution.gpu_reduction_nodes,
             host_cpu_nodes: forward_execution.host_cpu_nodes,
             gpu_execution_roots: forward_execution.gpu_execution_roots,
             gpu_backward_matmul_nodes: backward_execution.gpu_matmul_nodes,
             gpu_backward_elementwise_nodes: backward_execution.gpu_elementwise_nodes,
+            gpu_backward_reduction_nodes: backward_execution.gpu_reduction_nodes,
             gpu_backward_execution_roots: backward_execution.gpu_execution_roots,
         },
     })
