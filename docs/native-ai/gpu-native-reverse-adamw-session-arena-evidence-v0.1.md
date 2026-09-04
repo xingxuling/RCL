@@ -2,7 +2,7 @@
 
 ## Current ruling
 
-`PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`
+`PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE`
 
 K19 exercises the existing RCL-owned generic Tensor Autodiff and AdamW path for
 two repeated optimizer steps while one persistent AMD OpenCL provider session
@@ -41,6 +41,13 @@ AMD backend; they do not inherit the local device receipt.
 - The focused K19 suite is `3/3 PASS`; Python syntax, locked Rust cargo check,
   Node syntax and `git diff --check` passed. No new dependency or donor code
   was introduced.
+- Hosted PR #145 run `33905917746` passed the K19 suite on both Ubuntu
+  (`101130689327`) and Windows (`101130689995`). The push-triggered rerun
+  `33905846815` also passed on both platforms after its initial Windows
+  dependency-build timeout was rerun.
+- After merge commit `aae15df9d26ea5b749682b212d1c0925553be6dc` reached
+  `main`, Authority (`33906897287`), Canonical (`33906897338`), Universal
+  Stress (`33906897331`) and the K12-K18 regression workflows all passed.
 
 ## No Silent RCL Bypass ruling
 
@@ -67,7 +74,7 @@ AMD backend; they do not inherit the local device receipt.
 | ROBUST | PASS_LOCAL_FAIL_CLOSED_BOUNDARIES |
 | PERFORMANCE | ARENA_REUSE_TELEMETRY_ONLY_NO_THROUGHPUT_OR_VRAM_CLAIM |
 | AI_GENERATE | NOT_APPLICABLE |
-| EVIDENCE | CANDIDATE_HOSTED_PENDING |
+| EVIDENCE | PASS_HOSTED_REPLAY_BOUNDARY |
 
 Only the three bounded K19 persistent-session/arena candidate claims in the
 evidence JSON are granted. GPU training, full-graph training semantics,

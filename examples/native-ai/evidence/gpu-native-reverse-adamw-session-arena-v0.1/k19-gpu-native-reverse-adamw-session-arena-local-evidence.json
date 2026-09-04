@@ -2,11 +2,14 @@
   "schema": "rcl.native-ai.gpu-native-reverse-adamw-session-arena.evidence.v0.1",
   "campaign": "RCL K08 AI Model Factory Campaign",
   "task": "K19",
-  "status": "PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE",
   "canonicalOwner": "RCL",
   "baseMain": "0846e3c1babe518d85a46cfae7b07fc16ff7a76d",
   "implementationCommit": "065ed48965ce67e34e5b1ad9f45897d9770913fe",
   "branch": "codex/k19-gpu-training-residency-v01",
+  "pullRequest": 145,
+  "mergeCommit": "aae15df9d26ea5b749682b212d1c0925553be6dc",
+  "mergedAt": "2026-09-04T18:37:26Z",
   "contract": "examples/native-ai/gpu-native-reverse-adamw-session-arena-contract.v0.1.json",
   "genome": "examples/native-ai/gpu-native-reverse-adamw-session-arena-genome.rcl",
   "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
@@ -108,8 +111,52 @@
     }
   },
   "hostedReplay": {
-    "status": "PENDING_PR_WORKFLOW",
+    "status": "PASS",
+    "event": "pull_request",
+    "runId": "33905917746",
+    "headSha": "2470ffc7cc5d373c8b50a9ee4efc2f615ae64c21",
+    "ubuntu": {
+      "jobId": "101130689327",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/33905917746/job/101130689327"
+    },
+    "windows": {
+      "jobId": "101130689995",
+      "status": "PASS",
+      "url": "https://github.com/xingxuling/RCL/actions/runs/33905917746/job/101130689995"
+    },
+    "pushRerun": {
+      "runId": "33905846815",
+      "status": "PASS",
+      "ubuntuJobId": "101133327770",
+      "windowsJobId": "101133326092"
+    },
+    "url": "https://github.com/xingxuling/RCL/actions/runs/33905917746",
     "boundary": "Hosted runners prove replay or explicit unavailable-backend fail-closed behavior; they do not inherit this local AMD device receipt"
+  },
+  "postMergeVerification": {
+    "mainSha": "aae15df9d26ea5b749682b212d1c0925553be6dc",
+    "authorityContract": {
+      "runId": "33906897287",
+      "status": "PASS"
+    },
+    "canonicalVerification": {
+      "runId": "33906897338",
+      "status": "PASS"
+    },
+    "universalStress": {
+      "runId": "33906897331",
+      "status": "PASS"
+    },
+    "regression": {
+      "k12": { "runId": "33906897256", "status": "PASS" },
+      "k13": { "runId": "33906897009", "status": "PASS" },
+      "k14": { "runId": "33906897069", "status": "PASS" },
+      "k15": { "runId": "33906897233", "status": "PASS" },
+      "k16": { "runId": "33906897221", "status": "PASS" },
+      "k17": { "runId": "33906897285", "status": "PASS" },
+      "k18": { "runId": "33906897244", "status": "PASS" }
+    }
   },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -142,5 +189,5 @@
     "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
   ],
   "authority": "CANDIDATE_ONLY_RCL_GENERIC_REVERSE_ADAMW_WITH_PERSISTENT_SESSION_AND_BOUNDED_ARENA",
-  "reportRoot": "081fc02df542c08faa85753944ca5668f1aafb0db5f48544bdcf8e314505f1e7"
+  "reportRoot": "a2bef521019c16d67f84a5365854af2da68a9fde938f2851c70eb9f2ab265cf8"
 }
