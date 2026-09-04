@@ -350,7 +350,9 @@ The instruction “fill the RCL gaps” cannot honestly mean copying every exter
 ### RCL-owned work still open
 
 - AI003/AI015: bounded CPU-f64 two-block AdamW replay is now a hosted candidate; BF16/mixed-precision multi-block replay, packed/fused execution, scale and production convergence remain open;
-- AI001/009/011/012: Canonical promotion/self-host lowering breadth for Tensor/Autodiff/model topology;
+- AI001: RCL-owned typed Tensor descriptor and shape-rule admission now has a native self-hosted candidate; numerical kernels, alias safety, device lowering and canonical promotion remain open;
+- AI011: bounded compact tensor-plan liveness admission now has a native self-hosted candidate; broader graph lowering, scheduling, residency and canonical promotion remain open;
+- AI012: rooted model-topology-to-generic-graph admission now has a native self-hosted candidate; typed/shape-aware graph construction, numerical lowering and canonical promotion remain open;
 - AI002: graph-governance candidate now owns ordered graph validation, reverse-edge rules, StopGradient filtering and deterministic per-parameter contribution grouping; numeric reverse execution, shape-aware rules, broader corpus and promotion remain open;
 - AI009: RCL-owned generic operation admission and manifest binding now have a native self-host candidate; typed/shape-aware graph construction, canonical promotion and backend performance remain open;
 - AI008: bounded raw `.rcltype` parsing now has a native RCL candidate with reference-parser parity; multi-module linking, union/nested typed-expression lowering, fixed-point inclusion and promotion remain open;
