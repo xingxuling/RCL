@@ -1,0 +1,108 @@
+{
+  "schema": "rcl.native-ai.gpu-opencl-tensor-residency.evidence.v0.1",
+  "campaign": "RCL K08 AI Model Factory Campaign",
+  "task": "K14",
+  "status": "PASS_LOCAL_OPENCL_TENSOR_VALUE_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "baseMain": "37fe473eae197ee11251d1443222538317f6b2e7",
+  "implementationCommit": "8182772d7aa65d7c832310da0aeaa1459373640d",
+  "branch": "codex/k14-opencl-tensor-residency-v01",
+  "contract": "examples/native-ai/gpu-opencl-tensor-residency-contract.v0.1.json",
+  "genome": "examples/native-ai/gpu-opencl-tensor-residency-genome.rcl",
+  "bridge": "native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs",
+  "provider": "native/tensor-engine/amd_opencl_bf16_provider.py",
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)"
+  },
+  "localEvidence": {
+    "probe": {
+      "status": "PASS_LOCAL_REAL_AMD",
+      "inputBindings": ["uploaded", "uploaded", "elided", "elided"],
+      "matmulOutputBits": [["4130"], ["4130"]],
+      "executionRoots": [
+        "d9d2e4b07d7cde3112439d9fb1b41d079ce55c6b06792f30143f4411cd4cdc4a",
+        "e482e82b48f127474228b9bfe683b5ac1dfcb58f82e5487e4362323931b9d58c"
+      ],
+      "exactOutputParity": true,
+      "telemetry": {
+        "bufferAllocationCount": 4,
+        "bufferAllocationBytes": 12,
+        "bufferReleaseCount": 4,
+        "tensorValueResidency": true,
+        "residentTensorCountAfterClose": 0,
+        "residentBytesAfterClose": 0,
+        "maxResidentTensors": 64,
+        "maxResidentBytes": 2097152,
+        "tensorBindCount": 2,
+        "tensorResidencyHitCount": 2,
+        "tensorReplacementCount": 0,
+        "tensorHostToDeviceTransfers": 2,
+        "tensorDeviceToHostTransfers": 2,
+        "tensorReleaseCount": 2
+      }
+    },
+    "negativeAndBoundary": {
+      "changedValueRoot": "RCL_OPENCL_TENSOR_VALUE_STALE",
+      "unknownMode": "RCL_OPENCL_BUFFER_ALLOCATION_MODE_UNSUPPORTED",
+      "outputReadback": "explicit on every matmul",
+      "providerFallback": "forbidden"
+    },
+    "regressions": {
+      "rustBridgeBuild": "PASS",
+      "pythonSyntax": "PASS",
+      "diffCheck": "PASS",
+      "k13BufferArena": "PASS_LOCAL_3_GPU_TESTS",
+      "k08Tensor": "16_PASS_1_DECLARED_SKIP"
+    },
+    "strictClippy": {
+      "status": "NOT_RUN",
+      "scope": "K14 does not claim a new Clippy result"
+    },
+    "licenseAudit": "PASS_NO_NEW_DEPENDENCIES_OR_EXTERNAL_DONOR_CODE"
+  },
+  "k400": {
+    "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "matrixAfter": "23 PASS / 0 BLOCKED / 377 UNTESTED",
+    "verdict": "INCOMPLETE",
+    "impact": "K233 performance and future scale cells only; no cell promotion"
+  },
+  "universalStress": {
+    "EXPRESS": "CANDIDATE",
+    "COMPILE": "PASS_LOCAL",
+    "LOWER": "PASS_LOCAL_CANDIDATE",
+    "EXECUTE": "PASS_LOCAL_REAL_AMD",
+    "CORRECT": "PASS_LOCAL_EXACT_OUTPUT_BITS",
+    "ROBUST": "PASS_LOCAL_FAIL_CLOSED_STALE_IDENTITY",
+    "PERFORMANCE": "TRANSFER_COUNT_ONLY_NO_WALL_TIME_OR_THROUGHPUT_CLAIM",
+    "AI_GENERATE": "NOT_APPLICABLE",
+    "EVIDENCE": "CANDIDATE_LOCAL_HOSTED_PENDING"
+  },
+  "claimsGranted": [
+    "OPENCL_AMD_READ_ONLY_TENSOR_INPUT_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_INPUT_TRANSFER_ELISION_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "OPENCL_TENSOR_OUTPUT_RESIDENCY",
+    "OPENCL_FULL_GRAPH_RESIDENCY",
+    "OPENCL_TRAINING_STEP_RESIDENCY",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_PORTABILITY",
+    "GPU_TRAINING_PROMOTION",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_GPU_TRAINING_THROUGHPUT",
+    "RCL_GAP_RCL10M_TOKENIZER_DATASET"
+  ],
+  "authority": "CANDIDATE_ONLY_READ_ONLY_TENSOR_INPUT_RESIDENCY_WITH_EXPLICIT_ROOTS_AND_READBACK",
+  "reportRoot": "93e36519dfdfa8641b3cb994a40be6d0186e9e10ab9eec4f46ce9f1dcb9df268"
+}
