@@ -164,6 +164,23 @@ export {
   RCL_NATIVE_UI_ANDROID_FORMAT,
 } from './ui/ui-schema.mjs';
 
+export {
+  RCL_APPLICATION_FRAMEWORK_VERSION,
+  RCL_APPLICATION_FRAMEWORK_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_SPEC_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_TRACE_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_CATALOG_FORMAT,
+  RCL_APPLICATION_FRAMEWORK_TARGETS,
+  RCL_APPLICATION_FRAMEWORK_CATALOG,
+  DEFAULT_RCL_APPLICATION_FRAMEWORK_SPEC,
+  listRclApplicationFrameworks,
+  getRclApplicationFramework,
+  normalizeRclApplicationFrameworkSpec,
+  compileRclApplicationFramework,
+  traceRclApplicationFramework,
+  assessRclApplicationFrameworkCatalog,
+} from './application-framework.mjs';
+
 export { RCL_PACKAGE_COMPILER_VERSION, RCL_PACKAGE_TARGETS, packageRclSource, listRclPackageTargets, verifyRclPackage, detectAndroidBuildEnvironment, buildAndroidDebugPackage } from './package-compiler.mjs';
 
 
