@@ -240,6 +240,8 @@ jobs:
         run: npm run test:k08-tensor
       - name: K08 Native Autodiff portable verification
         run: npm run test:k08-autodiff
+      - name: AI009 RCL self-hosted General MLP Tensor lowering admission
+        run: npm run test:selfhost-general-mlp-tensor-lowering
       - name: K08 Native Autodiff portable evidence
         run: npm run evidence:k08-autodiff
       - name: K233 independent AI generation receipt replay
@@ -323,6 +325,8 @@ jobs:
         run: node --test tests/k321-k322-compiler-algorithm-cli-receipt.test.mjs && npm run verify:k321-k322-compiler-algorithm-cli
       - name: K08 Tensor native provider and CPU engine tests
         run: npm run test:k08-tensor
+      - name: AI009 RCL self-hosted General MLP Tensor lowering admission
+        run: npm run test:selfhost-general-mlp-tensor-lowering
       - name: K08 Tensor Windows performance evidence
         run: npm run evidence:k08-tensor-cpu
       - name: K08 General MLP Tensor lowering evidence
