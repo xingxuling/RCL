@@ -62,6 +62,43 @@ export const ATTACKS = Object.freeze({
     damage: 182, range: 2.72, arcDeg: 120, knockback: 1.34, hitstun: 0.72,
     move: 0.86, energyCost: 68, energyGain: 0, hitstop: 0.16, routeIntent: 'close_resolution',
   },
+
+  kendo_light1: {
+    id: 'kendo_light1', label: '中线·一', duration: 0.40, activeStart: 0.13, activeEnd: 0.22,
+    damage: 50, range: 1.80, arcDeg: 62, knockback: 0.34, hitstun: 0.24,
+    move: 0.27, energyCost: 0, energyGain: 8, hitstop: 0.055, routeIntent: 'take_line',
+  },
+  kendo_light2: {
+    id: 'kendo_light2', label: '返线·二', duration: 0.44, activeStart: 0.15, activeEnd: 0.25,
+    damage: 56, range: 1.82, arcDeg: 70, knockback: 0.39, hitstun: 0.27,
+    move: 0.24, energyCost: 0, energyGain: 9, hitstop: 0.06, routeIntent: 'intercept_route',
+  },
+  kendo_light3: {
+    id: 'kendo_light3', label: '压线·三', duration: 0.54, activeStart: 0.18, activeEnd: 0.31,
+    damage: 74, range: 1.90, arcDeg: 78, knockback: 0.64, hitstun: 0.35,
+    move: 0.30, energyCost: 0, energyGain: 12, hitstop: 0.075, routeIntent: 'close_resolution',
+  },
+  kendo_heavy: {
+    id: 'kendo_heavy', label: '正压重斩', duration: 0.74, activeStart: 0.29, activeEnd: 0.44,
+    damage: 106, range: 2.04, arcDeg: 76, knockback: 0.90, hitstun: 0.47,
+    move: 0.20, energyCost: 0, energyGain: 14, hitstop: 0.095, routeIntent: 'contact_control',
+  },
+  kendo_skill_u: {
+    id: 'kendo_skill_u', label: '取线突进', duration: 0.48, activeStart: 0.15, activeEnd: 0.27,
+    damage: 80, range: 2.26, arcDeg: 52, knockback: 0.50, hitstun: 0.34,
+    move: 0.58, energyCost: 18, energyGain: 0, hitstop: 0.08, routeIntent: 'take_line',
+  },
+  kendo_skill_i: {
+    id: 'kendo_skill_i', label: '守中反打', duration: 0.68, activeStart: 0.25, activeEnd: 0.42,
+    damage: 110, range: 2.20, arcDeg: 64, knockback: 0.76, hitstun: 0.44,
+    move: 0.24, energyCost: 30, energyGain: 0, hitstop: 0.105, routeIntent: 'intercept_route',
+  },
+  kendo_skill_o: {
+    id: 'kendo_skill_o', label: '一拍决', duration: 0.96, activeStart: 0.36, activeEnd: 0.55,
+    damage: 178, range: 2.62, arcDeg: 68, knockback: 1.28, hitstun: 0.70,
+    move: 0.72, energyCost: 68, energyGain: 0, hitstop: 0.155, routeIntent: 'close_resolution',
+  },
+
   ai_thrust: {
     id: 'ai_thrust', label: '取线突进', duration: 0.5, activeStart: 0.16, activeEnd: 0.29,
     damage: 58, range: 2.0, arcDeg: 70, knockback: 0.42, hitstun: 0.28,

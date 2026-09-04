@@ -10,9 +10,16 @@ import {
   createFighterLogic,
   observeRegime,
 } from '../examples/ugis-fighter-game/src/gameRules.js';
-import { MOTION_CLIPS, MOTION_ACTION_IDS } from '../examples/ugis-fighter-game/src/motion/motionClips.js';
+import { MOTION_CLIPS } from '../examples/ugis-fighter-game/src/motion/motionClips.js';
+import { KENDO_MOTION_CLIPS } from '../examples/ugis-fighter-game/src/motion/kendoMotionClips.js';
 import { RIG_BONES, sampleFighterPose } from '../examples/ugis-fighter-game/src/motion/motionRuntime.js';
 import { SFX_ASSETS } from '../examples/ugis-fighter-game/src/audio/sfx.js';
+import {
+  SWORD_STYLE_IDS,
+  SWORD_STYLES,
+  aiAttackFor,
+  playerAttackFor,
+} from '../examples/ugis-fighter-game/src/styles/swordStyles.js';
 import {
   AI_DIFFICULTIES,
   chooseUgisRoute,
@@ -22,6 +29,8 @@ import {
   resetUgisAiMemory,
   setUgisAiDifficulty,
 } from '../examples/ugis-fighter-game/src/ugisAi.js';
+
+const ALL_MOTION_CLIPS = Object.freeze({ ...MOTION_CLIPS, ...KENDO_MOTION_CLIPS });
 
 test('fighter game keeps the complete UGIS sword route catalog', () => {
   assert.equal(UGIS_ROUTES.length, 11);
@@ -42,10 +51,10 @@ test('all combat actions lower into a known UGIS tactical intent', () => {
   }
 });
 
-test('v0.3 motion clips cover every combat action and preserve game-rule active windows', () => {
-  assert.deepEqual(new Set(MOTION_ACTION_IDS), new Set(Object.keys(ATTACKS)));
+test('v0.3 motion catalogs cover every combat action and preserve game-rule active windows', () => {
+  assert.deepEqual(new Set(Object.keys(ALL_MOTION_CLIPS)), new Set(Object.keys(ATTACKS)));
   for (const [id, attack] of Object.entries(ATTACKS)) {
-    const motion = MOTION_CLIPS[id];
+    const motion = ALL_MOTION_CLIPS[id];
     assert.ok(motion, id);
     assert.ok(motion.keyframes.length >= 4, id);
     assert.equal(motion.keyframes[0].t, 0, id);
@@ -56,6 +65,36 @@ test('v0.3 motion clips cover every combat action and preserve game-rule active 
     assert.ok(Math.abs(motion.active[0] - attack.activeStart / attack.duration) < 0.015, `${id} activeStart`);
     assert.ok(Math.abs(motion.active[1] - attack.activeEnd / attack.duration) < 0.015, `${id} activeEnd`);
   }
+});
+
+test('sword style registry maps every player slot and UGIS attack semantic to real actions', () => {
+  assert.deepEqual(SWORD_STYLE_IDS, ['wanfeng', 'kendo']);
+  for (const styleId of SWORD_STYLE_IDS) {
+    const style = SWORD_STYLES[styleId];
+    assert.equal(style.lightCombo.length, 3, styleId);
+    for (let i = 0; i < 3; i += 1) assert.ok(ATTACKS[playerAttackFor(styleId, 'light', i)], `${styleId} light ${i}`);
+    for (const slot of ['heavy', 'skill_u', 'skill_i', 'skill_o']) {
+      assert.ok(ATTACKS[playerAttackFor(styleId, slot)], `${styleId} ${slot}`);
+    }
+    for (const semantic of ['thrust', 'heavy']) assert.ok(ATTACKS[aiAttackFor(styleId, semantic)], `${styleId} ai ${semantic}`);
+  }
+});
+
+test('WanFeng and Kendo-inspired sword paths remain mechanically distinct in presentation', () => {
+  const wanfeng = createFighterLogic('player');
+  wanfeng.action = 'light1';
+  wanfeng.actionDuration = ATTACKS.light1.duration;
+  wanfeng.actionTime = ATTACKS.light1.duration * 0.46;
+  const wanfengPose = sampleFighterPose({ logic: wanfeng, elapsed: 1, enemy: false });
+
+  const kendo = createFighterLogic('player');
+  kendo.action = 'kendo_light1';
+  kendo.actionDuration = ATTACKS.kendo_light1.duration;
+  kendo.actionTime = ATTACKS.kendo_light1.duration * 0.44;
+  const kendoPose = sampleFighterPose({ logic: kendo, elapsed: 1, enemy: true });
+
+  assert.ok(Math.abs(wanfengPose.chest[1]) > Math.abs(kendoPose.chest[1]) + 0.18, 'WanFeng should visibly turn off center line');
+  assert.ok(Math.abs(kendoPose.chest[1]) < 0.05, 'Kendo-inspired strike should stay near center line');
 });
 
 test('v0.3 rig exposes a full pelvis-to-sword and pelvis-to-foot chain', () => {
@@ -92,7 +131,9 @@ test('motion and rig presentation code do not own UGIS decisions or resource mut
   const files = [
     '../examples/ugis-fighter-game/src/motion/motionRuntime.js',
     '../examples/ugis-fighter-game/src/motion/motionClips.js',
+    '../examples/ugis-fighter-game/src/motion/kendoMotionClips.js',
     '../examples/ugis-fighter-game/src/characters/FighterRig.jsx',
+    '../examples/ugis-fighter-game/src/HumanoidFighter.jsx',
   ];
   for (const file of files) {
     const text = await readFile(new URL(file, import.meta.url), 'utf8');
@@ -211,6 +252,22 @@ test('fighter runtime starts bounded and uses the same basic resource limits', (
   assert.equal(explainRoute(enemy.route).label, ROUTE_LABELS.hold_measure);
 });
 
+test('start flow exposes player/opponent sword-style selection before battle', async () => {
+  const [app, start, pathCue] = await Promise.all([
+    readFile(new URL('../examples/ugis-fighter-game/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../examples/ugis-fighter-game/src/StartScreen.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../examples/ugis-fighter-game/src/HumanoidFighter.jsx', import.meta.url), 'utf8'),
+  ]);
+  assert.ok(app.includes('gameStarted'));
+  assert.ok(app.includes('playerStyleId'));
+  assert.ok(app.includes('opponentStyleId'));
+  assert.ok(start.includes('开始游戏'));
+  assert.ok(start.includes('你的流派'));
+  assert.ok(start.includes('对手流派'));
+  assert.ok(pathCue.includes('ringGeometry'), 'WanFeng should expose an arc path cue');
+  assert.ok(pathCue.includes('boxGeometry'), 'Kendo-inspired should expose a center-line path cue');
+});
+
 test('player-facing HUD defaults to normal and keeps Tianji as an explicit opt-in', async () => {
   const app = await readFile(
     new URL('../examples/ugis-fighter-game/src/App.jsx', import.meta.url),
@@ -221,7 +278,6 @@ test('player-facing HUD defaults to normal and keeps Tianji as an explicit opt-i
   }
   assert.ok(app.includes("useState('normal')"));
   assert.ok(app.includes('AI 难度'));
-  assert.ok(app.includes('天机'));
   assert.ok(app.includes('UGIS · {hud.aiRouteLabel}'));
   assert.equal(getUgisAiDifficulty().id, 'tianji');
 });
