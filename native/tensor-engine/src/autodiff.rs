@@ -13,6 +13,7 @@ pub const AUTODIFF_SGD_TRAINING_REQUEST_FORMAT: &str =
 pub const AUTODIFF_SGD_TRAINING_RESPONSE_FORMAT: &str =
     "rcl.tensor-autodiff-sgd-training-result.v0.1";
 pub const BF16_AUTODIFF_PRECISION: &str = "bf16-rne-fp32-accumulation";
+pub const GPU_ELEMENTWISE_MODE: &str = "elementwise-v0.1";
 const MAX_PARAMETERS: usize = 256;
 const MAX_TRAINING_STEPS: usize = 16_384;
 const MAX_TRAINING_NODE_STEPS: usize = 2_000_000;
@@ -95,9 +96,11 @@ pub struct AutodiffTelemetry {
     pub backward_nanos: u128,
     pub parameter_count: usize,
     pub gpu_matmul_nodes: usize,
+    pub gpu_elementwise_nodes: usize,
     pub host_cpu_nodes: usize,
     pub gpu_execution_roots: Vec<String>,
     pub gpu_backward_matmul_nodes: usize,
+    pub gpu_backward_elementwise_nodes: usize,
     pub gpu_backward_execution_roots: Vec<String>,
 }
 
@@ -194,6 +197,7 @@ impl ExecutionMode {
 #[derive(Default)]
 struct ForwardExecutionTelemetry {
     gpu_matmul_nodes: usize,
+    gpu_elementwise_nodes: usize,
     host_cpu_nodes: usize,
     gpu_execution_roots: Vec<String>,
 }
@@ -243,6 +247,21 @@ fn execution_mode(graph: &ComputationGraph) -> Result<ExecutionMode, EngineError
     }
 }
 
+fn gpu_elementwise_enabled(graph: &ComputationGraph) -> Result<bool, EngineError> {
+    match graph
+        .bindings
+        .get("gpuNonMatmulMode")
+        .and_then(Value::as_str)
+    {
+        None => Ok(false),
+        Some(GPU_ELEMENTWISE_MODE) => Ok(true),
+        Some(other) => Err(EngineError::new(
+            "RCL_ACCELERATOR_ELEMENTWISE_MODE_UNSUPPORTED",
+            format!("unsupported GPU non-matmul mode {other}"),
+        )),
+    }
+}
+
 fn validate_hybrid_placements(
     graph: &ComputationGraph,
     mode: &ExecutionMode,
@@ -253,6 +272,7 @@ fn validate_hybrid_placements(
     ) {
         return Ok(());
     }
+    let gpu_elementwise = gpu_elementwise_enabled(graph)?;
     for node in &graph.nodes {
         let placement = node
             .attributes
@@ -266,6 +286,7 @@ fn validate_hybrid_placements(
             })?;
         match (node.operation.as_str(), placement) {
             ("matmul", "gpu") => {}
+            ("sub" | "mul", "gpu") if gpu_elementwise => {}
             ("matmul", _) => {
                 return Err(EngineError::new(
                     "RCL_ACCELERATOR_GPU_PLACEMENT_REQUIRED",
@@ -277,7 +298,7 @@ fn validate_hybrid_placements(
                 return Err(EngineError::new(
                     "RCL_ACCELERATOR_PLACEMENT_UNSUPPORTED",
                     format!(
-                        "node {} has unsupported placement {placement}; only explicit cpu-reference is allowed for non-matmul nodes",
+                        "node {} has unsupported placement {placement}; only explicit cpu-reference is allowed for non-matmul nodes unless gpuNonMatmulMode is elementwise-v0.1",
                         node.id
                     ),
                 ));
@@ -1300,6 +1321,157 @@ fn execute_opencl_matmul(
     ))
 }
 
+fn execute_opencl_elementwise(
+    node_id: &str,
+    operation: &str,
+    provider_path: &PathBuf,
+    inputs: &[BoundTensor<'_>],
+    mut provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<(ExecutionResult, String), EngineError> {
+    require_arity(inputs, 2)?;
+    if !matches!(operation, "sub" | "mul") {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_ELEMENTWISE_OPERATION_UNSUPPORTED",
+            format!("GPU elementwise node {node_id} has unsupported operation {operation}"),
+        ));
+    }
+    let left = &inputs[0];
+    let right = &inputs[1];
+    if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_RANK",
+            format!("GPU elementwise node {node_id} requires rank-2 tensors"),
+        ));
+    }
+    if left.descriptor.shape != right.descriptor.shape {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_SHAPE",
+            format!("GPU elementwise node {node_id} requires equal input shapes"),
+        ));
+    }
+    let rows = left.descriptor.shape[0];
+    let columns = left.descriptor.shape[1];
+    if rows == 0 || columns == 0 || rows > 64 || columns > 64 || rows * columns > 4096 {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_SHAPE",
+            format!("GPU elementwise node {node_id} shape is outside the bounded rank-2 profile"),
+        ));
+    }
+    if !provider_path.is_file() {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
+        ));
+    }
+    let payload = json!({
+        "format": "rcl.opencl-bf16-elementwise-request.v0.1",
+        "backend": "opencl-amd",
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "leftBits": opencl_bits(left, "left")?,
+        "rightBits": opencl_bits(right, "right")?,
+        "nodeId": node_id,
+    });
+    let response = if let Some(session) = provider_session.as_deref_mut() {
+        session.execute(&payload)?
+    } else {
+        execute_opencl_json(provider_path, &payload)?
+    };
+    if response.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-bf16-elementwise-result.v0.1")
+        || response.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_ELEMENTWISE_REFERENCE_CANDIDATE")
+        || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+        || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        || response.get("operation").and_then(Value::as_str) != Some(operation)
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider did not return an admitted GPU elementwise result for node {node_id}"),
+        ));
+    }
+    let execution_root = opencl_execution_root(&response, node_id)?;
+    let output_bits = response
+        .get("outputBits")
+        .and_then(Value::as_array)
+        .ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                format!("OpenCL provider omitted elementwise outputBits for node {node_id}"),
+            )
+        })?;
+    if output_bits.len() != rows * columns {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!(
+                "OpenCL provider returned the wrong elementwise output length for node {node_id}"
+            ),
+        ));
+    }
+    let mut values = Vec::with_capacity(output_bits.len());
+    for value in output_bits {
+        let bits = value.as_str().ok_or_else(|| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL elementwise outputBits must contain lowercase hexadecimal strings",
+            )
+        })?;
+        if bits.len() != 4 || bits.to_ascii_lowercase() != bits {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL elementwise outputBits must contain four lowercase hexadecimal digits",
+            ));
+        }
+        let parsed = u16::from_str_radix(bits, 16).map_err(|_| {
+            EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL elementwise outputBits contains invalid hexadecimal digits",
+            )
+        })?;
+        if parsed & 0x7f80 == 0x7f80 {
+            return Err(EngineError::new(
+                "RCL_ACCELERATOR_RESPONSE_INVALID",
+                "OpenCL elementwise outputBits contains a non-finite BF16 value",
+            ));
+        }
+        values.push(bf16_value(parsed) as f64);
+    }
+    let shape = vec![rows, columns];
+    let storage_identity = output_identity("bf16", &shape, &values);
+    Ok((
+        ExecutionResult {
+            format: RESPONSE_FORMAT,
+            status: "ok",
+            tensor: TensorDescriptor {
+                id: "result".into(),
+                shape: shape.clone(),
+                dtype: "bf16".into(),
+                layout: "row-major".into(),
+                device: "opencl-amd".into(),
+                gradient_identity: format!("derived:{operation}"),
+                storage_identity: storage_identity.clone(),
+            },
+            storage: DenseStorage {
+                identity: storage_identity,
+                kind: "opencl-host-staging".into(),
+                data: values,
+            },
+            telemetry: Telemetry {
+                backend: "rcl-tensor-opencl-amd-bf16-elementwise-v0.1",
+                kernel: format!("rcl_bf16_{operation}"),
+                kernel_nanos: 0,
+                element_count: rows * columns,
+                allocated_bytes: rows * columns * std::mem::size_of::<u16>(),
+            },
+        },
+        execution_root,
+    ))
+}
+
 fn execute_opencl_json(provider_path: &PathBuf, payload: &Value) -> Result<Value, EngineError> {
     if !provider_path.is_file() {
         return Err(EngineError::new(
@@ -1570,9 +1742,158 @@ fn execute_opencl_matmul_gradient_pair(
     ))
 }
 
+fn opencl_elementwise_gradient_payload(
+    node_id: &str,
+    operation: &str,
+    left: &BoundTensor<'_>,
+    right: &BoundTensor<'_>,
+    upstream: &Gradient,
+) -> Result<(Value, usize, usize), EngineError> {
+    if !matches!(
+        operation,
+        "sub-left-gradient" | "sub-right-gradient" | "mul-left-gradient" | "mul-right-gradient"
+    ) {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_ELEMENTWISE_OPERATION_UNSUPPORTED",
+            format!(
+                "GPU elementwise gradient node {node_id} has unsupported operation {operation}"
+            ),
+        ));
+    }
+    if left.descriptor.shape.len() != 2 || right.descriptor.shape.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_RANK",
+            format!("GPU elementwise gradient node {node_id} requires rank-2 tensors"),
+        ));
+    }
+    if left.descriptor.shape != right.descriptor.shape {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_SHAPE",
+            format!("GPU elementwise gradient node {node_id} requires equal input shapes"),
+        ));
+    }
+    let rows = left.descriptor.shape[0];
+    let columns = left.descriptor.shape[1];
+    if rows == 0 || columns == 0 || rows > 64 || columns > 64 || rows * columns > 4096 {
+        return Err(EngineError::new(
+            "RCL_BF16_ELEMENTWISE_SHAPE",
+            format!("GPU elementwise gradient node {node_id} shape is outside the bounded rank-2 profile"),
+        ));
+    }
+    if upstream.shape != vec![rows, columns] {
+        return Err(EngineError::new(
+            "RCL_AUTODIFF_ELEMENTWISE_SHAPE",
+            format!("GPU elementwise gradient node {node_id} has an incompatible upstream shape"),
+        ));
+    }
+    let input_index = if operation.ends_with("left-gradient") {
+        0
+    } else {
+        1
+    };
+    let payload = json!({
+        "format": "rcl.opencl-bf16-elementwise-gradient-request.v0.1",
+        "backend": "opencl-amd",
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "leftBits": opencl_bits(left, "left")?,
+        "rightBits": opencl_bits(right, "right")?,
+        "upstreamF32Bits": upstream
+            .data
+            .iter()
+            .map(|value| opencl_f32_bits(*value, "upstream gradient"))
+            .collect::<Result<Vec<_>, _>>()?,
+        "inputIndex": input_index,
+        "nodeId": node_id,
+    });
+    Ok((payload, rows, columns))
+}
+
+fn decode_opencl_elementwise_gradient(
+    response: &Value,
+    node_id: &str,
+    operation: &str,
+    rows: usize,
+    columns: usize,
+) -> Result<(Gradient, String), EngineError> {
+    if response.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-bf16-elementwise-gradient-result.v0.1")
+        || response.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_ELEMENTWISE_GRADIENT_REFERENCE_CANDIDATE")
+        || response.get("backend").and_then(Value::as_str) != Some("opencl-amd")
+        || response.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        || response.get("operation").and_then(Value::as_str) != Some(operation)
+    {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!("OpenCL provider did not return an admitted GPU elementwise gradient for node {node_id}"),
+        ));
+    }
+    let root = opencl_execution_root(response, node_id)?;
+    let data = decode_opencl_f32_output(response, rows * columns, "elementwise gradient")?;
+    Ok((gradient(&[rows, columns], data)?, root))
+}
+
+fn execute_opencl_elementwise_gradient_pair(
+    node_id: &str,
+    operation: &str,
+    provider_path: &PathBuf,
+    left: &BoundTensor<'_>,
+    right: &BoundTensor<'_>,
+    upstream: &Gradient,
+    provider_session: Option<&mut OpenClProviderSession>,
+) -> Result<((Gradient, String), (Gradient, String)), EngineError> {
+    let left_operation = format!("{operation}-left-gradient");
+    let right_operation = format!("{operation}-right-gradient");
+    let (left_payload, rows, columns) =
+        opencl_elementwise_gradient_payload(node_id, &left_operation, left, right, upstream)?;
+    let (right_payload, right_rows, right_columns) =
+        opencl_elementwise_gradient_payload(node_id, &right_operation, left, right, upstream)?;
+    let payloads = [left_payload, right_payload];
+    let responses = if let Some(session) = provider_session {
+        session.execute_gradient_pair(&payloads)?
+    } else {
+        vec![
+            execute_opencl_json(provider_path, &payloads[0])?,
+            execute_opencl_json(provider_path, &payloads[1])?,
+        ]
+    };
+    if responses.len() != 2 {
+        return Err(EngineError::new(
+            "RCL_ACCELERATOR_RESPONSE_INVALID",
+            format!(
+                "OpenCL provider returned {} elementwise gradient pair responses",
+                responses.len()
+            ),
+        ));
+    }
+    Ok((
+        decode_opencl_elementwise_gradient(&responses[0], node_id, &left_operation, rows, columns)?,
+        decode_opencl_elementwise_gradient(
+            &responses[1],
+            node_id,
+            &right_operation,
+            right_rows,
+            right_columns,
+        )?,
+    ))
+}
+
 fn is_gpu_matmul_gradient_node(node: &Operation, mode: &ExecutionMode) -> bool {
     mode.gpu_backward()
         && node.operation == "matmul"
+        && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
+}
+
+fn is_gpu_elementwise_gradient_node(
+    node: &Operation,
+    mode: &ExecutionMode,
+    gpu_elementwise: bool,
+) -> bool {
+    mode.gpu_backward()
+        && gpu_elementwise
+        && matches!(node.operation.as_str(), "sub" | "mul")
         && node.attributes.get("placement").and_then(Value::as_str) == Some("gpu")
 }
 
@@ -1744,6 +2065,7 @@ fn forward_tape(
         ));
     }
     let mut values = validate_graph(graph, bf16, mode)?;
+    let gpu_elementwise = gpu_elementwise_enabled(graph)?;
     let mut execution = ForwardExecutionTelemetry::default();
     let mut allocated = values
         .values()
@@ -1775,15 +2097,40 @@ fn forward_tape(
                     ExecutionMode::OpenClAmdHybrid { provider_path }
                     | ExecutionMode::OpenClAmdGpuTraining { provider_path } => {
                         if node.attributes.get("placement").and_then(Value::as_str) == Some("gpu") {
-                            let (result, root) = execute_opencl_matmul(
-                                &node.id,
-                                provider_path,
-                                &inputs,
-                                provider_session.as_deref_mut(),
-                            )?;
-                            execution.gpu_matmul_nodes += 1;
-                            execution.gpu_execution_roots.push(root);
-                            result
+                            match node.operation.as_str() {
+                                "matmul" => {
+                                    let (result, root) = execute_opencl_matmul(
+                                        &node.id,
+                                        provider_path,
+                                        &inputs,
+                                        provider_session.as_deref_mut(),
+                                    )?;
+                                    execution.gpu_matmul_nodes += 1;
+                                    execution.gpu_execution_roots.push(root);
+                                    result
+                                }
+                                "sub" | "mul" if gpu_elementwise => {
+                                    let (result, root) = execute_opencl_elementwise(
+                                        &node.id,
+                                        &node.operation,
+                                        provider_path,
+                                        &inputs,
+                                        provider_session.as_deref_mut(),
+                                    )?;
+                                    execution.gpu_elementwise_nodes += 1;
+                                    execution.gpu_execution_roots.push(root);
+                                    result
+                                }
+                                operation => {
+                                    return Err(EngineError::new(
+                                        "RCL_ACCELERATOR_PLACEMENT_UNSUPPORTED",
+                                        format!(
+                                            "GPU placement for node {} operation {operation} is not enabled",
+                                            node.id
+                                        ),
+                                    ));
+                                }
+                            }
                         } else {
                             execution.host_cpu_nodes += 1;
                             execute_bound_bf16_host(&node.operation, &node.attributes, &inputs)?
@@ -1983,6 +2330,7 @@ fn transpose_2d(value: &Gradient) -> Result<Gradient, EngineError> {
 #[derive(Default)]
 struct BackwardExecutionTelemetry {
     gpu_matmul_nodes: usize,
+    gpu_elementwise_nodes: usize,
     gpu_execution_roots: Vec<String>,
 }
 
@@ -2034,6 +2382,7 @@ fn node_input_gradients(
     tape: &HashMap<String, (TensorDescriptor, DenseStorage)>,
     mode: &ExecutionMode,
     bf16: bool,
+    gpu_elementwise: bool,
     mut provider_session: Option<&mut OpenClProviderSession>,
     execution: &mut BackwardExecutionTelemetry,
 ) -> Result<Vec<Gradient>, EngineError> {
@@ -2069,6 +2418,54 @@ fn node_input_gradients(
             direct(output_gradient.clone(), &inputs[0].shape)?,
             direct(output_gradient.clone(), &inputs[1].shape)?,
         ]),
+        "sub" | "mul" if is_gpu_elementwise_gradient_node(node, mode, gpu_elementwise) => {
+            let provider_path = mode.provider_path().ok_or_else(|| {
+                EngineError::new(
+                    "RCL_ACCELERATOR_PROVIDER_REQUIRED",
+                    "GPU elementwise backward requires an explicit provider path",
+                )
+            })?;
+            let left_descriptor = tape.get(&node.inputs[0]).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_AUTODIFF_INPUT_MISSING",
+                    format!(
+                        "Backward node {} is missing input {}",
+                        node.id, node.inputs[0]
+                    ),
+                )
+            })?;
+            let right_descriptor = tape.get(&node.inputs[1]).ok_or_else(|| {
+                EngineError::new(
+                    "RCL_AUTODIFF_INPUT_MISSING",
+                    format!(
+                        "Backward node {} is missing input {}",
+                        node.id, node.inputs[1]
+                    ),
+                )
+            })?;
+            let left = BoundTensor {
+                descriptor: &left_descriptor.0,
+                data: left_descriptor.1.data.as_slice(),
+            };
+            let right = BoundTensor {
+                descriptor: &right_descriptor.0,
+                data: right_descriptor.1.data.as_slice(),
+            };
+            let ((left_gradient, left_root), (right_gradient, right_root)) =
+                execute_opencl_elementwise_gradient_pair(
+                    &node.id,
+                    &node.operation,
+                    provider_path,
+                    &left,
+                    &right,
+                    output_gradient,
+                    provider_session.as_deref_mut(),
+                )?;
+            execution.gpu_elementwise_nodes += 2;
+            execution.gpu_execution_roots.push(left_root);
+            execution.gpu_execution_roots.push(right_root);
+            Ok(vec![left_gradient, right_gradient])
+        }
         "sub" => Ok(vec![
             direct(output_gradient.clone(), &inputs[0].shape)?,
             direct(
@@ -2406,6 +2803,7 @@ pub fn backward_with_provider(
         }
     };
     let mode = execution_mode(&request.graph)?;
+    let gpu_elementwise = gpu_elementwise_enabled(&request.graph)?;
     let cross_node_gradient_batch = match request
         .graph
         .bindings
@@ -2619,6 +3017,7 @@ pub fn backward_with_provider(
             &tape,
             &mode,
             bf16,
+            gpu_elementwise,
             provider_session.as_deref_mut(),
             &mut backward_execution,
         )?;
@@ -2701,9 +3100,11 @@ pub fn backward_with_provider(
             backward_nanos,
             parameter_count: request.parameters.len(),
             gpu_matmul_nodes: forward_execution.gpu_matmul_nodes,
+            gpu_elementwise_nodes: forward_execution.gpu_elementwise_nodes,
             host_cpu_nodes: forward_execution.host_cpu_nodes,
             gpu_execution_roots: forward_execution.gpu_execution_roots,
             gpu_backward_matmul_nodes: backward_execution.gpu_matmul_nodes,
+            gpu_backward_elementwise_nodes: backward_execution.gpu_elementwise_nodes,
             gpu_backward_execution_roots: backward_execution.gpu_execution_roots,
         },
     })

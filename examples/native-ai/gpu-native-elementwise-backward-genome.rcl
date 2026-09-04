@@ -1,0 +1,27 @@
+# RCL-owned K20 candidate: opt-in same-shape elementwise GPU forward/backward
+# over the existing generic Tensor Autodiff and persistent session arena.
+reality GpuNativeElementwiseBackwardCandidate {
+  reckon positive(value : Number) -> Truth = value > 0
+
+  facet contract.id : Text = "rcl-k20-gpu-native-elementwise-backward-v0.1"
+  facet contract.canonical_owner : Text = "RCL"
+  facet contract.backend : Text = "opencl-amd-gpu-training"
+  facet contract.transport : Text = "persistent-session-and-session-arena-v0.1"
+  facet contract.gpu_primitives : Text = "sub,mul,sub-gradient-left,sub-gradient-right,mul-gradient-left,mul-gradient-right"
+  facet contract.elementwise_opt_in : Text = "elementwise-v0.1"
+  facet contract.host_reference_placement : Text = "explicit-per-node"
+  facet contract.precision_policy : Text = "BF16_FORWARD_FP32_GRADIENT_FP32_ADAMW"
+  facet contract.fallback_policy : Text = "FAIL_CLOSED_NO_CPU_FALLBACK"
+  facet contract.model_special_opcodes : Truth = false
+  facet evaluation.generic_tensor_graph : Truth = true
+  facet evaluation.same_shape_rank2_profile : Truth = true
+  facet evaluation.repeated_training_steps : Truth = positive(2)
+  facet evaluation.persistent_provider_session : Truth = true
+  facet evaluation.arena_reuse : Truth = true
+  facet evaluation.arena_close_releases_all : Truth = true
+  facet evaluation.cpu_differential_required : Truth = true
+  facet evaluation.elementwise_mode_required : Truth = true
+  facet evaluation.gpu_training_claim_closed : Truth = true
+  facet evaluation.rcl10m_claim_closed : Truth = true
+  facet evidence.authority : Text = "CANDIDATE_ONLY_BOUNDED_GPU_NON_MATMUL_AUTODIFF"
+}

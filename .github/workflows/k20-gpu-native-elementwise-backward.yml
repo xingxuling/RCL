@@ -1,0 +1,44 @@
+name: K20 GPU-native elementwise backward
+
+on:
+  push:
+    branches:
+      - codex/k20-gpu-elementwise-backward
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k20-gpu-native-elementwise-backward.test.mjs'
+      - 'examples/native-ai/gpu-native-elementwise-backward-*'
+      - 'package.json'
+      - '.github/workflows/k20-gpu-native-elementwise-backward.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/src/**'
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'tests/k20-gpu-native-elementwise-backward.test.mjs'
+      - 'examples/native-ai/gpu-native-elementwise-backward-*'
+      - 'package.json'
+      - '.github/workflows/k20-gpu-native-elementwise-backward.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k20-gpu-native-elementwise-backward:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run K20 GPU-native elementwise backward candidate
+        run: npm run test:k20-gpu-native-elementwise-backward

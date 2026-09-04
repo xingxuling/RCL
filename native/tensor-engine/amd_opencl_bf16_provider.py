@@ -22,6 +22,10 @@ REQUEST_FORMAT = "rcl.opencl-bf16-matmul-request.v0.1"
 RESULT_FORMAT = "rcl.opencl-bf16-matmul-result.v0.1"
 GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-matmul-gradient-request.v0.1"
 GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-matmul-gradient-result.v0.1"
+ELEMENTWISE_REQUEST_FORMAT = "rcl.opencl-bf16-elementwise-request.v0.1"
+ELEMENTWISE_RESULT_FORMAT = "rcl.opencl-bf16-elementwise-result.v0.1"
+ELEMENTWISE_GRADIENT_REQUEST_FORMAT = "rcl.opencl-bf16-elementwise-gradient-request.v0.1"
+ELEMENTWISE_GRADIENT_RESULT_FORMAT = "rcl.opencl-bf16-elementwise-gradient-result.v0.1"
 ADAMW_REQUEST_FORMAT = "rcl.opencl-adamw-update-request.v0.1"
 ADAMW_RESULT_FORMAT = "rcl.opencl-adamw-update-result.v0.1"
 MASKED_SOFTMAX_REQUEST_FORMAT = "rcl.opencl-bf16-masked-softmax-request.v0.1"
@@ -277,6 +281,86 @@ __kernel void rcl_bf16_add(
   float value = rcl_bf16_to_f32(left[index])
              + rcl_bf16_to_f32(right[index]);
   output[index] = (ushort)rcl_bf16_rne(value);
+}
+
+__kernel void rcl_bf16_sub(
+    __global const ushort* left,
+    __global const ushort* right,
+    __global ushort* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  float value = rcl_bf16_to_f32(left[index])
+             - rcl_bf16_to_f32(right[index]);
+  output[index] = (ushort)rcl_bf16_rne(value);
+}
+
+__kernel void rcl_bf16_mul(
+    __global const ushort* left,
+    __global const ushort* right,
+    __global ushort* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  float value = rcl_bf16_to_f32(left[index])
+             * rcl_bf16_to_f32(right[index]);
+  output[index] = (ushort)rcl_bf16_rne(value);
+}
+
+__kernel void rcl_bf16_sub_grad_left(
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  output[index] = upstream[index];
+}
+
+__kernel void rcl_bf16_sub_grad_right(
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  output[index] = -upstream[index];
+}
+
+__kernel void rcl_bf16_mul_grad_left(
+    __global const ushort* right,
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  output[index] = upstream[index] * rcl_bf16_to_f32(right[index]);
+}
+
+__kernel void rcl_bf16_mul_grad_right(
+    __global const ushort* left,
+    __global const float* upstream,
+    __global float* output,
+    uint rows,
+    uint columns
+) {
+  uint index = get_global_id(0);
+  uint length = rows * columns;
+  if (index >= length) return;
+  output[index] = upstream[index] * rcl_bf16_to_f32(left[index]);
 }
 
 __kernel void rcl_adamw_update(
@@ -1964,6 +2048,163 @@ def run_gradient(
     return gradient_result(operation, device, outputs[0], rows, columns)
 
 
+def elementwise_dimensions(request: dict[str, Any]) -> tuple[int, int]:
+    values = [request.get("rows"), request.get("columns")]
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in values):
+        raise fail("RCL_OPENCL_SHAPE", "elementwise dimensions must be integers")
+    rows, columns = values
+    if any(value < 1 or value > MAX_DIMENSION for value in values):
+        raise fail("RCL_OPENCL_SHAPE", "elementwise dimensions must be within 1..=64")
+    if rows * columns > MAX_ELEMENTS:
+        raise fail("RCL_OPENCL_SHAPE", f"elementwise element count must be within 1..={MAX_ELEMENTS}")
+    return rows, columns
+
+
+def elementwise_result(
+    operation: str,
+    device: dict[str, str],
+    output: list[int],
+    rows: int,
+    columns: int,
+    left: list[int],
+    right: list[int],
+) -> dict[str, Any]:
+    output_bits = [bits_hex(int(value)) for value in output]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-elementwise-v0.1\0")
+    digest.update(operation.encode("ascii"))
+    digest.update(device["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<II", rows, columns))
+    for bits in left + right + [int(value) for value in output]:
+        digest.update(bits_hex(bits).encode("ascii"))
+    return {
+        "format": ELEMENTWISE_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_ELEMENTWISE_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "device": device,
+        "outputBits": output_bits,
+        "outputData": [bf16_value(int(bits, 16)) for bits in output_bits],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
+def run_elementwise(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    if request.get("format") != ELEMENTWISE_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 elementwise request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    operation = request.get("operation")
+    if operation not in ("sub", "mul"):
+        raise fail("RCL_OPENCL_OPERATION", "elementwise operation must be sub or mul")
+    rows, columns = elementwise_dimensions(request)
+    expected = rows * columns
+    left = parse_bits(request.get("leftBits"), "left")
+    right = parse_bits(request.get("rightBits"), "right")
+    if len(left) != expected or len(right) != expected:
+        raise fail("RCL_OPENCL_SHAPE", "elementwise BF16 bit payload lengths must match rows*columns")
+    kernel = "rcl_bf16_sub" if operation == "sub" else "rcl_bf16_mul"
+    device, outputs = run_opencl_kernel(
+        kernel,
+        [("u16", left), ("u16", right)],
+        [("u16", expected)],
+        [(CLUint, rows), (CLUint, columns)],
+        (expected,),
+        runtime,
+    )
+    output = [int(value) for value in outputs[0]]
+    if any(bits & 0x7F80 == 0x7F80 for bits in output):
+        raise fail("RCL_OPENCL_BF16_NONFINITE", "OpenCL elementwise output is non-finite")
+    return elementwise_result(operation, device, output, rows, columns, left, right)
+
+
+def elementwise_gradient_result(
+    operation: str,
+    device: dict[str, str],
+    output: list[float],
+    rows: int,
+    columns: int,
+) -> dict[str, Any]:
+    output_hex = [f"{f32_bits(value):08x}" for value in output]
+    digest = hashlib.sha256()
+    digest.update(b"rcl.opencl-bf16-elementwise-gradient-v0.1\0")
+    digest.update(operation.encode("ascii"))
+    digest.update(device["deviceName"].encode("utf-8"))
+    digest.update(struct.pack("<II", rows, columns))
+    for bits in output_hex:
+        digest.update(bits.encode("ascii"))
+    return {
+        "format": ELEMENTWISE_GRADIENT_RESULT_FORMAT,
+        "status": "PASS_LOCAL_GPU_ELEMENTWISE_GRADIENT_REFERENCE_CANDIDATE",
+        "backend": BACKEND,
+        "gpuExecuted": True,
+        "gpuClaim": False,
+        "operation": operation,
+        "rows": rows,
+        "columns": columns,
+        "device": device,
+        "outputBits": output_hex,
+        "outputData": [f32_value(int(bits, 16)) for bits in output_hex],
+        "executionRoot": digest.hexdigest(),
+    }
+
+
+def run_elementwise_gradient(
+    request: dict[str, Any],
+    runtime: OpenCLRuntime | None = None,
+) -> dict[str, Any]:
+    if request.get("format") != ELEMENTWISE_GRADIENT_REQUEST_FORMAT:
+        raise fail("RCL_OPENCL_REQUEST_FORMAT", "unsupported OpenCL BF16 elementwise gradient request format")
+    if request.get("backend") != BACKEND:
+        raise fail("RCL_OPENCL_BACKEND_UNAVAILABLE", "requested backend is not opencl-amd; silent CPU fallback is forbidden")
+    operation = request.get("operation")
+    if operation not in (
+        "sub-left-gradient",
+        "sub-right-gradient",
+        "mul-left-gradient",
+        "mul-right-gradient",
+    ):
+        raise fail("RCL_OPENCL_OPERATION", "unsupported elementwise gradient operation")
+    rows, columns = elementwise_dimensions(request)
+    expected = rows * columns
+    left = parse_bits(request.get("leftBits"), "left")
+    right = parse_bits(request.get("rightBits"), "right")
+    upstream = parse_f32_bits(request.get("upstreamF32Bits"), "upstream", expected)
+    if len(left) != expected or len(right) != expected:
+        raise fail("RCL_OPENCL_SHAPE", "elementwise gradient BF16 bit payload lengths must match rows*columns")
+    if operation == "sub-left-gradient":
+        kernel = "rcl_bf16_sub_grad_left"
+        inputs = [("f32", upstream)]
+    elif operation == "sub-right-gradient":
+        kernel = "rcl_bf16_sub_grad_right"
+        inputs = [("f32", upstream)]
+    elif operation == "mul-left-gradient":
+        kernel = "rcl_bf16_mul_grad_left"
+        inputs = [("u16", right), ("f32", upstream)]
+    else:
+        kernel = "rcl_bf16_mul_grad_right"
+        inputs = [("u16", left), ("f32", upstream)]
+    device, outputs = run_opencl_kernel(
+        kernel,
+        inputs,
+        [("f32", expected)],
+        [(CLUint, rows), (CLUint, columns)],
+        (expected,),
+        runtime,
+    )
+    output = [float(value) for value in outputs[0]]
+    if any(not (value == value and abs(value) != float("inf")) for value in output):
+        raise fail("RCL_OPENCL_F32_NONFINITE", "OpenCL elementwise gradient output is non-finite")
+    return elementwise_gradient_result(operation, device, output, rows, columns)
+
+
 def run_adamw(
     request: dict[str, Any],
     runtime: OpenCLRuntime | None = None,
@@ -2160,6 +2401,10 @@ def run(request: dict[str, Any], runtime: OpenCLRuntime | None = None) -> dict[s
         return run_batch(request, runtime)
     if request_format == GRADIENT_REQUEST_FORMAT:
         return run_gradient(request, runtime)
+    if request_format == ELEMENTWISE_REQUEST_FORMAT:
+        return run_elementwise(request, runtime)
+    if request_format == ELEMENTWISE_GRADIENT_REQUEST_FORMAT:
+        return run_elementwise_gradient(request, runtime)
     if request_format == ADAMW_REQUEST_FORMAT:
         return run_adamw(request, runtime)
     if request_format == MASKED_SOFTMAX_REQUEST_FORMAT:
