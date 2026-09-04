@@ -1,0 +1,30 @@
+{
+  "format": "rcl.relational-transaction-protocol-candidate-evidence.v0.1",
+  "status": "CANDIDATE_LOCAL",
+  "gapId": "RCL_GAP_K326_DURABLE_CONCURRENT_RELATIONAL_RUNTIME",
+  "coordinate": "compiler-runtime::database",
+  "canonicalOwner": "RCL",
+  "semanticSurface": [
+    "rooted-schema-and-snapshot-identity",
+    "declarative-selection-join-projection-aggregation",
+    "read-set-binding",
+    "serializable-optimistic-conflict-rejection",
+    "atomic-write-set-commit",
+    "provider-durable-commit-receipt-binding",
+    "provider-recovery-receipt-admission"
+  ],
+  "testCommand": "npm run test:rcl-relational-protocol",
+  "tests": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0
+  },
+  "authority": {
+    "githubHosted": false,
+    "canonicalPromotionPerformed": false,
+    "rclEvidenceCommitPerformed": false,
+    "providerDurabilityPerformed": false
+  },
+  "boundary": "This local candidate closes only the reusable RCL semantic protocol. Durable database engines, WAL, fsync, locks, isolation implementation, crash recovery, replication, distributed consensus and query planning remain Provider or RNCS responsibilities and are not proven here.",
+  "reportRoot": "12adf7841f35454c86a1a8a495539aaa6731455107ad06ccc560658af05357be"
+}
