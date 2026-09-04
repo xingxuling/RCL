@@ -2,10 +2,13 @@
   "schema": "rcl.native-ai.gpu-native-reverse-adamw-session-arena.evidence.v0.1",
   "campaign": "RCL K08 AI Model Factory Campaign",
   "task": "K19",
-  "status": "PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING",
+  "status": "PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE",
   "canonicalOwner": "RCL",
   "baseMain": "0846e3c1babe518d85a46cfae7b07fc16ff7a76d",
   "implementationCommit": "065ed48965ce67e34e5b1ad9f45897d9770913fe",
+  "evidenceCommit": "2470ffc7cc5d373c8b50a9ee4efc2f615ae64c21",
+  "pullRequest": 145,
+  "mergeCommit": "aae15df9d26ea5b749682b212d1c0925553be6dc",
   "branch": "codex/k19-gpu-training-residency-v01",
   "contract": "examples/native-ai/gpu-native-reverse-adamw-session-arena-contract.v0.1.json",
   "genome": "examples/native-ai/gpu-native-reverse-adamw-session-arena-genome.rcl",
@@ -108,8 +111,47 @@
     }
   },
   "hostedReplay": {
-    "status": "PENDING_PR_WORKFLOW",
-    "boundary": "Hosted runners prove replay or explicit unavailable-backend fail-closed behavior; they do not inherit this local AMD device receipt"
+    "status": "PASS_EXACT_HEAD_PR_WORKFLOW",
+    "event": "pull_request",
+    "pullRequest": 145,
+    "head": "2470ffc7cc5d373c8b50a9ee4efc2f615ae64c21",
+    "workflowRun": 33905917746,
+    "jobs": {
+      "ubuntu-latest": {
+        "jobId": 101130689327,
+        "status": "SUCCESS"
+      },
+      "windows-latest": {
+        "jobId": 101130689995,
+        "status": "SUCCESS"
+      }
+    },
+    "repositoryVerification": {
+      "canonical": {
+        "workflowRun": 33905917771,
+        "jobId": 101130688962,
+        "status": "SUCCESS"
+      },
+      "universal": {
+        "workflowRun": 33905917844,
+        "focusedJobId": 101130689973,
+        "k01WindowsJobId": 101130689882,
+        "status": "SUCCESS"
+      },
+      "authority": {
+        "workflowRun": 33905917748,
+        "jobId": 101130689109,
+        "status": "SUCCESS"
+      }
+    },
+    "merge": {
+      "status": "MERGED",
+      "mergeCommit": "aae15df9d26ea5b749682b212d1c0925553be6dc"
+    },
+    "externalStatuses": {
+      "vercel": "FAILURE_EXTERNAL_BUILD_RATE_LIMIT_NOT_RCL"
+    },
+    "boundary": "Hosted runners prove exact-head replay and repository-contract success; they do not inherit this local AMD device receipt"
   },
   "k400": {
     "matrixBefore": "23 PASS / 0 BLOCKED / 377 UNTESTED",
@@ -142,5 +184,5 @@
     "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
   ],
   "authority": "CANDIDATE_ONLY_RCL_GENERIC_REVERSE_ADAMW_WITH_PERSISTENT_SESSION_AND_BOUNDED_ARENA",
-  "reportRoot": "081fc02df542c08faa85753944ca5668f1aafb0db5f48544bdcf8e314505f1e7"
+  "reportRoot": "2ec919253d56297776706689a30cbf6eaba7293a583795a5af4a3a4bf0099bc7"
 }

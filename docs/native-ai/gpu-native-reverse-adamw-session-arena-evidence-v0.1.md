@@ -2,7 +2,7 @@
 
 ## Current ruling
 
-`PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`
+`PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE`
 
 K19 exercises the existing RCL-owned generic Tensor Autodiff and AdamW path for
 two repeated optimizer steps while one persistent AMD OpenCL provider session
@@ -14,11 +14,14 @@ semantics. The provider owns only OpenCL lowering, transport and temporary
 buffer reuse. CPU fallback is forbidden.
 
 This is a real local AMD `gfx1152` candidate with exact CPU differential,
-deterministic replay and checkpoint-resume parity. Arena reuse is measured, but
-this does not grant full-graph GPU training, GPU-native non-matmul Autodiff,
+deterministic replay and checkpoint-resume parity. The exact-head PR #145
+workflow also passed the K19 Ubuntu and Windows jobs, plus the repository
+Canonical, Universal and Authority checks. Arena reuse is measured, but this
+does not grant full-graph GPU training, GPU-native non-matmul Autodiff,
 throughput, VRAM, portability, production Transformer training or K400
-promotion. Hosted runners may replay the contract or report an unavailable
-AMD backend; they do not inherit the local device receipt.
+promotion. Hosted runners prove exact-head replay and repository-contract
+success; they do not inherit the local device receipt. The unrelated Vercel
+status remained rate-limited by an external build quota.
 
 ## Local evidence
 
@@ -67,7 +70,7 @@ AMD backend; they do not inherit the local device receipt.
 | ROBUST | PASS_LOCAL_FAIL_CLOSED_BOUNDARIES |
 | PERFORMANCE | ARENA_REUSE_TELEMETRY_ONLY_NO_THROUGHPUT_OR_VRAM_CLAIM |
 | AI_GENERATE | NOT_APPLICABLE |
-| EVIDENCE | CANDIDATE_HOSTED_PENDING |
+| EVIDENCE | CANDIDATE_HOSTED_EXACT_HEAD |
 
 Only the three bounded K19 persistent-session/arena candidate claims in the
 evidence JSON are granted. GPU training, full-graph training semantics,

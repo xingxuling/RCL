@@ -618,7 +618,7 @@ The K400 matrix remains `23 PASS / 0 BLOCKED / 377 UNTESTED`.
 
 ## K19 GPU-native reverse/AdamW persistent session arena candidate
 
-Status: `PASS_LOCAL_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE_HOSTED_PENDING`.
+Status: `PASS_LOCAL_AND_HOSTED_GPU_NATIVE_REVERSE_ADAMW_SESSION_ARENA_CANDIDATE`.
 K19 exercises the existing RCL-owned generic Tensor Autodiff and AdamW path for
 two repeated optimizer steps through one persistent AMD OpenCL provider session
 configured with the bounded `session-arena-v0.1` temporary-buffer pool. The
@@ -637,6 +637,14 @@ and 232 bytes. Arena and per-kernel runs shared checkpoint root
 and the CPU reference matched loss, parameters, optimizer state, deterministic
 replay and one-step checkpoint resume exactly. Loss moved from `0.045166016`
 to `0.020629883`.
+
+PR #145 exact-head hosted replay passed K19 Ubuntu job `101130689327` and
+Windows job `101130689995`; the same head passed Canonical job `101130688962`,
+Universal focused job `101130689973`, Universal K01 Windows job
+`101130689882` and Authority job `101130689109`. It merged to main as
+`aae15df9d26ea5b749682b212d1c0925553be6dc`. Hosted replay is repository
+evidence only and does not inherit the local AMD device receipt; an unrelated
+Vercel status was rate-limited by an external build quota.
 
 This is a bounded transport/residency candidate, not full-graph GPU training,
 GPU-native non-matmul Autodiff, throughput, VRAM, portability, production
