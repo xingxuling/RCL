@@ -1,0 +1,50 @@
+name: K18 AMD OpenCL Tensor Training Graph Residency
+
+on:
+  push:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/Cargo.toml'
+      - 'native/tensor-engine/Cargo.lock'
+      - 'tests/k18-opencl-tensor-training-graph-residency.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-training-graph-residency-*'
+      - 'package.json'
+      - '.github/workflows/k18-opencl-tensor-training-graph-residency.yml'
+  pull_request:
+    paths:
+      - 'native/tensor-engine/amd_opencl_bf16_provider.py'
+      - 'native/tensor-engine/src/bin/rcl-opencl-tensor-residency.rs'
+      - 'native/tensor-engine/src/autodiff.rs'
+      - 'native/tensor-engine/Cargo.toml'
+      - 'native/tensor-engine/Cargo.lock'
+      - 'tests/k18-opencl-tensor-training-graph-residency.test.mjs'
+      - 'examples/native-ai/gpu-opencl-tensor-training-graph-residency-*'
+      - 'package.json'
+      - '.github/workflows/k18-opencl-tensor-training-graph-residency.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  training-graph-residency:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Run K18 training graph residency verification
+        run: npm run test:k18-opencl-tensor-training-graph-residency
+      - name: Run K17 mixed graph regression
+        run: npm run test:k17-opencl-tensor-mixed-graph
+      - name: Run K16 masked softmax regression
+        run: npm run test:k16-opencl-masked-softmax

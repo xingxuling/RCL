@@ -1,0 +1,63 @@
+{
+  "format": "rcl.k18.opencl-amd-tensor-training-graph-residency-contract.v0.1",
+  "status": "OPENCL_AMD_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE",
+  "canonicalOwner": "RCL",
+  "profile": "K08-R-GPU-NATIVE-BOUNDED_FULL_GRAPH_STEP_RESIDENCY",
+  "semanticBoundary": {
+    "owner": "RCL",
+    "graphOrder": "RCL declares the ordered generic Tensor node list, inputs, dimensions and readback policy",
+    "tensorIdentity": "storageIdentity plus deterministic valueRoot remains the canonical Tensor reference",
+    "trainingStep": "repeated forward graph execution only; no reverse-mode gradient or optimizer semantics",
+    "operations": "generic Tensor matmul, elementwise add and additive masked softmax",
+    "numeric": "BF16 storage, FP32 arithmetic where defined, BF16 round-to-nearest-even output",
+    "providerRole": "auxiliary OpenCL cl_mem allocation, kernel argument binding and ordered dispatch organ only",
+    "fallback": "forbidden"
+  },
+  "residency": {
+    "mode": "tensor-residency-v0.1",
+    "optIn": true,
+    "maxGraphNodes": 8,
+    "maxSteps": 16,
+    "maxOutputBytesPerNode": 2097152,
+    "intermediateReadbacks": "forbidden",
+    "finalReadback": "required exactly once after the final step",
+    "resourceLifetime": "one output buffer per graph node, reused for every step and released before session close",
+    "inputLifetime": "resident Tensor inputs remain bound for the enclosing provider session",
+    "outputResource": "ephemeral device resource reused across bounded forward steps, not a canonical Tensor value"
+  },
+  "acceptance": [
+    "RCL validates a bounded ordered graph of two through eight generic Tensor nodes",
+    "matmul nodes require rank-2 BF16 dimensions and add/masked-softmax nodes require equal-shape inputs",
+    "masked-softmax nodes require explicit additive maskMode and add nodes omit shared and maskMode",
+    "each graph node consumes resident Tensor references or a resource produced by an earlier node",
+    "every node output buffer is allocated once and reused across the bounded step count",
+    "intermediate outputs remain device-resident and no intermediate device-to-host readback is permitted",
+    "the final node performs exactly one explicit device-to-host readback after the final step",
+    "all graph output resources and resident Tensor inputs are released before session close",
+    "operation, resource order, shape, step count, readback and unavailable AMD OpenCL fail closed"
+  ],
+  "claimsGranted": [
+    "OPENCL_AMD_FULL_GRAPH_RESIDENCY_CANDIDATE",
+    "OPENCL_AMD_TRAINING_STEP_RESOURCE_REUSE_CANDIDATE",
+    "OPENCL_AMD_GRAPH_ADD_CANDIDATE"
+  ],
+  "claimsNotGranted": [
+    "GPU_TRAINING",
+    "GPU_NATIVE_AUTODIFF",
+    "GPU_NATIVE_ADAMW",
+    "OPENCL_FULL_GRAPH_TRAINING_SEMANTICS",
+    "OPENCL_PARALLEL_EXECUTION",
+    "OPENCL_TRAINING_THROUGHPUT",
+    "OPENCL_VRAM_REDUCTION",
+    "OPENCL_PORTABILITY",
+    "RCL_10M",
+    "RCL_1B",
+    "K400_PASS"
+  ],
+  "gaps": [
+    "RCL_GAP_GPU_AUTODIFF_ADAMW_INTEGRATION",
+    "RCL_GAP_GPU_DEVICE_BUFFER_RESIDENCY",
+    "RCL_GAP_PRODUCTION_TRANSFORMER_TRAINING"
+  ],
+  "authority": "CANDIDATE_ONLY_BOUNDED_GENERIC_FORWARD_GRAPH_WITH_SINGLE_ALLOCATION_PER_NODE_AND_FINAL_READBACK"
+}

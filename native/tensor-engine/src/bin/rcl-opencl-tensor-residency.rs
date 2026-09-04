@@ -14,11 +14,16 @@ const GRAPH_REQUEST_FORMAT: &str = "rcl.k15.opencl-amd-tensor-graph-residency-pr
 const GRAPH_RESULT_FORMAT: &str = "rcl.k15.opencl-amd-tensor-graph-residency-probe-result.v0.1";
 const MIXED_GRAPH_REQUEST_FORMAT: &str = "rcl.k17.opencl-amd-tensor-mixed-graph-probe-request.v0.1";
 const MIXED_GRAPH_RESULT_FORMAT: &str = "rcl.k17.opencl-amd-tensor-mixed-graph-probe-result.v0.1";
+const TRAINING_GRAPH_REQUEST_FORMAT: &str =
+    "rcl.k18.opencl-amd-tensor-training-graph-residency-probe-request.v0.1";
+const TRAINING_GRAPH_RESULT_FORMAT: &str =
+    "rcl.k18.opencl-amd-tensor-training-graph-residency-probe-result.v0.1";
 const BACKEND: &str = "opencl-amd";
 const MAX_TENSORS: usize = 64;
 const MAX_OPERATIONS: usize = 128;
 const MAX_GRAPH_NODES: usize = 8;
 const MAX_DIMENSION: usize = 64;
+const MAX_TRAINING_GRAPH_STEPS: usize = 16;
 
 #[derive(Debug)]
 struct ProbeError {
@@ -114,6 +119,17 @@ struct GraphRequest {
     provider_path: String,
     tensors: Vec<TensorSpec>,
     nodes: Vec<GraphNodeSpec>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct TrainingGraphRequest {
+    format: String,
+    backend: String,
+    provider_path: String,
+    tensors: Vec<TensorSpec>,
+    nodes: Vec<GraphNodeSpec>,
+    steps: usize,
 }
 
 fn read_request(argument: Option<&String>) -> Result<String, ProbeError> {
@@ -241,8 +257,10 @@ fn tensor_map(request: &Request) -> Result<HashMap<String, TensorSpec>, ProbeErr
     Ok(result)
 }
 
-fn graph_tensor_map(request: &GraphRequest) -> Result<HashMap<String, TensorSpec>, ProbeError> {
-    if request.tensors.is_empty() || request.tensors.len() > MAX_TENSORS {
+fn graph_tensor_map(
+    tensor_specs: &[TensorSpec],
+) -> Result<HashMap<String, TensorSpec>, ProbeError> {
+    if tensor_specs.is_empty() || tensor_specs.len() > MAX_TENSORS {
         return Err(ProbeError::new(
             "RCL_K15_TENSOR_LIMIT",
             format!("tensors must contain 1..={MAX_TENSORS} items"),
@@ -251,7 +269,7 @@ fn graph_tensor_map(request: &GraphRequest) -> Result<HashMap<String, TensorSpec
     let mut ids = HashSet::new();
     let mut storage_ids = HashSet::new();
     let mut result = HashMap::new();
-    for spec in &request.tensors {
+    for spec in tensor_specs {
         if spec.tensor_id.is_empty() || !ids.insert(spec.tensor_id.clone()) {
             return Err(ProbeError::new(
                 "RCL_K15_TENSOR_IDENTITY",
@@ -330,6 +348,7 @@ fn graph_input_payload(
     prior_shapes: &HashMap<String, Vec<usize>>,
     used_tensor_ids: &mut Vec<String>,
     payload: &mut Value,
+    error_family: &str,
 ) -> Result<Vec<usize>, ProbeError> {
     let tensor_id = if side == "left" {
         node.left_tensor_id.as_ref()
@@ -343,7 +362,7 @@ fn graph_input_payload(
     };
     if tensor_id.is_some() == resource_id.is_some() {
         return Err(ProbeError::new(
-            "RCL_K15_GRAPH_INPUT",
+            format!("RCL_{error_family}_GRAPH_INPUT"),
             format!("{side} input must select exactly one Tensor or resource"),
         ));
     }
@@ -351,7 +370,7 @@ fn graph_input_payload(
         let tensor_id = graph_node_identity(tensor_id, &format!("{side}TensorId"))?;
         let spec = tensors.get(&tensor_id).ok_or_else(|| {
             ProbeError::new(
-                "RCL_K15_GRAPH_INPUT",
+                format!("RCL_{error_family}_GRAPH_INPUT"),
                 format!("unknown {side} Tensor {tensor_id}"),
             )
         })?;
@@ -370,7 +389,7 @@ fn graph_input_payload(
     )?;
     let shape = prior_shapes.get(&resource_id).ok_or_else(|| {
         ProbeError::new(
-            "RCL_K15_GRAPH_RESOURCE",
+            format!("RCL_{error_family}_GRAPH_RESOURCE"),
             format!("{side} resource {resource_id} is not available at this graph point"),
         )
     })?;
@@ -378,54 +397,64 @@ fn graph_input_payload(
     Ok(shape.clone())
 }
 
-fn graph_payload(
-    request: &GraphRequest,
+fn graph_payload_from_nodes(
+    graph_nodes: &[GraphNodeSpec],
     tensors: &HashMap<String, TensorSpec>,
     used_tensor_ids: &mut Vec<String>,
+    allow_add: bool,
+    operation_name: &str,
 ) -> Result<Value, ProbeError> {
-    if request.nodes.len() < 2 || request.nodes.len() > MAX_GRAPH_NODES {
+    let validation_family = if allow_add { "K18" } else { "K15" };
+    let operation_family = if allow_add { "K18" } else { "K17" };
+    if graph_nodes.len() < 2 || graph_nodes.len() > MAX_GRAPH_NODES {
         return Err(ProbeError::new(
-            "RCL_K15_GRAPH_LIMIT",
+            format!("RCL_{validation_family}_GRAPH_LIMIT"),
             format!("nodes must contain 2..={MAX_GRAPH_NODES} items"),
         ));
     }
     let mut node_ids = HashSet::new();
     let mut output_resources = HashSet::new();
     let mut prior_shapes = HashMap::<String, Vec<usize>>::new();
-    let mut nodes = Vec::with_capacity(request.nodes.len());
-    for (index, node) in request.nodes.iter().enumerate() {
+    let mut nodes = Vec::with_capacity(graph_nodes.len());
+    for (index, node) in graph_nodes.iter().enumerate() {
         let node_id = graph_node_identity(&node.node_id, "nodeId")?;
         if !node_ids.insert(node_id.clone()) {
             return Err(ProbeError::new(
-                "RCL_K15_GRAPH_IDENTITY",
+                format!("RCL_{validation_family}_GRAPH_IDENTITY"),
                 format!("graph nodeId {node_id} is duplicated"),
             ));
         }
         let output_resource = graph_node_identity(&node.output_resource, "outputResource")?;
         if !output_resources.insert(output_resource.clone()) {
             return Err(ProbeError::new(
-                "RCL_K15_GRAPH_RESOURCE",
+                format!("RCL_{validation_family}_GRAPH_RESOURCE"),
                 format!("graph outputResource {output_resource} is duplicated"),
             ));
         }
-        if index + 1 == request.nodes.len() {
+        if index + 1 == graph_nodes.len() {
             if !node.readback {
                 return Err(ProbeError::new(
-                    "RCL_K15_GRAPH_READBACK",
+                    format!("RCL_{validation_family}_GRAPH_READBACK"),
                     "the final graph node requires an explicit readback",
                 ));
             }
         } else if node.readback {
             return Err(ProbeError::new(
-                "RCL_K15_GRAPH_READBACK",
+                format!("RCL_{validation_family}_GRAPH_READBACK"),
                 "only the final graph node may request a readback",
             ));
         }
         let operation = node.operation.as_deref().unwrap_or("matmul");
-        if !matches!(operation, "matmul" | "masked-softmax") {
+        let operation_allowed =
+            matches!(operation, "matmul" | "masked-softmax") || (allow_add && operation == "add");
+        if !operation_allowed {
             return Err(ProbeError::new(
-                "RCL_K17_GRAPH_OPERATION",
-                format!("graph node {node_id} operation must be matmul or masked-softmax"),
+                format!("RCL_{operation_family}_GRAPH_OPERATION"),
+                if allow_add {
+                    format!("graph node {node_id} operation must be matmul, add or masked-softmax")
+                } else {
+                    format!("graph node {node_id} operation must be matmul or masked-softmax")
+                },
             ));
         }
         if node.rows == 0
@@ -434,20 +463,20 @@ fn graph_payload(
             || node.columns > MAX_DIMENSION
         {
             return Err(ProbeError::new(
-                "RCL_K15_GRAPH_SHAPE",
+                format!("RCL_{validation_family}_GRAPH_SHAPE"),
                 format!("graph node {node_id} dimensions must be within 1..={MAX_DIMENSION}"),
             ));
         }
         let shared = if operation == "matmul" {
             let shared = node.shared.ok_or_else(|| {
                 ProbeError::new(
-                    "RCL_K15_GRAPH_SHAPE",
+                    format!("RCL_{validation_family}_GRAPH_SHAPE"),
                     format!("graph matmul node {node_id} requires shared"),
                 )
             })?;
             if shared == 0 || shared > MAX_DIMENSION {
                 return Err(ProbeError::new(
-                    "RCL_K15_GRAPH_SHAPE",
+                    format!("RCL_{validation_family}_GRAPH_SHAPE"),
                     format!("graph node {node_id} dimensions must be within 1..={MAX_DIMENSION}"),
                 ));
             }
@@ -455,14 +484,20 @@ fn graph_payload(
         } else {
             if node.shared.is_some() {
                 return Err(ProbeError::new(
-                    "RCL_K17_GRAPH_SHAPE",
-                    format!("graph masked-softmax node {node_id} must omit shared"),
+                    format!("RCL_{validation_family}_GRAPH_SHAPE"),
+                    format!("graph {operation} node {node_id} must omit shared"),
                 ));
             }
-            if node.mask_mode.as_deref() != Some("additive") {
+            if operation == "masked-softmax" && node.mask_mode.as_deref() != Some("additive") {
                 return Err(ProbeError::new(
-                    "RCL_K17_GRAPH_MASK_MODE",
+                    format!("RCL_{operation_family}_GRAPH_MASK_MODE"),
                     format!("graph masked-softmax node {node_id} requires additive maskMode"),
+                ));
+            }
+            if operation == "add" && node.mask_mode.is_some() {
+                return Err(ProbeError::new(
+                    format!("RCL_{validation_family}_GRAPH_MASK_MODE"),
+                    format!("graph add node {node_id} must omit maskMode"),
                 ));
             }
             0
@@ -478,7 +513,9 @@ fn graph_payload(
             payload["shared"] = json!(shared);
         } else {
             payload["operation"] = Value::String(operation.to_owned());
-            payload["maskMode"] = Value::String("additive".to_owned());
+            if operation == "masked-softmax" {
+                payload["maskMode"] = Value::String("additive".to_owned());
+            }
         }
         let left_shape = graph_input_payload(
             node,
@@ -487,6 +524,7 @@ fn graph_payload(
             &prior_shapes,
             used_tensor_ids,
             &mut payload,
+            validation_family,
         )?;
         let right_shape = graph_input_payload(
             node,
@@ -495,6 +533,7 @@ fn graph_payload(
             &prior_shapes,
             used_tensor_ids,
             &mut payload,
+            validation_family,
         )?;
         let expected_left_shape = if operation == "matmul" {
             vec![node.rows, shared]
@@ -508,7 +547,7 @@ fn graph_payload(
         };
         if left_shape != expected_left_shape || right_shape != expected_right_shape {
             return Err(ProbeError::new(
-                "RCL_K15_GRAPH_SHAPE",
+                format!("RCL_{validation_family}_GRAPH_SHAPE"),
                 format!("graph node {node_id} input shapes do not match its dimensions"),
             ));
         }
@@ -516,11 +555,39 @@ fn graph_payload(
         nodes.push(payload);
     }
     Ok(json!({
-        "format": "rcl.opencl-amd-tensor-residency-request.v0.1",
+        "format": if allow_add {
+            "rcl.opencl-amd-tensor-training-graph-residency-request.v0.1"
+        } else {
+            "rcl.opencl-amd-tensor-residency-request.v0.1"
+        },
         "backend": BACKEND,
-        "operation": "graph",
+        "operation": operation_name,
         "nodes": nodes,
     }))
+}
+
+fn graph_payload(
+    request: &GraphRequest,
+    tensors: &HashMap<String, TensorSpec>,
+    used_tensor_ids: &mut Vec<String>,
+) -> Result<Value, ProbeError> {
+    graph_payload_from_nodes(&request.nodes, tensors, used_tensor_ids, false, "graph")
+}
+
+fn training_graph_payload(
+    request: &TrainingGraphRequest,
+    tensors: &HashMap<String, TensorSpec>,
+    used_tensor_ids: &mut Vec<String>,
+) -> Result<Value, ProbeError> {
+    let mut payload = graph_payload_from_nodes(
+        &request.nodes,
+        tensors,
+        used_tensor_ids,
+        true,
+        "training-graph",
+    )?;
+    payload["steps"] = json!(request.steps);
+    Ok(payload)
 }
 
 fn run_graph(request: GraphRequest) -> Result<Value, ProbeError> {
@@ -536,7 +603,7 @@ fn run_graph(request: GraphRequest) -> Result<Value, ProbeError> {
             "the Tensor graph residency candidate requires opencl-amd",
         ));
     }
-    let tensors = graph_tensor_map(&request)?;
+    let tensors = graph_tensor_map(&request.tensors)?;
     let mut used_tensor_ids = Vec::new();
     let graph = graph_payload(&request, &tensors, &mut used_tensor_ids)?;
     let provider_path = PathBuf::from(&request.provider_path);
@@ -612,6 +679,152 @@ fn run_graph(request: GraphRequest) -> Result<Value, ProbeError> {
             "tensorHostToDeviceTransfers": session.tensor_host_to_device_transfers(),
             "tensorDeviceToHostTransfers": session.tensor_device_to_host_transfers(),
             "tensorReleaseCount": session.tensor_release_count(),
+        },
+        "intermediateReadbackCount": graph_receipt
+            .get("intermediateReadbackCount")
+            .cloned()
+            .unwrap_or(Value::Null),
+        "finalReadbackCount": graph_receipt
+            .get("finalReadbackCount")
+            .cloned()
+            .unwrap_or(Value::Null),
+        "closed": true,
+    }))
+}
+
+fn run_training_graph(request: TrainingGraphRequest) -> Result<Value, ProbeError> {
+    if request.format != TRAINING_GRAPH_REQUEST_FORMAT {
+        return Err(ProbeError::new(
+            "RCL_K18_REQUEST_FORMAT",
+            format!("unsupported request format {}", request.format),
+        ));
+    }
+    if request.backend != BACKEND {
+        return Err(ProbeError::new(
+            "RCL_K18_BACKEND",
+            "the Tensor training-graph residency candidate requires opencl-amd",
+        ));
+    }
+    if request.steps == 0 || request.steps > MAX_TRAINING_GRAPH_STEPS {
+        return Err(ProbeError::new(
+            "RCL_K18_GRAPH_STEPS",
+            format!("steps must contain 1..={MAX_TRAINING_GRAPH_STEPS} items"),
+        ));
+    }
+    let tensors = graph_tensor_map(&request.tensors)?;
+    let mut used_tensor_ids = Vec::new();
+    let graph = training_graph_payload(&request, &tensors, &mut used_tensor_ids)?;
+    let provider_path = PathBuf::from(&request.provider_path);
+    if !provider_path.is_file() {
+        return Err(ProbeError::new(
+            "RCL_ACCELERATOR_PROVIDER_UNAVAILABLE",
+            format!(
+                "OpenCL provider path is not a file: {}",
+                provider_path.display()
+            ),
+        ));
+    }
+    let mut session = OpenClProviderSession::new_with_buffer_allocation_mode(
+        &provider_path,
+        Some(SESSION_TENSOR_RESIDENCY_MODE),
+    )?;
+    let mut bound = Vec::with_capacity(used_tensor_ids.len());
+    for tensor_id in &used_tensor_ids {
+        let spec = tensors
+            .get(tensor_id)
+            .expect("training graph payload validated Tensor id");
+        let root = value_root(spec);
+        session.execute_tensor_residency(&json!({
+            "format": "rcl.opencl-amd-tensor-residency-request.v0.1",
+            "backend": BACKEND,
+            "operation": "bind",
+            "tensorIdentity": spec.storage_identity,
+            "valueRoot": root,
+            "dtype": spec.dtype,
+            "shape": spec.shape,
+            "access": "read-only",
+            "bits": spec.bits,
+        }))?;
+        bound.push((spec.storage_identity.clone(), root));
+    }
+    let graph_receipt = session.execute(&graph)?;
+    if graph_receipt.get("format").and_then(Value::as_str)
+        != Some("rcl.opencl-amd-tensor-training-graph-residency-result.v0.1")
+        || graph_receipt.get("status").and_then(Value::as_str)
+            != Some("PASS_LOCAL_GPU_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE")
+        || graph_receipt.get("backend").and_then(Value::as_str) != Some(BACKEND)
+        || graph_receipt.get("gpuExecuted").and_then(Value::as_bool) != Some(true)
+        || graph_receipt.get("operation").and_then(Value::as_str) != Some("training-graph")
+        || graph_receipt.get("steps").and_then(Value::as_u64) != Some(request.steps as u64)
+    {
+        return Err(ProbeError::new(
+            "RCL_K18_RESPONSE",
+            "OpenCL provider did not return an admitted Tensor training-graph result",
+        ));
+    }
+    for (identity, root) in bound.iter().rev() {
+        session.execute_tensor_residency(&json!({
+            "format": "rcl.opencl-amd-tensor-residency-request.v0.1",
+            "backend": BACKEND,
+            "operation": "release",
+            "tensorIdentity": identity,
+            "valueRoot": root,
+        }))?;
+    }
+    session.close_tensor_residency()?;
+    let device = graph_receipt.get("device").cloned().unwrap_or(Value::Null);
+    let output_bits = graph_receipt
+        .get("outputBits")
+        .cloned()
+        .unwrap_or(Value::Null);
+    let graph_telemetry = graph_receipt
+        .get("telemetry")
+        .cloned()
+        .unwrap_or(Value::Null);
+    Ok(json!({
+        "format": TRAINING_GRAPH_RESULT_FORMAT,
+        "status": "PASS_LOCAL_OPENCL_TENSOR_TRAINING_GRAPH_RESIDENCY_CANDIDATE",
+        "canonicalOwner": "RCL",
+        "backend": BACKEND,
+        "device": device,
+        "steps": request.steps,
+        "graph": graph_receipt,
+        "outputBits": output_bits,
+        "telemetry": {
+            "bufferAllocationCount": session.buffer_allocation_count(),
+            "bufferAllocationBytes": session.buffer_allocation_bytes(),
+            "bufferReleaseCount": session.buffer_release_count(),
+            "tensorValueResidency": session.tensor_value_residency(),
+            "residentTensorCount": session.resident_tensor_count(),
+            "residentBytes": session.resident_bytes(),
+            "maxResidentTensors": session.max_resident_tensors(),
+            "maxResidentBytes": session.max_resident_bytes(),
+            "tensorBindCount": session.tensor_bind_count(),
+            "tensorResidencyHitCount": session.tensor_residency_hit_count(),
+            "tensorReplacementCount": session.tensor_replacement_count(),
+            "tensorHostToDeviceTransfers": session.tensor_host_to_device_transfers(),
+            "tensorDeviceToHostTransfers": session.tensor_device_to_host_transfers(),
+            "tensorReleaseCount": session.tensor_release_count(),
+            "trainingStepResidency": graph_telemetry
+                .get("trainingStepResidency")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            "resourceReuseAcrossSteps": graph_telemetry
+                .get("resourceReuseAcrossSteps")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            "graphNodeCount": graph_telemetry
+                .get("graphNodeCount")
+                .and_then(Value::as_u64)
+                .unwrap_or(0),
+            "stepCount": graph_telemetry
+                .get("stepCount")
+                .and_then(Value::as_u64)
+                .unwrap_or(0),
+            "dispatchCount": graph_telemetry
+                .get("dispatchCount")
+                .and_then(Value::as_u64)
+                .unwrap_or(0),
         },
         "intermediateReadbackCount": graph_receipt
             .get("intermediateReadbackCount")
@@ -811,7 +1024,13 @@ fn main() {
         .get("format")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let result = if format == GRAPH_REQUEST_FORMAT || format == MIXED_GRAPH_REQUEST_FORMAT {
+    let result = if format == TRAINING_GRAPH_REQUEST_FORMAT {
+        let request =
+            serde_json::from_value::<TrainingGraphRequest>(envelope).unwrap_or_else(|error| {
+                fail(ProbeError::new("RCL_K18_REQUEST_JSON", error.to_string()))
+            });
+        run_training_graph(request)
+    } else if format == GRAPH_REQUEST_FORMAT || format == MIXED_GRAPH_REQUEST_FORMAT {
         let request = serde_json::from_value::<GraphRequest>(envelope).unwrap_or_else(|error| {
             fail(ProbeError::new("RCL_K15_REQUEST_JSON", error.to_string()))
         });
