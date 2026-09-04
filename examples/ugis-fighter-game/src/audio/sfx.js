@@ -15,16 +15,19 @@ const ATTACK_SAMPLE = Object.freeze({
 });
 
 const STYLE_AUDIO = Object.freeze({
-  epee:['slash1',1.22,.42,2500], destreza:['slash2,',1,.5,2100], liech:['slash3',.78,.62,1350], fiore:['slash3',.72,.65,1180], miaodao:['slash3',.62,.72,900],
+  epee:['slash1',1.22,.42,2500],
+  destreza:['slash2',1.00,.50,2100],
+  liech:['slash3',.78,.62,1350],
+  fiore:['slash3',.72,.65,1180],
+  miaodao:['slash3',.62,.72,900],
 });
 
 function fallbackAttackSample(attackId){
   const style=Object.keys(STYLE_AUDIO).find(prefix=>attackId.startsWith(`${prefix}_`));
   if(!style)return null;
-  const [sample0,rate0,volume0,frequency]=STYLE_AUDIO[style];
-  const sample=sample0==='slash2,'?'slash2':sample0;
+  const [sample,rate0,volume0,frequency]=STYLE_AUDIO[style];
   const heavy=attackId.includes('heavy')||attackId.endsWith('_o');
-  return [sample, heavy?rate0*.88:rate0, heavy?volume0*1.12:volume0, frequency];
+  return [sample, heavy ? rate0*.88 : rate0, heavy ? volume0*1.12 : volume0, frequency];
 }
 
 class SfxRuntime {
@@ -37,7 +40,8 @@ class SfxRuntime {
   attack(attackId,role='player'){
     const spec=ATTACK_SAMPLE[attackId]??fallbackAttackSample(attackId); if(!spec)return; const [sample,rate,volume,frequency=2200]=spec;
     const played=this.play(sample,{volume:role==='enemy'?volume*.82:volume,rate}); if(!played)this.noiseBurst({duration:.12,volume:.16,frequency,type:'bandpass'});
-    const skill=attackId.includes('skill_'); if(skill){const ultimate=attackId.endsWith('_o');this.noiseBurst({duration:ultimate?.32:.20,volume:ultimate?.34:.22,frequency:ultimate?frequency*.72:frequency,type:'bandpass'});}
+    const skill=attackId.includes('skill_');
+    if(skill){ const ultimate=attackId.endsWith('_o'); this.noiseBurst({duration:ultimate ? .32 : .20,volume:ultimate ? .34 : .22,frequency:ultimate ? frequency*.72 : frequency,type:'bandpass'}); }
   }
   dash(role='player'){this.noiseBurst({duration:.18,volume:role==='enemy'?.13:.2,frequency:1750,type:'bandpass'});}
   guard(){const index=1+Math.floor(Math.random()*3);const played=this.play(`metal${index}`,{volume:.72,rate:1.05+Math.random()*.08});if(!played)this.noiseBurst({duration:.08,volume:.34,frequency:3300,type:'highpass'});}
