@@ -12,7 +12,7 @@ export const SWORD_STYLES = Object.freeze({
     lightCombo: ['light1', 'light2', 'light3'],
     heavy: 'heavy',
     skills: ['skill_u', 'skill_i', 'skill_o'],
-    aiActionMap: Object.freeze({ thrust: 'skill_u', heavy: 'heavy' }),
+    aiActionMap: Object.freeze({ thrust: 'light1', heavy: 'heavy' }),
     guardLabel: '静动皆风',
     pathLabel: '流动弧线',
   }),
