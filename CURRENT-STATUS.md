@@ -14,7 +14,7 @@
 
 The Universal Program Stress program is now the primary falsification harness for RCL's long-term universal-language objective.
 
-Current authoritative matrix: `23 PASS / 0 BLOCKED / 377 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K233, K321, K322, K326, K327, K329, K331, K332, K333, K334, K336, K337, K338, K339 and K340.
+Current authoritative matrix: `24 PASS / 0 BLOCKED / 376 UNTESTED`; maturity `U3`; K400 verdict `INCOMPLETE`. The PASS cells are K063, K064, K078, K083, K085, K098, K124, K138, K188, K233, K321, K322, K326, K327, K329, K331, K332, K333, K334, K336, K337, K338, K339 and K340.
 
 K331 is independently closed for one bounded deterministic logical-time compiler profile. The absorbed PR #56 JavaScript scheduler remains an auxiliary Runtime/Oracle while RCL owns event ordering, monotonic advance, budget atomicity, acceleration projection and external-time authority. Its 13 donor tests pass; 20/20 native rounds preserve one artifact and semantic root, match the auxiliary differential and reject semantic mutations plus corrupt RBC. The first acquisition's honest 2/3 result remains preserved, while three new unique read-only sessions restored the frozen priority, budget and authority mutations to exact Canonical bytes. GitHub run `33141180858` bound focused job `98752173946` and Windows job `98752173843` for exact source commit `43d195d98e1bbd4066922bb47a1e24eed816f86b`; authority root is `033010acf7f2f0005466b1ff53ed1cf324f9e613ab25c783404e24d8e084408d`. This closes only K331; `RCL_GAP_K331_PHYSICAL_TIME_INTERRUPT_PROTOCOL` remains open, and no wall-clock, deadline, interrupt or hard-real-time claim is granted.
 
@@ -231,7 +231,11 @@ Authority document: `docs/ui-native-genome/evidence-ledger.md`.
 
 ### K04
 
-The next killer task in the declared campaign is a 2D game. No K04 PASS claim is made in this status file until an evidence-bearing campaign is merged.
+Current result: `PASS (9/9)` for the bounded `game-runtime::game` K188 profile; coverage remains `lowered-execution`.
+
+The K04StarRunner specimen executes 54 deterministic fixed-step frames with governed movement, jump, collision, collection, reset and scene projection. The native candidate verifier reports stable root `3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5`; the runtime receipt root is `6502cf4cd8880d24d8b0ddc9f98862b91490cbb214868c6f5a056d3184b91e1d`. Three independent ephemeral read-only repair sessions restored canonical bytes for the frozen mutations, and GitHub run `33930267375`, focused job `101207245099`, bound source commit `3a40aa4ad05be267aaf8b90540ba1590d5af2891` through authority root `bdd22beb988de595ffb7f961015dd3adf255e1a431c77790d8758a0283d7aeb4`.
+
+This closes only K188 for the declared deterministic JavaScript fixed-step runtime and generated Canvas projection. Native Godot/Unity/console/browser execution, arbitrary game generation, public deployment, distributed game state and the remaining K400 cells remain unverified; RCL owns state, transition guards and authority while JavaScript remains the lowered execution organ.
 
 ## Native / Foundation status
 
