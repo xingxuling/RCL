@@ -1,10 +1,10 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `23 PASS / 0 BLOCKED / 377 UNTESTED`
+**Current evidence:** `24 PASS / 0 BLOCKED / 376 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `157a4bb69a2bf5060ca2250aa162dd0ad7e7b7c267ac6ded00e43b7b332872b5`
-**Date:** 2026-08-28
+**Report root:** `914c20f17db5fe4f58063c5c31d5cdb7e6e09fba9d13475c34e441c3bd78dbe7`
+**Date:** 2026-09-04
 
 ## 1. Completion contract
 
@@ -36,7 +36,7 @@ output/universal-stress-k400/universal-stress-report.json
 output/universal-stress-k400/universal-stress-report.md
 ```
 
-The checked-in input is deterministically rebuilt from the current Native UI evidence, the historical K02/K03 direct receipts, the rooted Server Web/Reactive batch and the K08-B General MLP native receipt. K08-A remains the minimal baseline inside that campaign. Historical receipts retain their original verification dates and blockers.
+The checked-in input is deterministically rebuilt from the current Native UI evidence, the historical K02/K03 direct receipts, the rooted Server Web/Reactive batch, the K04 fixed-step game receipts and the K08-B General MLP native receipt. K08-A remains the minimal baseline inside that campaign. Historical receipts retain their original verification dates and blockers.
 
 ## 3. Nearest closures
 
@@ -56,6 +56,7 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
 | `K124` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile |
 | `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
+| `K188` | `game-runtime::game` | `PASS` | none for the bounded deterministic K04 fixed-step 2D game profile; arbitrary engines and game generation remain unverified |
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |
 | `K333` | `compiler-runtime::machine-learning` | `PASS` | none for the bounded integer-perceptron advisory profile; floating-point state-root canonicalization remains an explicit RCL gap |
@@ -98,6 +99,12 @@ The Android campaign installed the rebuilt K03 APK on `Rcl_Aether_API35_ATD`, ex
 ## 8. Server Web/Reactive closure
 
 The Server batch froze its runtime contract before acquisition and ran 20 fresh ephemeral loopback servers. State, observe, governed add/reset transactions and unknown state/rule rejection passed in all 20 rounds. Transaction p95 was `2.782 ms` against `100 ms`; full-replay/startup-proxy p95 was `66.846 ms` against `1000 ms`. Three unique ephemeral read-only sessions independently repaired effective transition, authority and reset mutations, restored canonical bytes, and replayed the same generated HTTP surface. GitHub run `32876898001`, focused job `97896893662`, bound exact source commit `f669460df4e4401e3e2f29b82c0ec35fc295930d`; authority root `5fb9eb94d6575ce9e606fb7c77e30d20f9d531e3cb828d38fc8c7fe028f940d2` closes K124 and K138 only. The `K04-SERVER` filename prefix identifies this evidence batch and does not claim the separate Killer Task K04 2D-game closure.
+
+## 8A. K04 2D game closure
+
+The K04StarRunner specimen executes 54 deterministic fixed-step frames with governed movement, jump, collision, collection, reset and scene projection. The native candidate verifier reports stable root `3f11567a046390968fd919ff98110fd77150ea3d29e15b8bcdf49168752b5ef5`; the runtime receipt root is `6502cf4cd8880d24d8b0ddc9f98862b91490cbb214868c6f5a056d3184b91e1d`. Three independent ephemeral read-only repair sessions restored canonical bytes for the frozen mutations. GitHub run `33930267375`, focused job `101207245099`, bound exact source commit `3a40aa4ad05be267aaf8b90540ba1590d5af2891`; hosted authority root is `bdd22beb988de595ffb7f961015dd3adf255e1a431c77790d8758a0283d7aeb4`.
+
+This closes only K188 `game-runtime::game` for the declared deterministic JavaScript fixed-step runtime and generated Canvas projection. Native Godot/Unity/console/browser execution, arbitrary game generation, public deployment, distributed game state and the remaining K400 cells remain unverified; RCL owns state, transition guards and authority while JavaScript remains the lowered execution organ.
 
 ## 9. K327 compiler closure
 
