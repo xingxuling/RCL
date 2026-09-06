@@ -1618,11 +1618,109 @@ static void free_string_array(char **items, size_t count) {
   free(items);
 }
 
+static int same_double_bits(double left, double right) {
+  uint64_t left_bits = 0, right_bits = 0;
+  memcpy(&left_bits, &left, sizeof(left_bits));
+  memcpy(&right_bits, &right, sizeof(right_bits));
+  return left_bits == right_bits;
+}
+
+static int shortest_roundtrip_candidate(double value, char *output, size_t output_size) {
+  char candidate[96];
+  for (int precision = 1; precision <= 17; precision++) {
+    int written = snprintf(candidate, sizeof(candidate), "%.*g", precision, value);
+    if (written <= 0 || (size_t)written >= sizeof(candidate)) continue;
+    char *end = NULL;
+    errno = 0;
+    double parsed = strtod(candidate, &end);
+    if (errno == 0 && end && *end == '\0' && same_double_bits(parsed, value)) {
+      if ((size_t)written + 1 > output_size) return 0;
+      memcpy(output, candidate, (size_t)written + 1);
+      return 1;
+    }
+  }
+  int written = snprintf(candidate, sizeof(candidate), "%.17g", value);
+  if (written <= 0 || (size_t)written >= sizeof(candidate) || (size_t)written + 1 > output_size) return 0;
+  memcpy(output, candidate, (size_t)written + 1);
+  return 1;
+}
+
+static char *canonical_number_text(double value) {
+  if (isnan(value)) return xstrdup("NaN");
+  if (isinf(value)) return xstrdup(signbit(value) ? "-Infinity" : "Infinity");
+  if (value == 0.0) return xstrdup("0");
+
+  char candidate[96];
+  if (!shortest_roundtrip_candidate(value, candidate, sizeof(candidate))) return NULL;
+
+  const char *cursor = candidate;
+  int negative = 0;
+  if (*cursor == '-') { negative = 1; cursor++; }
+
+  const char *exponent_marker = strchr(cursor, 'e');
+  if (!exponent_marker) exponent_marker = strchr(cursor, 'E');
+  char digits[96];
+  size_t digit_count = 0;
+  int k = 0;
+
+  if (exponent_marker) {
+    for (const char *item = cursor; item < exponent_marker; item++) {
+      if (*item >= '0' && *item <= '9') digits[digit_count++] = *item;
+    }
+    k = 1 + atoi(exponent_marker + 1);
+  } else {
+    const char *dot = strchr(cursor, '.');
+    size_t integer_digits = dot ? (size_t)(dot - cursor) : strlen(cursor);
+    for (const char *item = cursor; *item; item++) {
+      if (*item >= '0' && *item <= '9') digits[digit_count++] = *item;
+    }
+    k = (int)integer_digits;
+    size_t leading = 0;
+    while (leading < digit_count && digits[leading] == '0') { leading++; k--; }
+    if (leading > 0 && leading < digit_count) {
+      memmove(digits, digits + leading, digit_count - leading);
+      digit_count -= leading;
+    }
+  }
+  while (digit_count > 1 && digits[digit_count - 1] == '0') digit_count--;
+  digits[digit_count] = '\0';
+
+  char buffer[160];
+  size_t offset = 0;
+  if (negative) buffer[offset++] = '-';
+  if (k > 0 && k <= 21) {
+    if ((size_t)k >= digit_count) {
+      memcpy(buffer + offset, digits, digit_count); offset += digit_count;
+      for (int index = (int)digit_count; index < k; index++) buffer[offset++] = '0';
+    } else {
+      memcpy(buffer + offset, digits, (size_t)k); offset += (size_t)k;
+      buffer[offset++] = '.';
+      memcpy(buffer + offset, digits + k, digit_count - (size_t)k); offset += digit_count - (size_t)k;
+    }
+  } else if (k <= 0 && k > -6) {
+    buffer[offset++] = '0'; buffer[offset++] = '.';
+    for (int index = 0; index < -k; index++) buffer[offset++] = '0';
+    memcpy(buffer + offset, digits, digit_count); offset += digit_count;
+  } else {
+    buffer[offset++] = digits[0];
+    if (digit_count > 1) {
+      buffer[offset++] = '.';
+      memcpy(buffer + offset, digits + 1, digit_count - 1); offset += digit_count - 1;
+    }
+    int exponent = k - 1;
+    int written = snprintf(buffer + offset, sizeof(buffer) - offset, "e%+d", exponent);
+    if (written <= 0 || (size_t)written >= sizeof(buffer) - offset) return NULL;
+    offset += (size_t)written;
+  }
+  buffer[offset] = '\0';
+  return xstrdup(buffer);
+}
+
 static char *value_to_text(const Value *value) {
   char buffer[96];
   switch (value->type) {
     case VALUE_STRING: return xstrdup(value->string);
-    case VALUE_NUMBER: snprintf(buffer, sizeof(buffer), "%.15g", value->number); return xstrdup(buffer);
+    case VALUE_NUMBER: { char *text = canonical_number_text(value->number); return text ? text : xstrdup("0"); }
     case VALUE_BOOL: return xstrdup(value->boolean ? "true" : "false");
     default: { StringBuilder sb; sb_init(&sb); value_json_sb(&sb, value); return sb.data; }
   }
