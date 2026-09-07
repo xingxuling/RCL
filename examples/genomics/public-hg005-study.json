@@ -1,0 +1,91 @@
+{
+  "format": "rcl.genome-public-study-manifest.v0.1",
+  "status": "CANDIDATE",
+  "study_id": "human-biology-compiler-hg005-public-benchmark-v0.1",
+  "purpose": "Use a real public Han Chinese GIAB benchmark genome to validate the genomics compiler stack before introducing any private genome.",
+  "subject_boundary": {
+    "sample_ref": "HG005",
+    "biosample_alias": "NA24631_son",
+    "population_context": "Han Chinese reference trio member",
+    "access_tier": "public",
+    "personal_medical_interpretation": false,
+    "private_subject_data": false
+  },
+  "reference": {
+    "assembly": "GRCh38",
+    "benchmark_release": "NISTv4.2.1",
+    "benchmark_scope": "chromosomes 1-22 small-variant benchmark"
+  },
+  "primary_source": {
+    "provider_source_id": "giab",
+    "owner": "NIST Genome in a Bottle Consortium",
+    "benchmark_directory": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/ChineseTrio/HG005_NA24631_son/NISTv4.2.1/GRCh38/",
+    "benchmark_vcf": "HG005_GRCh38_1_22_v4.2.1_benchmark.vcf.gz",
+    "benchmark_bed": "HG005_GRCh38_1_22_v4.2.1_benchmark_noinconsistent.bed",
+    "landing_page": "https://www.nist.gov/programs-projects/genome-bottle",
+    "manifest_first": true
+  },
+  "context_sources": [
+    {
+      "source_id": "igsr-1000g",
+      "role": "population reference and ancestry context"
+    },
+    {
+      "source_id": "gnomad",
+      "role": "aggregate population allele frequency context"
+    },
+    {
+      "source_id": "gwas-catalog",
+      "role": "association evidence only"
+    },
+    {
+      "source_id": "clinvar",
+      "role": "submitted public variant interpretation evidence; not automatic diagnosis"
+    }
+  ],
+  "toolchain": [
+    {
+      "tool": "htslib",
+      "role": "VCF/BCF I/O and indexed bounded-region access"
+    },
+    {
+      "tool": "bcftools",
+      "role": "variant normalization, splitting, filtering and query"
+    },
+    {
+      "tool": "ensembl-vep",
+      "role": "gene/transcript functional consequence annotation"
+    }
+  ],
+  "initial_budget": {
+    "whole_genome_download": false,
+    "max_variant_records": 10000,
+    "max_input_bytes": 52428800,
+    "preferred_first_pass": "bounded region or benchmark slice"
+  },
+  "expected_compilation_chain": [
+    "source manifest",
+    "bounded VCF slice",
+    "normalized variant records",
+    "rcl.genome-observation.v0.1",
+    "rcl.genome-annotation-bundle.v0.1",
+    "rcl.genome-knowledge-graph.v0.1",
+    "rncs candidate evidence proposal",
+    "ugis minimum-sufficient next research action",
+    "dwac genomics research report"
+  ],
+  "hard_invariants": [
+    "reference assembly is explicit",
+    "every relation remains evidence-bound",
+    "association is not causality",
+    "causal edges require explicit causal basis",
+    "public source authority is preserved",
+    "no automatic medical diagnosis",
+    "no automatic canonical promotion",
+    "no private genome is introduced in this phase"
+  ],
+  "evidence_sources": [
+    "https://www.nist.gov/programs-projects/genome-bottle",
+    "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/ChineseTrio/HG005_NA24631_son/NISTv4.2.1/GRCh38/"
+  ]
+}
