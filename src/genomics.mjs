@@ -51,6 +51,15 @@ export {
 } from './genome-knowledge-graph.mjs';
 
 export {
+  RCL_GENOME_PUBLIC_EVIDENCE_VERSION,
+  RCL_GENOME_PUBLIC_EVIDENCE_BUNDLE_FORMAT,
+  createPopulationFrequencyBundle,
+  createGwasAssociationBundle,
+  createClinvarInterpretationBundle,
+  mergeGenomePublicEvidenceBundle,
+} from './genome-public-evidence.mjs';
+
+export {
   RCL_GENOME_STUDY_BOOTSTRAP_VERSION,
   RCL_GENOME_STUDY_BOOTSTRAP_FORMAT,
   RCL_GENOME_STUDY_STAGE_FORMAT,
