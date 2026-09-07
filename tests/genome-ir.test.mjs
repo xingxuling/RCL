@@ -9,19 +9,19 @@ import {
 
 function fixture() {
   return {
-    observationId: 'giab:HG005:chr1:10177:A:AC',
-    sampleRef: 'HG005',
+    observationId: 'synthetic:sample-001:chr1:10177:A:AC',
+    sampleRef: 'sample:synthetic-001',
     locus: { assembly: 'GRCh38', contig: 'chr1', start: 10177 },
-    variant: { id: 'rs367896724', ref: 'A', alt: 'AC' },
+    variant: { id: 'variant:synthetic-001', ref: 'A', alt: 'AC' },
     genotype: { alleles: [0, 1], phased: false },
-    quality: { score: 99.7, filters: ['PASS'], info: { source: 'fixture' } },
+    quality: { score: 99.7, filters: ['PASS'], info: { source: 'synthetic-fixture' } },
     evidence: [
-      { id: 'e1', source: 'GIAB', sourceType: 'benchmark', accession: 'HG005', confidence: 0.99 },
+      { id: 'e1', source: 'synthetic-fixture', sourceType: 'test-record', accession: 'sample-001', confidence: 0.99 },
     ],
     claims: [
-      { id: 'c1', predicate: 'benchmark_status', object: 'example', status: 'OBSERVED', evidenceRefs: ['e1'], confidence: 0.99 },
+      { id: 'c1', predicate: 'fixture_status', object: 'example', status: 'OBSERVED', evidenceRefs: ['e1'], confidence: 0.99 },
     ],
-    governance: { accessTier: 'public', consentBasis: 'public-reference-resource' },
+    governance: { accessTier: 'synthetic', consentBasis: 'not-applicable-test-fixture' },
   };
 }
 
@@ -41,7 +41,7 @@ test('Genome IR projects into RCL foundation domains without upgrading associati
   const projection = genomeFoundationProjection(observation);
   assert.equal(projection.knowledge.claims[0].status, 'ASSOCIATED');
   assert.equal(projection.sourceRoot, observation.observationRoot);
-  assert.equal(projection.authorityBoundary.accessTier, 'public');
+  assert.equal(projection.authorityBoundary.accessTier, 'synthetic');
 });
 
 test('Genome IR rejects an evidence-backed claim that references missing evidence', () => {
@@ -54,7 +54,7 @@ test('Genome IR rejects an evidence-backed claim that references missing evidenc
 test('Genome IR parses a biallelic VCF record into the same rooted model', () => {
   const observation = parseVcfVariantLine(
     'chr20\t14370\trs6054257\tG\tA\t29\tPASS\tNS=3;DP=14\tGT:GQ\t0|1:48',
-    { assembly: 'GRCh38', sampleRef: 'sample:public', governance: { accessTier: 'public' } },
+    { assembly: 'GRCh38', sampleRef: 'sample:synthetic', governance: { accessTier: 'synthetic' } },
   );
   assert.equal(observation.locus.start, 14370);
   assert.deepEqual(observation.variant.alts, ['A']);
