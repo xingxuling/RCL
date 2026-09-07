@@ -32,3 +32,20 @@ export {
   planGenomeToolchain,
   createGenomeProviderDefinition,
 } from './genome-provider-contract.mjs';
+
+export {
+  RCL_GENOME_KNOWLEDGE_GRAPH_VERSION,
+  RCL_GENOME_KNOWLEDGE_GRAPH_FORMAT,
+  RCL_GENOME_ANNOTATION_BUNDLE_FORMAT,
+  RCL_GENOME_ENTITY_KINDS,
+  RCL_GENOME_RELATION_KINDS,
+  RCL_GENOME_RELATION_STATUSES,
+  createGenomeEntity,
+  createGenomeGraphEvidence,
+  createGenomeRelation,
+  createGenomeKnowledgeGraph,
+  verifyGenomeKnowledgeGraph,
+  lowerGenomeObservationToGraph,
+  createVepAnnotationBundle,
+  mergeGenomeGraphBundle,
+} from './genome-knowledge-graph.mjs';
