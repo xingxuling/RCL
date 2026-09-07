@@ -49,3 +49,12 @@ export {
   createVepAnnotationBundle,
   mergeGenomeGraphBundle,
 } from './genome-knowledge-graph.mjs';
+
+export {
+  RCL_GENOME_STUDY_BOOTSTRAP_VERSION,
+  RCL_GENOME_STUDY_BOOTSTRAP_FORMAT,
+  RCL_GENOME_STUDY_STAGE_FORMAT,
+  DEFAULT_PUBLIC_GENOME_STUDY,
+  buildPublicGenomeStudyBootstrap,
+  publicGenomeStudySummary,
+} from './genome-study-bootstrap.mjs';
