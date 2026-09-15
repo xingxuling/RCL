@@ -1,0 +1,123 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-perception-synthetic-identity-v0.1",
+  "base_commit": "548c4372ae75c7e7614b78f84950a0b7ebc9fff8",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-perception-direct-lowering-rule-shadow",
+      "domain": "native_lowering_integrity",
+      "signal": "The new Perception Observe direct-lowering seam synthesizes Emergence rules inside the same user-visible rule namespace. A user rule named like the deterministic synthetic rule can therefore be silently shadowed after lowering because synthetic rules are appended and directive resolution is name-based.",
+      "pressure": 0.943,
+      "evidence": [
+        "src/foundation-direct-lowering.mjs#perceptionRule",
+        "src/bytecode.mjs#rules-map-by-name",
+        "tests/foundation-direct-lowering.test.mjs"
+      ]
+    },
+    {
+      "id": "rcl-perception-native-parity-still-open",
+      "domain": "native_runtime_validation",
+      "signal": "Perception direct lowering still lacks C Native VM execution parity and domain-receipt parity evidence.",
+      "pressure": 0.918,
+      "evidence": [
+        "evidence/RCL_NORTH_STAR_FOUNDATION_PERCEPTION_DIRECT_LOWERING_v0.1.json#native_c_vm_execution=NOT_RUN",
+        "src/native-vm.mjs#verifyNativeParity"
+      ]
+    },
+    {
+      "id": "rcl-selfhost-stage0-boundary",
+      "domain": "selfhost_boundary",
+      "signal": "Whole-language native self-host closure remains bounded by Stage-0 host ownership.",
+      "pressure": 0.87,
+      "evidence": [
+        "selfhost/rcl-source-selfhost-stage0.rcl",
+        "selfhost/compiler-core.rcl"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-synthetic-rule-identity-integrity",
+      "domain": "native_lowering_integrity",
+      "problem": "prevent direct-lowered synthetic perception rules from shadowing pre-existing user rules while retaining deterministic lowering and explicit evidence of any allocated rename",
+      "score": 0.8118,
+      "expected_goal_gain": 0.88,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.9,
+      "evidence_gain": 0.96,
+      "implementation_cost": 0.18,
+      "regression_risk": 0.08,
+      "evidence": [
+        "reuse the existing direct-lowering seam",
+        "reserve all existing rule identities before synthesis",
+        "deterministically probe a collision-free synthetic identity without changing user rules or directives",
+        "surface collision avoidance in lowering diagnostics and summary"
+      ]
+    },
+    {
+      "candidate_id": "foundation-perception-native-c-vm-parity",
+      "domain": "native_runtime_validation",
+      "problem": "execute the bounded perception lowering through canonical RBC and the C Native VM and prove semantic state-root parity",
+      "score": 0.766,
+      "expected_goal_gain": 0.94,
+      "reuse_gain": 0.9,
+      "autonomy_gain": 0.86,
+      "evidence_gain": 0.98,
+      "implementation_cost": 0.72,
+      "regression_risk": 0.38,
+      "evidence": [
+        "direct lowering seam already exists",
+        "native VM parity infrastructure exists",
+        "requires a full native execution environment rather than only the bounded transform harness"
+      ]
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.7302,
+      "expected_goal_gain": 0.9,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.9,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "foundation-perception-synthetic-rule-identity-integrity",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "A narrow correctness defect sits directly inside the newly introduced native-lowering seam and can change the meaning of existing user rules. Close the identity-integrity prerequisite before spending a larger reality-validation budget on C Native VM parity.",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "tests/foundation-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "existing user rule names are reserved before synthetic perception rules are allocated",
+    "a colliding synthetic rule receives the first deterministic free suffix instead of shadowing the user rule",
+    "existing user directives continue to resolve to the original rule",
+    "collision avoidance is explicit through RCL_FOUNDATION_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED diagnostics",
+    "the lowering summary records renamedSyntheticRuleCount"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-lowering.test.mjs",
+      "status": "PASS",
+      "tests": 9
+    },
+    "syntax": {
+      "command": "node --check src/foundation-direct-lowering.mjs",
+      "status": "PASS"
+    },
+    "adapter_contract": {
+      "status": "PASS",
+      "method": "exact updated lowering module loaded under the existing foundation-direct-bytecode adapter contract with injected compile stubs; colliding user rule remained intact and the lowered Observe directive targeted the deterministic collision-free synthetic rule"
+    },
+    "broad_repository_suite": "NOT_RUN",
+    "native_c_vm_execution": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED_DURING_LOCAL_VALIDATION"
+  },
+  "ci_policy": "Every branch commit carries [skip ci] [skip actions]. Do not actively consume GitHub Actions; verify the branch head remains workflow-free before PR and verify the PR head remains workflow-free before merge.",
+  "truth_boundary": "This cycle closes synthetic-rule identity shadowing inside the bounded Perception direct-lowering seam. It does not claim C Native VM parity, Foundation domain-receipt parity, all-domain native lowering, provider-bridge removal, or repository-wide regression coverage."
+}
