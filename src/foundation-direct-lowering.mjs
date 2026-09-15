@@ -17,8 +17,23 @@ function array(value) {
   return Array.isArray(value) ? value : [];
 }
 
-function perceptionRule(perception, directiveIndex) {
-  const ruleName = `__rcl_foundation_perception_${sanitizeName(perception.name)}_${directiveIndex}`;
+function syntheticRuleBaseName(perception, directiveIndex) {
+  return `__rcl_foundation_perception_${sanitizeName(perception.name)}_${directiveIndex}`;
+}
+
+function allocateSyntheticRuleName(perception, directiveIndex, reservedNames) {
+  const baseRuleName = syntheticRuleBaseName(perception, directiveIndex);
+  let ruleName = baseRuleName;
+  let suffix = 0;
+  while (reservedNames.has(ruleName)) {
+    suffix += 1;
+    ruleName = `${baseRuleName}_${suffix}`;
+  }
+  reservedNames.add(ruleName);
+  return { ruleName, baseRuleName, renamed: ruleName !== baseRuleName };
+}
+
+function perceptionRule(perception, ruleName) {
   return {
     ruleName,
     rule: {
@@ -50,6 +65,8 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
   const consumedDirectiveIndexes = new Set();
   const consumedPerceptions = new Set();
   const rewrittenDirectives = [];
+  const reservedRuleNames = new Set(array(program.rules).map(rule => rule?.name).filter(Boolean));
+  let renamedSyntheticRuleCount = 0;
 
   const perceptions = array(program.perceptions);
   const perceptionsByName = new Map(perceptions.map(item => [item.name, item]));
@@ -71,7 +88,22 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       return;
     }
 
-    const { ruleName, rule } = perceptionRule(perception, index);
+    const allocation = allocateSyntheticRuleName(perception, index, reservedRuleNames);
+    if (allocation.renamed) {
+      renamedSyntheticRuleCount += 1;
+      diagnostics.push(diagnostic(
+        'RCL_FOUNDATION_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED',
+        `Synthetic perception rule '${allocation.baseRuleName}' would collide with an existing rule; allocated '${allocation.ruleName}' instead`,
+        {
+          directiveIndex: index,
+          domain: 'perception',
+          declaration: perception.name,
+          requestedRuleName: allocation.baseRuleName,
+          allocatedRuleName: allocation.ruleName,
+        },
+      ));
+    }
+    const { ruleName, rule } = perceptionRule(perception, allocation.ruleName);
     syntheticRules.push(rule);
     rewrittenDirectives.push({ kind: 'Realize', rule: ruleName });
     consumedDirectiveIndexes.add(index);
@@ -114,6 +146,7 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       syntheticRuleCount: syntheticRules.length,
       consumedDirectiveCount: consumedDirectiveIndexes.size,
       remainingPerceptionCount: remainingPerceptions.length,
+      renamedSyntheticRuleCount,
       enabledDomains: [...enabledDomains].sort(),
     },
     truthBoundary: {
