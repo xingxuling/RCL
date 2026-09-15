@@ -1,0 +1,113 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-domain-receipt-parity-v0.1",
+  "base_commit": "e70786aa6d3efb47a2fe72cd3920df0bc6ac81ac",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍然是最高现实证据增益，但当前自动化容器没有直接 GitHub checkout/materialization 网络路径，无法诚实完成完整 canonical C VM 构建与回放。",
+      "pressure": 0.965,
+      "externally_blocked": true,
+      "evidence": [
+        "native/Makefile 与 native/rclvm.c 在仓库中存在",
+        "当前容器 git clone 无法解析 github.com",
+        "上一周期已经显式把真实 C VM replay 留在 truth boundary 外"
+      ]
+    },
+    {
+      "id": "rcl-foundation-domain-receipt-parity-gap",
+      "domain": "evidence_semantics",
+      "signal": "现有 lowering lineage 只证明 native history 命中合成规则、见证与目标覆盖；它仍允许 native transition 额外修改未声明状态，且没有把原始 Perception DomainTransition 的观察者、来源现实、权限类别、精确状态增量与 native transition 绑定为同一领域收据。",
+      "pressure": 0.925,
+      "evidence": [
+        "src/foundation-direct-native-parity.mjs@v0.2 的 lineage.stateTargetsCovered 是子集检查",
+        "src/runtime.mjs 的 Observe 参考语义产生 DomainTransition(domainKind=perceptual, authorityClass=observation)",
+        "src/foundation-direct-lowering.mjs 已有 declaration/syntheticRule/witness/stateTargets，但此前未携带 observer/sourceReality/authorityClass"
+      ]
+    },
+    {
+      "id": "rcl-whole-language-selfhost-gap",
+      "domain": "selfhost_boundary",
+      "signal": "整语言自举仍存在 Stage-0 host ownership，价值高但实现成本与回归风险显著高于当前可闭合证据语义缝。",
+      "pressure": 0.79
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "problem": "在 canonical C Native VM 上真实执行 direct-lowered Perception 并记录 parity evidence",
+      "score": 0.852,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-domain-receipt-parity-contract",
+      "domain": "evidence_semantics",
+      "problem": "把原始 Perception 领域收据与 lowering metadata、native transaction 绑定成非补偿性等价合同，禁止最终状态相同但执行了额外/错误状态变化的 native 路径被标记 native-verified",
+      "score": 0.8174,
+      "expected_goal_gain": 0.93,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.93,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.31,
+      "regression_risk": 0.14,
+      "evidence": [
+        "复用 reference runtime DomainTransition",
+        "复用 lowering syntheticRule/witness/stateTargets",
+        "复用 native history changes/status/witnesses",
+        "不引入新的外部执行权限"
+      ]
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "移除整语言 self-host 中剩余 Stage-0 host ownership",
+      "score": 0.731,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "foundation-domain-receipt-parity-contract",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "真实 C VM replay 仍被环境阻断；当前最高价值可执行候选是把已存在的 reference domain receipt、lowering provenance 与 native transition 组成精确、失败关闭的领域收据等价门。",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-direct-native-parity.test.mjs",
+    "tests/foundation-direct-lowering-receipt-metadata.test.mjs"
+  ],
+  "behavioral_change": [
+    "Perception lowering metadata 现在显式携带 directiveIndex、observer、sourceReality、authorityClass=observation",
+    "新增 verifyFoundationDomainReceiptParity：要求 reference perceptual receipts 与 lowering 数量/顺序精确覆盖",
+    "每个 lowered Observe 必须精确对应一个 native synthetic-rule transaction",
+    "native transition 的状态目标集合必须与 Foundation receipt 精确相等，额外 native mutation 失败关闭",
+    "reference/native before-after transition values 必须在 semanticValue 归一化后逐目标一致",
+    "observer、sourceReality、observation authority 与 witness 被绑定进领域收据证据链",
+    "native transaction 顺序必须保持 lowering 顺序",
+    "native-verified 新增 domainReceipt=true 非补偿性条件",
+    "full history parity、全部 Foundation domain native、provider bridge removal 仍不声明"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-lowering.test.mjs tests/foundation-direct-lowering-receipt-metadata.test.mjs tests/foundation-direct-native-parity.test.mjs",
+      "status": "PASS",
+      "tests": 29,
+      "scope_note": "在自动化容器中以与候选分支内容一致的模块和测试文件重建定向测试面；不是完整仓库 checkout。"
+    },
+    "syntax": {
+      "commands": [
+        "node --check src/foundation-direct-lowering.mjs",
+        "node --check src/foundation-direct-native-parity.mjs"
+      ],
+      "status": "PASS"
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_MATERIALIZE_CANONICAL_FULL_REPOSITORY_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "MUST_REMAIN_NOT_TRIGGERED; branch commits use [skip ci] [skip actions]"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明的是 Foundation Perception 领域收据等价合同及失败关闭行为，不宣称真实 canonical C Native VM replay、完整历史逐记录等价、全部 Foundation 原生下译、provider bridge 全局移除或全仓回归通过。"
+}
