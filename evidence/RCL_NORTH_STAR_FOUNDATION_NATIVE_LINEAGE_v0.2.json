@@ -1,0 +1,127 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-native-lineage-v0.2",
+  "base_commit": "d08e85fe6c88dca9db34707a3297921a5388faa9",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-foundation-native-lineage-gap",
+      "domain": "evidence_semantics",
+      "signal": "Foundation direct native parity could accept matching final state/root authority without proving that each lowered Observe actually corresponds to exactly one native transaction carrying the synthetic rule identity, witness and intended state targets.",
+      "pressure": 0.938,
+      "evidence": [
+        "src/foundation-direct-native-parity.mjs@v0.1 only checked final state/root authority",
+        "src/foundation-direct-lowering.mjs emits syntheticRule/witness/stateTargets provenance",
+        "native/runtime history records expose rule, witnesses and changes"
+      ]
+    },
+    {
+      "id": "rcl-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "signal": "A real canonical C Native VM parity run remains the strongest missing reality evidence, but this automation workspace cannot materialize the full canonical repository/native binary without an external fetch path.",
+      "pressure": 0.962,
+      "externally_blocked": true,
+      "evidence": [
+        "scripts/build-native.mjs defines canonical local build",
+        "native/Makefile builds native/rclvm from native/rclvm.c",
+        "current automation container has no direct GitHub network checkout/materialization path"
+      ]
+    },
+    {
+      "id": "rcl-foundation-domain-receipt-parity-gap",
+      "domain": "evidence_semantics",
+      "signal": "Foundation domain-level receipt/history equivalence is still not proven and must remain outside the claim boundary until a stronger mapping contract exists.",
+      "pressure": 0.884,
+      "evidence": [
+        "src/foundation-direct-native-parity.mjs truthBoundary.domainReceiptParityClaimed=false"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "problem": "execute a real direct-lowered Perception program on the canonical C Native VM and record parity evidence",
+      "score": 0.846,
+      "externally_blocked": true,
+      "evidence": [
+        "highest reality-evidence gain",
+        "blocked because canonical full repository/native binary cannot be materialized in this automation workspace"
+      ]
+    },
+    {
+      "candidate_id": "foundation-native-lowering-lineage-binding",
+      "domain": "evidence_semantics",
+      "problem": "bind lowered Foundation provenance to native transaction history so final state parity cannot mask the wrong or missing native transition lineage",
+      "score": 0.8236,
+      "expected_goal_gain": 0.94,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.95,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.24,
+      "regression_risk": 0.10,
+      "evidence": [
+        "reuse existing foundationDirectLowering.lowered metadata",
+        "reuse native history rule/witness/change targets",
+        "no new runtime authority introduced"
+      ]
+    },
+    {
+      "candidate_id": "foundation-domain-receipt-parity-contract",
+      "domain": "evidence_semantics",
+      "problem": "define and verify stronger Foundation-domain receipt equivalence beyond lowering lineage",
+      "score": 0.776,
+      "expected_goal_gain": 0.90,
+      "reuse_gain": 0.96,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.98,
+      "implementation_cost": 0.46,
+      "regression_risk": 0.18
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.731,
+      "expected_goal_gain": 0.90,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.90,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "foundation-native-lowering-lineage-binding",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "The real C Native VM replay is externally blocked in this automation workspace. The highest-value eligible prerequisite is the exact lineage seam: require every lowered Foundation transaction to be traceable to one native history record before native-verified can be claimed.",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-direct-native-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "native-verified now additionally requires loweringLineage=true",
+    "each lowered entry must carry a synthetic rule identity and map to exactly one native history record",
+    "the native record must include the lowering witness",
+    "every lowered state target must appear in the native record changes",
+    "declared lowering count must match exact lowering metadata",
+    "synthetic rule identities in one lowering receipt must be unique",
+    "history parity and Foundation domain-receipt parity remain explicitly unclaimed"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-native-parity.test.mjs",
+      "status": "PASS",
+      "tests": 13
+    },
+    "syntax": {
+      "command": "node --check src/foundation-direct-native-parity.mjs",
+      "status": "PASS"
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_MATERIALIZE_CANONICAL_FULL_REPOSITORY_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED_DURING_LOCAL_VALIDATION"
+  },
+  "ci_policy": "Every branch commit carries [skip ci] [skip actions]. Verify the branch head remains workflow-free before PR; after opening the PR verify the PR head remains workflow-free before merge.",
+  "truth_boundary": "This cycle proves the fail-closed lowering-lineage verifier contract with targeted local execution. It does not claim a real C Native VM replay, full history parity, Foundation domain-receipt parity, all-Foundation native lowering, provider-bridge removal, or repository-wide regression coverage."
+}
