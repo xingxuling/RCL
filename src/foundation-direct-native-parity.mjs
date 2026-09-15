@@ -1,5 +1,8 @@
-export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.3';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.3.0';
+import { createHash } from 'node:crypto';
+
+export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.4';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.4.0';
+export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.1';
 
 function codeOf(error) {
   return error?.code ?? error?.payload?.code ?? 'RCL_FOUNDATION_DIRECT_NATIVE_EXECUTION_FAILED';
@@ -16,6 +19,7 @@ function truthBoundary() {
     nativeStateRootAuthorityRequired: true,
     loweringLineageClaimedOnlyWhenVerified: true,
     domainReceiptParityClaimedOnlyWhenVerified: true,
+    domainReceiptRootIsEvidenceBindingNotStandaloneProof: true,
     fullHistoryParityClaimed: false,
     allFoundationDomainsNativeClaimed: false,
     providerBridgeRemovedGlobally: false,
@@ -96,6 +100,42 @@ function strictlyIncreasing(values) {
     if (values[index] <= values[index - 1]) return false;
   }
   return true;
+}
+
+export function foundationDomainReceiptRoot(report) {
+  if (!report || typeof report !== 'object' || Array.isArray(report)) {
+    throw new TypeError('Foundation domain receipt report object is required');
+  }
+  const binding = {
+    algorithm: FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
+    required: report.required === true,
+    ok: report.ok === true,
+    declaredLoweredCount: Number(report.declaredLoweredCount ?? 0),
+    observedLoweringEntries: Number(report.observedLoweringEntries ?? 0),
+    referenceReceiptCount: Number(report.referenceReceiptCount ?? 0),
+    metadataComplete: report.metadataComplete === true,
+    referenceCoverageExact: report.referenceCoverageExact === true,
+    nativeOrderPreserved: report.nativeOrderPreserved === true,
+    entries: asArray(report.entries).map(entry => ({
+      index: entry?.index ?? null,
+      domain: entry?.domain ?? null,
+      declaration: entry?.declaration ?? null,
+      directive: entry?.directive ?? null,
+      syntheticRule: entry?.syntheticRule ?? null,
+      authorityClass: entry?.authorityClass ?? null,
+      observer: entry?.observer ?? null,
+      sourceReality: entry?.sourceReality ?? null,
+      expectedTargets: asArray(entry?.expectedTargets),
+      referenceTargets: asArray(entry?.referenceTargets),
+      nativeTargets: asArray(entry?.nativeTargets),
+      referenceChanges: asArray(entry?.referenceChanges),
+      nativeChanges: asArray(entry?.nativeChanges),
+      nativeRecordCount: Number(entry?.nativeRecordCount ?? 0),
+      checks: canonicalJson(entry?.checks ?? {}),
+      ok: entry?.ok === true,
+    })),
+  };
+  return createHash('sha256').update(JSON.stringify(canonicalJson(binding))).digest('hex');
 }
 
 export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
@@ -204,6 +244,8 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
       expectedTargets,
       referenceTargets,
       nativeTargets,
+      referenceChanges,
+      nativeChanges,
       nativeRecordCount: nativeMatches.length,
       checks,
       ok: Object.values(checks).every(Boolean),
@@ -215,7 +257,7 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     && referenceCoverageExact
     && nativeOrderPreserved
     && (!required || (entries.length > 0 && entries.every(item => item.ok)));
-  return {
+  const report = {
     required,
     ok,
     declaredLoweredCount,
@@ -225,6 +267,11 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     referenceCoverageExact,
     nativeOrderPreserved,
     entries,
+  };
+  return {
+    ...report,
+    rootAlgorithm: FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
+    receiptRoot: foundationDomainReceiptRoot(report),
   };
 }
 
@@ -315,6 +362,8 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
       referenceSemanticStateRoot: referenceRoot,
       nativeSemanticStateRoot: nativeRoot,
       nativeStateRoot: native?.nativeStateRoot ?? null,
+      foundationDomainReceiptRoot: domainReceipt.receiptRoot,
+      foundationDomainReceiptRootAlgorithm: domainReceipt.rootAlgorithm,
     },
     gaps: verified ? [] : Object.entries(parity).filter(([, ok]) => !ok).map(([name]) => name),
     truthBoundary: truthBoundary(),

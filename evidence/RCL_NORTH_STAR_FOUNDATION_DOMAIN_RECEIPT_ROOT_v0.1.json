@@ -1,0 +1,105 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-domain-receipt-root-v0.1",
+  "base_commit": "78da416087216aeba31dbb9bf2da369e4fcf9dd9",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍是最高价值现实验证，但当前自动化容器无法直接 checkout/materialize 完整仓库并构建 canonical native binary。",
+      "pressure": 0.966,
+      "externally_blocked": true,
+      "evidence": [
+        "native/rclvm.c 与 native/Makefile 在 canonical 仓库中存在",
+        "当前容器外部 GitHub clone 仍不可用",
+        "Cycle 8 已把领域收据语义闭合，但没有冒充真实 C VM replay"
+      ]
+    },
+    {
+      "id": "rcl-foundation-domain-receipt-root-gap",
+      "domain": "evidence_provenance",
+      "signal": "Cycle 8 的领域收据已经能失败关闭验证 reference/native 等价，但其结构化证据没有独立的确定性证据根，因此跨运行时传递、缓存或后续 Evidence Ledger 绑定时缺少稳定内容身份。",
+      "pressure": 0.892,
+      "evidence": [
+        "src/foundation-direct-native-parity.mjs@v0.3 返回结构化 domainReceipt report",
+        "RCL 现有 universal-program-stress 等器官已经使用 canonical JSON + SHA-256 evidenceRoot 模式",
+        "北极星要求证据可追溯且跨运行时保持稳定身份"
+      ]
+    },
+    {
+      "id": "rcl-next-foundation-native-domain-gap",
+      "domain": "native_lowering",
+      "signal": "Physical/Neural/Energy 等其余 Foundation 域尚未进入同等级 direct lowering + receipt parity，但在 Perception 证据链彻底可携带前直接横向复制会放大证据债务。",
+      "pressure": 0.824
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "problem": "在 canonical C Native VM 上真实执行 direct-lowered Perception 并记录真实 parity evidence",
+      "score": 0.854,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-domain-receipt-evidence-root",
+      "domain": "evidence_provenance",
+      "problem": "为 Foundation domain receipt 构造稳定、确定性、包含成功与失败事实的 SHA-256 evidence root，并把它暴露到 native parity 结果而不提升其执行权限。",
+      "score": 0.8048,
+      "expected_goal_gain": 0.89,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.91,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.23,
+      "regression_risk": 0.10,
+      "evidence": [
+        "复用 Cycle 8 domainReceipt 结构",
+        "复用 RCL 现有 canonical JSON + SHA-256 evidence-root 模式",
+        "不引入新的外部权限或运行时副作用"
+      ]
+    },
+    {
+      "candidate_id": "next-foundation-domain-direct-lowering",
+      "domain": "native_lowering",
+      "problem": "把 Perception 已验证的 direct lowering 模式复制到下一个 Foundation 域",
+      "score": 0.773,
+      "implementation_cost": 0.57,
+      "regression_risk": 0.29
+    }
+  ],
+  "selected": "foundation-domain-receipt-evidence-root",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "真实 C VM replay 仍被环境阻断；在扩展更多 Foundation 域前，先让已经验证的领域收据获得稳定内容身份，可直接提升证据可追溯性和跨运行时携带能力，且风险低、复用率高。",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-domain-receipt-root.test.mjs"
+  ],
+  "behavioral_change": [
+    "新增 rcl.foundation-domain-receipt-root.sha256.v0.1 确定性证据根算法",
+    "领域收据根绑定 lowering 数量、metadata 完整性、reference coverage、native order、逐条领域身份、目标集合、reference/native 归一化 before-after 变化、检查结果与最终 ok 状态",
+    "成功证据与失败证据都会进入 root，失败检查不会被根生成过程抹掉",
+    "verifyFoundationDomainReceiptParity 直接返回 receiptRoot 与 rootAlgorithm",
+    "verifyFoundationDirectNativeParity 的 roots 暴露 Foundation domain receipt root，便于 Evidence Ledger/跨运行时传递",
+    "receiptRoot 明确只是 evidence binding，不是独立的真实性证明或执行授权",
+    "full history parity、全部 Foundation 原生化与 provider bridge 全局移除仍不声明"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-lowering.test.mjs tests/foundation-direct-lowering-receipt-metadata.test.mjs tests/foundation-direct-native-parity.test.mjs tests/foundation-domain-receipt-root.test.mjs",
+      "status": "PASS",
+      "tests": 33,
+      "scope_note": "在自动化容器中以与候选分支内容一致的模块和测试文件重建定向测试面；不是完整仓库 checkout。"
+    },
+    "syntax": {
+      "command": "node --check src/foundation-direct-native-parity.mjs",
+      "status": "PASS"
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_MATERIALIZE_CANONICAL_FULL_REPOSITORY_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "MUST_REMAIN_NOT_TRIGGERED; branch commits use [skip ci] [skip actions]"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明领域收据内容身份的确定性绑定与负证据保留；不宣称 receipt root 本身证明真实性，也不宣称真实 canonical C Native VM replay、完整历史逐记录等价、全部 Foundation 原生下译、provider bridge 全局移除或全仓回归通过。"
+}
