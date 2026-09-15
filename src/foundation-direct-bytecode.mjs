@@ -1,0 +1,37 @@
+import { compileReality } from './compiler.mjs';
+import { tryCompileRealityToBytecode } from './bytecode.mjs';
+import { lowerDeclaredFoundationToCore } from './foundation-direct-lowering.mjs';
+
+export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.1';
+
+export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options = {}) {
+  try {
+    const compileSource = options.compileSource ?? compileReality;
+    const compileBytecode = options.compileBytecode ?? tryCompileRealityToBytecode;
+    const program = typeof sourceOrProgram === 'string' ? compileSource(sourceOrProgram) : sourceOrProgram;
+    const lowering = lowerDeclaredFoundationToCore(program, options);
+    const result = compileBytecode(lowering.program);
+    return {
+      ...result,
+      foundationDirectLowering: {
+        format: FOUNDATION_DIRECT_BYTECODE_FORMAT,
+        lowered: lowering.lowered,
+        diagnostics: lowering.diagnostics,
+        summary: lowering.summary,
+        truthBoundary: lowering.truthBoundary,
+      },
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      diagnostics: [{
+        code: error?.code ?? 'RCL_FOUNDATION_DIRECT_LOWERING_FAILURE',
+        message: error?.message ?? String(error),
+        details: error?.details ?? {},
+      }],
+      program: null,
+      bytecode: null,
+      foundationDirectLowering: null,
+    };
+  }
+}
