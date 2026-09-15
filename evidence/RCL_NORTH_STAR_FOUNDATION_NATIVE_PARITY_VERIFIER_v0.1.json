@@ -1,0 +1,121 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-native-parity-verifier-v0.1",
+  "base_commit": "b1bb94f32e4777b9dbb00b4f7518b2728c199309",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-perception-direct-lowering-native-verification-gap",
+      "domain": "native_runtime_validation",
+      "signal": "The Perception Observe direct-lowering seam can emit canonical core RBC candidates, but RCL has no dedicated fail-closed verifier that binds the original reference semantics, lowered RBC execution, semantic state-root parity and native state-root authority into one reusable decision receipt.",
+      "pressure": 0.944,
+      "evidence": [
+        "evidence/RCL_NORTH_STAR_FOUNDATION_PERCEPTION_DIRECT_LOWERING_v0.1.json#native_c_vm_execution=NOT_RUN",
+        "src/foundation-direct-bytecode.mjs",
+        "src/native-vm.mjs#runNativeBytecode",
+        "src/semantic-state-root.mjs#verifyNativeSemanticStateRoot"
+      ]
+    },
+    {
+      "id": "rcl-perception-direct-lowering-domain-receipt-gap",
+      "domain": "evidence_semantics",
+      "signal": "Core state parity does not by itself prove Foundation domain-receipt/history parity, so the verifier must keep that claim outside its acceptance boundary instead of silently upgrading the evidence.",
+      "pressure": 0.902,
+      "evidence": [
+        "src/runtime.mjs#observePerception",
+        "src/native-vm.mjs#verifyNativeParity"
+      ]
+    },
+    {
+      "id": "rcl-selfhost-stage0-boundary",
+      "domain": "selfhost_boundary",
+      "signal": "Whole-language native self-host closure remains bounded by Stage-0 host ownership.",
+      "pressure": 0.87,
+      "evidence": [
+        "selfhost/rcl-source-selfhost-stage0.rcl",
+        "selfhost/compiler-core.rcl"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-native-parity-verifier",
+      "domain": "native_runtime_validation",
+      "problem": "materialize a reusable fail-closed verifier that can only return native-verified when direct-lowered RBC matches reference semantic state and semantic state root and the C Native VM has authenticated its own state root",
+      "score": 0.8224,
+      "expected_goal_gain": 0.91,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.95,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.28,
+      "regression_risk": 0.12,
+      "evidence": [
+        "reuse foundation-direct-bytecode seam",
+        "reuse runNativeBytecode with requireNativeStateRoot=true",
+        "reuse semanticStateRoot/semanticValue normalization",
+        "fail closed for missing native VM, compile blockage, execution failure and parity mismatch"
+      ]
+    },
+    {
+      "candidate_id": "foundation-perception-actual-c-native-parity-run",
+      "domain": "native_runtime_validation",
+      "problem": "run the direct-lowered perception candidate on an actually materialized canonical C Native VM and record the resulting parity receipt",
+      "score": 0.782,
+      "expected_goal_gain": 0.98,
+      "reuse_gain": 0.94,
+      "autonomy_gain": 0.9,
+      "evidence_gain": 1.0,
+      "implementation_cost": 0.62,
+      "regression_risk": 0.22,
+      "externally_blocked": true,
+      "evidence": [
+        "the current bounded validation workspace does not contain a materialized canonical Linux rclvm binary/full repository runtime",
+        "this cycle must not substitute a mocked runner for the actual C Native VM claim"
+      ]
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.731,
+      "expected_goal_gain": 0.9,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.9,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "foundation-perception-native-parity-verifier",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "Native execution parity is now the dominant evidence gap, but an executable decision organ that refuses false parity claims is a prerequisite for trustworthy reality validation. Deepen this exact seam before expanding Foundation domain coverage.",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-direct-native-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "direct-lowered Foundation bytecode can be evaluated through one explicit parity verifier instead of ad-hoc checks",
+    "native-verified is non-compensatory: semantic state, semantic state root, native state-root verification and native state-root parity must all pass",
+    "missing C Native VM is reported as native-blocked and never promoted to a parity claim",
+    "compile blockage and native execution failure remain distinct fail-closed states",
+    "semantic state comparison removes native heap metadata through semanticValue before canonical comparison",
+    "history/domain receipt parity remains explicitly outside the verifier claim boundary"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-native-parity.test.mjs",
+      "status": "PASS",
+      "tests": 8
+    },
+    "syntax": {
+      "command": "node --check src/foundation-direct-native-parity.mjs",
+      "status": "PASS"
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_CURRENT_VALIDATION_WORKSPACE_HAS_NO_MATERIALIZED_CANONICAL_LINUX_VM",
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED_DURING_LOCAL_VALIDATION"
+  },
+  "ci_policy": "Every branch commit carries [skip ci] [skip actions]. Do not actively consume GitHub Actions; verify the branch head remains workflow-free before PR and verify the PR head remains workflow-free before merge.",
+  "truth_boundary": "This cycle verifies the verifier organ itself, not Perception C Native VM parity. No native-verified claim is made for a real Perception program until the verifier runs against a materialized canonical C Native VM and returns native-verified. History/domain-receipt parity, all-Foundation native lowering and provider-bridge removal remain unclaimed."
+}
