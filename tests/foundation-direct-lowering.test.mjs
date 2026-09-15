@@ -30,6 +30,7 @@ test('Observe perception is rewritten to a direct core Realize rule', () => {
   assert.equal(result.program.perceptions.length, 0);
   assert.equal(result.program.rules.length, 1);
   assert.deepEqual(result.program.directives, [{ kind: 'Realize', rule: '__rcl_foundation_perception_vision_0' }]);
+  assert.equal(result.summary.renamedSyntheticRuleCount, 0);
 });
 
 test('channel expressions and state targets are preserved exactly', () => {
@@ -53,6 +54,48 @@ test('existing core rules and directives are retained', () => {
   const result = lowerDeclaredFoundationToCore(source);
   assert.equal(result.program.rules[0].name, 'existing');
   assert.deepEqual(result.program.directives[0], { kind: 'Realize', rule: 'existing' });
+});
+
+test('synthetic rule allocation cannot shadow an existing user rule', () => {
+  const source = baseProgram();
+  const reservedName = '__rcl_foundation_perception_vision_0';
+  source.rules.push({
+    kind: 'Emergence', name: reservedName, cause: 'owner',
+    when: { kind: 'LiteralExpr', valueType: 'Truth', value: true },
+    needs: [], alters: [], calls: [], preserves: [], witnesses: ['user:rule'],
+  });
+  source.directives.push({ kind: 'Realize', rule: reservedName });
+
+  const result = lowerDeclaredFoundationToCore(source);
+  assert.equal(result.program.rules[0].name, reservedName);
+  assert.deepEqual(result.program.rules[0].witnesses, ['user:rule']);
+  assert.equal(result.program.rules[1].name, `${reservedName}_1`);
+  assert.deepEqual(result.program.directives, [
+    { kind: 'Realize', rule: `${reservedName}_1` },
+    { kind: 'Realize', rule: reservedName },
+  ]);
+  assert.equal(result.lowered[0].syntheticRule, `${reservedName}_1`);
+  assert.equal(result.summary.renamedSyntheticRuleCount, 1);
+  assert.ok(result.diagnostics.some(item =>
+    item.code === 'RCL_FOUNDATION_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED'
+    && item.details.requestedRuleName === reservedName
+    && item.details.allocatedRuleName === `${reservedName}_1`
+  ));
+});
+
+test('synthetic rule allocation deterministically probes past occupied suffixes', () => {
+  const source = baseProgram();
+  const reservedName = '__rcl_foundation_perception_vision_0';
+  for (const name of [reservedName, `${reservedName}_1`, `${reservedName}_2`]) {
+    source.rules.push({
+      kind: 'Emergence', name, cause: 'owner',
+      when: { kind: 'LiteralExpr', valueType: 'Truth', value: true },
+      needs: [], alters: [], calls: [], preserves: [], witnesses: [],
+    });
+  }
+  const result = lowerDeclaredFoundationToCore(source);
+  assert.equal(result.lowered[0].syntheticRule, `${reservedName}_3`);
+  assert.equal(result.program.rules.at(-1).name, `${reservedName}_3`);
 });
 
 test('unobserved perception remains present so canonical bytecode validation fails closed', () => {
