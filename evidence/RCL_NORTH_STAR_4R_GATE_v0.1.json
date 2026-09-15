@@ -1,0 +1,106 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-a866b4fa1b2539a60bd8",
+  "base_commit": "01cd8bc1491e40845a625aa97c1e6ce3a6dbf233",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-4r-native-gate-gap",
+      "domain": "4r_governance",
+      "signal": "RCL declares the four 4R controls and produces foundation_governance for RNCS, but RCL itself has no reusable commit-grade 4R gate; its own conformance report therefore keeps 4R controls partial.",
+      "pressure": 0.957,
+      "evidence": [
+        "src/foundation-contract.mjs",
+        "src/rncs-bridge.mjs",
+        "foundation-conformance.json",
+        "RNCS packages/kernel/rncs-core-contract/src/index.mjs"
+      ]
+    },
+    {
+      "id": "rcl-declared-domain-native-lowering-gap",
+      "domain": "native_lowering",
+      "signal": "Declared Foundation-domain syntax remains outside the Native VM bytecode subset and is executed through provider bridges.",
+      "pressure": 0.94,
+      "evidence": [
+        "docs/foundation-native-provider-bridge.md",
+        "foundation-conformance.json"
+      ]
+    },
+    {
+      "id": "rcl-selfhost-stage0-boundary",
+      "domain": "selfhost_boundary",
+      "signal": "The self-host compiler is strong but Stage-0 JavaScript still owns parts of serialization/host materialization, so whole-language native closure remains bounded.",
+      "pressure": 0.858,
+      "evidence": [
+        "src/bootstrap.mjs",
+        "selfhost/compiler-core.rcl"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "native-foundation-4r-governance-gate",
+      "domain": "4r_governance",
+      "problem": "make RCL itself fail closed on incomplete provider capability, authority, evidence, invariant and irreversible-effect governance instead of only declaring 4R artifacts or relying on RNCS downstream",
+      "score": 0.8332,
+      "expected_goal_gain": 0.98,
+      "reuse_gain": 0.96,
+      "autonomy_gain": 0.95,
+      "evidence_gain": 0.98,
+      "implementation_cost": 0.48,
+      "regression_risk": 0.22,
+      "evidence": [
+        "reuse RCL foundation_governance shape",
+        "reuse RNCS FOUNDATION_4R_GATE_FAILED semantics"
+      ]
+    },
+    {
+      "candidate_id": "declared-foundation-native-lowering",
+      "domain": "native_lowering",
+      "problem": "lower declared Foundation-domain syntax directly into the native bytecode/runtime path",
+      "score": 0.7564,
+      "expected_goal_gain": 0.97,
+      "reuse_gain": 0.90,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.92,
+      "implementation_cost": 0.88,
+      "regression_risk": 0.52
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.7354,
+      "expected_goal_gain": 0.90,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.91,
+      "evidence_gain": 0.88,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "native-foundation-4r-governance-gate",
+  "mode": "WHOLE_ARTIFACT",
+  "mode_reason": "multiple high-pressure domains remain coupled and the top two candidates are close in North Star score; add the missing governance organ across structural validation, commit decision and RNCS handoff before deeper local lowering work",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-governance-gate.mjs",
+    "src/rncs-bridge.mjs",
+    "tests/foundation-governance-gate.test.mjs"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-governance-gate.test.mjs (materialized candidate module with the current Foundation contract version)",
+      "status": "PASS",
+      "tests": 6
+    },
+    "syntax": {
+      "command": "node --check src/rncs-bridge.mjs (candidate text)",
+      "status": "PASS"
+    },
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED"
+  },
+  "ci_policy": "Do not consume GitHub Actions for this autonomous cycle; targeted validation was performed outside Actions.",
+  "truth_boundary": "This cycle proves a deterministic RCL-owned 4R governance gate and structural gating of RCL->RNCS proposal handoff. It does not claim declared Foundation-domain syntax is native VM syntax, nor that the repository-wide suite has been rerun."
+}
