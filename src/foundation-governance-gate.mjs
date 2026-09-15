@@ -29,6 +29,19 @@ function hasArray(value, key) {
   return value && Array.isArray(value[key]);
 }
 
+function causalParentIdentity(value) {
+  if (typeof value === 'string') {
+    const text = value.trim();
+    return text.length ? text : null;
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  for (const field of ['root', 'beforeRoot', 'reference', 'id']) {
+    const candidate = value[field];
+    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+  }
+  return null;
+}
+
 function structuralFailures(governance, contractVersion = FOUNDATION_CONTRACT_VERSION) {
   const failures = [];
   if (contractVersion !== FOUNDATION_CONTRACT_VERSION) failures.push('RCL_4R_CONTRACT_VERSION_MISMATCH');
@@ -43,8 +56,16 @@ function structuralFailures(governance, contractVersion = FOUNDATION_CONTRACT_VE
   if (!hasArray(governance, 'irreversibleEffects')) failures.push('RCL_4R_IRREVERSIBLE_EFFECTS_REQUIRED');
   if (!hasArray(governance, 'invariants')) failures.push('RCL_4R_INVARIANTS_REQUIRED');
   if (!governance.adaptiveInvariantField || typeof governance.adaptiveInvariantField !== 'object' || !Array.isArray(governance.adaptiveInvariantField.active)) failures.push('RCL_4R_ADAPTIVE_INVARIANT_FIELD_REQUIRED');
-  if (!hasArray(governance, 'causalParents')) failures.push('RCL_4R_CAUSAL_PARENTS_REQUIRED');
-  if (!hasArray(governance, 'evidenceRequirements')) failures.push('RCL_4R_EVIDENCE_REQUIREMENTS_REQUIRED');
+  if (!hasArray(governance, 'causalParents')) {
+    failures.push('RCL_4R_CAUSAL_PARENTS_REQUIRED');
+  } else if (governance.causalParents.length === 0 || governance.causalParents.some(item => causalParentIdentity(item) === null)) {
+    failures.push('RCL_4R_CAUSAL_PARENTS_INVALID');
+  }
+  if (!hasArray(governance, 'evidenceRequirements')) {
+    failures.push('RCL_4R_EVIDENCE_REQUIREMENTS_REQUIRED');
+  } else if (governance.evidenceRequirements.length === 0) {
+    failures.push('RCL_4R_EVIDENCE_REQUIREMENTS_EMPTY');
+  }
   return failures;
 }
 
@@ -179,6 +200,7 @@ export function evaluateFoundationCommit(governance, context = {}) {
       authorityRequirements: governance.authorityRequirements.length,
       evidenceRequirements: governance.evidenceRequirements.length,
       activeInvariants: activeInvariants.length,
+      causalParents: governance.causalParents.length,
       irreversible,
       externalSideEffects,
     },
