@@ -1,0 +1,126 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-perception-direct-lowering-v0.1",
+  "base_commit": "aece2e124c6ba2efe1b9a7f0c2f53130ae8abd21",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-declared-domain-native-lowering-gap",
+      "domain": "native_lowering",
+      "signal": "Declared Foundation-domain syntax remains outside the canonical Native RBC/VM subset even though its JavaScript reference semantics and provider bridges are mature.",
+      "pressure": 0.9365,
+      "evidence": [
+        "src/bytecode.mjs#RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+        "foundation-conformance.json",
+        "output/foundation-integration/foundation-integration-report.md"
+      ]
+    },
+    {
+      "id": "rcl-native-lowering-semantic-risk",
+      "domain": "native_lowering",
+      "signal": "Lowering every Foundation domain in one step would carry high implementation cost and regression risk; the perception Observe path already maps naturally onto existing core transaction/state/preserve/witness semantics.",
+      "pressure": 0.89,
+      "evidence": [
+        "src/runtime.mjs#observePerception",
+        "src/parser.mjs#PerceptionDecl",
+        "src/bytecode.mjs#compileRuleInvocation"
+      ]
+    },
+    {
+      "id": "rcl-selfhost-stage0-boundary",
+      "domain": "selfhost_boundary",
+      "signal": "Whole-language native self-host closure remains bounded by Stage-0 host ownership.",
+      "pressure": 0.87,
+      "evidence": [
+        "selfhost/rcl-source-selfhost-stage0.rcl",
+        "selfhost/compiler-core.rcl"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-perception-direct-lowering-slice",
+      "domain": "native_lowering",
+      "problem": "create a fail-closed direct-lowering seam that rewrites declared perception Observe semantics into existing core RCL transaction semantics before RBC compilation, without provider calls",
+      "score": 0.8128,
+      "expected_goal_gain": 0.9,
+      "reuse_gain": 0.98,
+      "autonomy_gain": 0.92,
+      "evidence_gain": 0.95,
+      "implementation_cost": 0.31,
+      "regression_risk": 0.16,
+      "evidence": [
+        "reuse existing PerceptionDecl AST",
+        "reuse existing core Emergence/Realize lowering",
+        "reuse existing Native RBC/VM transaction opcodes",
+        "leave unsupported Foundation declarations intact so canonical bytecode validation still fails closed"
+      ]
+    },
+    {
+      "candidate_id": "all-foundation-direct-native-lowering",
+      "domain": "native_lowering",
+      "problem": "lower all declared Foundation domains into native RBC in one step",
+      "score": 0.7204,
+      "expected_goal_gain": 0.99,
+      "reuse_gain": 0.9,
+      "autonomy_gain": 0.94,
+      "evidence_gain": 0.94,
+      "implementation_cost": 0.98,
+      "regression_risk": 0.72
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.7354,
+      "expected_goal_gain": 0.9,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.91,
+      "evidence_gain": 0.88,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "foundation-perception-direct-lowering-slice",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "After the global causal/evidence seam closed, native lowering is the dominant remaining bottleneck. Deepen one state-transition-equivalent Foundation slice first instead of claiming whole-Foundation native closure without parity evidence.",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "src/foundation-direct-bytecode.mjs",
+    "tests/foundation-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "Observe directives for declared perception domains can be deterministically rewritten into ordinary Emergence + Realize core semantics",
+    "channel expressions, state targets and preserve invariants remain structurally identical through the rewrite",
+    "a deterministic Foundation perception witness is attached to the synthesized core transaction",
+    "unobserved perceptions and all other Foundation domains remain declared, so the existing canonical bytecode validator continues to reject unsupported semantics rather than silently dropping them",
+    "a provider-neutral adapter can pass the transformed program into the existing bytecode compiler without changing canonical bytecode.mjs"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-lowering.test.mjs",
+      "status": "PASS",
+      "tests": 7
+    },
+    "syntax": [
+      {
+        "command": "node --check src/foundation-direct-lowering.mjs",
+        "status": "PASS"
+      },
+      {
+        "command": "node --check src/foundation-direct-bytecode.mjs",
+        "status": "PASS"
+      }
+    ],
+    "adapter_contract": {
+      "status": "PASS",
+      "method": "exact candidate adapter loaded against injected compileReality/tryCompileRealityToBytecode stubs and verified one perception lowering reaches the bytecode adapter boundary"
+    },
+    "broad_repository_suite": "NOT_RUN",
+    "native_c_vm_execution": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED"
+  },
+  "ci_policy": "Every branch commit carries [skip ci] [skip actions]. Do not actively consume GitHub Actions; verify the head remains workflow-free before PR/merge.",
+  "truth_boundary": "This cycle creates the first bounded direct-lowering compiler seam for Perception Observe state transitions. It does not claim C Native VM execution parity, domain-receipt parity, all-Foundation native lowering, removal of Foundation provider bridges, or repository-wide regression coverage. Unsupported declarations remain fail-closed through the existing bytecode validator."
+}
