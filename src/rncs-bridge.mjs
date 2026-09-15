@@ -1,6 +1,7 @@
 import { realityRoot } from './canonical.mjs';
 import { createRclRncsVisualIntent } from './rncs-visual-intent.mjs';
 import { createRclRncsRuntimeBinding } from './rncs-runtime-binding.mjs';
+import { validateFoundationGovernance } from './foundation-governance-gate.mjs';
 
 /**
  * Convert an RCL realized transition into the input expected by
@@ -34,6 +35,10 @@ export function toRncsProposalInput(program, transition, options = {}) {
     causalParents: options.causalParents ?? [{ kind: transition.ruleKind ?? 'transition', rule: transition.rule, beforeRoot: transition.beforeRoot }],
     evidenceRequirements: evidenceRequirements.length ? evidenceRequirements : [{ kind: 'rcl-transition-root', reference: transition.afterRoot, required: true }],
   };
+  const governanceGate = validateFoundationGovernance(foundationGovernance);
+  if (!governanceGate.passed) {
+    throw new TypeError(`RCL_FOUNDATION_4R_GATE_FAILED:${governanceGate.failures.join(',')}`);
+  }
 
   return {
     reality_id: realityId,
