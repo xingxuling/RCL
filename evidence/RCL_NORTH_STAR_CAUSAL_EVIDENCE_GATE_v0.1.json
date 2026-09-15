@@ -1,0 +1,115 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-causal-evidence-v0.1",
+  "base_commit": "701ebbf185c2ce9fd05cfa861cd272cd80b49ad7",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-causal-commit-binding-gap",
+      "domain": "causality_evidence",
+      "signal": "The new RCL-owned 4R commit gate structurally required causalParents/evidenceRequirements fields, but accepted empty causal ancestry and an empty evidence-requirement set; an accepted commit could therefore become detached from causal/evidence reality while still producing a deterministic commit root.",
+      "pressure": 0.957,
+      "evidence": [
+        "src/foundation-governance-gate.mjs",
+        "src/rncs-bridge.mjs",
+        "src/foundation-contract.mjs#causality-evidence",
+        "evidence/RCL_NORTH_STAR_4R_GATE_v0.1.json"
+      ]
+    },
+    {
+      "id": "rcl-declared-domain-native-lowering-gap",
+      "domain": "native_lowering",
+      "signal": "Declared Foundation-domain syntax remains outside the Native VM bytecode subset and is executed through provider bridges.",
+      "pressure": 0.9365,
+      "evidence": [
+        "src/bytecode.mjs#RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+        "scripts/foundation-conformance.mjs",
+        "docs/foundation-native-provider-bridge.md"
+      ]
+    },
+    {
+      "id": "rcl-selfhost-stage0-boundary",
+      "domain": "selfhost_boundary",
+      "signal": "Whole-language native self-host closure remains bounded by Stage-0 host ownership.",
+      "pressure": 0.87,
+      "evidence": [
+        "selfhost/rcl-source-selfhost-stage0.rcl",
+        "selfhost/compiler-core.rcl"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "causal-parent-commit-binding",
+      "domain": "causality_evidence",
+      "problem": "fail closed when commit-grade Foundation governance erases causal ancestry or all evidence requirements, while preserving RNCS-style causal-parent objects and binding accepted commit identity to the parent set",
+      "score": 0.8508,
+      "expected_goal_gain": 0.96,
+      "reuse_gain": 0.98,
+      "autonomy_gain": 0.95,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.22,
+      "regression_risk": 0.12,
+      "evidence": [
+        "reuse existing Foundation governance gate",
+        "reuse causality-evidence Foundation axis",
+        "preserve existing RNCS beforeRoot parent shape"
+      ]
+    },
+    {
+      "candidate_id": "declared-foundation-native-lowering",
+      "domain": "native_lowering",
+      "problem": "lower declared Foundation-domain syntax directly into the native bytecode/runtime path",
+      "score": 0.7564,
+      "expected_goal_gain": 0.97,
+      "reuse_gain": 0.9,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.92,
+      "implementation_cost": 0.88,
+      "regression_risk": 0.52
+    },
+    {
+      "candidate_id": "whole-language-native-selfhost-closure",
+      "domain": "selfhost_boundary",
+      "problem": "remove remaining Stage-0 host ownership from whole-language self-host closure",
+      "score": 0.7354,
+      "expected_goal_gain": 0.9,
+      "reuse_gain": 0.85,
+      "autonomy_gain": 0.91,
+      "evidence_gain": 0.88,
+      "implementation_cost": 0.82,
+      "regression_risk": 0.45
+    }
+  ],
+  "selected": "causal-parent-commit-binding",
+  "mode": "WHOLE_ARTIFACT",
+  "mode_reason": "Three high-pressure domains remain coupled and the top candidate does not dominate by the DWAC 0.18 threshold; close the causal/evidence commit-integrity seam globally before entering the higher-risk native-lowering deep path.",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-governance-gate.mjs",
+    "tests/foundation-governance-gate.test.mjs"
+  ],
+  "behavioral_change": [
+    "causalParents must be non-empty and every parent must carry a usable identity (string, root, beforeRoot, reference or id)",
+    "evidenceRequirements must be non-empty for commit-grade Foundation governance",
+    "RNCS-style causal parent objects with beforeRoot remain accepted",
+    "accepted decision receipts expose causal parent count",
+    "governanceRoot and commitRoot remain deterministically bound to the causal-parent set"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-governance-gate.test.mjs",
+      "status": "PASS",
+      "tests": 10,
+      "materialization": "exact candidate gate + exact candidate test file; Foundation contract import was materialized with the current canonical FOUNDATION_CONTRACT_VERSION=0.1.0 because this focused suite uses no other Foundation contract exports"
+    },
+    "syntax": {
+      "command": "node --check src/foundation-governance-gate.mjs",
+      "status": "PASS"
+    },
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "NOT_TRIGGERED"
+  },
+  "ci_policy": "Do not consume GitHub Actions for this autonomous cycle; focused validation was performed outside Actions.",
+  "truth_boundary": "This cycle closes a commit-integrity bypass in the RCL-owned governance gate. It does not claim declared Foundation-domain syntax has become native VM syntax and does not claim repository-wide regression coverage."
+}

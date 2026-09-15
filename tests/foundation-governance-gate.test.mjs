@@ -87,3 +87,38 @@ test('assertFoundationCommit exposes one fail-closed error surface', () => {
     error => error instanceof FoundationGovernanceGateError && error.code === 'RCL_FOUNDATION_4R_GATE_FAILED',
   );
 });
+
+test('commit-grade governance cannot omit causal ancestry', () => {
+  const empty = validateFoundationGovernance(governance({ causalParents: [] }));
+  assert.equal(empty.passed, false);
+  assert.ok(empty.failures.includes('RCL_4R_CAUSAL_PARENTS_INVALID'));
+  const malformed = validateFoundationGovernance(governance({ causalParents: [{}] }));
+  assert.equal(malformed.passed, false);
+  assert.ok(malformed.failures.includes('RCL_4R_CAUSAL_PARENTS_INVALID'));
+});
+
+test('RNCS-style causal parent objects remain valid', () => {
+  const result = validateFoundationGovernance(governance({
+    causalParents: [{ kind: 'transition', rule: 'advance', beforeRoot: 'c'.repeat(64) }],
+  }));
+  assert.equal(result.passed, true);
+});
+
+test('commit-grade governance cannot erase all evidence requirements', () => {
+  const result = validateFoundationGovernance(governance({ evidenceRequirements: [] }));
+  assert.equal(result.passed, false);
+  assert.ok(result.failures.includes('RCL_4R_EVIDENCE_REQUIREMENTS_EMPTY'));
+});
+
+test('accepted commit identity is causally bound to the parent set', () => {
+  const evidenceRefs = ['b'.repeat(64)];
+  const left = assertFoundationCommit(governance({
+    causalParents: [{ kind: 'transition', root: 'a'.repeat(64) }],
+  }), { evidenceRefs });
+  const right = assertFoundationCommit(governance({
+    causalParents: [{ kind: 'transition', root: 'c'.repeat(64) }],
+  }), { evidenceRefs });
+  assert.notEqual(left.governanceRoot, right.governanceRoot);
+  assert.notEqual(left.commitRoot, right.commitRoot);
+  assert.equal(left.evaluated.causalParents, 1);
+});
