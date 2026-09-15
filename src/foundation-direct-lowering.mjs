@@ -1,5 +1,5 @@
-export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.1';
-export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.1.0';
+export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.2';
+export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.2.0';
 
 function diagnostic(code, message, details = {}) {
   return { code, message, details };
@@ -112,10 +112,14 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       domain: 'perception',
       declaration: perception.name,
       directive: 'Observe',
+      directiveIndex: index,
       syntheticRule: ruleName,
       stateTargets: array(perception.channels).map(channel => channel.path),
       preserveCount: array(perception.preserves).length,
       witness: `rcl:foundation:perception:${perception.name}`,
+      observer: perception.observer ?? null,
+      sourceReality: perception.source ?? null,
+      authorityClass: 'observation',
     });
   });
 
@@ -152,7 +156,7 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
     truthBoundary: {
       directDomains: ['perception'].filter(domain => enabledDomains.has(domain)),
       stateTransitionParityTargeted: true,
-      domainReceiptParityClaimed: false,
+      domainReceiptParityTargeted: true,
       allFoundationDomainsNativeClaimed: false,
       providerBridgeRemovedGlobally: false,
     },

@@ -1,5 +1,5 @@
-export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.2';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.2.0';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.3';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.3.0';
 
 function codeOf(error) {
   return error?.code ?? error?.payload?.code ?? 'RCL_FOUNDATION_DIRECT_NATIVE_EXECUTION_FAILED';
@@ -15,8 +15,8 @@ function truthBoundary() {
     semanticStateRootParityClaimedOnlyWhenVerified: true,
     nativeStateRootAuthorityRequired: true,
     loweringLineageClaimedOnlyWhenVerified: true,
-    historyParityClaimed: false,
-    domainReceiptParityClaimed: false,
+    domainReceiptParityClaimedOnlyWhenVerified: true,
+    fullHistoryParityClaimed: false,
     allFoundationDomainsNativeClaimed: false,
     providerBridgeRemovedGlobally: false,
   };
@@ -64,12 +64,38 @@ function normalizeState(value, semanticValue) {
   return canonicalJson(semanticValue ? semanticValue(value) : value);
 }
 
+function normalizeReceiptValue(value, semanticValue) {
+  return canonicalJson(semanticValue ? semanticValue(value) : value);
+}
+
 function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
 function unique(values) {
   return [...new Set(values)];
+}
+
+function sortedUnique(values) {
+  return unique(values).sort();
+}
+
+function receiptChanges(changes, semanticValue) {
+  return asArray(changes)
+    .filter(change => change?.target)
+    .map(change => ({
+      target: change.target,
+      before: normalizeReceiptValue(change.before, semanticValue),
+      after: normalizeReceiptValue(change.after, semanticValue),
+    }))
+    .sort((left, right) => left.target.localeCompare(right.target));
+}
+
+function strictlyIncreasing(values) {
+  for (let index = 1; index < values.length; index += 1) {
+    if (values[index] <= values[index - 1]) return false;
+  }
+  return true;
 }
 
 export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
@@ -120,6 +146,88 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
   };
 }
 
+export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, nativeHistory, semanticValue = value => value) {
+  const lowered = asArray(lowering?.lowered);
+  const referenceReceipts = asArray(referenceHistory).filter(record => record?.kind === 'DomainTransition' && record?.domainKind === 'perceptual');
+  const nativeRecords = asArray(nativeHistory);
+  const declaredLoweredCount = Number(lowering?.summary?.loweredCount ?? lowered.length);
+  const required = declaredLoweredCount > 0;
+  const metadataComplete = declaredLoweredCount === lowered.length && lowered.every(item => (
+    item?.domain === 'perception'
+    && item?.directive === 'Observe'
+    && typeof item?.declaration === 'string'
+    && typeof item?.syntheticRule === 'string'
+    && typeof item?.witness === 'string'
+    && Object.prototype.hasOwnProperty.call(item, 'observer')
+    && Object.prototype.hasOwnProperty.call(item, 'sourceReality')
+    && item?.authorityClass === 'observation'
+  ));
+  const referenceCoverageExact = referenceReceipts.length === lowered.length;
+  const nativeIndexes = [];
+
+  const entries = lowered.map((item, index) => {
+    const reference = referenceReceipts[index] ?? null;
+    const nativeMatches = nativeRecords
+      .map((record, nativeIndex) => ({ record, nativeIndex }))
+      .filter(({ record }) => record?.rule === item?.syntheticRule);
+    const nativeMatch = nativeMatches.length === 1 ? nativeMatches[0] : null;
+    if (nativeMatch) nativeIndexes.push(nativeMatch.nativeIndex);
+
+    const expectedTargets = sortedUnique(asArray(item?.stateTargets).filter(Boolean));
+    const referenceTargets = sortedUnique(asArray(reference?.changes).map(change => change?.target).filter(Boolean));
+    const nativeTargets = sortedUnique(asArray(nativeMatch?.record?.changes).map(change => change?.target).filter(Boolean));
+    const referenceChanges = receiptChanges(reference?.changes, semanticValue);
+    const nativeChanges = receiptChanges(nativeMatch?.record?.changes, semanticValue);
+    const checks = {
+      referenceReceiptAligned: Boolean(reference)
+        && reference.name === item?.declaration
+        && reference.status === 'realized'
+        && reference.authorityClass === 'observation'
+        && (reference.observer ?? null) === (item?.observer ?? null)
+        && (reference.sourceReality ?? null) === (item?.sourceReality ?? null),
+      exactNativeRecord: nativeMatches.length === 1,
+      nativeStatusRealized: nativeMatch?.record?.status === 'realized',
+      referenceTargetsExact: sameJson(referenceTargets, expectedTargets),
+      nativeTargetsExact: sameJson(nativeTargets, expectedTargets),
+      transitionValuesEquivalent: sameJson(referenceChanges, nativeChanges),
+      witnessPresent: asArray(nativeMatch?.record?.witnesses).includes(item?.witness),
+    };
+    return {
+      index,
+      domain: item?.domain ?? null,
+      declaration: item?.declaration ?? null,
+      directive: item?.directive ?? null,
+      syntheticRule: item?.syntheticRule ?? null,
+      authorityClass: item?.authorityClass ?? null,
+      observer: item?.observer ?? null,
+      sourceReality: item?.sourceReality ?? null,
+      expectedTargets,
+      referenceTargets,
+      nativeTargets,
+      nativeRecordCount: nativeMatches.length,
+      checks,
+      ok: Object.values(checks).every(Boolean),
+    };
+  });
+
+  const nativeOrderPreserved = nativeIndexes.length === lowered.length && strictlyIncreasing(nativeIndexes);
+  const ok = metadataComplete
+    && referenceCoverageExact
+    && nativeOrderPreserved
+    && (!required || (entries.length > 0 && entries.every(item => item.ok)));
+  return {
+    required,
+    ok,
+    declaredLoweredCount,
+    observedLoweringEntries: lowered.length,
+    referenceReceiptCount: referenceReceipts.length,
+    metadataComplete,
+    referenceCoverageExact,
+    nativeOrderPreserved,
+    entries,
+  };
+}
+
 export async function verifyFoundationDirectNativeParity(sourceOrProgram, options = {}) {
   const deps = await resolveDefaults(options);
   const program = typeof sourceOrProgram === 'string'
@@ -140,6 +248,7 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
       diagnostics: compiled?.diagnostics ?? [],
       lowering: compiled?.foundationDirectLowering ?? null,
       lineage: null,
+      domainReceipt: null,
       parity: null,
       gaps: ['direct-bytecode-not-available'],
       truthBoundary: truthBoundary(),
@@ -161,12 +270,10 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
       version: FOUNDATION_DIRECT_NATIVE_PARITY_VERSION,
       status: nativeMissing ? 'native-blocked' : 'native-failed',
       verified: false,
-      diagnostics: [{
-        code,
-        message: messageOf(error),
-      }],
+      diagnostics: [{ code, message: messageOf(error) }],
       lowering: compiled.foundationDirectLowering ?? null,
       lineage: null,
+      domainReceipt: null,
       parity: null,
       gaps: [nativeMissing ? 'native-vm-missing' : 'native-execution-failed'],
       truthBoundary: truthBoundary(),
@@ -178,12 +285,19 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
   const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
   const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
   const lineage = verifyFoundationDirectLoweringLineage(compiled.foundationDirectLowering, native?.history);
+  const domainReceipt = verifyFoundationDomainReceiptParity(
+    compiled.foundationDirectLowering,
+    reference?.history,
+    native?.history,
+    deps.semanticValue,
+  );
   const parity = {
     state: sameJson(nativeState, referenceState),
     semanticStateRoot: nativeRoot === referenceRoot,
     nativeStateRootVerified: native?.stateRootVerified === true,
     nativeStateRootParity: native?.stateRootParity === true,
     loweringLineage: lineage.ok,
+    domainReceipt: domainReceipt.ok,
   };
   const verified = Object.values(parity).every(Boolean);
 
@@ -195,6 +309,7 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
     diagnostics: [],
     lowering: compiled.foundationDirectLowering ?? null,
     lineage,
+    domainReceipt,
     parity,
     roots: {
       referenceSemanticStateRoot: referenceRoot,
