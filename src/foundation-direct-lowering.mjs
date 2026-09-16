@@ -1,12 +1,15 @@
-export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.4';
-export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.4.0';
+export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.5';
+export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.5.0';
 
 const MAX_STATIC_DOMAIN_STEPS = 256;
 
 function diagnostic(code, message, details = {}) { return { code, message, details }; }
 function trueExpression() { return { kind: 'LiteralExpr', valueType: 'Truth', value: true }; }
+function pathExpression(path) { return { kind: 'PathExpr', path }; }
+function addExpression(left, right) { return { kind: 'BinaryExpr', operator: '+', left, right }; }
 function sanitizeName(value) { return String(value ?? 'unnamed').replace(/[^A-Za-z0-9_]+/g, '_'); }
 function array(value) { return Array.isArray(value) ? value : []; }
+function unique(values) { return [...new Set(values)]; }
 function cloneAst(value) {
   if (Array.isArray(value)) return value.map(cloneAst);
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cloneAst(item)]));
@@ -87,6 +90,45 @@ function neuralRule(neural, pathway, ruleName, stepIndex, stepCount, pathwayInde
     },
   };
 }
+function geneticStageRules(genetic, mutationRuleName, expressionRuleName, generationIndex, generationCount) {
+  const mutationWitness = `rcl:foundation:genetic:${genetic.name}:generation:${generationIndex}:mutation`;
+  const expressionWitness = `rcl:foundation:genetic:${genetic.name}:generation:${generationIndex}:expression`;
+  const mutationTargets = array(genetic.mutations).map(change => change.target);
+  const expressionTargets = array(genetic.expressions).map(change => change.target);
+  return {
+    mutation: {
+      kind: 'Emergence', name: mutationRuleName, cause: `genetic.${genetic.name}.mutation`,
+      when: trueExpression(), needs: [],
+      alters: array(genetic.mutations).map(mutation => ({
+        target: mutation.target,
+        expression: addExpression(pathExpression(mutation.target), cloneAst(mutation.expression)),
+      })),
+      calls: [], preserves: [], witnesses: [mutationWitness],
+    },
+    expression: {
+      kind: 'Emergence', name: expressionRuleName, cause: `genetic.${genetic.name}.expression`,
+      when: trueExpression(), needs: [],
+      alters: array(genetic.expressions).map(expression => ({ target: expression.target, expression: cloneAst(expression.expression) })),
+      calls: [], preserves: array(genetic.preserves).map(cloneAst),
+      witnesses: [...array(genetic.witnesses), expressionWitness],
+    },
+    metadata: [
+      {
+        domain: 'genetic', declaration: genetic.name, directive: 'Inherit', stage: 'mutation', stageIndex: 1, stageCount: 2,
+        syntheticRule: mutationRuleName, stateTargets: mutationTargets, preserveCount: 0, witness: mutationWitness,
+        authorityClass: 'lineage-transformation', sourceReality: genetic.name, generationIndex, generationCount,
+        originalWitnesses: [...array(genetic.witnesses)], finalStage: false,
+      },
+      {
+        domain: 'genetic', declaration: genetic.name, directive: 'Inherit', stage: 'expression', stageIndex: 2, stageCount: 2,
+        syntheticRule: expressionRuleName, stateTargets: expressionTargets, preserveCount: array(genetic.preserves).length,
+        witness: expressionWitness, authorityClass: 'lineage-transformation', sourceReality: genetic.name,
+        generationIndex, generationCount, originalWitnesses: [...array(genetic.witnesses)], finalStage: true,
+        generationStateTargets: unique([...mutationTargets, ...expressionTargets]),
+      },
+    ],
+  };
+}
 function collisionDiagnostic(domain, declaration, directiveIndex, allocation, extra = {}) {
   return diagnostic(
     'RCL_FOUNDATION_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED',
@@ -98,19 +140,21 @@ function collisionDiagnostic(domain, declaration, directiveIndex, allocation, ex
 export function lowerDeclaredFoundationToCore(program, options = {}) {
   if (!program || typeof program !== 'object' || Array.isArray(program)) throw new TypeError('compiled RCL program object is required');
 
-  const enabledDomains = new Set(options.domains ?? ['perception', 'physical', 'neural']);
+  const enabledDomains = new Set(options.domains ?? ['perception', 'physical', 'neural', 'genetic']);
   const diagnostics = []; const lowered = []; const syntheticRules = [];
   const consumedDirectiveIndexes = new Set(); const consumedPerceptions = new Set();
-  const consumedPhysicalLaws = new Set(); const consumedNeurals = new Set();
+  const consumedPhysicalLaws = new Set(); const consumedNeurals = new Set(); const consumedGenetics = new Set();
   const rewrittenDirectives = [];
   const reservedRuleNames = new Set(array(program.rules).map(rule => rule?.name).filter(Boolean));
   let renamedSyntheticRuleCount = 0; let physicalLoweredStepCount = 0; let neuralLoweredTransactionCount = 0;
+  let geneticLoweredGenerationCount = 0; let geneticLoweredStageCount = 0;
 
   const perceptions = array(program.perceptions);
   const perceptionsByName = new Map(perceptions.map(item => [item.name, item]));
   const physicals = array(program.physicals); const physicalLawByName = new Map();
   for (const physical of physicals) for (const law of array(physical?.laws)) physicalLawByName.set(law.name, law);
   const neurals = array(program.neurals); const neuralByName = new Map(neurals.map(item => [item.name, item]));
+  const genetics = array(program.genetics); const geneticByName = new Map(genetics.map(item => [item.name, item]));
 
   array(program.directives).forEach((directive, index) => {
     if (directive?.kind === 'Observe' && enabledDomains.has('perception')) {
@@ -190,6 +234,31 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       consumedDirectiveIndexes.add(index); consumedNeurals.add(neural.name); return;
     }
 
+    if (directive?.kind === 'Inherit' && enabledDomains.has('genetic')) {
+      const genetic = geneticByName.get(directive.name);
+      if (!genetic) {
+        diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_TARGET_UNKNOWN', `Inherit target '${directive.name}' is not a declared genetic reality`, { directiveIndex: index, domain: 'genetic', target: directive.name }));
+        rewrittenDirectives.push(directive); return;
+      }
+      const generationCount = literalStepCount(directive.count);
+      if (generationCount === null) {
+        diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_GENETIC_DYNAMIC_GENERATIONS_UNSUPPORTED', `Inherit '${genetic.name}' requires a literal generation count between 1 and ${MAX_STATIC_DOMAIN_STEPS} for bounded staged direct lowering`, { directiveIndex: index, domain: 'genetic', declaration: genetic.name }));
+        rewrittenDirectives.push(directive); return;
+      }
+      for (let generationIndex = 1; generationIndex <= generationCount; generationIndex += 1) {
+        const mutationAllocation = allocateSyntheticRuleName(`__rcl_foundation_genetic_${sanitizeName(genetic.name)}_${index}_${generationIndex}_mutation`, reservedRuleNames);
+        const expressionAllocation = allocateSyntheticRuleName(`__rcl_foundation_genetic_${sanitizeName(genetic.name)}_${index}_${generationIndex}_expression`, reservedRuleNames);
+        if (mutationAllocation.renamed) { renamedSyntheticRuleCount += 1; diagnostics.push(collisionDiagnostic('genetic', genetic.name, index, mutationAllocation, { generationIndex, stage: 'mutation' })); }
+        if (expressionAllocation.renamed) { renamedSyntheticRuleCount += 1; diagnostics.push(collisionDiagnostic('genetic', genetic.name, index, expressionAllocation, { generationIndex, stage: 'expression' })); }
+        const staged = geneticStageRules(genetic, mutationAllocation.ruleName, expressionAllocation.ruleName, generationIndex, generationCount);
+        syntheticRules.push(staged.mutation, staged.expression);
+        rewrittenDirectives.push({ kind: 'Realize', rule: mutationAllocation.ruleName }, { kind: 'Realize', rule: expressionAllocation.ruleName });
+        lowered.push(...staged.metadata.map(item => ({ ...item, directiveIndex: index })));
+        geneticLoweredGenerationCount += 1; geneticLoweredStageCount += 2;
+      }
+      consumedDirectiveIndexes.add(index); consumedGenetics.add(genetic.name); return;
+    }
+
     rewrittenDirectives.push(directive);
   });
 
@@ -207,8 +276,12 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
   const transformedNeurals = neurals.filter(neural => !consumedNeurals.has(neural.name) || remainingPropagateTargets.has(neural.name));
   for (const neural of transformedNeurals) diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_DECLARATION_UNCONSUMED', `Neural domain '${neural.name}' remains declared because no fully supported Propagate directive consumed it`, { domain: 'neural', declaration: neural.name }));
 
+  const remainingInheritTargets = new Set(rewrittenDirectives.filter(item => item?.kind === 'Inherit').map(item => item.name));
+  const transformedGenetics = genetics.filter(genetic => !consumedGenetics.has(genetic.name) || remainingInheritTargets.has(genetic.name));
+  for (const genetic of transformedGenetics) diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_DECLARATION_UNCONSUMED', `Genetic reality '${genetic.name}' remains declared because no fully supported Inherit directive consumed it`, { domain: 'genetic', declaration: genetic.name }));
+
   const transformed = {
-    ...program, perceptions: remainingPerceptions, physicals: transformedPhysicals, neurals: transformedNeurals,
+    ...program, perceptions: remainingPerceptions, physicals: transformedPhysicals, neurals: transformedNeurals, genetics: transformedGenetics,
     rules: [...array(program.rules), ...syntheticRules], directives: rewrittenDirectives,
   };
   return {
@@ -217,14 +290,19 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
     summary: {
       loweredCount: lowered.length, syntheticRuleCount: syntheticRules.length, consumedDirectiveCount: consumedDirectiveIndexes.size,
       remainingPerceptionCount: remainingPerceptions.length, remainingPhysicalCount: transformedPhysicals.length,
-      remainingNeuralCount: transformedNeurals.length, physicalLoweredStepCount, neuralLoweredTransactionCount,
+      remainingNeuralCount: transformedNeurals.length, remainingGeneticCount: transformedGenetics.length,
+      physicalLoweredStepCount, neuralLoweredTransactionCount, geneticLoweredGenerationCount, geneticLoweredStageCount,
       renamedSyntheticRuleCount, enabledDomains: [...enabledDomains].sort(),
     },
     truthBoundary: {
-      directDomains: ['perception', 'physical', 'neural'].filter(domain => enabledDomains.has(domain)),
+      directDomains: ['perception', 'physical', 'neural', 'genetic'].filter(domain => enabledDomains.has(domain)),
       stateTransitionParityTargeted: true, domainReceiptParityTargeted: true,
       physicalDirectLoweringBoundedToStaticStepCountAndDt: true,
       neuralDirectLoweringBoundedToStaticStepCount: true,
+      geneticDirectLoweringBoundedToStaticGenerationCount: true,
+      geneticUsesTwoStageMutationThenExpressionTransactions: true,
+      geneticPreservesCheckedOnlyAfterExpressionStage: true,
+      geneticDomainReceiptParityClaimed: false,
       allFoundationDomainsNativeClaimed: false, providerBridgeRemovedGlobally: false,
     },
   };
