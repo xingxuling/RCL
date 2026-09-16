@@ -44,6 +44,12 @@ function successfulMockBuild(invocations = []) {
   };
 }
 
+function missingTool(name = 'make-test') {
+  const error = new Error(`spawnSync ${name} ENOENT`);
+  error.code = 'ENOENT';
+  return { status: null, signal: null, stdout: '', stderr: '', error };
+}
+
 test('embedded canonical build support stays byte-identical to repository Makefile and rclvm.h', () => {
   assert.equal(fs.readFileSync(path.join(ROOT, 'native', 'Makefile'), 'utf8'), RCL_NATIVE_VM_CANONICAL_MAKEFILE);
   assert.equal(fs.readFileSync(path.join(ROOT, 'native', 'rclvm.h'), 'utf8'), RCL_NATIVE_VM_CANONICAL_HEADER);
@@ -81,6 +87,7 @@ test('missing default Linux binary is materialized in a writable staged cache', 
     assert.equal(result.built, true);
     assert.equal(result.cached, false);
     assert.equal(result.provenance, 'staged-repository-source-makefile');
+    assert.equal(result.build.strategy, 'makefile');
     assert.equal(invocations.length, 1);
     assert.equal(invocations[0].command, 'make-test');
     assert.equal(invocations[0].args[0], '-C');
@@ -114,6 +121,88 @@ test('missing packaged Makefile and header are restored from canonical embedded 
     assert.equal(result.supportProvenance.header, 'embedded-canonical-support');
     assert.equal(fs.readFileSync(result.vmPath, 'utf8'), 'fallback-built');
     assert.ok(staged?.startsWith(item.cacheRoot));
+  } finally { clean(item); }
+});
+
+test('missing make falls back to a direct compiler only for canonical build support', () => {
+  const item = fixture({ canonicalSupport: true });
+  try {
+    const invocations = [];
+    const result = materializeNativeVm(item.root, {
+      platform: 'linux',
+      arch: 'fallback-arch',
+      cacheRoot: item.cacheRoot,
+      makePath: 'missing-make',
+      compilerPath: 'cc-test',
+      spawnSyncImpl(command, args, options) {
+        invocations.push({ command, args, options });
+        if (invocations.length === 1) return missingTool(command);
+        assert.equal(command, 'cc-test');
+        assert.equal(options.cwd.includes('fallback-arch-'), true);
+        assert.deepEqual(args.slice(0, 5), ['-O2', '-std=c11', '-Wall', '-Wextra', '-Wpedantic']);
+        assert.deepEqual(args.slice(-4), ['rclvm', 'rclvm.c', '-lcrypto', '-lm']);
+        fs.writeFileSync(path.join(options.cwd, 'rclvm'), 'direct-compiler-binary');
+        return { status: 0, stdout: 'compiled', stderr: '' };
+      },
+    });
+    assert.equal(invocations.length, 2);
+    assert.equal(result.built, true);
+    assert.equal(result.cached, false);
+    assert.equal(result.provenance, 'staged-repository-source-direct-compiler');
+    assert.equal(result.build.strategy, 'direct-compiler');
+    assert.equal(result.build.tool, 'cc-test');
+    assert.equal(result.build.fallbackFrom.tool, 'missing-make');
+    assert.equal(result.build.fallbackFrom.errorCode, 'ENOENT');
+    assert.equal(fs.readFileSync(result.vmPath, 'utf8'), 'direct-compiler-binary');
+  } finally { clean(item); }
+});
+
+test('custom repository Makefile refuses direct compiler fallback instead of changing build semantics', () => {
+  const item = fixture();
+  try {
+    assert.throws(() => materializeNativeVm(item.root, {
+      platform: 'linux',
+      cacheRoot: item.cacheRoot,
+      makePath: 'missing-make',
+      compilerPath: 'cc-test',
+      spawnSyncImpl() { return missingTool('missing-make'); },
+    }), error => error?.code === 'RCL_NATIVE_VM_BUILD_FALLBACK_UNSAFE'
+      && error?.details?.primaryBuildFailure?.errorCode === 'ENOENT');
+  } finally { clean(item); }
+});
+
+test('missing make and missing fallback compiler remain fail-closed with both tool attempts visible', () => {
+  const item = fixture({ canonicalSupport: true });
+  try {
+    let calls = 0;
+    assert.throws(() => materializeNativeVm(item.root, {
+      platform: 'linux',
+      cacheRoot: item.cacheRoot,
+      makePath: 'missing-make',
+      compilerPath: 'missing-cc',
+      spawnSyncImpl(command) { calls += 1; return missingTool(command); },
+    }), error => error?.code === 'RCL_NATIVE_VM_BUILD_TOOL'
+      && error?.details?.buildStrategy === 'direct-compiler'
+      && error?.details?.buildTool === 'missing-cc'
+      && error?.details?.primaryBuildFailure?.errorCode === 'ENOENT'
+      && error?.details?.errorCode === 'ENOENT');
+    assert.equal(calls, 2);
+  } finally { clean(item); }
+});
+
+test('direct compiler fallback can be explicitly disabled', () => {
+  const item = fixture({ canonicalSupport: true });
+  try {
+    let calls = 0;
+    assert.throws(() => materializeNativeVm(item.root, {
+      platform: 'linux',
+      cacheRoot: item.cacheRoot,
+      makePath: 'missing-make',
+      directCompilerFallback: false,
+      spawnSyncImpl(command) { calls += 1; return missingTool(command); },
+    }), error => error?.code === 'RCL_NATIVE_VM_BUILD_TOOL'
+      && error?.details?.buildStrategy === 'makefile');
+    assert.equal(calls, 1);
   } finally { clean(item); }
 });
 
@@ -184,6 +273,7 @@ test('failed staged source build is fail-closed with build and support evidence'
       spawnSyncImpl() { return { status: 2, stdout: 'compile-output', stderr: 'compile-error' }; },
     }), error => error?.code === 'RCL_NATIVE_VM_BUILD_FAILED'
       && error?.details?.buildAttempted === true
+      && error?.details?.buildStrategy === 'makefile'
       && error?.details?.stderr === 'compile-error'
       && typeof error?.details?.sourceRoot === 'string'
       && error?.details?.supportProvenance?.header === 'repository-source');

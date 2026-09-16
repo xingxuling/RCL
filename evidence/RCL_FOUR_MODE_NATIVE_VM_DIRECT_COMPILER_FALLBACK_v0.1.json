@@ -1,0 +1,88 @@
+{
+  "protocol": "dwac.rcl-four-mode-cycle.v0.1",
+  "cycle_id": "RCL-FM-27-native-vm-direct-compiler-fallback-v0.1",
+  "base_commit": "bcf33d4aac38ff7462cdb8d84e4e495a9028e666",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "routing": {
+    "scheduler_mode": "NORTH_STAR",
+    "implementation_mode": "DEEP_DEVELOPMENT",
+    "combined": true,
+    "reason": "当前最高压力仍是规范 C Native VM 真实重放，但最新部署面明确卡在 make 不存在。该阻断存在可验证的单点根因与窄而深的修复面，尚不适合在未重新观察部署结果前进入连续爆发，因此采用北极星单周期调度 + 深度开发实现。"
+  },
+  "observations": [
+    {
+      "id": "deployed-native-vm-make-tool-blocker",
+      "domain": "native_runtime_validation",
+      "signal": "与最新 main bcf33d4aac38ff7462cdb8d84e4e495a9028e666 对齐的 RCL/RNCS 运行面报告 native/rclvm 不存在，rncsFusion/live native verification 因 Unable to invoke native VM build tool 'make': spawnSync make ENOENT 退化为 evidence-only。",
+      "pressure": 0.999,
+      "externally_blocked": true,
+      "addressable_by_repository": true
+    },
+    {
+      "id": "attested-foundation-default-promotion",
+      "domain": "foundation_evidence_authority",
+      "signal": "Cycle 25 的 attested Foundation parity 严格入口仍未成为 canonical 默认入口；保持为下一高价值内部候选，但真实原生执行入口的工具链阻断优先级更高。",
+      "pressure": 0.958,
+      "externally_blocked": false
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "canonical-native-vm-make-independent-materialization",
+      "score": 0.982,
+      "expected_goal_gain": 0.995,
+      "evidence_gain": 0.989,
+      "implementation_cost": 0.22,
+      "regression_risk": 0.14
+    },
+    {
+      "candidate_id": "foundation-attested-default-promotion",
+      "score": 0.936,
+      "expected_goal_gain": 0.979,
+      "evidence_gain": 0.992,
+      "implementation_cost": 0.31,
+      "regression_risk": 0.24
+    }
+  ],
+  "selected": "canonical-native-vm-make-independent-materialization",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/native-vm-materialization.mjs",
+    "tests/native-vm-source-materialization.test.mjs"
+  ],
+  "behavioral_change": [
+    "当默认 Makefile 构建工具因 ENOENT 不存在时，规范 Native VM 物化允许在严格条件下回退到直接 C 编译器调用，而不是把 make 本身当成不可替代的现实执行前提。",
+    "直接编译回退只允许用于与内置 canonical Makefile 逐字节一致的构建合同；自定义/漂移 Makefile 不会被直接编译器路径偷偷替代，继续 fail-closed。",
+    "直接编译器调用不经 shell，复用 canonical CFLAGS/LDFLAGS，并确定性解析 CC/CFLAGS/LDFLAGS；构建策略、工具、参数、主工具失败证据和最终 binarySha256 进入 materialization build evidence。",
+    "非 ENOENT 的 make 编译失败不会被 fallback 掩盖；make 与 C 编译器都不存在时保留两个工具尝试的失败证据；回退可显式关闭。",
+    "sourceRoot 继续绑定源码、Makefile、header、构建环境，并新增 fallback 启用状态与 fallback compiler 身份，使缓存不会把不同物化策略混成同一来源。"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "commands": [
+        "node --check src/native-vm-materialization.mjs",
+        "node --test tests/native-vm-source-materialization.test.mjs"
+      ],
+      "result": "13/13 PASS"
+    },
+    "negative_controls": {
+      "custom_makefile_direct_fallback_rejected": true,
+      "non_enoent_make_failure_not_masked": true,
+      "make_and_compiler_missing_fail_closed": true,
+      "explicit_missing_vm_still_fail_closed": true,
+      "tampered_cache_binary_rebuilt": true,
+      "missing_rclvm_source_rejected": true
+    },
+    "real_process_probe": {
+      "status": "PASS",
+      "scope": "最小 staged C process probe；故意指定不存在的 make，使用 /usr/bin/cc 直接编译并执行成功",
+      "provenance": "staged-repository-source-direct-compiler",
+      "output": "direct-compiler-ok"
+    },
+    "real_canonical_c_native_vm_replay": "PENDING_DEPLOYED_REOBSERVATION",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期证明的是 make 缺失不再必然阻断规范源码物化，并且 direct compiler fallback 受 canonical build contract 与失败关闭约束；最小真实 C 进程探针通过，但尚未声明最新完整 native/rclvm.c 已在部署 RCL/RNCS 环境完成真实 RBC 重放，也不声明全仓回归。",
+  "ci_policy": "候选提交、PR 与 merge message 使用 [skip ci] [skip actions]；PR 前后及 merge 后检查 workflow runs，若出现自动 GitHub Actions 运行则停止后续交付。"
+}
