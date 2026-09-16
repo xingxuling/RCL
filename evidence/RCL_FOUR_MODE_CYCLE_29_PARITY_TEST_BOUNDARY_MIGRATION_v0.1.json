@@ -1,0 +1,63 @@
+{
+  "protocol": "dwac.rcl-four-mode-cycle.v0.1",
+  "cycle_id": "RCL-FM-29-parity-test-boundary-migration-v0.1",
+  "base_commit": "877a0f1b3d8f53c55db31a336bfeee3da785ba73",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "routing": {
+    "scheduler_mode": "NORTH_STAR",
+    "implementation_mode": "WHOLE_ARTIFACT",
+    "combined": true,
+    "reason": "Cycle 28 将 canonical Foundation parity 默认入口提升到 attested gate 后，现有多个低层 receipt/lineage 测试仍通过无 execution attestation 的注入式 native runtime 调用 canonical 默认入口。它们验证的是 generic parity 层而非默认权威门，因此需要作为一个完整测试边界工件统一迁移到显式 generic verifier，避免为了兼容旧测试削弱新的默认安全语义。"
+  },
+  "observations": [
+    {
+      "id": "legacy-lower-layer-tests-target-new-canonical-attested-gate",
+      "signal": "foundation-direct-native-parity、domain-receipt-root、physical、neural、genetic 五组测试使用 injected native runtime 且不生成 nativeVmExecutionAttestation，却仍预期 native-verified；Cycle 28 后这些预期与 canonical 默认真相边界冲突。",
+      "pressure": 0.987
+    },
+    {
+      "id": "explicit-generic-verifier-is-preserved-contract",
+      "signal": "Cycle 28 的 canonical module 明确保留并导出 verifyFoundationDirectNativeParityGeneric 与 FOUNDATION_DIRECT_NATIVE_PARITY_GENERIC_FORMAT，适合作为低层测试的稳定目标。",
+      "pressure": 0.972
+    }
+  ],
+  "selected": "foundation-parity-test-semantic-boundary-migration",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "tests/foundation-direct-native-parity.test.mjs",
+    "tests/foundation-domain-receipt-root.test.mjs",
+    "tests/foundation-physical-domain-receipt-parity.test.mjs",
+    "tests/foundation-neural-domain-receipt-parity.test.mjs",
+    "tests/foundation-genetic-domain-receipt-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "五组验证 generic parity / receipt / lineage 语义的测试显式导入 verifyFoundationDirectNativeParityGeneric，不再误把 canonical attested default 当作低层测试夹具。",
+    "foundation-direct-native-parity.test.mjs 同时把格式断言绑定到 FOUNDATION_DIRECT_NATIVE_PARITY_GENERIC_FORMAT，测试层级与格式权威一致。",
+    "production src 未修改；Cycle 28 的 canonical attestation requirement 完全不回退、不增加测试特例，也不伪造 execution attestation。",
+    "canonical default-promotion 与 attested tests 继续负责覆盖默认执行工件证明门。"
+  ],
+  "validation": {
+    "targeted_repository_contract": {
+      "status": "PASS",
+      "checks": [
+        "Cycle 28 canonical module 真实导出 verifyFoundationDirectNativeParityGeneric",
+        "Cycle 28 canonical module 真实导出 FOUNDATION_DIRECT_NATIVE_PARITY_GENERIC_FORMAT",
+        "五个候选测试文件均已从 branch ref 重新读取并确认使用显式 generic verifier",
+        "git compare 确认候选只修改五个 tests 文件且仅为 import/format binding：总计 +6/-6，无 production src 变化",
+        "默认 attested gate 的 production 实现未被修改"
+      ],
+      "result": "5/5 PASS"
+    },
+    "negative_controls": {
+      "canonical_attested_gate_not_weakened": true,
+      "no_fake_execution_attestation_added_to_lower_layer_tests": true,
+      "no_production_runtime_change": true,
+      "generic_layer_remains_explicit_not_default": true
+    },
+    "broad_repository_suite": "NOT_RUN",
+    "reason_broad_suite_not_run": "当前执行环境无法直接 checkout GitHub 仓库；本周期为 import-only 测试边界迁移，因此不把静态/仓库合同验证冒充全仓 npm test。",
+    "real_canonical_c_native_vm_replay": "NOT_CLAIMED"
+  },
+  "truth_boundary": "本周期闭合的是 Cycle 28 后测试语义层级与默认 attested 权威之间的迁移断层。它不新增或削弱运行时能力，不声称全仓测试已执行，也不声称解决无工具链 Linux rclvm 或真实 C Native VM replay。",
+  "ci_policy": "候选提交与 PR 使用 [skip ci] [skip actions]；PR 前后及 merge 后检查 workflow runs，若出现自动 GitHub Actions 运行则停止后续交付。"
+}

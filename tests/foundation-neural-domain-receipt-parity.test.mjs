@@ -4,7 +4,7 @@ import {
   FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
   verifyFoundationDirectLoweringLineage,
   verifyFoundationDomainReceiptParity,
-  verifyFoundationDirectNativeParity,
+  verifyFoundationDirectNativeParityGeneric as verifyFoundationDirectNativeParity,
 } from '../src/foundation-direct-native-parity.mjs';
 
 const R1 = '__rcl_foundation_neural_brain_integrate_0_1_1';

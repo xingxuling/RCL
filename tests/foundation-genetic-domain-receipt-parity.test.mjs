@@ -4,7 +4,7 @@ import {
   FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
   verifyFoundationDirectLoweringLineage,
   verifyFoundationDomainReceiptParity,
-  verifyFoundationDirectNativeParity,
+  verifyFoundationDirectNativeParityGeneric as verifyFoundationDirectNativeParity,
 } from '../src/foundation-direct-native-parity.mjs';
 
 const RM = '__rcl_foundation_genetic_lineage_0_1_mutation';
