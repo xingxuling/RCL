@@ -1,0 +1,28 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-conditional-lineage-absence-regression-v0.1",
+  "base_commit": "e905c054833e91bbb09786d14070b69864e5f385",
+  "observation": "Cycle 15 为 Genetic staged lineage 收紧 reference evidence 时，把 Physical/Neural conditional domain 的‘Reference history 中不存在该 transition’错误地解释成‘没有执行证据’。但对 conditional pathway/step，reference history 已存在且对应记录缺席本身就是 inactivity evidence；若 Native 同样缺席，该候选应保持可验证。Cycle 13 的原有行为因此发生回归。",
+  "selected": "restore-conditional-lineage-absence-as-reference-evidence",
+  "mode": "WHOLE_ARTIFACT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "why_now": "这是由近期 North Star 演化引入的非补偿性证据语义回归，会让合法 inactive Neural/Physical path 无法通过 lineage gate。继续扩域前必须先恢复旧的不活动证明语义，同时保留 Genetic 对实际 generation receipt 的更严格要求。",
+  "change": [
+    "Physical/Neural conditional lineage：只要 reference history 可用，record absence 就可作为 inactivity evidence；Native 仍必须对应 absence 才能通过",
+    "Genetic staged lineage：仍要求实际 Reference generation record 存在，不能用 absence 替代",
+    "没有 reference history 时，Physical/Neural 仍 fail-closed"
+  ],
+  "validation": {
+    "status": "PASS",
+    "tests": 16,
+    "breakdown": {
+      "conditional_lineage_regression": "2/2 PASS",
+      "genetic_staged_receipt_and_lineage": "14/14 PASS"
+    },
+    "syntax": "node --check src/foundation-direct-native-parity.mjs PASS",
+    "remote_content_identity": "PASS: parity module and regression test Git blob SHA matched locally validated files",
+    "actual_c_native_vm_execution": "NOT_RUN",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期只修复 conditional absence evidence 的 lineage 语义回归；不扩大 Foundation 支持面，不声称真实 C Native VM parity 或全仓回归。"
+}

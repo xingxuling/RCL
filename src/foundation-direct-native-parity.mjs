@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.7';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.7.0';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.7.1';
 export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.4';
 
 function codeOf(error) {
@@ -298,10 +298,15 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory, r
     const changeTargets = unique(asArray(record?.changes).map(change => change?.target).filter(Boolean));
     const reference = references?.matches?.[index]?.record ?? null;
     const conditionallyInactive = ['physical', 'neural'].includes(item?.domain) && referenceAvailable && reference === null;
-    const referenceRequired = ['physical', 'neural', 'genetic'].includes(item?.domain);
+    const conditionalReferenceDomain = ['physical', 'neural'].includes(item?.domain);
+    const geneticReferenceRequired = item?.domain === 'genetic';
     const checks = {
       syntheticRulePresent: Boolean(syntheticRule),
-      referenceExecutionEvidencePresent: !referenceRequired || (referenceAvailable && Boolean(reference)),
+      referenceExecutionEvidencePresent: conditionalReferenceDomain
+        ? referenceAvailable
+        : geneticReferenceRequired
+          ? referenceAvailable && Boolean(reference)
+          : true,
       exactNativeRecord: conditionallyInactive ? matchingRecords.length === 0 : matchingRecords.length === 1,
       witnessPresent: conditionallyInactive ? true : Boolean(witness) && witnesses.includes(witness),
       stateTargetsCovered: conditionallyInactive ? true : stateTargets.every(target => changeTargets.includes(target)),
