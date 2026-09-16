@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "node scripts/build-vercel-native.mjs",
+  "buildCommand": "node --test tests/foundation-quantity-native-lowering.test.mjs && node scripts/build-vercel-native.mjs && node scripts/verify-vercel-foundation-physical.mjs",
   "functions": {
     "api/*.mjs": {
       "maxDuration": 60
