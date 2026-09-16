@@ -138,8 +138,22 @@ try {
     });
   }
 
+  const perceptionParityProof = {
+    format: foundationProof.format ?? null,
+    version: foundationProof.version ?? null,
+    domain: 'perception',
+    status: foundationProof.status,
+    verified: foundationProof.verified === true,
+    loweredCount: foundationProof.lowering?.summary?.loweredCount ?? null,
+    parity: foundationProof.parity ?? null,
+    foundationDomainReceiptRoot: foundationProof.roots?.foundationDomainReceiptRoot ?? null,
+    foundationCompositeReceiptRoot: foundationProof.roots?.foundationCompositeReceiptRoot ?? null,
+    nativeVmExecutionAttestationRoot: foundationProof.roots?.nativeVmExecutionAttestationRoot ?? null,
+    executionBinarySha256: foundationExecutionBinarySha256,
+  };
+
   const deploymentArtifact = {
-    format: 'taowind.rcl-vercel-native-artifact.v0.2',
+    format: 'taowind.rcl-vercel-native-artifact.v0.3',
     platform: process.platform,
     arch: process.arch,
     target: 'native/rclvm',
@@ -162,18 +176,9 @@ try {
       attestationRoot: executionAttestation.attestationRoot,
       attestationBinarySha256,
     },
-    foundationParityProof: {
-      format: foundationProof.format ?? null,
-      version: foundationProof.version ?? null,
-      domain: 'perception',
-      status: foundationProof.status,
-      verified: foundationProof.verified === true,
-      loweredCount: foundationProof.lowering?.summary?.loweredCount ?? null,
-      parity: foundationProof.parity ?? null,
-      foundationDomainReceiptRoot: foundationProof.roots?.foundationDomainReceiptRoot ?? null,
-      foundationCompositeReceiptRoot: foundationProof.roots?.foundationCompositeReceiptRoot ?? null,
-      nativeVmExecutionAttestationRoot: foundationProof.roots?.nativeVmExecutionAttestationRoot ?? null,
-      executionBinarySha256: foundationExecutionBinarySha256,
+    foundationParityProof: perceptionParityProof,
+    foundationParityProofs: {
+      perception: perceptionParityProof,
     },
   };
 
@@ -195,13 +200,17 @@ try {
     stateRootVerified: true,
     stateRootParity: true,
     foundationParity: {
-      domain: deploymentArtifact.foundationParityProof.domain,
-      status: deploymentArtifact.foundationParityProof.status,
-      verified: deploymentArtifact.foundationParityProof.verified,
-      loweredCount: deploymentArtifact.foundationParityProof.loweredCount,
-      foundationDomainReceiptRoot: deploymentArtifact.foundationParityProof.foundationDomainReceiptRoot,
-      nativeVmExecutionAttestationRoot: deploymentArtifact.foundationParityProof.nativeVmExecutionAttestationRoot,
-      executionBinarySha256: deploymentArtifact.foundationParityProof.executionBinarySha256,
+      domain: perceptionParityProof.domain,
+      status: perceptionParityProof.status,
+      verified: perceptionParityProof.verified,
+      loweredCount: perceptionParityProof.loweredCount,
+      foundationDomainReceiptRoot: perceptionParityProof.foundationDomainReceiptRoot,
+      nativeVmExecutionAttestationRoot: perceptionParityProof.nativeVmExecutionAttestationRoot,
+      executionBinarySha256: perceptionParityProof.executionBinarySha256,
+    },
+    foundationParityDomains: ['perception'],
+    foundationParityProofs: {
+      perception: perceptionParityProof,
     },
   }, null, 2)}\n`);
 
@@ -214,11 +223,12 @@ try {
     attestationRoot: deploymentArtifact.replayProof.attestationRoot,
     stateRootVerified: true,
     stateRootParity: true,
-    foundationParityDomain: deploymentArtifact.foundationParityProof.domain,
-    foundationParityStatus: deploymentArtifact.foundationParityProof.status,
-    foundationParityVerified: deploymentArtifact.foundationParityProof.verified,
-    foundationLoweredCount: deploymentArtifact.foundationParityProof.loweredCount,
-    foundationDomainReceiptRoot: deploymentArtifact.foundationParityProof.foundationDomainReceiptRoot,
+    foundationParityDomain: perceptionParityProof.domain,
+    foundationParityStatus: perceptionParityProof.status,
+    foundationParityVerified: perceptionParityProof.verified,
+    foundationLoweredCount: perceptionParityProof.loweredCount,
+    foundationDomainReceiptRoot: perceptionParityProof.foundationDomainReceiptRoot,
+    foundationParityDomains: ['perception'],
   }, null, 2));
 } catch (error) {
   fail(error?.message ?? String(error), {
