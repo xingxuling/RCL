@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT,
+  FOUNDATION_DIRECT_NATIVE_PARITY_GENERIC_FORMAT as FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT,
   verifyFoundationDirectLoweringLineage,
   verifyFoundationDomainReceiptParity,
-  verifyFoundationDirectNativeParity,
+  verifyFoundationDirectNativeParityGeneric as verifyFoundationDirectNativeParity,
 } from '../src/foundation-direct-native-parity.mjs';
 
 const RULE = '__rcl_foundation_perception_vision_0';
