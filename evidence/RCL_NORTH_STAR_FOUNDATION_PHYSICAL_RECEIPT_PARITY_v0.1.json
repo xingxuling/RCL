@@ -1,0 +1,98 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-physical-receipt-parity-v0.1",
+  "base_commit": "2ecc74e5fecc37e8e639151c6f4df9c511727b37",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍是最高价值现实验证，但自动化容器仍无法 checkout 完整 GitHub 仓库或物化仓库中的 native binary。",
+      "pressure": 0.971,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-physical-receipt-gap",
+      "domain": "evidence_provenance",
+      "signal": "Cycle 10 已把有界 Physical Advance 下译为 core transactions，但 native parity/receipt verifier v0.4 仍把 domain receipt 硬编码为 Perception，因此新的 Physical direct-lowering 无法进入同等级非补偿性证据链。",
+      "pressure": 0.936,
+      "evidence": [
+        "src/foundation-direct-native-parity.mjs v0.4 只过滤 domainKind=perceptual",
+        "Cycle 10 lowering metadata 已提供 physical stepIndex/stepCount/originalWitnesses/dtExpression/natural-law authority",
+        "Reference runtime 的 Physical DomainTransition 提供 step/dt/witnesses/changes/authorityClass"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-physical-actual-c-native-replay",
+      "domain": "native_runtime_validation",
+      "score": 0.867,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-physical-domain-receipt-parity",
+      "domain": "evidence_provenance",
+      "score": 0.8419,
+      "expected_goal_gain": 0.93,
+      "reuse_gain": 0.97,
+      "autonomy_gain": 0.89,
+      "evidence_gain": 0.98,
+      "implementation_cost": 0.39,
+      "regression_risk": 0.19
+    },
+    {
+      "candidate_id": "foundation-neural-bounded-direct-lowering",
+      "domain": "native_lowering",
+      "score": 0.786,
+      "implementation_cost": 0.55,
+      "regression_risk": 0.31
+    }
+  ],
+  "selected": "foundation-physical-domain-receipt-parity",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "Physical direct lowering 已存在，但没有同等级 receipt/lineage 真实性约束；在扩展更多 Foundation 域前先让新域进入现有非补偿性证据链，可直接消除错误 native-verified 风险。",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-physical-domain-receipt-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "native parity format 从 v0.4 升级到 v0.5；domain receipt root algorithm 从 v0.1 升级到 v0.2，以显式绑定 Physical step 证据字段",
+    "domain receipt verifier 从 Perception-only 泛化为 Perception + Physical，并按领域身份确定性配对 Reference DomainTransition",
+    "Physical receipt 绑定 law declaration、natural-law authority、stepIndex/stepCount、原始 witnesses、状态目标、逐目标 before/after 变化、原生事务顺序和 Reference 顺序",
+    "Reference runtime 中条件为 false 的 Physical step 允许无 DomainTransition，但只有 Native 同样没有执行对应 synthetic rule 时才算 inactive-aligned；Native 偷跑会失败关闭",
+    "Physical lowering lineage 现在必须拿到 Reference execution history 才能判定 inactive step，避免仅凭 Native 缺记录误报一致",
+    "领域收据证据根 v0.2 绑定 referenceActive/nativeActive、reference step、归一化 reference dt、reference/native witnesses 与 step metadata",
+    "Perception v0.4 的状态/根/lineage/receipt 非补偿性约束保持回归兼容"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test tests/foundation-direct-native-parity.test.mjs tests/foundation-domain-receipt-root.test.mjs tests/foundation-physical-domain-receipt-parity.test.mjs",
+      "status": "PASS",
+      "tests": 33,
+      "scope_note": "以当前 main 的 19 个 Perception parity 测试和 4 个 receipt-root 测试逐字重建，并加入 10 个 Physical receipt tests；全部使用与候选分支完全一致的 parity module。"
+    },
+    "syntax": {
+      "command": "node --check src/foundation-direct-native-parity.mjs",
+      "status": "PASS"
+    },
+    "coverage": [
+      "Physical active step receipt parity",
+      "Physical inactive step reference/native 双缺席对齐",
+      "缺失 Reference execution evidence 失败关闭",
+      "inactive step Native 偷跑失败关闭",
+      "active step Native 记录缺失失败关闭",
+      "original law witnesses 绑定",
+      "额外 Native mutation 拒绝",
+      "Native transaction order 绑定",
+      "evaluated reference dt evidence root 绑定",
+      "top-level native-verified 非补偿性物理路径"
+    ],
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN",
+    "github_actions": "MUST_REMAIN_NOT_TRIGGERED; branch commits use [skip ci] [skip actions]"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明 Physical direct-lowering 的 receipt/lineage verifier 在注入 Reference/Native 历史下能正确通过或失败关闭；不宣称真实 canonical C Native VM replay 已运行，不宣称 Physical direct lowering 已在真实 C VM 上完成 parity，也不宣称动态 Physical loop、全部 Foundation 原生化、provider bridge 全局移除或全仓回归通过。"
+}
