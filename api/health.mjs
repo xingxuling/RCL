@@ -70,6 +70,32 @@ function neuralEvidenceBound(proof, binarySha256) {
   );
 }
 
+function geneticEvidenceBound(proof, binarySha256) {
+  return Boolean(
+    coreParityBound(proof, 'genetic', binarySha256)
+    && proof?.loweredCount === 4
+    && proof?.generationCount === 2
+    && proof?.stageCount === 4
+    && isSha256(proof?.foundationCompositeReceiptRoot)
+    && proof?.finalState?.['lineage.seed'] === 5
+    && proof?.finalState?.['lineage.trait'] === 15
+  );
+}
+
+function livingEvidenceBound(proof, binarySha256) {
+  return Boolean(
+    coreParityBound(proof, 'living', binarySha256)
+    && proof?.loweredCount === 6
+    && proof?.boundedSteps === 2
+    && proof?.stageCount === 6
+    && proof?.unchangedSenseNegativeEvidenceBound === true
+    && isSha256(proof?.foundationCompositeReceiptRoot)
+    && proof?.finalState?.['organism.foodSense'] === 4
+    && proof?.finalState?.['organism.energy'] === 9
+    && proof?.finalState?.['organism.health'] === 3
+  );
+}
+
 function proofSummary(proof) {
   if (!proof) return null;
   return {
@@ -78,6 +104,7 @@ function proofSummary(proof) {
     verified: proof.verified === true,
     loweredCount: proof.loweredCount ?? null,
     domainReceiptRoot: proof.foundationDomainReceiptRoot ?? null,
+    compositeReceiptRoot: proof.foundationCompositeReceiptRoot ?? null,
     nativeVmExecutionAttestationRoot: proof.nativeVmExecutionAttestationRoot ?? null,
     executionBinarySha256: proof.executionBinarySha256 ?? null,
   };
@@ -123,14 +150,20 @@ export function nativeVmDeploymentStatus() {
   const perceptionProof = attestation?.foundationParityProofs?.perception ?? attestation?.foundationParityProof ?? null;
   const physicalProof = attestation?.foundationParityProofs?.physical ?? attestation?.foundationPhysicalParityProof ?? null;
   const neuralProof = attestation?.foundationParityProofs?.neural ?? attestation?.foundationNeuralParityProof ?? null;
+  const geneticProof = attestation?.foundationParityProofs?.genetic ?? attestation?.foundationGeneticParityProof ?? null;
+  const livingProof = attestation?.foundationParityProofs?.living ?? attestation?.foundationLivingParityProof ?? null;
   const perceptionParityBound = Boolean(replayEvidenceBound && coreParityBound(perceptionProof, 'perception', binarySha256));
   const physicalParityBound = Boolean(replayEvidenceBound && physicalQuantityEvidenceBound(physicalProof, binarySha256));
   const neuralParityBound = Boolean(replayEvidenceBound && neuralEvidenceBound(neuralProof, binarySha256));
-  const foundationParityBound = perceptionParityBound && physicalParityBound && neuralParityBound;
+  const geneticParityBound = Boolean(replayEvidenceBound && geneticEvidenceBound(geneticProof, binarySha256));
+  const livingParityBound = Boolean(replayEvidenceBound && livingEvidenceBound(livingProof, binarySha256));
+  const foundationParityBound = perceptionParityBound && physicalParityBound && neuralParityBound && geneticParityBound && livingParityBound;
   const foundationParityDomains = [
     ...(perceptionParityBound ? ['perception'] : []),
     ...(physicalParityBound ? ['physical'] : []),
     ...(neuralParityBound ? ['neural'] : []),
+    ...(geneticParityBound ? ['genetic'] : []),
+    ...(livingParityBound ? ['living'] : []),
   ];
 
   return {
@@ -142,6 +175,8 @@ export function nativeVmDeploymentStatus() {
     perceptionParityBound,
     physicalParityBound,
     neuralParityBound,
+    geneticParityBound,
+    livingParityBound,
     evidenceBound: replayEvidenceBound && foundationParityBound,
     binarySha256,
     sourceRoot: attestation?.sourceMaterialization?.sourceRoot ?? null,
@@ -152,6 +187,8 @@ export function nativeVmDeploymentStatus() {
       perception: proofSummary(perceptionProof),
       physical: proofSummary(physicalProof),
       neural: proofSummary(neuralProof),
+      genetic: proofSummary(geneticProof),
+      living: proofSummary(livingProof),
     },
     physicalQuantityEvidence: physicalProof ? {
       quantityConstructorCount: physicalProof.quantityNativeLowering?.summary?.quantityConstructorCount ?? null,
@@ -168,6 +205,20 @@ export function nativeVmDeploymentStatus() {
       finalStimulus: neuralProof.finalState?.['brain.stimulus'] ?? null,
       finalResponse: neuralProof.finalState?.['brain.response'] ?? null,
       finalTrace: neuralProof.finalState?.['brain.trace'] ?? null,
+    } : null,
+    geneticEvidence: geneticProof ? {
+      generationCount: geneticProof.generationCount ?? null,
+      stageCount: geneticProof.stageCount ?? null,
+      finalSeed: geneticProof.finalState?.['lineage.seed'] ?? null,
+      finalTrait: geneticProof.finalState?.['lineage.trait'] ?? null,
+    } : null,
+    livingEvidence: livingProof ? {
+      boundedSteps: livingProof.boundedSteps ?? null,
+      stageCount: livingProof.stageCount ?? null,
+      unchangedSenseNegativeEvidenceBound: livingProof.unchangedSenseNegativeEvidenceBound === true,
+      finalFoodSense: livingProof.finalState?.['organism.foodSense'] ?? null,
+      finalEnergy: livingProof.finalState?.['organism.energy'] ?? null,
+      finalHealth: livingProof.finalState?.['organism.health'] ?? null,
     } : null,
   };
 }
