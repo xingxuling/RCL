@@ -6,12 +6,22 @@ import { RCL_MCP_SERVER_NAME, RCL_MCP_SERVER_VERSION, listRclMcpTools } from '..
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 const FOUNDATION_NATIVE_BRIDGE_SPECS = [
-  ['quantitative', 'quantitative.evaluate'],
-  ['knowledge', 'knowledge.resolve'],
-  ['perception', 'perception.observe'],
-  ['natural-language-reality', 'natural-language.interpret'],
-  ['understanding-reality', 'understanding.model'],
-  ['creative-reality', 'creative.generate'],
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'quantitative', capability: 'quantitative.evaluate' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'knowledge', capability: 'knowledge.resolve' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'perception', capability: 'perception.observe' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'natural-language-reality', capability: 'natural-language.interpret' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'understanding-reality', capability: 'understanding.model' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'creative-reality', capability: 'creative.generate' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-spacetime', capability: 'meta.spacetime.sequence' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-acceleration', capability: 'meta.acceleration.bound' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-compression', capability: 'meta.compression.restore' },
+  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'physical', capability: 'physical.simulate-step' },
+  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'embodiment', capability: 'embodiment.integrate' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'energy', capability: 'energy.balance' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'elemental', capability: 'elemental.compose' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'neural', capability: 'neural.integrate' },
+  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'metacomputation', capability: 'metacomputation.plan' },
+  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'computation', capability: 'computation.execute' },
 ];
 
 function sha256(buffer) {
@@ -104,16 +114,37 @@ function livingEvidenceBound(proof, binarySha256) {
   );
 }
 
-function nativeBridgeEvidenceBound(proof, domain, capability, attestation) {
+function nativeBridgeFederationBound(federation, attestation) {
+  const expectedDomains = FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => spec.domain);
   return Boolean(
-    proof?.domain === domain
-    && proof?.capability === capability
+    federation?.format === 'taowind.rcl-vercel-foundation-native-provider-federation.v0.1'
+    && federation?.status === 'deployment-bound'
+    && federation?.verified === true
+    && JSON.stringify(federation?.domains) === JSON.stringify(expectedDomains)
+    && federation?.canonicalVmSourceRoot === attestation?.sourceMaterialization?.sourceRoot
+    && federation?.declaredDomainDirectLoweringVerified === false
+    && isSha256(federation?.hostBinarySha256)
+    && isSha256(federation?.compilerBinarySha256)
+    && isSha256(federation?.hostSourceRoot)
+    && isSha256(federation?.conformanceContractRoot)
+    && isSha256(federation?.conformanceReportSha256)
+    && isSha256(federation?.batchAProofSha256)
+    && isSha256(federation?.extensionProofSha256)
+    && isSha256(federation?.federationRoot)
+  );
+}
+
+function nativeBridgeEvidenceBound(proof, spec, attestation, federation) {
+  return Boolean(
+    proof?.batchId === spec.batchId
+    && proof?.domain === spec.domain
+    && proof?.capability === spec.capability
     && proof?.mode === 'native-provider-bridge'
     && proof?.status === 'native-bridge-verified'
     && proof?.verified === true
-    && proof?.providerId === 'rcl.foundation.batch-a'
+    && proof?.providerId === spec.providerId
     && proof?.providerAbi === 1
-    && proof?.providerCallCount === FOUNDATION_NATIVE_BRIDGE_SPECS.length
+    && proof?.providerCallCount === spec.providerCallCount
     && proof?.selfhostByteIdentical === true
     && proof?.replayVerified === true
     && proof?.providerDisabledRejected === true
@@ -121,9 +152,9 @@ function nativeBridgeEvidenceBound(proof, domain, capability, attestation) {
     && proof?.declaredDomainDirectLoweringVerified === false
     && Number(proof?.authorityCount ?? 0) >= 1
     && Number(proof?.evidenceCount ?? 0) >= 1
-    && isSha256(proof?.hostBinarySha256)
-    && isSha256(proof?.compilerBinarySha256)
-    && isSha256(proof?.hostSourceRoot)
+    && proof?.hostBinarySha256 === federation?.hostBinarySha256
+    && proof?.compilerBinarySha256 === federation?.compilerBinarySha256
+    && proof?.hostSourceRoot === federation?.hostSourceRoot
     && isSha256(proof?.canonicalVmSourceRoot)
     && proof?.canonicalVmSourceRoot === attestation?.sourceMaterialization?.sourceRoot
     && isSha256(proof?.sourceRoot)
@@ -152,6 +183,7 @@ function proofSummary(proof) {
 function bridgeProofSummary(proof) {
   if (!proof) return null;
   return {
+    batchId: proof.batchId ?? null,
     domain: proof.domain ?? null,
     capability: proof.capability ?? null,
     mode: proof.mode ?? null,
@@ -174,6 +206,24 @@ function bridgeProofSummary(proof) {
     providerDisabledRejected: proof.providerDisabledRejected === true,
     behaviorMutationVerified: proof.behaviorMutationVerified === true,
     declaredDomainDirectLoweringVerified: proof.declaredDomainDirectLoweringVerified === true,
+  };
+}
+
+function federationSummary(federation) {
+  if (!federation) return null;
+  return {
+    format: federation.format ?? null,
+    status: federation.status ?? null,
+    verified: federation.verified === true,
+    domains: Array.isArray(federation.domains) ? [...federation.domains] : [],
+    providerBatches: federation.providerBatches ?? null,
+    hostBinarySha256: federation.hostBinarySha256 ?? null,
+    compilerBinarySha256: federation.compilerBinarySha256 ?? null,
+    hostSourceRoot: federation.hostSourceRoot ?? null,
+    canonicalVmSourceRoot: federation.canonicalVmSourceRoot ?? null,
+    conformanceContractRoot: federation.conformanceContractRoot ?? null,
+    federationRoot: federation.federationRoot ?? null,
+    declaredDomainDirectLoweringVerified: federation.declaredDomainDirectLoweringVerified === true,
   };
 }
 
@@ -234,14 +284,21 @@ export function nativeVmDeploymentStatus() {
     ...(livingParityBound ? ['living'] : []),
   ];
 
+  const federation = attestation?.foundationNativeBridgeFederationProof ?? null;
+  const foundationNativeBridgeFederationBound = Boolean(
+    replayEvidenceBound && nativeBridgeFederationBound(federation, attestation),
+  );
   const bridgeProofs = attestation?.foundationNativeBridgeProofs ?? {};
-  const bridgeBounds = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(([domain, capability]) => [
-    domain,
-    Boolean(replayEvidenceBound && nativeBridgeEvidenceBound(bridgeProofs[domain], domain, capability, attestation)),
+  const bridgeBounds = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => [
+    spec.domain,
+    Boolean(
+      foundationNativeBridgeFederationBound
+      && nativeBridgeEvidenceBound(bridgeProofs[spec.domain], spec, attestation, federation)
+    ),
   ]));
   const foundationNativeBridgeDomains = FOUNDATION_NATIVE_BRIDGE_SPECS
-    .filter(([domain]) => bridgeBounds[domain])
-    .map(([domain]) => domain);
+    .filter(spec => bridgeBounds[spec.domain])
+    .map(spec => spec.domain);
   const foundationNativeBridgeBound = foundationNativeBridgeDomains.length === FOUNDATION_NATIVE_BRIDGE_SPECS.length;
   const quantitativeBridgeBound = bridgeBounds.quantitative === true;
   const knowledgeBridgeBound = bridgeBounds.knowledge === true;
@@ -250,9 +307,12 @@ export function nativeVmDeploymentStatus() {
   const understandingRealityBridgeBound = bridgeBounds['understanding-reality'] === true;
   const creativeRealityBridgeBound = bridgeBounds['creative-reality'] === true;
   const evidenceBound = replayEvidenceBound && foundationParityBound;
-  const extendedEvidenceBound = evidenceBound && foundationNativeBridgeBound;
+  const extendedEvidenceBound = evidenceBound && foundationNativeBridgeBound && foundationNativeBridgeFederationBound;
 
-  const bridgeSummaries = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(([domain]) => [domain, bridgeProofSummary(bridgeProofs[domain])]));
+  const bridgeSummaries = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => [
+    spec.domain,
+    bridgeProofSummary(bridgeProofs[spec.domain]),
+  ]));
   const quantitativeBridgeProof = bridgeProofs.quantitative ?? null;
 
   return {
@@ -266,6 +326,7 @@ export function nativeVmDeploymentStatus() {
     neuralParityBound,
     geneticParityBound,
     livingParityBound,
+    foundationNativeBridgeFederationBound,
     foundationNativeBridgeBound,
     quantitativeBridgeBound,
     knowledgeBridgeBound,
@@ -280,6 +341,7 @@ export function nativeVmDeploymentStatus() {
     executionAttestationRoot: attestation?.replayProof?.attestationRoot ?? null,
     foundationParityDomains,
     foundationNativeBridgeDomains,
+    foundationNativeBridgeFederation: federationSummary(federation),
     foundationParity: proofSummary(perceptionProof),
     foundationParityProofs: {
       perception: proofSummary(perceptionProof),
