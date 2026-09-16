@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "node --test tests/foundation-quantity-native-lowering.test.mjs && node scripts/build-vercel-native.mjs && node scripts/verify-vercel-foundation-physical.mjs",
+  "buildCommand": "node --test tests/foundation-quantity-native-lowering.test.mjs tests/foundation-neural-direct-lowering.test.mjs tests/foundation-neural-domain-receipt-parity.test.mjs && node scripts/build-vercel-native.mjs && node scripts/verify-vercel-foundation-physical.mjs && node scripts/verify-vercel-foundation-neural.mjs",
   "functions": {
     "api/*.mjs": {
       "maxDuration": 60
