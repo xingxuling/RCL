@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
-export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT = 'taowind.rcl-foundation-direct-native-parity-composite.v0.2';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION = '0.2.0';
-export const FOUNDATION_COMPOSITE_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-composite-receipt-root.sha256.v0.1';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT = 'taowind.rcl-foundation-direct-native-parity-composite.v0.3';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION = '0.3.0';
+export const FOUNDATION_COMPOSITE_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-composite-receipt-root.sha256.v0.2';
 
 function asArray(value) { return Array.isArray(value) ? value : []; }
 function canonicalJson(value) {
@@ -18,11 +18,22 @@ function filterLowering(lowering, predicate) {
   const lowered = asArray(lowering?.lowered).filter(predicate);
   return { ...lowering, lowered, summary:{ ...(lowering?.summary ?? {}), loweredCount:lowered.length } };
 }
-function compositeReceiptRoot(genericReceipt, livingReceipt) {
+function executionAttestationBinding(attestation) {
+  return {
+    present: Boolean(attestation),
+    algorithm: attestation?.algorithm ?? null,
+    attestationRoot: attestation?.attestationRoot ?? null,
+    vmIdentity: attestation?.vmIdentity ?? null,
+    programSourceRoot: attestation?.programSourceRoot ?? null,
+    binarySha256: attestation?.materialization?.binarySha256 ?? null,
+  };
+}
+function compositeReceiptRoot(genericReceipt, livingReceipt, nativeExecutionAttestation) {
   const binding = canonicalJson({
     algorithm:FOUNDATION_COMPOSITE_RECEIPT_ROOT_ALGORITHM,
     generic:{ required:genericReceipt?.required===true, ok:genericReceipt?.ok===true, rootAlgorithm:genericReceipt?.rootAlgorithm??null, receiptRoot:genericReceipt?.receiptRoot??null },
     living:{ required:livingReceipt?.required===true, ok:livingReceipt?.ok===true, rootAlgorithm:livingReceipt?.rootAlgorithm??null, receiptRoot:livingReceipt?.receiptRoot??null },
+    nativeExecutionAttestation: executionAttestationBinding(nativeExecutionAttestation),
   });
   return createHash('sha256').update(JSON.stringify(binding)).digest('hex');
 }
@@ -60,7 +71,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
     return {
       format:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT, version:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION,
       status:'compile-blocked', verified:false, diagnostics:compiled?.diagnostics??[], lowering:compiled?.foundationDirectLowering??null,
-      lineage:null, domainReceipt:null, parity:null, gaps:['direct-bytecode-not-available'], truthBoundary:truthBoundary(),
+      lineage:null, domainReceipt:null, nativeExecutionAttestation:null, parity:null, gaps:['direct-bytecode-not-available'], truthBoundary:truthBoundary(),
     };
   }
 
@@ -73,7 +84,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
     return {
       format:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT, version:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION,
       status:nativeMissing?'native-blocked':'native-failed', verified:false, diagnostics:[{code,message:messageOf(error)}],
-      lowering:compiled.foundationDirectLowering??null, lineage:null, domainReceipt:null, parity:null,
+      lowering:compiled.foundationDirectLowering??null, lineage:null, domainReceipt:null, nativeExecutionAttestation:null, parity:null,
       gaps:[nativeMissing?'native-vm-missing':'native-execution-failed'], truthBoundary:truthBoundary(),
     };
   }
@@ -84,6 +95,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
   const nativeState = normalize(native?.state ?? {}, deps.semanticValue);
   const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
   const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
+  const nativeExecutionAttestation = native?.nativeVmExecutionAttestation ?? null;
   const genericLineage = deps.verifyLineage(nonLivingLowering, native?.history, reference?.history);
   const genericReceipt = deps.verifyGenericReceipt(nonLivingLowering, reference?.history, native?.history, deps.semanticValue);
   const livingReceipt = deps.verifyLivingReceipt(lowering, reference?.history, native?.history, deps.semanticValue);
@@ -106,7 +118,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
     living:livingReceipt,
     rootAlgorithm:FOUNDATION_COMPOSITE_RECEIPT_ROOT_ALGORITHM,
   };
-  domainReceipt.receiptRoot = compositeReceiptRoot(genericReceipt, livingReceipt);
+  domainReceipt.receiptRoot = compositeReceiptRoot(genericReceipt, livingReceipt, nativeExecutionAttestation);
 
   const parity = {
     state:sameJson(nativeState,referenceState),
@@ -119,7 +131,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
   const verified = Object.values(parity).every(Boolean);
   return {
     format:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT, version:FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION,
-    status:verified?'native-verified':'parity-failed', verified, diagnostics:[], lowering, lineage, domainReceipt, parity,
+    status:verified?'native-verified':'parity-failed', verified, diagnostics:[], lowering, lineage, domainReceipt, nativeExecutionAttestation, parity,
     roots:{
       referenceSemanticStateRoot:referenceRoot,
       nativeSemanticStateRoot:nativeRoot,
@@ -128,6 +140,8 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
       foundationCompositeReceiptRootAlgorithm:domainReceipt.rootAlgorithm,
       genericDomainReceiptRoot:genericReceipt?.receiptRoot??null,
       livingDomainReceiptRoot:livingReceipt?.receiptRoot??null,
+      nativeVmExecutionAttestationRoot:nativeExecutionAttestation?.attestationRoot??null,
+      nativeVmExecutionAttestationRootAlgorithm:nativeExecutionAttestation?.algorithm??null,
     },
     gaps:verified?[]:Object.entries(parity).filter(([,ok])=>!ok).map(([name])=>name),
     truthBoundary:truthBoundary(),
@@ -144,6 +158,8 @@ function truthBoundary() {
     legacyFoundationDirectNativeParityEntryPointReplaced:false,
     livingSenseOnlyReferenceGapRemainsFailClosed:true,
     receiptRootIsEvidenceBindingNotStandaloneProof:true,
+    nativeExecutionAttestationPropagatedIntoEvidence:true,
+    nativeExecutionAttestationRequiredForNativeVerified:false,
     actualCNativeVmExecutionClaimedOnlyWhenRunNativeProvidesIt:true,
     fullHistoryParityClaimed:false,
   };
