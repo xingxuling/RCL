@@ -8,8 +8,12 @@ import { verifyFoundationDirectNativeParity } from '../src/foundation-direct-nat
 import { runNativeBytecode } from '../src/native-vm.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const target = path.join(root, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
-const proofPath = path.join(root, 'public', 'rcl-foundation-physical-native-proof.json');
+const nativeDir = path.join(root, 'native');
+const target = path.join(nativeDir, process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
+const manifestPath = path.join(nativeDir, 'rclvm.vercel-attestation.json');
+const publicDir = path.join(root, 'public');
+const proofPath = path.join(publicDir, 'rcl-foundation-physical-native-proof.json');
+const publicBuildProofPath = path.join(publicDir, 'rcl-native-build-proof.json');
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -51,6 +55,7 @@ const source = [
 
 try {
   if (!fs.existsSync(target)) fail('Canonical Vercel native VM artifact is missing before physical parity proof', { target });
+  if (!fs.existsSync(manifestPath)) fail('Canonical Vercel native VM attestation is missing before physical parity proof', { manifestPath });
   const binarySha256 = sha256(fs.readFileSync(target));
   const nativeRuntime = {
     vmPath: target,
@@ -121,7 +126,7 @@ try {
 
   const artifact = {
     ok: true,
-    format: 'taowind.rcl-vercel-foundation-physical-native-proof.v0.2',
+    format: 'taowind.rcl-vercel-foundation-physical-native-proof.v0.3',
     domain: 'physical',
     status: proof.status,
     verified: true,
@@ -138,8 +143,71 @@ try {
       'world.stone.velocity': velocity,
     },
   };
-  fs.mkdirSync(path.dirname(proofPath), { recursive: true });
+
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (manifest?.format !== 'taowind.rcl-vercel-native-artifact.v0.3') {
+    fail('Native deployment attestation is not the expected multi-domain evidence format', { format: manifest?.format ?? null });
+  }
+  if (manifest?.binarySha256 !== binarySha256 || manifest?.replayProof?.attestationBinarySha256 !== binarySha256) {
+    fail('Native deployment attestation is not bound to the exact binary before adding Physical evidence', {
+      binarySha256,
+      manifestBinarySha256: manifest?.binarySha256 ?? null,
+      replayBinarySha256: manifest?.replayProof?.attestationBinarySha256 ?? null,
+    });
+  }
+  const perception = manifest?.foundationParityProofs?.perception ?? manifest?.foundationParityProof ?? null;
+  if (perception?.domain !== 'perception' || perception?.verified !== true || perception?.executionBinarySha256 !== binarySha256) {
+    fail('Perception Foundation proof must remain bound before Physical evidence can extend the deployment manifest', { perception });
+  }
+
+  const physicalParityProof = {
+    format: proof.format ?? null,
+    version: proof.version ?? null,
+    domain: 'physical',
+    status: proof.status,
+    verified: true,
+    loweredCount: artifact.physicalLoweredStepCount,
+    quantityNativeLowering: artifact.quantityNativeLowering,
+    parity: artifact.parity,
+    foundationDomainReceiptRoot: artifact.foundationDomainReceiptRoot,
+    foundationCompositeReceiptRoot: artifact.foundationCompositeReceiptRoot,
+    nativeVmExecutionAttestationRoot: artifact.nativeVmExecutionAttestationRoot,
+    executionBinarySha256,
+    finalState: artifact.finalState,
+  };
+
+  manifest.foundationParityProofs = {
+    ...(manifest.foundationParityProofs ?? {}),
+    perception,
+    physical: physicalParityProof,
+  };
+  manifest.foundationPhysicalParityProof = physicalParityProof;
+
+  fs.mkdirSync(publicDir, { recursive: true });
   fs.writeFileSync(proofPath, `${JSON.stringify(artifact, null, 2)}\n`);
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const publicBuildProof = fs.existsSync(publicBuildProofPath)
+    ? JSON.parse(fs.readFileSync(publicBuildProofPath, 'utf8'))
+    : {};
+  publicBuildProof.format = manifest.format;
+  publicBuildProof.binarySha256 = binarySha256;
+  publicBuildProof.foundationParityDomains = ['perception', 'physical'];
+  publicBuildProof.foundationParityProofs = {
+    perception,
+    physical: physicalParityProof,
+  };
+  publicBuildProof.foundationPhysicalParity = {
+    domain: 'physical',
+    status: physicalParityProof.status,
+    verified: physicalParityProof.verified,
+    loweredCount: physicalParityProof.loweredCount,
+    foundationDomainReceiptRoot: physicalParityProof.foundationDomainReceiptRoot,
+    nativeVmExecutionAttestationRoot: physicalParityProof.nativeVmExecutionAttestationRoot,
+    executionBinarySha256,
+  };
+  fs.writeFileSync(publicBuildProofPath, `${JSON.stringify(publicBuildProof, null, 2)}\n`);
+
   console.log(JSON.stringify({
     ok: true,
     status: 'RCL_VERCEL_FOUNDATION_PHYSICAL_NATIVE_VERIFIED',
@@ -150,6 +218,7 @@ try {
     quantityExtremumCount: artifact.quantityNativeLowering?.summary?.quantityExtremumCount ?? null,
     foundationDomainReceiptRoot: artifact.foundationDomainReceiptRoot,
     nativeVmExecutionAttestationRoot: artifact.nativeVmExecutionAttestationRoot,
+    foundationParityDomains: Object.keys(manifest.foundationParityProofs).sort(),
     finalPosition: position,
     finalVelocity: velocity,
   }, null, 2));
