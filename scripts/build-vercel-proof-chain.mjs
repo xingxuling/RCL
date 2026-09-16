@@ -15,6 +15,11 @@ const steps = [
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
   ['batch-a-real-c-provider-proof', ['scripts/verify-vercel-foundation-batch-a-bridge.mjs']],
   ['batch-a-bridge-deployment-binding', ['scripts/bind-vercel-foundation-batch-a-bridge.mjs']],
+  ['full-native-provider-federation-conformance', [
+    'scripts/foundation-conformance.mjs',
+    '--out',
+    'public/foundation-native-federation-conformance',
+  ]],
   ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
   ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
   ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
