@@ -151,7 +151,6 @@ export function verifyLivingStagedReceiptParity(lowering, referenceHistory, nati
       if (match) { activeReferenceRecords.push(match.record); consumedReferenceIndexes.add(match.referenceIndex); }
     }
     const senseEvidence = livingSenseChanges(activeReferenceRecords, semanticValue);
-
     for (const item of group.entries) {
       const nativeMatches = nativeMatchesFor(item, nativeHistory);
       const nativeMatch = nativeMatches.length === 1 ? nativeMatches[0] : null;
