@@ -17,7 +17,7 @@ try {
     fail('Native VM deployment artifact is not fully bundled before health evidence verification', { status });
   }
   if (status.replayEvidenceBound !== true || status.foundationParityBound !== true || status.evidenceBound !== true) {
-    fail('Deployment health does not fail-closed bind replay and Foundation parity evidence', { status });
+    fail('Deployment health does not fail-closed bind replay and direct Foundation parity evidence', { status });
   }
   if (
     status.perceptionParityBound !== true
@@ -26,16 +26,54 @@ try {
     || status.geneticParityBound !== true
     || status.livingParityBound !== true
   ) {
-    fail('Deployment health did not bind all five proven Foundation proof domains', { status });
+    fail('Deployment health did not bind all five proven direct Foundation proof domains', { status });
   }
   if (JSON.stringify(status.foundationParityDomains) !== JSON.stringify(['perception', 'physical', 'neural', 'genetic', 'living'])) {
-    fail('Deployment health exposes an unexpected Foundation proof domain set', {
+    fail('Deployment health exposes an unexpected direct Foundation parity domain set', {
       foundationParityDomains: status.foundationParityDomains,
     });
   }
   for (const domain of ['perception', 'physical', 'neural', 'genetic', 'living']) {
     if (status.foundationParityProofs?.[domain]?.executionBinarySha256 !== status.binarySha256) {
-      fail(`${domain} proof is not bound to the deployed binary hash`, { domain, status });
+      fail(`${domain} direct proof is not bound to the deployed canonical VM binary hash`, { domain, status });
+    }
+  }
+
+  if (
+    status.foundationNativeBridgeBound !== true
+    || status.quantitativeBridgeBound !== true
+    || status.extendedEvidenceBound !== true
+    || JSON.stringify(status.foundationNativeBridgeDomains) !== JSON.stringify(['quantitative'])
+  ) {
+    fail('Deployment health did not separately bind the proven Quantitative Native Provider Bridge evidence', { status });
+  }
+  const quantitativeBridge = status.quantitativeBridgeEvidence;
+  if (
+    quantitativeBridge?.providerId !== 'rcl.foundation.batch-a'
+    || quantitativeBridge?.providerAbi !== 1
+    || quantitativeBridge?.providerCallCount !== 1
+    || quantitativeBridge?.canonicalVmSourceRoot !== status.sourceRoot
+    || quantitativeBridge?.selfhostByteIdentical !== true
+    || quantitativeBridge?.replayVerified !== true
+    || quantitativeBridge?.providerDisabledRejected !== true
+    || quantitativeBridge?.declaredDomainDirectLoweringVerified !== false
+  ) {
+    fail('Health evidence lost Quantitative bridge provenance, replay, negative control, or strict direct-lowering truth boundary', {
+      quantitativeBridge,
+      sourceRoot: status.sourceRoot,
+    });
+  }
+  for (const value of [
+    quantitativeBridge.hostBinarySha256,
+    quantitativeBridge.compilerBinarySha256,
+    quantitativeBridge.hostSourceRoot,
+    quantitativeBridge.canonicalVmSourceRoot,
+    quantitativeBridge.bytecodeRoot,
+    quantitativeBridge.deterministicReceiptRoot,
+    quantitativeBridge.finalStateRoot,
+  ]) {
+    if (typeof value !== 'string' || !/^[0-9a-f]{64}$/i.test(value)) {
+      fail('Quantitative bridge health evidence is missing a required content-addressed root', { quantitativeBridge });
     }
   }
 
@@ -106,12 +144,24 @@ try {
     status: 'RCL_VERCEL_HEALTH_EVIDENCE_VERIFIED',
     binarySha256: status.binarySha256,
     evidenceBound: status.evidenceBound,
+    extendedEvidenceBound: status.extendedEvidenceBound,
     foundationParityDomains: status.foundationParityDomains,
+    foundationNativeBridgeDomains: status.foundationNativeBridgeDomains,
     perceptionDomainReceiptRoot: status.foundationParityProofs.perception.domainReceiptRoot,
     physicalDomainReceiptRoot: status.foundationParityProofs.physical.domainReceiptRoot,
     neuralDomainReceiptRoot: status.foundationParityProofs.neural.domainReceiptRoot,
     geneticDomainReceiptRoot: status.foundationParityProofs.genetic.domainReceiptRoot,
     livingDomainReceiptRoot: status.foundationParityProofs.living.domainReceiptRoot,
+    quantitativeBridge: {
+      providerId: quantitativeBridge.providerId,
+      hostBinarySha256: quantitativeBridge.hostBinarySha256,
+      hostSourceRoot: quantitativeBridge.hostSourceRoot,
+      canonicalVmSourceRoot: quantitativeBridge.canonicalVmSourceRoot,
+      bytecodeRoot: quantitativeBridge.bytecodeRoot,
+      deterministicReceiptRoot: quantitativeBridge.deterministicReceiptRoot,
+      finalStateRoot: quantitativeBridge.finalStateRoot,
+      declaredDomainDirectLoweringVerified: false,
+    },
     physicalQuantityExtremumCount: status.physicalQuantityEvidence.quantityExtremumCount,
     neuralLoweredTransactionCount: status.foundationParityProofs.neural.loweredCount,
     geneticLoweredStageCount: status.foundationParityProofs.genetic.loweredCount,
