@@ -4,7 +4,7 @@ import {
   FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
   foundationDomainReceiptRoot,
   verifyFoundationDomainReceiptParity,
-  verifyFoundationDirectNativeParity,
+  verifyFoundationDirectNativeParityGeneric as verifyFoundationDirectNativeParity,
 } from '../src/foundation-direct-native-parity.mjs';
 
 const RULE = '__rcl_foundation_perception_vision_0';
