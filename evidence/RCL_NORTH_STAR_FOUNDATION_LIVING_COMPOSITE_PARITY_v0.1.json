@@ -1,0 +1,87 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-living-composite-parity-v0.1",
+  "base_commit": "4b7f1a7885d40ab53ae43c0e03c0e0f887a7f438",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation，但当前自动化容器无法 checkout 完整仓库或物化 canonical native binary，因此继续 externally_blocked。",
+      "pressure": 0.985,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-living-top-level-parity-integration-gap",
+      "domain": "native_runtime_validation",
+      "signal": "Cycle 18 已建立 Living staged receipt 独立证据合同，但旧 foundation-direct-native-parity 会把 Living 交给不理解 Living metadata 的 generic receipt verifier，导致 Living 即使 staged receipt 通过也无法得到顶层 native-verified。需要一个非补偿性的 composite parity entry point，把 non-Living generic receipt 与 Living staged receipt 分开验证后再组合。",
+      "pressure": 0.971
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-living-actual-c-native-replay",
+      "domain": "native_runtime_validation",
+      "score": 0.904,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-living-composite-native-parity-entry-point",
+      "domain": "native_runtime_validation",
+      "score": 0.8842,
+      "expected_goal_gain": 0.97,
+      "reuse_gain": 0.96,
+      "autonomy_gain": 0.95,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.31,
+      "regression_risk": 0.15
+    },
+    {
+      "candidate_id": "replace-legacy-foundation-native-parity-default",
+      "domain": "api_surface",
+      "score": 0.811,
+      "blocked_by": "composite entry point must be validated before replacing existing default"
+    }
+  ],
+  "selected": "foundation-living-composite-native-parity-entry-point",
+  "mode": "WHOLE_ARTIFACT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Cycle 18 已把 Living 证据语义从 generic receipt 中拆出；下一步最小风险的闭环不是立刻改写 legacy verifier，而是先提供一个新的 composite entry point：继续复用既有 compiler/reference runtime/native VM/lineage/generic receipt，并只把 non-Living lowering 送进 generic receipt、把 Living lowering 送进 Living staged receipt，最后以非补偿性 parity gate 和 composite receipt root 统一裁决。",
+  "implementation": [
+    "src/foundation-direct-native-parity-composite.mjs",
+    "tests/foundation-direct-native-parity-composite.test.mjs"
+  ],
+  "behavioral_change": [
+    "新增 composite Foundation direct native parity v0.1；旧 entry point 保持不变，不做隐式替换",
+    "non-Living lowering 继续复用现有 verifyFoundationDomainReceiptParity；Living lowering 使用 Cycle 18 的 verifyLivingStagedReceiptParity",
+    "generic receipt 与 Living receipt 任一失败都会让 composite domainReceipt=false，不允许互相补偿",
+    "state parity、semantic state root、native state root authority、lowering lineage 与 composite domain receipt 六项全部通过才返回 native-verified",
+    "composite receipt root 绑定 generic receipt root 与 Living receipt root，包括失败状态与各自算法身份",
+    "native VM missing、compile blocked 与 execution failed 继续保持显式状态，不因 composite 层而弱化",
+    "sense-only Living Reference gap 继续 fail-closed；本周期不通过 final state parity 绕过历史证据缺口",
+    "truth boundary 明确 legacy foundation-direct-native-parity entry point 尚未被替换"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 10,
+      "breakdown": {
+        "composite_native_parity_contract": "10/10 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-native-parity-composite.mjs",
+        "node --test tests/foundation-direct-native-parity-composite.test.mjs"
+      ]
+    },
+    "remote_content_identity": {
+      "status": "PASS",
+      "module_git_blob_sha": "876b133b3a6b9f626c888f24c27b3e5e4cc00565",
+      "test_git_blob_sha": "2ed070dca7e184dad9fecb4cb9fb51500d4e933d"
+    },
+    "branch_head_workflow_runs_before_pr": 0,
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期建立新的 composite parity entry point，并证明在依赖注入 histories/runtime 结果下，Living staged receipt 可以与既有 non-Living receipt、lineage、state/root gates 非补偿组合。它不声明旧 foundation-direct-native-parity 已被替换，不声明真实 canonical C Native VM 已运行，不声明 Living sense-only step 已有 Reference receipt，不声明完整历史等价或全仓回归。",
+  "ci_policy": "候选分支提交均携带 [skip ci] [skip actions]；PR 前 branch head workflow run 数必须为 0，PR 后再次检查 head workflow-free 才允许 merge。"
+}
