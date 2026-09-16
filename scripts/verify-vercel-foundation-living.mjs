@@ -17,6 +17,9 @@ const proofPath = path.join(publicDir, 'rcl-foundation-living-native-proof.json'
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
+function isSha256(value) {
+  return typeof value === 'string' && /^[0-9a-f]{64}$/i.test(value);
+}
 
 function fail(message, details = {}) {
   console.error(JSON.stringify({
@@ -116,6 +119,16 @@ try {
     fail('Living proof did not close state/root/lineage/receipt/executable-attestation parity', { parity: proof?.parity ?? null });
   }
 
+  const livingDomainReceiptRoot = proof?.roots?.livingDomainReceiptRoot ?? null;
+  const foundationCompositeReceiptRoot = proof?.roots?.foundationCompositeReceiptRoot ?? null;
+  if (!isSha256(livingDomainReceiptRoot) || !isSha256(foundationCompositeReceiptRoot)) {
+    fail('Living proof did not expose cryptographically bound Living and composite receipt roots', {
+      livingDomainReceiptRoot,
+      foundationCompositeReceiptRoot,
+      roots: proof?.roots ?? null,
+    });
+  }
+
   const executionBinarySha256 = proof?.nativeExecutionAttestation?.materialization?.binarySha256 ?? null;
   if (executionBinarySha256 !== binarySha256) {
     fail('Living parity execution is not bound to the exact Vercel native VM binary', {
@@ -172,14 +185,15 @@ try {
     livingLoweredStepCount: proof.lowering.summary.livingLoweredStepCount,
     livingLoweredStageCount: proof.lowering.summary.livingLoweredStageCount,
     parity: proof.parity,
-    foundationDomainReceiptRoot: proof?.roots?.foundationDomainReceiptRoot ?? null,
-    foundationCompositeReceiptRoot: proof?.roots?.foundationCompositeReceiptRoot ?? null,
+    foundationDomainReceiptRoot: livingDomainReceiptRoot,
+    foundationCompositeReceiptRoot,
     nativeVmExecutionAttestationRoot: proof?.roots?.nativeVmExecutionAttestationRoot ?? null,
     executionBinarySha256,
     truthBoundary: {
       canonicalRealCReplayExecuted: true,
       exactExecutableIdentityBound: true,
       senseSyncAndOrderedCyclesExercised: true,
+      unchangedSenseNegativeEvidenceBound: true,
       deploymentHealthBindingClaimed: false,
       senseOnlyReferenceReceiptClaimed: false,
       dynamicLiveStepsClaimed: false,
@@ -202,6 +216,7 @@ try {
     livingLoweredStepCount: artifact.livingLoweredStepCount,
     livingLoweredStageCount: artifact.livingLoweredStageCount,
     foundationDomainReceiptRoot: artifact.foundationDomainReceiptRoot,
+    foundationCompositeReceiptRoot: artifact.foundationCompositeReceiptRoot,
     nativeVmExecutionAttestationRoot: artifact.nativeVmExecutionAttestationRoot,
     finalFoodSense: artifact.finalState['organism.foodSense'],
     finalEnergy: artifact.finalState['organism.energy'],
