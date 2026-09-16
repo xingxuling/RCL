@@ -3,7 +3,9 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tryCompileFoundationRealityToBytecode } from '../src/foundation-direct-bytecode.mjs';
 import { verifyFoundationDirectNativeParity } from '../src/foundation-direct-native-parity.mjs';
+import { runNativeBytecode } from '../src/native-vm.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const target = path.join(root, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
@@ -50,13 +52,12 @@ const source = [
 try {
   if (!fs.existsSync(target)) fail('Canonical Vercel native VM artifact is missing before physical parity proof', { target });
   const binarySha256 = sha256(fs.readFileSync(target));
-  const proof = await verifyFoundationDirectNativeParity(source, {
-    nativeRuntime: {
-      vmPath: target,
-      buildIfMissing: false,
-      timeout: 30_000,
-    },
-  });
+  const nativeRuntime = {
+    vmPath: target,
+    buildIfMissing: false,
+    timeout: 30_000,
+  };
+  const proof = await verifyFoundationDirectNativeParity(source, { nativeRuntime });
 
   if (proof?.status !== 'native-verified' || proof?.verified !== true) {
     fail('Physical Quantity Foundation slice did not pass canonical real-C native parity', {
@@ -87,7 +88,17 @@ try {
     });
   }
 
-  const state = proof?.native?.state ?? {};
+  const compiled = tryCompileFoundationRealityToBytecode(source);
+  if (!compiled?.ok || !compiled?.bytecode) {
+    fail('Physical Quantity source did not produce canonical Foundation direct bytecode', {
+      diagnostics: compiled?.diagnostics ?? null,
+    });
+  }
+  const native = runNativeBytecode(compiled.bytecode, {
+    ...nativeRuntime,
+    requireNativeStateRoot: true,
+  });
+  const state = native?.state ?? {};
   const position = state['world.stone.position'];
   const velocity = state['world.stone.velocity'];
   if (position?.kind !== 'Quantity' || position?.type !== 'Length' || position?.unit !== 'm' || position?.value !== 12) {
@@ -95,6 +106,12 @@ try {
   }
   if (velocity?.kind !== 'Quantity' || velocity?.type !== 'Velocity' || velocity?.unit !== 'm/s' || velocity?.value !== 1) {
     fail('Physical native final Velocity state is not the expected dimensioned value', { velocity });
+  }
+  if (native?.stateRootVerified !== true || native?.stateRootParity !== true) {
+    fail('Direct physical native replay did not verify its semantic state root', {
+      stateRootVerified: native?.stateRootVerified ?? false,
+      stateRootParity: native?.stateRootParity ?? false,
+    });
   }
 
   const artifact = {
@@ -105,6 +122,7 @@ try {
     verified: true,
     binarySha256,
     physicalLoweredStepCount: proof.lowering.summary.physicalLoweredStepCount,
+    quantityNativeLowering: compiled.foundationQuantityNativeLowering ?? null,
     parity: proof.parity,
     foundationDomainReceiptRoot: proof?.roots?.foundationDomainReceiptRoot ?? null,
     foundationCompositeReceiptRoot: proof?.roots?.foundationCompositeReceiptRoot ?? null,
@@ -122,6 +140,8 @@ try {
     status: 'RCL_VERCEL_FOUNDATION_PHYSICAL_NATIVE_VERIFIED',
     binarySha256,
     physicalLoweredStepCount: artifact.physicalLoweredStepCount,
+    quantityConstructorCount: artifact.quantityNativeLowering?.summary?.quantityConstructorCount ?? null,
+    quantityBinaryCount: artifact.quantityNativeLowering?.summary?.quantityBinaryCount ?? null,
     foundationDomainReceiptRoot: artifact.foundationDomainReceiptRoot,
     nativeVmExecutionAttestationRoot: artifact.nativeVmExecutionAttestationRoot,
     finalPosition: position,
