@@ -1,6 +1,15 @@
 #!/usr/bin/env node
 import { nativeVmDeploymentStatus } from '../api/health.mjs';
 
+const BRIDGE_SPECS = [
+  ['quantitative', 'quantitative.evaluate'],
+  ['knowledge', 'knowledge.resolve'],
+  ['perception', 'perception.observe'],
+  ['natural-language-reality', 'natural-language.interpret'],
+  ['understanding-reality', 'understanding.model'],
+  ['creative-reality', 'creative.generate'],
+];
+
 function fail(message, details = {}) {
   console.error(JSON.stringify({
     ok: false,
@@ -9,6 +18,9 @@ function fail(message, details = {}) {
     ...details,
   }, null, 2));
   process.exit(1);
+}
+function isSha256(value) {
+  return typeof value === 'string' && /^[0-9a-f]{64}$/i.test(value);
 }
 
 try {
@@ -39,41 +51,90 @@ try {
     }
   }
 
+  const expectedBridgeDomains = BRIDGE_SPECS.map(([domain]) => domain);
   if (
     status.foundationNativeBridgeBound !== true
     || status.quantitativeBridgeBound !== true
+    || status.knowledgeBridgeBound !== true
+    || status.perceptionBridgeBound !== true
+    || status.naturalLanguageRealityBridgeBound !== true
+    || status.understandingRealityBridgeBound !== true
+    || status.creativeRealityBridgeBound !== true
     || status.extendedEvidenceBound !== true
-    || JSON.stringify(status.foundationNativeBridgeDomains) !== JSON.stringify(['quantitative'])
+    || JSON.stringify(status.foundationNativeBridgeDomains) !== JSON.stringify(expectedBridgeDomains)
   ) {
-    fail('Deployment health did not separately bind the proven Quantitative Native Provider Bridge evidence', { status });
+    fail('Deployment health did not separately bind the complete proven Foundation Batch A Native Provider Bridge set', { status });
   }
-  const quantitativeBridge = status.quantitativeBridgeEvidence;
-  if (
-    quantitativeBridge?.providerId !== 'rcl.foundation.batch-a'
-    || quantitativeBridge?.providerAbi !== 1
-    || quantitativeBridge?.providerCallCount !== 1
-    || quantitativeBridge?.canonicalVmSourceRoot !== status.sourceRoot
-    || quantitativeBridge?.selfhostByteIdentical !== true
-    || quantitativeBridge?.replayVerified !== true
-    || quantitativeBridge?.providerDisabledRejected !== true
-    || quantitativeBridge?.declaredDomainDirectLoweringVerified !== false
-  ) {
-    fail('Health evidence lost Quantitative bridge provenance, replay, negative control, or strict direct-lowering truth boundary', {
-      quantitativeBridge,
-      sourceRoot: status.sourceRoot,
-    });
+
+  let sharedHostBinarySha256 = null;
+  let sharedHostSourceRoot = null;
+  let sharedBytecodeRoot = null;
+  let sharedReceiptRoot = null;
+  let sharedBatchFinalStateRoot = null;
+  for (const [domain, capability] of BRIDGE_SPECS) {
+    const proof = status.foundationNativeBridgeProofs?.[domain];
+    if (
+      proof?.domain !== domain
+      || proof?.capability !== capability
+      || proof?.mode !== 'native-provider-bridge'
+      || proof?.status !== 'native-bridge-verified'
+      || proof?.verified !== true
+      || proof?.providerId !== 'rcl.foundation.batch-a'
+      || proof?.providerAbi !== 1
+      || proof?.providerCallCount !== BRIDGE_SPECS.length
+      || proof?.canonicalVmSourceRoot !== status.sourceRoot
+      || proof?.selfhostByteIdentical !== true
+      || proof?.replayVerified !== true
+      || proof?.providerDisabledRejected !== true
+      || proof?.behaviorMutationVerified !== true
+      || proof?.declaredDomainDirectLoweringVerified !== false
+    ) {
+      fail(`Health evidence lost ${domain} Native Provider Bridge provenance, replay, negative control, or strict direct-lowering truth boundary`, {
+        domain,
+        capability,
+        proof,
+        sourceRoot: status.sourceRoot,
+      });
+    }
+    for (const value of [
+      proof.hostBinarySha256,
+      proof.compilerBinarySha256,
+      proof.hostSourceRoot,
+      proof.canonicalVmSourceRoot,
+      proof.bytecodeRoot,
+      proof.deterministicReceiptRoot,
+      proof.batchFinalStateRoot,
+      proof.beforeRoot,
+      proof.finalStateRoot,
+    ]) {
+      if (!isSha256(value)) fail(`${domain} bridge health evidence is missing a required content-addressed root`, { domain, proof });
+    }
+    sharedHostBinarySha256 ??= proof.hostBinarySha256;
+    sharedHostSourceRoot ??= proof.hostSourceRoot;
+    sharedBytecodeRoot ??= proof.bytecodeRoot;
+    sharedReceiptRoot ??= proof.deterministicReceiptRoot;
+    sharedBatchFinalStateRoot ??= proof.batchFinalStateRoot;
+    if (
+      proof.hostBinarySha256 !== sharedHostBinarySha256
+      || proof.hostSourceRoot !== sharedHostSourceRoot
+      || proof.bytecodeRoot !== sharedBytecodeRoot
+      || proof.deterministicReceiptRoot !== sharedReceiptRoot
+      || proof.batchFinalStateRoot !== sharedBatchFinalStateRoot
+    ) {
+      fail('Batch A bridge domains are not bound to one common host/source/bytecode/receipt/final-root execution', {
+        domain,
+        proof,
+      });
+    }
   }
-  for (const value of [
-    quantitativeBridge.hostBinarySha256,
-    quantitativeBridge.compilerBinarySha256,
-    quantitativeBridge.hostSourceRoot,
-    quantitativeBridge.canonicalVmSourceRoot,
-    quantitativeBridge.bytecodeRoot,
-    quantitativeBridge.deterministicReceiptRoot,
-    quantitativeBridge.finalStateRoot,
-  ]) {
-    if (typeof value !== 'string' || !/^[0-9a-f]{64}$/i.test(value)) {
-      fail('Quantitative bridge health evidence is missing a required content-addressed root', { quantitativeBridge });
+
+  const bridgeProofs = BRIDGE_SPECS.map(([domain]) => status.foundationNativeBridgeProofs[domain]);
+  for (let index = 1; index < bridgeProofs.length; index += 1) {
+    if (bridgeProofs[index].beforeRoot !== bridgeProofs[index - 1].finalStateRoot) {
+      fail('Batch A bridge health evidence lost causal state-root chaining between domains', {
+        previous: bridgeProofs[index - 1],
+        current: bridgeProofs[index],
+      });
     }
   }
 
@@ -147,41 +208,20 @@ try {
     extendedEvidenceBound: status.extendedEvidenceBound,
     foundationParityDomains: status.foundationParityDomains,
     foundationNativeBridgeDomains: status.foundationNativeBridgeDomains,
+    bridgeHostBinarySha256: sharedHostBinarySha256,
+    bridgeHostSourceRoot: sharedHostSourceRoot,
+    bridgeBytecodeRoot: sharedBytecodeRoot,
+    bridgeDeterministicReceiptRoot: sharedReceiptRoot,
+    bridgeBatchFinalStateRoot: sharedBatchFinalStateRoot,
     perceptionDomainReceiptRoot: status.foundationParityProofs.perception.domainReceiptRoot,
     physicalDomainReceiptRoot: status.foundationParityProofs.physical.domainReceiptRoot,
     neuralDomainReceiptRoot: status.foundationParityProofs.neural.domainReceiptRoot,
     geneticDomainReceiptRoot: status.foundationParityProofs.genetic.domainReceiptRoot,
     livingDomainReceiptRoot: status.foundationParityProofs.living.domainReceiptRoot,
-    quantitativeBridge: {
-      providerId: quantitativeBridge.providerId,
-      hostBinarySha256: quantitativeBridge.hostBinarySha256,
-      hostSourceRoot: quantitativeBridge.hostSourceRoot,
-      canonicalVmSourceRoot: quantitativeBridge.canonicalVmSourceRoot,
-      bytecodeRoot: quantitativeBridge.bytecodeRoot,
-      deterministicReceiptRoot: quantitativeBridge.deterministicReceiptRoot,
-      finalStateRoot: quantitativeBridge.finalStateRoot,
-      declaredDomainDirectLoweringVerified: false,
-    },
     physicalQuantityExtremumCount: status.physicalQuantityEvidence.quantityExtremumCount,
     neuralLoweredTransactionCount: status.foundationParityProofs.neural.loweredCount,
     geneticLoweredStageCount: status.foundationParityProofs.genetic.loweredCount,
     livingLoweredStageCount: status.foundationParityProofs.living.loweredCount,
-    finalPosition: position,
-    finalVelocity: velocity,
-    neuralFinalState: {
-      stimulus: neural.finalStimulus,
-      response: neural.finalResponse,
-      trace: neural.finalTrace,
-    },
-    geneticFinalState: {
-      seed: genetic.finalSeed,
-      trait: genetic.finalTrait,
-    },
-    livingFinalState: {
-      foodSense: living.finalFoodSense,
-      energy: living.finalEnergy,
-      health: living.finalHealth,
-    },
   }, null, 2));
 } catch (error) {
   fail(error?.message ?? String(error), {

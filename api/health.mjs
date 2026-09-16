@@ -5,6 +5,14 @@ import { RCL_MCP_SERVER_NAME, RCL_MCP_SERVER_VERSION, listRclMcpTools } from '..
 
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
+const FOUNDATION_NATIVE_BRIDGE_SPECS = [
+  ['quantitative', 'quantitative.evaluate'],
+  ['knowledge', 'knowledge.resolve'],
+  ['perception', 'perception.observe'],
+  ['natural-language-reality', 'natural-language.interpret'],
+  ['understanding-reality', 'understanding.model'],
+  ['creative-reality', 'creative.generate'],
+];
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -96,18 +104,20 @@ function livingEvidenceBound(proof, binarySha256) {
   );
 }
 
-function quantitativeBridgeEvidenceBound(proof, attestation) {
+function nativeBridgeEvidenceBound(proof, domain, capability, attestation) {
   return Boolean(
-    proof?.domain === 'quantitative'
+    proof?.domain === domain
+    && proof?.capability === capability
     && proof?.mode === 'native-provider-bridge'
     && proof?.status === 'native-bridge-verified'
     && proof?.verified === true
     && proof?.providerId === 'rcl.foundation.batch-a'
     && proof?.providerAbi === 1
-    && proof?.providerCallCount === 1
+    && proof?.providerCallCount === FOUNDATION_NATIVE_BRIDGE_SPECS.length
     && proof?.selfhostByteIdentical === true
     && proof?.replayVerified === true
     && proof?.providerDisabledRejected === true
+    && proof?.behaviorMutationVerified === true
     && proof?.declaredDomainDirectLoweringVerified === false
     && Number(proof?.authorityCount ?? 0) >= 1
     && Number(proof?.evidenceCount ?? 0) >= 1
@@ -119,6 +129,8 @@ function quantitativeBridgeEvidenceBound(proof, attestation) {
     && isSha256(proof?.sourceRoot)
     && isSha256(proof?.bytecodeRoot)
     && isSha256(proof?.deterministicReceiptRoot)
+    && isSha256(proof?.batchFinalStateRoot)
+    && isSha256(proof?.beforeRoot)
     && isSha256(proof?.finalStateRoot)
   );
 }
@@ -141,6 +153,7 @@ function bridgeProofSummary(proof) {
   if (!proof) return null;
   return {
     domain: proof.domain ?? null,
+    capability: proof.capability ?? null,
     mode: proof.mode ?? null,
     status: proof.status ?? null,
     verified: proof.verified === true,
@@ -153,10 +166,13 @@ function bridgeProofSummary(proof) {
     canonicalVmSourceRoot: proof.canonicalVmSourceRoot ?? null,
     bytecodeRoot: proof.bytecodeRoot ?? null,
     deterministicReceiptRoot: proof.deterministicReceiptRoot ?? null,
+    batchFinalStateRoot: proof.batchFinalStateRoot ?? null,
+    beforeRoot: proof.beforeRoot ?? null,
     finalStateRoot: proof.finalStateRoot ?? null,
     selfhostByteIdentical: proof.selfhostByteIdentical === true,
     replayVerified: proof.replayVerified === true,
     providerDisabledRejected: proof.providerDisabledRejected === true,
+    behaviorMutationVerified: proof.behaviorMutationVerified === true,
     declaredDomainDirectLoweringVerified: proof.declaredDomainDirectLoweringVerified === true,
   };
 }
@@ -203,7 +219,6 @@ export function nativeVmDeploymentStatus() {
   const neuralProof = attestation?.foundationParityProofs?.neural ?? attestation?.foundationNeuralParityProof ?? null;
   const geneticProof = attestation?.foundationParityProofs?.genetic ?? attestation?.foundationGeneticParityProof ?? null;
   const livingProof = attestation?.foundationParityProofs?.living ?? attestation?.foundationLivingParityProof ?? null;
-  const quantitativeBridgeProof = attestation?.foundationNativeBridgeProofs?.quantitative ?? attestation?.foundationQuantitativeNativeBridgeProof ?? null;
 
   const perceptionParityBound = Boolean(replayEvidenceBound && coreParityBound(perceptionProof, 'perception', binarySha256));
   const physicalParityBound = Boolean(replayEvidenceBound && physicalQuantityEvidenceBound(physicalProof, binarySha256));
@@ -219,11 +234,26 @@ export function nativeVmDeploymentStatus() {
     ...(livingParityBound ? ['living'] : []),
   ];
 
-  const quantitativeBridgeBound = Boolean(replayEvidenceBound && quantitativeBridgeEvidenceBound(quantitativeBridgeProof, attestation));
-  const foundationNativeBridgeBound = quantitativeBridgeBound;
-  const foundationNativeBridgeDomains = quantitativeBridgeBound ? ['quantitative'] : [];
+  const bridgeProofs = attestation?.foundationNativeBridgeProofs ?? {};
+  const bridgeBounds = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(([domain, capability]) => [
+    domain,
+    Boolean(replayEvidenceBound && nativeBridgeEvidenceBound(bridgeProofs[domain], domain, capability, attestation)),
+  ]));
+  const foundationNativeBridgeDomains = FOUNDATION_NATIVE_BRIDGE_SPECS
+    .filter(([domain]) => bridgeBounds[domain])
+    .map(([domain]) => domain);
+  const foundationNativeBridgeBound = foundationNativeBridgeDomains.length === FOUNDATION_NATIVE_BRIDGE_SPECS.length;
+  const quantitativeBridgeBound = bridgeBounds.quantitative === true;
+  const knowledgeBridgeBound = bridgeBounds.knowledge === true;
+  const perceptionBridgeBound = bridgeBounds.perception === true;
+  const naturalLanguageRealityBridgeBound = bridgeBounds['natural-language-reality'] === true;
+  const understandingRealityBridgeBound = bridgeBounds['understanding-reality'] === true;
+  const creativeRealityBridgeBound = bridgeBounds['creative-reality'] === true;
   const evidenceBound = replayEvidenceBound && foundationParityBound;
   const extendedEvidenceBound = evidenceBound && foundationNativeBridgeBound;
+
+  const bridgeSummaries = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(([domain]) => [domain, bridgeProofSummary(bridgeProofs[domain])]));
+  const quantitativeBridgeProof = bridgeProofs.quantitative ?? null;
 
   return {
     bundled,
@@ -238,6 +268,11 @@ export function nativeVmDeploymentStatus() {
     livingParityBound,
     foundationNativeBridgeBound,
     quantitativeBridgeBound,
+    knowledgeBridgeBound,
+    perceptionBridgeBound,
+    naturalLanguageRealityBridgeBound,
+    understandingRealityBridgeBound,
+    creativeRealityBridgeBound,
     evidenceBound,
     extendedEvidenceBound,
     binarySha256,
@@ -253,25 +288,8 @@ export function nativeVmDeploymentStatus() {
       genetic: proofSummary(geneticProof),
       living: proofSummary(livingProof),
     },
-    foundationNativeBridgeProofs: {
-      quantitative: bridgeProofSummary(quantitativeBridgeProof),
-    },
-    quantitativeBridgeEvidence: quantitativeBridgeProof ? {
-      providerId: quantitativeBridgeProof.providerId ?? null,
-      providerAbi: quantitativeBridgeProof.providerAbi ?? null,
-      providerCallCount: quantitativeBridgeProof.providerCallCount ?? null,
-      hostBinarySha256: quantitativeBridgeProof.hostBinarySha256 ?? null,
-      compilerBinarySha256: quantitativeBridgeProof.compilerBinarySha256 ?? null,
-      hostSourceRoot: quantitativeBridgeProof.hostSourceRoot ?? null,
-      canonicalVmSourceRoot: quantitativeBridgeProof.canonicalVmSourceRoot ?? null,
-      bytecodeRoot: quantitativeBridgeProof.bytecodeRoot ?? null,
-      deterministicReceiptRoot: quantitativeBridgeProof.deterministicReceiptRoot ?? null,
-      finalStateRoot: quantitativeBridgeProof.finalStateRoot ?? null,
-      selfhostByteIdentical: quantitativeBridgeProof.selfhostByteIdentical === true,
-      replayVerified: quantitativeBridgeProof.replayVerified === true,
-      providerDisabledRejected: quantitativeBridgeProof.providerDisabledRejected === true,
-      declaredDomainDirectLoweringVerified: quantitativeBridgeProof.declaredDomainDirectLoweringVerified === true,
-    } : null,
+    foundationNativeBridgeProofs: bridgeSummaries,
+    quantitativeBridgeEvidence: quantitativeBridgeProof ? bridgeProofSummary(quantitativeBridgeProof) : null,
     physicalQuantityEvidence: physicalProof ? {
       quantityConstructorCount: physicalProof.quantityNativeLowering?.summary?.quantityConstructorCount ?? null,
       quantityBinaryCount: physicalProof.quantityNativeLowering?.summary?.quantityBinaryCount ?? null,
