@@ -38,7 +38,7 @@ const source = [
   '    law drift {',
   '      step dt : Time',
   '      when world.stone.position > meters(0)',
-  '      evolve world.stone.position <- world.stone.position + world.stone.velocity * dt',
+  '      evolve world.stone.position <- min(meters(100), max(meters(0), world.stone.position + world.stone.velocity * dt))',
   '      evolve world.stone.velocity <- world.stone.velocity + world.gravity.acceleration * dt',
   '      conserve world.stone.position >= meters(0)',
   '      witness "physical:quantity-native"',
@@ -94,6 +94,11 @@ try {
       diagnostics: compiled?.diagnostics ?? null,
     });
   }
+  if ((compiled?.foundationQuantityNativeLowering?.summary?.quantityExtremumCount ?? 0) < 4) {
+    fail('Physical Quantity source did not lower both min/max across both bounded steps', {
+      quantityNativeLowering: compiled?.foundationQuantityNativeLowering ?? null,
+    });
+  }
   const native = runNativeBytecode(compiled.bytecode, {
     ...nativeRuntime,
     requireNativeStateRoot: true,
@@ -116,7 +121,7 @@ try {
 
   const artifact = {
     ok: true,
-    format: 'taowind.rcl-vercel-foundation-physical-native-proof.v0.1',
+    format: 'taowind.rcl-vercel-foundation-physical-native-proof.v0.2',
     domain: 'physical',
     status: proof.status,
     verified: true,
@@ -142,6 +147,7 @@ try {
     physicalLoweredStepCount: artifact.physicalLoweredStepCount,
     quantityConstructorCount: artifact.quantityNativeLowering?.summary?.quantityConstructorCount ?? null,
     quantityBinaryCount: artifact.quantityNativeLowering?.summary?.quantityBinaryCount ?? null,
+    quantityExtremumCount: artifact.quantityNativeLowering?.summary?.quantityExtremumCount ?? null,
     foundationDomainReceiptRoot: artifact.foundationDomainReceiptRoot,
     nativeVmExecutionAttestationRoot: artifact.nativeVmExecutionAttestationRoot,
     finalPosition: position,
