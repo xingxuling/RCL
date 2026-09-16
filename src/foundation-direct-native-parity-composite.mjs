@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
-export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT = 'taowind.rcl-foundation-direct-native-parity-composite.v0.1';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION = '0.1.0';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_FORMAT = 'taowind.rcl-foundation-direct-native-parity-composite.v0.2';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_COMPOSITE_VERSION = '0.2.0';
 export const FOUNDATION_COMPOSITE_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-composite-receipt-root.sha256.v0.1';
 
 function asArray(value) { return Array.isArray(value) ? value : []; }
@@ -84,9 +84,21 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
   const nativeState = normalize(native?.state ?? {}, deps.semanticValue);
   const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
   const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
-  const lineage = deps.verifyLineage(lowering, native?.history, reference?.history);
+  const genericLineage = deps.verifyLineage(nonLivingLowering, native?.history, reference?.history);
   const genericReceipt = deps.verifyGenericReceipt(nonLivingLowering, reference?.history, native?.history, deps.semanticValue);
   const livingReceipt = deps.verifyLivingReceipt(lowering, reference?.history, native?.history, deps.semanticValue);
+  const lineage = {
+    required:genericLineage?.required===true || livingReceipt?.required===true,
+    ok:genericLineage?.ok===true && livingReceipt?.ok===true,
+    generic:genericLineage,
+    living:{
+      required:livingReceipt?.required===true,
+      ok:livingReceipt?.ok===true,
+      evidenceSource:'living-staged-receipt',
+      rootAlgorithm:livingReceipt?.rootAlgorithm??null,
+      evidenceRoot:livingReceipt?.receiptRoot??null,
+    },
+  };
   const domainReceipt = {
     required:genericReceipt?.required===true || livingReceipt?.required===true,
     ok:genericReceipt?.ok===true && livingReceipt?.ok===true,
@@ -101,7 +113,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
     semanticStateRoot:nativeRoot===referenceRoot,
     nativeStateRootVerified:native?.stateRootVerified===true,
     nativeStateRootParity:native?.stateRootParity===true,
-    loweringLineage:lineage?.ok===true,
+    loweringLineage:lineage.ok,
     domainReceipt:domainReceipt.ok,
   };
   const verified = Object.values(parity).every(Boolean);
@@ -126,7 +138,9 @@ function truthBoundary() {
   return {
     compositeReceiptIntegratesLiving:true,
     genericReceiptRunsOnlyOnNonLivingLowering:true,
+    genericLineageRunsOnlyOnNonLivingLowering:true,
     livingReceiptRunsOnLivingLowering:true,
+    livingReceiptSuppliesLivingLineageEvidence:true,
     legacyFoundationDirectNativeParityEntryPointReplaced:false,
     livingSenseOnlyReferenceGapRemainsFailClosed:true,
     receiptRootIsEvidenceBindingNotStandaloneProof:true,
