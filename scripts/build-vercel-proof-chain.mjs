@@ -20,12 +20,18 @@ const steps = [
     '--out',
     'public/foundation-native-federation-conformance',
   ]],
+  ['strict-native-provider-federation-extension-proof', [
+    'scripts/verify-vercel-foundation-native-federation-extension.mjs',
+  ]],
   ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
   ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
   ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
   ['genetic-real-c-proof', ['scripts/verify-vercel-foundation-genetic.mjs']],
   ['living-real-c-proof', ['scripts/verify-vercel-foundation-living.mjs']],
   ['biological-deployment-binding', ['scripts/bind-vercel-foundation-biological.mjs']],
+  ['native-provider-federation-deployment-binding', [
+    'scripts/bind-vercel-foundation-native-federation.mjs',
+  ]],
   ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
 
