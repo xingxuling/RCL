@@ -1,0 +1,65 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-living-staged-lowering-v0.1",
+  "base_commit": "051838beb4a53f19c2e935607971cc6a75bcd888",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation，但自动化容器无法 checkout 完整仓库或物化 canonical native binary，因此继续 externally_blocked。",
+      "pressure": 0.982,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-living-staged-semantic-gap",
+      "domain": "native_lowering",
+      "signal": "Living Live 的 Reference Runtime 在每步先持久化 senses，再按声明顺序执行 conditional cycles；cycle condition 在 sense sync 与先前 cycle 之后求值，living maintains 只对触发的 cycle proposed state 检查。现有 direct lowerer 尚不能表达该 staged semantics。",
+      "pressure": 0.958
+    }
+  ],
+  "ranked_candidates": [
+    { "candidate_id": "foundation-living-actual-c-native-replay", "domain": "native_runtime_validation", "score": 0.893, "externally_blocked": true },
+    { "candidate_id": "foundation-living-bounded-staged-direct-lowering", "domain": "native_lowering", "score": 0.8711, "expected_goal_gain": 0.97, "reuse_gain": 0.96, "autonomy_gain": 0.94, "evidence_gain": 0.9, "implementation_cost": 0.43, "regression_risk": 0.28 },
+    { "candidate_id": "foundation-living-staged-domain-receipt-parity", "domain": "evidence_provenance", "score": 0.812, "blocked_by": "living-staged-lowering-not-yet-landed" }
+  ],
+  "selected": "foundation-living-bounded-staged-direct-lowering",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Genetic 已证明 ordered staged Core transactions 可以安全承载多阶段 Foundation semantics。Living 的关键差异是 sense sync 必须先持久化、cycle condition 必须读取已同步 senses 与前序 cycle 状态、maintains 只在触发 cycle 后检查；这些语义可以用显式 sense stage + ordered conditional cycle stages 精确保持，而不需要新增 VM 指令。",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "tests/foundation-living-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "foundation direct lowering format v0.5 -> v0.6；默认 direct domains 新增 living",
+    "静态 1..256 steps 的 Live 被逐步展开；有 senses 时每步先生成独立 sense-sync Realize stage，再按声明顺序生成 cycle Realize stages",
+    "sense stage 将每个 sense source PathExpr 复制到 sense facet，且不执行 living maintains，保持 Reference Runtime 在 cycle 之前先同步感知的语义",
+    "cycle stage 原样保留 cycle when/changes，因按顺序执行而自然读取同步后的 senses 与前序 cycle 状态",
+    "living maintains 仅绑定到 cycle rules；Core not-triggered rule 不提交历史/状态，因此 inactive cycle 保持 Reference no-transition 语义",
+    "每个 stage 拥有唯一 synthetic identity、step/stage/cycle metadata、intrinsic-life-cycle authority class、body/needs/change modes/witnesses 元数据",
+    "动态或超界 step count 继续 fail-closed；未消费 Living declaration 继续保留给现有 provider/native validation 拒绝",
+    "空 Living（无 senses、无 cycles）可消费 bounded Live 而不生成虚假事务",
+    "truth boundary 明确 livingDomainReceiptParityClaimed=false；本周期只建立 staged lowering，不伪称 Living receipt/native parity 已完成"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 29,
+      "breakdown": {
+        "new_living_staged_lowering": "13/13 PASS",
+        "existing_genetic_staged_lowering": "10/10 PASS",
+        "perception_physical_neural_compatibility_smoke": "6/6 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-lowering.mjs",
+        "node --test tests/foundation-living-direct-lowering.test.mjs tests/foundation-genetic-direct-lowering.test.mjs tests/regression-old-domains.test.mjs"
+      ]
+    },
+    "remote_content_identity": "PASS: Git blob SHA of direct lowerer and Living test matched locally validated files after GitHub upload",
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明 Living staged direct-lowering transform 的结构、顺序、感知同步、条件循环、maintain placement、身份与 fail-closed 边界；不宣称 Living Domain Receipt parity、真实 canonical C Native VM replay、真实 Living C VM parity、完整历史等价、动态 steps、全部 Foundation 原生化或全仓回归通过。"
+}

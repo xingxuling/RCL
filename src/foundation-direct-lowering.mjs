@@ -1,5 +1,5 @@
-export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.5';
-export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.5.0';
+export const FOUNDATION_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-direct-lowering.v0.6';
+export const FOUNDATION_DIRECT_LOWERING_VERSION = '0.6.0';
 
 const MAX_STATIC_DOMAIN_STEPS = 256;
 
@@ -90,6 +90,44 @@ function neuralRule(neural, pathway, ruleName, stepIndex, stepCount, pathwayInde
     },
   };
 }
+
+function livingSenseRule(living, ruleName, stepIndex, stepCount, stageCount) {
+  const witness = `rcl:foundation:living:${living.name}:step:${stepIndex}:sense`;
+  return {
+    rule: {
+      kind: 'Emergence', name: ruleName, cause: `living.${living.name}.sense`,
+      when: trueExpression(), needs: [],
+      alters: array(living.senses).map(sense => ({ target: sense.path, expression: pathExpression(sense.source) })),
+      calls: [], preserves: [], witnesses: [witness],
+    },
+    metadata: {
+      domain: 'living', declaration: living.name, directive: 'Live', stage: 'sense', stageIndex: 1, stageCount,
+      syntheticRule: ruleName, stateTargets: array(living.senses).map(sense => sense.path), preserveCount: 0,
+      witness, authorityClass: 'intrinsic-life-cycle', sourceReality: living.name,
+      stepIndex, stepCount, cycleIndex: null, cycleName: null, originalWitnesses: [],
+      body: living.body ?? null, livingNeeds: [...array(living.needs)], changeModes: array(living.senses).map(() => 'sense-sync'),
+    },
+  };
+}
+function livingCycleRule(living, cycle, ruleName, stepIndex, stepCount, cycleIndex, stageIndex, stageCount) {
+  const witness = `rcl:foundation:living:${cycle.name}:step:${stepIndex}:cycle:${cycleIndex}`;
+  return {
+    rule: {
+      kind: 'Emergence', name: ruleName, cause: `living.${cycle.name}`,
+      when: cycle.when ?? trueExpression(), needs: [],
+      alters: array(cycle.changes).map(change => ({ target: change.target, expression: cloneAst(change.expression) })),
+      calls: [], preserves: array(living.maintains).map(cloneAst), witnesses: [...array(cycle.witnesses), witness],
+    },
+    metadata: {
+      domain: 'living', declaration: living.name, directive: 'Live', stage: 'cycle', stageIndex, stageCount,
+      syntheticRule: ruleName, stateTargets: array(cycle.changes).map(change => change.target), preserveCount: array(living.maintains).length,
+      witness, authorityClass: 'intrinsic-life-cycle', sourceReality: living.name,
+      stepIndex, stepCount, cycleIndex, cycleName: cycle.name, originalWitnesses: [...array(cycle.witnesses)],
+      body: living.body ?? null, livingNeeds: [...array(living.needs)], changeModes: array(cycle.changes).map(change => change.mode ?? 'cycle'),
+    },
+  };
+}
+
 function geneticStageRules(genetic, mutationRuleName, expressionRuleName, generationIndex, generationCount) {
   const mutationWitness = `rcl:foundation:genetic:${genetic.name}:generation:${generationIndex}:mutation`;
   const expressionWitness = `rcl:foundation:genetic:${genetic.name}:generation:${generationIndex}:expression`;
@@ -140,14 +178,15 @@ function collisionDiagnostic(domain, declaration, directiveIndex, allocation, ex
 export function lowerDeclaredFoundationToCore(program, options = {}) {
   if (!program || typeof program !== 'object' || Array.isArray(program)) throw new TypeError('compiled RCL program object is required');
 
-  const enabledDomains = new Set(options.domains ?? ['perception', 'physical', 'neural', 'genetic']);
+  const enabledDomains = new Set(options.domains ?? ['perception', 'physical', 'neural', 'genetic', 'living']);
   const diagnostics = []; const lowered = []; const syntheticRules = [];
   const consumedDirectiveIndexes = new Set(); const consumedPerceptions = new Set();
-  const consumedPhysicalLaws = new Set(); const consumedNeurals = new Set(); const consumedGenetics = new Set();
+  const consumedPhysicalLaws = new Set(); const consumedNeurals = new Set(); const consumedGenetics = new Set(); const consumedLivings = new Set();
   const rewrittenDirectives = [];
   const reservedRuleNames = new Set(array(program.rules).map(rule => rule?.name).filter(Boolean));
   let renamedSyntheticRuleCount = 0; let physicalLoweredStepCount = 0; let neuralLoweredTransactionCount = 0;
   let geneticLoweredGenerationCount = 0; let geneticLoweredStageCount = 0;
+  let livingLoweredStepCount = 0; let livingLoweredStageCount = 0;
 
   const perceptions = array(program.perceptions);
   const perceptionsByName = new Map(perceptions.map(item => [item.name, item]));
@@ -155,6 +194,7 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
   for (const physical of physicals) for (const law of array(physical?.laws)) physicalLawByName.set(law.name, law);
   const neurals = array(program.neurals); const neuralByName = new Map(neurals.map(item => [item.name, item]));
   const genetics = array(program.genetics); const geneticByName = new Map(genetics.map(item => [item.name, item]));
+  const livings = array(program.livings); const livingByName = new Map(livings.map(item => [item.name, item]));
 
   array(program.directives).forEach((directive, index) => {
     if (directive?.kind === 'Observe' && enabledDomains.has('perception')) {
@@ -234,6 +274,43 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       consumedDirectiveIndexes.add(index); consumedNeurals.add(neural.name); return;
     }
 
+    if (directive?.kind === 'Live' && enabledDomains.has('living')) {
+      const living = livingByName.get(directive.name);
+      if (!living) {
+        diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_TARGET_UNKNOWN', `Live target '${directive.name}' is not a declared living reality`, { directiveIndex: index, domain: 'living', target: directive.name }));
+        rewrittenDirectives.push(directive); return;
+      }
+      const stepCount = literalStepCount(directive.count);
+      if (stepCount === null) {
+        diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_LIVING_DYNAMIC_STEPS_UNSUPPORTED', `Live '${living.name}' requires a literal step count between 1 and ${MAX_STATIC_DOMAIN_STEPS} for bounded staged direct lowering`, { directiveIndex: index, domain: 'living', declaration: living.name }));
+        rewrittenDirectives.push(directive); return;
+      }
+      const hasSenseStage = array(living.senses).length > 0;
+      const stageCount = array(living.cycles).length + (hasSenseStage ? 1 : 0);
+      for (let stepIndex = 1; stepIndex <= stepCount; stepIndex += 1) {
+        let stageOffset = 0;
+        if (hasSenseStage) {
+          stageOffset = 1;
+          const allocation = allocateSyntheticRuleName(`__rcl_foundation_living_${sanitizeName(living.name)}_${index}_${stepIndex}_sense`, reservedRuleNames);
+          if (allocation.renamed) { renamedSyntheticRuleCount += 1; diagnostics.push(collisionDiagnostic('living', living.name, index, allocation, { stepIndex, stage: 'sense' })); }
+          const staged = livingSenseRule(living, allocation.ruleName, stepIndex, stepCount, stageCount);
+          syntheticRules.push(staged.rule); rewrittenDirectives.push({ kind: 'Realize', rule: allocation.ruleName });
+          lowered.push({ ...staged.metadata, directiveIndex: index }); livingLoweredStageCount += 1;
+        }
+        array(living.cycles).forEach((cycle, cycleOffset) => {
+          const cycleIndex = cycleOffset + 1;
+          const stageIndex = stageOffset + cycleIndex;
+          const allocation = allocateSyntheticRuleName(`__rcl_foundation_living_${sanitizeName(cycle.name)}_${index}_${stepIndex}_${cycleIndex}`, reservedRuleNames);
+          if (allocation.renamed) { renamedSyntheticRuleCount += 1; diagnostics.push(collisionDiagnostic('living', cycle.name, index, allocation, { stepIndex, cycleIndex, stage: 'cycle' })); }
+          const staged = livingCycleRule(living, cycle, allocation.ruleName, stepIndex, stepCount, cycleIndex, stageIndex, stageCount);
+          syntheticRules.push(staged.rule); rewrittenDirectives.push({ kind: 'Realize', rule: allocation.ruleName });
+          lowered.push({ ...staged.metadata, directiveIndex: index }); livingLoweredStageCount += 1;
+        });
+        livingLoweredStepCount += 1;
+      }
+      consumedDirectiveIndexes.add(index); consumedLivings.add(living.name); return;
+    }
+
     if (directive?.kind === 'Inherit' && enabledDomains.has('genetic')) {
       const genetic = geneticByName.get(directive.name);
       if (!genetic) {
@@ -276,12 +353,16 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
   const transformedNeurals = neurals.filter(neural => !consumedNeurals.has(neural.name) || remainingPropagateTargets.has(neural.name));
   for (const neural of transformedNeurals) diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_DECLARATION_UNCONSUMED', `Neural domain '${neural.name}' remains declared because no fully supported Propagate directive consumed it`, { domain: 'neural', declaration: neural.name }));
 
+  const remainingLiveTargets = new Set(rewrittenDirectives.filter(item => item?.kind === 'Live').map(item => item.name));
+  const transformedLivings = livings.filter(living => !consumedLivings.has(living.name) || remainingLiveTargets.has(living.name));
+  for (const living of transformedLivings) diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_DECLARATION_UNCONSUMED', `Living reality '${living.name}' remains declared because no fully supported Live directive consumed it`, { domain: 'living', declaration: living.name }));
+
   const remainingInheritTargets = new Set(rewrittenDirectives.filter(item => item?.kind === 'Inherit').map(item => item.name));
   const transformedGenetics = genetics.filter(genetic => !consumedGenetics.has(genetic.name) || remainingInheritTargets.has(genetic.name));
   for (const genetic of transformedGenetics) diagnostics.push(diagnostic('RCL_FOUNDATION_DIRECT_LOWERING_DECLARATION_UNCONSUMED', `Genetic reality '${genetic.name}' remains declared because no fully supported Inherit directive consumed it`, { domain: 'genetic', declaration: genetic.name }));
 
   const transformed = {
-    ...program, perceptions: remainingPerceptions, physicals: transformedPhysicals, neurals: transformedNeurals, genetics: transformedGenetics,
+    ...program, perceptions: remainingPerceptions, physicals: transformedPhysicals, neurals: transformedNeurals, genetics: transformedGenetics, livings: transformedLivings,
     rules: [...array(program.rules), ...syntheticRules], directives: rewrittenDirectives,
   };
   return {
@@ -290,12 +371,12 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
     summary: {
       loweredCount: lowered.length, syntheticRuleCount: syntheticRules.length, consumedDirectiveCount: consumedDirectiveIndexes.size,
       remainingPerceptionCount: remainingPerceptions.length, remainingPhysicalCount: transformedPhysicals.length,
-      remainingNeuralCount: transformedNeurals.length, remainingGeneticCount: transformedGenetics.length,
-      physicalLoweredStepCount, neuralLoweredTransactionCount, geneticLoweredGenerationCount, geneticLoweredStageCount,
+      remainingNeuralCount: transformedNeurals.length, remainingGeneticCount: transformedGenetics.length, remainingLivingCount: transformedLivings.length,
+      physicalLoweredStepCount, neuralLoweredTransactionCount, geneticLoweredGenerationCount, geneticLoweredStageCount, livingLoweredStepCount, livingLoweredStageCount,
       renamedSyntheticRuleCount, enabledDomains: [...enabledDomains].sort(),
     },
     truthBoundary: {
-      directDomains: ['perception', 'physical', 'neural', 'genetic'].filter(domain => enabledDomains.has(domain)),
+      directDomains: ['perception', 'physical', 'neural', 'genetic', 'living'].filter(domain => enabledDomains.has(domain)),
       stateTransitionParityTargeted: true, domainReceiptParityTargeted: true,
       physicalDirectLoweringBoundedToStaticStepCountAndDt: true,
       neuralDirectLoweringBoundedToStaticStepCount: true,
@@ -303,6 +384,11 @@ export function lowerDeclaredFoundationToCore(program, options = {}) {
       geneticUsesTwoStageMutationThenExpressionTransactions: true,
       geneticPreservesCheckedOnlyAfterExpressionStage: true,
       geneticDomainReceiptParityClaimed: false,
+      livingDirectLoweringBoundedToStaticStepCount: true,
+      livingSenseSynchronizationIsSeparateStageWhenSensesExist: true,
+      livingCycleConditionsEvaluateAfterSenseSynchronizationAndPriorCycles: true,
+      livingMaintainsCheckedOnlyOnTriggeredCycleStages: true,
+      livingDomainReceiptParityClaimed: false,
       allFoundationDomainsNativeClaimed: false, providerBridgeRemovedGlobally: false,
     },
   };
