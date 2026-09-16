@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
-export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.4';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.4.0';
-export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.1';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.5';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.5.0';
+export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.2';
 
 function codeOf(error) {
   return error?.code ?? error?.payload?.code ?? 'RCL_FOUNDATION_DIRECT_NATIVE_EXECUTION_FAILED';
@@ -20,6 +20,7 @@ function truthBoundary() {
     loweringLineageClaimedOnlyWhenVerified: true,
     domainReceiptParityClaimedOnlyWhenVerified: true,
     domainReceiptRootIsEvidenceBindingNotStandaloneProof: true,
+    physicalInactiveStepRequiresReferenceAndNativeAbsence: true,
     fullHistoryParityClaimed: false,
     allFoundationDomainsNativeClaimed: false,
     providerBridgeRemovedGlobally: false,
@@ -102,6 +103,95 @@ function strictlyIncreasing(values) {
   return true;
 }
 
+function referenceDomainKind(item) {
+  if (item?.domain === 'perception') return 'perceptual';
+  if (item?.domain === 'physical') return 'physical';
+  return null;
+}
+
+function referenceIdentityMatches(item, record) {
+  if (!record || record.kind !== 'DomainTransition') return false;
+  const expectedKind = referenceDomainKind(item);
+  if (!expectedKind || record.domainKind !== expectedKind || record.name !== item?.declaration) return false;
+  if (item?.domain === 'physical') return Number(record.step) === Number(item?.stepIndex);
+  return true;
+}
+
+function pairReferenceReceipts(lowered, referenceHistory) {
+  const history = asArray(referenceHistory);
+  const used = new Set();
+  const matches = lowered.map(item => {
+    const referenceIndex = history.findIndex((record, index) => !used.has(index) && referenceIdentityMatches(item, record));
+    if (referenceIndex >= 0) used.add(referenceIndex);
+    return {
+      record: referenceIndex >= 0 ? history[referenceIndex] : null,
+      referenceIndex,
+    };
+  });
+  const relevantKinds = new Set(lowered.map(referenceDomainKind).filter(Boolean));
+  const relevantReferenceIndexes = history
+    .map((record, index) => ({ record, index }))
+    .filter(({ record }) => record?.kind === 'DomainTransition' && relevantKinds.has(record?.domainKind))
+    .map(({ index }) => index);
+  const consumedRelevantIndexes = [...used].filter(index => relevantReferenceIndexes.includes(index));
+  const matchedReferenceIndexes = matches.map(item => item.referenceIndex).filter(index => index >= 0);
+  return {
+    matches,
+    relevantReferenceCount: relevantReferenceIndexes.length,
+    consumedReferenceCount: consumedRelevantIndexes.length,
+    referenceCoverageExact: consumedRelevantIndexes.length === relevantReferenceIndexes.length,
+    referenceOrderPreserved: strictlyIncreasing(matchedReferenceIndexes),
+  };
+}
+
+function metadataCompleteForItem(item) {
+  const base = typeof item?.declaration === 'string'
+    && typeof item?.syntheticRule === 'string'
+    && typeof item?.witness === 'string'
+    && Array.isArray(item?.stateTargets)
+    && Number.isInteger(Number(item?.directiveIndex));
+  if (!base) return false;
+  if (item.domain === 'perception') {
+    return item.directive === 'Observe'
+      && Object.prototype.hasOwnProperty.call(item, 'observer')
+      && Object.prototype.hasOwnProperty.call(item, 'sourceReality')
+      && item.authorityClass === 'observation';
+  }
+  if (item.domain === 'physical') {
+    const stepIndex = Number(item.stepIndex);
+    const stepCount = Number(item.stepCount);
+    return item.directive === 'Advance'
+      && item.authorityClass === 'natural-law'
+      && Object.prototype.hasOwnProperty.call(item, 'sourceReality')
+      && Object.prototype.hasOwnProperty.call(item, 'dtExpression')
+      && Array.isArray(item.originalWitnesses)
+      && Number.isInteger(stepIndex) && stepIndex >= 1
+      && Number.isInteger(stepCount) && stepCount >= stepIndex;
+  }
+  return false;
+}
+
+function physicalReferenceAligned(item, reference) {
+  if (!reference) return false;
+  return reference.domainKind === 'physical'
+    && reference.name === item.declaration
+    && reference.status === 'realized'
+    && reference.authorityClass === 'natural-law'
+    && Number(reference.step) === Number(item.stepIndex)
+    && Object.prototype.hasOwnProperty.call(reference, 'dt')
+    && sameJson(asArray(reference.witnesses), asArray(item.originalWitnesses));
+}
+
+function perceptionReferenceAligned(item, reference) {
+  return Boolean(reference)
+    && reference.domainKind === 'perceptual'
+    && reference.name === item?.declaration
+    && reference.status === 'realized'
+    && reference.authorityClass === 'observation'
+    && (reference.observer ?? null) === (item?.observer ?? null)
+    && (reference.sourceReality ?? null) === (item?.sourceReality ?? null);
+}
+
 export function foundationDomainReceiptRoot(report) {
   if (!report || typeof report !== 'object' || Array.isArray(report)) {
     throw new TypeError('Foundation domain receipt report object is required');
@@ -113,18 +203,30 @@ export function foundationDomainReceiptRoot(report) {
     declaredLoweredCount: Number(report.declaredLoweredCount ?? 0),
     observedLoweringEntries: Number(report.observedLoweringEntries ?? 0),
     referenceReceiptCount: Number(report.referenceReceiptCount ?? 0),
+    activeReferenceReceiptCount: Number(report.activeReferenceReceiptCount ?? 0),
     metadataComplete: report.metadataComplete === true,
     referenceCoverageExact: report.referenceCoverageExact === true,
+    referenceOrderPreserved: report.referenceOrderPreserved === true,
     nativeOrderPreserved: report.nativeOrderPreserved === true,
     entries: asArray(report.entries).map(entry => ({
       index: entry?.index ?? null,
       domain: entry?.domain ?? null,
       declaration: entry?.declaration ?? null,
       directive: entry?.directive ?? null,
+      directiveIndex: entry?.directiveIndex ?? null,
       syntheticRule: entry?.syntheticRule ?? null,
       authorityClass: entry?.authorityClass ?? null,
       observer: entry?.observer ?? null,
       sourceReality: entry?.sourceReality ?? null,
+      stepIndex: entry?.stepIndex ?? null,
+      stepCount: entry?.stepCount ?? null,
+      originalWitnesses: asArray(entry?.originalWitnesses),
+      referenceActive: entry?.referenceActive === true,
+      nativeActive: entry?.nativeActive === true,
+      referenceStep: entry?.referenceStep ?? null,
+      referenceDt: entry?.referenceDt ?? null,
+      referenceWitnesses: asArray(entry?.referenceWitnesses),
+      nativeWitnesses: asArray(entry?.nativeWitnesses),
       expectedTargets: asArray(entry?.expectedTargets),
       referenceTargets: asArray(entry?.referenceTargets),
       nativeTargets: asArray(entry?.nativeTargets),
@@ -138,9 +240,11 @@ export function foundationDomainReceiptRoot(report) {
   return createHash('sha256').update(JSON.stringify(canonicalJson(binding))).digest('hex');
 }
 
-export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
+export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory, referenceHistory = null) {
   const lowered = asArray(lowering?.lowered);
   const history = asArray(nativeHistory);
+  const referenceAvailable = Array.isArray(referenceHistory);
+  const references = referenceAvailable ? pairReferenceReceipts(lowered, referenceHistory) : null;
   const declaredLoweredCount = Number(lowering?.summary?.loweredCount ?? lowered.length);
   const metadataComplete = declaredLoweredCount === lowered.length;
   const ruleNames = lowered.map(item => item?.syntheticRule).filter(Boolean);
@@ -153,11 +257,15 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
     const record = matchingRecords.length === 1 ? matchingRecords[0] : null;
     const witnesses = asArray(record?.witnesses);
     const changeTargets = unique(asArray(record?.changes).map(change => change?.target).filter(Boolean));
+    const reference = references?.matches?.[index]?.record ?? null;
+    const physicalInactive = item?.domain === 'physical' && referenceAvailable && reference === null;
     const checks = {
       syntheticRulePresent: Boolean(syntheticRule),
-      exactNativeRecord: matchingRecords.length === 1,
-      witnessPresent: Boolean(witness) && witnesses.includes(witness),
-      stateTargetsCovered: stateTargets.every(target => changeTargets.includes(target)),
+      referenceExecutionEvidencePresent: item?.domain !== 'physical' || referenceAvailable,
+      exactNativeRecord: physicalInactive ? matchingRecords.length === 0 : matchingRecords.length === 1,
+      witnessPresent: physicalInactive ? true : Boolean(witness) && witnesses.includes(witness),
+      stateTargetsCovered: physicalInactive ? true : stateTargets.every(target => changeTargets.includes(target)),
+      inactiveStepAligned: item?.domain !== 'physical' || !physicalInactive || matchingRecords.length === 0,
     };
     return {
       index,
@@ -167,6 +275,7 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
       syntheticRule,
       witness,
       stateTargets,
+      referenceActive: Boolean(reference),
       nativeRecordCount: matchingRecords.length,
       nativeChangeTargets: changeTargets,
       checks,
@@ -182,65 +291,77 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory) {
     observedLoweringEntries: lowered.length,
     metadataComplete,
     ruleIdentityUnique,
+    referenceExecutionEvidenceAvailable: referenceAvailable,
     entries,
   };
 }
 
 export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, nativeHistory, semanticValue = value => value) {
   const lowered = asArray(lowering?.lowered);
-  const referenceReceipts = asArray(referenceHistory).filter(record => record?.kind === 'DomainTransition' && record?.domainKind === 'perceptual');
+  const referenceReceipts = pairReferenceReceipts(lowered, referenceHistory);
   const nativeRecords = asArray(nativeHistory);
   const declaredLoweredCount = Number(lowering?.summary?.loweredCount ?? lowered.length);
   const required = declaredLoweredCount > 0;
-  const metadataComplete = declaredLoweredCount === lowered.length && lowered.every(item => (
-    item?.domain === 'perception'
-    && item?.directive === 'Observe'
-    && typeof item?.declaration === 'string'
-    && typeof item?.syntheticRule === 'string'
-    && typeof item?.witness === 'string'
-    && Object.prototype.hasOwnProperty.call(item, 'observer')
-    && Object.prototype.hasOwnProperty.call(item, 'sourceReality')
-    && item?.authorityClass === 'observation'
-  ));
-  const referenceCoverageExact = referenceReceipts.length === lowered.length;
+  const metadataComplete = declaredLoweredCount === lowered.length && lowered.every(metadataCompleteForItem);
   const nativeIndexes = [];
 
   const entries = lowered.map((item, index) => {
-    const reference = referenceReceipts[index] ?? null;
+    const referenceMatch = referenceReceipts.matches[index] ?? { record: null, referenceIndex: -1 };
+    const reference = referenceMatch.record;
     const nativeMatches = nativeRecords
       .map((record, nativeIndex) => ({ record, nativeIndex }))
       .filter(({ record }) => record?.rule === item?.syntheticRule);
     const nativeMatch = nativeMatches.length === 1 ? nativeMatches[0] : null;
     if (nativeMatch) nativeIndexes.push(nativeMatch.nativeIndex);
 
+    const physicalInactive = item?.domain === 'physical' && reference === null;
     const expectedTargets = sortedUnique(asArray(item?.stateTargets).filter(Boolean));
     const referenceTargets = sortedUnique(asArray(reference?.changes).map(change => change?.target).filter(Boolean));
     const nativeTargets = sortedUnique(asArray(nativeMatch?.record?.changes).map(change => change?.target).filter(Boolean));
     const referenceChanges = receiptChanges(reference?.changes, semanticValue);
     const nativeChanges = receiptChanges(nativeMatch?.record?.changes, semanticValue);
+    const referenceWitnesses = asArray(reference?.witnesses);
+    const nativeWitnesses = asArray(nativeMatch?.record?.witnesses);
     const checks = {
-      referenceReceiptAligned: Boolean(reference)
-        && reference.name === item?.declaration
-        && reference.status === 'realized'
-        && reference.authorityClass === 'observation'
-        && (reference.observer ?? null) === (item?.observer ?? null)
-        && (reference.sourceReality ?? null) === (item?.sourceReality ?? null),
-      exactNativeRecord: nativeMatches.length === 1,
-      nativeStatusRealized: nativeMatch?.record?.status === 'realized',
-      referenceTargetsExact: sameJson(referenceTargets, expectedTargets),
-      nativeTargetsExact: sameJson(nativeTargets, expectedTargets),
-      transitionValuesEquivalent: sameJson(referenceChanges, nativeChanges),
-      witnessPresent: asArray(nativeMatch?.record?.witnesses).includes(item?.witness),
+      metadataShapeSupported: metadataCompleteForItem(item),
+      referenceReceiptAligned: physicalInactive
+        ? true
+        : item?.domain === 'physical'
+          ? physicalReferenceAligned(item, reference)
+          : perceptionReferenceAligned(item, reference),
+      exactNativeRecord: physicalInactive ? nativeMatches.length === 0 : nativeMatches.length === 1,
+      nativeStatusRealized: physicalInactive ? true : nativeMatch?.record?.status === 'realized',
+      referenceTargetsExact: physicalInactive ? true : sameJson(referenceTargets, expectedTargets),
+      nativeTargetsExact: physicalInactive ? true : sameJson(nativeTargets, expectedTargets),
+      transitionValuesEquivalent: physicalInactive ? true : sameJson(referenceChanges, nativeChanges),
+      witnessPresent: physicalInactive ? true : nativeWitnesses.includes(item?.witness),
+      originalWitnessesPreserved: item?.domain !== 'physical' || physicalInactive
+        ? true
+        : sameJson(referenceWitnesses, asArray(item?.originalWitnesses))
+          && asArray(item?.originalWitnesses).every(witness => nativeWitnesses.includes(witness)),
+      inactiveStepAligned: item?.domain !== 'physical' || !physicalInactive || nativeMatches.length === 0,
     };
     return {
       index,
       domain: item?.domain ?? null,
       declaration: item?.declaration ?? null,
       directive: item?.directive ?? null,
+      directiveIndex: item?.directiveIndex ?? null,
       syntheticRule: item?.syntheticRule ?? null,
       authorityClass: item?.authorityClass ?? null,
       observer: item?.observer ?? null,
       sourceReality: item?.sourceReality ?? null,
+      stepIndex: item?.stepIndex ?? null,
+      stepCount: item?.stepCount ?? null,
+      originalWitnesses: asArray(item?.originalWitnesses),
+      referenceActive: Boolean(reference),
+      nativeActive: Boolean(nativeMatch),
+      referenceStep: reference?.step ?? null,
+      referenceDt: Object.prototype.hasOwnProperty.call(reference ?? {}, 'dt')
+        ? normalizeReceiptValue(reference.dt, semanticValue)
+        : null,
+      referenceWitnesses,
+      nativeWitnesses,
       expectedTargets,
       referenceTargets,
       nativeTargets,
@@ -252,9 +373,11 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     };
   });
 
-  const nativeOrderPreserved = nativeIndexes.length === lowered.length && strictlyIncreasing(nativeIndexes);
+  const nativeOrderPreserved = strictlyIncreasing(nativeIndexes);
+  const activeReferenceReceiptCount = entries.filter(item => item.referenceActive).length;
   const ok = metadataComplete
-    && referenceCoverageExact
+    && referenceReceipts.referenceCoverageExact
+    && referenceReceipts.referenceOrderPreserved
     && nativeOrderPreserved
     && (!required || (entries.length > 0 && entries.every(item => item.ok)));
   const report = {
@@ -262,9 +385,11 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     ok,
     declaredLoweredCount,
     observedLoweringEntries: lowered.length,
-    referenceReceiptCount: referenceReceipts.length,
+    referenceReceiptCount: referenceReceipts.relevantReferenceCount,
+    activeReferenceReceiptCount,
     metadataComplete,
-    referenceCoverageExact,
+    referenceCoverageExact: referenceReceipts.referenceCoverageExact,
+    referenceOrderPreserved: referenceReceipts.referenceOrderPreserved,
     nativeOrderPreserved,
     entries,
   };
@@ -331,7 +456,11 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
   const nativeState = normalizeState(native?.state ?? {}, deps.semanticValue);
   const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
   const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
-  const lineage = verifyFoundationDirectLoweringLineage(compiled.foundationDirectLowering, native?.history);
+  const lineage = verifyFoundationDirectLoweringLineage(
+    compiled.foundationDirectLowering,
+    native?.history,
+    reference?.history,
+  );
   const domainReceipt = verifyFoundationDomainReceiptParity(
     compiled.foundationDirectLowering,
     reference?.history,
