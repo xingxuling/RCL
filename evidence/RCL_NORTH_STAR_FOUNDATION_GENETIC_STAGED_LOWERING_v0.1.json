@@ -1,0 +1,71 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-genetic-staged-lowering-v0.1",
+  "base_commit": "40611f02711ceb9006c80bffeacf0c0d199f4ed1",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation；自动化容器无法通过公网 checkout GitHub 仓库，因此本周期不声明真实 C VM parity。",
+      "pressure": 0.978,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-genetic-staged-semantic-gap",
+      "domain": "native_lowering",
+      "signal": "Genetic Inherit 的 Reference Runtime 明确执行 mutation -> intermediate mutated state -> expression -> final preserve check；现有 direct lowering 仅覆盖 Perception/Physical/Neural，无法安全用一条 core transaction 表达该两阶段依赖。",
+      "pressure": 0.947
+    },
+    {
+      "id": "rcl-living-staged-semantic-gap",
+      "domain": "native_lowering",
+      "signal": "Living Live 在每步先同步 senses，再顺序运行 cycles；sense state 在 cycle history 之前已提交，且 inactive cycle 不产生同形记录，阶段语义比 Genetic 更复杂。",
+      "pressure": 0.912
+    }
+  ],
+  "ranked_candidates": [
+    { "candidate_id": "foundation-actual-c-native-replay", "domain": "native_runtime_validation", "score": 0.884, "externally_blocked": true },
+    { "candidate_id": "foundation-genetic-bounded-staged-direct-lowering", "domain": "native_lowering", "score": 0.8564, "expected_goal_gain": 0.96, "reuse_gain": 0.97, "autonomy_gain": 0.92, "evidence_gain": 0.89, "implementation_cost": 0.39, "regression_risk": 0.24 },
+    { "candidate_id": "foundation-living-bounded-staged-direct-lowering", "domain": "native_lowering", "score": 0.793, "implementation_cost": 0.61, "regression_risk": 0.41 }
+  ],
+  "selected": "foundation-genetic-bounded-staged-direct-lowering",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Genetic 是第一个明确需要 staged transaction 的 Foundation 域，但其 mutation/expression 两阶段可以精确复用现有 ordered Realize transaction 语义：mutation 阶段按 before state 计算 additive delta，expression 阶段自然读取 mutation 后状态，preserve 只在最终 expression stage 检查。它比 Living 的 senses + conditional cycles 更适合作为通用 staged lowering 的首个安全切口。",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "tests/foundation-genetic-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "foundation direct lowering format v0.4 -> v0.5；默认 direct domains 新增 genetic",
+    "静态 1..256 generations 的 Inherit 被确定性展开为 mutation -> expression 两条 ordered core Realize transactions / generation",
+    "mutation stage 使用 target + delta 重建 Reference Runtime additive mutation，并且不提前检查 genetic preserves",
+    "expression stage 在 mutation 已提交的状态上求值，并独占最终 genetic preserves 边界",
+    "每个 stage 获得唯一 synthetic rule identity、generation/stage metadata、lineage witness 与 lineage-transformation authority class",
+    "动态或超界 generation count 继续 fail-closed 并保留 Genetic declaration + Inherit directive 给现有 provider-domain/native validation 拒绝",
+    "未消费 Genetic declaration 继续保留，避免为了 direct lowering 静默丢弃 Foundation 语义",
+    "truth boundary 明确 geneticDomainReceiptParityClaimed=false；本周期只扩展 staged direct lowering，不伪称 receipt/native parity 已完成"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 16,
+      "breakdown": {
+        "committed_genetic_suite": "10/10 PASS",
+        "local_existing_domain_compatibility_smoke": "6/6 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-lowering.mjs",
+        "node --test tests/foundation-genetic-direct-lowering.test.mjs",
+        "node --test tests/foundation-genetic-direct-lowering.test.mjs tests/regression-old-domains.test.mjs (temporary local compatibility smoke; regression-old-domains.test.mjs not committed)"
+      ]
+    },
+    "branch_head_actions_before_pr": "0 workflow runs observed on candidate head after [skip ci] [skip actions] commits",
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_CANNOT_RESOLVE_GITHUB_FOR_CHECKOUT_AND_NO_CANONICAL_NATIVE_BINARY_WAS_MATERIALIZED",
+    "existing_full_perception_physical_neural_suites": "NOT_RUN_AS_CANONICAL_REPOSITORY_COULD_NOT_BE_MATERIALIZED_IN_CONTAINER",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "候选分支所有提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明 Genetic staged direct-lowering transform 的结构、边界、身份与 fail-closed 行为在本地重建模块上通过 10 个提交测试 + 6 个旧域兼容 smoke；不宣称真实 canonical C Native VM replay、Genetic Native receipt parity、真实 bytecode execution parity、Living staged lowering、动态 generations、全部 Foundation 原生化或全仓回归通过。"
+}
