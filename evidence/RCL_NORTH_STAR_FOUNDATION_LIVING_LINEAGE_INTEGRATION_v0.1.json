@@ -1,0 +1,78 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-living-lineage-integration-v0.1",
+  "base_commit": "d50f4043258d44ef0fe1881033a2fe32b90516cb",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation；自动化容器直接 git clone 仍因 github.com DNS 不可达而失败，因此保持 externally_blocked，不能用 Mock 冒充。",
+      "pressure": 0.986,
+      "externally_blocked": true
+    },
+    {
+      "id": "living-lineage-generic-verifier-mismatch",
+      "domain": "evidence_integrity",
+      "signal": "Cycle 19 composite parity 已把 Living staged receipt 接入 domain receipt，但 loweringLineage 仍把完整 lowering 交给 generic verifyFoundationDirectLoweringLineage。当前 generic metadata contract 只支持 perception/physical/neural/genetic，不支持 living，因此真实 Living lowering 会在 lineage gate 被错误 fail-closed；Cycle 19 的依赖注入测试没有覆盖这个真实 helper 组合缝。",
+      "pressure": 0.979
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-living-actual-c-native-replay",
+      "domain": "native_runtime_validation",
+      "score": 0.912,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-living-composite-lineage-integration",
+      "domain": "evidence_integrity",
+      "score": 0.901,
+      "expected_goal_gain": 0.98,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.96,
+      "evidence_gain": 0.995,
+      "implementation_cost": 0.18,
+      "regression_risk": 0.12
+    },
+    {
+      "candidate_id": "replace-legacy-foundation-native-parity-default",
+      "domain": "api_surface",
+      "score": 0.836,
+      "blocked_by": "composite verifier must first work with real Living lineage evidence rather than injected stubs"
+    }
+  ],
+  "selected": "foundation-living-composite-lineage-integration",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "继续深化 Cycle 19 的同一证据缝：Living staged receipt 已经验证 exact native records、synthetic witness、目标和值、顺序与阶段连续性，强于 generic Living lineage 所需证据。最小且可验证的修复是让 generic lineage 只处理 non-Living lowering，并把 Living staged receipt 的通过结果作为 Living lineage evidence；两者仍非补偿组合。",
+  "implementation": [
+    "src/foundation-direct-native-parity-composite.mjs",
+    "tests/foundation-direct-native-parity-composite-lineage.test.mjs"
+  ],
+  "behavioral_change": [
+    "composite verifier 升级 v0.2；generic lineage 只接收 non-Living lowering，避免把 unsupported Living metadata 错送入 generic verifier",
+    "Living lowering lineage 由 Living staged receipt 提供证据：exact native record、synthetic witness、目标和值、阶段顺序与 continuity 任一失败都会让 loweringLineage=false",
+    "generic lineage 与 Living lineage evidence 非补偿：任一失败都不能由另一侧补偿",
+    "domain receipt 仍保持 generic non-Living + Living staged receipt 的非补偿组合，不降低 Cycle 19 的证据边界",
+    "真实 canonical C Native VM 未运行；本周期只修复 verifier 组合语义，不宣称新增真实 C VM parity"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 3,
+      "breakdown": {
+        "living_composite_lineage_contract": "3/3 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-native-parity-composite.mjs",
+        "node --test tests/foundation-direct-native-parity-composite-lineage.test.mjs"
+      ]
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_GITHUB_DNS_UNAVAILABLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期证明 composite verifier 的 lineage gate 不再把 Living lowering 交给不支持 Living metadata 的 generic verifier，并以已有 Living staged receipt 作为 Living lineage evidence。它不声明真实 canonical C Native VM 已运行，不声明 sense-only Living Reference receipt 缺口已解决，不声明 legacy 默认 parity 入口已替换，不声明全仓回归。",
+  "ci_policy": "候选分支提交与 PR/merge message 携带 [skip ci] [skip actions]；PR 前后检查 branch head workflow runs 为 0 才允许 merge。"
+}
