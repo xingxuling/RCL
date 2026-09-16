@@ -64,8 +64,8 @@ test('execution attestation cannot compensate an earlier parity failure', async(
   assert.ok(result.gaps.includes('state'));
 });
 
-test('attested entry point does not pretend the default Foundation parity path was already promoted', async()=>{
+test('attested entry point reports that canonical default Foundation parity is promoted', async()=>{
   const result=await verifyFoundationDirectNativeParityAttested({name:'P'},options(base()));
-  assert.equal(result.truthBoundary.defaultFoundationParityEntryPointPromotedToAttested,false);
+  assert.equal(result.truthBoundary.defaultFoundationParityEntryPointPromotedToAttested,true);
   assert.equal(result.truthBoundary.nativeExecutionAttestationRequiredForNativeVerified,true);
 });
