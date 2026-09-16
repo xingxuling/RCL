@@ -1,0 +1,88 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-living-staged-receipt-v0.1",
+  "base_commit": "50bb4a282814879dfdb9ea38a765df26626cadfd",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation；当前自动化容器无法通过网络 checkout 完整 RCL 仓库，也无法直接物化 canonical native binary，因此继续 externally_blocked。",
+      "pressure": 0.984,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-living-staged-receipt-gap",
+      "domain": "evidence_provenance",
+      "signal": "Cycle 16 已把 Living Live 展开成 sense-sync -> ordered conditional cycles，但现有 Foundation parity verifier 尚不理解 Living。Reference Runtime 的 living:sense 变化会在每个实际触发的 Living cycle DomainTransition 中重复携带，却不会生成独立 sense receipt；如果一个 step 只有 sense sync 而没有任何 cycle 触发，则 Reference history 没有可独立证明该 sense stage 的 receipt。继续扩域前需要先把这条非同构证据边界显式建模并 fail-closed。",
+      "pressure": 0.962
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-living-actual-c-native-replay",
+      "domain": "native_runtime_validation",
+      "score": 0.901,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-living-staged-receipt-evidence-contract",
+      "domain": "evidence_provenance",
+      "score": 0.8716,
+      "expected_goal_gain": 0.96,
+      "reuse_gain": 0.94,
+      "autonomy_gain": 0.93,
+      "evidence_gain": 0.995,
+      "implementation_cost": 0.34,
+      "regression_risk": 0.18
+    },
+    {
+      "candidate_id": "foundation-living-top-level-parity-integration",
+      "domain": "native_runtime_validation",
+      "score": 0.824,
+      "blocked_by": "living staged receipt truth boundary must be explicit first"
+    }
+  ],
+  "selected": "foundation-living-staged-receipt-evidence-contract",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Living 的 Reference history 与直接下译后的 Core transaction history 不是一一同构：sense sync 没有独立 Reference receipt，active cycles 会重复携带 living:sense partition，inactive cycles 则通过 record absence 表达。若直接把 Genetic/Physical 的一对一收据模型复制过来会伪造证据。因此先建立 Living 专用 staged receipt contract，并明确其可证明与不可证明边界。",
+  "implementation": [
+    "src/foundation-living-staged-receipt.mjs",
+    "tests/foundation-living-staged-receipt.test.mjs"
+  ],
+  "behavioral_change": [
+    "新增 Living 专用 staged receipt verifier v0.1 与确定性 receipt root v0.1；当前作为独立证据合同，不伪称已经集成进 foundation-direct-native-parity 顶层 gate",
+    "按 directive/declaration/step 分组，强制 stageCount、stageIndex、sense-first、cycleIndex 顺序完整，避免 reordered staged semantics 被补偿",
+    "active Living cycle 必须存在唯一 Reference DomainTransition 与唯一 Native synthetic-rule record；inactive cycle 必须 Reference/Native 双方同时缺席",
+    "Reference cycle 的 living:sense partition 与 cycle 自身变化被分开验证，Native sense transaction 只能与重复且一致的 living:sense partition 对齐",
+    "多个 active cycles 若携带的 living:sense partition 不一致则 fail-closed",
+    "cycle Native beforeRoot/afterRoot 必须与对应 Reference cycle 边界根一致；Native staged records 必须保持顺序与 root continuity",
+    "sense Native afterRoot 必须连接到第一个 active Reference cycle beforeRoot，绑定 sense -> cycle 的阶段边界",
+    "若某 step 有 sense stage 但没有任何 active Reference cycle，则 Reference Runtime 没有独立 sense receipt；verifier 明确拒绝认证，而不是把 final state parity 当作历史证据替代",
+    "receipt root 绑定成功与失败检查、负证据、阶段元数据、Reference/Native 变化与边界根"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 14,
+      "breakdown": {
+        "living_staged_receipt_contract": "14/14 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-living-staged-receipt.mjs",
+        "node --test tests/foundation-living-staged-receipt.test.mjs"
+      ]
+    },
+    "remote_content_identity": {
+      "status": "PASS",
+      "module_git_blob_sha": "f4f9f154a7e692c742b59d5ae412bbeb0ea58c5b",
+      "test_git_blob_sha": "2aea01f47387649d808ff6b96d37bef0605924af"
+    },
+    "branch_head_workflow_runs_before_pr": 0,
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期只建立 Living staged receipt 的独立、失败关闭证据合同。它证明注入的 Reference/Native histories 在 sense partition、conditional cycle absence、目标和值、witness、顺序与 boundary roots 上是否一致；不宣称该 verifier 已集成顶层 Foundation native parity，不宣称 sense-only step 可被 Reference history 证明，不宣称真实 canonical C Native VM replay、真实 Living C VM parity、完整历史等价、动态 steps、全部 Foundation 原生化或全仓回归通过。",
+  "ci_policy": "候选分支提交均携带 [skip ci] [skip actions]；PR 前 branch head workflow run 数必须为 0，PR 后再次检查 head workflow-free 才允许 merge。"
+}
