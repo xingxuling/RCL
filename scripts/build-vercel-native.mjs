@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verifyFoundationDirectNativeParity } from '../src/foundation-direct-native-parity.mjs';
 import { materializeNativeVm } from '../src/native-vm-materialization.mjs';
 import { runRealityNative } from '../src/native-vm.mjs';
 
@@ -90,8 +91,55 @@ try {
   }
   const attestationBinarySha256 = executionAttestation.materialization?.binarySha256 ?? null;
 
+  const foundationProofSource = [
+    'reality VercelFoundationNativeProof {',
+    '  facet world.value : Number = 7',
+    '  perception sight {',
+    '    observer operator',
+    '    source world',
+    '    channel value : Number = world.value',
+    '    preserve sight.value >= 0',
+    '  }',
+    '  observe sight',
+    '}',
+    '',
+  ].join('\n');
+
+  const foundationProof = await verifyFoundationDirectNativeParity(foundationProofSource, {
+    nativeRuntime: {
+      vmPath: target,
+      buildIfMissing: false,
+      timeout: 30_000,
+    },
+  });
+
+  if (foundationProof?.status !== 'native-verified' || foundationProof?.verified !== true) {
+    fail('Canonical Foundation direct lowering did not pass real C Native VM parity', {
+      foundationStatus: foundationProof?.status ?? null,
+      foundationVerified: foundationProof?.verified ?? false,
+      foundationGaps: foundationProof?.gaps ?? null,
+      foundationDiagnostics: foundationProof?.diagnostics ?? null,
+      foundationParity: foundationProof?.parity ?? null,
+    });
+  }
+
+  if (foundationProof?.parity?.nativeExecutionAttestation !== true) {
+    fail('Canonical Foundation parity did not prove exact native executable identity', {
+      foundationParity: foundationProof?.parity ?? null,
+      executionAttestationVerification: foundationProof?.executionAttestationVerification ?? null,
+    });
+  }
+
+  const foundationExecutionBinarySha256 = foundationProof?.nativeExecutionAttestation?.materialization?.binarySha256 ?? null;
+  if (foundationExecutionBinarySha256 !== binarySha256) {
+    fail('Foundation parity execution is not bound to the exact Vercel native VM binary', {
+      binarySha256,
+      foundationExecutionBinarySha256,
+    });
+  }
+
   const deploymentArtifact = {
-    format: 'taowind.rcl-vercel-native-artifact.v0.1',
+    format: 'taowind.rcl-vercel-native-artifact.v0.2',
     platform: process.platform,
     arch: process.arch,
     target: 'native/rclvm',
@@ -114,6 +162,19 @@ try {
       attestationRoot: executionAttestation.attestationRoot,
       attestationBinarySha256,
     },
+    foundationParityProof: {
+      format: foundationProof.format ?? null,
+      version: foundationProof.version ?? null,
+      domain: 'perception',
+      status: foundationProof.status,
+      verified: foundationProof.verified === true,
+      loweredCount: foundationProof.lowering?.summary?.loweredCount ?? null,
+      parity: foundationProof.parity ?? null,
+      foundationDomainReceiptRoot: foundationProof.roots?.foundationDomainReceiptRoot ?? null,
+      foundationCompositeReceiptRoot: foundationProof.roots?.foundationCompositeReceiptRoot ?? null,
+      nativeVmExecutionAttestationRoot: foundationProof.roots?.nativeVmExecutionAttestationRoot ?? null,
+      executionBinarySha256: foundationExecutionBinarySha256,
+    },
   };
 
   if (deploymentArtifact.replayProof.attestationBinarySha256 !== binarySha256) {
@@ -133,6 +194,15 @@ try {
     attestationRoot: deploymentArtifact.replayProof.attestationRoot,
     stateRootVerified: true,
     stateRootParity: true,
+    foundationParity: {
+      domain: deploymentArtifact.foundationParityProof.domain,
+      status: deploymentArtifact.foundationParityProof.status,
+      verified: deploymentArtifact.foundationParityProof.verified,
+      loweredCount: deploymentArtifact.foundationParityProof.loweredCount,
+      foundationDomainReceiptRoot: deploymentArtifact.foundationParityProof.foundationDomainReceiptRoot,
+      nativeVmExecutionAttestationRoot: deploymentArtifact.foundationParityProof.nativeVmExecutionAttestationRoot,
+      executionBinarySha256: deploymentArtifact.foundationParityProof.executionBinarySha256,
+    },
   }, null, 2)}\n`);
 
   console.log(JSON.stringify({
@@ -144,6 +214,11 @@ try {
     attestationRoot: deploymentArtifact.replayProof.attestationRoot,
     stateRootVerified: true,
     stateRootParity: true,
+    foundationParityDomain: deploymentArtifact.foundationParityProof.domain,
+    foundationParityStatus: deploymentArtifact.foundationParityProof.status,
+    foundationParityVerified: deploymentArtifact.foundationParityProof.verified,
+    foundationLoweredCount: deploymentArtifact.foundationParityProof.loweredCount,
+    foundationDomainReceiptRoot: deploymentArtifact.foundationParityProof.foundationDomainReceiptRoot,
   }, null, 2));
 } catch (error) {
   fail(error?.message ?? String(error), {
