@@ -1,0 +1,93 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-deployment-safe-native-vm-materialization-v0.1",
+  "base_commit": "0cec1f2c0888a3d40264b3536f7ba207e351cc90",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "deployed-runtime-source-support-gap",
+      "domain": "native_runtime_materialization",
+      "signal": "与 main 同提交 0cec1f2 的已部署 RCL/RNCS 运行面上 native/rclvm 不存在，materialization attempted=true 但以 Native VM source materialization inputs are incomplete 失败；进一步读取 native/rclvm.h 得到 ENOENT，而 native/rclvm.c 可见。Cycle 22 的 clean-checkout 假设因此没有覆盖真实部署裁剪。",
+      "pressure": 0.997
+    },
+    {
+      "id": "in-place-build-assumption",
+      "domain": "runtime_portability",
+      "signal": "Cycle 22 把 make 输出固定到 <root>/native/rclvm；部署环境可能只携带部分源码资产，且运行时根目录不应被假定为可写构建目录。",
+      "pressure": 0.986
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.955,
+      "externally_blocked": true,
+      "blocker": "当前已部署运行面在进入 C VM replay 前先因 source-support closure 缺失失败；必须先消除部署物化断点。"
+    },
+    {
+      "candidate_id": "deployment-safe-native-vm-source-closure",
+      "score": 0.948,
+      "expected_goal_gain": 0.992,
+      "reuse_gain": 0.985,
+      "autonomy_gain": 0.994,
+      "evidence_gain": 0.972,
+      "implementation_cost": 0.24,
+      "regression_risk": 0.17
+    },
+    {
+      "candidate_id": "sense-only-living-reference-receipt",
+      "score": 0.781,
+      "deferred": true,
+      "reason": "当前 native replay 自举断点比新增领域历史合同更接近全局执行性瓶颈。"
+    }
+  ],
+  "selected": "deployment-safe-native-vm-source-closure",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是对 Cycle 22 真实部署失败的纵向深挖，不改变 RCL 语言/RBC/C VM 语义；目标是让同一规范源码在被裁剪的部署包和不可假定可写的应用根中仍能以失败关闭方式物化。",
+  "implementation": [
+    "src/native-vm-canonical-build-support.mjs",
+    "src/native-vm-materialization.mjs",
+    "tests/native-vm-source-materialization.test.mjs"
+  ],
+  "behavioral_change": [
+    "默认/显式预构建 native binary 已存在时保持原优先级，不触发构建",
+    "默认 Linux/macOS binary 缺失时不再向仓库 native/ 写入构建产物，而是按源码+支持资产+平台+架构+构建环境生成确定性 sourceRoot，在系统临时缓存中分阶段构建",
+    "部署包缺少 Makefile 或 rclvm.h 时，可从随 JS 运行时携带的 canonical build support 恢复；native/rclvm.c 仍是不可替代的规范实现源，缺失即 fail-closed",
+    "仓库 Makefile/rclvm.h 与嵌入 canonical support 由定向合同保持 byte-identical，避免常态开发时双份资产静默漂移",
+    "缓存 manifest 绑定 sourceRoot 与 binarySha256；缓存二进制被篡改或损坏时不得复用，必须重新构建",
+    "显式 vmPath、buildIfMissing=false、Windows 缺省行为、构建工具失败和输出缺失继续 fail-closed"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 9,
+      "breakdown": {
+        "deployment_safe_source_materialization_contract": "9/9 PASS"
+      },
+      "commands": [
+        "node --check src/native-vm-canonical-build-support.mjs",
+        "node --check src/native-vm-materialization.mjs",
+        "node --test tests/native-vm-source-materialization.test.mjs"
+      ]
+    },
+    "real_staged_make_process_probe": {
+      "status": "PASS",
+      "description": "真实 GNU make + cc，在源目录故意不提供 Makefile/rclvm.h 的情况下，由 embedded canonical support 恢复支持资产，在独立临时 cache 构建并执行最小 rclvm probe，stdout=staged-native-probe:1。该探针证明部署裁剪+分阶段构建链真实可运行，不冒充完整 RCL C VM replay。"
+    },
+    "deployed_pre_fix_reproduction": {
+      "status": "REPRODUCED",
+      "commit": "0cec1f2c0888a3d40264b3536f7ba207e351cc90",
+      "native_vm_exists": false,
+      "materialization_attempted": true,
+      "materialization_built": false,
+      "failure": "Native VM source materialization inputs are incomplete",
+      "missing_asset_observed": "native/rclvm.h ENOENT",
+      "native_example_result": "examples/hello-reality.rcl fails before VM execution with the same materialization error"
+    },
+    "actual_current_rcl_c_native_vm_replay": "NOT_CLAIMED_UNTIL_UPDATED_RUNTIME_IS_DEPLOYED_OR_FULL_CURRENT_CHECKOUT_IS_AVAILABLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期证明的是 Cycle 22 在真实部署裁剪环境中的物化断点被工程上闭合，并以真实 make/cc staged probe 验证恢复路径。它不声明完整当前 rclvm.c 已在该已部署运行面重放 Foundation 程序，不声明 Composite Receipt/State Root Parity 已取得新的 C VM 现实证据，也不声明全仓回归。",
+  "ci_policy": "候选提交、PR 和 merge message 必须携带 [skip ci] [skip actions]；创建 PR 前后及 merge 后检查 workflow runs，任何自动运行出现即停止后续交付。"
+}
