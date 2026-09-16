@@ -85,6 +85,7 @@ try {
   if (!executionAttestation?.attestationRoot) {
     fail('Canonical RBC replay did not produce an executable-artifact attestation');
   }
+  const attestationBinarySha256 = executionAttestation.materialization?.binarySha256 ?? null;
 
   const deploymentArtifact = {
     format: 'taowind.rcl-vercel-native-artifact.v0.1',
@@ -108,7 +109,7 @@ try {
       stateRootVerified: proof.stateRootVerified === true,
       stateRootParity: proof.stateRootParity === true,
       attestationRoot: executionAttestation.attestationRoot,
-      attestationBinarySha256: executionAttestation.binarySha256 ?? null,
+      attestationBinarySha256,
     },
   };
 
