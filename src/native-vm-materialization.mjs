@@ -81,6 +81,7 @@ export function materializeNativeVm(root, options = {}) {
       built: false,
       cached: false,
       provenance: explicitVmPath ? 'explicit-binary' : 'bundled-or-prebuilt-binary',
+      binarySha256: sha256(fs.readFileSync(vmPath)),
     };
   }
 
@@ -147,6 +148,7 @@ export function materializeNativeVm(root, options = {}) {
       provenance: 'staged-source-cache',
       sourceRoot,
       supportProvenance: cachedManifest.supportProvenance,
+      binarySha256: cachedManifest.binarySha256,
       build: cachedManifest.build,
     };
   }
@@ -231,6 +233,7 @@ export function materializeNativeVm(root, options = {}) {
     provenance: 'staged-repository-source-makefile',
     sourceRoot,
     supportProvenance: support.provenance,
+    binarySha256,
     build,
   };
 }

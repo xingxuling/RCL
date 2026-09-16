@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
 import { defaultNativeVmPath, materializeNativeVm } from './native-vm-materialization.mjs';
 import {
+  createNativeVmExecutionAttestation,
+  verifyNativeVmExecutionAttestation,
+} from './native-vm-execution-attestation.mjs';
+import {
   RCL_NATIVE_STATE_ROOT_ALGORITHM,
   RCLSemanticStateRootError,
   semanticStateRoot,
@@ -50,6 +54,18 @@ function verifyNativePayload(payload, options) {
     }
     throw error;
   }
+}
+
+function bindNativeExecutionAttestation(payload, materialization) {
+  const attestation = createNativeVmExecutionAttestation(materialization, payload);
+  const verdict = verifyNativeVmExecutionAttestation(attestation);
+  if (!verdict.ok) {
+    throw new RCLNativeVMError({
+      code: 'RCL_NATIVE_VM_EXECUTION_ATTESTATION_FAILED',
+      message: 'Native VM execution could not be bound to a valid executable artifact attestation',
+    }, { materialization, attestation, attestationVerification: verdict });
+  }
+  return { ...payload, nativeVmExecutionAttestation: attestation };
 }
 
 function resolveRunnableNativeVm(options) {
@@ -98,7 +114,9 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
       throw new RCLNativeVMError(payload, { status: result.status, stdout: result.stdout, stderr: result.stderr, materialization });
     }
     const payload = parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout });
-    return verifyNativePayload(payload, options);
+    const verified = verifyNativePayload(payload, options);
+    if (verified?.status === 'error' || verified?.code === 'RCL_NATIVE_OUTPUT') return verified;
+    return bindNativeExecutionAttestation(verified, materialization);
   } finally {
     if (temporaryDir) fs.rmSync(temporaryDir, { recursive: true, force: true });
   }
