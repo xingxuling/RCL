@@ -4,7 +4,7 @@ import {
   FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM,
   verifyFoundationDirectLoweringLineage,
   verifyFoundationDomainReceiptParity,
-  verifyFoundationDirectNativeParity,
+  verifyFoundationDirectNativeParityGeneric as verifyFoundationDirectNativeParity,
 } from '../src/foundation-direct-native-parity.mjs';
 
 const RULE1 = '__rcl_foundation_physical_world_fall_0_1';
