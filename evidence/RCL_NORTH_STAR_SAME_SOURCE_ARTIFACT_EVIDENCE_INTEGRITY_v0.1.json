@@ -1,0 +1,96 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-same-source-artifact-evidence-integrity-v0.1",
+  "base_commit": "f958435897fe58973f31930669c33cecc89887c0",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "canonical-c-native-replay-toolchain-blocker",
+      "domain": "native_runtime_validation",
+      "signal": "当前部署 RCL/RNCS 运行面处于 main f958435897fe58973f31930669c33cecc89887c0，但 native/rclvm 不存在且 make 不可用，真实 native replay 仍以 spawnSync make ENOENT 外部阻断。",
+      "pressure": 0.998,
+      "externally_blocked": true
+    },
+    {
+      "id": "v096-artifact-root-not-enforced",
+      "domain": "evidence_authority",
+      "signal": "v0.96 同源工件交换声明 requireArtifactHash=true，但 receiveArtifact 未重新计算或验证 artifactRoot；claims/authorityScope/producer/epoch/kind 等安全相关元数据可在 body/bodyHash 不变时被修改后接受。chunkHash/byteLength 也生成但未验证，transmitArtifact 未证明工件来自 sender.vfs。",
+      "pressure": 0.997,
+      "externally_blocked": false
+    },
+    {
+      "id": "attested-foundation-default-promotion",
+      "domain": "foundation_evidence_authority",
+      "signal": "Cycle 25 的 attested Foundation parity 已存在，但 canonical default 仍是 composite parity；该升级仍有价值，但新出现的 v0.96 工件证据绕过更直接违反 evidence/authority 北极星边界。",
+      "pressure": 0.956,
+      "externally_blocked": false
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.973,
+      "externally_blocked": true,
+      "blocker": "当前部署运行面缺少 native/rclvm 且无 make；真实运行已复现 spawnSync make ENOENT。"
+    },
+    {
+      "candidate_id": "same-source-artifact-exchange-evidence-integrity-binding",
+      "score": 0.969,
+      "expected_goal_gain": 0.996,
+      "reuse_gain": 0.995,
+      "autonomy_gain": 0.982,
+      "evidence_gain": 0.999,
+      "implementation_cost": 0.18,
+      "regression_risk": 0.11
+    },
+    {
+      "candidate_id": "foundation-attested-default-promotion",
+      "score": 0.931,
+      "expected_goal_gain": 0.978,
+      "evidence_gain": 0.991,
+      "implementation_cost": 0.31,
+      "regression_risk": 0.24
+    }
+  ],
+  "selected": "same-source-artifact-exchange-evidence-integrity-binding",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是刚进入 main 的 v0.96 工件交换协议中的纵向证据/权限漏洞，目标明确且可通过负向控制闭合；不需要扩展最终 RCL 形态，优先深挖现有器官的真实性与鲁棒性。",
+  "implementation": [
+    "src/same-source-artifact-exchange-runtime.mjs",
+    "src/index.mjs",
+    "tests/same-source-artifact-exchange-runtime.test.mjs",
+    "examples/same-source-artifact-exchange/default-same-source-artifact-exchange.json",
+    "examples/same-source-artifact-exchange/same-source-artifact-exchange-v0.96.rcl"
+  ],
+  "behavioral_change": [
+    "artifactRoot v0.2 绑定 format/artifactId/producer/core/lineage/epoch/kind/mime/virtualPath/visibility/parent/bodyHash/claims/authorityScope，接收端重新计算并与 envelope 双向一致验证。",
+    "chunkHash、byteLength 与连续 seq 由接收端逐块验证，不再只有整体 payloadHash。",
+    "transmitArtifact 默认要求 artifactId/artifactRoot/bodyHash/producer 与 sender.vfs 中已生成工件匹配，阻止攻击者篡改后重新计算新根绕过。",
+    "负向控制新增 metadata/root tamper、recomputed unprovenanced forgery 与 chunk metadata tamper；runtime judge 将三者提升为非补偿通过条件。",
+    "模块版本从 0.96.0-alpha.1 升到 0.96.0-alpha.2，示例与根 index 公共导出同步。"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 8,
+      "commands": [
+        "node --check src/same-source-artifact-exchange-runtime.mjs",
+        "node --test tests/same-source-artifact-exchange-runtime.test.mjs"
+      ],
+      "result": "8/8 PASS"
+    },
+    "negative_controls": {
+      "payload_tamper_rejected": true,
+      "chunk_integrity_tamper_rejected": true,
+      "artifact_root_metadata_tamper_rejected": true,
+      "recomputed_unprovenanced_forgery_rejected": true,
+      "replay_rejected": true,
+      "cross_core_rejected": true
+    },
+    "real_canonical_c_native_vm_replay": "BLOCKED_EXTERNAL_TOOLCHAIN_NO_MAKE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期只证明同源工件交换的内容、元数据、分块与发送者来源证据变为非补偿的 fail-closed 门；不声明独立外部 peer、外部宇宙证明、真实网络传输或 canonical C Native VM replay 已完成。",
+  "ci_policy": "候选提交、PR 与 merge message 携带 [skip ci] [skip actions]；PR 前后及 merge 后检查 workflow runs，若出现自动 GitHub Actions 运行则停止后续交付。"
+}

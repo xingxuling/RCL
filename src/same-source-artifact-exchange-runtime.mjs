@@ -2,9 +2,10 @@
 import crypto from 'node:crypto';
 import zlib from 'node:zlib';
 
-export const RCL_SAME_SOURCE_ARTIFACT_EXCHANGE_VERSION = '0.96.0-alpha.1';
+export const RCL_SAME_SOURCE_ARTIFACT_EXCHANGE_VERSION = '0.96.0-alpha.2';
 export const RCL_SAME_SOURCE_ARTIFACT_EXCHANGE_SPEC_FORMAT = 'rcl.same-source-artifact-exchange.spec.v0.96';
 export const RCL_SAME_SOURCE_ARTIFACT_EXCHANGE_RESULT_FORMAT = 'rcl.same-source-artifact-exchange.result.v0.96';
+export const RCL_SAME_SOURCE_ARTIFACT_ROOT_ALGORITHM = 'rcl.same-source.artifact-root.sha256.v0.2';
 
 function sha256(value) {
   const body = Buffer.isBuffer(value) ? value : Buffer.from(typeof value === 'string' ? value : JSON.stringify(value));
@@ -18,6 +19,31 @@ function canonicalJson(value) {
   }
   return JSON.stringify(value);
 }
+
+function artifactRootBinding(artifact) {
+  return {
+    algorithm: RCL_SAME_SOURCE_ARTIFACT_ROOT_ALGORITHM,
+    format: artifact?.format ?? null,
+    artifactId: artifact?.artifactId ?? null,
+    producerInstanceId: artifact?.producerInstanceId ?? null,
+    coreId: artifact?.coreId ?? null,
+    lineageRoot: artifact?.lineageRoot ?? null,
+    epoch: artifact?.epoch ?? null,
+    kind: artifact?.kind ?? null,
+    mime: artifact?.mime ?? null,
+    virtualPath: artifact?.virtualPath ?? null,
+    visible: artifact?.visible ?? null,
+    parentRoot: artifact?.parentRoot ?? null,
+    bodyHash: artifact?.bodyHash ?? null,
+    claims: artifact?.claims ?? null,
+    authorityScope: artifact?.authorityScope ?? null,
+  };
+}
+
+export function artifactRootFor(artifact) {
+  return sha256(canonicalJson(artifactRootBinding(artifact)));
+}
+
 
 function hashUnit(seed) {
   return Number.parseInt(sha256(seed).slice(0, 13), 16) / 0x1fffffffffffff;
@@ -74,6 +100,9 @@ export function buildSameSourceArtifactExchangeSpec(input = {}) {
       minCrossCoreRejectRate: input.thresholds?.minCrossCoreRejectRate ?? 1,
       minTamperRejectRate: input.thresholds?.minTamperRejectRate ?? 1,
       minReplayRejectRate: input.thresholds?.minReplayRejectRate ?? 1,
+      minArtifactRootRejectRate: input.thresholds?.minArtifactRootRejectRate ?? 1,
+      minSenderProvenanceRejectRate: input.thresholds?.minSenderProvenanceRejectRate ?? 1,
+      minChunkIntegrityRejectRate: input.thresholds?.minChunkIntegrityRejectRate ?? 1,
       minConvergenceGain: input.thresholds?.minConvergenceGain ?? 0.05,
     },
     guards: {
@@ -83,6 +112,8 @@ export function buildSameSourceArtifactExchangeSpec(input = {}) {
       requireSameCore: true,
       requireArtifactHash: true,
       requireLineage: true,
+      requireSenderProvenance: true,
+      requireChunkHash: true,
       rejectReplay: true,
       ...(input.guards ?? {}),
     },
@@ -178,18 +209,9 @@ export function generateArtifacts(instance, specInput = {}, epoch = instance.epo
       bodyHash,
       claims: { ...instance.state },
       authorityScope: 'sandbox-artifact-only',
+      artifactRootAlgorithm: RCL_SAME_SOURCE_ARTIFACT_ROOT_ALGORITHM,
     };
-    artifact.artifactRoot = sha256(canonicalJson({
-      artifactId: artifact.artifactId,
-      producerInstanceId: artifact.producerInstanceId,
-      coreId: artifact.coreId,
-      lineageRoot: artifact.lineageRoot,
-      epoch: artifact.epoch,
-      kind: artifact.kind,
-      parentRoot: artifact.parentRoot,
-      bodyHash: artifact.bodyHash,
-      claims: artifact.claims,
-    }));
+    artifact.artifactRoot = artifactRootFor(artifact);
     return artifact;
   });
   instance.vfs.push(...artifacts);
@@ -222,6 +244,8 @@ function chunkCompressedArtifact(artifact, chunkBytes) {
   }
   return {
     codec: 'gzip',
+    artifactRootAlgorithm: artifact.artifactRootAlgorithm ?? null,
+    artifactRoot: artifact.artifactRoot ?? null,
     payloadHash: sha256(compressed),
     originalBodyHash: artifact.bodyHash,
     chunks,
@@ -237,8 +261,40 @@ function receiveArtifact(receiver, artifact, envelope, spec, controls = {}) {
     receiver.rejectedArtifacts += 1;
     return { accepted: false, reason: 'replay_rejected' };
   }
+  if (spec.guards.requireArtifactHash) {
+    if (artifact.artifactRootAlgorithm !== RCL_SAME_SOURCE_ARTIFACT_ROOT_ALGORITHM
+      || envelope.artifactRootAlgorithm !== RCL_SAME_SOURCE_ARTIFACT_ROOT_ALGORITHM) {
+      receiver.rejectedArtifacts += 1;
+      return { accepted: false, reason: 'artifact_root_algorithm_rejected' };
+    }
+    const expectedArtifactRoot = artifactRootFor(artifact);
+    if (artifact.artifactRoot !== expectedArtifactRoot || envelope.artifactRoot !== expectedArtifactRoot) {
+      receiver.rejectedArtifacts += 1;
+      return { accepted: false, reason: 'artifact_root_mismatch' };
+    }
+  }
   const ordered = [...envelope.chunks].sort((a, b) => a.seq - b.seq);
-  const compressed = Buffer.concat(ordered.map(c => Buffer.from(c.payload, 'base64')));
+  const chunkBuffers = [];
+  if (spec.guards.requireChunkHash) {
+    for (let index = 0; index < ordered.length; index += 1) {
+      const chunk = ordered[index];
+      const raw = Buffer.from(chunk?.payload ?? '', 'base64');
+      const valid = Number.isInteger(chunk?.seq)
+        && chunk.seq === index
+        && Number.isInteger(chunk?.byteLength)
+        && chunk.byteLength === raw.length
+        && typeof chunk?.chunkHash === 'string'
+        && chunk.chunkHash === sha256(raw);
+      if (!valid) {
+        receiver.rejectedArtifacts += 1;
+        return { accepted: false, reason: 'chunk_integrity_mismatch' };
+      }
+      chunkBuffers.push(raw);
+    }
+  }
+  const compressed = Buffer.concat(spec.guards.requireChunkHash
+    ? chunkBuffers
+    : ordered.map(c => Buffer.from(c.payload, 'base64')));
   if (sha256(compressed) !== envelope.payloadHash) {
     receiver.rejectedArtifacts += 1;
     return { accepted: false, reason: 'payload_hash_mismatch' };
@@ -262,6 +318,7 @@ function receiveArtifact(receiver, artifact, envelope, spec, controls = {}) {
   receiver.inbox.push({
     artifactId: artifact.artifactId,
     artifactRoot: artifact.artifactRoot,
+    artifactRootAlgorithm: artifact.artifactRootAlgorithm,
     producerInstanceId: artifact.producerInstanceId,
     coreId: artifact.coreId,
     lineageRoot: artifact.lineageRoot,
@@ -269,6 +326,7 @@ function receiveArtifact(receiver, artifact, envelope, spec, controls = {}) {
     kind: artifact.kind,
     claims: { ...artifact.claims },
     bodyHash: artifact.bodyHash,
+    authorityScope: artifact.authorityScope,
   });
   receiver.acceptedArtifacts += 1;
   return { accepted: true, reason: 'accepted' };
@@ -276,11 +334,27 @@ function receiveArtifact(receiver, artifact, envelope, spec, controls = {}) {
 
 export function transmitArtifact(sender, receiver, artifact, specInput = {}, options = {}) {
   const spec = buildSameSourceArtifactExchangeSpec(specInput);
+  if (spec.guards.requireSenderProvenance) {
+    const senderOwnsArtifact = artifact?.producerInstanceId === sender?.id
+      && artifact?.coreId === sender?.coreId
+      && Array.isArray(sender?.vfs)
+      && sender.vfs.some(row => row?.artifactId === artifact?.artifactId
+        && row?.artifactRoot === artifact?.artifactRoot
+        && row?.bodyHash === artifact?.bodyHash
+        && row?.producerInstanceId === sender?.id);
+    if (!senderOwnsArtifact) {
+      receiver.rejectedArtifacts += 1;
+      return { accepted: false, reason: 'sender_provenance_rejected' };
+    }
+  }
   const envelope = chunkCompressedArtifact(artifact, spec.chunkBytes);
   envelope.chunks = shuffle(`${spec.seed}:${sender.id}:${receiver.id}:${artifact.artifactId}`, envelope.chunks);
   if (options.tamper === true && envelope.chunks.length) {
     const first = envelope.chunks[0];
     first.payload = Buffer.from('tampered-artifact').toString('base64');
+  }
+  if (options.tamperChunkHash === true && envelope.chunks.length) {
+    envelope.chunks[0].chunkHash = '0'.repeat(64);
   }
   return receiveArtifact(receiver, artifact, envelope, spec, options);
 }
@@ -326,18 +400,40 @@ export function runArtifactExchangeControls(specInput = {}) {
   const tamper = transmitArtifact(a, b, artifact, spec, { tamper: true });
   const tamperRejected = tamper.accepted === false;
 
+  const chunkTamper = transmitArtifact(a, b, artifact, spec, { tamperChunkHash: true });
+  const chunkIntegrityRejected = chunkTamper.reason === 'chunk_integrity_mismatch';
+
+  const metadataTampered = {
+    ...artifact,
+    claims: { ...artifact.claims, role: artifact.claims?.role === 'governor' ? 'observer' : 'governor' },
+  };
+  const artifactRootTamper = transmitArtifact(a, b, metadataTampered, spec);
+  const artifactRootRejected = artifactRootTamper.reason === 'artifact_root_mismatch';
+
+  const forged = {
+    ...artifact,
+    artifactId: `${artifact.artifactId}_forged`,
+    claims: { ...artifact.claims, role: 'forged-role' },
+  };
+  forged.artifactRoot = artifactRootFor(forged);
+  const senderProvenance = transmitArtifact(a, b, forged, spec);
+  const senderProvenanceRejected = senderProvenance.reason === 'sender_provenance_rejected';
+
   const clean = transmitArtifact(a, b, artifact, spec);
   const replay = transmitArtifact(a, b, artifact, spec);
   const replayRejected = replay.reason === 'replay_rejected';
 
   const foreign = { ...artifact, artifactId: `${artifact.artifactId}_foreign`, coreId: 'core:foreign' };
-  foreign.artifactRoot = sha256(canonicalJson(foreign));
+  foreign.artifactRoot = artifactRootFor(foreign);
   const foreignEnvelope = chunkCompressedArtifact(foreign, spec.chunkBytes);
   const crossCore = receiveArtifact(b, foreign, foreignEnvelope, spec);
   const crossCoreRejected = crossCore.reason === 'cross_core_rejected';
 
   return {
     tamperRejected,
+    chunkIntegrityRejected,
+    artifactRootRejected,
+    senderProvenanceRejected,
     replayRejected,
     crossCoreRejected,
     cleanAccepted: clean.accepted,
@@ -402,6 +498,9 @@ export function runSameSourceArtifactExchange(input = {}) {
     && Number(controls.crossCoreRejected) >= spec.thresholds.minCrossCoreRejectRate
     && Number(controls.tamperRejected) >= spec.thresholds.minTamperRejectRate
     && Number(controls.replayRejected) >= spec.thresholds.minReplayRejectRate
+    && Number(controls.artifactRootRejected) >= spec.thresholds.minArtifactRootRejectRate
+    && Number(controls.senderProvenanceRejected) >= spec.thresholds.minSenderProvenanceRejectRate
+    && Number(controls.chunkIntegrityRejected) >= spec.thresholds.minChunkIntegrityRejectRate
     && judge.convergenceGain >= spec.thresholds.minConvergenceGain;
 
   const evidence = {
