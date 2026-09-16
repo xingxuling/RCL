@@ -2,12 +2,22 @@
 import { nativeVmDeploymentStatus } from '../api/health.mjs';
 
 const BRIDGE_SPECS = [
-  ['quantitative', 'quantitative.evaluate'],
-  ['knowledge', 'knowledge.resolve'],
-  ['perception', 'perception.observe'],
-  ['natural-language-reality', 'natural-language.interpret'],
-  ['understanding-reality', 'understanding.model'],
-  ['creative-reality', 'creative.generate'],
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'quantitative', capability: 'quantitative.evaluate' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'knowledge', capability: 'knowledge.resolve' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'perception', capability: 'perception.observe' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'natural-language-reality', capability: 'natural-language.interpret' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'understanding-reality', capability: 'understanding.model' },
+  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'creative-reality', capability: 'creative.generate' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-spacetime', capability: 'meta.spacetime.sequence' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-acceleration', capability: 'meta.acceleration.bound' },
+  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-compression', capability: 'meta.compression.restore' },
+  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'physical', capability: 'physical.simulate-step' },
+  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'embodiment', capability: 'embodiment.integrate' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'energy', capability: 'energy.balance' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'elemental', capability: 'elemental.compose' },
+  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'neural', capability: 'neural.integrate' },
+  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'metacomputation', capability: 'metacomputation.plan' },
+  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'computation', capability: 'computation.execute' },
 ];
 
 function fail(message, details = {}) {
@@ -51,37 +61,58 @@ try {
     }
   }
 
-  const expectedBridgeDomains = BRIDGE_SPECS.map(([domain]) => domain);
+  const expectedBridgeDomains = BRIDGE_SPECS.map(spec => spec.domain);
   if (
-    status.foundationNativeBridgeBound !== true
-    || status.quantitativeBridgeBound !== true
-    || status.knowledgeBridgeBound !== true
-    || status.perceptionBridgeBound !== true
-    || status.naturalLanguageRealityBridgeBound !== true
-    || status.understandingRealityBridgeBound !== true
-    || status.creativeRealityBridgeBound !== true
+    status.foundationNativeBridgeFederationBound !== true
+    || status.foundationNativeBridgeBound !== true
     || status.extendedEvidenceBound !== true
     || JSON.stringify(status.foundationNativeBridgeDomains) !== JSON.stringify(expectedBridgeDomains)
   ) {
-    fail('Deployment health did not separately bind the complete proven Foundation Batch A Native Provider Bridge set', { status });
+    fail('Deployment health did not separately bind the complete proven Foundation Native Provider federation', { status });
   }
 
+  const federation = status.foundationNativeBridgeFederation;
+  if (
+    federation?.format !== 'taowind.rcl-vercel-foundation-native-provider-federation.v0.1'
+    || federation?.status !== 'deployment-bound'
+    || federation?.verified !== true
+    || JSON.stringify(federation?.domains) !== JSON.stringify(expectedBridgeDomains)
+    || federation?.canonicalVmSourceRoot !== status.sourceRoot
+    || federation?.declaredDomainDirectLoweringVerified !== false
+  ) {
+    fail('Deployment health lost the strict Native Provider federation truth boundary', {
+      federation,
+      expectedBridgeDomains,
+      sourceRoot: status.sourceRoot,
+    });
+  }
+  for (const value of [
+    federation.hostBinarySha256,
+    federation.compilerBinarySha256,
+    federation.hostSourceRoot,
+    federation.canonicalVmSourceRoot,
+    federation.conformanceContractRoot,
+    federation.federationRoot,
+  ]) {
+    if (!isSha256(value)) fail('Native Provider federation health evidence is missing a required content-addressed root', { value, federation });
+  }
+
+  const proofsByBatch = new Map();
   let sharedHostBinarySha256 = null;
   let sharedHostSourceRoot = null;
-  let sharedBytecodeRoot = null;
-  let sharedReceiptRoot = null;
-  let sharedBatchFinalStateRoot = null;
-  for (const [domain, capability] of BRIDGE_SPECS) {
-    const proof = status.foundationNativeBridgeProofs?.[domain];
+  let sharedCompilerBinarySha256 = null;
+  for (const spec of BRIDGE_SPECS) {
+    const proof = status.foundationNativeBridgeProofs?.[spec.domain];
     if (
-      proof?.domain !== domain
-      || proof?.capability !== capability
+      proof?.batchId !== spec.batchId
+      || proof?.domain !== spec.domain
+      || proof?.capability !== spec.capability
       || proof?.mode !== 'native-provider-bridge'
       || proof?.status !== 'native-bridge-verified'
       || proof?.verified !== true
-      || proof?.providerId !== 'rcl.foundation.batch-a'
+      || proof?.providerId !== spec.providerId
       || proof?.providerAbi !== 1
-      || proof?.providerCallCount !== BRIDGE_SPECS.length
+      || proof?.providerCallCount !== spec.providerCallCount
       || proof?.canonicalVmSourceRoot !== status.sourceRoot
       || proof?.selfhostByteIdentical !== true
       || proof?.replayVerified !== true
@@ -89,9 +120,8 @@ try {
       || proof?.behaviorMutationVerified !== true
       || proof?.declaredDomainDirectLoweringVerified !== false
     ) {
-      fail(`Health evidence lost ${domain} Native Provider Bridge provenance, replay, negative control, or strict direct-lowering truth boundary`, {
-        domain,
-        capability,
+      fail(`Health evidence lost ${spec.domain} Native Provider Bridge provenance, replay, negative control, or strict direct-lowering truth boundary`, {
+        spec,
         proof,
         sourceRoot: status.sourceRoot,
       });
@@ -107,35 +137,78 @@ try {
       proof.beforeRoot,
       proof.finalStateRoot,
     ]) {
-      if (!isSha256(value)) fail(`${domain} bridge health evidence is missing a required content-addressed root`, { domain, proof });
+      if (!isSha256(value)) fail(`${spec.domain} bridge health evidence is missing a required content-addressed root`, { spec, proof });
     }
+
     sharedHostBinarySha256 ??= proof.hostBinarySha256;
     sharedHostSourceRoot ??= proof.hostSourceRoot;
-    sharedBytecodeRoot ??= proof.bytecodeRoot;
-    sharedReceiptRoot ??= proof.deterministicReceiptRoot;
-    sharedBatchFinalStateRoot ??= proof.batchFinalStateRoot;
+    sharedCompilerBinarySha256 ??= proof.compilerBinarySha256;
     if (
       proof.hostBinarySha256 !== sharedHostBinarySha256
       || proof.hostSourceRoot !== sharedHostSourceRoot
-      || proof.bytecodeRoot !== sharedBytecodeRoot
-      || proof.deterministicReceiptRoot !== sharedReceiptRoot
-      || proof.batchFinalStateRoot !== sharedBatchFinalStateRoot
+      || proof.compilerBinarySha256 !== sharedCompilerBinarySha256
+      || proof.hostBinarySha256 !== federation.hostBinarySha256
+      || proof.hostSourceRoot !== federation.hostSourceRoot
+      || proof.compilerBinarySha256 !== federation.compilerBinarySha256
     ) {
-      fail('Batch A bridge domains are not bound to one common host/source/bytecode/receipt/final-root execution', {
-        domain,
+      fail('Native Provider domains are not bound to one common current host/compiler/source execution', {
+        spec,
         proof,
+        federation,
       });
     }
+    if (!proofsByBatch.has(spec.batchId)) proofsByBatch.set(spec.batchId, []);
+    proofsByBatch.get(spec.batchId).push(proof);
   }
 
-  const bridgeProofs = BRIDGE_SPECS.map(([domain]) => status.foundationNativeBridgeProofs[domain]);
-  for (let index = 1; index < bridgeProofs.length; index += 1) {
-    if (bridgeProofs[index].beforeRoot !== bridgeProofs[index - 1].finalStateRoot) {
-      fail('Batch A bridge health evidence lost causal state-root chaining between domains', {
-        previous: bridgeProofs[index - 1],
-        current: bridgeProofs[index],
+  const bridgeBatchRoots = {};
+  for (const [batchId, proofs] of proofsByBatch.entries()) {
+    const first = proofs[0];
+    for (const proof of proofs) {
+      if (
+        proof.providerId !== first.providerId
+        || proof.providerCallCount !== first.providerCallCount
+        || proof.bytecodeRoot !== first.bytecodeRoot
+        || proof.deterministicReceiptRoot !== first.deterministicReceiptRoot
+        || proof.batchFinalStateRoot !== first.batchFinalStateRoot
+      ) {
+        fail('A Native Provider batch is not bound to one bytecode/receipt/final-state execution', {
+          batchId,
+          first,
+          proof,
+        });
+      }
+    }
+    for (let index = 1; index < proofs.length; index += 1) {
+      if (proofs[index].beforeRoot !== proofs[index - 1].finalStateRoot) {
+        fail('Native Provider batch health evidence lost causal state-root chaining between domains', {
+          batchId,
+          previous: proofs[index - 1],
+          current: proofs[index],
+        });
+      }
+    }
+    const federationBatch = federation.providerBatches?.[batchId];
+    if (
+      federationBatch?.providerId !== first.providerId
+      || federationBatch?.providerAbi !== 1
+      || federationBatch?.providerCallCount !== first.providerCallCount
+      || JSON.stringify(federationBatch?.domains) !== JSON.stringify(proofs.map(proof => proof.domain))
+      || federationBatch?.bytecodeRoot !== first.bytecodeRoot
+      || federationBatch?.deterministicReceiptRoot !== first.deterministicReceiptRoot
+      || federationBatch?.finalStateRoot !== first.batchFinalStateRoot
+    ) {
+      fail('Federation batch summary diverges from its per-domain bridge proofs', {
+        batchId,
+        federationBatch,
+        proofs,
       });
     }
+    bridgeBatchRoots[batchId] = {
+      bytecodeRoot: first.bytecodeRoot,
+      deterministicReceiptRoot: first.deterministicReceiptRoot,
+      finalStateRoot: first.batchFinalStateRoot,
+    };
   }
 
   const position = status.physicalQuantityEvidence?.finalPosition;
@@ -208,11 +281,14 @@ try {
     extendedEvidenceBound: status.extendedEvidenceBound,
     foundationParityDomains: status.foundationParityDomains,
     foundationNativeBridgeDomains: status.foundationNativeBridgeDomains,
+    bridgeProviderCount: proofsByBatch.size,
+    bridgeDomainCount: expectedBridgeDomains.length,
     bridgeHostBinarySha256: sharedHostBinarySha256,
     bridgeHostSourceRoot: sharedHostSourceRoot,
-    bridgeBytecodeRoot: sharedBytecodeRoot,
-    bridgeDeterministicReceiptRoot: sharedReceiptRoot,
-    bridgeBatchFinalStateRoot: sharedBatchFinalStateRoot,
+    bridgeCompilerBinarySha256: sharedCompilerBinarySha256,
+    bridgeFederationRoot: federation.federationRoot,
+    bridgeConformanceContractRoot: federation.conformanceContractRoot,
+    bridgeBatchRoots,
     perceptionDomainReceiptRoot: status.foundationParityProofs.perception.domainReceiptRoot,
     physicalDomainReceiptRoot: status.foundationParityProofs.physical.domainReceiptRoot,
     neuralDomainReceiptRoot: status.foundationParityProofs.neural.domainReceiptRoot,
