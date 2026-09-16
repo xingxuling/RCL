@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
+import { defaultNativeVmPath, materializeNativeVm } from './native-vm-materialization.mjs';
 import {
   RCL_NATIVE_STATE_ROOT_ALGORITHM,
   RCLSemanticStateRootError,
@@ -19,7 +20,7 @@ export {
 };
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-export const DEFAULT_NATIVE_VM_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
+export const DEFAULT_NATIVE_VM_PATH = defaultNativeVmPath(ROOT);
 export const DEFAULT_NATIVE_COMPILER_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclc.exe' : 'rclc');
 
 export class RCLNativeVMError extends Error {
@@ -51,9 +52,27 @@ function verifyNativePayload(payload, options) {
   }
 }
 
+function resolveRunnableNativeVm(options) {
+  try {
+    return materializeNativeVm(ROOT, {
+      vmPath: options.vmPath,
+      buildIfMissing: options.buildIfMissing,
+      makePath: options.makePath,
+      env: options.buildEnv ?? options.env,
+      maxBuffer: options.buildMaxBuffer,
+      buildTimeout: options.buildTimeout,
+    });
+  } catch (error) {
+    if (error?.code) {
+      throw new RCLNativeVMError({ code: error.code, message: error.message }, error.details ?? {});
+    }
+    throw error;
+  }
+}
+
 export function runNativeBytecode(bytecodeOrPath, options = {}) {
-  const vmPath = options.vmPath ?? DEFAULT_NATIVE_VM_PATH;
-  if (!fs.existsSync(vmPath)) throw new RCLNativeVMError({ code: 'RCL_NATIVE_VM_MISSING', message: `Native VM binary is missing at ${vmPath}` });
+  const materialization = resolveRunnableNativeVm(options);
+  const vmPath = materialization.vmPath;
 
   let bytecodePath = bytecodeOrPath;
   let temporaryDir = null;
@@ -73,10 +92,10 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
       maxBuffer: options.maxBuffer ?? 16 * 1024 * 1024,
       timeout: options.timeout ?? 30_000,
     });
-    if (result.error) throw new RCLNativeVMError({ code: 'RCL_NATIVE_PROCESS', message: result.error.message }, { result });
+    if (result.error) throw new RCLNativeVMError({ code: 'RCL_NATIVE_PROCESS', message: result.error.message }, { result, materialization });
     if (result.status !== 0) {
       const payload = parsePayload(result.stderr.trim(), { code: 'RCL_NATIVE_PROCESS', message: result.stderr.trim() || `Native VM exited with ${result.status}` });
-      throw new RCLNativeVMError(payload, { status: result.status, stdout: result.stdout, stderr: result.stderr });
+      throw new RCLNativeVMError(payload, { status: result.status, stdout: result.stdout, stderr: result.stderr, materialization });
     }
     const payload = parsePayload(result.stdout, { status: 'error', code: 'RCL_NATIVE_OUTPUT', message: 'Native VM returned invalid JSON', raw: result.stdout });
     return verifyNativePayload(payload, options);
