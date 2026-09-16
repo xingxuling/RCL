@@ -1,0 +1,78 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-native-vm-source-materialization-v0.1",
+  "base_commit": "b7caae14447140009ce6691f430af0af232ca9d4",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "canonical-linux-native-vm-artifact-gap",
+      "domain": "native_runtime_materialization",
+      "signal": "当前 main 的 src/native-vm.mjs 在 Linux 默认要求 native/rclvm，但仓库 native/ 只提交 C 源码与 Windows 二进制，没有提交 Linux rclvm；因此直接 native replay 在干净 Linux checkout 上会在执行前以 RCL_NATIVE_VM_MISSING 失败。",
+      "pressure": 0.993
+    },
+    {
+      "id": "existing-native-build-organ-not-reused-by-runtime",
+      "domain": "asset_reuse",
+      "signal": "仓库已经存在 native/Makefile 的 rclvm target 与 scripts/build-native.mjs，但 runNativeBytecode 不会在默认 native VM 缺失时复用该构建器官。",
+      "pressure": 0.976
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.949,
+      "externally_blocked": true,
+      "blocker": "自动化执行容器无法通过 DNS 物化完整 GitHub checkout，因此不能在本轮把当前 main 的完整 Foundation lowering 链直接送入规范 C VM。"
+    },
+    {
+      "candidate_id": "canonical-native-vm-source-materialization-seam",
+      "score": 0.934,
+      "expected_goal_gain": 0.985,
+      "reuse_gain": 0.995,
+      "autonomy_gain": 0.99,
+      "evidence_gain": 0.92,
+      "implementation_cost": 0.18,
+      "regression_risk": 0.14
+    }
+  ],
+  "selected": "canonical-native-vm-source-materialization-seam",
+  "mode": "WHOLE_ARTIFACT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是一个边界清晰的运行时自举工件：不改变 RCL 语言语义、RBC 或 C VM，只把当前已经存在的 Makefile 构建能力接到 native execution 默认路径，使干净 Linux checkout 能从仓库自身源码物化规范 rclvm。显式 vmPath 仍绝不被隐式替换，构建失败继续 fail-closed。",
+  "implementation": [
+    "src/native-vm-materialization.mjs",
+    "src/native-vm.mjs",
+    "tests/native-vm-source-materialization.test.mjs"
+  ],
+  "behavioral_change": [
+    "默认 native/rclvm 已存在时保持原行为，不调用构建工具",
+    "Linux/macOS 默认 rclvm 缺失时复用 native/Makefile 的 rclvm target 进行本地源码物化，不访问网络",
+    "显式 vmPath 缺失时保持 fail-closed，不允许隐式构建替代用户指定二进制",
+    "可通过 buildIfMissing=false 保持严格预构建模式",
+    "Makefile、rclvm.c 或 rclvm.h 缺失时 fail-closed 并返回缺失输入证据",
+    "构建工具不存在、退出非零或没有生成目标二进制时均返回独立错误码与 stdout/stderr 证据",
+    "runNativeBytecode 的成功 payload 形状保持不变；只在进程错误 details 中附加 materialization provenance"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 5,
+      "breakdown": {
+        "source_materialization_contract": "5/5 PASS"
+      },
+      "commands": [
+        "node --check src/native-vm-materialization.mjs",
+        "node --check src/native-vm.mjs",
+        "node --test tests/native-vm-source-materialization.test.mjs"
+      ]
+    },
+    "real_make_process_probe": {
+      "status": "PASS",
+      "description": "使用真实 make + C compiler 对最小 fixture 走 materializeNativeVm 进程路径，生成并成功执行 rclvm fixture；用于证明进程/目标物化路径真实可运行，不代表当前 RCL C VM 已完成 replay。"
+    },
+    "actual_current_rcl_c_native_vm_replay": "NOT_RUN_AUTOMATION_CONTAINER_GITHUB_DNS_UNAVAILABLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期只消除干净 Linux checkout 中默认 C Native VM 必须预先存在的运行时物化断点，并证明源码构建路径在真实 make/C compiler fixture 上可运行。它不声明当前 main 的完整 native/rclvm.c 已在本自动化容器编译执行，不声明 Foundation composite parity 已取得真实 C VM replay 证据，也不声明全仓回归。",
+  "ci_policy": "候选提交、PR 和 merge message 必须携带 [skip ci] [skip actions]；创建 PR 前后及 merge 后检查 workflow runs，任何自动运行出现即停止后续交付。"
+}
