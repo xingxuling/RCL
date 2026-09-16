@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+import { spawnSync } from 'node:child_process';
+
+const steps = [
+  ['targeted-foundation-tests', [
+    '--test',
+    'tests/foundation-quantity-native-lowering.test.mjs',
+    'tests/foundation-neural-direct-lowering.test.mjs',
+    'tests/foundation-neural-domain-receipt-parity.test.mjs',
+  ]],
+  ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
+  ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
+  ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
+];
+
+for (const [name, args] of steps) {
+  const result = spawnSync(process.execPath, args, {
+    stdio: 'inherit',
+    env: process.env,
+  });
+  if (result.error) {
+    console.error(JSON.stringify({
+      ok: false,
+      status: 'RCL_VERCEL_PROOF_CHAIN_STEP_FAILED',
+      step: name,
+      error: result.error.message,
+    }, null, 2));
+    process.exit(1);
+  }
+  if (result.status !== 0) {
+    console.error(JSON.stringify({
+      ok: false,
+      status: 'RCL_VERCEL_PROOF_CHAIN_STEP_FAILED',
+      step: name,
+      exitCode: result.status,
+      signal: result.signal ?? null,
+    }, null, 2));
+    process.exit(result.status ?? 1);
+  }
+}
+
+console.log(JSON.stringify({
+  ok: true,
+  status: 'RCL_VERCEL_PROOF_CHAIN_VERIFIED',
+  steps: steps.map(([name]) => name),
+}, null, 2));
