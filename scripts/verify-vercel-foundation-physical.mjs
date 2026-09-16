@@ -72,7 +72,7 @@ try {
       loweringSummary: proof?.lowering?.summary ?? null,
     });
   }
-  if (proof?.parity?.state !== true || proof?.parity?.semanticStateRoot !== true || proof?.parity?.nativeStateRootAuthority !== true) {
+  if (proof?.parity?.state !== true || proof?.parity?.semanticStateRoot !== true || proof?.parity?.nativeStateRootVerified !== true || proof?.parity?.nativeStateRootParity !== true) {
     fail('Physical Quantity proof did not close state/root authority parity', { parity: proof?.parity ?? null });
   }
   if (proof?.parity?.loweringLineage !== true || proof?.parity?.domainReceipt !== true || proof?.parity?.nativeExecutionAttestation !== true) {
@@ -105,7 +105,6 @@ try {
     verified: true,
     binarySha256,
     physicalLoweredStepCount: proof.lowering.summary.physicalLoweredStepCount,
-    quantityNativeLowering: proof?.foundationQuantityNativeLowering ?? null,
     parity: proof.parity,
     foundationDomainReceiptRoot: proof?.roots?.foundationDomainReceiptRoot ?? null,
     foundationCompositeReceiptRoot: proof?.roots?.foundationCompositeReceiptRoot ?? null,
