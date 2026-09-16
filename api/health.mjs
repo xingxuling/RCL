@@ -56,6 +56,20 @@ function physicalQuantityEvidenceBound(proof, binarySha256) {
   );
 }
 
+function neuralEvidenceBound(proof, binarySha256) {
+  return Boolean(
+    coreParityBound(proof, 'neural', binarySha256)
+    && proof?.loweredCount === 4
+    && proof?.boundedSteps === 2
+    && proof?.pathwayCount === 2
+    && proof?.activePathway === 'brain.integrate'
+    && proof?.inactivePathway === 'brain.dormant'
+    && proof?.finalState?.['brain.stimulus'] === 1
+    && proof?.finalState?.['brain.response'] === 1
+    && proof?.finalState?.['brain.trace'] === 0
+  );
+}
+
 function proofSummary(proof) {
   if (!proof) return null;
   return {
@@ -108,12 +122,15 @@ export function nativeVmDeploymentStatus() {
 
   const perceptionProof = attestation?.foundationParityProofs?.perception ?? attestation?.foundationParityProof ?? null;
   const physicalProof = attestation?.foundationParityProofs?.physical ?? attestation?.foundationPhysicalParityProof ?? null;
+  const neuralProof = attestation?.foundationParityProofs?.neural ?? attestation?.foundationNeuralParityProof ?? null;
   const perceptionParityBound = Boolean(replayEvidenceBound && coreParityBound(perceptionProof, 'perception', binarySha256));
   const physicalParityBound = Boolean(replayEvidenceBound && physicalQuantityEvidenceBound(physicalProof, binarySha256));
-  const foundationParityBound = perceptionParityBound && physicalParityBound;
+  const neuralParityBound = Boolean(replayEvidenceBound && neuralEvidenceBound(neuralProof, binarySha256));
+  const foundationParityBound = perceptionParityBound && physicalParityBound && neuralParityBound;
   const foundationParityDomains = [
     ...(perceptionParityBound ? ['perception'] : []),
     ...(physicalParityBound ? ['physical'] : []),
+    ...(neuralParityBound ? ['neural'] : []),
   ];
 
   return {
@@ -124,6 +141,7 @@ export function nativeVmDeploymentStatus() {
     foundationParityBound,
     perceptionParityBound,
     physicalParityBound,
+    neuralParityBound,
     evidenceBound: replayEvidenceBound && foundationParityBound,
     binarySha256,
     sourceRoot: attestation?.sourceMaterialization?.sourceRoot ?? null,
@@ -133,6 +151,7 @@ export function nativeVmDeploymentStatus() {
     foundationParityProofs: {
       perception: proofSummary(perceptionProof),
       physical: proofSummary(physicalProof),
+      neural: proofSummary(neuralProof),
     },
     physicalQuantityEvidence: physicalProof ? {
       quantityConstructorCount: physicalProof.quantityNativeLowering?.summary?.quantityConstructorCount ?? null,
@@ -140,6 +159,15 @@ export function nativeVmDeploymentStatus() {
       quantityExtremumCount: physicalProof.quantityNativeLowering?.summary?.quantityExtremumCount ?? null,
       finalPosition: physicalProof.finalState?.['world.stone.position'] ?? null,
       finalVelocity: physicalProof.finalState?.['world.stone.velocity'] ?? null,
+    } : null,
+    neuralEvidence: neuralProof ? {
+      boundedSteps: neuralProof.boundedSteps ?? null,
+      pathwayCount: neuralProof.pathwayCount ?? null,
+      activePathway: neuralProof.activePathway ?? null,
+      inactivePathway: neuralProof.inactivePathway ?? null,
+      finalStimulus: neuralProof.finalState?.['brain.stimulus'] ?? null,
+      finalResponse: neuralProof.finalState?.['brain.response'] ?? null,
+      finalTrace: neuralProof.finalState?.['brain.trace'] ?? null,
     } : null,
   };
 }
