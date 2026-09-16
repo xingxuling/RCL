@@ -18,6 +18,7 @@ const steps = [
   ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
   ['genetic-real-c-proof', ['scripts/verify-vercel-foundation-genetic.mjs']],
   ['living-real-c-proof', ['scripts/verify-vercel-foundation-living.mjs']],
+  ['biological-deployment-binding', ['scripts/bind-vercel-foundation-biological.mjs']],
   ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
 
