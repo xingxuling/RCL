@@ -7,11 +7,14 @@ const steps = [
     'tests/foundation-quantity-native-lowering.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
     'tests/foundation-neural-domain-receipt-parity.test.mjs',
+    'tests/foundation-genetic-direct-lowering.test.mjs',
+    'tests/foundation-genetic-domain-receipt-parity.test.mjs',
   ]],
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
   ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
   ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
   ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
+  ['genetic-real-c-proof', ['scripts/verify-vercel-foundation-genetic.mjs']],
   ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
 
