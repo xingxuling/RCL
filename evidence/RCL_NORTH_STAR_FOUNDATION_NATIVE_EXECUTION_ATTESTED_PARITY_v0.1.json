@@ -1,0 +1,80 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-native-execution-attested-parity-v0.1",
+  "base_commit": "7b08142638686cb82061853a72e081d3ac8bc703",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "deployed-canonical-native-replay-toolchain-blocker",
+      "domain": "native_runtime_validation",
+      "signal": "与当前 main 7b08142638686cb82061853a72e081d3ac8bc703 同提交的已部署 RCL/RNCS 运行面仍没有 native/rclvm；真实 rcl_run_native_file 在源码物化阶段以 Unable to invoke native VM build tool 'make': spawnSync make ENOENT 失败，因此 canonical C Native VM replay 继续属于 external runtime/toolchain blocker，不能用 mock 代替。",
+      "pressure": 0.998,
+      "externally_blocked": true
+    },
+    {
+      "id": "cycle24-attestation-not-consumed-by-foundation-parity",
+      "domain": "evidence_authority",
+      "signal": "Cycle 24 已让成功 runNativeBytecode 产生并自验证 exact executable artifact attestation，但 Foundation composite parity v0.2 既不传播也不验证 nativeVmExecutionAttestation；因此尚不存在一个 Foundation 级入口能把精确执行二进制身份作为 native-verified 的非补偿证据门。",
+      "pressure": 0.993
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.971,
+      "externally_blocked": true,
+      "blocker": "当前部署运行时缺少 native/rclvm 且无 make；真实运行已复现 spawnSync make ENOENT。"
+    },
+    {
+      "candidate_id": "foundation-attested-native-parity-entry-point",
+      "score": 0.962,
+      "expected_goal_gain": 0.992,
+      "reuse_gain": 0.998,
+      "autonomy_gain": 0.977,
+      "evidence_gain": 0.999,
+      "implementation_cost": 0.16,
+      "regression_risk": 0.08
+    }
+  ],
+  "selected": "foundation-attested-native-parity-entry-point",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是对 Cycle 24 执行工件证明的纵向证据闭环：先让现有 composite parity 传播并绑定 attestation identity，再增加严格 attested entry point；不改变 RCL 语言、RBC、C VM 或现有默认 parity 的判定语义，从而避免在尚未迁移既有验证合同前直接破坏默认入口。",
+  "implementation": [
+    "src/foundation-direct-native-parity-composite.mjs",
+    "src/foundation-direct-native-parity-attested.mjs",
+    "tests/foundation-direct-native-parity-attested.test.mjs"
+  ],
+  "behavioral_change": [
+    "Foundation composite parity v0.3 在成功 native execution 结果中传播 nativeVmExecutionAttestation，并把 attestationRoot、算法身份、VM identity、program source root 与 binarySha256 的摘要绑定到 composite receipt root v0.2",
+    "新增 verifyFoundationDirectNativeParityAttested：只有原 composite parity 已 native-verified 且 verifyNativeVmExecutionAttestation 对实际 attestation 返回 ok=true 时，才允许 attested native-verified",
+    "缺失 attestation、被篡改的 binarySha256/root 或任何先前 parity gate 失败都不可互相补偿，统一 fail-closed",
+    "现有默认 verifyFoundationDirectNativeParity 尚未切换到 attested entry point；本周期明确不冒充 default promotion 已完成"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 15,
+      "breakdown": {
+        "existing_composite_parity_regression": "10/10 PASS",
+        "attested_foundation_parity_contract": "5/5 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-native-parity-composite.mjs",
+        "node --check src/foundation-direct-native-parity-attested.mjs",
+        "node --test tests/foundation-direct-native-parity-composite.test.mjs tests/foundation-direct-native-parity-attested.test.mjs"
+      ]
+    },
+    "deployed_current_main_reality_probe": {
+      "status": "BLOCKED_AS_EXPECTED",
+      "commit": "7b08142638686cb82061853a72e081d3ac8bc703",
+      "native_vm_exists": false,
+      "rcl_run_native_file": "Unable to invoke native VM build tool 'make': spawnSync make ENOENT"
+    },
+    "actual_current_canonical_rcl_c_vm_replay": "NOT_CLAIMED_DEPLOYED_RUNTIME_LACKS_NATIVE_BINARY_AND_BUILD_TOOL",
+    "default_foundation_parity_promoted_to_attested": "NOT_YET_THIS_CYCLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期建立严格的 Foundation attested parity 入口，并把 Cycle 24 的精确 executable artifact identity 带入 composite evidence root。它不声明现有默认 Foundation parity 已升级为 attested gate，不声明当前部署面完成 canonical C VM replay，也不声明全仓回归。下一次 default promotion 需要单独迁移/验证既有 parity 合同后再进行。",
+  "ci_policy": "候选提交、PR 与 merge message 必须携带 [skip ci] [skip actions]；创建 PR 前后及 merge 后检查 workflow runs，若出现自动 GitHub Actions 运行则停止后续交付。"
+}
