@@ -112,3 +112,25 @@ test('verifier declares its integration and reality boundaries explicitly',()=>{
   assert.equal(value.truthBoundary.actualCNativeVmExecutionClaimed,false);
   assert.equal(value.truthBoundary.fullHistoryParityClaimed,false);
 });
+
+test('unchanged reference sense target can be certified only by an exact native no-op',()=>{
+  const feed=refFeed(); feed.changes=feed.changes.filter(change=>change.source!=='living:sense');
+  const heal=refHeal(); heal.changes=heal.changes.filter(change=>change.source!=='living:sense');
+  const sense=natSense(); sense.beforeRoot='r1'; sense.afterRoot='r1'; sense.changes=[{target:'organism.foodSense',before:4,after:4}];
+  const value=report([feed,heal],[sense,natFeed(),natHeal()]);
+  assert.equal(value.ok,true);
+  assert.equal(value.entries[0].checks.referenceTargetsExact,true);
+  assert.equal(value.entries[0].checks.omittedReferenceSenseTargetsAreNativeNoOps,true);
+  assert.equal(value.entries[0].checks.transitionValuesEquivalent,true);
+  assert.equal(value.truthBoundary.unchangedReferenceSenseTargetsMayBeCertifiedOnlyByExactNativeNoOps,true);
+});
+
+test('silent reference sense partition rejects a native value-changing transition',()=>{
+  const feed=refFeed(); feed.changes=feed.changes.filter(change=>change.source!=='living:sense');
+  const heal=refHeal(); heal.changes=heal.changes.filter(change=>change.source!=='living:sense');
+  const sense=natSense(); sense.beforeRoot='r1'; sense.afterRoot='r1'; sense.changes=[{target:'organism.foodSense',before:0,after:4}];
+  const value=report([feed,heal],[sense,natFeed(),natHeal()]);
+  assert.equal(value.ok,false);
+  assert.equal(value.entries[0].checks.omittedReferenceSenseTargetsAreNativeNoOps,false);
+  assert.equal(value.entries[0].checks.transitionValuesEquivalent,false);
+});

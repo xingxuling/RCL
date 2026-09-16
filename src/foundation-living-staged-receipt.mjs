@@ -96,6 +96,31 @@ function livingSenseChanges(referenceRecords, semanticValue) {
   const first = partitions[0];
   return { available:true, consistent:partitions.every(partition => sameJson(partition, first)), changes:first };
 }
+function livingSenseTransitionCompatible(expectedTargets, referenceChanges, nativeChanges) {
+  const expected = sortedUnique(expectedTargets);
+  const referenceByTarget = new Map(asArray(referenceChanges).map(change => [change.target, change]));
+  const nativeByTarget = new Map(asArray(nativeChanges).map(change => [change.target, change]));
+  const referenceTargets = sortedUnique([...referenceByTarget.keys()]);
+  const nativeTargets = sortedUnique([...nativeByTarget.keys()]);
+  const referenceTargetsWithinDeclaredSenseSet = referenceTargets.every(target => expected.includes(target));
+  const nativeTargetsExact = sameJson(nativeTargets, expected);
+  const omittedReferenceTargets = expected.filter(target => !referenceByTarget.has(target));
+  const omittedReferenceTargetsAreNativeNoOps = omittedReferenceTargets.every(target => {
+    const change = nativeByTarget.get(target);
+    return Boolean(change) && sameJson(change.before, change.after);
+  });
+  const reportedReferenceTransitionsMatchNative = referenceTargets.every(target => sameJson(referenceByTarget.get(target), nativeByTarget.get(target)));
+  return {
+    referenceTargetsWithinDeclaredSenseSet,
+    nativeTargetsExact,
+    omittedReferenceTargetsAreNativeNoOps,
+    reportedReferenceTransitionsMatchNative,
+    transitionValuesEquivalent: referenceTargetsWithinDeclaredSenseSet
+      && nativeTargetsExact
+      && omittedReferenceTargetsAreNativeNoOps
+      && reportedReferenceTransitionsMatchNative,
+  };
+}
 
 export function livingStagedReceiptRoot(report) {
   if (!report || typeof report !== 'object' || Array.isArray(report)) throw new TypeError('Living staged receipt report object is required');
@@ -162,13 +187,17 @@ export function verifyLivingStagedReceiptParity(lowering, referenceHistory, nati
       if (item.stage === 'sense') {
         referenceChanges = senseEvidence.changes;
         referenceActive = senseEvidence.available;
+        const nativeSenseChanges = receiptChanges(nativeMatch?.record?.changes, semanticValue);
+        const senseCompatibility = livingSenseTransitionCompatible(expectedTargets, referenceChanges, nativeSenseChanges);
         checks.referenceSenseEvidencePresent = senseEvidence.available;
         checks.referenceSenseEvidenceConsistent = senseEvidence.consistent;
         checks.exactNativeRecord = nativeMatches.length === 1;
         checks.nativeStatusRealized = nativeMatch?.record?.status === 'realized';
-        checks.referenceTargetsExact = sameJson(sortedUnique(referenceChanges.map(change=>change.target)), expectedTargets);
-        checks.nativeTargetsExact = sameJson(sortedUnique(asArray(nativeMatch?.record?.changes).map(change=>change?.target).filter(Boolean)), expectedTargets);
-        checks.transitionValuesEquivalent = sameJson(referenceChanges, receiptChanges(nativeMatch?.record?.changes, semanticValue));
+        checks.referenceTargetsExact = senseCompatibility.referenceTargetsWithinDeclaredSenseSet;
+        checks.nativeTargetsExact = senseCompatibility.nativeTargetsExact;
+        checks.omittedReferenceSenseTargetsAreNativeNoOps = senseCompatibility.omittedReferenceTargetsAreNativeNoOps;
+        checks.reportedReferenceSenseTransitionsMatchNative = senseCompatibility.reportedReferenceTransitionsMatchNative;
+        checks.transitionValuesEquivalent = senseCompatibility.transitionValuesEquivalent;
         checks.syntheticWitnessPresent = asArray(nativeMatch?.record?.witnesses).includes(item.witness);
       } else {
         const pair = activeReferenceByCycle.get(item.syntheticRule) ?? { matches:[], match:null };
@@ -237,6 +266,7 @@ export function verifyLivingStagedReceiptParity(lowering, referenceHistory, nati
       integratedIntoFoundationDirectNativeParity:false,
       senseEvidenceRequiresAtLeastOneActiveReferenceCyclePerStep:true,
       silentReferenceSenseOnlyStepCannotBeCertified:true,
+      unchangedReferenceSenseTargetsMayBeCertifiedOnlyByExactNativeNoOps:true,
       actualCNativeVmExecutionClaimed:false,
       fullHistoryParityClaimed:false,
     },
