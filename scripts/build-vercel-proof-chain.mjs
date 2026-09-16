@@ -11,6 +11,8 @@ const steps = [
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
   ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
   ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
+  ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
+  ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
 
 for (const [name, args] of steps) {
