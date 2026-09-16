@@ -1,0 +1,64 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-genetic-staged-receipt-parity-v0.1",
+  "base_commit": "5c6072dfcd0067edca97993108dfcde04c203b53",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍是最高价值 Reality Validation，但自动化容器无法 checkout 完整仓库或物化 canonical native binary，因此继续标记 externally_blocked。",
+      "pressure": 0.981,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-genetic-staged-receipt-gap",
+      "domain": "evidence_provenance",
+      "signal": "Cycle 14 已把 Genetic Inherit 展开为 mutation -> expression 两阶段 Core transactions，但 parity verifier v0.6 仍只理解 Perception/Physical/Neural；Genetic 尚不能证明一个 Reference generation 与两个有序 Native staged transactions 之间的收据、边界根和连续性一致。",
+      "pressure": 0.953
+    }
+  ],
+  "ranked_candidates": [
+    { "candidate_id": "foundation-genetic-actual-c-native-replay", "domain": "native_runtime_validation", "score": 0.889, "externally_blocked": true },
+    { "candidate_id": "foundation-genetic-staged-domain-receipt-parity", "domain": "evidence_provenance", "score": 0.8652, "expected_goal_gain": 0.96, "reuse_gain": 0.98, "autonomy_gain": 0.93, "evidence_gain": 0.99, "implementation_cost": 0.38, "regression_risk": 0.22 },
+    { "candidate_id": "foundation-living-bounded-staged-direct-lowering", "domain": "native_lowering", "score": 0.801, "implementation_cost": 0.61, "regression_risk": 0.41 }
+  ],
+  "selected": "foundation-genetic-staged-domain-receipt-parity",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Cycle 14 首次引入 staged transaction；继续扩域前必须先把 Genetic staged execution 纳入已有非补偿性 Lineage + Domain Receipt + Evidence Root 链，否则会出现能 lower 但不能证明 mutation/expression 顺序、阶段连续性和 Reference generation 边界一致的证据断层。",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-genetic-domain-receipt-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "native parity format v0.6 -> v0.7；domain receipt root algorithm v0.3 -> v0.4",
+    "一个 Genetic Reference generation receipt 可被同一 generation 的 mutation/expression 两个 lowering entries 共享，但只计为一个真实 Reference receipt",
+    "Reference genetic changes 按 genetic:mutation / genetic:expression source 分区，未知 source 会 fail-closed",
+    "Genetic receipt 要求唯一 mutation + expression Native records，且 Native transaction order 必须保持",
+    "mutation Native afterRoot 必须等于 expression Native beforeRoot，形成不可补偿的 staged continuity gate",
+    "mutation Native beforeRoot 必须等于 Reference generation beforeRoot；expression Native afterRoot 必须等于 Reference generation afterRoot",
+    "每阶段目标集合和 before/after 值必须与对应 Reference source partition 精确一致，额外或缺失状态变化都会失败",
+    "最终 expression stage 必须保留 Reference Genetic original witnesses",
+    "receipt root v0.4 绑定 generation/stage metadata、Reference/Native 边界根和 stage continuity roots"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 14,
+      "breakdown": {
+        "new_genetic_staged_receipt": "13/13 PASS",
+        "existing_neural_compatibility_smoke": "1/1 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-native-parity.mjs",
+        "node --test tests/foundation-genetic-domain-receipt-parity.test.mjs"
+      ]
+    },
+    "remote_content_identity": "PASS: Git blob SHA of parity module and Genetic receipt test matched locally validated files after GitHub upload",
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明 staged Genetic receipt/lineage verifier 在注入 Reference/Native histories 时能正确验证或 fail-closed，并绑定 staged continuity evidence；不宣称真实 canonical C Native VM replay、真实 Genetic C VM parity、Living staged lowering、全部 Foundation 原生化、provider bridge 全局移除或全仓回归通过。"
+}
