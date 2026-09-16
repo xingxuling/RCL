@@ -19,20 +19,20 @@ try {
   if (status.replayEvidenceBound !== true || status.foundationParityBound !== true || status.evidenceBound !== true) {
     fail('Deployment health does not fail-closed bind replay and Foundation parity evidence', { status });
   }
-  if (status.perceptionParityBound !== true || status.physicalParityBound !== true) {
-    fail('Deployment health did not bind both Perception and Physical Foundation proof domains', { status });
+  if (status.perceptionParityBound !== true || status.physicalParityBound !== true || status.neuralParityBound !== true) {
+    fail('Deployment health did not bind Perception, Physical and Neural Foundation proof domains', { status });
   }
-  if (JSON.stringify(status.foundationParityDomains) !== JSON.stringify(['perception', 'physical'])) {
+  if (JSON.stringify(status.foundationParityDomains) !== JSON.stringify(['perception', 'physical', 'neural'])) {
     fail('Deployment health exposes an unexpected Foundation proof domain set', {
       foundationParityDomains: status.foundationParityDomains,
     });
   }
-  if (status.foundationParityProofs?.perception?.executionBinarySha256 !== status.binarySha256) {
-    fail('Perception proof is not bound to the deployed binary hash', { status });
+  for (const domain of ['perception', 'physical', 'neural']) {
+    if (status.foundationParityProofs?.[domain]?.executionBinarySha256 !== status.binarySha256) {
+      fail(`${domain} proof is not bound to the deployed binary hash`, { domain, status });
+    }
   }
-  if (status.foundationParityProofs?.physical?.executionBinarySha256 !== status.binarySha256) {
-    fail('Physical proof is not bound to the deployed binary hash', { status });
-  }
+
   const position = status.physicalQuantityEvidence?.finalPosition;
   const velocity = status.physicalQuantityEvidence?.finalVelocity;
   if (position?.kind !== 'Quantity' || position?.type !== 'Length' || position?.value !== 12 || position?.unit !== 'm') {
@@ -47,6 +47,24 @@ try {
     });
   }
 
+  const neural = status.neuralEvidence;
+  if (
+    neural?.boundedSteps !== 2
+    || neural?.pathwayCount !== 2
+    || neural?.activePathway !== 'brain.integrate'
+    || neural?.inactivePathway !== 'brain.dormant'
+    || neural?.finalStimulus !== 1
+    || neural?.finalResponse !== 1
+    || neural?.finalTrace !== 0
+  ) {
+    fail('Health evidence lost the proven bounded Neural active/inactive pathway semantics', { neural });
+  }
+  if (status.foundationParityProofs?.neural?.loweredCount !== 4) {
+    fail('Health evidence lost the proven Neural direct-lowering transaction count', {
+      neuralProof: status.foundationParityProofs?.neural ?? null,
+    });
+  }
+
   console.log(JSON.stringify({
     ok: true,
     status: 'RCL_VERCEL_HEALTH_EVIDENCE_VERIFIED',
@@ -55,9 +73,16 @@ try {
     foundationParityDomains: status.foundationParityDomains,
     perceptionDomainReceiptRoot: status.foundationParityProofs.perception.domainReceiptRoot,
     physicalDomainReceiptRoot: status.foundationParityProofs.physical.domainReceiptRoot,
+    neuralDomainReceiptRoot: status.foundationParityProofs.neural.domainReceiptRoot,
     physicalQuantityExtremumCount: status.physicalQuantityEvidence.quantityExtremumCount,
+    neuralLoweredTransactionCount: status.foundationParityProofs.neural.loweredCount,
     finalPosition: position,
     finalVelocity: velocity,
+    neuralFinalState: {
+      stimulus: neural.finalStimulus,
+      response: neural.finalResponse,
+      trace: neural.finalTrace,
+    },
   }, null, 2));
 } catch (error) {
   fail(error?.message ?? String(error), {
