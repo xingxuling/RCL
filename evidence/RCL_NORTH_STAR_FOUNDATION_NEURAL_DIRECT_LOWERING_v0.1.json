@@ -1,0 +1,66 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-neural-direct-lowering-v0.1",
+  "base_commit": "7f5f5aa10df01bce07122eba2f963f27604491b0",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍然是最高价值现实验证，但当前环境仍无法 checkout 完整仓库或物化 canonical native binary。",
+      "pressure": 0.973,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-neural-direct-lowering-gap",
+      "domain": "native_lowering",
+      "signal": "Perception 与 Physical 已拥有有界 direct lowering，Neural Propagate 参考运行时同样以逐 step、逐 pathway 的顺序事务提交状态，但 bytecode validator 仍把 neurals 整体标记为 provider-required。",
+      "pressure": 0.928,
+      "evidence": [
+        "runtime propagateNeural 每 step 顺序遍历 pathways，按 when -> changes -> preserves -> commit 执行",
+        "parser 将 Propagate 编译为 neural domain + count，不含 dt",
+        "bytecode validateNativeSubset 对非空 neurals 触发 RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    { "candidate_id": "foundation-neural-actual-c-native-replay", "domain": "native_runtime_validation", "score": 0.869, "externally_blocked": true },
+    { "candidate_id": "foundation-neural-bounded-direct-lowering", "domain": "native_lowering", "score": 0.8357, "expected_goal_gain": 0.95, "reuse_gain": 0.97, "autonomy_gain": 0.91, "evidence_gain": 0.86, "implementation_cost": 0.41, "regression_risk": 0.23 },
+    { "candidate_id": "foundation-living-bounded-direct-lowering", "domain": "native_lowering", "score": 0.764, "implementation_cost": 0.59, "regression_risk": 0.36 }
+  ],
+  "selected": "foundation-neural-bounded-direct-lowering",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Neural Propagate 的参考语义与现有 Emergence + Realize 核心事务高度同构；先实现有界静态 step 展开，比直接进入 Living/Genetic 等多动作域有更低语义漂移风险和更高复用收益。",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "tests/foundation-neural-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "direct lowering 默认 direct domains 从 perception + physical 扩展为 perception + physical + neural",
+    "literal 1..256 步的 Propagate 被按 Reference Runtime 的 step/pathway 顺序展开为唯一 Emergence + Realize 事务",
+    "pathway when、changes、preserves 原样进入核心事务，当前 runtime 对 transmit/inhibit/learn/modulate 的 state-write 语义由 changeModes metadata 保留而不另造执行模型",
+    "每个 step/pathway 产生唯一 synthetic rule identity 与 lineage witness，原 pathway witnesses 同时保留",
+    "lowering metadata 绑定 intrinsic-neural-dynamics authority、source neural domain、stepIndex/stepCount/pathwayIndex/stateTargets/originalWitnesses/changeModes",
+    "动态 step count、未知 neural domain、空 pathway domain 均失败关闭并保留原 Propagate + Neural declaration",
+    "未消费的 Neural domain 保留在 program.neurals，使 canonical bytecode validator 继续 fail-closed",
+    "synthetic neural rule 与用户规则冲突时确定性寻找可用后缀"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 29,
+      "breakdown": {
+        "existing_perception_lowering": "9/9 PASS",
+        "existing_physical_lowering": "10/10 PASS",
+        "new_neural_lowering": "10/10 PASS"
+      },
+      "command": "node --test tests/foundation-direct-lowering.test.mjs tests/foundation-physical-direct-lowering.test.mjs tests/foundation-neural-direct-lowering.test.mjs"
+    },
+    "syntax": { "command": "node --check src/foundation-direct-lowering.mjs", "status": "PASS" },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期只证明有界 Neural Propagate -> Core RCL 的结构下译合同；不宣称真实 canonical C Native VM parity、Neural domain receipt parity、动态 propagation 原生化、全部 Foundation 原生下译、provider bridge 全局移除或全仓回归完成。"
+}
