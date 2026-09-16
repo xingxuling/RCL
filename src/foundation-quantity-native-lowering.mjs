@@ -5,8 +5,8 @@ import {
   quantityConstructorTypes,
 } from './quantity.mjs';
 
-export const FOUNDATION_QUANTITY_NATIVE_LOWERING_FORMAT = 'taowind.rcl-foundation-quantity-native-lowering.v0.1';
-export const FOUNDATION_QUANTITY_NATIVE_LOWERING_VERSION = '0.1.0';
+export const FOUNDATION_QUANTITY_NATIVE_LOWERING_FORMAT = 'taowind.rcl-foundation-quantity-native-lowering.v0.2';
+export const FOUNDATION_QUANTITY_NATIVE_LOWERING_VERSION = '0.2.0';
 
 const QUANTITY_RECORD_TYPE = 'taowind.rcl.native.Quantity.v0.1';
 const QUANTITY_UNIT_BY_TYPE = new Map(
@@ -115,6 +115,38 @@ function rewriteBinary(expr, context) {
   throw error;
 }
 
+function quantityExtremum(name, expr, context) {
+  if (!Array.isArray(expr.args) || expr.args.length < 1) {
+    const error = new Error(`${name} requires at least one argument for native quantity lowering`);
+    error.code = 'RCL_FOUNDATION_QUANTITY_NATIVE_EXTREMUM_ARITY';
+    throw error;
+  }
+  const types = expr.args.map(arg => inferExpressionType(arg, context));
+  const firstType = types[0];
+  if (!isQuantityType(firstType) || !types.every(type => type === firstType)) {
+    const error = new Error(`${name} native quantity lowering requires arguments of one common Quantity type`);
+    error.code = 'RCL_FOUNDATION_QUANTITY_NATIVE_EXTREMUM_TYPE';
+    error.details = { name, types };
+    throw error;
+  }
+  const args = expr.args.map(arg => rewriteExpression(arg, context));
+  const operator = name === 'max' ? '>=' : '<=';
+  return args.slice(1).reduce((selected, candidate) => ({
+    kind: 'CallExpr',
+    name: 'choose',
+    args: [
+      {
+        kind: 'BinaryExpr',
+        operator,
+        left: quantityNumber(clone(selected)),
+        right: quantityNumber(clone(candidate)),
+      },
+      selected,
+      candidate,
+    ],
+  }), args[0]);
+}
+
 function rewriteCall(expr, context) {
   const quantityType = quantityConstructorTypes[expr.name];
   if (quantityType) {
@@ -130,6 +162,10 @@ function rewriteCall(expr, context) {
       throw error;
     }
     return quantityRecord(quantityType, rewriteExpression(expr.args[0], context));
+  }
+  if (expr.name === 'min' || expr.name === 'max') {
+    const resultType = inferCallType(expr, context);
+    if (isQuantityType(resultType)) return quantityExtremum(expr.name, expr, context);
   }
   return { ...clone(expr), args: (expr.args ?? []).map(arg => rewriteExpression(arg, context)) };
 }
@@ -185,6 +221,10 @@ function withLocals(context, params = []) {
 function scanExpression(expr, context, summary) {
   if (!expr || typeof expr !== 'object') return;
   if (expr.kind === 'CallExpr' && quantityConstructorTypes[expr.name]) summary.quantityConstructorCount += 1;
+  if (expr.kind === 'CallExpr' && (expr.name === 'min' || expr.name === 'max')) {
+    const resultType = inferCallType(expr, context);
+    if (isQuantityType(resultType)) summary.quantityExtremumCount += 1;
+  }
   if (expr.kind === 'BinaryExpr') {
     const leftType = inferExpressionType(expr.left, context);
     const rightType = inferExpressionType(expr.right, context);
@@ -215,6 +255,7 @@ export function lowerFoundationQuantitiesForNativeBytecode(program) {
   const summary = {
     quantityConstructorCount: 0,
     quantityBinaryCount: 0,
+    quantityExtremumCount: 0,
     representation: 'existing-native-typed-record',
     canonicalQuantityRecordType: QUANTITY_RECORD_TYPE,
   };
@@ -259,6 +300,7 @@ export function lowerFoundationQuantitiesForNativeBytecode(program) {
       nativeVmOpcodeExtensionRequired: false,
       nativeVmBinaryReplacementRequired: false,
       quantityMetadataRetained: true,
+      quantityExtremaLoweredViaPureChoose: true,
       unsupportedQuantitySemanticsFailClosed: true,
     },
   };
