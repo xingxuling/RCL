@@ -1,0 +1,78 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-native-parity-default-promotion-v0.1",
+  "base_commit": "75bf0a60d11cb562e10f72286f4f4567f99cb9b1",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM replay 仍 externally_blocked；不能用 Mock 或依赖注入结果冒充真实 C VM 运行。",
+      "pressure": 0.986,
+      "externally_blocked": true
+    },
+    {
+      "id": "legacy-default-bypasses-living-composite-evidence",
+      "domain": "api_surface",
+      "signal": "Cycle 20 已修复 composite parity 的 Living lineage 组合，但 canonical path src/foundation-direct-native-parity.mjs 仍是旧 generic verifier；调用默认入口会绕过 Living staged receipt/composite evidence，导致已经建立的证据器官不能成为默认现实验证路径。",
+      "pressure": 0.976
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-living-actual-c-native-replay",
+      "score": 0.914,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "promote-composite-foundation-native-parity-default",
+      "score": 0.907,
+      "expected_goal_gain": 0.985,
+      "reuse_gain": 0.99,
+      "autonomy_gain": 0.97,
+      "evidence_gain": 0.99,
+      "implementation_cost": 0.22,
+      "regression_risk": 0.17
+    }
+  ],
+  "selected": "promote-composite-foundation-native-parity-default",
+  "mode": "WHOLE_ARTIFACT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "Composite parity 已经过 Cycle 19/20 两轮定向验证，继续保留旧 generic verifier 作为默认入口会让 Living 证据链成为旁路功能。采用 facade promotion：原 generic 实现按完全相同 Git blob 迁移到显式 generic 模块，默认函数切到 composite，同时对 non-Living 结果提供兼容投影，避免无关域 API 形状回归。",
+  "implementation": [
+    "src/foundation-direct-native-parity-generic.mjs",
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-direct-native-parity-default-promotion.test.mjs"
+  ],
+  "behavioral_change": [
+    "原 src/foundation-direct-native-parity.mjs 的完整 generic 实现以相同 Git blob 身份保留为 foundation-direct-native-parity-generic.mjs",
+    "canonical verifyFoundationDirectNativeParity 默认委托 composite verifier v0.2",
+    "non-Living lowering 自动投影回原 generic lineage/domainReceipt 形状，并保留 foundationDomainReceiptRoot 兼容别名",
+    "Living/mixed lowering 保留 composite lineage + composite domainReceipt，不再被 legacy generic default 绕过",
+    "旧 generic 顶层 verifier 通过 verifyFoundationDirectNativeParityGeneric 显式保留，可审计、可回退",
+    "默认 facade 版本提升至 v0.8.0；真实 C Native VM 权限与证据边界不变"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 4,
+      "breakdown": {
+        "default_promotion_contract": "4/4 PASS"
+      },
+      "commands": [
+        "node --check src/foundation-direct-native-parity.mjs",
+        "node --test tests/foundation-direct-native-parity-default-promotion.test.mjs"
+      ]
+    },
+    "generic_blob_identity": {
+      "source_path": "src/foundation-direct-native-parity.mjs@75bf0a60d11cb562e10f72286f4f4567f99cb9b1",
+      "source_blob_sha": "58d16b19e09e7806a613964e1573dfb1e8a132a8",
+      "destination_path": "src/foundation-direct-native-parity-generic.mjs",
+      "copy_strategy": "same Git blob SHA; no semantic rewrite"
+    },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_CONTAINER_GITHUB_DNS_UNAVAILABLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期把已经验证的 composite parity 提升为默认 Foundation native parity 入口，并保留原 generic verifier 的字节级 Git blob 身份与显式调用入口。它不声明真实 canonical C Native VM replay，不解决 sense-only Living Reference receipt 缺口，不声明全仓回归。",
+  "ci_policy": "候选提交、PR 和 merge message 携带 [skip ci] [skip actions]；PR 前后 branch head workflow runs 必须为 0。"
+}
