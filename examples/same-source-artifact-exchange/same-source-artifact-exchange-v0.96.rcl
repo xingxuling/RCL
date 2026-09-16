@@ -1,0 +1,36 @@
+reality SameSourceArtifactExchangeV096 {
+  facet runtime.version : Text = "0.96.0-alpha.1"
+  facet runtime.status : Text = "candidate"
+  facet runtime.core_id : Text = "core:ssp:AAB8A4"
+  facet runtime.realm_prefix : Text = "AA-B8-A4"
+  facet runtime.seed_instance : Text = "80:9A:EF:1D:05"
+  facet runtime.exchange_mode : Text = "sparse_artifact_exchange"
+  facet runtime.transport_compatibility : Text = "v0.93-transmission+v0.94-autonomous-emission"
+  facet runtime.boundary : Text = "sandbox_only_not_external_universe_proof"
+
+  subject artifact_runtime {
+    warrant artifact.emit on exchange
+    warrant artifact.receive on exchange
+  }
+
+  emergence establish_artifact_exchange {
+    cause artifact_runtime
+    when runtime.status == "candidate"
+    needs artifact.emit on exchange
+    needs artifact.receive on exchange
+
+    alter runtime.status <- "verified"
+
+    preserve runtime.core_id == "core:ssp:AAB8A4"
+      and runtime.realm_prefix == "AA-B8-A4"
+      and runtime.seed_instance == "80:9A:EF:1D:05"
+      and runtime.exchange_mode == "sparse_artifact_exchange"
+      and runtime.transport_compatibility == "v0.93-transmission+v0.94-autonomous-emission"
+      and runtime.boundary == "sandbox_only_not_external_universe_proof"
+
+    witness "rcl:same-source-artifact-exchange:v0.96"
+  }
+
+  foresee establish_artifact_exchange
+  realize establish_artifact_exchange
+}
