@@ -1,0 +1,62 @@
+{
+  "protocol": "dwac.rcl-four-mode-cycle.v0.1",
+  "cycle_id": "RCL-FM-28-attested-foundation-default-parity-v0.1",
+  "base_commit": "a575f2543f900a856a3438e5f3aeffa8b63f10bc",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "routing": {
+    "scheduler_mode": "NORTH_STAR",
+    "implementation_mode": "DEEP_DEVELOPMENT",
+    "combined": true,
+    "reason": "最新 main 已把执行工件证明接入严格 attested Foundation parity，但 canonical 默认入口仍只要求 composite parity。该缺口直接影响默认真相判定权威，问题集中、语义边界明确、适合单周期深挖；在默认权威切换后应重新观察，因此不预先进入爆发模式。"
+  },
+  "observations": [
+    {
+      "id": "default-foundation-parity-does-not-require-executable-attestation",
+      "signal": "src/foundation-direct-native-parity.mjs 的 canonical verifyFoundationDirectNativeParity 仍直接调用 composite verifier；严格 attested verifier 已存在，但不是默认入口。",
+      "pressure": 0.981
+    },
+    {
+      "id": "native-vm-toolchain-free-artifact-remains-external-runtime-pressure",
+      "signal": "无工具链部署环境的 canonical Linux rclvm 工件仍是现实执行层压力，但本周期无法在当前受限执行环境完成完整二进制来源与 ABI 证明链，因此不伪造完成度。",
+      "pressure": 0.969,
+      "externally_blocked": true
+    }
+  ],
+  "selected": "foundation-attested-default-promotion",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "src/foundation-direct-native-parity-attested.mjs",
+    "tests/foundation-direct-native-parity-default-promotion.test.mjs",
+    "tests/foundation-direct-native-parity-attested.test.mjs"
+  ],
+  "behavioral_change": [
+    "canonical verifyFoundationDirectNativeParity 默认入口现在经 attested parity 验证，只有 composite parity 已通过且 native execution attestation 自验证通过时才允许 native-verified。",
+    "缺失或无效执行工件证明不能再由 state/root/lineage/domain receipt 的成功补偿，默认路径 fail-closed。",
+    "non-Living 默认结果继续投影为旧 lineage/domainReceipt 兼容形状，显式 generic verifier 与 composite verifier 仍保留。",
+    "truthBoundary 明确声明默认 Foundation parity 已提升为 attested，并要求精确执行工件身份。"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "commands": [
+        "node --check foundation-direct-native-parity.mjs",
+        "node --check foundation-direct-native-parity-attested.mjs",
+        "node --test cycle28.test.mjs"
+      ],
+      "result": "5/5 PASS"
+    },
+    "negative_controls": {
+      "missing_execution_attestation_fails_closed": true,
+      "invalid_execution_attestation_fails_closed": true,
+      "prior_composite_success_cannot_compensate_attestation_failure": true,
+      "living_composite_evidence_preserved": true,
+      "generic_verifier_remains_explicitly_addressable": true
+    },
+    "validation_scope": "使用与候选模块同形的本地模块合同/依赖注入探针完成定向语义验证；当前环境无法直接 checkout GitHub 仓库，因此不声明全仓 npm test 或真实 canonical C VM replay 已执行。",
+    "broad_repository_suite": "NOT_RUN",
+    "real_canonical_c_native_vm_replay": "NOT_CLAIMED"
+  },
+  "truth_boundary": "本周期只提升 canonical Foundation parity 默认真相入口的非补偿执行工件证明要求，并保持现有兼容投影；不声称解决无工具链 Linux rclvm 工件问题，不声称全仓回归或真实 C Native VM replay 已完成。",
+  "ci_policy": "候选提交与 PR 使用 [skip ci] [skip actions]；创建 PR 前确认候选 HEAD workflow runs 为 0，创建后若出现自动 Actions 则停止并不合并。"
+}

@@ -2,7 +2,7 @@ import { verifyFoundationDirectNativeParityComposite } from './foundation-direct
 import { verifyNativeVmExecutionAttestation } from './native-vm-execution-attestation.mjs';
 
 export const FOUNDATION_DIRECT_NATIVE_PARITY_ATTESTED_FORMAT = 'taowind.rcl-foundation-direct-native-parity-attested.v0.1';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_ATTESTED_VERSION = '0.1.0';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_ATTESTED_VERSION = '0.1.1';
 
 function unique(values) { return [...new Set(values)]; }
 
@@ -38,7 +38,7 @@ export async function verifyFoundationDirectNativeParityAttested(sourceOrProgram
       ...(base?.truthBoundary ?? {}),
       nativeExecutionAttestationRequiredForNativeVerified: true,
       exactExecutableArtifactIdentityIsNonCompensatory: true,
-      defaultFoundationParityEntryPointPromotedToAttested: false,
+      defaultFoundationParityEntryPointPromotedToAttested: true,
     },
   };
 }
