@@ -1,0 +1,61 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-neural-receipt-parity-v0.1",
+  "base_commit": "3abccde0cc6b7cb60c0b67097727973eeed990ee",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍是最高价值 Reality Validation，但当前环境仍无法 checkout 完整仓库或物化 canonical native binary。",
+      "pressure": 0.974,
+      "externally_blocked": true
+    },
+    {
+      "id": "rcl-neural-receipt-gap",
+      "domain": "evidence_provenance",
+      "signal": "Cycle 12 已把有界 Neural Propagate 下译为 core transactions，但 parity verifier v0.5 只认识 Perception 与 Physical；Neural 尚未进入同等级 non-compensatory lineage/receipt/evidence-root 链。",
+      "pressure": 0.941
+    }
+  ],
+  "ranked_candidates": [
+    { "candidate_id": "foundation-neural-actual-c-native-replay", "domain": "native_runtime_validation", "score": 0.871, "externally_blocked": true },
+    { "candidate_id": "foundation-neural-domain-receipt-parity", "domain": "evidence_provenance", "score": 0.8468, "expected_goal_gain": 0.94, "reuse_gain": 0.98, "autonomy_gain": 0.91, "evidence_gain": 0.98, "implementation_cost": 0.36, "regression_risk": 0.18 },
+    { "candidate_id": "foundation-living-bounded-direct-lowering", "domain": "native_lowering", "score": 0.769, "implementation_cost": 0.59, "regression_risk": 0.36 }
+  ],
+  "selected": "foundation-neural-domain-receipt-parity",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "扩展更多 Foundation 域前先把 Neural 新直接域纳入已有非补偿性证据链，避免出现能 lower 却不能证明 Reference/Native 事务谱系和收据一致的证据断层。",
+  "implementation": [
+    "src/foundation-direct-native-parity.mjs",
+    "tests/foundation-neural-domain-receipt-parity.test.mjs"
+  ],
+  "behavioral_change": [
+    "native parity format v0.5 -> v0.6；domain receipt root algorithm v0.2 -> v0.3",
+    "reference receipt pairing 新增 neural domainKind，并按 pathway declaration + stepIndex 确定性配对",
+    "Neural metadata contract 绑定 Propagate、intrinsic-neural-dynamics、source neural domain、stepIndex/stepCount/pathwayIndex、originalWitnesses 与 changeModes",
+    "Neural active pathway 要求 Reference receipt 与唯一 Native synthetic transaction 的目标集合、before/after 变化、authority 和 witnesses 一致",
+    "Neural when=false pathway 允许 Reference 无记录，但只有 Native 同样没有执行该 synthetic rule 才视为 inactive-aligned",
+    "Neural lineage 若没有 Reference execution history 不允许通过 conditional inactivity 推断",
+    "receipt root v0.3 绑定 pathwayIndex/changeModes，同时保留 Perception/Physical 已有证据字段"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 43,
+      "breakdown": {
+        "existing_perception_parity": "19/19 PASS",
+        "existing_receipt_root": "4/4 PASS",
+        "existing_physical_receipt": "10/10 PASS",
+        "new_neural_receipt": "10/10 PASS"
+      },
+      "command": "node --test tests/foundation-direct-native-parity.test.mjs tests/foundation-domain-receipt-root.test.mjs tests/foundation-physical-domain-receipt-parity.test.mjs tests/foundation-neural-domain-receipt-parity.test.mjs"
+    },
+    "syntax": { "command": "node --check src/foundation-direct-native-parity.mjs", "status": "PASS" },
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期证明 Neural direct-lowering 的 receipt/lineage verifier 在注入 Reference/Native 历史下能正确通过或失败关闭；不宣称真实 canonical C Native VM replay 已运行，不宣称 Neural direct lowering 已在真实 C VM 上完成 parity，也不宣称动态传播、全部 Foundation 原生化、provider bridge 全局移除或全仓回归通过。"
+}

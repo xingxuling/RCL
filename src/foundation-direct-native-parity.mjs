@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
-export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.5';
-export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.5.0';
-export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.2';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-direct-native-parity.v0.6';
+export const FOUNDATION_DIRECT_NATIVE_PARITY_VERSION = '0.6.0';
+export const FOUNDATION_DOMAIN_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-domain-receipt-root.sha256.v0.3';
 
 function codeOf(error) {
   return error?.code ?? error?.payload?.code ?? 'RCL_FOUNDATION_DIRECT_NATIVE_EXECUTION_FAILED';
@@ -21,6 +21,7 @@ function truthBoundary() {
     domainReceiptParityClaimedOnlyWhenVerified: true,
     domainReceiptRootIsEvidenceBindingNotStandaloneProof: true,
     physicalInactiveStepRequiresReferenceAndNativeAbsence: true,
+    neuralInactivePathwayRequiresReferenceAndNativeAbsence: true,
     fullHistoryParityClaimed: false,
     allFoundationDomainsNativeClaimed: false,
     providerBridgeRemovedGlobally: false,
@@ -106,6 +107,7 @@ function strictlyIncreasing(values) {
 function referenceDomainKind(item) {
   if (item?.domain === 'perception') return 'perceptual';
   if (item?.domain === 'physical') return 'physical';
+  if (item?.domain === 'neural') return 'neural';
   return null;
 }
 
@@ -113,7 +115,7 @@ function referenceIdentityMatches(item, record) {
   if (!record || record.kind !== 'DomainTransition') return false;
   const expectedKind = referenceDomainKind(item);
   if (!expectedKind || record.domainKind !== expectedKind || record.name !== item?.declaration) return false;
-  if (item?.domain === 'physical') return Number(record.step) === Number(item?.stepIndex);
+  if (item?.domain === 'physical' || item?.domain === 'neural') return Number(record.step) === Number(item?.stepIndex);
   return true;
 }
 
@@ -168,6 +170,19 @@ function metadataCompleteForItem(item) {
       && Number.isInteger(stepIndex) && stepIndex >= 1
       && Number.isInteger(stepCount) && stepCount >= stepIndex;
   }
+  if (item.domain === 'neural') {
+    const stepIndex = Number(item.stepIndex);
+    const stepCount = Number(item.stepCount);
+    const pathwayIndex = Number(item.pathwayIndex);
+    return item.directive === 'Propagate'
+      && item.authorityClass === 'intrinsic-neural-dynamics'
+      && Object.prototype.hasOwnProperty.call(item, 'sourceReality')
+      && Array.isArray(item.originalWitnesses)
+      && Array.isArray(item.changeModes)
+      && Number.isInteger(stepIndex) && stepIndex >= 1
+      && Number.isInteger(stepCount) && stepCount >= stepIndex
+      && Number.isInteger(pathwayIndex) && pathwayIndex >= 1;
+  }
   return false;
 }
 
@@ -190,6 +205,16 @@ function perceptionReferenceAligned(item, reference) {
     && reference.authorityClass === 'observation'
     && (reference.observer ?? null) === (item?.observer ?? null)
     && (reference.sourceReality ?? null) === (item?.sourceReality ?? null);
+}
+
+function neuralReferenceAligned(item, reference) {
+  if (!reference) return false;
+  return reference.domainKind === 'neural'
+    && reference.name === item.declaration
+    && reference.status === 'realized'
+    && reference.authorityClass === 'intrinsic-neural-dynamics'
+    && Number(reference.step) === Number(item.stepIndex)
+    && sameJson(asArray(reference.witnesses), asArray(item.originalWitnesses));
 }
 
 export function foundationDomainReceiptRoot(report) {
@@ -220,6 +245,8 @@ export function foundationDomainReceiptRoot(report) {
       sourceReality: entry?.sourceReality ?? null,
       stepIndex: entry?.stepIndex ?? null,
       stepCount: entry?.stepCount ?? null,
+      pathwayIndex: entry?.pathwayIndex ?? null,
+      changeModes: asArray(entry?.changeModes),
       originalWitnesses: asArray(entry?.originalWitnesses),
       referenceActive: entry?.referenceActive === true,
       nativeActive: entry?.nativeActive === true,
@@ -258,14 +285,14 @@ export function verifyFoundationDirectLoweringLineage(lowering, nativeHistory, r
     const witnesses = asArray(record?.witnesses);
     const changeTargets = unique(asArray(record?.changes).map(change => change?.target).filter(Boolean));
     const reference = references?.matches?.[index]?.record ?? null;
-    const physicalInactive = item?.domain === 'physical' && referenceAvailable && reference === null;
+    const conditionallyInactive = ['physical', 'neural'].includes(item?.domain) && referenceAvailable && reference === null;
     const checks = {
       syntheticRulePresent: Boolean(syntheticRule),
-      referenceExecutionEvidencePresent: item?.domain !== 'physical' || referenceAvailable,
-      exactNativeRecord: physicalInactive ? matchingRecords.length === 0 : matchingRecords.length === 1,
-      witnessPresent: physicalInactive ? true : Boolean(witness) && witnesses.includes(witness),
-      stateTargetsCovered: physicalInactive ? true : stateTargets.every(target => changeTargets.includes(target)),
-      inactiveStepAligned: item?.domain !== 'physical' || !physicalInactive || matchingRecords.length === 0,
+      referenceExecutionEvidencePresent: !['physical', 'neural'].includes(item?.domain) || referenceAvailable,
+      exactNativeRecord: conditionallyInactive ? matchingRecords.length === 0 : matchingRecords.length === 1,
+      witnessPresent: conditionallyInactive ? true : Boolean(witness) && witnesses.includes(witness),
+      stateTargetsCovered: conditionallyInactive ? true : stateTargets.every(target => changeTargets.includes(target)),
+      inactiveStepAligned: !['physical', 'neural'].includes(item?.domain) || !conditionallyInactive || matchingRecords.length === 0,
     };
     return {
       index,
@@ -314,7 +341,7 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     const nativeMatch = nativeMatches.length === 1 ? nativeMatches[0] : null;
     if (nativeMatch) nativeIndexes.push(nativeMatch.nativeIndex);
 
-    const physicalInactive = item?.domain === 'physical' && reference === null;
+    const conditionallyInactive = ['physical', 'neural'].includes(item?.domain) && reference === null;
     const expectedTargets = sortedUnique(asArray(item?.stateTargets).filter(Boolean));
     const referenceTargets = sortedUnique(asArray(reference?.changes).map(change => change?.target).filter(Boolean));
     const nativeTargets = sortedUnique(asArray(nativeMatch?.record?.changes).map(change => change?.target).filter(Boolean));
@@ -324,22 +351,24 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
     const nativeWitnesses = asArray(nativeMatch?.record?.witnesses);
     const checks = {
       metadataShapeSupported: metadataCompleteForItem(item),
-      referenceReceiptAligned: physicalInactive
+      referenceReceiptAligned: conditionallyInactive
         ? true
         : item?.domain === 'physical'
           ? physicalReferenceAligned(item, reference)
-          : perceptionReferenceAligned(item, reference),
-      exactNativeRecord: physicalInactive ? nativeMatches.length === 0 : nativeMatches.length === 1,
-      nativeStatusRealized: physicalInactive ? true : nativeMatch?.record?.status === 'realized',
-      referenceTargetsExact: physicalInactive ? true : sameJson(referenceTargets, expectedTargets),
-      nativeTargetsExact: physicalInactive ? true : sameJson(nativeTargets, expectedTargets),
-      transitionValuesEquivalent: physicalInactive ? true : sameJson(referenceChanges, nativeChanges),
-      witnessPresent: physicalInactive ? true : nativeWitnesses.includes(item?.witness),
-      originalWitnessesPreserved: item?.domain !== 'physical' || physicalInactive
+          : item?.domain === 'neural'
+            ? neuralReferenceAligned(item, reference)
+            : perceptionReferenceAligned(item, reference),
+      exactNativeRecord: conditionallyInactive ? nativeMatches.length === 0 : nativeMatches.length === 1,
+      nativeStatusRealized: conditionallyInactive ? true : nativeMatch?.record?.status === 'realized',
+      referenceTargetsExact: conditionallyInactive ? true : sameJson(referenceTargets, expectedTargets),
+      nativeTargetsExact: conditionallyInactive ? true : sameJson(nativeTargets, expectedTargets),
+      transitionValuesEquivalent: conditionallyInactive ? true : sameJson(referenceChanges, nativeChanges),
+      witnessPresent: conditionallyInactive ? true : nativeWitnesses.includes(item?.witness),
+      originalWitnessesPreserved: !['physical', 'neural'].includes(item?.domain) || conditionallyInactive
         ? true
         : sameJson(referenceWitnesses, asArray(item?.originalWitnesses))
           && asArray(item?.originalWitnesses).every(witness => nativeWitnesses.includes(witness)),
-      inactiveStepAligned: item?.domain !== 'physical' || !physicalInactive || nativeMatches.length === 0,
+      inactiveStepAligned: !['physical', 'neural'].includes(item?.domain) || !conditionallyInactive || nativeMatches.length === 0,
     };
     return {
       index,
@@ -353,6 +382,8 @@ export function verifyFoundationDomainReceiptParity(lowering, referenceHistory, 
       sourceReality: item?.sourceReality ?? null,
       stepIndex: item?.stepIndex ?? null,
       stepCount: item?.stepCount ?? null,
+      pathwayIndex: item?.pathwayIndex ?? null,
+      changeModes: asArray(item?.changeModes),
       originalWitnesses: asArray(item?.originalWitnesses),
       referenceActive: Boolean(reference),
       nativeActive: Boolean(nativeMatch),
