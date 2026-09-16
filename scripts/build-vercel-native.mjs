@@ -11,6 +11,8 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const nativeDir = path.join(root, 'native');
 const target = path.join(nativeDir, process.platform === 'win32' ? 'rclvm.exe' : 'rclvm');
 const manifestPath = path.join(nativeDir, 'rclvm.vercel-attestation.json');
+const publicDir = path.join(root, 'public');
+const publicProofPath = path.join(publicDir, 'rcl-native-build-proof.json');
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -36,6 +38,7 @@ if (process.platform !== 'linux') {
 try {
   fs.rmSync(target, { force: true });
   fs.rmSync(manifestPath, { force: true });
+  fs.rmSync(publicProofPath, { force: true });
 
   const materialization = materializeNativeVm(root, {
     cacheRoot: path.join(os.tmpdir(), 'taowind-rcl-vercel-native-build'),
@@ -121,6 +124,17 @@ try {
   }
 
   fs.writeFileSync(manifestPath, `${JSON.stringify(deploymentArtifact, null, 2)}\n`);
+  fs.mkdirSync(publicDir, { recursive: true });
+  fs.writeFileSync(publicProofPath, `${JSON.stringify({
+    ok: true,
+    format: deploymentArtifact.format,
+    binarySha256,
+    sourceRoot: deploymentArtifact.sourceMaterialization.sourceRoot,
+    attestationRoot: deploymentArtifact.replayProof.attestationRoot,
+    stateRootVerified: true,
+    stateRootParity: true,
+  }, null, 2)}\n`);
+
   console.log(JSON.stringify({
     ok: true,
     status: 'RCL_VERCEL_NATIVE_ARTIFACT_READY',
