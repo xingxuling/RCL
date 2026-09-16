@@ -1,0 +1,82 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-native-vm-execution-artifact-attestation-v0.1",
+  "base_commit": "2a61b2adfe481fdd334502197c7864dc586cfcf7",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "successful-native-execution-drops-materialization-provenance",
+      "domain": "native_execution_evidence",
+      "signal": "Cycle 23 已能给 staged native binary 生成 sourceRoot 与 binarySha256，但 runNativeBytecode 在成功路径仅返回 VM JSON；materialization provenance 只在进程错误 details 中存在。成功的现实执行因此无法从结果本身追溯到实际执行二进制。",
+      "pressure": 0.994
+    },
+    {
+      "id": "vm-version-is-not-binary-identity",
+      "domain": "version_and_evidence_binding",
+      "signal": "C VM payload 会报告 rcl-native-vm/<version> 与 program sourceRoot，但相同版本字符串不能唯一标识实际执行工件；binary digest 尚未与本次执行/program identity 形成不可分离证据根。",
+      "pressure": 0.981
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.959,
+      "externally_blocked": true,
+      "blocker": "当前已部署 RCL/RNCS 运行面尚未刷新到 Cycle 23 main，因此仍无法在该运行面取得修复后的完整 C VM replay。"
+    },
+    {
+      "candidate_id": "native-vm-execution-artifact-attestation",
+      "score": 0.953,
+      "expected_goal_gain": 0.991,
+      "reuse_gain": 0.997,
+      "autonomy_gain": 0.968,
+      "evidence_gain": 0.998,
+      "implementation_cost": 0.18,
+      "regression_risk": 0.12
+    }
+  ],
+  "selected": "native-vm-execution-artifact-attestation",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是对 Cycle 23 物化证据的纵向闭环：不改变 RCL 语言、RBC 或 C VM 语义，只确保成功 native execution（原生执行）不再丢失实际 executable artifact（可执行工件）的身份与来源。",
+  "implementation": [
+    "src/native-vm-materialization.mjs",
+    "src/native-vm-execution-attestation.mjs",
+    "src/native-vm.mjs",
+    "tests/native-vm-execution-attestation.test.mjs",
+    "tests/native-vm-execution-attestation-integration.test.mjs"
+  ],
+  "behavioral_change": [
+    "所有 materializeNativeVm 成功结果都暴露实际 binarySha256，包括 explicit/prebuilt、staged fresh build 与 verified staged cache",
+    "新增 deterministic native VM execution attestation（确定性原生虚拟机执行证明）：绑定 VM 报告身份、bytecode version、program、program sourceRoot、materialization format/version/provenance/sourceRoot 与 binarySha256",
+    "attestationRoot 使用 canonical JSON + SHA-256；二进制身份、程序 sourceRoot 或 VM 版本任一变化都会改变 root",
+    "runNativeBytecode 成功路径必须生成并自验证 attestation；若执行结果不能绑定到合法 artifact identity，则以 RCL_NATIVE_VM_EXECUTION_ATTESTATION_FAILED fail-closed",
+    "原生进程失败路径与语义 state-root 验证边界保持不变"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 15,
+      "breakdown": {
+        "deployment_safe_source_materialization_contract": "9/9 PASS",
+        "native_vm_execution_attestation_contract": "5/5 PASS",
+        "run_native_attestation_integration": "1/1 PASS"
+      },
+      "commands": [
+        "node --check src/native-vm-materialization.mjs",
+        "node --check src/native-vm-execution-attestation.mjs",
+        "node --check src/native-vm.mjs",
+        "node --test tests/native-vm-source-materialization.test.mjs tests/native-vm-execution-attestation.test.mjs tests/native-vm-execution-attestation-integration.test.mjs"
+      ]
+    },
+    "real_process_integration_probe": {
+      "status": "PASS",
+      "description": "使用真实可执行 POSIX probe 作为显式 vmPath，输出合法 RCL native payload；runNativeBytecode 实际启动进程、验证 semantic state root，并返回与该 probe 文件真实 SHA-256 完全相同的 nativeVmExecutionAttestation.materialization.binarySha256。"
+    },
+    "actual_current_canonical_rcl_c_vm_replay": "NOT_CLAIMED_DEPLOYED_RUNTIME_NOT_YET_AT_CYCLE_23_OR_24",
+    "foundation_composite_parity_requires_attestation": "NOT_YET_THIS_CYCLE",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期把实际执行二进制身份带入每个成功 native execution 结果，但尚未把 attestationRoot 设为 Foundation composite native-verified 的非补偿门；该门应由后续周期单独验证并升级。也不声明当前规范 rclvm.c 已在刷新后的部署面完成真实 Foundation replay。",
+  "ci_policy": "候选提交、PR 和 merge message 必须携带 [skip ci] [skip actions]；创建 PR 前后及 merge 后检查全部 workflow runs，任何自动 Actions 运行出现即停止后续交付。"
+}
