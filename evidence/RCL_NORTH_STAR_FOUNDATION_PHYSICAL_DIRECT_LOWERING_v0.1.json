@@ -1,0 +1,96 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-foundation-physical-direct-lowering-v0.1",
+  "base_commit": "8c794fc2bf8c6a40ea5f2177057ff13ba6ef2507",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "rcl-canonical-c-native-replay",
+      "domain": "native_runtime_validation",
+      "signal": "真实 canonical C Native VM 重放仍是最高价值现实验证，但当前自动化容器无法解析 github.com 并 checkout 完整仓库；GitHub connector 只可读取文本资源，无法直接物化仓库中的原生二进制。",
+      "pressure": 0.969,
+      "externally_blocked": true,
+      "evidence": [
+        "native/rclvm.c、native/rclvm.h 与 native/Makefile 在 canonical main 中存在",
+        "容器 git clone https://github.com/xingxuling/RCL.git 失败：Could not resolve host: github.com",
+        "未使用 Mock 结果冒充 canonical C VM replay"
+      ]
+    },
+    {
+      "id": "rcl-next-foundation-direct-domain",
+      "domain": "native_lowering",
+      "signal": "Perception 已拥有 direct lowering + lineage + domain receipt + evidence root；Physical Advance 的参考运行时语义同样由确定性状态事务构成，并可复用现有 Emergence + Realize 核心事务，而 bytecode validator 仍将 physicals 整体标记为 provider-required。",
+      "pressure": 0.914,
+      "evidence": [
+        "src/runtime.mjs advancePhysical: 每 step 在 before state 上计算 when/evolves/conserves 并提交状态",
+        "src/bytecode.mjs validateNativeSubset: physicals 非空触发 RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED",
+        "examples/eight-domain-foundation.rcl 使用 advance world.fall steps 2 dt seconds(1)"
+      ]
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "foundation-physical-actual-c-native-replay",
+      "domain": "native_runtime_validation",
+      "score": 0.861,
+      "externally_blocked": true
+    },
+    {
+      "candidate_id": "foundation-physical-bounded-direct-lowering",
+      "domain": "native_lowering",
+      "score": 0.8236,
+      "expected_goal_gain": 0.94,
+      "reuse_gain": 0.96,
+      "autonomy_gain": 0.88,
+      "evidence_gain": 0.86,
+      "implementation_cost": 0.42,
+      "regression_risk": 0.24
+    },
+    {
+      "candidate_id": "foundation-neural-bounded-direct-lowering",
+      "domain": "native_lowering",
+      "score": 0.771,
+      "implementation_cost": 0.56,
+      "regression_risk": 0.31
+    }
+  ],
+  "selected": "foundation-physical-bounded-direct-lowering",
+  "mode": "DEEP_DEVELOPMENT",
+  "mode_reason": "真实 C VM replay 继续被环境阻断；Physical Advance 是当前最接近 Perception 现有核心事务语义、同时显著扩展现实程序表达范围的可执行候选。采用有界静态 step/dt 子集，避免动态循环和 dt 重求值造成语义漂移。",
+  "sovereignty_gate": "AUTONOMOUS",
+  "implementation": [
+    "src/foundation-direct-lowering.mjs",
+    "tests/foundation-physical-direct-lowering.test.mjs"
+  ],
+  "behavioral_change": [
+    "direct lowering 默认支持 perception + physical 两个 Foundation 域",
+    "literal 1..256 步且 dt 为 state-independent seconds(...) / 静态表达式的 Advance 可确定性展开为逐 step 唯一 Emergence + Realize 事务",
+    "physical law step variable 在 when/evolves/conserves 中结构化替换为一次性语义等价的静态 dt 表达式",
+    "每个物理 step 使用唯一 synthetic rule identity 与确定性 lineage witness，避免多 step 共用 rule identity 破坏后续原生谱系验证",
+    "保留原 physical witnesses、state targets、natural-law authority metadata、stepIndex/stepCount/dtExpression",
+    "动态 step count、state-dependent dt、缺失 step variable、未知 law 均失败关闭并保留原 provider-domain 声明",
+    "未消费 physical law 继续保留在 program.physicals，确保 canonical bytecode validator 仍会 RCL_NATIVE_DOMAIN_PROVIDER_REQUIRED 而非静默丢义",
+    "synthetic physical rule 与用户 core rule 冲突时确定性寻找可用后缀，不遮蔽用户规则"
+  ],
+  "validation": {
+    "targeted_local": {
+      "command": "node --test perception-regression + physical-direct-lowering focused suites",
+      "status": "PASS",
+      "tests": 19,
+      "scope_note": "在自动化容器中以 canonical Cycle 9 lowering module 为基线重建候选模块；9 个既有 Perception 定向测试 + 10 个 Physical 新测试全部通过。"
+    },
+    "syntax": {
+      "command": "node --check foundation-direct-lowering.mjs",
+      "status": "PASS"
+    },
+    "adapter_contract": {
+      "status": "PASS",
+      "method": "使用现有 foundation-direct-bytecode adapter 与 injected bytecode compiler stub；确认 fully consumed Physical domain 被移除且展开后的 directives 全部为 Realize，lowering metadata 保留 2 个 physical steps。"
+    },
+    "branch_head_workflow_runs_before_pr": 0,
+    "actual_c_native_vm_execution": "NOT_RUN_AUTOMATION_WORKSPACE_CANNOT_CHECKOUT_CANONICAL_REPOSITORY_OR_MATERIALIZE_NATIVE_BINARY",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "ci_policy": "所有候选分支提交携带 [skip ci] [skip actions]；PR 前检查 branch head workflow-free，PR 后再次检查 head workflow-free，确认后才允许 merge。",
+  "truth_boundary": "本周期只证明有界 Physical Advance -> Core RCL 直接下译转换器的结构与定向合同；不宣称真实 canonical C Native VM parity、Physical domain receipt parity、动态 physical loop 原生化、全部 Foundation 原生下译、provider bridge 全局移除或全仓回归通过。"
+}
