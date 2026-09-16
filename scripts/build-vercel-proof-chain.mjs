@@ -13,6 +13,7 @@ const steps = [
     'tests/foundation-living-staged-receipt.test.mjs',
   ]],
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
+  ['quantitative-real-c-provider-proof', ['scripts/verify-vercel-foundation-quantitative-bridge.mjs']],
   ['physical-real-c-proof', ['scripts/verify-vercel-foundation-physical.mjs']],
   ['neural-real-c-proof', ['scripts/verify-vercel-foundation-neural.mjs']],
   ['neural-deployment-binding', ['scripts/bind-vercel-foundation-neural.mjs']],
