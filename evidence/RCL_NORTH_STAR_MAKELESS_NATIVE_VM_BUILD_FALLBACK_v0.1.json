@@ -1,0 +1,89 @@
+{
+  "protocol": "dwac.rcl-north-star-cycle.v0.1",
+  "cycle_id": "RCL-NSC-makeless-native-vm-build-fallback-v0.1",
+  "base_commit": "7b08142638686cb82061853a72e081d3ac8bc703",
+  "north_star": "持续提升 RCL 作为可执行现实语义中间语言/现实事务演算的通用性、可表达性、可执行性、可验证性与现实鲁棒性；任何候选现实不得绕过证据、权限、版本、4R 与现实验证边界。",
+  "observations": [
+    {
+      "id": "deployed-runtime-make-tool-absent",
+      "domain": "native_runtime_materialization",
+      "signal": "Cycle 24 合并并部署后，RCL/RNCS 运行面已刷新到 7b081426，但 native/rclvm 仍不存在；Cycle 23 staged materialization 已越过 header/Makefile 裁剪问题，新的真实失败点变为 Unable to invoke native VM build tool 'make': spawnSync make ENOENT。examples/hello-reality.rcl 在进入 C VM 前复现同一失败。",
+      "pressure": 0.998
+    },
+    {
+      "id": "make-is-orchestration-not-semantic-authority",
+      "domain": "runtime_portability",
+      "signal": "构建 rclvm 的规范输入仍是 rclvm.c + rclvm.h + 编译/链接参数；Makefile 是编排资产而非语义权威。仅因 make 不存在就阻断现实执行，不符合当前源码自举目标。",
+      "pressure": 0.989
+    }
+  ],
+  "ranked_candidates": [
+    {
+      "candidate_id": "real-canonical-c-native-replay",
+      "score": 0.965,
+      "externally_blocked": true,
+      "blocker": "当前已部署运行面在 C VM 启动前因 make ENOENT 失败，必须先消除构建编排工具单点依赖。"
+    },
+    {
+      "candidate_id": "make-independent-direct-c-compiler-fallback",
+      "score": 0.958,
+      "expected_goal_gain": 0.994,
+      "reuse_gain": 0.998,
+      "autonomy_gain": 0.995,
+      "evidence_gain": 0.965,
+      "implementation_cost": 0.12,
+      "regression_risk": 0.11
+    }
+  ],
+  "selected": "make-independent-direct-c-compiler-fallback",
+  "mode": "DEEP_DEVELOPMENT",
+  "sovereignty_gate": "AUTONOMOUS",
+  "mode_reason": "这是对刚部署的新鲜现实失败继续纵向收敛：不修改 RCL/RBC/C VM 语义，而是移除 Makefile 编排工具作为 native execution 自举的单点依赖。只有 make 本身 ENOENT 时才降级到直接 C compiler；make 存在但构建失败时绝不绕过其失败证据。",
+  "implementation": [
+    "src/native-vm-materialization.mjs",
+    "src/native-vm.mjs",
+    "tests/native-vm-makeless-build-fallback.test.mjs"
+  ],
+  "behavioral_change": [
+    "materialization format 升级 v0.3，sourceRoot 绑定 make-then-direct-cc build policy、make/compiler 两个候选工具身份与构建环境，避免与旧缓存证据混淆",
+    "默认仍优先调用 Makefile rclvm target；仅当 make 进程错误码为 ENOENT 时尝试 direct C compiler fallback",
+    "direct compiler 使用 staged rclvm.c/rclvm.h 与规范 -O2 -std=c11 -Wall -Wextra -Wpedantic、-lcrypto、-lm 构建同一 staged rclvm，不访问网络、不写应用根",
+    "make 存在但退出非零时保持 fail-closed，不用 direct compiler 掩盖真实 Makefile/build failure",
+    "make 与 compiler 都不存在时返回 RCL_NATIVE_VM_BUILD_TOOL，并同时保留 fallbackFrom、buildMethod、buildTool 证据",
+    "build manifest 记录 policy、method、tool、args、fallbackFrom 与 binarySha256；execution attestation 自动继承新 materialization identity",
+    "runNativeBytecode 增加 compilerPath 透传，显式工具配置仍可审计"
+  ],
+  "validation": {
+    "targeted_local": {
+      "status": "PASS",
+      "tests": 18,
+      "breakdown": {
+        "native_vm_source_materialization": "9/9 PASS",
+        "makeless_direct_compiler_fallback": "3/3 PASS",
+        "native_vm_execution_attestation": "5/5 PASS",
+        "native_process_attestation_integration": "1/1 PASS"
+      },
+      "commands": [
+        "node --check src/native-vm-materialization.mjs",
+        "node --check src/native-vm.mjs",
+        "node --check tests/native-vm-makeless-build-fallback.test.mjs",
+        "node --test tests/native-vm-source-materialization.test.mjs tests/native-vm-makeless-build-fallback.test.mjs tests/native-vm-execution-attestation.test.mjs tests/native-vm-execution-attestation-integration.test.mjs"
+      ]
+    },
+    "real_direct_compiler_probe": {
+      "status": "PASS",
+      "description": "在 makePath 指向确定不存在的路径时，真实系统 cc 被调用，在 staged cache 从 rclvm.c/rclvm.h fixture 构建可执行 rclvm；证明 direct compiler fallback 进程路径真实可用，而非只靠 mock。"
+    },
+    "deployed_pre_fix_reproduction": {
+      "status": "REPRODUCED",
+      "commit": "7b08142638686cb82061853a72e081d3ac8bc703",
+      "nativeVmExists": false,
+      "reason": "Unable to invoke native VM build tool 'make': spawnSync make ENOENT",
+      "nativeExample": "examples/hello-reality.rcl fails with the same make ENOENT before C VM execution"
+    },
+    "actual_current_canonical_rcl_c_vm_replay": "NOT_YET_CLAIMED_UNTIL_CYCLE_25_DEPLOYS_AND_RUNTIME_REOBSERVATION_RUNS",
+    "broad_repository_suite": "NOT_RUN"
+  },
+  "truth_boundary": "本周期只移除 make 作为源码自举的单点依赖，并证明 direct compiler fallback 的真实进程路径。它不假设目标部署环境一定拥有 cc/clang；若部署后 compiler 也不存在，必须把它记录为新的外部运行时阻断而不是继续伪造 native replay。它不声明 Foundation composite parity 已获得真实 canonical C VM 证明，也不声明全仓回归。",
+  "ci_policy": "候选提交、PR 和 merge message 必须携带 [skip ci] [skip actions]；创建 PR 前后及 merge 后检查 workflow runs，任何自动 GitHub Actions 运行出现即停止后续交付。"
+}

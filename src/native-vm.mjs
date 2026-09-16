@@ -74,6 +74,7 @@ function resolveRunnableNativeVm(options) {
       vmPath: options.vmPath,
       buildIfMissing: options.buildIfMissing,
       makePath: options.makePath,
+      compilerPath: options.compilerPath,
       env: options.buildEnv ?? options.env,
       maxBuffer: options.buildMaxBuffer,
       buildTimeout: options.buildTimeout,

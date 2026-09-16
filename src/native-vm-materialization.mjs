@@ -10,8 +10,9 @@ import {
   nativeVmCanonicalBuildSupportRoots,
 } from './native-vm-canonical-build-support.mjs';
 
-export const RCL_NATIVE_VM_MATERIALIZATION_FORMAT = 'taowind.rcl-native-vm-materialization.v0.2';
-export const RCL_NATIVE_VM_MATERIALIZATION_VERSION = '0.2.0';
+export const RCL_NATIVE_VM_MATERIALIZATION_FORMAT = 'taowind.rcl-native-vm-materialization.v0.3';
+export const RCL_NATIVE_VM_MATERIALIZATION_VERSION = '0.3.0';
+const RCL_NATIVE_VM_BUILD_POLICY = 'make-then-direct-cc.v0.1';
 const CACHE_MANIFEST_FORMAT = 'taowind.rcl-native-vm-source-cache.v0.1';
 const BUILD_ENV_KEYS = ['CC', 'CFLAGS', 'CPPFLAGS', 'LDFLAGS'];
 
@@ -121,6 +122,7 @@ export function materializeNativeVm(root, options = {}) {
   const support = resolveBuildSupport(nativeDir);
   const supportRoots = nativeVmCanonicalBuildSupportRoots();
   const makePath = options.makePath ?? options.env?.MAKE ?? process.env.MAKE ?? 'make';
+  const compilerPath = options.compilerPath ?? options.env?.CC ?? process.env.CC ?? 'cc';
   const buildEnv = { ...process.env, ...(options.env ?? {}) };
   const sourceDescriptor = {
     format: RCL_NATIVE_VM_CANONICAL_BUILD_SUPPORT_FORMAT,
@@ -129,7 +131,8 @@ export function materializeNativeVm(root, options = {}) {
     sourceSha256: sha256(source),
     makefileSha256: sha256(support.makefile),
     headerSha256: sha256(support.header),
-    buildTool: makePath,
+    buildPolicy: RCL_NATIVE_VM_BUILD_POLICY,
+    buildTools: { make: makePath, compiler: compilerPath },
     buildEnvironment: stableBuildEnvironment(buildEnv),
   };
   const sourceRoot = sha256(JSON.stringify(sourceDescriptor));
@@ -160,13 +163,36 @@ export function materializeNativeVm(root, options = {}) {
   fs.writeFileSync(path.join(stageDir, 'rclvm.h'), support.header);
 
   const spawn = options.spawnSyncImpl ?? spawnSync;
-  const run = spawn(makePath, ['-C', stageDir, 'rclvm'], {
+  const spawnOptions = {
     cwd: root,
     encoding: 'utf8',
     env: buildEnv,
     maxBuffer: options.maxBuffer ?? 16 * 1024 * 1024,
     timeout: options.buildTimeout ?? 120_000,
-  });
+  };
+  const makeRun = spawn(makePath, ['-C', stageDir, 'rclvm'], spawnOptions);
+  let run = makeRun;
+  let buildMethod = 'makefile';
+  let buildTool = makePath;
+  let buildArgs = ['-C', stageDir, 'rclvm'];
+  let fallbackFrom = null;
+
+  if (makeRun.error?.code === 'ENOENT') {
+    const compilerArgs = [
+      '-O2', '-std=c11', '-Wall', '-Wextra', '-Wpedantic',
+      '-o', stagedVmPath, path.join(stageDir, 'rclvm.c'), '-lcrypto', '-lm',
+    ];
+    const compilerRun = spawn(compilerPath, compilerArgs, { ...spawnOptions, cwd: stageDir });
+    run = compilerRun;
+    buildMethod = 'direct-c-compiler';
+    buildTool = compilerPath;
+    buildArgs = compilerArgs;
+    fallbackFrom = {
+      tool: makePath,
+      errorCode: makeRun.error.code,
+      message: makeRun.error.message,
+    };
+  }
 
   const commonDetails = {
     vmPath: stagedVmPath,
@@ -174,11 +200,16 @@ export function materializeNativeVm(root, options = {}) {
     sourceRoot,
     stageDir,
     makePath,
+    compilerPath,
+    buildMethod,
+    buildTool,
+    buildArgs,
+    fallbackFrom,
     supportProvenance: support.provenance,
     supportRoots,
   };
   if (run.error) {
-    throw errorWith('RCL_NATIVE_VM_BUILD_TOOL', `Unable to invoke native VM build tool '${makePath}': ${run.error.message}`, {
+    throw errorWith('RCL_NATIVE_VM_BUILD_TOOL', `Unable to invoke native VM build tool '${buildTool}': ${run.error.message}`, {
       ...commonDetails,
       status: run.status,
       stdout: run.stdout,
@@ -207,7 +238,11 @@ export function materializeNativeVm(root, options = {}) {
 
   const binarySha256 = sha256(fs.readFileSync(stagedVmPath));
   const build = {
-    tool: makePath,
+    policy: RCL_NATIVE_VM_BUILD_POLICY,
+    method: buildMethod,
+    tool: buildTool,
+    args: buildArgs,
+    fallbackFrom,
     target: 'rclvm',
     stageDir,
     binarySha256,
@@ -230,7 +265,7 @@ export function materializeNativeVm(root, options = {}) {
     vmPath: stagedVmPath,
     built: true,
     cached: false,
-    provenance: 'staged-repository-source-makefile',
+    provenance: buildMethod === 'makefile' ? 'staged-repository-source-makefile' : 'staged-repository-source-direct-compiler',
     sourceRoot,
     supportProvenance: support.provenance,
     binarySha256,
