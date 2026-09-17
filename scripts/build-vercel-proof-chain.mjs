@@ -5,6 +5,7 @@ const steps = [
   ['targeted-foundation-tests', [
     '--test',
     'tests/foundation-quantity-native-lowering.test.mjs',
+    'tests/foundation-quantitative-direct-lowering.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
     'tests/foundation-neural-domain-receipt-parity.test.mjs',
     'tests/foundation-genetic-direct-lowering.test.mjs',
@@ -13,6 +14,7 @@ const steps = [
     'tests/foundation-living-staged-receipt.test.mjs',
   ]],
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
+  ['quantitative-declared-direct-real-c-proof', ['scripts/verify-vercel-foundation-quantitative-direct.mjs']],
   ['batch-a-real-c-provider-proof', ['scripts/verify-vercel-foundation-batch-a-bridge.mjs']],
   ['batch-a-bridge-deployment-binding', ['scripts/bind-vercel-foundation-batch-a-bridge.mjs']],
   ['full-native-provider-federation-conformance', [
