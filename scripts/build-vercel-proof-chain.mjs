@@ -37,6 +37,12 @@ const steps = [
   ['native-provider-federation-root-stabilization', [
     'scripts/stabilize-vercel-foundation-native-federation-root.mjs',
   ]],
+  ['quantitative-direct-deployment-binding', [
+    'scripts/bind-vercel-foundation-quantitative-direct.mjs',
+  ]],
+  ['quantitative-direct-health-evidence', [
+    'scripts/verify-vercel-foundation-quantitative-direct-health.mjs',
+  ]],
   ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
 
