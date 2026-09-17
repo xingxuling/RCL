@@ -114,6 +114,71 @@ function livingEvidenceBound(proof, binarySha256) {
   );
 }
 
+function quantitativeDirectEvidenceBound(proof, binarySha256, attestation) {
+  const measurement = proof?.finalState?.['sensor.temperature'];
+  const healthy = proof?.finalState?.['sensor.healthy'];
+  const summary = proof?.loweringSummary;
+  const loweringTruth = proof?.loweringTruthBoundary;
+  const truth = proof?.truthBoundary;
+  return Boolean(
+    proof?.format === 'taowind.rcl-vercel-foundation-quantitative-direct-native-proof.v0.1'
+    && proof?.domain === 'quantitative'
+    && proof?.status === 'native-direct-verified'
+    && proof?.verified === true
+    && proof?.executionMode === 'declared-domain-direct-lowering'
+    && isSha256(proof?.proofSha256)
+    && proof?.binarySha256 === binarySha256
+    && proof?.executionBinarySha256 === binarySha256
+    && isSha256(proof?.canonicalVmSourceRoot)
+    && proof?.canonicalVmSourceRoot === attestation?.sourceMaterialization?.sourceRoot
+    && isSha256(proof?.nativeStateRoot)
+    && proof?.stateRootVerified === true
+    && proof?.stateRootParity === true
+    && proof?.transactionWitnessObserved === true
+    && summary?.quantitativeLoweredDeclarationCount === 1
+    && summary?.consumedDirectiveCount === 1
+    && summary?.syntheticRuleCount === 1
+    && summary?.remainingQuantitativeCount === 0
+    && summary?.measurementRecordCount === 1
+    && loweringTruth?.declaredQuantitativeDirectLoweringImplemented === true
+    && loweringTruth?.declaredQuantitativeDirectLoweringVerified === false
+    && loweringTruth?.measurementValueUncertaintyConfidenceUnitScaleRetained === true
+    && loweringTruth?.measurementEvidenceRetainedAsCanonicalJsonText === true
+    && loweringTruth?.measurementCalibrationIdentityRetained === true
+    && loweringTruth?.measurementAccessorsLoweredToTypedRecordFields === true
+    && loweringTruth?.quantitativeDomainReceiptParityClaimed === false
+    && loweringTruth?.referenceRuntimeParityClaimed === false
+    && loweringTruth?.providerBridgeRemovedGlobally === false
+    && loweringTruth?.allFoundationDomainsNativeClaimed === false
+    && truth?.declaredDomainDirectLoweringVerified === true
+    && truth?.domain === 'quantitative'
+    && truth?.providerBridgeUsedForThisProof === false
+    && truth?.referenceRuntimeParityClaimed === false
+    && truth?.domainReceiptParityClaimed === false
+    && truth?.deploymentHealthBound === true
+    && truth?.providerBridgeRemovedGlobally === false
+    && truth?.allFoundationDomainsNativeClaimed === false
+    && measurement?.kind === 'Measurement'
+    && measurement?.baseType === 'Temperature'
+    && measurement?.value?.kind === 'Quantity'
+    && measurement?.value?.type === 'Temperature'
+    && measurement?.value?.value === 8
+    && measurement?.value?.unit === '°C'
+    && measurement?.uncertainty?.kind === 'Quantity'
+    && measurement?.uncertainty?.type === 'Temperature'
+    && measurement?.uncertainty?.value === 0.2
+    && measurement?.uncertainty?.unit === '°C'
+    && measurement?.confidence === 0.98
+    && measurement?.unit === '°C'
+    && measurement?.scale === 'interval'
+    && measurement?.evidence === '["sensor:ambient-v1"]'
+    && measurement?.calibratedBy === 'calibration:ambient-v1'
+    && measurement?.hasUnit === true
+    && measurement?.hasCalibration === true
+    && healthy === true
+  );
+}
+
 function nativeBridgeFederationBound(federation, attestation) {
   const expectedDomains = FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => spec.domain);
   return Boolean(
@@ -177,6 +242,26 @@ function proofSummary(proof) {
     compositeReceiptRoot: proof.foundationCompositeReceiptRoot ?? null,
     nativeVmExecutionAttestationRoot: proof.nativeVmExecutionAttestationRoot ?? null,
     executionBinarySha256: proof.executionBinarySha256 ?? null,
+  };
+}
+
+function quantitativeDirectSummary(proof) {
+  if (!proof) return null;
+  return {
+    domain: proof.domain ?? null,
+    status: proof.status ?? null,
+    verified: proof.verified === true,
+    executionMode: proof.executionMode ?? null,
+    proofSha256: proof.proofSha256 ?? null,
+    nativeStateRoot: proof.nativeStateRoot ?? null,
+    stateRootVerified: proof.stateRootVerified === true,
+    stateRootParity: proof.stateRootParity === true,
+    transactionWitnessObserved: proof.transactionWitnessObserved === true,
+    executionBinarySha256: proof.executionBinarySha256 ?? null,
+    canonicalVmSourceRoot: proof.canonicalVmSourceRoot ?? null,
+    loweringSummary: proof.loweringSummary ?? null,
+    truthBoundary: proof.truthBoundary ?? null,
+    finalState: proof.finalState ?? null,
   };
 }
 
@@ -269,12 +354,18 @@ export function nativeVmDeploymentStatus() {
   const neuralProof = attestation?.foundationParityProofs?.neural ?? attestation?.foundationNeuralParityProof ?? null;
   const geneticProof = attestation?.foundationParityProofs?.genetic ?? attestation?.foundationGeneticParityProof ?? null;
   const livingProof = attestation?.foundationParityProofs?.living ?? attestation?.foundationLivingParityProof ?? null;
+  const quantitativeDirectProof = attestation?.foundationDirectExtensionProofs?.quantitative
+    ?? attestation?.foundationQuantitativeDirectProof
+    ?? null;
 
   const perceptionParityBound = Boolean(replayEvidenceBound && coreParityBound(perceptionProof, 'perception', binarySha256));
   const physicalParityBound = Boolean(replayEvidenceBound && physicalQuantityEvidenceBound(physicalProof, binarySha256));
   const neuralParityBound = Boolean(replayEvidenceBound && neuralEvidenceBound(neuralProof, binarySha256));
   const geneticParityBound = Boolean(replayEvidenceBound && geneticEvidenceBound(geneticProof, binarySha256));
   const livingParityBound = Boolean(replayEvidenceBound && livingEvidenceBound(livingProof, binarySha256));
+  const quantitativeDirectLoweringBound = Boolean(
+    replayEvidenceBound && quantitativeDirectEvidenceBound(quantitativeDirectProof, binarySha256, attestation),
+  );
   const foundationParityBound = perceptionParityBound && physicalParityBound && neuralParityBound && geneticParityBound && livingParityBound;
   const foundationParityDomains = [
     ...(perceptionParityBound ? ['perception'] : []),
@@ -282,6 +373,9 @@ export function nativeVmDeploymentStatus() {
     ...(neuralParityBound ? ['neural'] : []),
     ...(geneticParityBound ? ['genetic'] : []),
     ...(livingParityBound ? ['living'] : []),
+  ];
+  const foundationDirectExtensionDomains = [
+    ...(quantitativeDirectLoweringBound ? ['quantitative'] : []),
   ];
 
   const federation = attestation?.foundationNativeBridgeFederationProof ?? null;
@@ -307,7 +401,11 @@ export function nativeVmDeploymentStatus() {
   const understandingRealityBridgeBound = bridgeBounds['understanding-reality'] === true;
   const creativeRealityBridgeBound = bridgeBounds['creative-reality'] === true;
   const evidenceBound = replayEvidenceBound && foundationParityBound;
-  const extendedEvidenceBound = evidenceBound && foundationNativeBridgeBound && foundationNativeBridgeFederationBound;
+  const directExtensionEvidenceBound = quantitativeDirectLoweringBound;
+  const extendedEvidenceBound = evidenceBound
+    && directExtensionEvidenceBound
+    && foundationNativeBridgeBound
+    && foundationNativeBridgeFederationBound;
 
   const bridgeSummaries = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => [
     spec.domain,
@@ -326,6 +424,8 @@ export function nativeVmDeploymentStatus() {
     neuralParityBound,
     geneticParityBound,
     livingParityBound,
+    quantitativeDirectLoweringBound,
+    directExtensionEvidenceBound,
     foundationNativeBridgeFederationBound,
     foundationNativeBridgeBound,
     quantitativeBridgeBound,
@@ -340,6 +440,7 @@ export function nativeVmDeploymentStatus() {
     sourceRoot: attestation?.sourceMaterialization?.sourceRoot ?? null,
     executionAttestationRoot: attestation?.replayProof?.attestationRoot ?? null,
     foundationParityDomains,
+    foundationDirectExtensionDomains,
     foundationNativeBridgeDomains,
     foundationNativeBridgeFederation: federationSummary(federation),
     foundationParity: proofSummary(perceptionProof),
@@ -350,6 +451,10 @@ export function nativeVmDeploymentStatus() {
       genetic: proofSummary(geneticProof),
       living: proofSummary(livingProof),
     },
+    foundationDirectExtensionProofs: {
+      quantitative: quantitativeDirectSummary(quantitativeDirectProof),
+    },
+    quantitativeDirectEvidence: quantitativeDirectSummary(quantitativeDirectProof),
     foundationNativeBridgeProofs: bridgeSummaries,
     quantitativeBridgeEvidence: quantitativeBridgeProof ? bridgeProofSummary(quantitativeBridgeProof) : null,
     physicalQuantityEvidence: physicalProof ? {
