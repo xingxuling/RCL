@@ -113,7 +113,7 @@ function quantitativeRule(quantitative, facets, ruleName) {
       sourceReality: quantitative.name,
       measurementCount: measurePaths.length,
       derivedCount: derivePaths.length,
-      measurementPaths,
+      measurementPaths: measurePaths,
       derivedPaths: derivePaths,
       evidenceCount: array(quantitative.measures).reduce((sum, measure) => sum + array(measure.evidence).length, 0),
     },
