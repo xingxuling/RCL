@@ -33,7 +33,12 @@ export function runtimeCapabilityTruthSurface() {
       ...capability.truthBoundary,
       deploymentEvidenceIsRuntimeSpecific: true,
       deploymentEvidenceDoesNotRewriteVersionedCapabilityTruth: true,
-      runtimeDeploymentEvidenceRegistryDoesNotImplyCompleteDirectCoverage: true,
+      runtimeDeploymentEvidenceRegistryDoesNotImplyCompleteDirectCoverage:
+        deployment.completeDirectDeploymentCoverage !== true,
+      runtimeDeploymentEvidenceRegistryDoesNotImplyCompleteDomainCapability: true,
+      completeDirectDeploymentEvidenceCoverageClaimed:
+        deployment.completeDirectDeploymentCoverage === true,
+      completeDirectDeploymentEvidenceCoverageMeansEvidenceCoverageNotFullDomainNativeCoverage: true,
       energyProviderBridgeMayCoexistWithBoundedDirectVerification: true,
     },
   };
