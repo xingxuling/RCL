@@ -15,11 +15,7 @@ const tests = [
   'tests/foundation-living-direct-lowering.test.mjs',
   'tests/foundation-living-staged-receipt.test.mjs',
 ];
-const steps = tests.map((file, index) => ({
-  code: 10 + index,
-  name: file,
-  args: ['--test', file],
-}));
+const steps = tests.map((file, index) => ({ code: 10 + index, name: file, args: ['--test', file] }));
 steps.push(
   { code: 30, name: 'capability-registry-truth', args: ['scripts/verify-foundation-capability-registry-truth.mjs'] },
   { code: 31, name: 'version-contract-truth', args: ['scripts/verify-foundation-version-contract-truth.mjs'] },
@@ -29,6 +25,7 @@ steps.push(
   { code: 35, name: 'batch-a-real-c-provider', args: ['scripts/verify-vercel-foundation-batch-a-bridge.mjs'] },
   { code: 36, name: 'batch-a-deployment-binding', args: ['scripts/bind-vercel-foundation-batch-a-bridge.mjs'] },
   { code: 37, name: 'base-federation-conformance', args: ['scripts/foundation-conformance-base.mjs', '--out', 'public/foundation-native-federation-conformance-base'] },
+  { code: null, propagateChildStatus: true, name: 'conformance-truth-field-diff', args: ['scripts/dwac-cycle58-truth-diff-probe.mjs'] },
   { code: 38, name: 'full-federation-conformance', args: ['scripts/foundation-conformance.mjs', '--out', 'public/foundation-native-federation-conformance'] },
   { code: 39, name: 'canonical-conformance-truth', args: ['scripts/verify-foundation-conformance-truth.mjs', '--out', 'public/foundation-native-federation-conformance'] },
   { code: 40, name: 'developer-release-conformance-truth', args: ['scripts/verify-developer-release-conformance-truth.mjs'] },
@@ -50,14 +47,15 @@ steps.push(
 for (const step of steps) {
   const result = spawnSync(process.execPath, step.args, { stdio: 'inherit', env: process.env });
   if (result.error || result.status !== 0) {
+    const exitCode = step.propagateChildStatus && Number.isInteger(result.status) ? result.status : step.code;
     console.error(JSON.stringify({
       status: 'DWAC_CYCLE58_EXIT_PROBE_FAILURE',
-      probeExitCode: step.code,
+      probeExitCode: exitCode,
       step: step.name,
       childExitCode: result.status ?? null,
       error: result.error?.message ?? null,
     }, null, 2));
-    process.exit(step.code);
+    process.exit(exitCode ?? 1);
   }
 }
 console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE58_EXIT_PROBE_ALL_PASS' }, null, 2));
