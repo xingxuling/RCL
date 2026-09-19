@@ -16,20 +16,31 @@ const proofPath = path.join(publicDir, 'rcl-foundation-energy-native-proof.json'
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
-function fail(message, details = {}) {
+function fail(message, details = {}, exitCode = 1) {
   console.error(JSON.stringify({
     ok: false,
     status: 'RCL_VERCEL_FOUNDATION_ENERGY_PROOF_FAILED',
     message,
+    exitCode,
     ...details,
   }, null, 2));
-  process.exit(1);
+  process.exit(exitCode);
 }
 function isEnergyQuantity(value, expected) {
   return value?.kind === 'Quantity'
     && value?.type === 'Energy'
     && value?.unit === 'J'
     && value?.value === expected;
+}
+function parityFailureExitCode(proof) {
+  if (proof?.status === 'compile-blocked') return 61;
+  if (proof?.status === 'native-blocked' || proof?.status === 'native-failed') return 62;
+  if (proof?.parity?.state !== true) return 63;
+  if (proof?.parity?.semanticStateRoot !== true) return 64;
+  if (proof?.parity?.nativeStateRootVerified !== true || proof?.parity?.nativeStateRootParity !== true) return 65;
+  if (proof?.parity?.energyReceipt !== true) return 66;
+  if (proof?.parity?.nativeExecutionAttestation !== true) return 67;
+  return 68;
 }
 
 const source = [
@@ -48,8 +59,8 @@ const source = [
 ].join('\n');
 
 try {
-  if (!fs.existsSync(target)) fail('Canonical native VM artifact is missing before Energy parity proof', { target });
-  if (!fs.existsSync(manifestPath)) fail('Canonical native VM attestation is missing before Energy parity proof', { manifestPath });
+  if (!fs.existsSync(target)) fail('Canonical native VM artifact is missing before Energy parity proof', { target }, 51);
+  if (!fs.existsSync(manifestPath)) fail('Canonical native VM attestation is missing before Energy parity proof', { manifestPath }, 52);
   const binarySha256 = sha256(fs.readFileSync(target));
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
@@ -63,7 +74,7 @@ try {
       manifestFormat: manifest?.format ?? null,
       manifestBinarySha256: manifest?.binarySha256 ?? null,
       replayBinarySha256: manifest?.replayProof?.attestationBinarySha256 ?? null,
-    });
+    }, 53);
   }
 
   const requiredPriorDomains = ['perception', 'physical', 'neural', 'genetic', 'living'];
@@ -74,7 +85,7 @@ try {
         domain,
         prior,
         binarySha256,
-      });
+      }, 54);
     }
   }
 
@@ -95,7 +106,7 @@ try {
       gaps: proof?.gaps ?? null,
       diagnostics: proof?.diagnostics ?? null,
       receiptParity: proof?.receiptParity ?? null,
-    });
+    }, parityFailureExitCode(proof));
   }
   if (
     proof?.parity?.state !== true
@@ -105,7 +116,7 @@ try {
     || proof?.parity?.energyReceipt !== true
     || proof?.parity?.nativeExecutionAttestation !== true
   ) {
-    fail('Energy proof did not close state/root/receipt/executable parity', { parity: proof?.parity ?? null });
+    fail('Energy proof did not close state/root/receipt/executable parity', { parity: proof?.parity ?? null }, 69);
   }
   if (
     proof?.lowering?.summary?.loweredDirectiveCount !== 1
@@ -116,13 +127,13 @@ try {
     fail('Energy proof did not preserve one declared Energize into one atomic native receipt', {
       loweringSummary: proof?.lowering?.summary ?? null,
       receiptParity: proof?.receiptParity ?? null,
-    });
+    }, 70);
   }
   if (proof?.executionBinarySha256 !== binarySha256) {
     fail('Energy proof executed a different native VM binary', {
       binarySha256,
       executionBinarySha256: proof?.executionBinarySha256 ?? null,
-    });
+    }, 71);
   }
 
   const sourceState = proof?.finalState?.['grid.source'];
@@ -131,7 +142,7 @@ try {
     fail('Energy native final state does not preserve the bounded transfer semantics', {
       sourceState,
       loadState,
-    });
+    }, 72);
   }
 
   const energyParityProof = {
@@ -210,5 +221,5 @@ try {
     code: error?.code ?? null,
     details: error?.details ?? null,
     stack: error?.stack ?? null,
-  });
+  }, 79);
 }

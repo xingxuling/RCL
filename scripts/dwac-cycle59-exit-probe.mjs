@@ -37,7 +37,7 @@ steps.push(
   { code: 45, name: 'genetic-real-c', args: ['scripts/verify-vercel-foundation-genetic.mjs'] },
   { code: 46, name: 'living-real-c', args: ['scripts/verify-vercel-foundation-living.mjs'] },
   { code: 47, name: 'biological-deployment-binding', args: ['scripts/bind-vercel-foundation-biological.mjs'] },
-  { code: 48, name: 'energy-real-c-receipt-parity', args: ['scripts/verify-vercel-foundation-energy.mjs'] },
+  { code: null, propagateChildStatus: true, name: 'energy-real-c-receipt-parity', args: ['scripts/verify-vercel-foundation-energy.mjs'] },
   { code: 49, name: 'federation-deployment-binding', args: ['scripts/bind-vercel-foundation-native-federation.mjs'] },
   { code: 50, name: 'federation-root-stabilization', args: ['scripts/stabilize-vercel-foundation-native-federation-root.mjs'] },
   { code: 51, name: 'bridge-registry-verification', args: ['scripts/verify-foundation-native-bridge-capability-registry.mjs'] },
