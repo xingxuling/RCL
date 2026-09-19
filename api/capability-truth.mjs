@@ -1,41 +1,39 @@
 import { foundationCapabilityTruthSurface } from '../src/foundation-capability-truth-surface.mjs';
-import { foundationEnergyDeploymentEvidence } from '../src/foundation-energy-deployment-evidence.mjs';
+import {
+  foundationRuntimeDeploymentEvidenceSurface,
+} from '../src/foundation-runtime-deployment-evidence-registry.mjs';
 
 export function runtimeCapabilityTruthSurface() {
   const capability = foundationCapabilityTruthSurface();
-  let energy;
-  try {
-    energy = foundationEnergyDeploymentEvidence();
-  } catch (error) {
-    energy = {
-      ok: false,
-      format: 'taowind.rcl-foundation-energy-deployment-evidence.v0.1',
-      version: '0.1.0',
-      domain: 'energy',
-      status: 'deployment-unavailable',
-      verified: false,
-      deploymentEvidenceRoot: null,
-      errors: [{
-        code: error?.code ?? 'RCL_ENERGY_DEPLOYMENT_EVIDENCE_UNAVAILABLE',
-        message: error?.message ?? String(error),
-      }],
-    };
-  }
+  const deployment = foundationRuntimeDeploymentEvidenceSurface();
+  const ok = capability.ok === true && deployment.ok === true;
 
-  const ok = capability.ok === true && energy.ok === true;
   return {
     ...capability,
     ok,
     status: ok
       ? 'RCL_FOUNDATION_RUNTIME_CAPABILITY_TRUTH_VERIFIED'
       : 'RCL_FOUNDATION_RUNTIME_CAPABILITY_TRUTH_DRIFT',
-    deploymentEvidence: {
-      energy,
+    deploymentEvidenceRegistry: {
+      format: deployment.format,
+      version: deployment.version,
+      registryRoot: deployment.registryRoot,
+      providers: deployment.providers,
+      registeredDomains: deployment.registeredDomains,
+      registeredDomainCount: deployment.registeredDomainCount,
+      directImplementationDomains: deployment.directImplementationDomains,
+      directImplementationDomainCount: deployment.directImplementationDomainCount,
+      missingDirectDeploymentEvidenceDomains: deployment.missingDirectDeploymentEvidenceDomains,
+      completeDirectDeploymentCoverage: deployment.completeDirectDeploymentCoverage,
+      truthBoundary: deployment.truthBoundary,
+      errors: deployment.errors,
     },
+    deploymentEvidence: deployment.evidenceByDomain,
     truthBoundary: {
       ...capability.truthBoundary,
       deploymentEvidenceIsRuntimeSpecific: true,
       deploymentEvidenceDoesNotRewriteVersionedCapabilityTruth: true,
+      runtimeDeploymentEvidenceRegistryDoesNotImplyCompleteDirectCoverage: true,
       energyProviderBridgeMayCoexistWithBoundedDirectVerification: true,
     },
   };
