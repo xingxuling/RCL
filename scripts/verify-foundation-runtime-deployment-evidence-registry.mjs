@@ -64,6 +64,11 @@ try {
       expectedMissing,
     });
   }
+  if (JSON.stringify(expectedMissing) !== JSON.stringify(['quantitative'])) {
+    fail('Cycle 62 truth boundary expected Quantitative to remain the sole direct-domain evidence gap.', {
+      expectedMissing,
+    });
+  }
   if (registry?.completeDirectDeploymentCoverage !== false) {
     fail('Runtime deployment evidence registry overclaimed complete direct-domain deployment coverage.', { registry });
   }
@@ -78,14 +83,20 @@ try {
     });
   }
 
-  const energy = surface?.deploymentEvidence?.energy;
-  if (
-    energy?.ok !== true
-    || energy?.verified !== true
-    || energy?.domain !== 'energy'
-    || !isSha256(energy?.deploymentEvidenceRoot)
-  ) {
-    fail('Registered Energy deployment evidence is not verified/content-addressed.', { energy });
+  for (const domain of expectedRegisteredDomains) {
+    const evidence = surface?.deploymentEvidence?.[domain];
+    if (
+      evidence?.ok !== true
+      || evidence?.verified !== true
+      || evidence?.domain !== domain
+      || !isSha256(evidence?.deploymentEvidenceRoot)
+    ) {
+      fail('A registered deployment evidence domain is not verified/content-addressed.', { domain, evidence });
+    }
+  }
+  const life = surface?.deploymentEvidence?.life;
+  if (life?.runtimeDomain !== 'living') {
+    fail('Life deployment evidence lost the canonical life -> runtime living ID boundary.', { life });
   }
   if (Object.keys(surface?.deploymentEvidence ?? {}).some(domain => !expectedRegisteredDomains.includes(domain))) {
     fail('Runtime capability truth exposed deployment evidence outside the canonical registry.', {
@@ -100,7 +111,9 @@ try {
     registryRoot: registry.registryRoot,
     registeredDomains: registry.registeredDomains,
     missingDirectDeploymentEvidenceDomains: registry.missingDirectDeploymentEvidenceDomains,
-    energyDeploymentEvidenceRoot: energy.deploymentEvidenceRoot,
+    deploymentEvidenceRoots: Object.fromEntries(
+      expectedRegisteredDomains.map(domain => [domain, surface.deploymentEvidence[domain].deploymentEvidenceRoot]),
+    ),
   }, null, 2));
 } catch (error) {
   fail(error?.message ?? String(error), {

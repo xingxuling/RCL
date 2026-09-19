@@ -2,21 +2,34 @@ import crypto from 'node:crypto';
 import {
   FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS,
 } from './foundation-direct-capability-registry.mjs';
+import {
+  foundationPerceptionDeploymentEvidence,
+  foundationPhysicalDeploymentEvidence,
+  foundationNeuralDeploymentEvidence,
+  foundationGeneticDeploymentEvidence,
+  foundationLifeDeploymentEvidence,
+} from './foundation-core-deployment-evidence.mjs';
 import { foundationEnergyDeploymentEvidence } from './foundation-energy-deployment-evidence.mjs';
 
 export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_FORMAT =
-  'taowind.rcl-foundation-runtime-deployment-evidence-registry.v0.1';
-export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION = '0.1.0';
+  'taowind.rcl-foundation-runtime-deployment-evidence-registry.v0.2';
+export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION = '0.2.0';
 
 const RAW_PROVIDERS = [
-  {
-    domain: 'energy',
-    evidenceModule: 'src/foundation-energy-deployment-evidence.mjs',
-    evidenceFunction: 'foundationEnergyDeploymentEvidence',
-  },
+  { domain: 'perception', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationPerceptionDeploymentEvidence' },
+  { domain: 'physical', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationPhysicalDeploymentEvidence' },
+  { domain: 'neural', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationNeuralDeploymentEvidence' },
+  { domain: 'genetic', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationGeneticDeploymentEvidence' },
+  { domain: 'life', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationLifeDeploymentEvidence' },
+  { domain: 'energy', evidenceModule: 'src/foundation-energy-deployment-evidence.mjs', evidenceFunction: 'foundationEnergyDeploymentEvidence' },
 ];
 
 const DEFAULT_BUILDERS = Object.freeze({
+  perception: foundationPerceptionDeploymentEvidence,
+  physical: foundationPhysicalDeploymentEvidence,
+  neural: foundationNeuralDeploymentEvidence,
+  genetic: foundationGeneticDeploymentEvidence,
+  life: foundationLifeDeploymentEvidence,
   energy: foundationEnergyDeploymentEvidence,
 });
 
@@ -145,10 +158,7 @@ export function foundationRuntimeDeploymentEvidenceSurface({
     fail(
       'RCL_RUNTIME_DEPLOYMENT_EVIDENCE_COVERAGE_INCOMPLETE',
       'Complete direct-domain deployment evidence was required but the registry is intentionally partial.',
-      {
-        missingDirectDeploymentEvidenceDomains,
-        registeredDomains,
-      },
+      { missingDirectDeploymentEvidenceDomains, registeredDomains },
     );
   }
 
