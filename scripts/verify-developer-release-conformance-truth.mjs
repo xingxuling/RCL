@@ -21,6 +21,21 @@ function fail(message, details = {}) {
   process.exitCode = 1;
 }
 
+function extractArchiveText(archivePath, member) {
+  const extract = spawnSync('tar', ['-xOf', archivePath, member], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  });
+  if (extract.status !== 0) {
+    fail(`Unable to extract packaged ${member} from developer release.`, {
+      exitCode: extract.status,
+      stderr: extract.stderr,
+    });
+    return null;
+  }
+  return extract.stdout;
+}
+
 try {
   const build = spawnSync(
     process.execPath,
@@ -47,19 +62,12 @@ try {
       });
     }
 
-    const extract = spawnSync(
-      'tar',
-      ['-xOf', archivePath, 'package/foundation-conformance.json'],
-      { cwd: ROOT, encoding: 'utf8' },
-    );
-    if (extract.status !== 0) {
-      fail('Unable to extract packaged foundation-conformance.json from developer release.', {
-        exitCode: extract.status,
-        stderr: extract.stderr,
-      });
-    } else {
-      const report = JSON.parse(extract.stdout);
+    const reportText = extractArchiveText(archivePath, 'package/foundation-conformance.json');
+    const truthText = extractArchiveText(archivePath, 'package/foundation-conformance-truth.json');
+    if (reportText !== null && truthText !== null) {
+      const report = JSON.parse(reportText);
       const truth = report?.canonicalExecutionTruth;
+      const truthSnapshot = JSON.parse(truthText);
       const expectedDirect = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
       const actualDirect = [...(truth?.implementationDomains ?? [])].sort();
       const stalePhrases = [
@@ -68,6 +76,12 @@ try {
         'Unsupported declared-domain lowering remains explicit and is not counted as native mode',
       ];
 
+      if (JSON.stringify(truthSnapshot) !== JSON.stringify(truth)) {
+        fail('Packaged compact truth snapshot diverged from packaged conformance report truth.', {
+          snapshotTruthRoot: truthSnapshot?.truthRoot ?? null,
+          reportTruthRoot: truth?.truthRoot ?? null,
+        });
+      }
       if (report?.executionLayers?.nativeVm !== 'hybrid') {
         fail('Packaged developer release still exposes bridge-only Native VM truth.', {
           nativeVm: report?.executionLayers?.nativeVm ?? null,
@@ -95,6 +109,15 @@ try {
       if (truth?.truthBoundary?.providerBridgeRemovedGlobally !== false) {
         fail('Developer release must preserve the Provider bridge truth boundary.');
       }
+      if (manifest?.conformanceTruth?.snapshot !== 'foundation-conformance-truth.json') {
+        fail('Release manifest is not bound to the packaged compact truth snapshot.');
+      }
+      if (manifest?.conformanceTruth?.truthRoot !== truth?.truthRoot) {
+        fail('Release manifest truth root diverged from packaged canonical truth.', {
+          manifestTruthRoot: manifest?.conformanceTruth?.truthRoot ?? null,
+          packagedTruthRoot: truth?.truthRoot ?? null,
+        });
+      }
       if (manifest?.conformanceTruth?.materializedFromStagedSource !== true) {
         fail('Release manifest does not bind conformance truth to staged source materialization.');
       }
@@ -102,7 +125,7 @@ try {
         fail('Release manifest incorrectly claims deployment-bound evidence.');
       }
       for (const phrase of stalePhrases) {
-        if (extract.stdout.includes(phrase)) {
+        if (reportText.includes(phrase) || truthText.includes(phrase)) {
           fail('Stale bridge-only execution truth leaked into the developer release archive.', { phrase });
         }
       }
@@ -116,6 +139,7 @@ try {
           nativeVm: report.executionLayers.nativeVm,
           truthStatus: truth.status,
           truthRoot: truth.truthRoot,
+          compactTruthSnapshotBound: true,
           directImplementationDomains: actualDirect,
           verifiedDirectDomains: truth.verifiedDirectDomains,
           providerBridgeDomains: truth.verifiedBridgeDomains,
