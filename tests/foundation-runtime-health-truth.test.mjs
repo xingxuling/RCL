@@ -23,6 +23,8 @@ function nativeHealthy() {
     replayEvidenceBound: true,
     evidenceBound: true,
     extendedEvidenceBound: true,
+    foundationNativeBridgeRegistryRoot: BRIDGE_ROOT,
+    foundationNativeBridgeSpecCount: 1,
     foundationNativeBridgeDomains: ['knowledge'],
     foundationNativeBridgeProofs: {
       knowledge: {
@@ -77,9 +79,12 @@ test('canonical runtime health verifies only when native deployment, aggregate r
   assert.deepEqual(health.runtimeCapabilityTruth.directImplementationDomains, DIRECT);
   assert.deepEqual(health.runtimeCapabilityTruth.registeredDeploymentEvidenceDomains, DIRECT);
   assert.equal(health.providerBridgeTopologyHealthy, true);
+  assert.equal(health.providerBridgeTopology.nativeDeploymentRegistryRoot, BRIDGE_ROOT);
+  assert.equal(health.providerBridgeTopology.nativeDeploymentSpecCount, 1);
   assert.deepEqual(health.providerBridgeTopology.domains, ['knowledge']);
   assert.equal(health.truthBoundary.healthFailsClosedOnRuntimeCapabilityTruthDrift, true);
   assert.equal(health.truthBoundary.healthFailsClosedOnProviderBridgeTopologyDrift, true);
+  assert.equal(health.truthBoundary.nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology, true);
 });
 
 test('canonical runtime health fails closed when aggregate runtime truth drifts', () => {
@@ -118,6 +123,22 @@ test('canonical runtime health fails closed when deployed native evidence is not
   const health = healthStatus({ nativeStatus: native });
   assert.equal(health.ok, false);
   assert.equal(health.nativeDeploymentHealthy, false);
+});
+
+test('canonical runtime health fails closed when native deployment bridge registry root drifts', () => {
+  const native = nativeHealthy();
+  native.foundationNativeBridgeRegistryRoot = '9'.repeat(64);
+  const health = healthStatus({ nativeStatus: native });
+  assert.equal(health.ok, false);
+  assert.equal(health.providerBridgeTopologyHealthy, false);
+});
+
+test('canonical runtime health fails closed when native deployment bridge spec count drifts', () => {
+  const native = nativeHealthy();
+  native.foundationNativeBridgeSpecCount = 0;
+  const health = healthStatus({ nativeStatus: native });
+  assert.equal(health.ok, false);
+  assert.equal(health.providerBridgeTopologyHealthy, false);
 });
 
 test('canonical runtime health fails closed when native bridge domain topology shadows a stale domain set', () => {
