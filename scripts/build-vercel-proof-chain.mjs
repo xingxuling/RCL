@@ -28,6 +28,9 @@ const steps = [
     '--out',
     'public/foundation-native-federation-conformance',
   ]],
+  ['developer-release-conformance-truth-proof', [
+    'scripts/verify-developer-release-conformance-truth.mjs',
+  ]],
   ['strict-native-provider-federation-extension-proof', [
     'scripts/verify-vercel-foundation-native-federation-extension.mjs',
   ]],
