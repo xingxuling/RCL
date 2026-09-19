@@ -6,6 +6,7 @@ import {
   FOUNDATION_NATIVE_BRIDGE_SPECS,
   foundationNativeBridgeCapabilityRegistrySnapshot,
 } from '../src/foundation-native-bridge-capability-registry.mjs';
+import { verifyFoundationNativeFederationRegistryBinding } from '../src/foundation-native-federation-registry-binding.mjs';
 
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
@@ -165,12 +166,25 @@ function quantitativeDirectEvidenceBound(proof, binarySha256, attestation) {
   );
 }
 
-function nativeBridgeFederationBound(federation, attestation) {
+function nativeBridgeFederationBound(federation, attestation, bridgeRegistry) {
+  let registryBinding = null;
+  try {
+    registryBinding = verifyFoundationNativeFederationRegistryBinding({
+      federationProof: federation,
+      bridgeSpecs: FOUNDATION_NATIVE_BRIDGE_SPECS,
+      registrySnapshot: bridgeRegistry,
+    });
+  } catch {
+    return false;
+  }
   const expectedDomains = FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => spec.domain);
   return Boolean(
-    federation?.format === 'taowind.rcl-vercel-foundation-native-provider-federation.v0.1'
+    registryBinding?.ok === true
+    && federation?.format === 'taowind.rcl-vercel-foundation-native-provider-federation.v0.1'
     && federation?.status === 'deployment-bound'
     && federation?.verified === true
+    && federation?.providerBridgeRegistryRoot === bridgeRegistry?.registryRoot
+    && federation?.providerBridgeSpecCount === FOUNDATION_NATIVE_BRIDGE_SPECS.length
     && JSON.stringify(federation?.domains) === JSON.stringify(expectedDomains)
     && federation?.canonicalVmSourceRoot === attestation?.sourceMaterialization?.sourceRoot
     && federation?.declaredDomainDirectLoweringVerified === false
@@ -286,6 +300,8 @@ function federationSummary(federation) {
     format: federation.format ?? null,
     status: federation.status ?? null,
     verified: federation.verified === true,
+    providerBridgeRegistryRoot: federation.providerBridgeRegistryRoot ?? null,
+    providerBridgeSpecCount: federation.providerBridgeSpecCount ?? null,
     domains: Array.isArray(federation.domains) ? [...federation.domains] : [],
     providerBatches: federation.providerBatches ?? null,
     hostBinarySha256: federation.hostBinarySha256 ?? null,
@@ -367,7 +383,7 @@ export function nativeVmDeploymentStatus() {
 
   const federation = attestation?.foundationNativeBridgeFederationProof ?? null;
   const foundationNativeBridgeFederationBound = Boolean(
-    replayEvidenceBound && nativeBridgeFederationBound(federation, attestation),
+    replayEvidenceBound && nativeBridgeFederationBound(federation, attestation, bridgeRegistry),
   );
   const bridgeProofs = attestation?.foundationNativeBridgeProofs ?? {};
   const bridgeBounds = Object.fromEntries(FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => [
