@@ -10,6 +10,7 @@ const steps = [
     'tests/foundation-quantity-native-lowering.test.mjs',
     'tests/foundation-quantitative-direct-lowering.test.mjs',
     'tests/foundation-energy-direct-lowering.test.mjs',
+    'tests/foundation-energy-native-parity.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
     'tests/foundation-neural-domain-receipt-parity.test.mjs',
     'tests/foundation-genetic-direct-lowering.test.mjs',
@@ -52,6 +53,7 @@ const steps = [
   ['genetic-real-c-proof', ['scripts/verify-vercel-foundation-genetic.mjs']],
   ['living-real-c-proof', ['scripts/verify-vercel-foundation-living.mjs']],
   ['biological-deployment-binding', ['scripts/bind-vercel-foundation-biological.mjs']],
+  ['energy-real-c-receipt-parity-proof', ['scripts/verify-vercel-foundation-energy.mjs']],
   ['native-provider-federation-deployment-binding', [
     'scripts/bind-vercel-foundation-native-federation.mjs',
   ]],
