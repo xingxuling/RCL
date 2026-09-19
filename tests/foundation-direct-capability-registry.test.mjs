@@ -28,10 +28,10 @@ function emptyFoundationProgram() {
   };
 }
 
-test('canonical direct capability registry owns the six current implementation domains', () => {
+test('canonical direct capability registry owns the seven current implementation domains', () => {
   assert.deepEqual(
     [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS],
-    ['perception', 'physical', 'neural', 'genetic', 'life', 'quantitative'],
+    ['perception', 'physical', 'neural', 'genetic', 'life', 'quantitative', 'energy'],
   );
   assert.equal(new Set(FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS).size, FOUNDATION_DIRECT_CAPABILITIES.length);
   assert.equal(Object.isFrozen(FOUNDATION_DIRECT_CAPABILITIES), true);
@@ -65,6 +65,10 @@ test('implementation provenance comes from the same capability registry', () => 
     'src/foundation-quantitative-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
   );
   assert.equal(
+    foundationDirectImplementation('energy'),
+    'src/foundation-energy-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
+  );
+  assert.equal(
     foundationDirectImplementation('living'),
     'src/foundation-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
   );
@@ -82,7 +86,7 @@ test('registry snapshot and root are deterministic and evidence-bearing', () => 
 
 test('counterfactual domain omission is observably different from canonical registry truth', () => {
   const canonical = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
-  const missingQuantitative = canonical.filter(domain => domain !== 'quantitative');
-  assert.notDeepEqual(missingQuantitative, canonical);
-  assert.equal(missingQuantitative.includes('quantitative'), false);
+  const missingEnergy = canonical.filter(domain => domain !== 'energy');
+  assert.notDeepEqual(missingEnergy, canonical);
+  assert.equal(missingEnergy.includes('energy'), false);
 });
