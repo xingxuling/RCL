@@ -75,6 +75,18 @@ try {
   };
   fs.writeFileSync(stagedPackagePath, `${JSON.stringify(stagedPackage, null, 2)}\n`);
 
+  // Bind the exact staged source tree to the same versioned capability truth
+  // and canonical VERSION-CONTRACT before any runtime archive can be packed.
+  runStageNode('foundation-capability-registry-truth-verification', [
+    'scripts/verify-foundation-capability-registry-truth.mjs',
+  ]);
+  runStageNode('foundation-version-contract-truth-verification', [
+    'scripts/verify-foundation-version-contract-truth.mjs',
+  ]);
+  const stagedCapabilityTruth = JSON.parse(
+    fs.readFileSync(path.join(stageRoot, 'src', 'foundation-capability-registry-truth.json'), 'utf8'),
+  );
+
   // The checked-in full conformance report is evidence input. The compact truth
   // snapshot is the versioned canonical execution-truth surface and is verified
   // against executable reconciliation before the release artifact is packed.
@@ -145,6 +157,19 @@ try {
       completeRuntime: false,
       jsReferenceRuntimeStillRequired: true,
     },
+    capabilityTruth: {
+      snapshot: 'src/foundation-capability-registry-truth.json',
+      truthRoot: stagedCapabilityTruth.truthRoot,
+      directRegistryRoot: stagedCapabilityTruth.direct.registryRoot,
+      directImplementationDomainCount: stagedCapabilityTruth.direct.domains.length,
+      providerBridgeRegistryRoot: stagedCapabilityTruth.providerBridge.registryRoot,
+      providerBridgeDomainCount: stagedCapabilityTruth.providerBridge.domains.length,
+      providerBatchCount: stagedCapabilityTruth.providerBridge.batches.length,
+      verifiedInStagedSource: true,
+      deploymentEvidenceClaimed: false,
+      allFoundationDomainsDirectNativeClaimed:
+        stagedCapabilityTruth?.truthBoundary?.allFoundationDomainsDirectNativeClaimed === true,
+    },
     conformanceTruth: {
       snapshot: 'foundation-conformance-truth.json',
       truthRoot: stagedConformanceTruth.truthRoot,
@@ -193,9 +218,11 @@ try {
     '',
     'The published package.json exposes only scripts whose referenced files are included in the runtime archive: mcp, demo and verify:install.',
     '',
-    'The packaged Foundation conformance report and compact canonical truth snapshot are regenerated and verified inside the exact staged source tree. They record implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
+    'The packaged Foundation capability truth, Foundation conformance report and compact canonical truth snapshot are verified inside the exact staged source tree. They record implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
     '',
-    `Canonical Foundation truth root: ${stagedConformanceTruth.truthRoot}`,
+    `Canonical Foundation capability truth root: ${stagedCapabilityTruth.truthRoot}`,
+    '',
+    `Canonical Foundation conformance truth root: ${stagedConformanceTruth.truthRoot}`,
     '',
     '## Honest boundary',
     '',
