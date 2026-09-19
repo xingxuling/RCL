@@ -122,14 +122,6 @@ export function foundationCoreDeploymentEvidence(canonicalDomain, { binaryBytes,
     );
   }
 
-  if (!proof?.finalState || typeof proof.finalState !== 'object' || Array.isArray(proof.finalState)) {
-    fail(
-      'RCL_CORE_DEPLOYMENT_FINAL_STATE_MISSING',
-      'Core deployment proof lost its bounded final-state witness.',
-      { canonicalDomain, runtimeDomain, finalState: proof?.finalState ?? null },
-    );
-  }
-
   const payload = {
     format: FOUNDATION_CORE_DEPLOYMENT_EVIDENCE_FORMAT,
     version: FOUNDATION_CORE_DEPLOYMENT_EVIDENCE_VERSION,
@@ -146,6 +138,9 @@ export function foundationCoreDeploymentEvidence(canonicalDomain, { binaryBytes,
     truthBoundary: {
       boundedFoundationSliceOnly: true,
       canonicalDomainMayMapToDifferentRuntimeDomain: canonicalDomain !== runtimeDomain,
+      finalStateWitnessMayBeOmittedFromDeploymentAttestation: true,
+      stateParityStillRequired: true,
+      semanticStateRootParityStillRequired: true,
       providerBridgeRemovedGlobally: false,
       allProgramsNativeClaimed: false,
       completeFoundationDirectCoverageClaimed: false,
