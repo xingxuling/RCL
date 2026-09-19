@@ -13,14 +13,37 @@ import {
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const truthPath = path.join(ROOT, 'foundation-conformance-truth.json');
 const reportPath = path.join(ROOT, 'foundation-conformance.json');
-const committed = JSON.parse(await fs.readFile(truthPath, 'utf8'));
-await import('./foundation-conformance-base.mjs');
-const baseReport = JSON.parse(await fs.readFile(reportPath, 'utf8'));
-const generated = reconcileFoundationConformanceTruth(baseReport, {}, {
-  implementationDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort(),
-  requiredDirectDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort(),
-  requireDeploymentEvidence: false,
-}).canonicalExecutionTruth;
+let committed;
+try {
+  committed = JSON.parse(await fs.readFile(truthPath, 'utf8'));
+} catch (error) {
+  console.error(JSON.stringify({ status: 'DWAC_CYCLE58_TRUTH_READ_FAILED', error: error?.message ?? String(error) }, null, 2));
+  process.exit(76);
+}
+try {
+  await import('./foundation-conformance-base.mjs');
+} catch (error) {
+  console.error(JSON.stringify({ status: 'DWAC_CYCLE58_BASE_IMPORT_FAILED', code: error?.code ?? null, error: error?.message ?? String(error), details: error?.details ?? null }, null, 2));
+  process.exit(77);
+}
+let baseReport;
+try {
+  baseReport = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+} catch (error) {
+  console.error(JSON.stringify({ status: 'DWAC_CYCLE58_REPORT_READ_FAILED', error: error?.message ?? String(error) }, null, 2));
+  process.exit(78);
+}
+let generated;
+try {
+  generated = reconcileFoundationConformanceTruth(baseReport, {}, {
+    implementationDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort(),
+    requiredDirectDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort(),
+    requireDeploymentEvidence: false,
+  }).canonicalExecutionTruth;
+} catch (error) {
+  console.error(JSON.stringify({ status: 'DWAC_CYCLE58_RECONCILE_FAILED', code: error?.code ?? null, error: error?.message ?? String(error), details: error?.details ?? null }, null, 2));
+  process.exit(79);
+}
 
 const checks = [
   [60, 'format', committed.format, generated.format],
@@ -45,9 +68,7 @@ for (const [code, field, left, right] of checks) {
     process.exit(code);
   }
 }
-if (JSON.stringify(committed) !== JSON.stringify(generated)) {
-  process.exit(75);
-}
+if (JSON.stringify(committed) !== JSON.stringify(generated)) process.exit(75);
 console.log(JSON.stringify({
   ok: true,
   status: 'DWAC_CYCLE58_TRUTH_DIFF_NONE',
