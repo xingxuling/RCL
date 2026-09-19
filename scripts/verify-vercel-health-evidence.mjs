@@ -1,24 +1,9 @@
 #!/usr/bin/env node
 import { nativeVmDeploymentStatus } from '../api/health.mjs';
-
-const BRIDGE_SPECS = [
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'quantitative', capability: 'quantitative.evaluate' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'knowledge', capability: 'knowledge.resolve' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'perception', capability: 'perception.observe' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'natural-language-reality', capability: 'natural-language.interpret' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'understanding-reality', capability: 'understanding.model' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'creative-reality', capability: 'creative.generate' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-spacetime', capability: 'meta.spacetime.sequence' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-acceleration', capability: 'meta.acceleration.bound' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-compression', capability: 'meta.compression.restore' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'physical', capability: 'physical.simulate-step' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'embodiment', capability: 'embodiment.integrate' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'energy', capability: 'energy.balance' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'elemental', capability: 'elemental.compose' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'neural', capability: 'neural.integrate' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'metacomputation', capability: 'metacomputation.plan' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'computation', capability: 'computation.execute' },
-];
+import {
+  FOUNDATION_NATIVE_BRIDGE_SPECS as BRIDGE_SPECS,
+  foundationNativeBridgeCapabilityRegistrySnapshot,
+} from '../src/foundation-native-bridge-capability-registry.mjs';
 
 function fail(message, details = {}) {
   console.error(JSON.stringify({
@@ -35,11 +20,23 @@ function isSha256(value) {
 
 try {
   const status = nativeVmDeploymentStatus();
+  const bridgeRegistry = foundationNativeBridgeCapabilityRegistrySnapshot();
   if (status.bundled !== true || status.executable !== true || status.attestationBundled !== true) {
     fail('Native VM deployment artifact is not fully bundled before health evidence verification', { status });
   }
   if (status.replayEvidenceBound !== true || status.foundationParityBound !== true || status.evidenceBound !== true) {
     fail('Deployment health does not fail-closed bind replay and direct Foundation parity evidence', { status });
+  }
+  if (
+    status.foundationNativeBridgeRegistryRoot !== bridgeRegistry.registryRoot
+    || status.foundationNativeBridgeSpecCount !== BRIDGE_SPECS.length
+  ) {
+    fail('Native deployment health is not bound to the executable canonical Provider bridge registry.', {
+      deploymentRegistryRoot: status.foundationNativeBridgeRegistryRoot,
+      canonicalRegistryRoot: bridgeRegistry.registryRoot,
+      deploymentSpecCount: status.foundationNativeBridgeSpecCount,
+      canonicalSpecCount: BRIDGE_SPECS.length,
+    });
   }
   if (
     status.perceptionParityBound !== true
@@ -280,6 +277,7 @@ try {
     evidenceBound: status.evidenceBound,
     extendedEvidenceBound: status.extendedEvidenceBound,
     foundationParityDomains: status.foundationParityDomains,
+    foundationNativeBridgeRegistryRoot: status.foundationNativeBridgeRegistryRoot,
     foundationNativeBridgeDomains: status.foundationNativeBridgeDomains,
     bridgeProviderCount: proofsByBatch.size,
     bridgeDomainCount: expectedBridgeDomains.length,
