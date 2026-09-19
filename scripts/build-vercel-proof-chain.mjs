@@ -11,6 +11,7 @@ const steps = [
     'tests/foundation-quantitative-direct-lowering.test.mjs',
     'tests/foundation-energy-direct-lowering.test.mjs',
     'tests/foundation-energy-native-parity.test.mjs',
+    'tests/foundation-energy-deployment-evidence.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
     'tests/foundation-neural-domain-receipt-parity.test.mjs',
     'tests/foundation-genetic-direct-lowering.test.mjs',
@@ -68,6 +69,9 @@ const steps = [
   ]],
   ['quantitative-direct-health-evidence', [
     'scripts/verify-vercel-foundation-quantitative-direct-health.mjs',
+  ]],
+  ['energy-runtime-capability-truth-verification', [
+    'scripts/verify-foundation-energy-deployment-truth.mjs',
   ]],
   ['deployment-health-evidence', ['scripts/verify-vercel-health-evidence.mjs']],
 ];
