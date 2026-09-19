@@ -21,6 +21,27 @@ function copyFilter(source) {
   );
 }
 
+function runStageNode(label, args) {
+  const result = spawnSync(process.execPath, args, {
+    cwd: stageRoot,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  if (result.status !== 0) {
+    console.error(JSON.stringify({
+      ok: false,
+      status: 'RCL_DEVELOPER_RELEASE_STAGE_VERIFICATION_FAILED',
+      step: label,
+      exitCode: result.status,
+      signal: result.signal ?? null,
+    }, null, 2));
+    console.error(result.stdout);
+    console.error(result.stderr);
+    process.exit(result.status ?? 1);
+  }
+  return result;
+}
+
 try {
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
@@ -53,16 +74,28 @@ try {
   };
   fs.writeFileSync(stagedPackagePath, `${JSON.stringify(stagedPackage, null, 2)}\n`);
 
-  const contractResult = spawnSync(
-    process.execPath,
-    ['--test', '--test-concurrency=1', 'tests/cli-public-contract.test.mjs'],
-    { cwd: stageRoot, encoding: 'utf8' },
-  );
-  if (contractResult.status !== 0) {
-    console.error(contractResult.stdout);
-    console.error(contractResult.stderr);
-    process.exit(contractResult.status ?? 1);
-  }
+  // The checked-in conformance snapshot is evidence input, not a trusted release
+  // truth surface. Regenerate it inside the exact staged source tree so developer
+  // artifacts cannot ship bridge-only truth after direct-lowering capabilities
+  // have changed. Verification remains fail-closed and keeps implementation truth
+  // separate from deployment-bound native evidence.
+  const conformanceOut = path.join(stageRoot, 'output', 'developer-release-conformance');
+  runStageNode('canonical-foundation-conformance-materialization', [
+    'scripts/foundation-conformance.mjs',
+    '--out',
+    conformanceOut,
+  ]);
+  runStageNode('canonical-foundation-conformance-truth-verification', [
+    'scripts/verify-foundation-conformance-truth.mjs',
+    '--out',
+    conformanceOut,
+  ]);
+
+  runStageNode('cli-public-contract', [
+    '--test',
+    '--test-concurrency=1',
+    'tests/cli-public-contract.test.mjs',
+  ]);
 
   const packed = spawnSync('npm', ['pack', '--json', '--pack-destination', outDir], {
     cwd: stageRoot,
@@ -110,6 +143,12 @@ try {
       completeRuntime: false,
       jsReferenceRuntimeStillRequired: true,
     },
+    conformanceTruth: {
+      materializedFromStagedSource: true,
+      deploymentEvidenceClaimed: false,
+      providerBridgeRemovedGlobally: false,
+      allFoundationDomainsNativeClaimed: false,
+    },
   };
 
   fs.writeFileSync(
@@ -145,6 +184,8 @@ try {
     'Release metadata, Tutor Skill sources, integration contracts, tests and CI files are deliberately excluded from the runtime npm archive so the artifact hash is not self-referential.',
     '',
     'The published package.json exposes only scripts whose referenced files are included in the runtime archive: mcp, demo and verify:install.',
+    '',
+    'The packaged Foundation conformance report is regenerated and verified inside the exact staged source tree. It records implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
     '',
     '## Honest boundary',
     '',
