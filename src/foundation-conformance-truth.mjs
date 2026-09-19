@@ -1,32 +1,24 @@
 import crypto from 'node:crypto';
+import {
+  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS,
+  canonicalFoundationDirectDomainId,
+  foundationDirectImplementation,
+} from './foundation-direct-capability-registry.mjs';
 
 export const FOUNDATION_CONFORMANCE_TRUTH_FORMAT = 'taowind.rcl-foundation-conformance-truth.v0.1';
 export const FOUNDATION_CONFORMANCE_TRUTH_VERSION = '0.1.0';
 
-export const FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS = Object.freeze([
-  'perception',
-  'physical',
-  'neural',
-  'genetic',
-  'life',
-  'quantitative',
-]);
-
-const CURRENT_REQUIRED_DIRECT_DOMAINS = Object.freeze([
-  'perception',
-  'physical',
-  'neural',
-  'genetic',
-  'life',
-  'quantitative',
-]);
+// Compatibility export only: the canonical direct-capability registry owns the
+// actual domain set. Consumers importing the historical truth-module symbol now
+// receive the exact frozen registry array rather than a shadow copy.
+export const FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS = REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS;
 
 function array(value) {
   return Array.isArray(value) ? value : [];
 }
 
 export function canonicalFoundationConformanceDomainId(value) {
-  return value === 'living' ? 'life' : value;
+  return canonicalFoundationDirectDomainId(value);
 }
 
 function uniqueSorted(values) {
@@ -63,9 +55,13 @@ function fail(code, message, details = {}) {
 }
 
 function directImplementation(domain) {
-  return domain === 'quantitative'
-    ? 'src/foundation-quantitative-direct-lowering.mjs + src/foundation-direct-bytecode.mjs'
-    : 'src/foundation-direct-lowering.mjs + src/foundation-direct-bytecode.mjs';
+  const implementation = foundationDirectImplementation(domain);
+  if (implementation) return implementation;
+  fail(
+    'RCL_FOUNDATION_CONFORMANCE_DIRECT_IMPLEMENTATION_PROVENANCE_UNKNOWN',
+    `No direct implementation provenance is registered for '${domain}'.`,
+    { domain },
+  );
 }
 
 function domainKnown(report, domain) {
@@ -167,7 +163,7 @@ export function reconcileFoundationConformanceTruth(report, deployment = {}, opt
   }
 
   const requiredCurrentDirectDomains = uniqueSorted(
-    options.requiredDirectDomains ?? CURRENT_REQUIRED_DIRECT_DOMAINS,
+    options.requiredDirectDomains ?? FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS,
   );
   const missingCurrentDirectEvidence = requiredCurrentDirectDomains.filter(
     domain => !verifiedDirectDomains.includes(domain),
