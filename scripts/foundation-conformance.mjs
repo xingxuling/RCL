@@ -3,13 +3,18 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS,
-  canonicalFoundationConformanceDomainId,
+  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as TRUTH_DIRECT_IMPLEMENTATION_DOMAINS,
   reconcileFoundationConformanceTruth,
   renderFoundationConformanceCsv,
   renderFoundationConformanceMarkdown,
 } from '../src/foundation-conformance-truth.mjs';
 import { lowerDeclaredFoundationToCore } from '../src/foundation-direct-lowering.mjs';
+import {
+  FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
+  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS,
+  canonicalFoundationDirectDomainId,
+  foundationDirectCapabilityRegistrySnapshot,
+} from '../src/foundation-direct-capability-registry.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_OUT = path.join(ROOT, 'output', 'foundation-conformance');
@@ -33,6 +38,10 @@ function emptyFoundationProgram() {
   };
 }
 
+function sortedCanonicalDomains(values) {
+  return [...new Set(values.map(canonicalFoundationDirectDomainId))].sort();
+}
+
 // Capture the versioned canonical truth surface before the base evidence producer
 // rewrites foundation-conformance.json. This turns the small truth snapshot into a
 // fail-closed drift gate rather than letting generation silently repair repository
@@ -44,16 +53,31 @@ const committedTruthSnapshot = JSON.parse(await fs.readFile(rootTruthPath, 'utf8
 // the direct-lowering implementation that exists beside the bridge path.
 await import('./foundation-conformance-base.mjs');
 
+const capabilityRegistry = foundationDirectCapabilityRegistrySnapshot();
 const directProbe = lowerDeclaredFoundationToCore(emptyFoundationProgram());
-const executableDefaultDomains = [
-  ...(directProbe?.summary?.enabledDomains ?? []).map(canonicalFoundationConformanceDomainId),
-  'quantitative',
-].sort();
-const expectedDirectDomains = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
-if (JSON.stringify(executableDefaultDomains) !== JSON.stringify(expectedDirectDomains)) {
-  const error = new Error('Canonical conformance direct-domain registry drifted from the executable lowerer defaults.');
-  error.code = 'RCL_FOUNDATION_CONFORMANCE_DIRECT_REGISTRY_DRIFT';
-  error.details = { executableDefaultDomains, expectedDirectDomains };
+const executableCoreDomains = sortedCanonicalDomains(directProbe?.summary?.enabledDomains ?? []);
+const registryCoreDomains = sortedCanonicalDomains(FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS);
+if (JSON.stringify(executableCoreDomains) !== JSON.stringify(registryCoreDomains)) {
+  const error = new Error('Foundation direct capability registry drifted from executable core-lowerer defaults.');
+  error.code = 'RCL_FOUNDATION_DIRECT_CAPABILITY_EXECUTABLE_DRIFT';
+  error.details = {
+    executableCoreDomains,
+    registryCoreDomains,
+    capabilityRegistryRoot: capabilityRegistry.registryRoot,
+  };
+  throw error;
+}
+
+const registryDirectDomains = [...REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS].sort();
+const truthCompatibilityDomains = [...TRUTH_DIRECT_IMPLEMENTATION_DOMAINS].sort();
+if (JSON.stringify(registryDirectDomains) !== JSON.stringify(truthCompatibilityDomains)) {
+  const error = new Error('Foundation conformance compatibility domain list drifted from the canonical direct capability registry.');
+  error.code = 'RCL_FOUNDATION_CONFORMANCE_TRUTH_REGISTRY_DRIFT';
+  error.details = {
+    registryDirectDomains,
+    truthCompatibilityDomains,
+    capabilityRegistryRoot: capabilityRegistry.registryRoot,
+  };
   throw error;
 }
 
@@ -65,7 +89,8 @@ const outMarkdownPath = path.join(out, 'foundation-conformance.md');
 
 const baseReport = JSON.parse(await fs.readFile(rootJsonPath, 'utf8'));
 const reconciled = reconcileFoundationConformanceTruth(baseReport, {}, {
-  implementationDomains: executableDefaultDomains,
+  implementationDomains: registryDirectDomains,
+  requiredDirectDomains: registryDirectDomains,
   requireDeploymentEvidence: false,
 });
 const canonicalTruth = reconciled.canonicalExecutionTruth;
@@ -78,6 +103,7 @@ if (JSON.stringify(committedTruthSnapshot) !== JSON.stringify(canonicalTruth)) {
     generatedTruthRoot: canonicalTruth?.truthRoot ?? null,
     committedStatus: committedTruthSnapshot?.status ?? null,
     generatedStatus: canonicalTruth?.status ?? null,
+    capabilityRegistryRoot: capabilityRegistry.registryRoot,
   };
   throw error;
 }
@@ -98,6 +124,7 @@ console.log(JSON.stringify({
   directImplementationDomains: canonicalTruth.implementationDomains,
   providerBridgeDomains: canonicalTruth.verifiedBridgeDomains,
   truthRoot: canonicalTruth.truthRoot,
+  directCapabilityRegistryRoot: capabilityRegistry.registryRoot,
   canonicalTruthSnapshot: rootTruthPath,
   snapshotFresh: true,
   out,
