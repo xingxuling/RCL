@@ -22,6 +22,10 @@ const steps = [
   ['version-contract-capability-truth-verification', [
     'scripts/verify-foundation-version-contract-truth.mjs',
   ]],
+  // Keep runtime capability truth fail-closed before native artifact construction.
+  ['runtime-capability-truth-surface-verification', [
+    'scripts/verify-foundation-capability-truth-surface.mjs',
+  ]],
   ['canonical-native-artifact', ['scripts/build-vercel-native.mjs']],
   ['quantitative-declared-direct-real-c-proof', ['scripts/verify-vercel-foundation-quantitative-direct.mjs']],
   ['batch-a-real-c-provider-proof', ['scripts/verify-vercel-foundation-batch-a-bridge.mjs']],
