@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 const steps = [
   ['targeted-foundation-tests', [
     '--test',
+    'tests/foundation-conformance-truth.test.mjs',
     'tests/foundation-quantity-native-lowering.test.mjs',
     'tests/foundation-quantitative-direct-lowering.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
@@ -19,6 +20,11 @@ const steps = [
   ['batch-a-bridge-deployment-binding', ['scripts/bind-vercel-foundation-batch-a-bridge.mjs']],
   ['full-native-provider-federation-conformance', [
     'scripts/foundation-conformance.mjs',
+    '--out',
+    'public/foundation-native-federation-conformance',
+  ]],
+  ['canonical-foundation-conformance-truth-verification', [
+    'scripts/verify-foundation-conformance-truth.mjs',
     '--out',
     'public/foundation-native-federation-conformance',
   ]],
