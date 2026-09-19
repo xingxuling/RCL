@@ -65,6 +65,7 @@ try {
     'benchmarks/**',
     'VERSION-CONTRACT.json',
     'foundation-conformance.json',
+    'foundation-conformance-truth.json',
   ];
   stagedPackage.scripts = {
     mcp: 'node src/rcl-mcp-server.mjs',
@@ -74,11 +75,9 @@ try {
   };
   fs.writeFileSync(stagedPackagePath, `${JSON.stringify(stagedPackage, null, 2)}\n`);
 
-  // The checked-in conformance snapshot is evidence input, not a trusted release
-  // truth surface. Regenerate it inside the exact staged source tree so developer
-  // artifacts cannot ship bridge-only truth after direct-lowering capabilities
-  // have changed. Verification remains fail-closed and keeps implementation truth
-  // separate from deployment-bound native evidence.
+  // The checked-in full conformance report is evidence input. The compact truth
+  // snapshot is the versioned canonical execution-truth surface and is verified
+  // against executable reconciliation before the release artifact is packed.
   const conformanceOut = path.join(stageRoot, 'output', 'developer-release-conformance');
   runStageNode('canonical-foundation-conformance-materialization', [
     'scripts/foundation-conformance.mjs',
@@ -90,6 +89,9 @@ try {
     '--out',
     conformanceOut,
   ]);
+  const stagedConformanceTruth = JSON.parse(
+    fs.readFileSync(path.join(stageRoot, 'foundation-conformance-truth.json'), 'utf8'),
+  );
 
   runStageNode('cli-public-contract', [
     '--test',
@@ -144,10 +146,16 @@ try {
       jsReferenceRuntimeStillRequired: true,
     },
     conformanceTruth: {
+      snapshot: 'foundation-conformance-truth.json',
+      truthRoot: stagedConformanceTruth.truthRoot,
+      status: stagedConformanceTruth.status,
+      nativeVmMode: stagedConformanceTruth.nativeVmMode,
       materializedFromStagedSource: true,
-      deploymentEvidenceClaimed: false,
-      providerBridgeRemovedGlobally: false,
-      allFoundationDomainsNativeClaimed: false,
+      deploymentEvidenceClaimed: stagedConformanceTruth.deploymentEvidenceComplete === true,
+      providerBridgeRemovedGlobally:
+        stagedConformanceTruth?.truthBoundary?.providerBridgeRemovedGlobally === true,
+      allFoundationDomainsNativeClaimed:
+        stagedConformanceTruth?.truthBoundary?.allFoundationDomainsNativeClaimed === true,
     },
   };
 
@@ -185,7 +193,9 @@ try {
     '',
     'The published package.json exposes only scripts whose referenced files are included in the runtime archive: mcp, demo and verify:install.',
     '',
-    'The packaged Foundation conformance report is regenerated and verified inside the exact staged source tree. It records implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
+    'The packaged Foundation conformance report and compact canonical truth snapshot are regenerated and verified inside the exact staged source tree. They record implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
+    '',
+    `Canonical Foundation truth root: ${stagedConformanceTruth.truthRoot}`,
     '',
     '## Honest boundary',
     '',

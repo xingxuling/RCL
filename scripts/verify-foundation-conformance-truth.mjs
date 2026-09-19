@@ -24,16 +24,28 @@ function fail(message, details = {}) {
 
 const out = path.resolve(option('out', DEFAULT_OUT));
 const rootJsonBytes = await fs.readFile(path.join(ROOT, 'foundation-conformance.json'));
+const rootTruthBytes = await fs.readFile(path.join(ROOT, 'foundation-conformance-truth.json'));
 const outJsonBytes = await fs.readFile(path.join(out, 'foundation-conformance.json'));
+const outTruthBytes = await fs.readFile(path.join(out, 'foundation-conformance-truth.json'));
 const csv = await fs.readFile(path.join(out, 'foundation-conformance.csv'), 'utf8');
 const markdown = await fs.readFile(path.join(out, 'foundation-conformance.md'), 'utf8');
 
 if (!rootJsonBytes.equals(outJsonBytes)) {
   fail('Root and requested-output canonical conformance JSON diverged.');
 }
+if (!rootTruthBytes.equals(outTruthBytes)) {
+  fail('Root and requested-output canonical truth snapshots diverged.');
+}
 
 const report = JSON.parse(rootJsonBytes.toString('utf8'));
+const truthSnapshot = JSON.parse(rootTruthBytes.toString('utf8'));
 const truth = report?.canonicalExecutionTruth;
+if (JSON.stringify(truthSnapshot) !== JSON.stringify(truth)) {
+  fail('Versioned canonical truth snapshot diverged from the reconciled report truth.', {
+    snapshotTruthRoot: truthSnapshot?.truthRoot ?? null,
+    reportTruthRoot: truth?.truthRoot ?? null,
+  });
+}
 const direct = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
 const actualDirect = [...(truth?.implementationDomains ?? [])].sort();
 if (report?.executionLayers?.nativeVm !== 'hybrid') {
@@ -83,7 +95,7 @@ const stalePhrases = [
   'declared domain syntax is still not Native VM syntax',
   'Unsupported declared-domain lowering remains explicit and is not counted as native mode',
 ];
-const artifacts = [rootJsonBytes.toString('utf8'), csv, markdown];
+const artifacts = [rootJsonBytes.toString('utf8'), rootTruthBytes.toString('utf8'), csv, markdown];
 for (const phrase of stalePhrases) {
   if (artifacts.some(text => text.includes(phrase))) {
     fail('Stale bridge-only execution truth survived reconciliation.', { phrase });
@@ -102,6 +114,7 @@ console.log(JSON.stringify({
   ok: true,
   status: 'RCL_FOUNDATION_CONFORMANCE_TRUTH_VERIFIED',
   truthRoot: truth.truthRoot,
+  truthSnapshotBound: true,
   directImplementationDomains: direct,
   providerBridgeDomains: truth.verifiedBridgeDomains,
   nativeVm: report.executionLayers.nativeVm,
