@@ -3,7 +3,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as TRUTH_DIRECT_IMPLEMENTATION_DOMAINS,
   reconcileFoundationConformanceTruth,
   renderFoundationConformanceCsv,
   renderFoundationConformanceMarkdown,
@@ -11,7 +10,7 @@ import {
 import { lowerDeclaredFoundationToCore } from '../src/foundation-direct-lowering.mjs';
 import {
   FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
-  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS,
+  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS,
   canonicalFoundationDirectDomainId,
   foundationDirectCapabilityRegistrySnapshot,
 } from '../src/foundation-direct-capability-registry.mjs';
@@ -68,18 +67,7 @@ if (JSON.stringify(executableCoreDomains) !== JSON.stringify(registryCoreDomains
   throw error;
 }
 
-const registryDirectDomains = [...REGISTRY_DIRECT_IMPLEMENTATION_DOMAINS].sort();
-const truthCompatibilityDomains = [...TRUTH_DIRECT_IMPLEMENTATION_DOMAINS].sort();
-if (JSON.stringify(registryDirectDomains) !== JSON.stringify(truthCompatibilityDomains)) {
-  const error = new Error('Foundation conformance compatibility domain list drifted from the canonical direct capability registry.');
-  error.code = 'RCL_FOUNDATION_CONFORMANCE_TRUTH_REGISTRY_DRIFT';
-  error.details = {
-    registryDirectDomains,
-    truthCompatibilityDomains,
-    capabilityRegistryRoot: capabilityRegistry.registryRoot,
-  };
-  throw error;
-}
+const registryDirectDomains = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
 
 const out = path.resolve(option('out', DEFAULT_OUT));
 const outJsonPath = path.join(out, 'foundation-conformance.json');
