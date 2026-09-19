@@ -10,6 +10,10 @@ import {
   foundationDirectCapabilityRegistrySnapshot,
   foundationDirectImplementation,
 } from '../src/foundation-direct-capability-registry.mjs';
+import {
+  FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS as CONFORMANCE_DIRECT_IMPLEMENTATION_DOMAINS,
+  canonicalFoundationConformanceDomainId,
+} from '../src/foundation-conformance-truth.mjs';
 import { lowerDeclaredFoundationToCore } from '../src/foundation-direct-lowering.mjs';
 
 function emptyFoundationProgram() {
@@ -32,6 +36,12 @@ test('canonical direct capability registry owns the six current implementation d
   assert.equal(new Set(FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS).size, FOUNDATION_DIRECT_CAPABILITIES.length);
   assert.equal(Object.isFrozen(FOUNDATION_DIRECT_CAPABILITIES), true);
   assert.equal(FOUNDATION_DIRECT_CAPABILITIES.every(Object.isFrozen), true);
+});
+
+test('conformance truth consumes the exact registry domain object instead of a shadow copy', () => {
+  assert.strictEqual(CONFORMANCE_DIRECT_IMPLEMENTATION_DOMAINS, FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS);
+  assert.equal(canonicalFoundationConformanceDomainId('living'), canonicalFoundationDirectDomainId('living'));
+  assert.equal(canonicalFoundationConformanceDomainId('life'), canonicalFoundationDirectDomainId('life'));
 });
 
 test('registry preserves the runtime living to canonical life boundary explicitly', () => {
