@@ -11,7 +11,7 @@ const EXPECTED_TRUTH_PATH = 'src/foundation-capability-registry-truth.json';
 const EXPECTED_DIRECT_REGISTRY = 'src/foundation-direct-capability-registry.mjs';
 const EXPECTED_BRIDGE_REGISTRY = 'src/foundation-native-bridge-capability-registry.mjs';
 const EXPECTED_ADVANCED_RUNTIME =
-  'JavaScript Reference Runtime plus implementation-bound direct lowering for 6 declared Foundation domains and 5 Native Provider bridge batches covering 16 bridge domains';
+  'JavaScript Reference Runtime plus implementation-bound direct lowering for 7 declared Foundation domains and 5 Native Provider bridge batches covering 16 bridge domains';
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
