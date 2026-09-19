@@ -6,6 +6,7 @@ const steps = [
     '--test',
     'tests/foundation-conformance-truth.test.mjs',
     'tests/foundation-direct-capability-registry.test.mjs',
+    'tests/foundation-native-bridge-capability-registry.test.mjs',
     'tests/foundation-quantity-native-lowering.test.mjs',
     'tests/foundation-quantitative-direct-lowering.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
@@ -46,6 +47,9 @@ const steps = [
   ]],
   ['native-provider-federation-root-stabilization', [
     'scripts/stabilize-vercel-foundation-native-federation-root.mjs',
+  ]],
+  ['provider-bridge-capability-registry-verification', [
+    'scripts/verify-foundation-native-bridge-capability-registry.mjs',
   ]],
   ['quantitative-direct-deployment-binding', [
     'scripts/bind-vercel-foundation-quantitative-direct.mjs',
