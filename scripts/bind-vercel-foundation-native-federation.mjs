@@ -3,6 +3,10 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  FOUNDATION_NATIVE_BRIDGE_SPECS as BRIDGE_SPECS,
+  foundationNativeBridgeCapabilityRegistrySnapshot,
+} from '../src/foundation-native-bridge-capability-registry.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const nativeDir = path.join(root, 'native');
@@ -14,25 +18,6 @@ const batchAProofPath = path.join(publicDir, 'rcl-foundation-batch-a-native-brid
 const extensionProofPath = path.join(publicDir, 'rcl-foundation-native-federation-extension-proof.json');
 const conformancePath = path.join(root, 'foundation-conformance.json');
 const publicBuildProofPath = path.join(publicDir, 'rcl-native-build-proof.json');
-
-const BRIDGE_SPECS = [
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'quantitative', capability: 'quantitative.evaluate' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'knowledge', capability: 'knowledge.resolve' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'perception', capability: 'perception.observe' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'natural-language-reality', capability: 'natural-language.interpret' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'understanding-reality', capability: 'understanding.model' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'creative-reality', capability: 'creative.generate' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-spacetime', capability: 'meta.spacetime.sequence' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-acceleration', capability: 'meta.acceleration.bound' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-compression', capability: 'meta.compression.restore' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'physical', capability: 'physical.simulate-step' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'embodiment', capability: 'embodiment.integrate' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'energy', capability: 'energy.balance' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'elemental', capability: 'elemental.compose' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'neural', capability: 'neural.integrate' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'metacomputation', capability: 'metacomputation.plan' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'computation', capability: 'computation.execute' },
-];
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -51,6 +36,7 @@ function fail(message, details = {}) {
 }
 
 try {
+  const bridgeRegistry = foundationNativeBridgeCapabilityRegistrySnapshot();
   for (const requiredPath of [vmPath, hostPath, manifestPath, batchAProofPath, extensionProofPath, conformancePath]) {
     if (!fs.existsSync(requiredPath)) fail('Required Native Provider federation deployment evidence input is missing', { requiredPath });
   }
@@ -276,6 +262,8 @@ try {
   }));
   const federationCore = {
     format: 'taowind.rcl-vercel-foundation-native-provider-federation.v0.1',
+    providerBridgeRegistryRoot: bridgeRegistry.registryRoot,
+    providerBridgeSpecCount: BRIDGE_SPECS.length,
     domains: BRIDGE_SPECS.map(spec => spec.domain),
     providerBatches,
     hostBinarySha256,
@@ -315,6 +303,8 @@ try {
     canonicalVmSourceRoot: manifest.sourceMaterialization.sourceRoot,
     hostBinarySha256,
     hostSourceRoot: batchAProof.hostSourceRoot,
+    providerBridgeRegistryRoot: bridgeRegistry.registryRoot,
+    providerBridgeSpecCount: BRIDGE_SPECS.length,
     federationRoot: federationProof.federationRoot,
     conformanceContractRoot: federationProof.conformanceContractRoot,
     foundationNativeBridgeDomains: federationCore.domains,
