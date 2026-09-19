@@ -6,6 +6,8 @@ import { foundationEnergyDeploymentEvidence } from './foundation-energy-deployme
 
 export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_FORMAT = 'taowind.rcl-foundation-runtime-deployment-evidence-registry.v0.3';
 export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION = '0.3.0';
+export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_FORMAT = 'taowind.rcl-foundation-runtime-deployment-evidence-set.v0.1';
+export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_VERSION = '0.1.0';
 const RAW_PROVIDERS = [
   { domain: 'perception', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationPerceptionDeploymentEvidence' },
   { domain: 'physical', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationPhysicalDeploymentEvidence' },
@@ -24,6 +26,17 @@ export function foundationRuntimeDeploymentEvidenceRegistrySnapshot({ providers 
   const payload = { format: FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_FORMAT, version: FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION, providers: normalizedProviders(providers) };
   return { ...payload, registryRoot: sha256Canonical(payload) };
 }
+export function foundationRuntimeDeploymentEvidenceSetSnapshot({ registryRoot, directImplementationDomains = FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS, evidenceByDomain = {} } = {}) {
+  const deploymentEvidenceRoots = Object.fromEntries(directImplementationDomains.map(domain => [domain, evidenceByDomain?.[domain]?.deploymentEvidenceRoot ?? null]));
+  const payload = {
+    format: FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_FORMAT,
+    version: FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_VERSION,
+    registryRoot: registryRoot ?? null,
+    directImplementationDomains: [...directImplementationDomains],
+    deploymentEvidenceRoots,
+  };
+  return { ...payload, evidenceSetRoot: sha256Canonical(payload) };
+}
 export function foundationRuntimeDeploymentEvidenceSurface({ providers = FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_PROVIDERS, builders = DEFAULT_BUILDERS, evidenceInputs = {}, requireCompleteDirectCoverage = false } = {}) {
   const errors = []; const fail = (code, message, details = {}) => errors.push({ code, message, ...details });
   const snapshot = foundationRuntimeDeploymentEvidenceRegistrySnapshot({ providers }); const evidenceByDomain = {}; const registeredDomains = snapshot.providers.map(item => item.domain);
@@ -40,5 +53,7 @@ export function foundationRuntimeDeploymentEvidenceSurface({ providers = FOUNDAT
   const missingDirectDeploymentEvidenceDomains = FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS.filter(domain => !registeredDomains.includes(domain));
   const completeDirectDeploymentCoverage = missingDirectDeploymentEvidenceDomains.length === 0;
   if (requireCompleteDirectCoverage && !completeDirectDeploymentCoverage) fail('RCL_RUNTIME_DEPLOYMENT_EVIDENCE_COVERAGE_INCOMPLETE', 'Complete direct-domain deployment evidence was required but the registry is partial.', { missingDirectDeploymentEvidenceDomains, registeredDomains });
-  return { ok: errors.length === 0, status: errors.length === 0 ? 'RCL_FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERIFIED' : 'RCL_FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_DRIFT', ...snapshot, registeredDomains, registeredDomainCount: registeredDomains.length, directImplementationDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS], directImplementationDomainCount: FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS.length, missingDirectDeploymentEvidenceDomains, completeDirectDeploymentCoverage, evidenceByDomain, truthBoundary: { registeredEvidenceDoesNotImplyCompleteDomainCapability: true, unregisteredDirectDomainsAreReportedNotInvented: true, providerBridgeMayCoexistWithDirectDeploymentEvidence: true, completeDirectDeploymentCoverageClaimed: completeDirectDeploymentCoverage, completeDirectDeploymentCoverageMeansEvidenceCoverageNotFullDomainNativeCoverage: true }, errors };
+  const evidenceSet = foundationRuntimeDeploymentEvidenceSetSnapshot({ registryRoot: snapshot.registryRoot, directImplementationDomains: FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS, evidenceByDomain });
+  const evidenceSetVerified = errors.length === 0 && completeDirectDeploymentCoverage && Object.values(evidenceSet.deploymentEvidenceRoots).every(root => typeof root === 'string' && /^[0-9a-f]{64}$/i.test(root));
+  return { ok: errors.length === 0, status: errors.length === 0 ? 'RCL_FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERIFIED' : 'RCL_FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_DRIFT', ...snapshot, registeredDomains, registeredDomainCount: registeredDomains.length, directImplementationDomains: [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS], directImplementationDomainCount: FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS.length, missingDirectDeploymentEvidenceDomains, completeDirectDeploymentCoverage, evidenceSetFormat: evidenceSet.format, evidenceSetVersion: evidenceSet.version, evidenceSetRoot: evidenceSet.evidenceSetRoot, evidenceSetVerified, deploymentEvidenceRoots: evidenceSet.deploymentEvidenceRoots, evidenceByDomain, truthBoundary: { registeredEvidenceDoesNotImplyCompleteDomainCapability: true, unregisteredDirectDomainsAreReportedNotInvented: true, providerBridgeMayCoexistWithDirectDeploymentEvidence: true, completeDirectDeploymentCoverageClaimed: completeDirectDeploymentCoverage, completeDirectDeploymentCoverageMeansEvidenceCoverageNotFullDomainNativeCoverage: true, evidenceSetRootBindsRegistryAndPerDomainDeploymentRoots: true }, errors };
 }
