@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
-export const FOUNDATION_DIRECT_CAPABILITY_REGISTRY_FORMAT = 'taowind.rcl-foundation-direct-capability-registry.v0.1';
-export const FOUNDATION_DIRECT_CAPABILITY_REGISTRY_VERSION = '0.1.0';
+export const FOUNDATION_DIRECT_CAPABILITY_REGISTRY_FORMAT = 'taowind.rcl-foundation-direct-capability-registry.v0.2';
+export const FOUNDATION_DIRECT_CAPABILITY_REGISTRY_VERSION = '0.2.0';
 
 const RAW_CAPABILITIES = [
   {
@@ -44,6 +44,13 @@ const RAW_CAPABILITIES = [
     runtimeDomain: 'quantitative',
     lowererStage: 'quantitative-prepass',
     implementationModule: 'src/foundation-quantitative-direct-lowering.mjs',
+    bytecodeModule: 'src/foundation-direct-bytecode.mjs',
+  },
+  {
+    canonicalDomain: 'energy',
+    runtimeDomain: 'energy',
+    lowererStage: 'energy-prepass',
+    implementationModule: 'src/foundation-energy-direct-lowering.mjs',
     bytecodeModule: 'src/foundation-direct-bytecode.mjs',
   },
 ];
