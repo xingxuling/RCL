@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+import { spawnSync } from 'node:child_process';
+
+const tests = [
+  'tests/foundation-conformance-truth.test.mjs',
+  'tests/foundation-direct-capability-registry.test.mjs',
+  'tests/foundation-native-bridge-capability-registry.test.mjs',
+  'tests/foundation-quantity-native-lowering.test.mjs',
+  'tests/foundation-quantitative-direct-lowering.test.mjs',
+  'tests/foundation-energy-direct-lowering.test.mjs',
+  'tests/foundation-energy-native-parity.test.mjs',
+  'tests/foundation-energy-deployment-evidence.test.mjs',
+  'tests/foundation-runtime-deployment-evidence-registry.test.mjs',
+  'tests/foundation-neural-direct-lowering.test.mjs',
+  'tests/foundation-neural-domain-receipt-parity.test.mjs',
+  'tests/foundation-genetic-direct-lowering.test.mjs',
+  'tests/foundation-genetic-domain-receipt-parity.test.mjs',
+  'tests/foundation-living-direct-lowering.test.mjs',
+  'tests/foundation-living-staged-receipt.test.mjs',
+];
+const steps = tests.map((file, index) => ({ code: 10 + index, name: file, args: ['--test', file] }));
+steps.push(
+  { code: 31, name: 'capability-registry-truth', args: ['scripts/verify-foundation-capability-registry-truth.mjs'] },
+  { code: 32, name: 'version-contract-truth', args: ['scripts/verify-foundation-version-contract-truth.mjs'] },
+  { code: 33, name: 'runtime-capability-truth', args: ['scripts/verify-foundation-capability-truth-surface.mjs'] },
+  { code: 34, name: 'canonical-native-artifact', args: ['scripts/build-vercel-native.mjs'] },
+  { code: 35, name: 'quantitative-direct-real-c', args: ['scripts/verify-vercel-foundation-quantitative-direct.mjs'] },
+  { code: 36, name: 'batch-a-real-c-provider', args: ['scripts/verify-vercel-foundation-batch-a-bridge.mjs'] },
+  { code: 37, name: 'batch-a-deployment-binding', args: ['scripts/bind-vercel-foundation-batch-a-bridge.mjs'] },
+  { code: 38, name: 'base-federation-conformance', args: ['scripts/foundation-conformance-base.mjs', '--out', 'public/foundation-native-federation-conformance-base'] },
+  { code: null, propagateChildStatus: true, name: 'conformance-truth-field-diff', args: ['scripts/dwac-cycle58-truth-diff-probe.mjs'] },
+  { code: 39, name: 'full-federation-conformance', args: ['scripts/foundation-conformance.mjs', '--out', 'public/foundation-native-federation-conformance'] },
+  { code: 40, name: 'canonical-conformance-truth', args: ['scripts/verify-foundation-conformance-truth.mjs', '--out', 'public/foundation-native-federation-conformance'] },
+  { code: 41, name: 'developer-release-conformance-truth', args: ['scripts/verify-developer-release-conformance-truth.mjs'] },
+  { code: 42, name: 'strict-federation-extension', args: ['scripts/verify-vercel-foundation-native-federation-extension.mjs'] },
+  { code: 43, name: 'physical-real-c', args: ['scripts/verify-vercel-foundation-physical.mjs'] },
+  { code: 44, name: 'neural-real-c', args: ['scripts/verify-vercel-foundation-neural.mjs'] },
+  { code: 45, name: 'neural-deployment-binding', args: ['scripts/bind-vercel-foundation-neural.mjs'] },
+  { code: 46, name: 'genetic-real-c', args: ['scripts/verify-vercel-foundation-genetic.mjs'] },
+  { code: 47, name: 'living-real-c', args: ['scripts/verify-vercel-foundation-living.mjs'] },
+  { code: 48, name: 'biological-deployment-binding', args: ['scripts/bind-vercel-foundation-biological.mjs'] },
+  { code: null, propagateChildStatus: true, name: 'energy-real-c-receipt-parity', args: ['scripts/verify-vercel-foundation-energy.mjs'] },
+  { code: 50, name: 'federation-deployment-binding', args: ['scripts/bind-vercel-foundation-native-federation.mjs'] },
+  { code: 51, name: 'federation-root-stabilization', args: ['scripts/stabilize-vercel-foundation-native-federation-root.mjs'] },
+  { code: 52, name: 'bridge-registry-verification', args: ['scripts/verify-foundation-native-bridge-capability-registry.mjs'] },
+  { code: 53, name: 'quantitative-direct-deployment-binding', args: ['scripts/bind-vercel-foundation-quantitative-direct.mjs'] },
+  { code: 54, name: 'quantitative-direct-health', args: ['scripts/verify-vercel-foundation-quantitative-direct-health.mjs'] },
+  { code: 55, name: 'runtime-deployment-evidence-registry', args: ['scripts/verify-foundation-runtime-deployment-evidence-registry.mjs'] },
+  { code: 56, name: 'energy-runtime-capability-truth', args: ['scripts/verify-foundation-energy-deployment-truth.mjs'] },
+  { code: 57, name: 'deployment-health', args: ['scripts/verify-vercel-health-evidence.mjs'] },
+);
+
+for (const step of steps) {
+  const result = spawnSync(process.execPath, step.args, { stdio: 'inherit', env: process.env });
+  if (result.error || result.status !== 0) {
+    const exitCode = step.propagateChildStatus && Number.isInteger(result.status) ? result.status : step.code;
+    console.error(JSON.stringify({
+      status: 'DWAC_CYCLE61_EXIT_PROBE_FAILURE',
+      probeExitCode: exitCode,
+      step: step.name,
+      childExitCode: result.status ?? null,
+      error: result.error?.message ?? null,
+    }, null, 2));
+    process.exit(exitCode ?? 1);
+  }
+}
+console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE61_EXIT_PROBE_ALL_PASS' }, null, 2));
