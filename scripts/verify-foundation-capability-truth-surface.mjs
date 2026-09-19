@@ -28,7 +28,7 @@ if (!/^[0-9a-f]{64}$/i.test(surface.truthRoot ?? '')) {
 if (surface.truthRoot !== surface.recomputedTruthRoot) {
   fail('Runtime capability truth root is not self-consistent.', { surface });
 }
-if (surface.direct.domainCount !== 6) {
+if (surface.direct.domainCount !== 7) {
   fail('Runtime direct capability domain count drifted.', { direct: surface.direct });
 }
 if (surface.providerBridge.domainCount !== 16 || surface.providerBridge.batchCount !== 5) {
