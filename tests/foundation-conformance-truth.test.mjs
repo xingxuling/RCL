@@ -45,7 +45,7 @@ function deployment(overrides = {}) {
     foundationNativeBridgeFederationBound: true,
     extendedEvidenceBound: true,
     foundationParityDomains: ['perception', 'physical', 'neural', 'genetic', 'living'],
-    foundationDirectExtensionDomains: ['quantitative'],
+    foundationDirectExtensionDomains: ['quantitative', 'energy'],
     foundationNativeBridgeDomains: bridge,
     binarySha256: '1'.repeat(64),
     sourceRoot: '2'.repeat(64),
@@ -67,6 +67,9 @@ test('reconciles stale bridge-only truth into direct + bridge coexistence withou
   assert.equal(reconciled.domains.quantitative.directNativeVerified, true);
   assert.equal(reconciled.domains.quantitative.providerBridgeVerified, true);
   assert.deepEqual(reconciled.domains.quantitative.availableModes, ['bridge', 'native-direct', 'reference-native']);
+  assert.equal(reconciled.domains.energy.mode, 'native-direct');
+  assert.equal(reconciled.domains.energy.directNativeVerified, true);
+  assert.equal(reconciled.domains.energy.providerBridgeVerified, true);
   assert.equal(reconciled.domains.genetic.mode, 'native-direct');
   assert.equal(reconciled.domains.genetic.providerBridgeVerified, false);
   assert.equal(reconciled.domains.knowledge.mode, 'bridge');
@@ -85,6 +88,9 @@ test('structural reconciliation corrects the global no-direct-lowering claim bef
   assert.equal(reconciled.domains.quantitative.directLoweringImplemented, true);
   assert.equal(reconciled.domains.quantitative.directNativeVerified, false);
   assert.equal(reconciled.domains.quantitative.mode, 'bridge');
+  assert.equal(reconciled.domains.energy.directLoweringImplemented, true);
+  assert.equal(reconciled.domains.energy.directNativeVerified, false);
+  assert.equal(reconciled.domains.energy.mode, 'bridge');
   assert.match(reconciled.executionLayers.nativeVmLimitation, /direct lowering is implemented/);
   assert.doesNotMatch(reconciled.executionLayers.nativeVmLimitation, /syntax still rejects lowering/);
 });
@@ -97,14 +103,15 @@ test('fails closed when required deployment-bound direct evidence is incomplete'
       directExtensionEvidenceBound: false,
     }), { requireDeploymentEvidence: true }),
     error => error?.code === 'RCL_FOUNDATION_CONFORMANCE_DEPLOYMENT_EVIDENCE_INCOMPLETE'
-      && error?.details?.missingCurrentDirectEvidence?.includes('quantitative'),
+      && error?.details?.missingCurrentDirectEvidence?.includes('quantitative')
+      && error?.details?.missingCurrentDirectEvidence?.includes('energy'),
   );
 });
 
 test('rejects verified direct evidence for a domain without a declared direct implementation', () => {
   assert.throws(
     () => reconcileFoundationConformanceTruth(report(), deployment({
-      foundationDirectExtensionDomains: ['quantitative', 'knowledge'],
+      foundationDirectExtensionDomains: ['quantitative', 'energy', 'knowledge'],
     })),
     error => error?.code === 'RCL_FOUNDATION_CONFORMANCE_VERIFIED_DIRECT_WITHOUT_IMPLEMENTATION'
       && error?.details?.domain === 'knowledge',
@@ -115,6 +122,7 @@ test('truth root is deterministic under evidence array reordering', () => {
   const a = reconcileFoundationConformanceTruth(report(), deployment());
   const b = reconcileFoundationConformanceTruth(report(), deployment({
     foundationParityDomains: ['living', 'genetic', 'neural', 'physical', 'perception'],
+    foundationDirectExtensionDomains: ['energy', 'quantitative'],
     foundationNativeBridgeDomains: [...bridge].reverse(),
   }));
   assert.equal(a.canonicalExecutionTruth.truthRoot, b.canonicalExecutionTruth.truthRoot);
@@ -128,6 +136,7 @@ test('CSV and Markdown expose reconciled truth rather than stale global bridge c
   const markdown = renderFoundationConformanceMarkdown(reconciled);
   assert.match(csv, /directNativeVerified/);
   assert.match(csv, /"quantitative".*"native-direct"/);
+  assert.match(csv, /"energy".*"native-direct"/);
   assert.match(markdown, /native VM truth: hybrid/);
   assert.match(markdown, /direct-native verified:/);
   assert.doesNotMatch(markdown, /Declared Foundation-domain syntax still rejects lowering/);
