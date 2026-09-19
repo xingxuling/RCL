@@ -22,6 +22,7 @@ const steps = [
   ['version-contract-capability-truth-verification', [
     'scripts/verify-foundation-version-contract-truth.mjs',
   ]],
+  // Keep runtime capability truth fail-closed before native artifact construction.
   ['runtime-capability-truth-surface-verification', [
     'scripts/verify-foundation-capability-truth-surface.mjs',
   ]],
