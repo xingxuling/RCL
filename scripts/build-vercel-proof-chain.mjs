@@ -9,6 +9,7 @@ const steps = [
     'tests/foundation-native-bridge-capability-registry.test.mjs',
     'tests/foundation-quantity-native-lowering.test.mjs',
     'tests/foundation-quantitative-direct-lowering.test.mjs',
+    'tests/foundation-energy-direct-lowering.test.mjs',
     'tests/foundation-neural-direct-lowering.test.mjs',
     'tests/foundation-neural-domain-receipt-parity.test.mjs',
     'tests/foundation-genetic-direct-lowering.test.mjs',
@@ -22,7 +23,6 @@ const steps = [
   ['version-contract-capability-truth-verification', [
     'scripts/verify-foundation-version-contract-truth.mjs',
   ]],
-  // Keep runtime capability truth fail-closed before native artifact construction.
   ['runtime-capability-truth-surface-verification', [
     'scripts/verify-foundation-capability-truth-surface.mjs',
   ]],
