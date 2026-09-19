@@ -2,27 +2,13 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { RCL_MCP_SERVER_NAME, RCL_MCP_SERVER_VERSION, listRclMcpTools } from '../src/rcl-mcp-server.mjs';
+import {
+  FOUNDATION_NATIVE_BRIDGE_SPECS,
+  foundationNativeBridgeCapabilityRegistrySnapshot,
+} from '../src/foundation-native-bridge-capability-registry.mjs';
 
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
-const FOUNDATION_NATIVE_BRIDGE_SPECS = [
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'quantitative', capability: 'quantitative.evaluate' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'knowledge', capability: 'knowledge.resolve' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'perception', capability: 'perception.observe' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'natural-language-reality', capability: 'natural-language.interpret' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'understanding-reality', capability: 'understanding.model' },
-  { batchId: 'batch-a', providerId: 'rcl.foundation.batch-a', providerCallCount: 6, domain: 'creative-reality', capability: 'creative.generate' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-spacetime', capability: 'meta.spacetime.sequence' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-acceleration', capability: 'meta.acceleration.bound' },
-  { batchId: 'meta-batch-b', providerId: 'rcl.foundation.meta-batch-b', providerCallCount: 3, domain: 'meta-compression', capability: 'meta.compression.restore' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'physical', capability: 'physical.simulate-step' },
-  { batchId: 'batch-c', providerId: 'rcl.foundation.batch-c', providerCallCount: 2, domain: 'embodiment', capability: 'embodiment.integrate' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'energy', capability: 'energy.balance' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'elemental', capability: 'elemental.compose' },
-  { batchId: 'batch-d', providerId: 'rcl.foundation.batch-d', providerCallCount: 3, domain: 'neural', capability: 'neural.integrate' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'metacomputation', capability: 'metacomputation.plan' },
-  { batchId: 'batch-e', providerId: 'rcl.foundation.batch-e', providerCallCount: 2, domain: 'computation', capability: 'computation.execute' },
-];
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -313,6 +299,7 @@ function federationSummary(federation) {
 }
 
 export function nativeVmDeploymentStatus() {
+  const bridgeRegistry = foundationNativeBridgeCapabilityRegistrySnapshot();
   const bundled = fs.existsSync(NATIVE_VM_PATH);
   const attestationBundled = fs.existsSync(NATIVE_VM_ATTESTATION_PATH);
   let executable = false;
@@ -441,6 +428,8 @@ export function nativeVmDeploymentStatus() {
     executionAttestationRoot: attestation?.replayProof?.attestationRoot ?? null,
     foundationParityDomains,
     foundationDirectExtensionDomains,
+    foundationNativeBridgeRegistryRoot: bridgeRegistry.registryRoot,
+    foundationNativeBridgeSpecCount: FOUNDATION_NATIVE_BRIDGE_SPECS.length,
     foundationNativeBridgeDomains,
     foundationNativeBridgeFederation: federationSummary(federation),
     foundationParity: proofSummary(perceptionProof),
