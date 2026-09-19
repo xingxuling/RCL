@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS,
+  canonicalFoundationConformanceDomainId,
   reconcileFoundationConformanceTruth,
   renderFoundationConformanceCsv,
   renderFoundationConformanceMarkdown,
@@ -37,7 +38,7 @@ function emptyFoundationProgram() {
 
 const directProbe = lowerDeclaredFoundationToCore(emptyFoundationProgram());
 const executableDefaultDomains = [
-  ...(directProbe?.summary?.enabledDomains ?? []),
+  ...(directProbe?.summary?.enabledDomains ?? []).map(canonicalFoundationConformanceDomainId),
   'quantitative',
 ].sort();
 const expectedDirectDomains = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();

@@ -8,7 +8,7 @@ export const FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS = Object.freeze([
   'physical',
   'neural',
   'genetic',
-  'living',
+  'life',
   'quantitative',
 ]);
 
@@ -17,12 +17,16 @@ const CURRENT_REQUIRED_DIRECT_DOMAINS = Object.freeze([
   'physical',
   'neural',
   'genetic',
-  'living',
+  'life',
   'quantitative',
 ]);
 
 function array(value) {
   return Array.isArray(value) ? value : [];
+}
+
+export function canonicalFoundationConformanceDomainId(value) {
+  return value === 'living' ? 'life' : value;
 }
 
 function uniqueSorted(values) {
@@ -114,8 +118,12 @@ export function reconcileFoundationConformanceTruth(report, deployment = {}, opt
     }
   }
 
-  const verifiedParityDomains = uniqueSorted(deployment?.foundationParityDomains);
-  const verifiedExtensionDomains = uniqueSorted(deployment?.foundationDirectExtensionDomains);
+  const verifiedParityDomains = uniqueSorted(
+    array(deployment?.foundationParityDomains).map(canonicalFoundationConformanceDomainId),
+  );
+  const verifiedExtensionDomains = uniqueSorted(
+    array(deployment?.foundationDirectExtensionDomains).map(canonicalFoundationConformanceDomainId),
+  );
   const verifiedDirectDomains = uniqueSorted([
     ...verifiedParityDomains,
     ...verifiedExtensionDomains,
@@ -125,7 +133,9 @@ export function reconcileFoundationConformanceTruth(report, deployment = {}, opt
       .filter(([, item]) => item?.mode === 'bridge')
       .map(([id]) => id),
   );
-  const deploymentBridgeDomains = uniqueSorted(deployment?.foundationNativeBridgeDomains);
+  const deploymentBridgeDomains = uniqueSorted(
+    array(deployment?.foundationNativeBridgeDomains).map(canonicalFoundationConformanceDomainId),
+  );
   const verifiedBridgeDomains = deploymentBridgeDomains.length > 0
     ? deploymentBridgeDomains
     : baseBridgeDomains;
