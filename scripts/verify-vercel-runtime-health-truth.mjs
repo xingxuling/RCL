@@ -61,6 +61,8 @@ try {
     !isSha256(health?.providerBridgeTopology?.registryRoot)
     || health.providerBridgeTopology.registryRoot !== bridgeRegistry.registryRoot
     || health.providerBridgeTopology.registryRoot !== truth.providerBridge.registryRoot
+    || health.providerBridgeTopology.nativeDeploymentRegistryRoot !== bridgeRegistry.registryRoot
+    || health.providerBridgeTopology.nativeDeploymentSpecCount !== FOUNDATION_NATIVE_BRIDGE_SPECS.length
     || JSON.stringify(health.providerBridgeTopology.domains) !== JSON.stringify(bridgeDomains)
     || JSON.stringify(health.providerBridgeTopology.nativeEvidenceDomains) !== JSON.stringify(bridgeDomains)
     || health.providerBridgeTopology.proofCount !== bridgeDomains.length
@@ -95,6 +97,7 @@ try {
     || health?.truthBoundary?.healthBindsCanonicalRuntimeTruthRoot !== true
     || health?.truthBoundary?.healthFailsClosedOnProviderBridgeTopologyDrift !== true
     || health?.truthBoundary?.healthUsesExecutableProviderBridgeRegistryAsCanonicalTopology !== true
+    || health?.truthBoundary?.nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology !== true
     || health?.truthBoundary?.providerBridgeTopologyVerificationDoesNotClaimStatePathSemanticParity !== true
   ) {
     fail('Canonical /health truth boundary drifted or overclaimed runtime capability.', { health });
@@ -108,6 +111,7 @@ try {
     deploymentEvidenceRegistryRoot: healthTruth.deploymentEvidenceRegistryRoot,
     deploymentEvidenceSetRoot: healthTruth.deploymentEvidenceSetRoot,
     providerBridgeRegistryRoot: health.providerBridgeTopology.registryRoot,
+    nativeDeploymentBridgeRegistryRoot: health.providerBridgeTopology.nativeDeploymentRegistryRoot,
     providerBridgeDomains: health.providerBridgeTopology.domains,
     providerBridgeProofCount: health.providerBridgeTopology.proofCount,
     directImplementationDomains: healthTruth.directImplementationDomains,

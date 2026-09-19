@@ -64,6 +64,8 @@ export function runtimeHealthStatus({
 
   const providerBridgeTopologyHealthy = Boolean(
     isSha256(canonicalBridgeRegistry?.registryRoot)
+    && nativeVmDeployment?.foundationNativeBridgeRegistryRoot === canonicalBridgeRegistry.registryRoot
+    && nativeVmDeployment?.foundationNativeBridgeSpecCount === bridgeSpecs.length
     && runtimeCapabilityTruth?.providerBridge?.registryRoot === canonicalBridgeRegistry.registryRoot
     && JSON.stringify(runtimeCapabilityTruth?.providerBridge?.domains ?? []) === JSON.stringify(canonicalBridgeDomains)
     && JSON.stringify(nativeBridgeDomains) === JSON.stringify(canonicalBridgeDomains)
@@ -107,6 +109,8 @@ export function runtimeHealthStatus({
     },
     providerBridgeTopology: {
       registryRoot: canonicalBridgeRegistry?.registryRoot ?? null,
+      nativeDeploymentRegistryRoot: nativeVmDeployment?.foundationNativeBridgeRegistryRoot ?? null,
+      nativeDeploymentSpecCount: nativeVmDeployment?.foundationNativeBridgeSpecCount ?? null,
       domains: canonicalBridgeDomains,
       nativeEvidenceDomains: [...nativeBridgeDomains],
       proofCount: canonicalBridgeDomains.filter(domain => bridgeProofs?.[domain]).length,
@@ -117,6 +121,7 @@ export function runtimeHealthStatus({
       healthBindsCanonicalRuntimeTruthRoot: true,
       healthFailsClosedOnProviderBridgeTopologyDrift: true,
       healthUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
+      nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
       providerBridgeTopologyVerificationDoesNotClaimStatePathSemanticParity: true,
       completeEvidenceCoverageDoesNotClaimFullDomainNativeCoverage: true,
       providerBridgeMayCoexistWithDirectDeploymentEvidence: true,
