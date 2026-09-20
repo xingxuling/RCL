@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { runtimeCapabilityTruthSurface } from '../api/capability-truth.mjs';
 import { runtimeHealthStatus } from '../api/runtime-health.mjs';
+import { bridgeStatePathTruthStatus } from '../api/bridge-statepath-truth.mjs';
 import {
   FOUNDATION_NATIVE_BRIDGE_SPECS,
   foundationNativeBridgeCapabilityRegistrySnapshot,
@@ -23,6 +24,7 @@ function fail(message, details = {}) {
 try {
   const health = runtimeHealthStatus();
   const truth = runtimeCapabilityTruthSurface();
+  const statePathTruth = bridgeStatePathTruthStatus();
   const healthTruth = health.runtimeCapabilityTruth;
   const bridgeRegistry = foundationNativeBridgeCapabilityRegistrySnapshot();
   const bridgeDomains = FOUNDATION_NATIVE_BRIDGE_SPECS.map(spec => spec.domain);
@@ -34,8 +36,9 @@ try {
     health.nativeDeploymentHealthy !== true
     || health.runtimeTruthHealthy !== true
     || health.providerBridgeTopologyHealthy !== true
+    || health.providerBridgeStatePathHealthy !== true
   ) {
-    fail('Canonical /health surface did not bind native deployment, runtime capability truth, and canonical Provider bridge topology.', { health });
+    fail('Canonical /health surface did not bind native deployment, runtime capability truth, Provider bridge topology, and Provider bridge statePath semantics.', { health });
   }
   if (!isSha256(healthTruth?.runtimeTruthRoot) || healthTruth.runtimeTruthRoot !== truth.runtimeTruthRoot) {
     fail('Canonical /health runtime truth root diverged from /capability-truth.', { healthTruth, truthRoot: truth.runtimeTruthRoot });
@@ -74,6 +77,26 @@ try {
       bridgeDomains,
     });
   }
+  const healthStatePath = health?.providerBridgeStatePathTruth;
+  if (
+    !isSha256(healthStatePath?.attestationRoot)
+    || healthStatePath.attestationRoot !== statePathTruth.attestationRoot
+    || healthStatePath.providerBridgeRegistryRoot !== bridgeRegistry.registryRoot
+    || healthStatePath.providerBridgeRegistryRoot !== statePathTruth.providerBridgeRegistryRoot
+    || healthStatePath.providerBridgeSpecCount !== FOUNDATION_NATIVE_BRIDGE_SPECS.length
+    || JSON.stringify(healthStatePath.domains) !== JSON.stringify(bridgeDomains)
+    || healthStatePath?.truthBoundary?.executableStatePathBoundToCanonicalRegistry !== true
+    || healthStatePath?.truthBoundary?.semanticResultPathBoundToFoundationDomainContract !== true
+    || healthStatePath?.truthBoundary?.sourceRootAndReceiptRootBindObservedExecutionEvidence !== true
+    || healthStatePath?.truthBoundary?.replayVerificationRequired !== true
+    || healthStatePath?.truthBoundary?.statePathSemanticAttestationDoesNotImplyDirectNativeExecution !== true
+  ) {
+    fail('Canonical /health Provider bridge statePath truth diverged from the independently verified attestation.', {
+      healthStatePath,
+      statePathTruth,
+      bridgeRegistry,
+    });
+  }
   for (const spec of FOUNDATION_NATIVE_BRIDGE_SPECS) {
     const proof = health?.nativeVmDeployment?.foundationNativeBridgeProofs?.[spec.domain];
     if (
@@ -99,6 +122,9 @@ try {
     || health?.truthBoundary?.healthUsesExecutableProviderBridgeRegistryAsCanonicalTopology !== true
     || health?.truthBoundary?.nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology !== true
     || health?.truthBoundary?.providerBridgeTopologyVerificationDoesNotClaimStatePathSemanticParity !== true
+    || health?.truthBoundary?.healthFailsClosedOnProviderBridgeStatePathSemanticDrift !== true
+    || health?.truthBoundary?.healthBindsCanonicalProviderBridgeStatePathAttestationRoot !== true
+    || health?.truthBoundary?.statePathSemanticAttestationDoesNotImplyDirectNativeExecution !== true
   ) {
     fail('Canonical /health truth boundary drifted or overclaimed runtime capability.', { health });
   }
@@ -112,6 +138,7 @@ try {
     deploymentEvidenceSetRoot: healthTruth.deploymentEvidenceSetRoot,
     providerBridgeRegistryRoot: health.providerBridgeTopology.registryRoot,
     nativeDeploymentBridgeRegistryRoot: health.providerBridgeTopology.nativeDeploymentRegistryRoot,
+    providerBridgeStatePathAttestationRoot: healthStatePath.attestationRoot,
     providerBridgeDomains: health.providerBridgeTopology.domains,
     providerBridgeProofCount: health.providerBridgeTopology.proofCount,
     directImplementationDomains: healthTruth.directImplementationDomains,
