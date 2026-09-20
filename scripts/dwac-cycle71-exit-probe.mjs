@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 const steps = [
   { code: 93, name: 'cycle70-regression-proof-chain', args: ['scripts/dwac-cycle70-exit-probe.mjs'] },
   { code: 94, name: 'runtime-health-statepath-negative-controls', args: ['scripts/verify-runtime-health-statepath-negative-control.mjs'] },
-  { code: 95, name: 'runtime-health-statepath-truth-binding', args: ['scripts/verify-vercel-runtime-health-truth.mjs'] },
+  { code: 95, name: 'runtime-health-statepath-truth-binding', args: ['scripts/verify-vercel-runtime-health-statepath-truth.mjs'] },
 ];
 
 for (const step of steps) {

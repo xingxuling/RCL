@@ -25,17 +25,15 @@ function bridgeProofMatchesCanonicalSpec(proof, spec) {
   );
 }
 
-export function runtimeHealthStatus({
+function runtimeHealthBaseStatus({
   nativeStatus = null,
   runtimeSurface = null,
-  bridgeStatePathSurface = null,
   bridgeSpecs = FOUNDATION_NATIVE_BRIDGE_SPECS,
   bridgeRegistrySnapshot = null,
 } = {}) {
   const tools = listRclMcpTools();
   const nativeVmDeployment = nativeStatus ?? nativeVmDeploymentStatus();
   const runtimeCapabilityTruth = runtimeSurface ?? runtimeCapabilityTruthSurface();
-  const providerBridgeStatePathTruth = bridgeStatePathSurface ?? bridgeStatePathTruthStatus();
   const registry = runtimeCapabilityTruth?.deploymentEvidenceRegistry;
   const canonicalBridgeRegistry = bridgeRegistrySnapshot ?? foundationNativeBridgeCapabilityRegistrySnapshot();
   const canonicalBridgeDomains = bridgeSpecs.map(spec => spec.domain);
@@ -75,24 +73,7 @@ export function runtimeHealthStatus({
     && bridgeSpecs.every(spec => bridgeProofMatchesCanonicalSpec(bridgeProofs?.[spec.domain], spec))
   );
 
-  const providerBridgeStatePathHealthy = Boolean(
-    providerBridgeStatePathTruth?.ok === true
-    && providerBridgeStatePathTruth?.status === 'RCL_PROVIDER_BRIDGE_STATEPATH_SEMANTICS_VERIFIED'
-    && isSha256(providerBridgeStatePathTruth?.attestationRoot)
-    && providerBridgeStatePathTruth?.providerBridgeRegistryRoot === canonicalBridgeRegistry.registryRoot
-    && providerBridgeStatePathTruth?.providerBridgeSpecCount === bridgeSpecs.length
-    && JSON.stringify(providerBridgeStatePathTruth?.domains ?? []) === JSON.stringify(canonicalBridgeDomains)
-    && providerBridgeStatePathTruth?.truthBoundary?.executableStatePathBoundToCanonicalRegistry === true
-    && providerBridgeStatePathTruth?.truthBoundary?.semanticResultPathBoundToFoundationDomainContract === true
-    && providerBridgeStatePathTruth?.truthBoundary?.sourceRootAndReceiptRootBindObservedExecutionEvidence === true
-    && providerBridgeStatePathTruth?.truthBoundary?.replayVerificationRequired === true
-    && providerBridgeStatePathTruth?.truthBoundary?.statePathSemanticAttestationDoesNotImplyDirectNativeExecution === true
-  );
-
-  const ok = nativeDeploymentHealthy
-    && runtimeTruthHealthy
-    && providerBridgeTopologyHealthy
-    && providerBridgeStatePathHealthy;
+  const ok = nativeDeploymentHealthy && runtimeTruthHealthy && providerBridgeTopologyHealthy;
   return {
     ok,
     status: ok ? 'RCL_RUNTIME_HEALTH_VERIFIED' : 'RCL_RUNTIME_HEALTH_DRIFT',
@@ -105,7 +86,6 @@ export function runtimeHealthStatus({
     nativeDeploymentHealthy,
     runtimeTruthHealthy,
     providerBridgeTopologyHealthy,
-    providerBridgeStatePathHealthy,
     nativeVmDeployment,
     runtimeCapabilityTruth: {
       status: runtimeCapabilityTruth?.status ?? null,
@@ -137,6 +117,60 @@ export function runtimeHealthStatus({
       proofCount: canonicalBridgeDomains.filter(domain => bridgeProofs?.[domain]).length,
       allProofsMatchCanonicalSpecs: bridgeSpecs.every(spec => bridgeProofMatchesCanonicalSpec(bridgeProofs?.[spec.domain], spec)),
     },
+    truthBoundary: {
+      healthFailsClosedOnRuntimeCapabilityTruthDrift: true,
+      healthBindsCanonicalRuntimeTruthRoot: true,
+      healthFailsClosedOnProviderBridgeTopologyDrift: true,
+      healthUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
+      nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
+      providerBridgeTopologyVerificationDoesNotClaimStatePathSemanticParity: true,
+      completeEvidenceCoverageDoesNotClaimFullDomainNativeCoverage: true,
+      providerBridgeMayCoexistWithDirectDeploymentEvidence: true,
+    },
+  };
+}
+
+// Historical regression probes use this topology/runtime-truth surface before the
+// Cycle 70 statePath attestation is materialized. Keep this contract stable.
+export function runtimeHealthStatus(options = {}) {
+  return runtimeHealthBaseStatus(options);
+}
+
+// The deployed /health surface is stricter: it additionally binds the Cycle 70
+// Provider bridge statePath semantic attestation and fails closed on any drift.
+export function runtimeHealthStatusWithStatePath({
+  bridgeStatePathSurface = null,
+  bridgeSpecs = FOUNDATION_NATIVE_BRIDGE_SPECS,
+  bridgeRegistrySnapshot = null,
+  ...baseOptions
+} = {}) {
+  const base = runtimeHealthBaseStatus({
+    ...baseOptions,
+    bridgeSpecs,
+    bridgeRegistrySnapshot,
+  });
+  const canonicalBridgeRegistry = bridgeRegistrySnapshot ?? foundationNativeBridgeCapabilityRegistrySnapshot();
+  const canonicalBridgeDomains = bridgeSpecs.map(spec => spec.domain);
+  const providerBridgeStatePathTruth = bridgeStatePathSurface ?? bridgeStatePathTruthStatus();
+  const providerBridgeStatePathHealthy = Boolean(
+    providerBridgeStatePathTruth?.ok === true
+    && providerBridgeStatePathTruth?.status === 'RCL_PROVIDER_BRIDGE_STATEPATH_SEMANTICS_VERIFIED'
+    && isSha256(providerBridgeStatePathTruth?.attestationRoot)
+    && providerBridgeStatePathTruth?.providerBridgeRegistryRoot === canonicalBridgeRegistry.registryRoot
+    && providerBridgeStatePathTruth?.providerBridgeSpecCount === bridgeSpecs.length
+    && JSON.stringify(providerBridgeStatePathTruth?.domains ?? []) === JSON.stringify(canonicalBridgeDomains)
+    && providerBridgeStatePathTruth?.truthBoundary?.executableStatePathBoundToCanonicalRegistry === true
+    && providerBridgeStatePathTruth?.truthBoundary?.semanticResultPathBoundToFoundationDomainContract === true
+    && providerBridgeStatePathTruth?.truthBoundary?.sourceRootAndReceiptRootBindObservedExecutionEvidence === true
+    && providerBridgeStatePathTruth?.truthBoundary?.replayVerificationRequired === true
+    && providerBridgeStatePathTruth?.truthBoundary?.statePathSemanticAttestationDoesNotImplyDirectNativeExecution === true
+  );
+  const ok = base.ok && providerBridgeStatePathHealthy;
+  return {
+    ...base,
+    ok,
+    status: ok ? 'RCL_RUNTIME_HEALTH_VERIFIED' : 'RCL_RUNTIME_HEALTH_DRIFT',
+    providerBridgeStatePathHealthy,
     providerBridgeStatePathTruth: {
       status: providerBridgeStatePathTruth?.status ?? null,
       attestationRoot: providerBridgeStatePathTruth?.attestationRoot ?? null,
@@ -146,17 +180,10 @@ export function runtimeHealthStatus({
       truthBoundary: providerBridgeStatePathTruth?.truthBoundary ?? null,
     },
     truthBoundary: {
-      healthFailsClosedOnRuntimeCapabilityTruthDrift: true,
-      healthBindsCanonicalRuntimeTruthRoot: true,
-      healthFailsClosedOnProviderBridgeTopologyDrift: true,
-      healthUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
-      nativeDeploymentUsesExecutableProviderBridgeRegistryAsCanonicalTopology: true,
-      providerBridgeTopologyVerificationDoesNotClaimStatePathSemanticParity: true,
+      ...base.truthBoundary,
       healthFailsClosedOnProviderBridgeStatePathSemanticDrift: true,
       healthBindsCanonicalProviderBridgeStatePathAttestationRoot: true,
       statePathSemanticAttestationDoesNotImplyDirectNativeExecution: true,
-      completeEvidenceCoverageDoesNotClaimFullDomainNativeCoverage: true,
-      providerBridgeMayCoexistWithDirectDeploymentEvidence: true,
     },
   };
 }
@@ -164,7 +191,7 @@ export function runtimeHealthStatus({
 export default function handler(_request, response) {
   let health;
   try {
-    health = runtimeHealthStatus();
+    health = runtimeHealthStatusWithStatePath();
   } catch (error) {
     response.writeHead(503, { 'content-type': 'application/json; charset=utf-8' });
     response.end(`${JSON.stringify({
