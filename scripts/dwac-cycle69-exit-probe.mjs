@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Revalidate the unchanged Cycle 69 delivery gate after the transient external deployment-rate-limit window.
 import { spawnSync } from 'node:child_process';
 
 const steps = [
