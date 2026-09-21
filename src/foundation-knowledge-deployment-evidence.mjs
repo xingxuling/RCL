@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.1';
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.1.0';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.2';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.2.0';
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
@@ -63,21 +63,27 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || parity.semanticStateRoot !== true
     || parity.nativeStateRootVerified !== true
     || parity.nativeStateRootParity !== true
+    || parity.knowledgeReceipt !== true
     || parity.nativeExecutionAttestation !== true
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_PARITY_DRIFT', 'Knowledge deployment proof no longer closes state/root/executable parity.', { parity });
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_PARITY_DRIFT', 'Knowledge deployment proof no longer closes state/root/domain-receipt/executable parity.', { parity });
   }
 
   if (
     proof?.executionBinarySha256 !== binarySha256
     || !isSha256(proof?.nativeVmExecutionAttestationRoot)
     || !isSha256(proof?.initialStateRoot)
+    || !isSha256(proof?.knowledgeReceiptRoot)
+    || proof?.receiptParity?.ok !== true
+    || proof?.receiptParity?.receiptRoot !== proof?.knowledgeReceiptRoot
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge deployment proof lost content-addressed execution/binary/pre-Learn-root binding.', {
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge deployment proof lost content-addressed execution/binary/pre-Learn/domain-receipt binding.', {
       executionBinarySha256: proof?.executionBinarySha256 ?? null,
       binarySha256,
       nativeVmExecutionAttestationRoot: proof?.nativeVmExecutionAttestationRoot ?? null,
       initialStateRoot: proof?.initialStateRoot ?? null,
+      knowledgeReceiptRoot: proof?.knowledgeReceiptRoot ?? null,
+      receiptParityRoot: proof?.receiptParity?.receiptRoot ?? null,
     });
   }
 
@@ -98,10 +104,12 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || boundary.exactInitialFormedAtRootRequired !== true
     || boundary.dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound !== true
     || boundary.referenceRuntimeStateParityRequired !== true
+    || boundary.exactReferenceNativeDomainReceiptParityRequired !== true
     || boundary.canonicalRealCExecutionRequiredForVerifiedStatus !== true
     || boundary.providerBridgeRemovedGlobally !== false
     || boundary.allKnowledgeProgramsNativeClaimed !== false
-    || boundary.knowledgeDomainReceiptParityClaimed !== false
+    || boundary.knowledgeDomainReceiptParityClaimed !== true
+    || boundary.fullHistoryParityClaimed !== false
   ) {
     fail('RCL_KNOWLEDGE_DEPLOYMENT_BOUNDARY_DRIFT', 'Knowledge deployment truth boundary drifted or overclaimed the bounded proof.', { boundary });
   }
@@ -116,6 +124,8 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     executionBinarySha256: proof?.executionBinarySha256 ?? null,
     nativeVmExecutionAttestationRoot: proof?.nativeVmExecutionAttestationRoot ?? null,
     initialStateRoot: proof?.initialStateRoot ?? null,
+    knowledgeReceiptRoot: proof?.knowledgeReceiptRoot ?? null,
+    knowledgeReceiptRootAlgorithm: proof?.knowledgeReceiptRootAlgorithm ?? null,
     loweredDirectiveCount: proof?.loweredDirectiveCount ?? null,
     loweredClaimCount: proof?.loweredClaimCount ?? null,
     finalState: {
@@ -124,9 +134,11 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     },
     truthBoundary: {
       boundedSingleClaimKnowledgeSubsetOnly: boundary.boundedSingleClaimKnowledgeSubsetOnly === true,
+      exactReferenceNativeDomainReceiptParityRequired: boundary.exactReferenceNativeDomainReceiptParityRequired === true,
       providerBridgeRemovedGlobally: boundary.providerBridgeRemovedGlobally === true,
       allKnowledgeProgramsNativeClaimed: boundary.allKnowledgeProgramsNativeClaimed === true,
       knowledgeDomainReceiptParityClaimed: boundary.knowledgeDomainReceiptParityClaimed === true,
+      fullHistoryParityClaimed: boundary.fullHistoryParityClaimed === true,
     },
   };
 
