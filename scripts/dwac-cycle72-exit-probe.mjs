@@ -28,7 +28,7 @@ const steps = [
   { code: 72, name: 'runtime-health-native-registry-truth', args: ['scripts/verify-vercel-runtime-health-truth.mjs'] },
   { code: 73, name: 'federation-producer-canonical-registry-rebind', args: ['scripts/bind-vercel-foundation-native-federation.mjs'] },
   { code: null, propagateChildStatus: true, name: 'federation-registry-semantic-diagnostic', args: ['--input-type=module', '-e', federationDiagnostic] },
-  { code: 74, name: 'federation-registry-negative-controls', args: ['--test', 'tests/foundation-native-federation-registry-binding.test.mjs'] },
+  { captureTap: true, name: 'federation-registry-negative-controls', args: ['--test', 'tests/foundation-native-federation-registry-binding.test.mjs'] },
   { code: 75, name: 'deployed-federation-registry-binding', args: ['scripts/verify-vercel-foundation-native-federation-registry-binding.mjs'] },
   { code: 76, name: 'cycle68-deployment-health-regression', args: ['scripts/verify-vercel-health-evidence.mjs'] },
   { code: 77, name: 'cycle68-runtime-health-truth-regression', args: ['scripts/verify-vercel-runtime-health-truth.mjs'] },
@@ -43,5 +43,23 @@ const steps = [
   { code: 86, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
   { code: 87, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
 ];
-for (const step of steps) { const result=spawnSync(process.execPath,step.args,{stdio:'inherit',env:process.env}); if(result.error||result.status!==0){const exitCode=step.propagateChildStatus&&Number.isInteger(result.status)?result.status:step.code; console.error(JSON.stringify({status:'DWAC_CYCLE72_EXIT_PROBE_FAILURE',probeExitCode:exitCode,step:step.name,childExitCode:result.status??null,error:result.error?.message??null},null,2)); process.exit(exitCode??1);} }
+
+for (const step of steps) {
+  const options = step.captureTap
+    ? { encoding: 'utf8', env: process.env }
+    : { stdio: 'inherit', env: process.env };
+  const result = spawnSync(process.execPath, step.args, options);
+  if (result.error || result.status !== 0) {
+    if (step.captureTap) {
+      const tap = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+      console.error(tap);
+      const match = tap.match(/not ok\s+(\d+)/);
+      const tapExit = match ? 110 + Number(match[1]) : 119;
+      process.exit(tapExit);
+    }
+    const exitCode = step.propagateChildStatus && Number.isInteger(result.status) ? result.status : step.code;
+    console.error(JSON.stringify({ status: 'DWAC_CYCLE72_EXIT_PROBE_FAILURE', probeExitCode: exitCode, step: step.name, childExitCode: result.status ?? null, error: result.error?.message ?? null }, null, 2));
+    process.exit(exitCode ?? 1);
+  }
+}
 console.log(JSON.stringify({ok:true,status:'DWAC_CYCLE72_EXIT_PROBE_ALL_PASS',truthBoundary:{inheritedRegressionProofChainPreserved:true,boundedSingleClaimKnowledgeDirectLoweringVerified:true,canonicalRealCStateAndSemanticRootParityRequired:true,exactInitialFormedAtRootBound:true,runtimeCapabilityTruthBindsKnowledgeDeploymentEvidence:true,unsupportedKnowledgeProgramsRemainProviderBound:true,knowledgeProviderBridgeRemovedGlobally:false,allKnowledgeProgramsNativeClaimed:false,knowledgeDomainReceiptParityClaimed:false}},null,2));
