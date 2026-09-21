@@ -8,6 +8,7 @@ import { tryCompileFoundationRealityToBytecode } from '../src/foundation-direct-
 import { runReality } from '../src/runtime.mjs';
 import { runNativeBytecode } from '../src/native-vm.mjs';
 import { semanticStateRoot, semanticValue } from '../src/semantic-state-root.mjs';
+import { verifyFoundationKnowledgeReceiptParity } from '../src/foundation-knowledge-native-parity.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const nativeDir = path.join(root, 'native');
@@ -129,6 +130,23 @@ try {
   fail('Knowledge semantic state/root normalization threw unexpectedly', { code: error?.code ?? null, error: error?.message ?? String(error) }, 116);
 }
 
+const receiptParity = verifyFoundationKnowledgeReceiptParity(
+  compiled.foundationKnowledgeDirectLowering,
+  reference?.history,
+  native?.history,
+  semanticValue,
+);
+if (receiptParity.ok !== true) {
+  const checks = receiptParity?.entries?.[0]?.checks ?? {};
+  let exitCode = 180;
+  if (checks.exactNativeReceipt !== true || receiptParity.nativeCoverageExact !== true) exitCode = 181;
+  else if (checks.transitionValuesEquivalent !== true || checks.referenceTargetsExact !== true || checks.nativeTargetsExact !== true) exitCode = 182;
+  else if (checks.boundaryRootsEquivalent !== true) exitCode = 183;
+  else if (checks.formedAtRootRetained !== true || checks.referenceKnowledgeClaimAligned !== true) exitCode = 184;
+  else if (checks.syntheticWitnessPresent !== true) exitCode = 185;
+  fail('Knowledge real-C domain receipt parity failed closed', { receiptParity }, exitCode);
+}
+
 const executionAttestation = native?.nativeVmExecutionAttestation ?? null;
 const executionBinarySha256 = executionAttestation?.materialization?.binarySha256 ?? null;
 const parity = {
@@ -136,10 +154,20 @@ const parity = {
   semanticStateRoot: nativeRoot === referenceRoot,
   nativeStateRootVerified: native?.stateRootVerified === true,
   nativeStateRootParity: native?.stateRootParity === true,
+  knowledgeReceipt: receiptParity.ok === true,
   nativeExecutionAttestation: Boolean(executionAttestation?.attestationRoot && executionBinarySha256 === binarySha256),
 };
 if (!Object.values(parity).every(Boolean)) {
-  fail('Knowledge proof did not close state/root/executable parity', { parity, referenceState, nativeState, referenceRoot, nativeRoot, executionBinarySha256, binarySha256 }, 117);
+  fail('Knowledge proof did not close state/root/domain-receipt/executable parity', {
+    parity,
+    receiptParity,
+    referenceState,
+    nativeState,
+    referenceRoot,
+    nativeRoot,
+    executionBinarySha256,
+    binarySha256,
+  }, 117);
 }
 
 const initialStateRoot = compiled.foundationKnowledgeDirectLowering.summary.formedAtRoot;
@@ -163,8 +191,8 @@ if (
 }
 
 const knowledgeParityProof = {
-  format: 'taowind.rcl-foundation-knowledge-native-parity.v0.1',
-  version: '0.1.0',
+  format: 'taowind.rcl-foundation-knowledge-native-parity.v0.2',
+  version: '0.2.0',
   domain: 'knowledge',
   status: 'native-verified',
   verified: true,
@@ -172,6 +200,9 @@ const knowledgeParityProof = {
   loweredDirectiveCount: compiled.foundationKnowledgeDirectLowering.summary.consumedDirectiveCount,
   loweredClaimCount: compiled.foundationKnowledgeDirectLowering.summary.knowledgeLoweredDeclarationCount,
   parity,
+  receiptParity,
+  knowledgeReceiptRoot: receiptParity.receiptRoot,
+  knowledgeReceiptRootAlgorithm: receiptParity.rootAlgorithm,
   initialStateRoot,
   nativeVmExecutionAttestationRoot: executionAttestation.attestationRoot,
   executionBinarySha256,
@@ -185,10 +216,12 @@ const knowledgeParityProof = {
     exactInitialFormedAtRootRequired: true,
     dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound: true,
     referenceRuntimeStateParityRequired: true,
+    exactReferenceNativeDomainReceiptParityRequired: true,
     canonicalRealCExecutionRequiredForVerifiedStatus: true,
     providerBridgeRemovedGlobally: false,
     allKnowledgeProgramsNativeClaimed: false,
-    knowledgeDomainReceiptParityClaimed: false,
+    knowledgeDomainReceiptParityClaimed: true,
+    fullHistoryParityClaimed: false,
   },
 };
 
@@ -197,7 +230,7 @@ manifest.foundationKnowledgeParityProof = knowledgeParityProof;
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
 fs.mkdirSync(publicDir, { recursive: true });
-fs.writeFileSync(proofPath, `${JSON.stringify({ ok: true, format: 'taowind.rcl-vercel-foundation-knowledge-native-proof.v0.1', status: 'native-verified', verified: true, binarySha256, knowledgeParityProof }, null, 2)}\n`);
+fs.writeFileSync(proofPath, `${JSON.stringify({ ok: true, format: 'taowind.rcl-vercel-foundation-knowledge-native-proof.v0.2', status: 'native-verified', verified: true, binarySha256, knowledgeParityProof }, null, 2)}\n`);
 const publicBuildProof = fs.existsSync(publicBuildProofPath) ? JSON.parse(fs.readFileSync(publicBuildProofPath, 'utf8')) : {};
 const existingDomains = Array.isArray(publicBuildProof.foundationParityDomains) ? publicBuildProof.foundationParityDomains : [];
 publicBuildProof.binarySha256 = binarySha256;
@@ -209,6 +242,8 @@ publicBuildProof.foundationKnowledgeParity = {
   verified: true,
   boundedSubset: true,
   initialStateRoot,
+  knowledgeReceiptRoot: knowledgeParityProof.knowledgeReceiptRoot,
+  knowledgeReceiptRootAlgorithm: knowledgeParityProof.knowledgeReceiptRootAlgorithm,
   nativeVmExecutionAttestationRoot: knowledgeParityProof.nativeVmExecutionAttestationRoot,
   executionBinarySha256,
 };
@@ -221,6 +256,8 @@ console.log(JSON.stringify({
   loweredDirectiveCount: knowledgeParityProof.loweredDirectiveCount,
   loweredClaimCount: knowledgeParityProof.loweredClaimCount,
   initialStateRoot,
+  knowledgeReceiptRoot: knowledgeParityProof.knowledgeReceiptRoot,
+  knowledgeReceiptRootAlgorithm: knowledgeParityProof.knowledgeReceiptRootAlgorithm,
   nativeVmExecutionAttestationRoot: knowledgeParityProof.nativeVmExecutionAttestationRoot,
   foundationParityDomains: Object.keys(manifest.foundationParityProofs),
   finalKnowledge: nativeKnowledge,

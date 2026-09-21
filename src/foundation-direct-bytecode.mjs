@@ -10,7 +10,75 @@ import {
   foundationDirectCapabilityRegistrySnapshot,
 } from './foundation-direct-capability-registry.mjs';
 
-export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.6';
+export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.7';
+
+function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
+  const lowered = Array.isArray(knowledgeLowering?.lowered) ? knowledgeLowering.lowered : [];
+  if (lowered.length === 0) {
+    return {
+      program,
+      omittedInitialFacetPaths: [],
+      firstWriteRules: [],
+      truthBoundary: {
+        knowledgeInitialStateEncodingChanged: false,
+        omissionAllowedOnlyForFirstDirectiveBoundedLearn: true,
+      },
+    };
+  }
+
+  if (lowered.length !== 1) {
+    throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_REQUIRES_SINGLE_LOWERING');
+  }
+  const item = lowered[0];
+  if (
+    item?.domain !== 'knowledge'
+    || item?.directive !== 'Learn'
+    || Number(item?.directiveIndex) !== 0
+    || typeof item?.claimPath !== 'string'
+    || typeof item?.syntheticRule !== 'string'
+  ) {
+    throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_METADATA_INVALID');
+  }
+
+  const firstDirective = program?.directives?.[0];
+  const firstRule = (program?.rules ?? []).find(rule => rule?.name === item.syntheticRule);
+  const exactFirstWriteRule = firstDirective?.kind === 'Realize'
+    && firstDirective?.rule === item.syntheticRule
+    && firstRule?.when?.kind === 'LiteralExpr'
+    && firstRule?.when?.valueType === 'Truth'
+    && firstRule?.when?.value === true
+    && (firstRule?.needs?.length ?? 0) === 0
+    && (firstRule?.calls?.length ?? 0) === 0
+    && (firstRule?.preserves?.length ?? 0) === 0
+    && (firstRule?.alters?.length ?? 0) === 1
+    && firstRule.alters[0]?.target === item.claimPath;
+  if (!exactFirstWriteRule) {
+    throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_ORDER_UNPROVEN');
+  }
+
+  const facets = Array.isArray(program?.facets) ? program.facets : [];
+  const matchingFacets = facets.filter(facet => facet?.path === item.claimPath);
+  if (matchingFacets.length !== 1) {
+    throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_FACET_IDENTITY_DRIFT');
+  }
+
+  return {
+    program: {
+      ...program,
+      facets: facets.filter(facet => facet?.path !== item.claimPath),
+    },
+    omittedInitialFacetPaths: [item.claimPath],
+    firstWriteRules: [item.syntheticRule],
+    truthBoundary: {
+      knowledgeInitialStateEncodingChanged: true,
+      omissionAllowedOnlyForFirstDirectiveBoundedLearn: true,
+      firstDirectiveMustBeUnconditionalSingleTargetRealize: true,
+      omissionPreservesReferencePreLearnRealityBoundary: true,
+      omittedFacetIsCreatedByTheFirstNativeTransaction: true,
+      genericDeferredFacetSupportClaimed: false,
+    },
+  };
+}
 
 export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options = {}) {
   try {
@@ -26,7 +94,12 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
       domains: options.domains ?? FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
     });
     const quantityLowering = lowerFoundationQuantitiesForNativeBytecode(lowering.program);
-    const result = compileBytecode(quantityLowering.program);
+    const knowledgeNativeInitialization = prepareKnowledgeFirstWriteNativeProgram(
+      quantityLowering.program,
+      knowledgeLowering,
+    );
+    const { program: nativeProgram, ...knowledgeNativeInitializationEvidence } = knowledgeNativeInitialization;
+    const result = compileBytecode(nativeProgram);
     return {
       ...result,
       program: result?.ok ? lowering.program : result?.program ?? null,
@@ -55,6 +128,7 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
         summary: knowledgeLowering.summary,
         truthBoundary: knowledgeLowering.truthBoundary,
       },
+      foundationKnowledgeNativeInitialization: knowledgeNativeInitializationEvidence,
       foundationDirectLowering: {
         format: FOUNDATION_DIRECT_BYTECODE_FORMAT,
         lowered: lowering.lowered,
@@ -83,6 +157,7 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
       foundationQuantitativeDirectLowering: null,
       foundationEnergyDirectLowering: null,
       foundationKnowledgeDirectLowering: null,
+      foundationKnowledgeNativeInitialization: null,
       foundationDirectLowering: null,
       foundationQuantityNativeLowering: null,
     };
