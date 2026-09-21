@@ -44,8 +44,19 @@ async function fixture() {
     rule: item.syntheticRule,
     witnesses: [...(referenceReceipt.witnesses ?? []), item.witness],
   };
-  return { lowering: compiled.foundationKnowledgeDirectLowering, referenceReceipt, nativeReceipt };
+  return { compiled, lowering: compiled.foundationKnowledgeDirectLowering, referenceReceipt, nativeReceipt };
 }
+
+test('Knowledge native encoding omits only the bounded Learn claim initializer so the first transaction owns the state transition', async () => {
+  const { compiled, lowering } = await fixture();
+  const initialization = compiled.foundationKnowledgeNativeInitialization;
+  assert.deepEqual(initialization.omittedInitialFacetPaths, ['mind.trusted']);
+  assert.deepEqual(initialization.firstWriteRules, [lowering.lowered[0].syntheticRule]);
+  assert.equal(initialization.truthBoundary.omissionPreservesReferencePreLearnRealityBoundary, true);
+  assert.equal(initialization.truthBoundary.omittedFacetIsCreatedByTheFirstNativeTransaction, true);
+  assert.equal(initialization.truthBoundary.genericDeferredFacetSupportClaimed, false);
+  assert.equal(Object.hasOwn(initialization, 'program'), false);
+});
 
 test('Knowledge receipt parity binds one reference Learn transition to one synthetic native transaction', async () => {
   const { lowering, referenceReceipt, nativeReceipt } = await fixture();
