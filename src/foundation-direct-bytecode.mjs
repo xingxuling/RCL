@@ -3,13 +3,14 @@ import { tryCompileRealityToBytecode } from './bytecode.mjs';
 import { lowerDeclaredFoundationToCore } from './foundation-direct-lowering.mjs';
 import { lowerDeclaredQuantitativeToCore } from './foundation-quantitative-direct-lowering.mjs';
 import { lowerDeclaredEnergyToCore } from './foundation-energy-direct-lowering.mjs';
+import { lowerDeclaredKnowledgeToCore } from './foundation-knowledge-direct-lowering.mjs';
 import { lowerFoundationQuantitiesForNativeBytecode } from './foundation-quantity-native-lowering.mjs';
 import {
   FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
   foundationDirectCapabilityRegistrySnapshot,
 } from './foundation-direct-capability-registry.mjs';
 
-export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.5';
+export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.6';
 
 export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options = {}) {
   try {
@@ -19,7 +20,8 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
     const capabilityRegistry = foundationDirectCapabilityRegistrySnapshot();
     const quantitativeLowering = lowerDeclaredQuantitativeToCore(program);
     const energyLowering = lowerDeclaredEnergyToCore(quantitativeLowering.program);
-    const lowering = lowerDeclaredFoundationToCore(energyLowering.program, {
+    const knowledgeLowering = lowerDeclaredKnowledgeToCore(energyLowering.program);
+    const lowering = lowerDeclaredFoundationToCore(knowledgeLowering.program, {
       ...options,
       domains: options.domains ?? FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
     });
@@ -44,6 +46,14 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
         diagnostics: energyLowering.diagnostics,
         summary: energyLowering.summary,
         truthBoundary: energyLowering.truthBoundary,
+      },
+      foundationKnowledgeDirectLowering: {
+        format: knowledgeLowering.format,
+        version: knowledgeLowering.version,
+        lowered: knowledgeLowering.lowered,
+        diagnostics: knowledgeLowering.diagnostics,
+        summary: knowledgeLowering.summary,
+        truthBoundary: knowledgeLowering.truthBoundary,
       },
       foundationDirectLowering: {
         format: FOUNDATION_DIRECT_BYTECODE_FORMAT,
@@ -72,6 +82,7 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
       foundationDirectCapabilityRegistry: null,
       foundationQuantitativeDirectLowering: null,
       foundationEnergyDirectLowering: null,
+      foundationKnowledgeDirectLowering: null,
       foundationDirectLowering: null,
       foundationQuantityNativeLowering: null,
     };

@@ -32,5 +32,9 @@ test('runtime deployment evidence surface fails closed when any registered provi
   const report = foundationRuntimeDeploymentEvidenceSurface({ builders: testBuilders }); assert.equal(report.ok, false); assert.equal(report.evidenceSetVerified, false); assert.ok(report.errors.some(error => error.code === 'RCL_RUNTIME_DEPLOYMENT_EVIDENCE_PROVIDER_FAILED'));
 });
 test('runtime deployment evidence registry rejects non-direct evidence providers', () => {
-  const report = foundationRuntimeDeploymentEvidenceSurface({ providers: [{ domain: 'knowledge', evidenceModule: 'src/fake.mjs', evidenceFunction: 'fake' }], builders: { knowledge: () => verified('knowledge') } }); assert.equal(report.ok, false); assert.ok(report.errors.some(error => error.code === 'RCL_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_NON_DIRECT_DOMAIN'));
+  const domain = 'natural-language-reality';
+  assert.equal(FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS.includes(domain), false);
+  const report = foundationRuntimeDeploymentEvidenceSurface({ providers: [{ domain, evidenceModule: 'src/fake.mjs', evidenceFunction: 'fake' }], builders: { [domain]: () => verified(domain) } });
+  assert.equal(report.ok, false);
+  assert.ok(report.errors.some(error => error.code === 'RCL_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_NON_DIRECT_DOMAIN'));
 });

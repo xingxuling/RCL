@@ -29,6 +29,7 @@ steps.push(
 {code:56,name:'quantitative-direct-deployment-binding',args:['scripts/bind-vercel-foundation-quantitative-direct.mjs']},
 {code:57,name:'quantitative-direct-health',args:['scripts/verify-vercel-foundation-quantitative-direct-health.mjs']},
 {code:null,propagateChildStatus:true,name:'quantitative-receipt-parity',args:['scripts/verify-vercel-foundation-quantitative-parity.mjs']},
+{code:null,propagateChildStatus:true,name:'knowledge-real-c-bounded-parity',args:['scripts/verify-vercel-foundation-knowledge.mjs']},
 {code:59,name:'runtime-deployment-evidence-registry',args:['scripts/verify-foundation-runtime-deployment-evidence-registry.mjs']},
 {code:60,name:'energy-runtime-capability-truth',args:['scripts/verify-foundation-energy-deployment-truth.mjs']},
 {code:61,name:'deployment-health',args:['scripts/verify-vercel-health-evidence.mjs']});
