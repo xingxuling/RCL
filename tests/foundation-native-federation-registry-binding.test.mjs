@@ -36,6 +36,19 @@ function verify(federationProof = proof()) {
   });
 }
 
+function expectDrift(mutator, expectedCode) {
+  const drifted = proof();
+  mutator(drifted);
+  let caught = null;
+  try {
+    verify(drifted);
+  } catch (error) {
+    caught = error;
+  }
+  assert.ok(caught instanceof FoundationNativeFederationRegistryBindingError);
+  assert.equal(caught.code, expectedCode);
+}
+
 test('federation attestation is bound to the exact executable canonical bridge registry identity', () => {
   const result = verify();
   assert.equal(result.ok, true);
@@ -47,41 +60,29 @@ test('federation attestation is bound to the exact executable canonical bridge r
 });
 
 test('federation attestation fails closed on registry-root drift', () => {
-  const drifted = proof();
-  drifted.providerBridgeRegistryRoot = 'b'.repeat(64);
-  assert.throws(
-    () => verify(drifted),
-    error => error instanceof FoundationNativeFederationRegistryBindingError
-      && error.code === 'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',
+  expectDrift(
+    drifted => { drifted.providerBridgeRegistryRoot = 'b'.repeat(64); },
+    'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',
   );
 });
 
 test('federation attestation fails closed on canonical spec-count drift', () => {
-  const drifted = proof();
-  drifted.providerBridgeSpecCount = 1;
-  assert.throws(
-    () => verify(drifted),
-    error => error instanceof FoundationNativeFederationRegistryBindingError
-      && error.code === 'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',
+  expectDrift(
+    drifted => { drifted.providerBridgeSpecCount = 1; },
+    'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',
   );
 });
 
 test('federation attestation fails closed on domain topology drift', () => {
-  const drifted = proof();
-  drifted.domains = ['beta', 'alpha'];
-  assert.throws(
-    () => verify(drifted),
-    error => error instanceof FoundationNativeFederationRegistryBindingError
-      && error.code === 'RCL_FOUNDATION_FEDERATION_DOMAIN_DRIFT',
+  expectDrift(
+    drifted => { drifted.domains = ['beta', 'alpha']; },
+    'RCL_FOUNDATION_FEDERATION_DOMAIN_DRIFT',
   );
 });
 
 test('federation attestation fails closed on provider batch identity drift', () => {
-  const drifted = proof();
-  drifted.providerBatches['batch-a'].providerCallCount = 1;
-  assert.throws(
-    () => verify(drifted),
-    error => error instanceof FoundationNativeFederationRegistryBindingError
-      && error.code === 'RCL_FOUNDATION_FEDERATION_BATCH_DRIFT',
+  expectDrift(
+    drifted => { drifted.providerBatches['batch-a'].providerCallCount = 1; },
+    'RCL_FOUNDATION_FEDERATION_BATCH_DRIFT',
   );
 });
