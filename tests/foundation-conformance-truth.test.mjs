@@ -45,7 +45,7 @@ function deployment(overrides = {}) {
     foundationNativeBridgeFederationBound: true,
     extendedEvidenceBound: true,
     foundationParityDomains: ['perception', 'physical', 'neural', 'genetic', 'living'],
-    foundationDirectExtensionDomains: ['quantitative', 'energy'],
+    foundationDirectExtensionDomains: ['quantitative', 'energy', 'knowledge'],
     foundationNativeBridgeDomains: bridge,
     binarySha256: '1'.repeat(64),
     sourceRoot: '2'.repeat(64),
@@ -55,66 +55,53 @@ function deployment(overrides = {}) {
 }
 
 test('reconciles stale bridge-only truth into direct + bridge coexistence without all-domain overclaim', () => {
-  const reconciled = reconcileFoundationConformanceTruth(report(), deployment(), {
-    requireDeploymentEvidence: true,
-  });
+  const reconciled = reconcileFoundationConformanceTruth(report(), deployment(), { requireDeploymentEvidence: true });
   assert.equal(reconciled.executionLayers.nativeVm, 'hybrid');
   assert.equal(reconciled.canonicalExecutionTruth.status, 'deployment-bound');
   assert.deepEqual(reconciled.canonicalExecutionTruth.verifiedDirectDomains, [...direct].sort());
   assert.equal(reconciled.canonicalExecutionTruth.truthBoundary.allFoundationDomainsNativeClaimed, false);
   assert.equal(reconciled.canonicalExecutionTruth.truthBoundary.providerBridgeRemovedGlobally, false);
-  assert.equal(reconciled.domains.quantitative.mode, 'native-direct');
-  assert.equal(reconciled.domains.quantitative.directNativeVerified, true);
-  assert.equal(reconciled.domains.quantitative.providerBridgeVerified, true);
-  assert.deepEqual(reconciled.domains.quantitative.availableModes, ['bridge', 'native-direct', 'reference-native']);
-  assert.equal(reconciled.domains.energy.mode, 'native-direct');
-  assert.equal(reconciled.domains.energy.directNativeVerified, true);
-  assert.equal(reconciled.domains.energy.providerBridgeVerified, true);
+  for (const domain of ['quantitative', 'energy', 'knowledge']) {
+    assert.equal(reconciled.domains[domain].mode, 'native-direct');
+    assert.equal(reconciled.domains[domain].directNativeVerified, true);
+    assert.equal(reconciled.domains[domain].providerBridgeVerified, true);
+    assert.deepEqual(reconciled.domains[domain].availableModes, ['bridge', 'native-direct', 'reference-native']);
+  }
   assert.equal(reconciled.domains.genetic.mode, 'native-direct');
   assert.equal(reconciled.domains.genetic.providerBridgeVerified, false);
-  assert.equal(reconciled.domains.knowledge.mode, 'bridge');
-  assert.equal(reconciled.domains.knowledge.directNativeVerified, false);
   assert.match(reconciled.executionLayers.nativeVmLimitation, /No all-Foundation direct-native claim/);
 });
 
 test('structural reconciliation corrects the global no-direct-lowering claim before deployment evidence is available', () => {
-  const reconciled = reconcileFoundationConformanceTruth(report(), {}, {
-    requireDeploymentEvidence: false,
-  });
+  const reconciled = reconcileFoundationConformanceTruth(report(), {}, { requireDeploymentEvidence: false });
   assert.equal(reconciled.executionLayers.nativeVm, 'hybrid');
   assert.equal(reconciled.canonicalExecutionTruth.status, 'implementation-bound');
   assert.deepEqual(reconciled.canonicalExecutionTruth.verifiedDirectDomains, []);
   assert.deepEqual(reconciled.canonicalExecutionTruth.verifiedBridgeDomains, [...bridge].sort());
-  assert.equal(reconciled.domains.quantitative.directLoweringImplemented, true);
-  assert.equal(reconciled.domains.quantitative.directNativeVerified, false);
-  assert.equal(reconciled.domains.quantitative.mode, 'bridge');
-  assert.equal(reconciled.domains.energy.directLoweringImplemented, true);
-  assert.equal(reconciled.domains.energy.directNativeVerified, false);
-  assert.equal(reconciled.domains.energy.mode, 'bridge');
+  for (const domain of ['quantitative', 'energy', 'knowledge']) {
+    assert.equal(reconciled.domains[domain].directLoweringImplemented, true);
+    assert.equal(reconciled.domains[domain].directNativeVerified, false);
+    assert.equal(reconciled.domains[domain].mode, 'bridge');
+  }
   assert.match(reconciled.executionLayers.nativeVmLimitation, /direct lowering is implemented/);
   assert.doesNotMatch(reconciled.executionLayers.nativeVmLimitation, /syntax still rejects lowering/);
 });
 
 test('fails closed when required deployment-bound direct evidence is incomplete', () => {
   assert.throws(
-    () => reconcileFoundationConformanceTruth(report(), deployment({
-      extendedEvidenceBound: false,
-      foundationDirectExtensionDomains: [],
-      directExtensionEvidenceBound: false,
-    }), { requireDeploymentEvidence: true }),
+    () => reconcileFoundationConformanceTruth(report(), deployment({ extendedEvidenceBound: false, foundationDirectExtensionDomains: [], directExtensionEvidenceBound: false }), { requireDeploymentEvidence: true }),
     error => error?.code === 'RCL_FOUNDATION_CONFORMANCE_DEPLOYMENT_EVIDENCE_INCOMPLETE'
       && error?.details?.missingCurrentDirectEvidence?.includes('quantitative')
-      && error?.details?.missingCurrentDirectEvidence?.includes('energy'),
+      && error?.details?.missingCurrentDirectEvidence?.includes('energy')
+      && error?.details?.missingCurrentDirectEvidence?.includes('knowledge'),
   );
 });
 
 test('rejects verified direct evidence for a domain without a declared direct implementation', () => {
   assert.throws(
-    () => reconcileFoundationConformanceTruth(report(), deployment({
-      foundationDirectExtensionDomains: ['quantitative', 'energy', 'knowledge'],
-    })),
+    () => reconcileFoundationConformanceTruth(report(), deployment({ foundationDirectExtensionDomains: ['quantitative', 'energy', 'knowledge', 'spiritual'] })),
     error => error?.code === 'RCL_FOUNDATION_CONFORMANCE_VERIFIED_DIRECT_WITHOUT_IMPLEMENTATION'
-      && error?.details?.domain === 'knowledge',
+      && error?.details?.domain === 'spiritual',
   );
 });
 
@@ -122,21 +109,20 @@ test('truth root is deterministic under evidence array reordering', () => {
   const a = reconcileFoundationConformanceTruth(report(), deployment());
   const b = reconcileFoundationConformanceTruth(report(), deployment({
     foundationParityDomains: ['living', 'genetic', 'neural', 'physical', 'perception'],
-    foundationDirectExtensionDomains: ['energy', 'quantitative'],
+    foundationDirectExtensionDomains: ['knowledge', 'energy', 'quantitative'],
     foundationNativeBridgeDomains: [...bridge].reverse(),
   }));
   assert.equal(a.canonicalExecutionTruth.truthRoot, b.canonicalExecutionTruth.truthRoot);
 });
 
 test('CSV and Markdown expose reconciled truth rather than stale global bridge claims', () => {
-  const reconciled = reconcileFoundationConformanceTruth(report(), deployment(), {
-    requireDeploymentEvidence: true,
-  });
+  const reconciled = reconcileFoundationConformanceTruth(report(), deployment(), { requireDeploymentEvidence: true });
   const csv = renderFoundationConformanceCsv(reconciled);
   const markdown = renderFoundationConformanceMarkdown(reconciled);
   assert.match(csv, /directNativeVerified/);
   assert.match(csv, /"quantitative".*"native-direct"/);
   assert.match(csv, /"energy".*"native-direct"/);
+  assert.match(csv, /"knowledge".*"native-direct"/);
   assert.match(markdown, /native VM truth: hybrid/);
   assert.match(markdown, /direct-native verified:/);
   assert.doesNotMatch(markdown, /Declared Foundation-domain syntax still rejects lowering/);

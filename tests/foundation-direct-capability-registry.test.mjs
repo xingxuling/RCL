@@ -28,10 +28,10 @@ function emptyFoundationProgram() {
   };
 }
 
-test('canonical direct capability registry owns the seven current implementation domains', () => {
+test('canonical direct capability registry owns the eight current implementation domains', () => {
   assert.deepEqual(
     [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS],
-    ['perception', 'physical', 'neural', 'genetic', 'life', 'quantitative', 'energy'],
+    ['perception', 'physical', 'neural', 'genetic', 'life', 'quantitative', 'energy', 'knowledge'],
   );
   assert.equal(new Set(FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS).size, FOUNDATION_DIRECT_CAPABILITIES.length);
   assert.equal(Object.isFrozen(FOUNDATION_DIRECT_CAPABILITIES), true);
@@ -69,10 +69,13 @@ test('implementation provenance comes from the same capability registry', () => 
     'src/foundation-energy-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
   );
   assert.equal(
+    foundationDirectImplementation('knowledge'),
+    'src/foundation-knowledge-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
+  );
+  assert.equal(
     foundationDirectImplementation('living'),
     'src/foundation-direct-lowering.mjs + src/foundation-direct-bytecode.mjs',
   );
-  assert.equal(foundationDirectImplementation('knowledge'), null);
 });
 
 test('registry snapshot and root are deterministic and evidence-bearing', () => {
@@ -84,9 +87,9 @@ test('registry snapshot and root are deterministic and evidence-bearing', () => 
   assert.equal(a.capabilities.length, FOUNDATION_DIRECT_CAPABILITIES.length);
 });
 
-test('counterfactual domain omission is observably different from canonical registry truth', () => {
+test('counterfactual Knowledge omission is observably different from canonical registry truth', () => {
   const canonical = [...FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS].sort();
-  const missingEnergy = canonical.filter(domain => domain !== 'energy');
-  assert.notDeepEqual(missingEnergy, canonical);
-  assert.equal(missingEnergy.includes('energy'), false);
+  const missingKnowledge = canonical.filter(domain => domain !== 'knowledge');
+  assert.notDeepEqual(missingKnowledge, canonical);
+  assert.equal(missingKnowledge.includes('knowledge'), false);
 });

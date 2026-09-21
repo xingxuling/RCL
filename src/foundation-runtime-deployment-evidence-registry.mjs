@@ -3,9 +3,10 @@ import { FOUNDATION_DIRECT_IMPLEMENTATION_DOMAINS } from './foundation-direct-ca
 import { foundationPerceptionDeploymentEvidence, foundationPhysicalDeploymentEvidence, foundationNeuralDeploymentEvidence, foundationGeneticDeploymentEvidence, foundationLifeDeploymentEvidence } from './foundation-core-deployment-evidence.mjs';
 import { foundationQuantitativeDeploymentEvidence } from './foundation-quantitative-deployment-evidence.mjs';
 import { foundationEnergyDeploymentEvidence } from './foundation-energy-deployment-evidence.mjs';
+import { foundationKnowledgeDeploymentEvidence } from './foundation-knowledge-deployment-evidence.mjs';
 
-export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_FORMAT = 'taowind.rcl-foundation-runtime-deployment-evidence-registry.v0.3';
-export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION = '0.3.0';
+export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_FORMAT = 'taowind.rcl-foundation-runtime-deployment-evidence-registry.v0.4';
+export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_REGISTRY_VERSION = '0.4.0';
 export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_FORMAT = 'taowind.rcl-foundation-runtime-deployment-evidence-set.v0.1';
 export const FOUNDATION_RUNTIME_DEPLOYMENT_EVIDENCE_SET_VERSION = '0.1.0';
 const RAW_PROVIDERS = [
@@ -16,8 +17,9 @@ const RAW_PROVIDERS = [
   { domain: 'life', evidenceModule: 'src/foundation-core-deployment-evidence.mjs', evidenceFunction: 'foundationLifeDeploymentEvidence' },
   { domain: 'quantitative', evidenceModule: 'src/foundation-quantitative-deployment-evidence.mjs', evidenceFunction: 'foundationQuantitativeDeploymentEvidence' },
   { domain: 'energy', evidenceModule: 'src/foundation-energy-deployment-evidence.mjs', evidenceFunction: 'foundationEnergyDeploymentEvidence' },
+  { domain: 'knowledge', evidenceModule: 'src/foundation-knowledge-deployment-evidence.mjs', evidenceFunction: 'foundationKnowledgeDeploymentEvidence' },
 ];
-const DEFAULT_BUILDERS = Object.freeze({ perception: foundationPerceptionDeploymentEvidence, physical: foundationPhysicalDeploymentEvidence, neural: foundationNeuralDeploymentEvidence, genetic: foundationGeneticDeploymentEvidence, life: foundationLifeDeploymentEvidence, quantitative: foundationQuantitativeDeploymentEvidence, energy: foundationEnergyDeploymentEvidence });
+const DEFAULT_BUILDERS = Object.freeze({ perception: foundationPerceptionDeploymentEvidence, physical: foundationPhysicalDeploymentEvidence, neural: foundationNeuralDeploymentEvidence, genetic: foundationGeneticDeploymentEvidence, life: foundationLifeDeploymentEvidence, quantitative: foundationQuantitativeDeploymentEvidence, energy: foundationEnergyDeploymentEvidence, knowledge: foundationKnowledgeDeploymentEvidence });
 function canonicalize(value) { if (Array.isArray(value)) return value.map(canonicalize); if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonicalize(value[key])])); return value; }
 function sha256Canonical(value) { return crypto.createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex'); }
 function normalizedProviders(providers) { return providers.map(item => ({ domain: String(item.domain), evidenceModule: String(item.evidenceModule), evidenceFunction: String(item.evidenceFunction) })); }
