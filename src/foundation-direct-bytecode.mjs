@@ -98,7 +98,8 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
       quantityLowering.program,
       knowledgeLowering,
     );
-    const result = compileBytecode(knowledgeNativeInitialization.program);
+    const { program: nativeProgram, ...knowledgeNativeInitializationEvidence } = knowledgeNativeInitialization;
+    const result = compileBytecode(nativeProgram);
     return {
       ...result,
       program: result?.ok ? lowering.program : result?.program ?? null,
@@ -127,7 +128,7 @@ export function tryCompileFoundationRealityToBytecode(sourceOrProgram, options =
         summary: knowledgeLowering.summary,
         truthBoundary: knowledgeLowering.truthBoundary,
       },
-      foundationKnowledgeNativeInitialization: knowledgeNativeInitialization,
+      foundationKnowledgeNativeInitialization: knowledgeNativeInitializationEvidence,
       foundationDirectLowering: {
         format: FOUNDATION_DIRECT_BYTECODE_FORMAT,
         lowered: lowering.lowered,
