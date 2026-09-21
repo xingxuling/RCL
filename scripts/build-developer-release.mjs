@@ -5,6 +5,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import {
+  createFoundationRuntimeTruthContract,
+  verifyFoundationRuntimeTruthContract,
+} from '../src/foundation-runtime-truth-contract.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const sourcePackage = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
@@ -66,6 +70,7 @@ try {
     'VERSION-CONTRACT.json',
     'foundation-conformance.json',
     'foundation-conformance-truth.json',
+    'runtime-truth-contract.json',
   ];
   stagedPackage.scripts = {
     mcp: 'node src/rcl-mcp-server.mjs',
@@ -103,6 +108,27 @@ try {
   ]);
   const stagedConformanceTruth = JSON.parse(
     fs.readFileSync(path.join(stageRoot, 'foundation-conformance-truth.json'), 'utf8'),
+  );
+
+  // Developer releases do not carry deployment evidence. They do carry a
+  // content-addressed contract for the exact runtime-truth source bytes that a
+  // later deployment must re-verify before claiming runtime truth.
+  const stagedRuntimeTruthContract = createFoundationRuntimeTruthContract(stageRoot);
+  const runtimeTruthVerification = verifyFoundationRuntimeTruthContract(
+    stagedRuntimeTruthContract,
+    { rootDir: stageRoot },
+  );
+  if (runtimeTruthVerification.ok !== true) {
+    console.error(JSON.stringify({
+      ok: false,
+      status: 'RCL_DEVELOPER_RELEASE_RUNTIME_TRUTH_CONTRACT_FAILED',
+      verification: runtimeTruthVerification,
+    }, null, 2));
+    process.exit(1);
+  }
+  fs.writeFileSync(
+    path.join(stageRoot, 'runtime-truth-contract.json'),
+    `${JSON.stringify(stagedRuntimeTruthContract, null, 2)}\n`,
   );
 
   runStageNode('cli-public-contract', [
@@ -182,6 +208,19 @@ try {
       allFoundationDomainsNativeClaimed:
         stagedConformanceTruth?.truthBoundary?.allFoundationDomainsNativeClaimed === true,
     },
+    runtimeTruthContract: {
+      snapshot: 'runtime-truth-contract.json',
+      format: stagedRuntimeTruthContract.format,
+      version: stagedRuntimeTruthContract.version,
+      contractRoot: stagedRuntimeTruthContract.contractRoot,
+      capabilityTruthRoot: stagedRuntimeTruthContract.capabilityTruth.truthRoot,
+      sourceBindingCount: stagedRuntimeTruthContract.sourceBindings.length,
+      surfaceCount: stagedRuntimeTruthContract.surfaces.length,
+      verifiedInStagedSource: true,
+      deploymentEvidenceClaimed: false,
+      runtimeSurfaceAvailabilityClaimed: false,
+      deploymentMustReverifyRuntimeTruth: true,
+    },
   };
 
   fs.writeFileSync(
@@ -220,9 +259,13 @@ try {
     '',
     'The packaged Foundation capability truth, Foundation conformance report and compact canonical truth snapshot are verified inside the exact staged source tree. They record implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
     '',
+    'The packaged runtime truth contract content-addresses the exact runtime-health, capability-truth, bridge-statePath-truth and native-deployment-health source bytes plus their canonical capability roots. It does not claim those HTTP surfaces are deployed or healthy; each deployment must re-verify runtime truth.',
+    '',
     `Canonical Foundation capability truth root: ${stagedCapabilityTruth.truthRoot}`,
     '',
     `Canonical Foundation conformance truth root: ${stagedConformanceTruth.truthRoot}`,
+    '',
+    `Packaged runtime truth contract root: ${stagedRuntimeTruthContract.contractRoot}`,
     '',
     '## Honest boundary',
     '',
