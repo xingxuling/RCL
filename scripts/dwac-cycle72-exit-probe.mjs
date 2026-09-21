@@ -2,11 +2,16 @@
 import { spawnSync } from 'node:child_process';
 
 const steps = [
-  { code: 121, name: 'cycle70-regression-proof-chain', args: ['scripts/dwac-cycle70-exit-probe.mjs'] },
-  { code: 122, name: 'cycle71-runtime-health-statepath-negative-controls', args: ['scripts/verify-runtime-health-statepath-negative-control.mjs'] },
-  { code: 123, name: 'cycle71-runtime-health-statepath-truth-binding', args: ['scripts/verify-vercel-runtime-health-statepath-truth.mjs'] },
-  { code: 124, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
-  { code: 125, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
+  { code: 121, name: 'cycle69-regression-proof-chain', args: ['scripts/dwac-cycle69-exit-probe.mjs'] },
+  { code: 122, name: 'provider-bridge-statepath-attestation-bind', args: ['scripts/bind-vercel-foundation-native-bridge-statepath-attestation.mjs'] },
+  { code: 123, name: 'provider-bridge-statepath-negative-controls', args: ['--test', 'tests/foundation-native-bridge-statepath-attestation.test.mjs'] },
+  { code: 124, name: 'provider-bridge-statepath-deployment-attestation', args: ['scripts/verify-vercel-foundation-native-bridge-statepath-attestation.mjs'] },
+  { code: 125, name: 'deployment-health-regression', args: ['scripts/verify-vercel-health-evidence.mjs'] },
+  { code: 126, name: 'runtime-health-truth-regression', args: ['scripts/verify-vercel-runtime-health-truth.mjs'] },
+  { code: 127, name: 'cycle71-runtime-health-statepath-negative-controls', args: ['scripts/verify-runtime-health-statepath-negative-control.mjs'] },
+  { code: 128, name: 'cycle71-runtime-health-statepath-truth-binding', args: ['scripts/verify-vercel-runtime-health-statepath-truth.mjs'] },
+  { code: 129, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
+  { code: 130, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
 ];
 
 for (const step of steps) {
