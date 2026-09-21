@@ -2,7 +2,6 @@
 import { spawnSync } from 'node:child_process';
 const tests = ['tests/foundation-conformance-truth.test.mjs','tests/foundation-direct-capability-registry.test.mjs','tests/foundation-native-bridge-capability-registry.test.mjs','tests/foundation-quantity-native-lowering.test.mjs','tests/foundation-quantitative-direct-lowering.test.mjs','tests/foundation-quantitative-native-parity.test.mjs','tests/foundation-quantitative-deployment-evidence.test.mjs','tests/foundation-energy-direct-lowering.test.mjs','tests/foundation-energy-native-parity.test.mjs','tests/foundation-energy-deployment-evidence.test.mjs','tests/foundation-core-deployment-evidence.test.mjs','tests/foundation-runtime-deployment-evidence-registry.test.mjs','tests/foundation-neural-direct-lowering.test.mjs','tests/foundation-neural-domain-receipt-parity.test.mjs','tests/foundation-genetic-direct-lowering.test.mjs','tests/foundation-genetic-domain-receipt-parity.test.mjs','tests/foundation-living-direct-lowering.test.mjs','tests/foundation-living-staged-receipt.test.mjs'];
 const steps = tests.map((file,index)=>({code:10+index,name:file,args:['--test',file]}));
-const knowledgePrereqDiagnostic = `import fs from 'node:fs'; import crypto from 'node:crypto'; const bytes=fs.readFileSync('native/rclvm'); const sha=crypto.createHash('sha256').update(bytes).digest('hex'); const m=JSON.parse(fs.readFileSync('native/rclvm.vercel-attestation.json','utf8')); const ds=['perception','physical','neural','genetic','living','quantitative','energy']; for(let i=0;i<ds.length;i++){const d=ds[i]; const p=m?.foundationParityProofs?.[d]; if(p?.domain!==d||p?.verified!==true||p?.executionBinarySha256!==sha) process.exit(141+i);}`;
 steps.push(
 {code:34,name:'capability-registry-truth',args:['scripts/verify-foundation-capability-registry-truth.mjs']},
 {code:35,name:'version-contract-truth',args:['scripts/verify-foundation-version-contract-truth.mjs']},
@@ -24,14 +23,13 @@ steps.push(
 {code:50,name:'living-real-c',args:['scripts/verify-vercel-foundation-living.mjs']},
 {code:51,name:'biological-deployment-binding',args:['scripts/bind-vercel-foundation-biological.mjs']},
 {code:null,propagateChildStatus:true,name:'energy-real-c-receipt-parity',args:['scripts/verify-vercel-foundation-energy.mjs']},
-{code:null,propagateChildStatus:true,name:'knowledge-prerequisite-parity-diagnostic',args:['--input-type=module','-e',knowledgePrereqDiagnostic]},
-{code:null,propagateChildStatus:true,name:'knowledge-real-c-bounded-parity',args:['scripts/verify-vercel-foundation-knowledge.mjs']},
 {code:53,name:'federation-deployment-binding',args:['scripts/bind-vercel-foundation-native-federation.mjs']},
 {code:54,name:'federation-root-stabilization',args:['scripts/stabilize-vercel-foundation-native-federation-root.mjs']},
 {code:55,name:'bridge-registry-verification',args:['scripts/verify-foundation-native-bridge-capability-registry.mjs']},
 {code:56,name:'quantitative-direct-deployment-binding',args:['scripts/bind-vercel-foundation-quantitative-direct.mjs']},
 {code:57,name:'quantitative-direct-health',args:['scripts/verify-vercel-foundation-quantitative-direct-health.mjs']},
 {code:null,propagateChildStatus:true,name:'quantitative-receipt-parity',args:['scripts/verify-vercel-foundation-quantitative-parity.mjs']},
+{code:null,propagateChildStatus:true,name:'knowledge-real-c-bounded-parity',args:['scripts/verify-vercel-foundation-knowledge.mjs']},
 {code:59,name:'runtime-deployment-evidence-registry',args:['scripts/verify-foundation-runtime-deployment-evidence-registry.mjs']},
 {code:60,name:'energy-runtime-capability-truth',args:['scripts/verify-foundation-energy-deployment-truth.mjs']},
 {code:61,name:'deployment-health',args:['scripts/verify-vercel-health-evidence.mjs']});
