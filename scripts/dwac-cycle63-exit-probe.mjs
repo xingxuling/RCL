@@ -23,6 +23,7 @@ steps.push(
 {code:50,name:'living-real-c',args:['scripts/verify-vercel-foundation-living.mjs']},
 {code:51,name:'biological-deployment-binding',args:['scripts/bind-vercel-foundation-biological.mjs']},
 {code:null,propagateChildStatus:true,name:'energy-real-c-receipt-parity',args:['scripts/verify-vercel-foundation-energy.mjs']},
+{code:52,name:'knowledge-real-c-bounded-parity',args:['scripts/verify-vercel-foundation-knowledge.mjs']},
 {code:53,name:'federation-deployment-binding',args:['scripts/bind-vercel-foundation-native-federation.mjs']},
 {code:54,name:'federation-root-stabilization',args:['scripts/stabilize-vercel-foundation-native-federation-root.mjs']},
 {code:55,name:'bridge-registry-verification',args:['scripts/verify-foundation-native-bridge-capability-registry.mjs']},
