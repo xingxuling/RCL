@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 
-const federationBaseline = `
-import { verifyFoundationNativeFederationRegistryBinding } from './src/foundation-native-federation-registry-binding.mjs';
+const federationDiagnostic = `
+import { FoundationNativeFederationRegistryBindingError, verifyFoundationNativeFederationRegistryBinding } from './src/foundation-native-federation-registry-binding.mjs';
 const ROOT='a'.repeat(64);
-const SPECS=[
-{batchId:'batch-a',providerId:'provider-a',providerCallCount:2,domain:'alpha',capability:'alpha.run',statePath:'bridge.alpha'},
-{batchId:'batch-a',providerId:'provider-a',providerCallCount:2,domain:'beta',capability:'beta.run',statePath:'bridge.beta'}];
-const proof={providerBridgeRegistryRoot:ROOT,providerBridgeSpecCount:2,domains:['alpha','beta'],providerBatches:{'batch-a':{providerId:'provider-a',providerAbi:1,providerCallCount:2,domains:['alpha','beta']}}};
-try { const result=verifyFoundationNativeFederationRegistryBinding({federationProof:proof,bridgeSpecs:SPECS,registrySnapshot:{registryRoot:ROOT}}); if(result?.ok!==true) process.exit(102); } catch(error) { console.error(error?.code,error?.message,error?.details); process.exit(101); }
+const SPECS=[{batchId:'batch-a',providerId:'provider-a',providerCallCount:2,domain:'alpha',capability:'alpha.run',statePath:'bridge.alpha'},{batchId:'batch-a',providerId:'provider-a',providerCallCount:2,domain:'beta',capability:'beta.run',statePath:'bridge.beta'}];
+const make=()=>({providerBridgeRegistryRoot:ROOT,providerBridgeSpecCount:2,domains:['alpha','beta'],providerBatches:{'batch-a':{providerId:'provider-a',providerAbi:1,providerCallCount:2,domains:['alpha','beta']}}});
+const verify=(p)=>verifyFoundationNativeFederationRegistryBinding({federationProof:p,bridgeSpecs:SPECS,registrySnapshot:{registryRoot:ROOT}});
+try { if(verify(make())?.ok!==true) process.exit(101); } catch { process.exit(101); }
+const expect=(mutate,code,exit)=>{const p=make(); mutate(p); try{verify(p); process.exit(exit);}catch(e){if(!(e instanceof FoundationNativeFederationRegistryBindingError)||e.code!==code) process.exit(exit);}};
+expect(p=>p.providerBridgeRegistryRoot='b'.repeat(64),'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',102);
+expect(p=>p.providerBridgeSpecCount=1,'RCL_FOUNDATION_FEDERATION_REGISTRY_DRIFT',103);
+expect(p=>p.domains=['beta','alpha'],'RCL_FOUNDATION_FEDERATION_DOMAIN_DRIFT',104);
+expect(p=>p.providerBatches['batch-a'].providerCallCount=1,'RCL_FOUNDATION_FEDERATION_BATCH_DRIFT',105);
 `;
 
 const steps = [
@@ -23,7 +27,7 @@ const steps = [
   { code: 71, name: 'native-deployment-health-canonical-bridge-registry', args: ['scripts/verify-vercel-health-evidence.mjs'] },
   { code: 72, name: 'runtime-health-native-registry-truth', args: ['scripts/verify-vercel-runtime-health-truth.mjs'] },
   { code: 73, name: 'federation-producer-canonical-registry-rebind', args: ['scripts/bind-vercel-foundation-native-federation.mjs'] },
-  { code: null, propagateChildStatus: true, name: 'federation-registry-inline-baseline', args: ['--input-type=module', '-e', federationBaseline] },
+  { code: null, propagateChildStatus: true, name: 'federation-registry-semantic-diagnostic', args: ['--input-type=module', '-e', federationDiagnostic] },
   { code: 74, name: 'federation-registry-negative-controls', args: ['--test', 'tests/foundation-native-federation-registry-binding.test.mjs'] },
   { code: 75, name: 'deployed-federation-registry-binding', args: ['scripts/verify-vercel-foundation-native-federation-registry-binding.mjs'] },
   { code: 76, name: 'cycle68-deployment-health-regression', args: ['scripts/verify-vercel-health-evidence.mjs'] },
@@ -39,13 +43,5 @@ const steps = [
   { code: 86, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
   { code: 87, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
 ];
-
-for (const step of steps) {
-  const result = spawnSync(process.execPath, step.args, { stdio: 'inherit', env: process.env });
-  if (result.error || result.status !== 0) {
-    const exitCode = step.propagateChildStatus && Number.isInteger(result.status) ? result.status : step.code;
-    console.error(JSON.stringify({ status: 'DWAC_CYCLE72_EXIT_PROBE_FAILURE', probeExitCode: exitCode, step: step.name, childExitCode: result.status ?? null, error: result.error?.message ?? null }, null, 2));
-    process.exit(exitCode ?? 1);
-  }
-}
+for (const step of steps) { const result=spawnSync(process.execPath,step.args,{stdio:'inherit',env:process.env}); if(result.error||result.status!==0){const exitCode=step.propagateChildStatus&&Number.isInteger(result.status)?result.status:step.code; console.error(JSON.stringify({status:'DWAC_CYCLE72_EXIT_PROBE_FAILURE',probeExitCode:exitCode,step:step.name,childExitCode:result.status??null,error:result.error?.message??null},null,2)); process.exit(exitCode??1);} }
 console.log(JSON.stringify({ok:true,status:'DWAC_CYCLE72_EXIT_PROBE_ALL_PASS',truthBoundary:{inheritedRegressionProofChainPreserved:true,boundedSingleClaimKnowledgeDirectLoweringVerified:true,canonicalRealCStateAndSemanticRootParityRequired:true,exactInitialFormedAtRootBound:true,runtimeCapabilityTruthBindsKnowledgeDeploymentEvidence:true,unsupportedKnowledgeProgramsRemainProviderBound:true,knowledgeProviderBridgeRemovedGlobally:false,allKnowledgeProgramsNativeClaimed:false,knowledgeDomainReceiptParityClaimed:false}},null,2));
