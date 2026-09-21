@@ -9,6 +9,7 @@ const source = [
   'reality KnowledgeDeclaredDirect {',
   '  facet world.signal : Truth = true',
   '  facet decision.allowed : Truth = false',
+  '  subject actor { }',
   '  knowledge mind {',
   '    claim trusted : Truth = world.signal confidence 0.90 evidence "sensor:signal-v1" source "sensor:signal"',
   '  }',
