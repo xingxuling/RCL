@@ -65,11 +65,23 @@ if (
   }, 103);
 }
 
-for (const domain of ['perception', 'physical', 'neural', 'genetic', 'living', 'quantitative', 'energy']) {
+for (const domain of ['perception', 'physical', 'neural', 'genetic', 'living', 'energy']) {
   const prior = manifest?.foundationParityProofs?.[domain];
   if (prior?.domain !== domain || prior?.verified !== true || prior?.executionBinarySha256 !== binarySha256) {
-    fail('Knowledge proof requires the existing direct-native parity chain to remain bound to the same binary', { domain, prior, binarySha256 }, 104);
+    fail('Knowledge proof requires the existing parity-based direct-native chain to remain bound to the same binary', { domain, prior, binarySha256 }, 104);
   }
+}
+const quantitativePrior = manifest?.foundationDirectExtensionProofs?.quantitative ?? manifest?.foundationQuantitativeDirectProof ?? null;
+if (
+  quantitativePrior?.domain !== 'quantitative'
+  || quantitativePrior?.verified !== true
+  || quantitativePrior?.executionBinarySha256 !== binarySha256
+) {
+  fail('Knowledge proof requires the Quantitative direct-extension proof to remain bound to the same binary', {
+    domain: 'quantitative',
+    prior: quantitativePrior,
+    binarySha256,
+  }, 105);
 }
 
 let program;
