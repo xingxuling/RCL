@@ -136,6 +136,17 @@ const receiptParity = verifyFoundationKnowledgeReceiptParity(
   native?.history,
   semanticValue,
 );
+if (receiptParity.ok !== true) {
+  const checks = receiptParity?.entries?.[0]?.checks ?? {};
+  let exitCode = 180;
+  if (checks.exactNativeReceipt !== true || receiptParity.nativeCoverageExact !== true) exitCode = 181;
+  else if (checks.transitionValuesEquivalent !== true || checks.referenceTargetsExact !== true || checks.nativeTargetsExact !== true) exitCode = 182;
+  else if (checks.boundaryRootsEquivalent !== true) exitCode = 183;
+  else if (checks.formedAtRootRetained !== true || checks.referenceKnowledgeClaimAligned !== true) exitCode = 184;
+  else if (checks.syntheticWitnessPresent !== true) exitCode = 185;
+  fail('Knowledge real-C domain receipt parity failed closed', { receiptParity }, exitCode);
+}
+
 const executionAttestation = native?.nativeVmExecutionAttestation ?? null;
 const executionBinarySha256 = executionAttestation?.materialization?.binarySha256 ?? null;
 const parity = {
