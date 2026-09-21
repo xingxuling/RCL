@@ -29,9 +29,11 @@ console.log(JSON.stringify({
   ok: true,
   status: 'DWAC_CYCLE73_EXIT_PROBE_ALL_PASS',
   truthBoundary: {
-    boundedSingleClaimKnowledgeDirectLoweringVerified: true,
+    boundedPrimitiveMultiClaimKnowledgeDirectLoweringVerified: true,
+    maxBoundedClaimCount: 4,
     canonicalRealCStateAndSemanticRootParityRequired: true,
     exactReferenceNativeKnowledgeDomainReceiptParityRequired: true,
+    oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: true,
     knowledgeReceiptRootBoundIntoRuntimeDeploymentEvidence: true,
     canonicalKnowledgeRuntimeTruthVerifierRequired: true,
     exactInitialFormedAtRootBound: true,

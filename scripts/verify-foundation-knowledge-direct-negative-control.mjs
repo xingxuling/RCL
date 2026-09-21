@@ -36,6 +36,27 @@ const unsupportedSources = [
       '',
     ].join('\n'),
   },
+  {
+    id: 'claim-count-exceeds-bounded-maximum',
+    source: [
+      'reality KnowledgeTooManyClaimsNegative {',
+      '  facet world.a : Number = 1',
+      '  facet world.b : Number = 2',
+      '  facet world.c : Number = 3',
+      '  facet world.d : Number = 4',
+      '  facet world.e : Number = 5',
+      '  knowledge mind {',
+      '    claim a : Number = world.a confidence 0.9 source "sensor:a"',
+      '    claim b : Number = world.b confidence 0.9 source "sensor:b"',
+      '    claim c : Number = world.c confidence 0.9 source "sensor:c"',
+      '    claim d : Number = world.d confidence 0.9 source "sensor:d"',
+      '    claim e : Number = world.e confidence 0.9 source "sensor:e"',
+      '  }',
+      '  learn mind',
+      '}',
+      '',
+    ].join('\n'),
+  },
 ];
 
 const results = [];
@@ -56,6 +77,9 @@ console.log(JSON.stringify({
   status: 'RCL_FOUNDATION_KNOWLEDGE_NEGATIVE_CONTROLS_VERIFIED',
   results,
   truthBoundary: {
+    boundedPrimitiveMultiClaimSubsetOnly: true,
+    maxBoundedClaimCount: 4,
+    multipleLearnDirectivesRemainProviderBound: true,
     unsupportedKnowledgeProgramsRemainProviderBound: true,
     boundedSubsetDoesNotRemoveKnowledgeProviderBridge: true,
     noUnsupportedProgramIsRelabeledDirectNative: true,

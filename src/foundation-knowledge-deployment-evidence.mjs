@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.2';
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.2.0';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.3';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.3.0';
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
@@ -17,13 +17,13 @@ function sha256(value) { return crypto.createHash('sha256').update(value).digest
 function sha256Canonical(value) { return sha256(JSON.stringify(canonical(value))); }
 function isSha256(value) { return typeof value === 'string' && /^[0-9a-f]{64}$/i.test(value); }
 
-function validKnowledgeState(value, expectedFormedAtRoot) {
+function validKnowledgeState(value, expected = {}, expectedFormedAtRoot) {
   return value?.kind === 'Knowledge'
-    && value?.baseType === 'Truth'
-    && value?.value === true
-    && value?.confidence === 0.9
-    && JSON.stringify(value?.evidence) === JSON.stringify(['sensor:signal-v1'])
-    && value?.source === 'sensor:signal'
+    && value?.baseType === expected.baseType
+    && Object.is(value?.value, expected.value)
+    && value?.confidence === expected.confidence
+    && JSON.stringify(value?.evidence) === JSON.stringify(expected.evidence)
+    && value?.source === expected.source
     && value?.scope === 'local'
     && value?.status === 'provisional'
     && JSON.stringify(value?.dependencies) === '[]'
@@ -52,7 +52,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || proof?.verified !== true
     || proof?.boundedSubset !== true
     || proof?.loweredDirectiveCount !== 1
-    || proof?.loweredClaimCount !== 1
+    || proof?.loweredClaimCount !== 2
   ) {
     fail('RCL_KNOWLEDGE_DEPLOYMENT_PROOF_IDENTITY_DRIFT', 'Knowledge deployment proof identity/counts are missing or overclaimed.', { proof });
   }
@@ -69,39 +69,67 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     fail('RCL_KNOWLEDGE_DEPLOYMENT_PARITY_DRIFT', 'Knowledge deployment proof no longer closes state/root/domain-receipt/executable parity.', { parity });
   }
 
+  const formedRoots = proof?.claimFormedAtRoots ?? {};
   if (
     proof?.executionBinarySha256 !== binarySha256
     || !isSha256(proof?.nativeVmExecutionAttestationRoot)
     || !isSha256(proof?.initialStateRoot)
+    || !isSha256(formedRoots?.['mind.trusted'])
+    || !isSha256(formedRoots?.['mind.score'])
+    || proof?.initialStateRoot !== formedRoots?.['mind.trusted']
+    || formedRoots?.['mind.trusted'] === formedRoots?.['mind.score']
     || !isSha256(proof?.knowledgeReceiptRoot)
     || proof?.receiptParity?.ok !== true
     || proof?.receiptParity?.receiptRoot !== proof?.knowledgeReceiptRoot
+    || proof?.receiptParity?.entries?.[0]?.claimCount !== 2
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge deployment proof lost content-addressed execution/binary/pre-Learn/domain-receipt binding.', {
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge deployment proof lost content-addressed execution/binary/sequential-formation/domain-receipt binding.', {
       executionBinarySha256: proof?.executionBinarySha256 ?? null,
       binarySha256,
       nativeVmExecutionAttestationRoot: proof?.nativeVmExecutionAttestationRoot ?? null,
       initialStateRoot: proof?.initialStateRoot ?? null,
+      claimFormedAtRoots: formedRoots,
       knowledgeReceiptRoot: proof?.knowledgeReceiptRoot ?? null,
       receiptParityRoot: proof?.receiptParity?.receiptRoot ?? null,
+      receiptClaimCount: proof?.receiptParity?.entries?.[0]?.claimCount ?? null,
     });
   }
 
-  const knowledgeState = proof?.finalState?.['mind.trusted'];
-  const decisionState = proof?.finalState?.['decision.allowed'];
-  if (!validKnowledgeState(knowledgeState, proof?.initialStateRoot) || decisionState !== true) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_STATE_DRIFT', 'Knowledge deployment evidence lost the bounded claim state/accessor behavior.', {
-      knowledgeState,
-      decisionState,
-      initialStateRoot: proof?.initialStateRoot ?? null,
+  const trustedKnowledge = proof?.finalState?.['mind.trusted'];
+  const scoreKnowledge = proof?.finalState?.['mind.score'];
+  const decisionAllowed = proof?.finalState?.['decision.allowed'];
+  const decisionScore = proof?.finalState?.['decision.score'];
+  const trustedExpected = {
+    baseType: 'Truth', value: true, confidence: 0.9, evidence: ['sensor:signal-v1'], source: 'sensor:signal',
+  };
+  const scoreExpected = {
+    baseType: 'Number', value: 7, confidence: 0.8, evidence: ['sensor:score-v1'], source: 'sensor:score',
+  };
+  if (
+    !validKnowledgeState(trustedKnowledge, trustedExpected, formedRoots?.['mind.trusted'])
+    || !validKnowledgeState(scoreKnowledge, scoreExpected, formedRoots?.['mind.score'])
+    || decisionAllowed !== true
+    || decisionScore !== 7
+  ) {
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_STATE_DRIFT', 'Knowledge deployment evidence lost the bounded multi-claim state/accessor behavior.', {
+      trustedKnowledge,
+      scoreKnowledge,
+      decisionAllowed,
+      decisionScore,
+      claimFormedAtRoots: formedRoots,
     });
   }
 
   const boundary = proof?.truthBoundary ?? {};
   if (
-    boundary.boundedSingleClaimKnowledgeSubsetOnly !== true
+    boundary.boundedSingleClaimKnowledgeSubsetOnly !== false
+    || boundary.boundedPrimitiveMultiClaimKnowledgeSubsetOnly !== true
+    || boundary.maxBoundedClaimCount !== 4
+    || boundary.verifiedAtomicClaimCount !== 2
     || boundary.primitiveClaimTypesOnly !== true
-    || boundary.exactInitialFormedAtRootRequired !== true
+    || boundary.directMultiClaimExpressionsRestrictedToLiteralOrInitialPrimitivePath !== true
+    || boundary.referenceSequentialClaimFormationRootsMustBePreserved !== true
+    || boundary.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction !== true
     || boundary.dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound !== true
     || boundary.referenceRuntimeStateParityRequired !== true
     || boundary.exactReferenceNativeDomainReceiptParityRequired !== true
@@ -111,7 +139,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || boundary.knowledgeDomainReceiptParityClaimed !== true
     || boundary.fullHistoryParityClaimed !== false
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_BOUNDARY_DRIFT', 'Knowledge deployment truth boundary drifted or overclaimed the bounded proof.', { boundary });
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_BOUNDARY_DRIFT', 'Knowledge deployment truth boundary drifted or overclaimed the bounded multi-claim proof.', { boundary });
   }
 
   const payload = {
@@ -124,17 +152,24 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     executionBinarySha256: proof?.executionBinarySha256 ?? null,
     nativeVmExecutionAttestationRoot: proof?.nativeVmExecutionAttestationRoot ?? null,
     initialStateRoot: proof?.initialStateRoot ?? null,
+    claimFormedAtRoots: formedRoots,
     knowledgeReceiptRoot: proof?.knowledgeReceiptRoot ?? null,
     knowledgeReceiptRootAlgorithm: proof?.knowledgeReceiptRootAlgorithm ?? null,
     loweredDirectiveCount: proof?.loweredDirectiveCount ?? null,
     loweredClaimCount: proof?.loweredClaimCount ?? null,
     finalState: {
-      'mind.trusted': knowledgeState ?? null,
-      'decision.allowed': decisionState ?? null,
+      'mind.trusted': trustedKnowledge ?? null,
+      'mind.score': scoreKnowledge ?? null,
+      'decision.allowed': decisionAllowed ?? null,
+      'decision.score': decisionScore ?? null,
     },
     truthBoundary: {
-      boundedSingleClaimKnowledgeSubsetOnly: boundary.boundedSingleClaimKnowledgeSubsetOnly === true,
+      boundedPrimitiveMultiClaimKnowledgeSubsetOnly: boundary.boundedPrimitiveMultiClaimKnowledgeSubsetOnly === true,
+      maxBoundedClaimCount: boundary.maxBoundedClaimCount ?? null,
+      verifiedAtomicClaimCount: boundary.verifiedAtomicClaimCount ?? null,
+      referenceSequentialClaimFormationRootsMustBePreserved: boundary.referenceSequentialClaimFormationRootsMustBePreserved === true,
       exactReferenceNativeDomainReceiptParityRequired: boundary.exactReferenceNativeDomainReceiptParityRequired === true,
+      oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: boundary.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction === true,
       providerBridgeRemovedGlobally: boundary.providerBridgeRemovedGlobally === true,
       allKnowledgeProgramsNativeClaimed: boundary.allKnowledgeProgramsNativeClaimed === true,
       knowledgeDomainReceiptParityClaimed: boundary.knowledgeDomainReceiptParityClaimed === true,
