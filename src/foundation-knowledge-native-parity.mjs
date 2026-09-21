@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import { semanticValue } from './semantic-state-root.mjs';
 
-export const FOUNDATION_KNOWLEDGE_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-knowledge-native-parity.v0.2';
-export const FOUNDATION_KNOWLEDGE_NATIVE_PARITY_VERSION = '0.2.0';
-export const FOUNDATION_KNOWLEDGE_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-knowledge-receipt-root.sha256.v0.1';
+export const FOUNDATION_KNOWLEDGE_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-knowledge-native-parity.v0.3';
+export const FOUNDATION_KNOWLEDGE_NATIVE_PARITY_VERSION = '0.3.0';
+export const FOUNDATION_KNOWLEDGE_RECEIPT_ROOT_ALGORITHM = 'rcl.foundation-knowledge-receipt-root.sha256.v0.2';
 
 function array(value) { return Array.isArray(value) ? value : []; }
 function canonical(value) {
@@ -33,8 +33,10 @@ function isSha256(value) { return typeof value === 'string' && /^[0-9a-f]{64}$/i
 
 function truthBoundary() {
   return {
-    boundedSingleClaimKnowledgeSubsetOnly: true,
-    exactInitialFormedAtRootRequired: true,
+    boundedSingleClaimKnowledgeSubsetOnly: false,
+    boundedPrimitiveMultiClaimKnowledgeSubsetOnly: true,
+    maxBoundedClaimCount: 4,
+    referenceSequentialClaimFormationRootsMustBePreserved: true,
     oneLearnDirectiveMapsToOneSyntheticNativeTransaction: true,
     referenceReceiptAndNativeReceiptMustMatchExactly: true,
     nativePreLearnBoundaryMustMatchReferencePreLearnBoundary: true,
@@ -42,6 +44,14 @@ function truthBoundary() {
     allKnowledgeProgramsNativeClaimed: false,
     fullHistoryParityClaimed: false,
   };
+}
+
+function formedRootEntries(item, expectedTargets) {
+  const explicit = array(item?.formedAtRoots)
+    .filter(entry => typeof entry?.path === 'string' && typeof entry?.root === 'string')
+    .map(entry => ({ path: entry.path, root: entry.root }));
+  if (explicit.length > 0) return explicit;
+  return expectedTargets.map(path => ({ path, root: item?.formedAtRoot ?? null }));
 }
 
 export function knowledgeReceiptRoot(report) {
@@ -62,8 +72,10 @@ export function knowledgeReceiptRoot(report) {
       declaration: entry?.declaration ?? null,
       directiveIndex: entry?.directiveIndex ?? null,
       syntheticRule: entry?.syntheticRule ?? null,
-      claimPath: entry?.claimPath ?? null,
+      claimCount: entry?.claimCount ?? null,
+      claimPaths: array(entry?.claimPaths),
       formedAtRoot: entry?.formedAtRoot ?? null,
+      formedAtRoots: array(entry?.formedAtRoots),
       expectedTargets: array(entry?.expectedTargets),
       referenceTargets: array(entry?.referenceTargets),
       nativeTargets: array(entry?.nativeTargets),
@@ -107,16 +119,37 @@ export function verifyFoundationKnowledgeReceiptParity(lowering, referenceHistor
     if (nativeMatch) usedNative.add(nativeMatch.candidateIndex);
     const native = nativeMatch?.record ?? null;
 
-    const expectedTargets = uniqueSorted(array(item?.stateTargets));
+    const expectedTargets = uniqueSorted(array(item?.stateTargets).length
+      ? item.stateTargets
+      : (array(item?.claimPaths).length ? item.claimPaths : [item?.claimPath]));
+    const claimPaths = uniqueSorted(array(item?.claimPaths).length ? item.claimPaths : expectedTargets);
+    const formedAtRoots = formedRootEntries(item, expectedTargets).sort((left, right) => left.path.localeCompare(right.path));
+    const formedRootMap = new Map(formedAtRoots.map(entry => [entry.path, entry.root]));
     const referenceChanges = normalizeChanges(reference?.changes, semantic);
     const nativeChanges = normalizeChanges(native?.changes, semantic);
     const referenceTargets = referenceChanges.map(change => change.target);
     const nativeTargets = nativeChanges.map(change => change.target);
     const referenceKnowledgeClaims = array(reference?.knowledgeClaims).map(claim => canonical(claim));
+    const referenceKnowledgeClaimPaths = uniqueSorted(referenceKnowledgeClaims.map(claim => claim?.path));
     const nativeWitnesses = array(native?.witnesses);
-    const referenceClaim = referenceKnowledgeClaims.find(claim => claim?.path === item?.claimPath) ?? null;
-    const referenceAfter = referenceChanges.find(change => change.target === item?.claimPath)?.after ?? null;
-    const nativeAfter = nativeChanges.find(change => change.target === item?.claimPath)?.after ?? null;
+
+    const referenceClaimsAligned = expectedTargets.every(target => {
+      const referenceClaim = referenceKnowledgeClaims.find(claim => claim?.path === target) ?? null;
+      const referenceAfter = referenceChanges.find(change => change.target === target)?.after ?? null;
+      return Boolean(referenceClaim)
+        && referenceClaim?.confidence === referenceAfter?.confidence
+        && same(referenceClaim?.evidence, referenceAfter?.evidence)
+        && referenceClaim?.source === referenceAfter?.source
+        && referenceClaim?.status === referenceAfter?.status;
+    });
+    const formedAtRootsRetained = expectedTargets.every(target => {
+      const expectedRoot = formedRootMap.get(target);
+      const referenceAfter = referenceChanges.find(change => change.target === target)?.after ?? null;
+      const nativeAfter = nativeChanges.find(change => change.target === target)?.after ?? null;
+      return isSha256(expectedRoot)
+        && referenceAfter?.formedAtRoot === expectedRoot
+        && nativeAfter?.formedAtRoot === expectedRoot;
+    });
 
     const checks = {
       metadataShapeSupported:
@@ -126,12 +159,17 @@ export function verifyFoundationKnowledgeReceiptParity(lowering, referenceHistor
         && typeof item?.declaration === 'string'
         && Number.isInteger(Number(item?.directiveIndex))
         && typeof item?.syntheticRule === 'string'
-        && typeof item?.claimPath === 'string'
-        && Number(item?.claimCount ?? 0) === 1
+        && Number(item?.claimCount ?? 0) >= 1
+        && Number(item?.claimCount ?? 0) <= 4
+        && Number(item?.claimCount ?? 0) === expectedTargets.length
+        && claimPaths.length === expectedTargets.length
+        && same(claimPaths, expectedTargets)
+        && formedAtRoots.length === expectedTargets.length
+        && same(formedAtRoots.map(entry => entry.path), expectedTargets)
+        && formedAtRoots.every(entry => isSha256(entry.root))
         && typeof item?.witness === 'string'
         && isSha256(item?.formedAtRoot)
-        && expectedTargets.length === 1
-        && expectedTargets[0] === item?.claimPath,
+        && item.formedAtRoot === formedRootMap.get(item?.claimPaths?.[0] ?? item?.claimPath),
       exactReferenceReceipt: Boolean(reference),
       referenceStatusRealized: reference?.status === 'realized',
       exactNativeReceipt: Boolean(native) && nativeMatches.length === 1,
@@ -139,15 +177,9 @@ export function verifyFoundationKnowledgeReceiptParity(lowering, referenceHistor
       referenceTargetsExact: same(referenceTargets, expectedTargets),
       nativeTargetsExact: same(nativeTargets, expectedTargets),
       transitionValuesEquivalent: same(referenceChanges, nativeChanges),
-      referenceKnowledgeClaimAligned:
-        Boolean(referenceClaim)
-        && referenceClaim?.confidence === referenceAfter?.confidence
-        && same(referenceClaim?.evidence, referenceAfter?.evidence)
-        && referenceClaim?.source === referenceAfter?.source
-        && referenceClaim?.status === referenceAfter?.status,
-      formedAtRootRetained:
-        referenceAfter?.formedAtRoot === item?.formedAtRoot
-        && nativeAfter?.formedAtRoot === item?.formedAtRoot,
+      referenceKnowledgeClaimsExact: same(referenceKnowledgeClaimPaths, expectedTargets),
+      referenceKnowledgeClaimsAligned: referenceClaimsAligned,
+      formedAtRootsRetained,
       syntheticWitnessPresent: nativeWitnesses.includes(item?.witness),
       boundaryRootsEquivalent:
         typeof reference?.beforeRoot === 'string'
@@ -161,8 +193,10 @@ export function verifyFoundationKnowledgeReceiptParity(lowering, referenceHistor
       declaration: item?.declaration ?? null,
       directiveIndex: item?.directiveIndex ?? null,
       syntheticRule: item?.syntheticRule ?? null,
-      claimPath: item?.claimPath ?? null,
+      claimCount: item?.claimCount ?? null,
+      claimPaths,
       formedAtRoot: item?.formedAtRoot ?? null,
+      formedAtRoots,
       expectedTargets,
       referenceTargets,
       nativeTargets,

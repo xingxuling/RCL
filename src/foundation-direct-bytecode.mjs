@@ -10,7 +10,7 @@ import {
   foundationDirectCapabilityRegistrySnapshot,
 } from './foundation-direct-capability-registry.mjs';
 
-export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.7';
+export const FOUNDATION_DIRECT_BYTECODE_FORMAT = 'taowind.rcl-foundation-direct-bytecode.v0.8';
 
 function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
   const lowered = Array.isArray(knowledgeLowering?.lowered) ? knowledgeLowering.lowered : [];
@@ -30,18 +30,28 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
     throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_REQUIRES_SINGLE_LOWERING');
   }
   const item = lowered[0];
+  const expectedTargets = Array.isArray(item?.stateTargets)
+    ? [...item.stateTargets]
+    : (Array.isArray(item?.claimPaths) ? [...item.claimPaths] : [item?.claimPath].filter(Boolean));
+  const uniqueTargets = [...new Set(expectedTargets)];
   if (
     item?.domain !== 'knowledge'
     || item?.directive !== 'Learn'
     || Number(item?.directiveIndex) !== 0
-    || typeof item?.claimPath !== 'string'
     || typeof item?.syntheticRule !== 'string'
+    || expectedTargets.length < 1
+    || expectedTargets.length !== Number(item?.claimCount ?? expectedTargets.length)
+    || uniqueTargets.length !== expectedTargets.length
+    || expectedTargets.some(target => typeof target !== 'string' || target.length === 0)
   ) {
     throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_METADATA_INVALID');
   }
 
   const firstDirective = program?.directives?.[0];
   const firstRule = (program?.rules ?? []).find(rule => rule?.name === item.syntheticRule);
+  const actualTargets = (firstRule?.alters ?? []).map(alter => alter?.target);
+  const sameTargets = actualTargets.length === expectedTargets.length
+    && [...actualTargets].sort().every((target, index) => target === [...expectedTargets].sort()[index]);
   const exactFirstWriteRule = firstDirective?.kind === 'Realize'
     && firstDirective?.rule === item.syntheticRule
     && firstRule?.when?.kind === 'LiteralExpr'
@@ -50,31 +60,34 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
     && (firstRule?.needs?.length ?? 0) === 0
     && (firstRule?.calls?.length ?? 0) === 0
     && (firstRule?.preserves?.length ?? 0) === 0
-    && (firstRule?.alters?.length ?? 0) === 1
-    && firstRule.alters[0]?.target === item.claimPath;
+    && sameTargets;
   if (!exactFirstWriteRule) {
     throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_ORDER_UNPROVEN');
   }
 
   const facets = Array.isArray(program?.facets) ? program.facets : [];
-  const matchingFacets = facets.filter(facet => facet?.path === item.claimPath);
-  if (matchingFacets.length !== 1) {
-    throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_FACET_IDENTITY_DRIFT');
+  for (const target of expectedTargets) {
+    const matchingFacets = facets.filter(facet => facet?.path === target);
+    if (matchingFacets.length !== 1) {
+      throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_FACET_IDENTITY_DRIFT');
+    }
   }
+  const targetSet = new Set(expectedTargets);
 
   return {
     program: {
       ...program,
-      facets: facets.filter(facet => facet?.path !== item.claimPath),
+      facets: facets.filter(facet => !targetSet.has(facet?.path)),
     },
-    omittedInitialFacetPaths: [item.claimPath],
+    omittedInitialFacetPaths: expectedTargets,
     firstWriteRules: [item.syntheticRule],
     truthBoundary: {
       knowledgeInitialStateEncodingChanged: true,
       omissionAllowedOnlyForFirstDirectiveBoundedLearn: true,
-      firstDirectiveMustBeUnconditionalSingleTargetRealize: true,
+      firstDirectiveMustBeUnconditionalAtomicMultiTargetRealize: true,
       omissionPreservesReferencePreLearnRealityBoundary: true,
-      omittedFacetIsCreatedByTheFirstNativeTransaction: true,
+      omittedFacetsAreCreatedByTheFirstNativeTransaction: true,
+      omittedFacetCount: expectedTargets.length,
       genericDeferredFacetSupportClaimed: false,
     },
   };

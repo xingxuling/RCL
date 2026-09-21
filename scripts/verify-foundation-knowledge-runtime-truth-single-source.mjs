@@ -32,6 +32,12 @@ const canonicalSource = fs.readFileSync(canonicalVerifier, 'utf8');
 const gateSource = fs.readFileSync(cycle73Gate, 'utf8');
 const requiredCanonicalClaims = [
   'knowledgeReceiptRoot',
+  'claimFormedAtRoots',
+  'boundedPrimitiveMultiClaimKnowledgeSubsetOnly',
+  'maxBoundedClaimCount',
+  'verifiedAtomicClaimCount',
+  'referenceSequentialClaimFormationRootsMustBePreserved',
+  'oneLearnDirectiveMapsToOneAtomicSyntheticTransaction',
   'exactReferenceNativeDomainReceiptParityRequired',
   'knowledgeDomainReceiptParityClaimed',
   'fullHistoryParityClaimed',
@@ -40,14 +46,14 @@ const requiredCanonicalClaims = [
 ];
 for (const token of requiredCanonicalClaims) {
   if (!canonicalSource.includes(token)) {
-    fail('Canonical Knowledge runtime truth verifier lost a required receipt/coexistence assertion.', { token });
+    fail('Canonical Knowledge runtime truth verifier lost a required multi-claim receipt/formation/coexistence assertion.', { token });
   }
 }
 if (!gateSource.includes("scripts/verify-foundation-knowledge-deployment-truth.mjs")) {
   fail('Cycle 73 regression gate no longer consumes the canonical Knowledge runtime truth verifier.');
 }
 if (gateSource.includes('verify-foundation-knowledge-receipt-deployment-truth.mjs')) {
-  fail('Cycle 73 regression gate still consumes the retired duplicate Knowledge runtime truth verifier.');
+  fail('Cycle 73 regression gate still consumes the retired duplicate Knowledge receipt runtime truth verifier.');
 }
 
 console.log(JSON.stringify({
@@ -58,6 +64,8 @@ console.log(JSON.stringify({
   cycle73GateConsumesCanonicalVerifier: true,
   truthBoundary: {
     canonicalKnowledgeRuntimeTruthIsSingleSource: true,
+    boundedPrimitiveMultiClaimTruthRequiredByCanonicalVerifier: true,
+    sequentialClaimFormationRootsRequiredByCanonicalVerifier: true,
     receiptRootRequiredByCanonicalVerifier: true,
     directAndProviderBridgeCoexistenceStillRequired: true,
     fullHistoryParityClaimed: false,

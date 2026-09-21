@@ -29,9 +29,9 @@ try {
     || knowledge?.domain !== 'knowledge'
     || knowledge?.status !== 'deployment-bound'
     || knowledge?.loweredDirectiveCount !== 1
-    || knowledge?.loweredClaimCount !== 1
+    || knowledge?.loweredClaimCount !== 2
   ) {
-    fail('Runtime capability truth did not bind the bounded Knowledge deployment proof.', { knowledge });
+    fail('Runtime capability truth did not bind the bounded atomic multi-claim Knowledge deployment proof.', { knowledge });
   }
 
   for (const value of [
@@ -39,25 +39,39 @@ try {
     knowledge?.executionBinarySha256,
     knowledge?.nativeVmExecutionAttestationRoot,
     knowledge?.initialStateRoot,
+    knowledge?.claimFormedAtRoots?.['mind.trusted'],
+    knowledge?.claimFormedAtRoots?.['mind.score'],
     knowledge?.knowledgeReceiptRoot,
     knowledge?.deploymentEvidenceRoot,
   ]) {
-    if (!isSha256(value)) fail('Knowledge runtime truth is missing a required content-addressed execution/evidence/receipt root.', { value, knowledge });
+    if (!isSha256(value)) fail('Knowledge runtime truth is missing a required content-addressed execution/evidence/formation/receipt root.', { value, knowledge });
   }
-  if (knowledge.binarySha256 !== knowledge.executionBinarySha256) {
-    fail('Knowledge runtime truth is not bound to the exact deployed canonical Native VM binary.', { knowledge });
+  if (
+    knowledge.binarySha256 !== knowledge.executionBinarySha256
+    || knowledge.initialStateRoot !== knowledge?.claimFormedAtRoots?.['mind.trusted']
+    || knowledge?.claimFormedAtRoots?.['mind.trusted'] === knowledge?.claimFormedAtRoots?.['mind.score']
+  ) {
+    fail('Knowledge runtime truth is not bound to the exact Native VM binary and sequential claim-formation root topology.', { knowledge });
   }
   if (
     knowledge?.finalState?.['mind.trusted']?.kind !== 'Knowledge'
-    || knowledge?.finalState?.['mind.trusted']?.formedAtRoot !== knowledge.initialStateRoot
+    || knowledge?.finalState?.['mind.trusted']?.formedAtRoot !== knowledge?.claimFormedAtRoots?.['mind.trusted']
+    || knowledge?.finalState?.['mind.score']?.kind !== 'Knowledge'
+    || knowledge?.finalState?.['mind.score']?.formedAtRoot !== knowledge?.claimFormedAtRoots?.['mind.score']
+    || knowledge?.finalState?.['mind.score']?.value !== 7
     || knowledge?.finalState?.['decision.allowed'] !== true
+    || knowledge?.finalState?.['decision.score'] !== 7
   ) {
-    fail('Knowledge runtime truth lost the verified bounded claim/accessor final state.', { finalState: knowledge?.finalState ?? null });
+    fail('Knowledge runtime truth lost the verified bounded multi-claim/accessor final state.', { finalState: knowledge?.finalState ?? null });
   }
   if (
     surface?.truthBoundary?.deploymentEvidenceIsRuntimeSpecific !== true
     || surface?.truthBoundary?.deploymentEvidenceDoesNotRewriteVersionedCapabilityTruth !== true
-    || knowledge?.truthBoundary?.boundedSingleClaimKnowledgeSubsetOnly !== true
+    || knowledge?.truthBoundary?.boundedPrimitiveMultiClaimKnowledgeSubsetOnly !== true
+    || knowledge?.truthBoundary?.maxBoundedClaimCount !== 4
+    || knowledge?.truthBoundary?.verifiedAtomicClaimCount !== 2
+    || knowledge?.truthBoundary?.referenceSequentialClaimFormationRootsMustBePreserved !== true
+    || knowledge?.truthBoundary?.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction !== true
     || knowledge?.truthBoundary?.exactReferenceNativeDomainReceiptParityRequired !== true
     || knowledge?.truthBoundary?.providerBridgeRemovedGlobally !== false
     || knowledge?.truthBoundary?.allKnowledgeProgramsNativeClaimed !== false
@@ -80,6 +94,8 @@ try {
     knowledgeDeploymentEvidenceRoot: knowledge.deploymentEvidenceRoot,
     knowledgeReceiptRoot: knowledge.knowledgeReceiptRoot,
     initialStateRoot: knowledge.initialStateRoot,
+    claimFormedAtRoots: knowledge.claimFormedAtRoots,
+    loweredClaimCount: knowledge.loweredClaimCount,
     nativeVmExecutionAttestationRoot: knowledge.nativeVmExecutionAttestationRoot,
     binarySha256: knowledge.binarySha256,
   }, null, 2));
