@@ -1,39 +1,37 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import { compileReality } from '../src/compiler.mjs';
+import { spawnSync } from 'node:child_process';
 
-const source = [
-  'reality VercelKnowledgeNativeProof {',
-  '  facet world.signal : Truth = true',
-  '  facet decision.allowed : Truth = false',
-  '  knowledge mind {',
-  '    claim trusted : Truth = world.signal confidence 0.90 evidence "sensor:signal-v1" source "sensor:signal"',
-  '  }',
-  '  emergence apply_knowledge {',
-  '    cause actor',
-  '    when known(mind.trusted, 0.80)',
-  '    alter decision.allowed <- belief(mind.trusted)',
-  '  }',
-  '  learn mind',
-  '  realize apply_knowledge',
-  '}',
-  '',
-].join('\n');
+const steps = [
+  { code: 121, name: 'cycle71-regression-proof-chain', args: ['scripts/dwac-cycle71-exit-probe.mjs'] },
+  { code: 122, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
+  { code: 123, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
+];
 
-let report;
-try {
-  const program = compileReality(source);
-  report = { ok: true, reality: program?.name ?? null, knowledgeCount: program?.knowledges?.length ?? null, directiveCount: program?.directives?.length ?? null };
-} catch (error) {
-  report = {
-    ok: false,
-    name: error?.name ?? null,
-    code: error?.code ?? null,
-    message: error?.message ?? String(error),
-    diagnostics: error?.diagnostics ?? error?.details ?? null,
-    stack: error?.stack ?? null,
-  };
+for (const step of steps) {
+  const result = spawnSync(process.execPath, step.args, { stdio: 'inherit', env: process.env });
+  if (result.error || result.status !== 0) {
+    console.error(JSON.stringify({
+      status: 'DWAC_CYCLE72_EXIT_PROBE_FAILURE',
+      probeExitCode: step.code,
+      step: step.name,
+      childExitCode: result.status ?? null,
+      error: result.error?.message ?? null,
+    }, null, 2));
+    process.exit(step.code);
+  }
 }
-fs.mkdirSync('public', { recursive: true });
-fs.writeFileSync('public/cycle72-knowledge-compile-debug.json', `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify({ status: 'CYCLE72_KNOWLEDGE_COMPILE_DIAGNOSTIC_WRITTEN', report }, null, 2));
+
+console.log(JSON.stringify({
+  ok: true,
+  status: 'DWAC_CYCLE72_EXIT_PROBE_ALL_PASS',
+  truthBoundary: {
+    boundedSingleClaimKnowledgeDirectLoweringVerified: true,
+    canonicalRealCStateAndSemanticRootParityRequired: true,
+    exactInitialFormedAtRootBound: true,
+    runtimeCapabilityTruthBindsKnowledgeDeploymentEvidence: true,
+    unsupportedKnowledgeProgramsRemainProviderBound: true,
+    knowledgeProviderBridgeRemovedGlobally: false,
+    allKnowledgeProgramsNativeClaimed: false,
+    knowledgeDomainReceiptParityClaimed: false,
+  },
+}, null, 2));
