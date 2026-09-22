@@ -51,8 +51,19 @@ const source = [
   '    channel position : Length = world.stone.position',
   '    preserve sight.position >= meters(0)',
   '  }',
+  '  neural brain {',
+  '    facet stimulus : Number = 1',
+  '    facet response : Number = 0',
+  '    pathway integrate {',
+  '      when brain.stimulus > 0',
+  '      transmit brain.response <- brain.response + brain.stimulus * 0.5',
+  '      preserve brain.response >= 0 and brain.response <= 1',
+  '      witness "cross-domain:neural"',
+  '    }',
+  '  }',
   '  advance world.drift steps 1 dt seconds(1)',
   '  observe sight',
+  '  propagate brain steps 1',
   '}',
   '',
 ].join('\n');
@@ -84,8 +95,9 @@ try {
   if (historyParity?.required !== true || historyParity?.ok !== true || historyParity?.rootsEqual !== true) {
     fail('Bounded cross-domain history-root parity did not verify', { historyParity, domainReceipt });
   }
-  if (!historyParity.domains.includes('physical') || !historyParity.domains.includes('perception') || historyParity.domainCount < 2) {
-    fail('Cross-domain history proof did not include the intended Physical + Perception domains', { domains: historyParity.domains });
+  const expectedDomains = ['physical', 'perception', 'neural'];
+  if (!expectedDomains.every(domain => historyParity.domains.includes(domain)) || historyParity.domainCount < 3) {
+    fail('Cross-domain history proof did not include the intended Physical + Perception + Neural domains', { domains: historyParity.domains });
   }
   if (!isSha256(historyParity.referenceHistoryRoot) || historyParity.referenceHistoryRoot !== historyParity.nativeHistoryRoot) {
     fail('Cross-domain reference/native history roots are not the same content-addressed root', { historyParity });
@@ -111,7 +123,7 @@ try {
   const transitionDrift = clone(domainReceipt);
   const transitionEntry = transitionDrift.entries.find(entry => ['perception', 'physical', 'neural'].includes(entry?.domain) && Array.isArray(entry?.nativeChanges) && entry.nativeChanges.length > 0);
   if (!transitionEntry) fail('Cross-domain proof did not expose a transition for negative control');
-  transitionEntry.nativeChanges[0] = { ...transitionEntry.nativeChanges[0], after: '__DWAC_CYCLE80_DRIFT__' };
+  transitionEntry.nativeChanges[0] = { ...transitionEntry.nativeChanges[0], after: '__DWAC_CYCLE88_DRIFT__' };
   const transitionNegative = verifyFoundationCrossDomainHistoryRootParity(transitionDrift);
   if (transitionNegative.ok !== false || transitionNegative.checks?.everyBoundaryAndTransitionExact !== false) {
     fail('Transition-value drift negative control did not fail closed', { transitionNegative });
@@ -124,9 +136,16 @@ try {
     fail('Native ordering drift negative control did not fail closed', { orderNegative });
   }
 
+  const neuralEntryDrift = clone(domainReceipt);
+  neuralEntryDrift.entries = neuralEntryDrift.entries.filter(entry => entry?.domain !== 'neural');
+  const neuralEntryNegative = verifyFoundationCrossDomainHistoryRootParity(neuralEntryDrift);
+  if (neuralEntryNegative.domains.includes('neural') || neuralEntryNegative.domainCount >= 3) {
+    fail('Removing Neural history did not remove the three-domain claim', { neuralEntryNegative });
+  }
+
   const artifact = {
     ok: true,
-    format: 'taowind.rcl-vercel-foundation-cross-domain-history-proof.v0.1',
+    format: 'taowind.rcl-vercel-foundation-cross-domain-history-proof.v0.2',
     status: 'RCL_FOUNDATION_CROSS_DOMAIN_HISTORY_ROOT_PARITY_VERIFIED',
     binarySha256,
     executionAttestationRoot: proof?.nativeExecutionAttestation?.attestationRoot ?? null,
@@ -142,9 +161,10 @@ try {
       boundaryRootDriftFailsClosed: true,
       transitionValueDriftFailsClosed: true,
       nativeOrderDriftFailsClosed: true,
+      neuralDomainRemovalDropsThreeDomainClaim: true,
     },
     truthBoundary: {
-      boundedPhysicalPerceptionSpecimenOnly: true,
+      boundedPhysicalPerceptionNeuralSpecimenOnly: true,
       supportedCrossDomainRootDomains: ['perception', 'physical', 'neural'],
       stagedGeneticHistoryIncluded: false,
       livingStagedHistoryIncluded: false,
