@@ -27,6 +27,17 @@ const receipt = overrides => ({
   ...overrides,
 });
 
+function withNeural(base = receipt()) {
+  const copy = structuredClone(base);
+  copy.entries.push({
+    index: 2, domain: 'neural', declaration: 'brain.integrate', directive: 'Propagate', directiveIndex: 2,
+    referenceActive: true, nativeActive: true, referenceBeforeRoot: r('3'), nativeBeforeRoot: r('3'),
+    referenceAfterRoot: r('4'), nativeAfterRoot: r('4'),
+    referenceChanges: [{ target: 'brain.response', before: 0, after: 0.5 }], nativeChanges: [{ target: 'brain.response', before: 0, after: 0.5 }], ok: true,
+  });
+  return copy;
+}
+
 test('two verified direct domains produce one equal cross-domain history root', () => {
   const result = verifyFoundationCrossDomainHistoryRootParity(receipt());
   assert.equal(result.required, true);
@@ -36,6 +47,19 @@ test('two verified direct domains produce one equal cross-domain history root', 
   assert.equal(result.referenceHistoryRoot, result.nativeHistoryRoot);
   assert.match(result.referenceHistoryRoot, /^[0-9a-f]{64}$/);
   assert.equal(result.truthBoundary.fullHistoryParityClaimed, false);
+});
+
+test('three verified direct domains include Neural in the same ordered history root', () => {
+  const result = verifyFoundationCrossDomainHistoryRootParity(withNeural());
+  assert.equal(result.required, true);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.domains, ['physical', 'perception', 'neural']);
+  assert.equal(result.domainCount, 3);
+  assert.equal(result.entryCount, 3);
+  assert.equal(result.checks.referenceContinuityPreserved, true);
+  assert.equal(result.checks.nativeContinuityPreserved, true);
+  assert.equal(result.referenceHistoryRoot, result.nativeHistoryRoot);
+  assert.match(result.referenceHistoryRoot, /^[0-9a-f]{64}$/);
 });
 
 test('boundary-root drift fails closed even when transition values remain equal', () => {
@@ -51,6 +75,14 @@ test('boundary-root drift fails closed even when transition values remain equal'
 test('transition-value drift fails closed', () => {
   const bad = receipt();
   bad.entries[0] = { ...bad.entries[0], nativeChanges: [{ target: 'world.x', before: 0, after: 2 }] };
+  const result = verifyFoundationCrossDomainHistoryRootParity(bad);
+  assert.equal(result.ok, false);
+  assert.equal(result.checks.everyBoundaryAndTransitionExact, false);
+});
+
+test('Neural transition drift fails closed in a three-domain history', () => {
+  const bad = withNeural();
+  bad.entries[2] = { ...bad.entries[2], nativeChanges: [{ target: 'brain.response', before: 0, after: 1 }] };
   const result = verifyFoundationCrossDomainHistoryRootParity(bad);
   assert.equal(result.ok, false);
   assert.equal(result.checks.everyBoundaryAndTransitionExact, false);
@@ -73,12 +105,12 @@ test('single-domain receipt stays compatible and makes no cross-domain claim', (
 });
 
 test('staged genetic and living entries remain outside the bounded cross-domain root', () => {
-  const mixed = receipt();
-  mixed.entries.push({ index: 2, domain: 'genetic', ok: false });
-  mixed.entries.push({ index: 3, domain: 'living', ok: false });
+  const mixed = withNeural();
+  mixed.entries.push({ index: 3, domain: 'genetic', ok: false });
+  mixed.entries.push({ index: 4, domain: 'living', ok: false });
   const result = verifyFoundationCrossDomainHistoryRootParity(mixed);
   assert.equal(result.ok, true);
-  assert.equal(result.entryCount, 2);
+  assert.equal(result.entryCount, 3);
   assert.equal(result.truthBoundary.stagedGeneticHistoryExcluded, true);
   assert.equal(result.truthBoundary.livingStagedHistoryExcluded, true);
 });
