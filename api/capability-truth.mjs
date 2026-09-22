@@ -3,9 +3,12 @@ import { foundationCapabilityTruthSurface } from '../src/foundation-capability-t
 import {
   foundationRuntimeDeploymentEvidenceSurface,
 } from '../src/foundation-runtime-deployment-evidence-registry.mjs';
+import {
+  foundationCrossDomainHistoryDeploymentEvidence,
+} from '../src/foundation-cross-domain-history-deployment-evidence.mjs';
 
-const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.2';
-const RUNTIME_TRUTH_VERSION = '0.2.0';
+const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.3';
+const RUNTIME_TRUTH_VERSION = '0.3.0';
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -19,7 +22,8 @@ function sha256Canonical(value) {
   return crypto.createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex');
 }
 
-export function foundationRuntimeCapabilityTruthAttestation({ capability, deployment }) {
+export function foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory = null }) {
+  const crossDomainVerified = crossDomainHistory?.ok === true && crossDomainHistory?.verified === true;
   const payload = {
     format: RUNTIME_TRUTH_FORMAT,
     version: RUNTIME_TRUTH_VERSION,
@@ -31,15 +35,37 @@ export function foundationRuntimeCapabilityTruthAttestation({ capability, deploy
     directImplementationDomains: [...(deployment?.directImplementationDomains ?? [])],
     registeredDeploymentEvidenceDomains: [...(deployment?.registeredDomains ?? [])],
     completeDirectDeploymentCoverage: deployment?.completeDirectDeploymentCoverage === true,
+    crossDomainHistoryBound: crossDomainVerified,
+    crossDomainHistoryEvidenceRoot: crossDomainVerified ? crossDomainHistory.deploymentEvidenceRoot : null,
+    crossDomainHistoryReferenceRoot: crossDomainVerified ? crossDomainHistory.referenceHistoryRoot : null,
+    crossDomainHistoryNativeRoot: crossDomainVerified ? crossDomainHistory.nativeHistoryRoot : null,
+    crossDomainHistoryDomains: crossDomainVerified ? [...crossDomainHistory.domains] : [],
   };
   return { ...payload, runtimeTruthRoot: sha256Canonical(payload) };
 }
 
-export function runtimeCapabilityTruthSurface() {
+export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = false } = {}) {
   const capability = foundationCapabilityTruthSurface();
   const deployment = foundationRuntimeDeploymentEvidenceSurface({ requireCompleteDirectCoverage: true });
-  const runtimeTruth = foundationRuntimeCapabilityTruthAttestation({ capability, deployment });
-  const ok = capability.ok === true && deployment.ok === true && deployment.evidenceSetVerified === true;
+  let crossDomainHistory;
+  try {
+    crossDomainHistory = foundationCrossDomainHistoryDeploymentEvidence();
+  } catch (error) {
+    crossDomainHistory = {
+      ok: false,
+      present: false,
+      verified: false,
+      status: 'deployment-unavailable',
+      deploymentEvidenceRoot: null,
+      errors: [{ code: error?.code ?? 'RCL_CROSS_DOMAIN_HISTORY_RUNTIME_EVIDENCE_UNAVAILABLE', message: error?.message ?? String(error) }],
+    };
+  }
+  const runtimeTruth = foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory });
+  const crossDomainRequiredSatisfied = requireCrossDomainHistory !== true || crossDomainHistory?.ok === true;
+  const ok = capability.ok === true
+    && deployment.ok === true
+    && deployment.evidenceSetVerified === true
+    && crossDomainRequiredSatisfied;
 
   return {
     ...capability,
@@ -49,6 +75,7 @@ export function runtimeCapabilityTruthSurface() {
       : 'RCL_FOUNDATION_RUNTIME_CAPABILITY_TRUTH_DRIFT',
     runtimeTruth,
     runtimeTruthRoot: runtimeTruth.runtimeTruthRoot,
+    crossDomainHistoryEvidence: crossDomainHistory,
     deploymentEvidenceRegistry: {
       format: deployment.format,
       version: deployment.version,
@@ -81,6 +108,12 @@ export function runtimeCapabilityTruthSurface() {
       completeDirectDeploymentEvidenceCoverageMeansEvidenceCoverageNotFullDomainNativeCoverage: true,
       runtimeTruthRootBindsVersionedCapabilityAndDeploymentEvidenceSet: true,
       deploymentEvidenceSetRootBindsPerDomainEvidenceRoots: true,
+      crossDomainHistoryEvidencePresent: crossDomainHistory?.present === true,
+      crossDomainHistoryRuntimeTruthBound: crossDomainHistory?.ok === true,
+      crossDomainHistoryRuntimeTruthRequired: requireCrossDomainHistory === true,
+      runtimeTruthRootBindsCrossDomainHistoryEvidenceWhenPresent: crossDomainHistory?.ok === true,
+      crossDomainHistoryBindingDoesNotClaimFullHistoryParity: true,
+      crossDomainHistoryBindingDoesNotClaimAllFoundationDomainHistoryParity: true,
       energyProviderBridgeMayCoexistWithBoundedDirectVerification: true,
     },
   };
