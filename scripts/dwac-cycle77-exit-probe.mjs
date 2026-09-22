@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 
+// Revalidation marker: no semantic change; used to obtain a fresh deployment receipt for this exact candidate tree.
 const steps = [
   { code: 171, name: 'cycle76-regression-proof-chain', args: ['scripts/dwac-cycle76-exit-probe.mjs'] },
   { code: 172, name: 'knowledge-four-claim-boundary-unit-and-negative-control', args: ['--test', 'tests/foundation-knowledge-max-boundary.test.mjs'] },
