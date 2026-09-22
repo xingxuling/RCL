@@ -30,6 +30,7 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
       firstWriteRules: [],
       truthBoundary: {
         knowledgeInitialStateEncodingChanged: false,
+        omissionAllowedOnlyForFirstDirectiveBoundedLearn: true,
         omissionAllowedOnlyForContiguousLeadingBoundedLearns: true,
       },
     };
@@ -92,6 +93,7 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
   }
 
   const targetSet = new Set(allTargets);
+  const singleLearnCompatibility = lowered.length === 1;
   return {
     program: {
       ...program,
@@ -101,6 +103,9 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
     firstWriteRules,
     truthBoundary: {
       knowledgeInitialStateEncodingChanged: true,
+      omissionAllowedOnlyForFirstDirectiveBoundedLearn: singleLearnCompatibility,
+      firstDirectiveMustBeUnconditionalAtomicMultiTargetRealize: singleLearnCompatibility,
+      omittedFacetsAreCreatedByTheFirstNativeTransaction: singleLearnCompatibility,
       omissionAllowedOnlyForContiguousLeadingBoundedLearns: true,
       maxBoundedLearnDirectiveCount: FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS,
       leadingDirectivesMustBeUnconditionalAtomicMultiTargetRealizes: true,
