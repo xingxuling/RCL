@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { compileReality } from '../src/compiler.mjs';
+import { lowerDeclaredKnowledgeToCore } from '../src/foundation-knowledge-direct-lowering.mjs';
 import { tryCompileFoundationRealityToBytecode } from '../src/foundation-direct-bytecode.mjs';
 
 function fail(message, details = {}, exitCode = 1) {
@@ -58,61 +59,83 @@ const threeLearnSource = [
   '',
 ].join('\n');
 
-function compile(source, label) {
+function compileCase(source, label) {
   let program;
   try { program = compileReality(source); }
   catch (error) {
     fail(`${label} did not parse; negative control must exercise lowering rather than syntax failure.`, {
       code: error?.code ?? null,
       error: error?.message ?? String(error),
-    }, 294);
+    }, 233);
   }
-  try { return tryCompileFoundationRealityToBytecode(program); }
+
+  let lowering;
+  try { lowering = lowerDeclaredKnowledgeToCore(program); }
   catch (error) {
-    fail(`${label} threw instead of failing closed through diagnostics.`, {
+    fail(`${label} threw during Knowledge lowering instead of failing closed through diagnostics.`, {
       code: error?.code ?? null,
       error: error?.message ?? String(error),
-    }, 295);
+    }, 234);
   }
+
+  let compiled;
+  try { compiled = tryCompileFoundationRealityToBytecode(program); }
+  catch (error) {
+    fail(`${label} threw during bytecode compilation instead of failing closed through diagnostics.`, {
+      code: error?.code ?? null,
+      error: error?.message ?? String(error),
+    }, 235);
+  }
+  return { lowering, compiled };
 }
 
-const overClaim = compile(fiveClaimFirstLearn, 'five-claim first Learn');
-const overLearn = compile(threeLearnSource, 'three-Learn program');
-const overClaimDiagnostics = overClaim?.diagnostics ?? [];
-const overLearnDiagnostics = overLearn?.diagnostics ?? [];
+function assertProviderBound(result, label, exitCode) {
+  const loweringDiagnostics = result?.lowering?.diagnostics ?? [];
+  const compiledDiagnostics = result?.compiled?.diagnostics ?? [];
+  const loweringRejected = result?.lowering?.summary?.knowledgeLoweredDeclarationCount === 0
+    && result?.lowering?.summary?.nativeKnowledgeRecordCount === 0
+    && result?.lowering?.summary?.remainingKnowledgeCount >= 1
+    && loweringDiagnostics.some(item => item?.code === 'RCL_FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_PROVIDER_REQUIRED');
+  const bytecodeRejected = result?.compiled?.ok === false && !result?.compiled?.bytecode;
 
-if (
-  overClaim?.ok !== false
-  || overClaim?.bytecode
-  || !overClaimDiagnostics.some(item => item?.code === 'RCL_FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_PROVIDER_REQUIRED')
-) {
-  fail('Five claims in one Learn crossed the declared four-claim boundary without failing closed to Provider-required.', {
-    ok: overClaim?.ok ?? null,
-    diagnostics: overClaimDiagnostics,
-    bytecodePresent: Boolean(overClaim?.bytecode),
-  }, 296);
+  if (!loweringRejected || !bytecodeRejected) {
+    fail(`${label} crossed the bounded Knowledge autonomy surface instead of failing closed to Provider-required.`, {
+      loweringSummary: result?.lowering?.summary ?? null,
+      loweringDiagnostics,
+      compiledOk: result?.compiled?.ok ?? null,
+      compiledDiagnostics,
+      bytecodePresent: Boolean(result?.compiled?.bytecode),
+    }, exitCode);
+  }
+
+  return {
+    loweringDiagnosticCodes: loweringDiagnostics.map(item => item?.code).filter(Boolean),
+    compiledDiagnosticCodes: compiledDiagnostics.map(item => item?.code).filter(Boolean),
+  };
 }
 
-if (
-  overLearn?.ok !== false
-  || overLearn?.bytecode
-  || !overLearnDiagnostics.some(item => item?.code === 'RCL_FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_PROVIDER_REQUIRED')
-) {
-  fail('Three Learn directives crossed the declared two-Learn boundary without failing closed to Provider-required.', {
-    ok: overLearn?.ok ?? null,
-    diagnostics: overLearnDiagnostics,
-    bytecodePresent: Boolean(overLearn?.bytecode),
-  }, 297);
-}
+const overClaim = assertProviderBound(
+  compileCase(fiveClaimFirstLearn, 'five-claim first Learn'),
+  'Five claims in one Learn',
+  236,
+);
+const overLearn = assertProviderBound(
+  compileCase(threeLearnSource, 'three-Learn program'),
+  'Three Learn directives',
+  237,
+);
 
 console.log(JSON.stringify({
   ok: true,
   status: 'RCL_FOUNDATION_KNOWLEDGE_MULTI_LEARN_MAX_BOUNDARY_NEGATIVE_CONTROL_PASS',
+  overClaim,
+  overLearn,
   truthBoundary: {
     maxBoundedLearnDirectiveCount: 2,
     maxBoundedClaimCountPerLearn: 4,
     fiveOrMoreClaimsPerLearnRemainProviderBound: true,
     threeOrMoreLearnDirectivesRemainProviderBound: true,
     overBoundaryBytecodeEmissionRejected: true,
+    lowererProviderRequiredDiagnosticRequired: true,
   },
 }, null, 2));
