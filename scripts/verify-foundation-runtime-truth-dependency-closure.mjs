@@ -77,5 +77,11 @@ try {
     truthBoundary: contract.truthBoundary,
   }, null, 2));
 } catch (error) {
-  fail(error?.message ?? String(error), { code: error?.code ?? null, details: error?.details ?? null, stack: error?.stack ?? null }, 89);
+  const unresolved = Array.isArray(error?.details?.unresolvedRelativeImports)
+    ? error.details.unresolvedRelativeImports
+    : [];
+  const exitCode = error?.message === 'RCL_RUNTIME_TRUTH_DEPENDENCY_CLOSURE_UNRESOLVED'
+    ? Math.min(119, 90 + unresolved.length)
+    : 89;
+  fail(error?.message ?? String(error), { code: error?.code ?? null, details: error?.details ?? null, stack: error?.stack ?? null, unresolvedCount: unresolved.length }, exitCode);
 }
