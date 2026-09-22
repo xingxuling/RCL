@@ -23,7 +23,25 @@
       "producer": "native/rclvm.c",
       "verifier": "src/semantic-state-root.mjs",
       "strictOption": "requireNativeStateRoot",
-      "status": "verified"
+      "status": "verified",
+      "candidateAlgorithms": [
+        {
+          "algorithm": "rcl.semantic-state-root.v2-candidate",
+          "status": "candidate-authority-bound",
+          "authoritativeDefault": false,
+          "format": "rcl.canonical-f64.v0.1",
+          "version": "0.1.0-candidate.1",
+          "numberEncoding": "IEEE754_BINARY64_HEX_16_LOWERCASE",
+          "negativeZeroPolicy": "NORMALIZE_TO_POSITIVE_ZERO",
+          "componentContract": "COMPONENT-VERSIONS.json#components.semanticStateRoot.candidates",
+          "evidence": "evidence/RCL_GAP_AI010_NATIVE_V2_INTEGRATION_CANDIDATE_v0.1.json",
+          "canonicalPromotionPerformed": false,
+          "windowsCandidateReplayPerformed": false,
+          "hostedCiAuthorityPerformed": false,
+          "historicalRootMigrationPerformed": false,
+          "downstreamAcceptanceClaimed": false
+        }
+      ]
     },
     "wholeLanguageRuntimeSelfHosting": false,
     "advancedDomainRuntime": "JavaScript Reference Runtime plus implementation-bound direct lowering for 8 declared Foundation domains and 5 Native Provider bridge batches covering 16 bridge domains",
@@ -134,7 +152,13 @@
     "providerBridgeRemovedGlobally": false,
     "windowsExecutionVerified": true,
     "hostNativeExecutionVerified": true,
-    "nativeSemanticStateRootVerified": true
+    "nativeSemanticStateRootVerified": true,
+    "semanticStateRootV2CandidateAuthorityBound": true,
+    "semanticStateRootV2CandidatePromoted": false,
+    "semanticStateRootV2WindowsCandidateReplayVerified": false,
+    "semanticStateRootV2HostedCiAuthorityVerified": false,
+    "semanticStateRootV2HistoricalMigrationPerformed": false,
+    "semanticStateRootV2DownstreamAcceptanceClaimed": false
   },
   "evidence": {
     "scripts": [
