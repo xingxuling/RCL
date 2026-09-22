@@ -27,15 +27,15 @@ function isSha256(value) { return typeof value === 'string' && /^[0-9a-f]{64}$/i
 function sha256(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 
 try {
-  if (!fs.existsSync(binaryPath)) fail('Canonical Native VM binary is missing before Cycle 81 runtime truth binding.', { binaryPath });
-  if (!fs.existsSync(manifestPath)) fail('Canonical Native VM attestation is missing before Cycle 81 runtime truth binding.', { manifestPath });
+  if (!fs.existsSync(binaryPath)) fail('Canonical Native VM binary is missing before cross-domain runtime truth binding.', { binaryPath });
+  if (!fs.existsSync(manifestPath)) fail('Canonical Native VM attestation is missing before cross-domain runtime truth binding.', { manifestPath });
 
   const binaryBytes = fs.readFileSync(binaryPath);
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   const binarySha256 = sha256(binaryBytes);
   const evidence = foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, attestation: manifest });
   if (evidence?.ok !== true || evidence?.verified !== true || evidence?.present !== true) {
-    fail('Cycle 80 cross-domain history proof did not bind into deployment evidence.', { evidence });
+    fail('Bounded Physical + Perception + Neural cross-domain history proof did not bind into deployment evidence.', { evidence });
   }
   if (
     evidence.binarySha256 !== binarySha256
@@ -45,8 +45,10 @@ try {
     || evidence.referenceHistoryRoot !== evidence.nativeHistoryRoot
     || !evidence.domains.includes('physical')
     || !evidence.domains.includes('perception')
+    || !evidence.domains.includes('neural')
+    || evidence.domainCount < 3
   ) {
-    fail('Cross-domain history deployment evidence lost content-addressed root/binary/domain binding.', { evidence, binarySha256 });
+    fail('Three-domain history deployment evidence lost content-addressed root/binary/domain binding.', { evidence, binarySha256 });
   }
 
   const surface = runtimeCapabilityTruthSurface({ requireCrossDomainHistory: true });
@@ -60,12 +62,13 @@ try {
     || surface?.runtimeTruth?.crossDomainHistoryReferenceRoot !== evidence.referenceHistoryRoot
     || surface?.runtimeTruth?.crossDomainHistoryNativeRoot !== evidence.nativeHistoryRoot
     || JSON.stringify(surface?.runtimeTruth?.crossDomainHistoryDomains) !== JSON.stringify(evidence.domains)
+    || !surface?.runtimeTruth?.crossDomainHistoryDomains?.includes('neural')
     || surface?.truthBoundary?.crossDomainHistoryRuntimeTruthBound !== true
     || surface?.truthBoundary?.runtimeTruthRootBindsCrossDomainHistoryEvidenceWhenPresent !== true
     || surface?.truthBoundary?.crossDomainHistoryBindingDoesNotClaimFullHistoryParity !== true
     || surface?.truthBoundary?.crossDomainHistoryBindingDoesNotClaimAllFoundationDomainHistoryParity !== true
   ) {
-    fail('Canonical runtime truth surface did not bind the exact Cycle 80 cross-domain evidence without overclaim.', {
+    fail('Canonical runtime truth surface did not bind the exact three-domain cross-domain evidence without overclaim.', {
       runtimeTruth: surface?.runtimeTruth,
       truthBoundary: surface?.truthBoundary,
       crossDomainHistoryEvidence: surface?.crossDomainHistoryEvidence,
@@ -99,6 +102,13 @@ try {
     fail('Cross-domain proof binary identity drift negative control did not fail closed.', { binaryNegative });
   }
 
+  const neuralDomainDrift = clone(manifest);
+  neuralDomainDrift.foundationCrossDomainHistoryProof.domains = neuralDomainDrift.foundationCrossDomainHistoryProof.domains.filter(domain => domain !== 'neural');
+  const neuralDomainNegative = foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, attestation: neuralDomainDrift });
+  if (neuralDomainNegative.ok !== false) {
+    fail('Removing Neural from the bounded three-domain proof did not fail closed.', { neuralDomainNegative });
+  }
+
   const boundaryOverclaim = clone(manifest);
   boundaryOverclaim.foundationCrossDomainHistoryProof.truthBoundary.fullHistoryParityClaimed = true;
   const boundaryNegative = foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, attestation: boundaryOverclaim });
@@ -108,7 +118,7 @@ try {
 
   const artifact = {
     ok: true,
-    format: 'taowind.rcl-foundation-cross-domain-runtime-truth.v0.1',
+    format: 'taowind.rcl-foundation-cross-domain-runtime-truth.v0.2',
     status: 'RCL_FOUNDATION_CROSS_DOMAIN_HISTORY_RUNTIME_TRUTH_VERIFIED',
     runtimeTruthRoot: surface.runtimeTruthRoot,
     crossDomainHistoryEvidenceRoot: evidence.deploymentEvidenceRoot,
@@ -121,10 +131,11 @@ try {
     negativeControls: {
       nativeHistoryRootDriftFailsClosed: true,
       proofBinaryIdentityDriftFailsClosed: true,
+      neuralDomainRemovalFailsClosed: true,
       fullHistoryOverclaimFailsClosed: true,
     },
     truthBoundary: {
-      boundedPhysicalPerceptionSpecimenOnly: true,
+      boundedPhysicalPerceptionNeuralSpecimenOnly: true,
       stagedGeneticHistoryIncluded: false,
       livingStagedHistoryIncluded: false,
       fullHistoryParityClaimed: false,
