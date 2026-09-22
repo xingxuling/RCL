@@ -11,9 +11,11 @@ const SOURCE_BINDING_PATHS = Object.freeze([
   'api/runtime-health.mjs',
   'api/capability-truth.mjs',
   'api/bridge-statepath-truth.mjs',
+  'api/release-runtime-truth.mjs',
   'src/foundation-capability-registry-truth.json',
   'src/foundation-direct-capability-registry.mjs',
   'src/foundation-native-bridge-capability-registry.mjs',
+  'src/foundation-release-deployment-source-parity.mjs',
   'src/foundation-runtime-truth-contract.mjs',
 ]);
 
@@ -21,6 +23,7 @@ const RUNTIME_TRUTH_SURFACES = Object.freeze([
   { id: 'runtime-health', logicalPath: '/health', source: 'api/runtime-health.mjs' },
   { id: 'capability-truth', logicalPath: '/capability-truth', source: 'api/capability-truth.mjs' },
   { id: 'bridge-statepath-truth', logicalPath: '/bridge-statepath-truth', source: 'api/bridge-statepath-truth.mjs' },
+  { id: 'release-runtime-truth', logicalPath: '/release-runtime-truth', source: 'api/release-runtime-truth.mjs' },
   { id: 'native-deployment-health', logicalPath: 'internal:native-deployment-health', source: 'api/health.mjs' },
 ]);
 
