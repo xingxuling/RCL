@@ -60,14 +60,182 @@ function normalizeRelative(root, absolutePath) {
 
 function extractRelativeModuleSpecifiers(sourceText) {
   const values = new Set();
-  const staticPattern = /\b(?:import|export)\s+(?:[^'";]*?\s+from\s+)?['"]([^'"]+)['"]/g;
-  const dynamicPattern = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
-  for (const pattern of [staticPattern, dynamicPattern]) {
-    let match;
-    while ((match = pattern.exec(sourceText)) !== null) {
-      const specifier = match[1];
-      if (specifier?.startsWith('.')) values.add(specifier);
+  const length = sourceText.length;
+  const isWord = char => Boolean(char && /[A-Za-z0-9_$]/.test(char));
+
+  function readQuoted(start) {
+    const quote = sourceText[start];
+    if (quote !== "'" && quote !== '"') return null;
+    let value = '';
+    let cursor = start + 1;
+    while (cursor < length) {
+      const char = sourceText[cursor];
+      if (char === '\\') {
+        if (cursor + 1 < length) {
+          value += sourceText[cursor + 1];
+          cursor += 2;
+          continue;
+        }
+        return null;
+      }
+      if (char === quote) return { value, end: cursor + 1 };
+      value += char;
+      cursor += 1;
     }
+    return null;
+  }
+
+  function skipLineComment(start) {
+    let cursor = start + 2;
+    while (cursor < length && sourceText[cursor] !== '\n') cursor += 1;
+    return cursor;
+  }
+
+  function skipBlockComment(start) {
+    const end = sourceText.indexOf('*/', start + 2);
+    return end === -1 ? length : end + 2;
+  }
+
+  function skipTemplate(start) {
+    let cursor = start + 1;
+    while (cursor < length) {
+      const char = sourceText[cursor];
+      if (char === '\\') {
+        cursor += 2;
+        continue;
+      }
+      if (char === '`') return cursor + 1;
+      cursor += 1;
+    }
+    return length;
+  }
+
+  function skipTrivia(start) {
+    let cursor = start;
+    while (cursor < length) {
+      if (/\s/.test(sourceText[cursor])) {
+        cursor += 1;
+        continue;
+      }
+      if (sourceText[cursor] === '/' && sourceText[cursor + 1] === '/') {
+        cursor = skipLineComment(cursor);
+        continue;
+      }
+      if (sourceText[cursor] === '/' && sourceText[cursor + 1] === '*') {
+        cursor = skipBlockComment(cursor);
+        continue;
+      }
+      break;
+    }
+    return cursor;
+  }
+
+  function wordAt(start, word) {
+    return sourceText.startsWith(word, start)
+      && !isWord(sourceText[start - 1])
+      && !isWord(sourceText[start + word.length]);
+  }
+
+  function readStaticImport(start) {
+    let cursor = skipTrivia(start + 'import'.length);
+    if (sourceText[cursor] === '.') return start + 'import'.length; // import.meta
+    if (sourceText[cursor] === '(') {
+      cursor = skipTrivia(cursor + 1);
+      const quoted = readQuoted(cursor);
+      if (quoted?.value?.startsWith('.')) values.add(quoted.value);
+      return quoted?.end ?? cursor + 1;
+    }
+    const immediate = readQuoted(cursor);
+    if (immediate) {
+      if (immediate.value.startsWith('.')) values.add(immediate.value);
+      return immediate.end;
+    }
+    let scanned = cursor;
+    while (scanned < length) {
+      if (sourceText[scanned] === ';') return scanned + 1;
+      if (sourceText[scanned] === '/' && sourceText[scanned + 1] === '/') {
+        scanned = skipLineComment(scanned);
+        continue;
+      }
+      if (sourceText[scanned] === '/' && sourceText[scanned + 1] === '*') {
+        scanned = skipBlockComment(scanned);
+        continue;
+      }
+      if (sourceText[scanned] === '`') {
+        scanned = skipTemplate(scanned);
+        continue;
+      }
+      if (sourceText[scanned] === "'" || sourceText[scanned] === '"') {
+        const quoted = readQuoted(scanned);
+        if (quoted) {
+          if (quoted.value.startsWith('.')) values.add(quoted.value);
+          return quoted.end;
+        }
+      }
+      scanned += 1;
+    }
+    return scanned;
+  }
+
+  function readReExport(start) {
+    let cursor = start + 'export'.length;
+    while (cursor < length) {
+      if (sourceText[cursor] === ';') return cursor + 1;
+      if (sourceText[cursor] === '/' && sourceText[cursor + 1] === '/') {
+        cursor = skipLineComment(cursor);
+        continue;
+      }
+      if (sourceText[cursor] === '/' && sourceText[cursor + 1] === '*') {
+        cursor = skipBlockComment(cursor);
+        continue;
+      }
+      if (sourceText[cursor] === '`') {
+        cursor = skipTemplate(cursor);
+        continue;
+      }
+      if (wordAt(cursor, 'from')) {
+        const quoted = readQuoted(skipTrivia(cursor + 'from'.length));
+        if (quoted?.value?.startsWith('.')) values.add(quoted.value);
+        return quoted?.end ?? cursor + 'from'.length;
+      }
+      if (sourceText[cursor] === "'" || sourceText[cursor] === '"') {
+        const quoted = readQuoted(cursor);
+        cursor = quoted?.end ?? cursor + 1;
+        continue;
+      }
+      cursor += 1;
+    }
+    return cursor;
+  }
+
+  let cursor = 0;
+  while (cursor < length) {
+    const char = sourceText[cursor];
+    if (char === '/' && sourceText[cursor + 1] === '/') {
+      cursor = skipLineComment(cursor);
+      continue;
+    }
+    if (char === '/' && sourceText[cursor + 1] === '*') {
+      cursor = skipBlockComment(cursor);
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      cursor = readQuoted(cursor)?.end ?? cursor + 1;
+      continue;
+    }
+    if (char === '`') {
+      cursor = skipTemplate(cursor);
+      continue;
+    }
+    if (wordAt(cursor, 'import')) {
+      cursor = readStaticImport(cursor);
+      continue;
+    }
+    if (wordAt(cursor, 'export')) {
+      cursor = readReExport(cursor);
+      continue;
+    }
+    cursor += 1;
   }
   return [...values].sort();
 }
