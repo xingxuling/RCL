@@ -1,9 +1,10 @@
 import { realityRoot } from './canonical.mjs';
 import { knowledgeClaim } from './knowledge.mjs';
 
-export const FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-knowledge-direct-lowering.v0.2';
-export const FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_VERSION = '0.2.0';
+export const FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_FORMAT = 'taowind.rcl-foundation-knowledge-direct-lowering.v0.3';
+export const FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_VERSION = '0.3.0';
 export const FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS = 4;
+export const FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS = 2;
 
 const KNOWLEDGE_RECORD_TYPE = 'taowind.rcl.native.Knowledge.v0.1';
 const PRIMITIVE_KNOWLEDGE_TYPES = new Set(['Number', 'Text', 'Truth']);
@@ -82,33 +83,41 @@ function claimSupported(claim, initialState) {
   return true;
 }
 
-function buildSequentialClaimFormationPlan(claims, initialState) {
+function makeReferenceKnowledgeValue(claim, staticValue, formedAtRoot) {
+  return knowledgeClaim(claim.baseType, staticValue, {
+    confidence: claim?.confidence?.value ?? 1,
+    evidence: array(claim.evidence),
+    source: claim.source,
+    scope: claim.scope ?? 'local',
+    status: claim.status ?? 'provisional',
+    dependencies: [],
+    revision: 1,
+    alternatives: [],
+    formedAtRoot,
+  });
+}
+
+function buildSequentialLearnFormationPlans(entries, initialState) {
   const working = clone(initialState);
-  const plan = [];
-  for (const claim of claims) {
-    const staticValue = staticPrimitiveExpressionValue(claim.expression, initialState);
-    if (!staticValue.supported) return null;
-    const formedAtRoot = realityRoot(working);
-    let referenceValue;
-    try {
-      referenceValue = knowledgeClaim(claim.baseType, staticValue.value, {
-        confidence: claim?.confidence?.value ?? 1,
-        evidence: array(claim.evidence),
-        source: claim.source,
-        scope: claim.scope ?? 'local',
-        status: claim.status ?? 'provisional',
-        dependencies: [],
-        revision: 1,
-        alternatives: [],
-        formedAtRoot,
-      });
-    } catch {
-      return null;
+  const plans = [];
+  for (const entry of entries) {
+    const plan = [];
+    for (const claim of entry.claims) {
+      const staticValue = staticPrimitiveExpressionValue(claim.expression, initialState);
+      if (!staticValue.supported) return null;
+      const formedAtRoot = realityRoot(working);
+      let referenceValue;
+      try {
+        referenceValue = makeReferenceKnowledgeValue(claim, staticValue.value, formedAtRoot);
+      } catch {
+        return null;
+      }
+      plan.push({ path: claim.path, formedAtRoot, staticValue: staticValue.value });
+      working[claim.path] = referenceValue;
     }
-    plan.push({ path: claim.path, formedAtRoot, staticValue: staticValue.value });
-    working[claim.path] = referenceValue;
+    plans.push(plan);
   }
-  return plan;
+  return plans;
 }
 
 function knowledgeRecord(claim, formedAtRoot) {
@@ -182,10 +191,17 @@ function boundedTruthBoundary(extra = {}) {
   return {
     boundedSingleClaimKnowledgeSubsetOnly: false,
     boundedPrimitiveMultiClaimKnowledgeSubsetOnly: true,
+    boundedContiguousMultiLearnKnowledgeSubsetOnly: true,
+    maxBoundedClaimCountPerLearn: FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS,
+    maxBoundedLearnDirectiveCount: FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS,
     maxBoundedClaimCount: FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS,
-    exactlyOneFirstLearnDirectiveRequired: true,
+    exactlyOneFirstLearnDirectiveRequired: false,
+    contiguousLeadingLearnDirectivesRequired: true,
+    distinctLearnDeclarationNamesRequired: true,
+    globallyUniqueLearnedClaimPathsRequired: true,
     directMultiClaimExpressionsRestrictedToLiteralOrInitialPrimitivePath: true,
     referenceSequentialClaimFormationRootsMustBePreserved: true,
+    referenceSequentialFormationAcrossLearnTransactionsRequired: true,
     primitiveClaimTypesOnly: true,
     dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound: true,
     nativeKnowledgeRecordType: KNOWLEDGE_RECORD_TYPE,
@@ -207,36 +223,56 @@ export function lowerDeclaredKnowledgeToCore(program) {
   const learnDirectives = array(program.directives)
     .map((directive, index) => ({ directive, index }))
     .filter(item => item.directive?.kind === 'Learn');
+  const initialState = initialLiteralState(program);
 
   let eligible = null;
-  if (learnDirectives.length === 1 && learnDirectives[0].index === 0) {
-    const declaration = knowledges.find(item => item.name === learnDirectives[0].directive.name) ?? null;
-    const claims = array(declaration?.claims);
-    const claimPaths = claims.map(claim => claim?.path).filter(Boolean);
-    const initialState = initialLiteralState(program);
-    const formationPlan = initialState === null ? null : buildSequentialClaimFormationPlan(claims, initialState);
-    if (
-      declaration
-      && claims.length >= 1
-      && claims.length <= FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS
-      && claimPaths.length === claims.length
-      && unique(claimPaths)
-      && array(declaration.derives).length === 0
-      && array(declaration.revisions).length === 0
-      && array(declaration.decays).length === 0
-      && array(declaration.preserves).length === 0
-      && initialState !== null
-      && claims.every(claim => claimSupported(claim, initialState))
-      && formationPlan?.length === claims.length
-    ) {
-      eligible = {
+  if (
+    initialState !== null
+    && learnDirectives.length >= 1
+    && learnDirectives.length <= FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS
+    && learnDirectives.every((item, index) => item.index === index)
+    && unique(learnDirectives.map(item => item.directive?.name))
+  ) {
+    const entries = [];
+    let valid = true;
+    const allClaimPaths = [];
+    for (const learn of learnDirectives) {
+      const declaration = knowledges.find(item => item.name === learn.directive.name) ?? null;
+      const claims = array(declaration?.claims);
+      const claimPaths = claims.map(claim => claim?.path).filter(Boolean);
+      const declarationValid = Boolean(
+        declaration
+        && claims.length >= 1
+        && claims.length <= FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS
+        && claimPaths.length === claims.length
+        && unique(claimPaths)
+        && array(declaration.derives).length === 0
+        && array(declaration.revisions).length === 0
+        && array(declaration.decays).length === 0
+        && array(declaration.preserves).length === 0
+        && claims.every(claim => claimSupported(claim, initialState))
+      );
+      if (!declarationValid) {
+        valid = false;
+        break;
+      }
+      allClaimPaths.push(...claimPaths);
+      entries.push({
         declaration,
         claims,
         claimPaths,
-        formationPlan,
-        directiveIndex: learnDirectives[0].index,
-        formedAtRoot: formationPlan[0].formedAtRoot,
-      };
+        directiveIndex: learn.index,
+      });
+    }
+    if (valid && unique(allClaimPaths)) {
+      const formationPlans = buildSequentialLearnFormationPlans(entries, initialState);
+      if (formationPlans?.length === entries.length && formationPlans.every((plan, index) => plan.length === entries[index].claims.length)) {
+        eligible = entries.map((entry, index) => ({
+          ...entry,
+          formationPlan: formationPlans[index],
+          formedAtRoot: formationPlans[index][0].formedAtRoot,
+        }));
+      }
     }
   }
 
@@ -249,8 +285,8 @@ export function lowerDeclaredKnowledgeToCore(program) {
           domain: 'knowledge',
           declaration: declaration.name,
           requirements: [
-            'exactly one Learn directive and it must be the first directive',
-            `between 1 and ${FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS} primitive claims with unique state paths`,
+            `between 1 and ${FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS} distinct Learn directives, contiguous from directive index 0`,
+            `between 1 and ${FOUNDATION_KNOWLEDGE_MAX_BOUNDED_CLAIMS} primitive claims per learned declaration with globally unique state paths`,
             'claim values must be literals or direct paths to pre-Learn primitive literal facets',
             'literal confidence in [0,1] when explicit',
             'explicit static source identity',
@@ -279,85 +315,101 @@ export function lowerDeclaredKnowledgeToCore(program) {
     };
   }
 
-  const knowledgePaths = new Set(eligible.claimPaths);
+  const knowledgePaths = new Set(eligible.flatMap(item => item.claimPaths));
   let transformed = rewriteKnowledgeAccessors(clone(program), knowledgePaths);
-  const declaration = array(transformed.knowledges).find(item => item.name === eligible.declaration.name);
-  const claims = array(declaration.claims);
-  const formedRootByPath = new Map(eligible.formationPlan.map(item => [item.path, item.formedAtRoot]));
-  const recordsByPath = new Map(claims.map(claim => [
-    claim.path,
-    knowledgeRecord(claim, formedRootByPath.get(claim.path)),
-  ]));
-
-  transformed.facets = array(transformed.facets).map(facet => {
-    if (facet.owner !== declaration.name || !knowledgePaths.has(facet.path)) return facet;
-    const record = recordsByPath.get(facet.path);
-    if (!record) return facet;
-    return {
-      ...facet,
-      deferred: false,
-      value: record,
-      nativeKnowledgeRecordType: KNOWLEDGE_RECORD_TYPE,
-      nativeKnowledgeMetadataRetained: true,
-    };
-  });
-
   const reservedRuleNames = new Set(array(transformed.rules).map(rule => rule?.name).filter(Boolean));
-  const allocation = allocateSyntheticRuleName(
-    `__rcl_foundation_knowledge_${sanitizeName(declaration.name)}_${eligible.directiveIndex}`,
-    reservedRuleNames,
-  );
-  if (allocation.renamed) {
-    diagnostics.push(diagnostic(
-      'RCL_FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED',
-      `Synthetic knowledge rule '${allocation.baseRuleName}' would collide with an existing rule; allocated '${allocation.ruleName}' instead`,
-      {
-        declaration: declaration.name,
-        requestedRuleName: allocation.baseRuleName,
-        allocatedRuleName: allocation.ruleName,
-      },
-    ));
-  }
+  const syntheticRules = [];
+  const lowered = [];
+  const learnedNames = new Set();
+  const ruleByDirectiveIndex = new Map();
+  const allFormedAtRoots = [];
+  let renamedSyntheticRuleCount = 0;
+  let nativeKnowledgeRecordCount = 0;
 
-  const witness = `rcl:foundation:knowledge:${declaration.name}`;
-  const syntheticRule = {
-    kind: 'Emergence',
-    name: allocation.ruleName,
-    cause: `knowledge.${declaration.name}`,
-    when: trueExpression(),
-    needs: [],
-    alters: claims.map(claim => ({ target: claim.path, expression: recordsByPath.get(claim.path) })),
-    calls: [],
-    preserves: [],
-    witnesses: [witness],
-  };
+  for (const item of eligible) {
+    const declaration = array(transformed.knowledges).find(entry => entry.name === item.declaration.name);
+    const claims = array(declaration?.claims);
+    const formedRootByPath = new Map(item.formationPlan.map(entry => [entry.path, entry.formedAtRoot]));
+    const recordsByPath = new Map(claims.map(claim => [
+      claim.path,
+      knowledgeRecord(claim, formedRootByPath.get(claim.path)),
+    ]));
+
+    transformed.facets = array(transformed.facets).map(facet => {
+      if (facet.owner !== declaration.name || !item.claimPaths.includes(facet.path)) return facet;
+      const record = recordsByPath.get(facet.path);
+      if (!record) return facet;
+      return {
+        ...facet,
+        deferred: false,
+        value: record,
+        nativeKnowledgeRecordType: KNOWLEDGE_RECORD_TYPE,
+        nativeKnowledgeMetadataRetained: true,
+      };
+    });
+
+    const allocation = allocateSyntheticRuleName(
+      `__rcl_foundation_knowledge_${sanitizeName(declaration.name)}_${item.directiveIndex}`,
+      reservedRuleNames,
+    );
+    if (allocation.renamed) {
+      renamedSyntheticRuleCount += 1;
+      diagnostics.push(diagnostic(
+        'RCL_FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_RULE_NAME_COLLISION_AVOIDED',
+        `Synthetic knowledge rule '${allocation.baseRuleName}' would collide with an existing rule; allocated '${allocation.ruleName}' instead`,
+        {
+          declaration: declaration.name,
+          requestedRuleName: allocation.baseRuleName,
+          allocatedRuleName: allocation.ruleName,
+        },
+      ));
+    }
+
+    const witness = `rcl:foundation:knowledge:${declaration.name}`;
+    const syntheticRule = {
+      kind: 'Emergence',
+      name: allocation.ruleName,
+      cause: `knowledge.${declaration.name}`,
+      when: trueExpression(),
+      needs: [],
+      alters: claims.map(claim => ({ target: claim.path, expression: recordsByPath.get(claim.path) })),
+      calls: [],
+      preserves: [],
+      witnesses: [witness],
+    };
+    syntheticRules.push(syntheticRule);
+    learnedNames.add(declaration.name);
+    ruleByDirectiveIndex.set(item.directiveIndex, allocation.ruleName);
+
+    const formedAtRoots = item.formationPlan.map(entry => ({ path: entry.path, root: entry.formedAtRoot }));
+    allFormedAtRoots.push(...formedAtRoots);
+    nativeKnowledgeRecordCount += claims.length;
+    lowered.push({
+      domain: 'knowledge',
+      declaration: declaration.name,
+      directive: 'Learn',
+      directiveIndex: item.directiveIndex,
+      syntheticRule: allocation.ruleName,
+      stateTargets: [...item.claimPaths],
+      claimCount: claims.length,
+      claimPaths: [...item.claimPaths],
+      claimPath: item.claimPaths[0],
+      evidenceCount: claims.reduce((sum, claim) => sum + array(claim.evidence).length, 0),
+      formedAtRoot: item.formedAtRoot,
+      formedAtRoots,
+      witness,
+      authorityClass: 'epistemic',
+    });
+  }
 
   transformed = {
     ...transformed,
-    knowledges: array(transformed.knowledges).filter(item => item.name !== declaration.name),
-    rules: [...array(transformed.rules), syntheticRule],
+    knowledges: array(transformed.knowledges).filter(item => !learnedNames.has(item.name)),
+    rules: [...array(transformed.rules), ...syntheticRules],
     directives: array(transformed.directives).map((directive, index) => (
-      index === eligible.directiveIndex ? { kind: 'Realize', rule: allocation.ruleName } : directive
+      ruleByDirectiveIndex.has(index) ? { kind: 'Realize', rule: ruleByDirectiveIndex.get(index) } : directive
     )),
   };
-
-  const formedAtRoots = eligible.formationPlan.map(item => ({ path: item.path, root: item.formedAtRoot }));
-  const lowered = [{
-    domain: 'knowledge',
-    declaration: declaration.name,
-    directive: 'Learn',
-    directiveIndex: eligible.directiveIndex,
-    syntheticRule: allocation.ruleName,
-    stateTargets: [...eligible.claimPaths],
-    claimCount: claims.length,
-    claimPaths: [...eligible.claimPaths],
-    claimPath: eligible.claimPaths[0],
-    evidenceCount: claims.reduce((sum, claim) => sum + array(claim.evidence).length, 0),
-    formedAtRoot: eligible.formedAtRoot,
-    formedAtRoots,
-    witness,
-    authorityClass: 'epistemic',
-  }];
 
   return {
     format: FOUNDATION_KNOWLEDGE_DIRECT_LOWERING_FORMAT,
@@ -366,15 +418,16 @@ export function lowerDeclaredKnowledgeToCore(program) {
     lowered,
     diagnostics,
     summary: {
-      loweredCount: 1,
-      knowledgeLoweredDeclarationCount: 1,
-      consumedDirectiveCount: 1,
-      syntheticRuleCount: 1,
+      loweredCount: lowered.length,
+      knowledgeLoweredDeclarationCount: lowered.length,
+      consumedDirectiveCount: lowered.length,
+      syntheticRuleCount: syntheticRules.length,
       remainingKnowledgeCount: transformed.knowledges.length,
-      nativeKnowledgeRecordCount: claims.length,
-      renamedSyntheticRuleCount: allocation.renamed ? 1 : 0,
-      formedAtRoot: eligible.formedAtRoot,
-      formedAtRoots,
+      nativeKnowledgeRecordCount,
+      renamedSyntheticRuleCount,
+      formedAtRoot: lowered[0]?.formedAtRoot ?? null,
+      formedAtRoots: allFormedAtRoots,
+      boundedLearnDirectiveCount: lowered.length,
     },
     truthBoundary: boundedTruthBoundary({
       literalConfidenceRequiredWhenExplicit: true,
@@ -382,6 +435,7 @@ export function lowerDeclaredKnowledgeToCore(program) {
       knowledgeValueConfidenceEvidenceSourceScopeStatusRevisionAndFormedRootsRetained: true,
       knowledgeAccessorsLoweredToTypedRecordFields: true,
       oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: true,
+      multipleLearnDirectivesRemainSeparateOrderedAtomicTransactions: true,
     }),
   };
 }
