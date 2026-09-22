@@ -40,6 +40,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
   const binarySha256 = sha256(bytes);
   const proof = manifest?.foundationParityProofs?.knowledge ?? manifest?.foundationKnowledgeParityProof ?? null;
   const maxBoundaryProof = manifest?.foundationKnowledgeMaxBoundaryProof ?? null;
+  const maxBoundaryPresent = maxBoundaryProof != null;
 
   if (manifest?.binarySha256 !== binarySha256) {
     fail('RCL_KNOWLEDGE_DEPLOYMENT_BINARY_DRIFT', 'Knowledge deployment evidence is not attached to the exact bundled Native VM binary.', {
@@ -153,7 +154,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
   } = maxBoundaryProof && typeof maxBoundaryProof === 'object' && !Array.isArray(maxBoundaryProof)
     ? maxBoundaryProof
     : {};
-  if (
+  if (maxBoundaryPresent && (
     maxBoundaryProof?.format !== 'taowind.rcl-vercel-foundation-knowledge-max-boundary-proof.v0.1'
     || maxBoundaryProof?.version !== '0.1.0'
     || maxBoundaryProof?.ok !== true
@@ -193,8 +194,8 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || maxBoundaryRuntimeBinding?.canonicalRuntimeTruthConsumerRequired !== true
     || maxBoundaryRuntimeBinding?.baseTwoClaimBehavioralSpecimenRemainsDistinct !== true
     || maxBoundaryRuntimeBinding?.maxBoundaryAttestationDoesNotClaimFullKnowledgeNativeCoverage !== true
-  ) {
-    fail('RCL_KNOWLEDGE_MAX_BOUNDARY_RUNTIME_ATTESTATION_DRIFT', 'Knowledge max-boundary real-C attestation is missing, unbound, or overclaims runtime coverage.', {
+  )) {
+    fail('RCL_KNOWLEDGE_MAX_BOUNDARY_RUNTIME_ATTESTATION_DRIFT', 'Knowledge max-boundary real-C attestation is present but unbound, inconsistent, or overclaims runtime coverage.', {
       maxBoundaryProof,
       maxBoundaryAttestationRoot,
       recomputedAttestationRoot: Object.keys(maxBoundaryPayload).length > 0 ? sha256Canonical(maxBoundaryPayload) : null,
@@ -217,12 +218,12 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     knowledgeReceiptRootAlgorithm: proof?.knowledgeReceiptRootAlgorithm ?? null,
     loweredDirectiveCount: proof?.loweredDirectiveCount ?? null,
     loweredClaimCount: proof?.loweredClaimCount ?? null,
-    maxBoundaryAttestationRoot,
+    maxBoundaryAttestationRoot: maxBoundaryPresent ? maxBoundaryAttestationRoot : null,
     maxBoundaryExecutionBinarySha256: maxBoundaryProof?.executionBinarySha256 ?? null,
     maxBoundaryNativeVmExecutionAttestationRoot: maxBoundaryProof?.nativeVmExecutionAttestationRoot ?? null,
     maxBoundaryKnowledgeReceiptRoot: maxBoundaryProof?.knowledgeReceiptRoot ?? null,
     maxBoundaryKnowledgeReceiptRootAlgorithm: maxBoundaryProof?.knowledgeReceiptRootAlgorithm ?? null,
-    maxBoundaryClaimFormedAtRoots: maxBoundaryRoots,
+    maxBoundaryClaimFormedAtRoots: maxBoundaryPresent ? maxBoundaryRoots : {},
     maxBoundaryLoweredClaimCount: maxBoundaryProof?.loweredClaimCount ?? null,
     finalState: {
       'mind.trusted': trustedKnowledge ?? null,
@@ -234,10 +235,12 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
       boundedPrimitiveMultiClaimKnowledgeSubsetOnly: boundary.boundedPrimitiveMultiClaimKnowledgeSubsetOnly === true,
       maxBoundedClaimCount: boundary.maxBoundedClaimCount ?? null,
       behavioralSpecimenVerifiedAtomicClaimCount: boundary.verifiedAtomicClaimCount ?? null,
-      verifiedAtomicClaimCount: maxBoundaryProof?.truthBoundary?.verifiedAtomicClaimCount ?? null,
-      maxBoundedClaimCountRealCVerified: maxBoundaryProof?.truthBoundary?.maxBoundedClaimCountRealCVerified === true,
-      maxBoundaryRuntimeTruthBound: isSha256(maxBoundaryAttestationRoot),
-      overBoundaryFiveClaimsRemainProviderBound: maxBoundaryProof?.truthBoundary?.overBoundaryFiveClaimsRemainProviderBound === true,
+      verifiedAtomicClaimCount: maxBoundaryPresent
+        ? maxBoundaryProof?.truthBoundary?.verifiedAtomicClaimCount ?? null
+        : boundary.verifiedAtomicClaimCount ?? null,
+      maxBoundedClaimCountRealCVerified: maxBoundaryPresent && maxBoundaryProof?.truthBoundary?.maxBoundedClaimCountRealCVerified === true,
+      maxBoundaryRuntimeTruthBound: maxBoundaryPresent && isSha256(maxBoundaryAttestationRoot),
+      overBoundaryFiveClaimsRemainProviderBound: maxBoundaryPresent && maxBoundaryProof?.truthBoundary?.overBoundaryFiveClaimsRemainProviderBound === true,
       referenceSequentialClaimFormationRootsMustBePreserved: boundary.referenceSequentialClaimFormationRootsMustBePreserved === true,
       exactReferenceNativeDomainReceiptParityRequired: boundary.exactReferenceNativeDomainReceiptParityRequired === true,
       oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: boundary.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction === true,
