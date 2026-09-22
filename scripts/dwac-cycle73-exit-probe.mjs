@@ -7,7 +7,9 @@ const steps = [
   { code: 132, name: 'knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
   { code: 133, name: 'knowledge-receipt-parity-negative-controls', args: ['--test', 'tests/foundation-knowledge-native-parity.test.mjs'] },
   { code: 134, name: 'knowledge-real-c-receipt-parity', args: ['scripts/verify-vercel-foundation-knowledge.mjs'] },
-  { code: 135, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
+  { code: 135, name: 'knowledge-max-boundary-real-c-attestation', args: ['scripts/verify-vercel-foundation-knowledge-max-boundary.mjs'] },
+  { code: 136, name: 'knowledge-max-boundary-runtime-binding', args: ['scripts/bind-vercel-foundation-knowledge-max-boundary-runtime-truth.mjs'] },
+  { code: 137, name: 'knowledge-runtime-capability-truth', args: ['scripts/verify-foundation-knowledge-deployment-truth.mjs'] },
 ];
 
 for (const step of steps) {
@@ -35,6 +37,8 @@ console.log(JSON.stringify({
     exactReferenceNativeKnowledgeDomainReceiptParityRequired: true,
     oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: true,
     knowledgeReceiptRootBoundIntoRuntimeDeploymentEvidence: true,
+    maxBoundedClaimCountRealCVerified: true,
+    maxBoundaryAttestationBoundIntoRuntimeDeploymentEvidence: true,
     canonicalKnowledgeRuntimeTruthVerifierRequired: true,
     exactInitialFormedAtRootBound: true,
     unsupportedKnowledgeProgramsRemainProviderBound: true,

@@ -33,9 +33,17 @@ const gateSource = fs.readFileSync(cycle73Gate, 'utf8');
 const requiredCanonicalClaims = [
   'knowledgeReceiptRoot',
   'claimFormedAtRoots',
+  'maxBoundaryAttestationRoot',
+  'maxBoundaryKnowledgeReceiptRoot',
+  'maxBoundaryClaimFormedAtRoots',
+  'maxBoundaryLoweredClaimCount',
   'boundedPrimitiveMultiClaimKnowledgeSubsetOnly',
   'maxBoundedClaimCount',
+  'behavioralSpecimenVerifiedAtomicClaimCount',
   'verifiedAtomicClaimCount',
+  'maxBoundedClaimCountRealCVerified',
+  'maxBoundaryRuntimeTruthBound',
+  'overBoundaryFiveClaimsRemainProviderBound',
   'referenceSequentialClaimFormationRootsMustBePreserved',
   'oneLearnDirectiveMapsToOneAtomicSyntheticTransaction',
   'exactReferenceNativeDomainReceiptParityRequired',
@@ -46,11 +54,18 @@ const requiredCanonicalClaims = [
 ];
 for (const token of requiredCanonicalClaims) {
   if (!canonicalSource.includes(token)) {
-    fail('Canonical Knowledge runtime truth verifier lost a required multi-claim receipt/formation/coexistence assertion.', { token });
+    fail('Canonical Knowledge runtime truth verifier lost a required receipt/formation/max-boundary/coexistence assertion.', { token });
   }
 }
-if (!gateSource.includes("scripts/verify-foundation-knowledge-deployment-truth.mjs")) {
-  fail('Cycle 73 regression gate no longer consumes the canonical Knowledge runtime truth verifier.');
+for (const gateToken of [
+  'scripts/verify-vercel-foundation-knowledge.mjs',
+  'scripts/verify-vercel-foundation-knowledge-max-boundary.mjs',
+  'scripts/bind-vercel-foundation-knowledge-max-boundary-runtime-truth.mjs',
+  'scripts/verify-foundation-knowledge-deployment-truth.mjs',
+]) {
+  if (!gateSource.includes(gateToken)) {
+    fail('Cycle 73 regression gate no longer materializes and consumes the canonical Knowledge max-boundary runtime truth chain.', { gateToken });
+  }
 }
 if (gateSource.includes('verify-foundation-knowledge-receipt-deployment-truth.mjs')) {
   fail('Cycle 73 regression gate still consumes the retired duplicate Knowledge receipt runtime truth verifier.');
@@ -62,11 +77,14 @@ console.log(JSON.stringify({
   canonicalVerifier: 'scripts/verify-foundation-knowledge-deployment-truth.mjs',
   retiredDuplicateAbsent: true,
   cycle73GateConsumesCanonicalVerifier: true,
+  cycle73GateMaterializesMaxBoundaryBeforeCanonicalVerifier: true,
   truthBoundary: {
     canonicalKnowledgeRuntimeTruthIsSingleSource: true,
     boundedPrimitiveMultiClaimTruthRequiredByCanonicalVerifier: true,
     sequentialClaimFormationRootsRequiredByCanonicalVerifier: true,
     receiptRootRequiredByCanonicalVerifier: true,
+    maxBoundaryAttestationRequiredByCanonicalVerifier: true,
+    exactFourClaimRealCMaxBoundaryRequiredByCanonicalVerifier: true,
     directAndProviderBridgeCoexistenceStillRequired: true,
     fullHistoryParityClaimed: false,
   },

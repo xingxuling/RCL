@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.3';
-export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.3.0';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-deployment-evidence.v0.4';
+export const FOUNDATION_KNOWLEDGE_DEPLOYMENT_EVIDENCE_VERSION = '0.4.0';
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
@@ -39,6 +39,8 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
   const manifest = attestation ?? JSON.parse(fs.readFileSync(NATIVE_VM_ATTESTATION_PATH, 'utf8'));
   const binarySha256 = sha256(bytes);
   const proof = manifest?.foundationParityProofs?.knowledge ?? manifest?.foundationKnowledgeParityProof ?? null;
+  const maxBoundaryProof = manifest?.foundationKnowledgeMaxBoundaryProof ?? null;
+  const maxBoundaryPresent = maxBoundaryProof != null;
 
   if (manifest?.binarySha256 !== binarySha256) {
     fail('RCL_KNOWLEDGE_DEPLOYMENT_BINARY_DRIFT', 'Knowledge deployment evidence is not attached to the exact bundled Native VM binary.', {
@@ -54,7 +56,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || proof?.loweredDirectiveCount !== 1
     || proof?.loweredClaimCount !== 2
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_PROOF_IDENTITY_DRIFT', 'Knowledge deployment proof identity/counts are missing or overclaimed.', { proof });
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_PROOF_IDENTITY_DRIFT', 'Knowledge behavioral specimen proof identity/counts are missing or overclaimed.', { proof });
   }
 
   const parity = proof?.parity ?? {};
@@ -66,7 +68,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || parity.knowledgeReceipt !== true
     || parity.nativeExecutionAttestation !== true
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_PARITY_DRIFT', 'Knowledge deployment proof no longer closes state/root/domain-receipt/executable parity.', { parity });
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_PARITY_DRIFT', 'Knowledge behavioral specimen proof no longer closes state/root/domain-receipt/executable parity.', { parity });
   }
 
   const formedRoots = proof?.claimFormedAtRoots ?? {};
@@ -83,7 +85,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || proof?.receiptParity?.receiptRoot !== proof?.knowledgeReceiptRoot
     || proof?.receiptParity?.entries?.[0]?.claimCount !== 2
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge deployment proof lost content-addressed execution/binary/sequential-formation/domain-receipt binding.', {
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_ROOT_BINDING_DRIFT', 'Knowledge behavioral specimen proof lost content-addressed execution/binary/sequential-formation/domain-receipt binding.', {
       executionBinarySha256: proof?.executionBinarySha256 ?? null,
       binarySha256,
       nativeVmExecutionAttestationRoot: proof?.nativeVmExecutionAttestationRoot ?? null,
@@ -111,7 +113,7 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || decisionAllowed !== true
     || decisionScore !== 7
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_STATE_DRIFT', 'Knowledge deployment evidence lost the bounded multi-claim state/accessor behavior.', {
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_STATE_DRIFT', 'Knowledge behavioral specimen evidence lost the bounded multi-claim state/accessor behavior.', {
       trustedKnowledge,
       scoreKnowledge,
       decisionAllowed,
@@ -139,7 +141,66 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     || boundary.knowledgeDomainReceiptParityClaimed !== true
     || boundary.fullHistoryParityClaimed !== false
   ) {
-    fail('RCL_KNOWLEDGE_DEPLOYMENT_BOUNDARY_DRIFT', 'Knowledge deployment truth boundary drifted or overclaimed the bounded multi-claim proof.', { boundary });
+    fail('RCL_KNOWLEDGE_DEPLOYMENT_BOUNDARY_DRIFT', 'Knowledge behavioral specimen truth boundary drifted or overclaimed the bounded multi-claim proof.', { boundary });
+  }
+
+  const maxBoundaryRoots = maxBoundaryProof?.claimFormedAtRoots ?? {};
+  const expectedMaxBoundaryPaths = ['mind.trusted', 'mind.score', 'mind.label', 'mind.rank'];
+  const maxBoundaryRootValues = expectedMaxBoundaryPaths.map(pathName => maxBoundaryRoots?.[pathName]);
+  const {
+    attestationRoot: maxBoundaryAttestationRoot = null,
+    runtimeBinding: maxBoundaryRuntimeBinding = null,
+    ...maxBoundaryPayload
+  } = maxBoundaryProof && typeof maxBoundaryProof === 'object' && !Array.isArray(maxBoundaryProof)
+    ? maxBoundaryProof
+    : {};
+  if (maxBoundaryPresent && (
+    maxBoundaryProof?.format !== 'taowind.rcl-vercel-foundation-knowledge-max-boundary-proof.v0.1'
+    || maxBoundaryProof?.version !== '0.1.0'
+    || maxBoundaryProof?.ok !== true
+    || maxBoundaryProof?.verified !== true
+    || maxBoundaryProof?.status !== 'native-verified'
+    || maxBoundaryProof?.domain !== 'knowledge'
+    || maxBoundaryProof?.loweredDirectiveCount !== 1
+    || maxBoundaryProof?.loweredClaimCount !== 4
+    || maxBoundaryProof?.binarySha256 !== binarySha256
+    || maxBoundaryProof?.executionBinarySha256 !== binarySha256
+    || !isSha256(maxBoundaryProof?.nativeVmExecutionAttestationRoot)
+    || !isSha256(maxBoundaryProof?.knowledgeReceiptRoot)
+    || !isSha256(maxBoundaryAttestationRoot)
+    || maxBoundaryAttestationRoot !== sha256Canonical(maxBoundaryPayload)
+    || JSON.stringify(maxBoundaryProof?.claimPaths) !== JSON.stringify(expectedMaxBoundaryPaths)
+    || maxBoundaryRootValues.some(rootValue => !isSha256(rootValue))
+    || new Set(maxBoundaryRootValues).size !== 4
+    || maxBoundaryProof?.parity?.state !== true
+    || maxBoundaryProof?.parity?.semanticStateRoot !== true
+    || maxBoundaryProof?.parity?.nativeStateRootVerified !== true
+    || maxBoundaryProof?.parity?.nativeStateRootParity !== true
+    || maxBoundaryProof?.parity?.knowledgeReceipt !== true
+    || maxBoundaryProof?.parity?.nativeExecutionAttestation !== true
+    || maxBoundaryProof?.truthBoundary?.boundedPrimitiveMultiClaimKnowledgeSubsetOnly !== true
+    || maxBoundaryProof?.truthBoundary?.maxBoundedClaimCount !== 4
+    || maxBoundaryProof?.truthBoundary?.verifiedAtomicClaimCount !== 4
+    || maxBoundaryProof?.truthBoundary?.maxBoundedClaimCountRealCVerified !== true
+    || maxBoundaryProof?.truthBoundary?.overBoundaryFiveClaimsRemainProviderBound !== true
+    || maxBoundaryProof?.truthBoundary?.referenceSequentialClaimFormationRootsMustBePreserved !== true
+    || maxBoundaryProof?.truthBoundary?.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction !== true
+    || maxBoundaryProof?.truthBoundary?.exactReferenceNativeDomainReceiptParityRequired !== true
+    || maxBoundaryProof?.truthBoundary?.canonicalRealCExecutionRequiredForVerifiedStatus !== true
+    || maxBoundaryProof?.truthBoundary?.providerBridgeRemovedGlobally !== false
+    || maxBoundaryProof?.truthBoundary?.allKnowledgeProgramsNativeClaimed !== false
+    || maxBoundaryProof?.truthBoundary?.fullHistoryParityClaimed !== false
+    || maxBoundaryRuntimeBinding?.exactBinaryRequired !== true
+    || maxBoundaryRuntimeBinding?.canonicalRuntimeTruthConsumerRequired !== true
+    || maxBoundaryRuntimeBinding?.baseTwoClaimBehavioralSpecimenRemainsDistinct !== true
+    || maxBoundaryRuntimeBinding?.maxBoundaryAttestationDoesNotClaimFullKnowledgeNativeCoverage !== true
+  )) {
+    fail('RCL_KNOWLEDGE_MAX_BOUNDARY_RUNTIME_ATTESTATION_DRIFT', 'Knowledge max-boundary real-C attestation is present but unbound, inconsistent, or overclaims runtime coverage.', {
+      maxBoundaryProof,
+      maxBoundaryAttestationRoot,
+      recomputedAttestationRoot: Object.keys(maxBoundaryPayload).length > 0 ? sha256Canonical(maxBoundaryPayload) : null,
+      binarySha256,
+    });
   }
 
   const payload = {
@@ -157,6 +218,13 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     knowledgeReceiptRootAlgorithm: proof?.knowledgeReceiptRootAlgorithm ?? null,
     loweredDirectiveCount: proof?.loweredDirectiveCount ?? null,
     loweredClaimCount: proof?.loweredClaimCount ?? null,
+    maxBoundaryAttestationRoot: maxBoundaryPresent ? maxBoundaryAttestationRoot : null,
+    maxBoundaryExecutionBinarySha256: maxBoundaryProof?.executionBinarySha256 ?? null,
+    maxBoundaryNativeVmExecutionAttestationRoot: maxBoundaryProof?.nativeVmExecutionAttestationRoot ?? null,
+    maxBoundaryKnowledgeReceiptRoot: maxBoundaryProof?.knowledgeReceiptRoot ?? null,
+    maxBoundaryKnowledgeReceiptRootAlgorithm: maxBoundaryProof?.knowledgeReceiptRootAlgorithm ?? null,
+    maxBoundaryClaimFormedAtRoots: maxBoundaryPresent ? maxBoundaryRoots : {},
+    maxBoundaryLoweredClaimCount: maxBoundaryProof?.loweredClaimCount ?? null,
     finalState: {
       'mind.trusted': trustedKnowledge ?? null,
       'mind.score': scoreKnowledge ?? null,
@@ -166,7 +234,13 @@ export function foundationKnowledgeDeploymentEvidence({ binaryBytes, attestation
     truthBoundary: {
       boundedPrimitiveMultiClaimKnowledgeSubsetOnly: boundary.boundedPrimitiveMultiClaimKnowledgeSubsetOnly === true,
       maxBoundedClaimCount: boundary.maxBoundedClaimCount ?? null,
-      verifiedAtomicClaimCount: boundary.verifiedAtomicClaimCount ?? null,
+      behavioralSpecimenVerifiedAtomicClaimCount: boundary.verifiedAtomicClaimCount ?? null,
+      verifiedAtomicClaimCount: maxBoundaryPresent
+        ? maxBoundaryProof?.truthBoundary?.verifiedAtomicClaimCount ?? null
+        : boundary.verifiedAtomicClaimCount ?? null,
+      maxBoundedClaimCountRealCVerified: maxBoundaryPresent && maxBoundaryProof?.truthBoundary?.maxBoundedClaimCountRealCVerified === true,
+      maxBoundaryRuntimeTruthBound: maxBoundaryPresent && isSha256(maxBoundaryAttestationRoot),
+      overBoundaryFiveClaimsRemainProviderBound: maxBoundaryPresent && maxBoundaryProof?.truthBoundary?.overBoundaryFiveClaimsRemainProviderBound === true,
       referenceSequentialClaimFormationRootsMustBePreserved: boundary.referenceSequentialClaimFormationRootsMustBePreserved === true,
       exactReferenceNativeDomainReceiptParityRequired: boundary.exactReferenceNativeDomainReceiptParityRequired === true,
       oneLearnDirectiveMapsToOneAtomicSyntheticTransaction: boundary.oneLearnDirectiveMapsToOneAtomicSyntheticTransaction === true,
