@@ -2,10 +2,10 @@
 import { spawnSync } from 'node:child_process';
 
 // Cycle 82 first proves the new source-closure contract can materialize on the
-// exact deployment tree, then replays the legacy proof chain. Cycle 63 keeps
-// its own exit status so Vercel exposes the precise historical gate on drift.
+// exact deployment tree, then replays the legacy proof chain. Typed child exit
+// codes are preserved on diagnostic gates without weakening fail-closed order.
 const steps = [
-  { code: 220, name: 'runtime-truth-static-dependency-closure-preflight', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
+  { code: 220, propagateChildStatus: true, name: 'runtime-truth-static-dependency-closure-preflight', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
   { code: 221, propagateChildStatus: true, name: 'cycle63-knowledge-core-proof-chain', args: ['scripts/dwac-cycle63-exit-probe.mjs'] },
   { code: 222, name: 'cycle71-regression-proof-chain', args: ['scripts/dwac-cycle71-exit-probe.mjs'] },
   { code: 223, name: 'cycle73-knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
