@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 
+// Cycle 82 flattens the Cycle 81 wrapper into its two canonical child gates so
+// an external deployment failure identifies the exact regressed boundary while
+// preserving the same proof order and fail-closed semantics.
 const steps = [
-  { code: 221, name: 'cycle81-regression-proof-chain', args: ['scripts/dwac-cycle81-exit-probe.mjs'] },
-  { code: 222, name: 'runtime-truth-static-dependency-closure', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
+  { code: 221, name: 'cycle80-regression-proof-chain', args: ['scripts/dwac-cycle80-exit-probe.mjs'] },
+  { code: 222, name: 'cycle81-cross-domain-history-runtime-truth-binding', args: ['scripts/verify-foundation-cross-domain-history-runtime-truth.mjs'] },
+  { code: 223, name: 'runtime-truth-static-dependency-closure', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
 ];
 
 for (const step of steps) {
@@ -24,7 +28,8 @@ console.log(JSON.stringify({
   ok: true,
   status: 'DWAC_CYCLE82_EXIT_PROBE_ALL_PASS',
   truthBoundary: {
-    cycle81RegressionProofChainRemainsRequired: true,
+    cycle80RegressionProofChainRemainsRequired: true,
+    cycle81CrossDomainHistoryRuntimeTruthRemainsRequired: true,
     runtimeTruthStaticRepositoryLocalDependencyClosureBound: true,
     exactTransitiveSourceBytesRequired: true,
     unresolvedRelativeImportsFailClosed: true,
