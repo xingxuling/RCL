@@ -38,6 +38,27 @@ test('two verified direct domains produce one equal cross-domain history root', 
   assert.equal(result.truthBoundary.fullHistoryParityClaimed, false);
 });
 
+test('three verified direct domains preserve one contiguous Physical -> Perception -> Neural history root', () => {
+  const three = receipt();
+  three.entries.push({
+    index: 2, domain: 'neural', declaration: 'brain.integrate', directive: 'Propagate', directiveIndex: 2,
+    referenceActive: true, nativeActive: true, referenceBeforeRoot: r('3'), nativeBeforeRoot: r('3'),
+    referenceAfterRoot: r('4'), nativeAfterRoot: r('4'),
+    referenceChanges: [{ target: 'brain.response', before: 0, after: 0.5 }],
+    nativeChanges: [{ target: 'brain.response', before: 0, after: 0.5 }], ok: true,
+  });
+  const result = verifyFoundationCrossDomainHistoryRootParity(three);
+  assert.equal(result.required, true);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.domains, ['physical', 'perception', 'neural']);
+  assert.equal(result.domainCount, 3);
+  assert.equal(result.entryCount, 3);
+  assert.equal(result.referenceHistoryRoot, result.nativeHistoryRoot);
+  assert.equal(result.checks.referenceContinuityPreserved, true);
+  assert.equal(result.checks.nativeContinuityPreserved, true);
+  assert.deepEqual(result.truthBoundary.supportedDomains, ['perception', 'physical', 'neural']);
+});
+
 test('boundary-root drift fails closed even when transition values remain equal', () => {
   const bad = receipt();
   bad.entries[1] = { ...bad.entries[1], nativeAfterRoot: r('4') };
