@@ -29,7 +29,26 @@
       "algorithm": "rcl.semantic-state-root.v1",
       "producer": "native/rclvm.c",
       "verifier": "src/semantic-state-root.mjs",
-      "relationToPackage": "versioned-authority-algorithm"
+      "relationToPackage": "versioned-authority-algorithm",
+      "candidates": [
+        {
+          "algorithm": "rcl.semantic-state-root.v2-candidate",
+          "status": "candidate",
+          "authoritativeDefault": false,
+          "format": "rcl.canonical-f64.v0.1",
+          "version": "0.1.0-candidate.1",
+          "numberEncoding": "IEEE754_BINARY64_HEX_16_LOWERCASE",
+          "negativeZeroPolicy": "NORMALIZE_TO_POSITIVE_ZERO",
+          "source": "src/canonical-f64.mjs",
+          "nativeMaterializer": "scripts/materialize-semantic-state-root-v2-vm-candidate.mjs",
+          "verifier": "src/semantic-state-root.mjs",
+          "evidence": "evidence/RCL_GAP_AI010_NATIVE_V2_INTEGRATION_CANDIDATE_v0.1.json",
+          "canonicalPromotionPerformed": false,
+          "windowsCandidateReplayPerformed": false,
+          "hostedCiAuthorityPerformed": false,
+          "historicalRootMigrationPerformed": false
+        }
+      ]
     }
   }
 }
