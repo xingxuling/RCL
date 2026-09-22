@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 
-export const FOUNDATION_CROSS_DOMAIN_HISTORY_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-cross-domain-history-deployment-evidence.v0.1';
-export const FOUNDATION_CROSS_DOMAIN_HISTORY_DEPLOYMENT_EVIDENCE_VERSION = '0.1.0';
+export const FOUNDATION_CROSS_DOMAIN_HISTORY_DEPLOYMENT_EVIDENCE_FORMAT = 'taowind.rcl-foundation-cross-domain-history-deployment-evidence.v0.2';
+export const FOUNDATION_CROSS_DOMAIN_HISTORY_DEPLOYMENT_EVIDENCE_VERSION = '0.2.0';
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
@@ -36,12 +36,12 @@ export function foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, at
   }
 
   if (!present) {
-    fail('RCL_CROSS_DOMAIN_HISTORY_RUNTIME_PROOF_MISSING', 'Cycle 80 cross-domain history proof is not yet present in the Native VM attestation.');
+    fail('RCL_CROSS_DOMAIN_HISTORY_RUNTIME_PROOF_MISSING', 'Bounded Physical + Perception + Neural cross-domain history proof is not present in the Native VM attestation.');
   } else {
     const domains = Array.isArray(proof?.domains) ? proof.domains : [];
     const truthBoundary = proof?.truthBoundary ?? {};
     if (
-      proof?.format !== 'taowind.rcl-vercel-foundation-cross-domain-history-proof.v0.1'
+      proof?.format !== 'taowind.rcl-vercel-foundation-cross-domain-history-proof.v0.2'
       || proof?.status !== 'RCL_FOUNDATION_CROSS_DOMAIN_HISTORY_ROOT_PARITY_VERIFIED'
       || proof?.verified !== true
       || proof?.binarySha256 !== binarySha256
@@ -52,9 +52,10 @@ export function foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, at
       || proof?.referenceHistoryRoot !== proof?.nativeHistoryRoot
       || !domains.includes('physical')
       || !domains.includes('perception')
-      || Number(proof?.domainCount) < 2
-      || Number(proof?.entryCount) < 2
-      || truthBoundary?.boundedPhysicalPerceptionSpecimenOnly !== true
+      || !domains.includes('neural')
+      || Number(proof?.domainCount) < 3
+      || Number(proof?.entryCount) < 3
+      || truthBoundary?.boundedPhysicalPerceptionNeuralSpecimenOnly !== true
       || JSON.stringify(truthBoundary?.supportedCrossDomainRootDomains) !== JSON.stringify(['perception', 'physical', 'neural'])
       || truthBoundary?.stagedGeneticHistoryIncluded !== false
       || truthBoundary?.livingStagedHistoryIncluded !== false
@@ -62,7 +63,7 @@ export function foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, at
       || truthBoundary?.fullHistoryParityClaimed !== false
       || truthBoundary?.allFoundationDomainsHistoryParityClaimed !== false
     ) {
-      fail('RCL_CROSS_DOMAIN_HISTORY_RUNTIME_PROOF_DRIFT', 'Cross-domain history proof is present but no longer satisfies the bounded runtime truth contract.', { proof, binarySha256 });
+      fail('RCL_CROSS_DOMAIN_HISTORY_RUNTIME_PROOF_DRIFT', 'Cross-domain history proof is present but no longer satisfies the bounded three-domain runtime truth contract.', { proof, binarySha256 });
     }
   }
 
@@ -81,7 +82,7 @@ export function foundationCrossDomainHistoryDeploymentEvidence({ binaryBytes, at
     referenceHistoryRoot: proof?.referenceHistoryRoot ?? null,
     nativeHistoryRoot: proof?.nativeHistoryRoot ?? null,
     truthBoundary: {
-      boundedPhysicalPerceptionSpecimenOnly: proof?.truthBoundary?.boundedPhysicalPerceptionSpecimenOnly === true,
+      boundedPhysicalPerceptionNeuralSpecimenOnly: proof?.truthBoundary?.boundedPhysicalPerceptionNeuralSpecimenOnly === true,
       supportedCrossDomainRootDomains: Array.isArray(proof?.truthBoundary?.supportedCrossDomainRootDomains)
         ? [...proof.truthBoundary.supportedCrossDomainRootDomains]
         : [],
