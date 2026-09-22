@@ -2,9 +2,9 @@
 import { spawnSync } from 'node:child_process';
 
 const steps = [
-  { code: 298, propagateChildStatus: true, name: 'cycle85-regression-proof-chain', args: ['scripts/dwac-cycle85-exit-probe.mjs'] },
-  { code: 299, name: 'knowledge-bounded-multi-learn-max-boundary-real-c-attestation', args: ['scripts/verify-vercel-foundation-knowledge-multi-learn-max-boundary.mjs'] },
-  { code: 300, name: 'knowledge-bounded-multi-learn-max-boundary-negative-controls', args: ['scripts/verify-foundation-knowledge-multi-learn-max-boundary-negative-control.mjs'] },
+  { code: 230, propagateChildStatus: true, name: 'cycle85-regression-proof-chain', args: ['scripts/dwac-cycle85-exit-probe.mjs'] },
+  { code: 231, name: 'knowledge-bounded-multi-learn-max-boundary-real-c-attestation', args: ['scripts/verify-vercel-foundation-knowledge-multi-learn-max-boundary.mjs'] },
+  { code: 232, name: 'knowledge-bounded-multi-learn-max-boundary-negative-controls', args: ['scripts/verify-foundation-knowledge-multi-learn-max-boundary-negative-control.mjs'] },
 ];
 
 for (const step of steps) {
