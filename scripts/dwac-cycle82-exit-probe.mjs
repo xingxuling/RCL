@@ -2,9 +2,10 @@
 import { spawnSync } from 'node:child_process';
 
 // Cycle 82 preserves the canonical proof order while flattening wrapper-only
-// probes. The unique codes make Vercel itself a fail-closed diagnostic surface.
+// probes. For the large Cycle 63 prerequisite, preserve its own precise exit
+// status so Vercel exposes the exact legacy gate that regressed.
 const steps = [
-  { code: 221, name: 'cycle63-knowledge-core-proof-chain', args: ['scripts/dwac-cycle63-exit-probe.mjs'] },
+  { code: 221, propagateChildStatus: true, name: 'cycle63-knowledge-core-proof-chain', args: ['scripts/dwac-cycle63-exit-probe.mjs'] },
   { code: 222, name: 'cycle71-regression-proof-chain', args: ['scripts/dwac-cycle71-exit-probe.mjs'] },
   { code: 223, name: 'cycle73-knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
   { code: 224, name: 'cycle73-knowledge-receipt-parity-negative-controls', args: ['--test', 'tests/foundation-knowledge-native-parity.test.mjs'] },
@@ -32,14 +33,15 @@ const steps = [
 for (const step of steps) {
   const result = spawnSync(process.execPath, step.args, { stdio: 'inherit', env: process.env });
   if (result.error || result.status !== 0) {
+    const exitCode = step.propagateChildStatus && Number.isInteger(result.status) ? result.status : step.code;
     console.error(JSON.stringify({
       status: 'DWAC_CYCLE82_EXIT_PROBE_FAILURE',
-      probeExitCode: step.code,
+      probeExitCode: exitCode,
       step: step.name,
       childExitCode: result.status ?? null,
       error: result.error?.message ?? null,
     }, null, 2));
-    process.exit(step.code);
+    process.exit(exitCode ?? 1);
   }
 }
 
