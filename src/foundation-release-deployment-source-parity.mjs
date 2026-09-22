@@ -26,11 +26,13 @@ function safeBoundary() {
     packagedRuntimeTruthContractVerifiedAtBuildTime: true,
     developerReleaseArtifactHashVerifiedAtBuildTime: true,
     deployedSourceTreeMustReverifyRuntimeTruthContract: true,
+    deployedBoundRuntimeTruthSourcesVerifiedAtBuildTime: true,
     deploymentRuntimeCapabilityTruthMustMatchContract: true,
     releaseArtifactRetainedInDeploymentClaimed: false,
     releaseArtifactInstalledAsRuntimeClaimed: false,
     deploymentBinaryParityClaimed: false,
     runtimeSurfaceAvailabilityClaimed: false,
+    runtimeRequestRehashesFullDeploymentSourceTreeClaimed: false,
     completeRuntimeClaimed: false,
     fullSelfHostingClaimed: false,
   };
@@ -137,6 +139,7 @@ export function verifyFoundationReleaseDeploymentAttestation(
     'packagedRuntimeTruthContractVerifiedAtBuildTime',
     'developerReleaseArtifactHashVerifiedAtBuildTime',
     'deployedSourceTreeMustReverifyRuntimeTruthContract',
+    'deployedBoundRuntimeTruthSourcesVerifiedAtBuildTime',
     'deploymentRuntimeCapabilityTruthMustMatchContract',
   ];
   const requiredFalse = [
@@ -144,6 +147,7 @@ export function verifyFoundationReleaseDeploymentAttestation(
     'releaseArtifactInstalledAsRuntimeClaimed',
     'deploymentBinaryParityClaimed',
     'runtimeSurfaceAvailabilityClaimed',
+    'runtimeRequestRehashesFullDeploymentSourceTreeClaimed',
     'completeRuntimeClaimed',
     'fullSelfHostingClaimed',
   ];

@@ -1,52 +1,64 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-  createFoundationRuntimeTruthContract,
-  verifyFoundationRuntimeTruthContract,
-} from '../src/foundation-runtime-truth-contract.mjs';
+import { foundationRuntimeTruthContractRoot } from '../src/foundation-runtime-truth-contract.mjs';
 import { verifyFoundationReleaseDeploymentAttestation } from '../src/foundation-release-deployment-source-parity.mjs';
+import {
+  FOUNDATION_RELEASE_RUNTIME_TRUTH_ATTESTATION,
+  FOUNDATION_RELEASE_RUNTIME_TRUTH_DEPLOYMENT_CONTRACT,
+} from '../src/generated/developer-release-runtime-truth-attestation.mjs';
 import { runtimeCapabilityTruthSurface } from './capability-truth.mjs';
 
-const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const ATTESTATION_PATH = path.join(ROOT, 'public', 'developer-release-runtime-truth-attestation.json');
+function isSha256(value) {
+  return typeof value === 'string' && /^[0-9a-f]{64}$/i.test(value);
+}
 
-export function releaseRuntimeTruthStatus({ rootDir = ROOT, attestation = null, runtimeSurface = null } = {}) {
-  const deploymentContract = createFoundationRuntimeTruthContract(rootDir);
-  const deploymentVerification = verifyFoundationRuntimeTruthContract(deploymentContract, { rootDir });
-  if (deploymentVerification.ok !== true) {
+export function releaseRuntimeTruthStatus({
+  attestation = FOUNDATION_RELEASE_RUNTIME_TRUTH_ATTESTATION,
+  deploymentContract = FOUNDATION_RELEASE_RUNTIME_TRUTH_DEPLOYMENT_CONTRACT,
+  runtimeSurface = null,
+} = {}) {
+  if (!deploymentContract || !attestation) {
     return {
       ok: false,
-      status: 'RCL_RELEASE_RUNTIME_TRUTH_DEPLOYMENT_CONTRACT_FAILED',
-      deploymentVerification,
+      status: 'RCL_RELEASE_RUNTIME_TRUTH_BUILD_ATTESTATION_MISSING',
+      truthBoundary: {
+        buildTimeAttestationRequired: true,
+        runtimeRequestRehashesFullDeploymentSourceTreeClaimed: false,
+      },
     };
   }
 
-  let persistedAttestation = attestation;
-  if (!persistedAttestation) {
-    if (!fs.existsSync(ATTESTATION_PATH)) {
-      return {
-        ok: false,
-        status: 'RCL_RELEASE_RUNTIME_TRUTH_ATTESTATION_MISSING',
-        attestationPath: ATTESTATION_PATH,
-      };
-    }
-    persistedAttestation = JSON.parse(fs.readFileSync(ATTESTATION_PATH, 'utf8'));
+  let computedContractRoot = null;
+  try {
+    computedContractRoot = foundationRuntimeTruthContractRoot(deploymentContract);
+  } catch (error) {
+    return {
+      ok: false,
+      status: 'RCL_RELEASE_RUNTIME_TRUTH_DEPLOYMENT_CONTRACT_INVALID',
+      error: error?.message ?? String(error),
+    };
+  }
+  if (!isSha256(deploymentContract.contractRoot) || computedContractRoot !== deploymentContract.contractRoot) {
+    return {
+      ok: false,
+      status: 'RCL_RELEASE_RUNTIME_TRUTH_DEPLOYMENT_CONTRACT_ROOT_DRIFT',
+      expected: deploymentContract.contractRoot ?? null,
+      actual: computedContractRoot,
+    };
   }
 
   const runtimeCapabilityTruth = runtimeSurface ?? runtimeCapabilityTruthSurface();
-  const verification = verifyFoundationReleaseDeploymentAttestation(persistedAttestation, {
+  const verification = verifyFoundationReleaseDeploymentAttestation(attestation, {
     deploymentContract,
     runtimeCapabilityTruth,
   });
   return {
     ...verification,
-    deploymentContractVerification: deploymentVerification.status,
+    deploymentContractVerification: 'RCL_FOUNDATION_RUNTIME_TRUTH_CONTRACT_ROOT_VERIFIED',
     runtimeCapabilityTruthStatus: runtimeCapabilityTruth?.status ?? null,
     runtimeObservation: {
       releaseRuntimeTruthSurfaceObserved: verification.ok === true,
-      deployedSourceTreeContractReverified: deploymentVerification.ok === true,
+      deploymentBuildSourceContractAttestationVerified: verification.ok === true,
       runtimeCapabilityTruthReverified: runtimeCapabilityTruth?.ok === true,
+      runtimeRequestRehashesFullDeploymentSourceTree: false,
       developerReleaseArtifactRetainedInDeploymentObserved: false,
       developerReleaseInstalledAsDeploymentRuntimeObserved: false,
     },
