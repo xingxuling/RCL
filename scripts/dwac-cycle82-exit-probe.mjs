@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 
-// Cycle 82 preserves the canonical proof order while flattening wrapper-only
-// probes. For the large Cycle 63 prerequisite, preserve its own precise exit
-// status so Vercel exposes the exact legacy gate that regressed.
+// Cycle 82 first proves the new source-closure contract can materialize on the
+// exact deployment tree, then replays the legacy proof chain. Cycle 63 keeps
+// its own exit status so Vercel exposes the precise historical gate on drift.
 const steps = [
+  { code: 220, name: 'runtime-truth-static-dependency-closure-preflight', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
   { code: 221, propagateChildStatus: true, name: 'cycle63-knowledge-core-proof-chain', args: ['scripts/dwac-cycle63-exit-probe.mjs'] },
   { code: 222, name: 'cycle71-regression-proof-chain', args: ['scripts/dwac-cycle71-exit-probe.mjs'] },
   { code: 223, name: 'cycle73-knowledge-direct-negative-controls', args: ['scripts/verify-foundation-knowledge-direct-negative-control.mjs'] },
@@ -27,7 +28,7 @@ const steps = [
   { code: 240, name: 'cycle80-cross-domain-history-root-parity-unit-negative-controls', args: ['--test', 'tests/foundation-cross-domain-history-root-parity.test.mjs'] },
   { code: 241, name: 'cycle80-cross-domain-history-real-c-proof', args: ['scripts/verify-vercel-foundation-cross-domain-history.mjs'] },
   { code: 242, name: 'cycle81-cross-domain-history-runtime-truth-binding', args: ['scripts/verify-foundation-cross-domain-history-runtime-truth.mjs'] },
-  { code: 243, name: 'runtime-truth-static-dependency-closure', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
+  { code: 243, name: 'runtime-truth-static-dependency-closure-final', args: ['scripts/verify-foundation-runtime-truth-dependency-closure.mjs'] },
 ];
 
 for (const step of steps) {
@@ -49,6 +50,7 @@ console.log(JSON.stringify({
   ok: true,
   status: 'DWAC_CYCLE82_EXIT_PROBE_ALL_PASS',
   truthBoundary: {
+    dependencyClosurePreflightAndFinalVerificationRequired: true,
     cycle63And71KnowledgeProofPrerequisitesRemainRequired: true,
     cycle73Through81CanonicalProofOrderPreserved: true,
     runtimeTruthStaticRepositoryLocalDependencyClosureBound: true,
