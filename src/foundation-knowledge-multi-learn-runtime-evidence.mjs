@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const NATIVE_VM_PATH = fileURLToPath(new URL('../native/rclvm', import.meta.url));
 const NATIVE_VM_ATTESTATION_PATH = fileURLToPath(new URL('../native/rclvm.vercel-attestation.json', import.meta.url));
 
-export const FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-multi-learn-runtime-evidence.v0.1';
-export const FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_VERSION = '0.1.0';
+export const FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_FORMAT = 'taowind.rcl-foundation-knowledge-multi-learn-runtime-evidence.v0.2';
+export const FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_VERSION = '0.2.0';
 
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
@@ -24,7 +24,9 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
   const manifest = attestation ?? JSON.parse(fs.readFileSync(NATIVE_VM_ATTESTATION_PATH, 'utf8'));
   const binarySha256 = sha256(bytes);
   const proof = manifest?.foundationKnowledgeMultiLearnProof ?? null;
+  const maxBoundaryProof = manifest?.foundationKnowledgeMultiLearnMaxBoundaryProof ?? null;
   const present = proof != null;
+  const maxBoundaryPresent = maxBoundaryProof != null;
 
   if (!present) {
     const payload = {
@@ -44,6 +46,19 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
       loweredClaimCount: null,
       declarations: [],
       formedAtRoots: [],
+      maxBoundaryPresent: false,
+      maxBoundaryVerified: false,
+      maxBoundaryStatus: 'runtime-unbound',
+      maxBoundaryAttestationRoot: null,
+      maxBoundaryExecutionBinarySha256: null,
+      maxBoundaryNativeVmExecutionAttestationRoot: null,
+      maxBoundaryKnowledgeReceiptRoot: null,
+      maxBoundaryKnowledgeReceiptRootAlgorithm: null,
+      maxBoundaryLoweredLearnCount: null,
+      maxBoundaryLoweredClaimCount: null,
+      maxBoundaryDeclarations: [],
+      maxBoundaryClaimPaths: [],
+      maxBoundaryFormedAtRoots: [],
       truthBoundary: {
         boundedContiguousMultiLearnKnowledgeSubsetOnly: false,
         maxBoundedLearnDirectiveCount: null,
@@ -51,6 +66,7 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
         verifiedLearnDirectiveCount: null,
         verifiedClaimCount: null,
         runtimeTruthBound: false,
+        maxBoundaryRuntimeTruthBound: false,
         fullHistoryParityClaimed: false,
         providerBridgeRemovedGlobally: false,
         allKnowledgeProgramsNativeClaimed: false,
@@ -134,6 +150,94 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
     });
   }
 
+  let maxBoundaryAttestationRoot = null;
+  let maxBoundaryRuntimeBinding = null;
+  let maxBoundaryPayload = {};
+  let maxBoundaryFormedAtRoots = [];
+  let maxBoundaryParity = {};
+  let maxBoundaryBoundary = {};
+  const expectedMaxBoundaryPaths = [
+    'mind.trusted', 'mind.score', 'mind.label', 'mind.rank',
+    'context.ready', 'context.weight', 'context.zone', 'context.level',
+  ];
+
+  if (maxBoundaryPresent) {
+    ({
+      attestationRoot: maxBoundaryAttestationRoot = null,
+      runtimeBinding: maxBoundaryRuntimeBinding = null,
+      ...maxBoundaryPayload
+    } = maxBoundaryProof && typeof maxBoundaryProof === 'object' && !Array.isArray(maxBoundaryProof) ? maxBoundaryProof : {});
+    maxBoundaryFormedAtRoots = maxBoundaryProof?.formedAtRoots ?? [];
+    const maxBoundaryFormedRootValues = maxBoundaryFormedAtRoots.map(entry => entry?.root);
+    maxBoundaryParity = maxBoundaryProof?.parity ?? {};
+    maxBoundaryBoundary = maxBoundaryProof?.truthBoundary ?? {};
+
+    if (
+      maxBoundaryProof?.format !== 'taowind.rcl-vercel-foundation-knowledge-multi-learn-max-boundary-proof.v0.1'
+      || maxBoundaryProof?.version !== '0.1.0'
+      || maxBoundaryProof?.ok !== true
+      || maxBoundaryProof?.verified !== true
+      || maxBoundaryProof?.status !== 'native-verified'
+      || maxBoundaryProof?.domain !== 'knowledge'
+      || maxBoundaryProof?.loweredLearnCount !== 2
+      || maxBoundaryProof?.loweredClaimCount !== 8
+      || JSON.stringify(maxBoundaryProof?.declarations) !== JSON.stringify(['mind', 'context'])
+      || JSON.stringify(maxBoundaryProof?.claimPaths) !== JSON.stringify(expectedMaxBoundaryPaths)
+      || maxBoundaryProof?.binarySha256 !== binarySha256
+      || maxBoundaryProof?.executionBinarySha256 !== binarySha256
+      || !isSha256(maxBoundaryProof?.nativeVmExecutionAttestationRoot)
+      || !isSha256(maxBoundaryProof?.knowledgeReceiptRoot)
+      || maxBoundaryFormedAtRoots.length !== 8
+      || JSON.stringify(maxBoundaryFormedAtRoots.map(entry => entry?.path)) !== JSON.stringify(expectedMaxBoundaryPaths)
+      || maxBoundaryFormedRootValues.some(rootValue => !isSha256(rootValue))
+      || new Set(maxBoundaryFormedRootValues).size !== 8
+      || !isSha256(maxBoundaryAttestationRoot)
+      || maxBoundaryAttestationRoot !== sha256Canonical(maxBoundaryPayload)
+      || maxBoundaryParity.state !== true
+      || maxBoundaryParity.semanticStateRoot !== true
+      || maxBoundaryParity.nativeStateRootVerified !== true
+      || maxBoundaryParity.nativeStateRootParity !== true
+      || maxBoundaryParity.knowledgeReceipt !== true
+      || maxBoundaryParity.learnTransactionOrder !== true
+      || maxBoundaryParity.learnBoundaryContinuity !== true
+      || maxBoundaryParity.nativeExecutionAttestation !== true
+      || maxBoundaryBoundary.boundedContiguousMultiLearnKnowledgeSubsetOnly !== true
+      || maxBoundaryBoundary.maxBoundedLearnDirectiveCount !== 2
+      || maxBoundaryBoundary.maxBoundedClaimCountPerLearn !== 4
+      || maxBoundaryBoundary.verifiedLearnDirectiveCount !== 2
+      || maxBoundaryBoundary.verifiedClaimCount !== 8
+      || maxBoundaryBoundary.maxDeclaredMultiLearnBoundaryRealCVerified !== true
+      || maxBoundaryBoundary.separateOrderedAtomicTransactionsRequired !== true
+      || maxBoundaryBoundary.exactReferenceNativeDomainReceiptParityRequired !== true
+      || maxBoundaryBoundary.crossLearnBoundaryRootContinuityRequired !== true
+      || maxBoundaryBoundary.globalSequentialClaimFormationRootsRequired !== true
+      || maxBoundaryBoundary.canonicalRealCExecutionRequiredForVerifiedStatus !== true
+      || maxBoundaryBoundary.threeOrMoreLearnDirectivesNativeClaimed !== false
+      || maxBoundaryBoundary.fiveOrMoreClaimsPerLearnNativeClaimed !== false
+      || maxBoundaryBoundary.nonLeadingOrInterleavedLearnNativeClaimed !== false
+      || maxBoundaryBoundary.dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound !== true
+      || maxBoundaryBoundary.providerBridgeRemovedGlobally !== false
+      || maxBoundaryBoundary.allKnowledgeProgramsNativeClaimed !== false
+      || maxBoundaryBoundary.fullHistoryParityClaimed !== false
+      || maxBoundaryRuntimeBinding?.exactBinaryRequired !== true
+      || maxBoundaryRuntimeBinding?.canonicalRuntimeTruthConsumerRequired !== true
+      || maxBoundaryRuntimeBinding?.behavioralAndMaxBoundaryAttestationsRemainDistinct !== true
+      || maxBoundaryRuntimeBinding?.maxBoundaryAttestationDoesNotClaimFullKnowledgeNativeCoverage !== true
+    ) {
+      fail('RCL_KNOWLEDGE_MULTI_LEARN_MAX_BOUNDARY_RUNTIME_ATTESTATION_DRIFT', 'Bounded multi-Learn max-boundary real-C attestation is present but unbound, inconsistent, or overclaims runtime coverage.', {
+        maxBoundaryProof,
+        binarySha256,
+        maxBoundaryAttestationRoot,
+        recomputedMaxBoundaryAttestationRoot: Object.keys(maxBoundaryPayload).length > 0 ? sha256Canonical(maxBoundaryPayload) : null,
+        expectedMaxBoundaryPaths,
+      });
+    }
+  }
+
+  const maxBoundaryVerified = maxBoundaryPresent
+    && errors.every(error => error?.code !== 'RCL_KNOWLEDGE_MULTI_LEARN_MAX_BOUNDARY_RUNTIME_ATTESTATION_DRIFT'
+      && error?.code !== 'RCL_KNOWLEDGE_MULTI_LEARN_RUNTIME_BINARY_DRIFT');
+
   const payload = {
     format: FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_FORMAT,
     version: FOUNDATION_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_VERSION,
@@ -155,6 +259,33 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
       path: entry?.path ?? null,
       root: entry?.root ?? null,
     })),
+    maxBoundaryPresent,
+    maxBoundaryVerified,
+    maxBoundaryStatus: maxBoundaryPresent ? (maxBoundaryVerified ? 'runtime-bound' : 'runtime-drift') : 'runtime-unbound',
+    maxBoundaryAttestationRoot,
+    maxBoundaryExecutionBinarySha256: maxBoundaryProof?.executionBinarySha256 ?? null,
+    maxBoundaryNativeVmExecutionAttestationRoot: maxBoundaryProof?.nativeVmExecutionAttestationRoot ?? null,
+    maxBoundaryKnowledgeReceiptRoot: maxBoundaryProof?.knowledgeReceiptRoot ?? null,
+    maxBoundaryKnowledgeReceiptRootAlgorithm: maxBoundaryProof?.knowledgeReceiptRootAlgorithm ?? null,
+    maxBoundaryLoweredLearnCount: maxBoundaryProof?.loweredLearnCount ?? null,
+    maxBoundaryLoweredClaimCount: maxBoundaryProof?.loweredClaimCount ?? null,
+    maxBoundaryDeclarations: [...(maxBoundaryProof?.declarations ?? [])],
+    maxBoundaryClaimPaths: [...(maxBoundaryProof?.claimPaths ?? [])],
+    maxBoundaryFormedAtRoots: maxBoundaryFormedAtRoots.map(entry => ({
+      declaration: entry?.declaration ?? null,
+      path: entry?.path ?? null,
+      root: entry?.root ?? null,
+    })),
+    maxBoundaryParity: maxBoundaryPresent ? {
+      state: maxBoundaryParity.state === true,
+      semanticStateRoot: maxBoundaryParity.semanticStateRoot === true,
+      nativeStateRootVerified: maxBoundaryParity.nativeStateRootVerified === true,
+      nativeStateRootParity: maxBoundaryParity.nativeStateRootParity === true,
+      knowledgeReceipt: maxBoundaryParity.knowledgeReceipt === true,
+      learnTransactionOrder: maxBoundaryParity.learnTransactionOrder === true,
+      learnBoundaryContinuity: maxBoundaryParity.learnBoundaryContinuity === true,
+      nativeExecutionAttestation: maxBoundaryParity.nativeExecutionAttestation === true,
+    } : null,
     parity: {
       state: parity.state === true,
       semanticStateRoot: parity.semanticStateRoot === true,
@@ -179,6 +310,10 @@ export function foundationKnowledgeMultiLearnRuntimeEvidence({ binaryBytes, atte
       nonLeadingOrInterleavedLearnNativeClaimed: boundary.nonLeadingOrInterleavedLearnNativeClaimed === true,
       dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound: boundary.dependenciesRevisionsDecayAndDerivedKnowledgeRemainProviderBound === true,
       runtimeTruthBound: errors.length === 0 && isSha256(attestationRoot),
+      maxBoundaryRuntimeTruthBound: maxBoundaryVerified && isSha256(maxBoundaryAttestationRoot),
+      maxBoundaryRealCVerified: maxBoundaryBoundary.maxDeclaredMultiLearnBoundaryRealCVerified === true,
+      fiveOrMoreClaimsPerLearnNativeClaimed: maxBoundaryBoundary.fiveOrMoreClaimsPerLearnNativeClaimed === true,
+      globalSequentialClaimFormationRootsRequired: maxBoundaryBoundary.globalSequentialClaimFormationRootsRequired === true,
       providerBridgeRemovedGlobally: boundary.providerBridgeRemovedGlobally === true,
       allKnowledgeProgramsNativeClaimed: boundary.allKnowledgeProgramsNativeClaimed === true,
       fullHistoryParityClaimed: boundary.fullHistoryParityClaimed === true,

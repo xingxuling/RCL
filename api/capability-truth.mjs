@@ -10,8 +10,8 @@ import {
   foundationKnowledgeMultiLearnRuntimeEvidence,
 } from '../src/foundation-knowledge-multi-learn-runtime-evidence.mjs';
 
-const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.4';
-const RUNTIME_TRUTH_VERSION = '0.4.0';
+const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.5';
+const RUNTIME_TRUTH_VERSION = '0.5.0';
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -30,6 +30,10 @@ export function foundationRuntimeCapabilityTruthAttestation({ capability, deploy
   const knowledgeMultiLearnVerified = knowledgeMultiLearn?.present === true
     && knowledgeMultiLearn?.ok === true
     && knowledgeMultiLearn?.verified === true;
+  const knowledgeMultiLearnMaxBoundaryVerified = knowledgeMultiLearnVerified
+    && knowledgeMultiLearn?.maxBoundaryPresent === true
+    && knowledgeMultiLearn?.maxBoundaryVerified === true
+    && knowledgeMultiLearn?.truthBoundary?.maxBoundaryRuntimeTruthBound === true;
   const payload = {
     format: RUNTIME_TRUTH_FORMAT,
     version: RUNTIME_TRUTH_VERSION,
@@ -53,6 +57,16 @@ export function foundationRuntimeCapabilityTruthAttestation({ capability, deploy
     knowledgeMultiLearnExecutionBinarySha256: knowledgeMultiLearnVerified ? knowledgeMultiLearn.executionBinarySha256 : null,
     knowledgeMultiLearnLoweredLearnCount: knowledgeMultiLearnVerified ? knowledgeMultiLearn.loweredLearnCount : null,
     knowledgeMultiLearnLoweredClaimCount: knowledgeMultiLearnVerified ? knowledgeMultiLearn.loweredClaimCount : null,
+    knowledgeMultiLearnMaxBoundaryRuntimeBound: knowledgeMultiLearnMaxBoundaryVerified,
+    knowledgeMultiLearnMaxBoundaryAttestationRoot: knowledgeMultiLearnMaxBoundaryVerified ? knowledgeMultiLearn.maxBoundaryAttestationRoot : null,
+    knowledgeMultiLearnMaxBoundaryKnowledgeReceiptRoot: knowledgeMultiLearnMaxBoundaryVerified ? knowledgeMultiLearn.maxBoundaryKnowledgeReceiptRoot : null,
+    knowledgeMultiLearnMaxBoundaryExecutionBinarySha256: knowledgeMultiLearnMaxBoundaryVerified ? knowledgeMultiLearn.maxBoundaryExecutionBinarySha256 : null,
+    knowledgeMultiLearnMaxBoundaryLoweredLearnCount: knowledgeMultiLearnMaxBoundaryVerified ? knowledgeMultiLearn.maxBoundaryLoweredLearnCount : null,
+    knowledgeMultiLearnMaxBoundaryLoweredClaimCount: knowledgeMultiLearnMaxBoundaryVerified ? knowledgeMultiLearn.maxBoundaryLoweredClaimCount : null,
+    knowledgeMultiLearnMaxBoundaryClaimPaths: knowledgeMultiLearnMaxBoundaryVerified ? [...knowledgeMultiLearn.maxBoundaryClaimPaths] : [],
+    knowledgeMultiLearnMaxBoundaryFormedAtRoots: knowledgeMultiLearnMaxBoundaryVerified
+      ? knowledgeMultiLearn.maxBoundaryFormedAtRoots.map(entry => entry.root)
+      : [],
   };
   return { ...payload, runtimeTruthRoot: sha256Canonical(payload) };
 }
@@ -83,6 +97,8 @@ export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = fals
       verified: false,
       status: 'runtime-unavailable',
       runtimeEvidenceRoot: null,
+      maxBoundaryPresent: false,
+      maxBoundaryVerified: false,
       errors: [{ code: error?.code ?? 'RCL_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_UNAVAILABLE', message: error?.message ?? String(error) }],
     };
   }
@@ -150,7 +166,17 @@ export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = fals
       knowledgeMultiLearnRuntimeTruthBound: knowledgeMultiLearn?.present === true && knowledgeMultiLearn?.ok === true,
       knowledgeMultiLearnRuntimeTruthRequired: requireKnowledgeMultiLearn === true,
       runtimeTruthRootBindsKnowledgeMultiLearnEvidenceWhenPresent: knowledgeMultiLearn?.present === true && knowledgeMultiLearn?.ok === true,
+      knowledgeMultiLearnMaxBoundaryEvidencePresent: knowledgeMultiLearn?.maxBoundaryPresent === true,
+      knowledgeMultiLearnMaxBoundaryRuntimeTruthBound:
+        knowledgeMultiLearn?.maxBoundaryPresent === true
+        && knowledgeMultiLearn?.maxBoundaryVerified === true
+        && knowledgeMultiLearn?.truthBoundary?.maxBoundaryRuntimeTruthBound === true,
+      runtimeTruthRootBindsKnowledgeMultiLearnMaxBoundaryEvidenceWhenPresent:
+        knowledgeMultiLearn?.maxBoundaryPresent === true
+        && knowledgeMultiLearn?.maxBoundaryVerified === true
+        && knowledgeMultiLearn?.truthBoundary?.maxBoundaryRuntimeTruthBound === true,
       knowledgeMultiLearnBindingDoesNotClaimThreeOrMoreLearnDirectives: true,
+      knowledgeMultiLearnBindingDoesNotClaimFiveOrMoreClaimsPerLearn: true,
       knowledgeMultiLearnBindingDoesNotClaimNonLeadingOrInterleavedLearn: true,
       knowledgeMultiLearnBindingDoesNotClaimFullHistoryParity: true,
       knowledgeMultiLearnBindingDoesNotClaimGlobalProviderRemoval: true,
