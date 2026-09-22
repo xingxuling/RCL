@@ -6,9 +6,12 @@ import {
 import {
   foundationCrossDomainHistoryDeploymentEvidence,
 } from '../src/foundation-cross-domain-history-deployment-evidence.mjs';
+import {
+  foundationKnowledgeMultiLearnRuntimeEvidence,
+} from '../src/foundation-knowledge-multi-learn-runtime-evidence.mjs';
 
-const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.3';
-const RUNTIME_TRUTH_VERSION = '0.3.0';
+const RUNTIME_TRUTH_FORMAT = 'taowind.rcl-foundation-runtime-capability-truth.v0.4';
+const RUNTIME_TRUTH_VERSION = '0.4.0';
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -22,8 +25,11 @@ function sha256Canonical(value) {
   return crypto.createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex');
 }
 
-export function foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory = null }) {
+export function foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory = null, knowledgeMultiLearn = null }) {
   const crossDomainVerified = crossDomainHistory?.ok === true && crossDomainHistory?.verified === true;
+  const knowledgeMultiLearnVerified = knowledgeMultiLearn?.present === true
+    && knowledgeMultiLearn?.ok === true
+    && knowledgeMultiLearn?.verified === true;
   const payload = {
     format: RUNTIME_TRUTH_FORMAT,
     version: RUNTIME_TRUTH_VERSION,
@@ -40,11 +46,18 @@ export function foundationRuntimeCapabilityTruthAttestation({ capability, deploy
     crossDomainHistoryReferenceRoot: crossDomainVerified ? crossDomainHistory.referenceHistoryRoot : null,
     crossDomainHistoryNativeRoot: crossDomainVerified ? crossDomainHistory.nativeHistoryRoot : null,
     crossDomainHistoryDomains: crossDomainVerified ? [...crossDomainHistory.domains] : [],
+    knowledgeMultiLearnRuntimeBound: knowledgeMultiLearnVerified,
+    knowledgeMultiLearnRuntimeEvidenceRoot: knowledgeMultiLearnVerified ? knowledgeMultiLearn.runtimeEvidenceRoot : null,
+    knowledgeMultiLearnAttestationRoot: knowledgeMultiLearnVerified ? knowledgeMultiLearn.attestationRoot : null,
+    knowledgeMultiLearnKnowledgeReceiptRoot: knowledgeMultiLearnVerified ? knowledgeMultiLearn.knowledgeReceiptRoot : null,
+    knowledgeMultiLearnExecutionBinarySha256: knowledgeMultiLearnVerified ? knowledgeMultiLearn.executionBinarySha256 : null,
+    knowledgeMultiLearnLoweredLearnCount: knowledgeMultiLearnVerified ? knowledgeMultiLearn.loweredLearnCount : null,
+    knowledgeMultiLearnLoweredClaimCount: knowledgeMultiLearnVerified ? knowledgeMultiLearn.loweredClaimCount : null,
   };
   return { ...payload, runtimeTruthRoot: sha256Canonical(payload) };
 }
 
-export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = false } = {}) {
+export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = false, requireKnowledgeMultiLearn = false } = {}) {
   const capability = foundationCapabilityTruthSurface();
   const deployment = foundationRuntimeDeploymentEvidenceSurface({ requireCompleteDirectCoverage: true });
   let crossDomainHistory;
@@ -60,12 +73,30 @@ export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = fals
       errors: [{ code: error?.code ?? 'RCL_CROSS_DOMAIN_HISTORY_RUNTIME_EVIDENCE_UNAVAILABLE', message: error?.message ?? String(error) }],
     };
   }
-  const runtimeTruth = foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory });
+  let knowledgeMultiLearn;
+  try {
+    knowledgeMultiLearn = foundationKnowledgeMultiLearnRuntimeEvidence();
+  } catch (error) {
+    knowledgeMultiLearn = {
+      ok: false,
+      present: false,
+      verified: false,
+      status: 'runtime-unavailable',
+      runtimeEvidenceRoot: null,
+      errors: [{ code: error?.code ?? 'RCL_KNOWLEDGE_MULTI_LEARN_RUNTIME_EVIDENCE_UNAVAILABLE', message: error?.message ?? String(error) }],
+    };
+  }
+  const runtimeTruth = foundationRuntimeCapabilityTruthAttestation({ capability, deployment, crossDomainHistory, knowledgeMultiLearn });
   const crossDomainRequiredSatisfied = requireCrossDomainHistory !== true || crossDomainHistory?.ok === true;
+  const knowledgeMultiLearnPresentSatisfied = knowledgeMultiLearn?.present !== true || knowledgeMultiLearn?.ok === true;
+  const knowledgeMultiLearnRequiredSatisfied = requireKnowledgeMultiLearn !== true
+    || (knowledgeMultiLearn?.present === true && knowledgeMultiLearn?.ok === true && knowledgeMultiLearn?.verified === true);
   const ok = capability.ok === true
     && deployment.ok === true
     && deployment.evidenceSetVerified === true
-    && crossDomainRequiredSatisfied;
+    && crossDomainRequiredSatisfied
+    && knowledgeMultiLearnPresentSatisfied
+    && knowledgeMultiLearnRequiredSatisfied;
 
   return {
     ...capability,
@@ -76,6 +107,7 @@ export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = fals
     runtimeTruth,
     runtimeTruthRoot: runtimeTruth.runtimeTruthRoot,
     crossDomainHistoryEvidence: crossDomainHistory,
+    knowledgeMultiLearnEvidence: knowledgeMultiLearn,
     deploymentEvidenceRegistry: {
       format: deployment.format,
       version: deployment.version,
@@ -114,6 +146,14 @@ export function runtimeCapabilityTruthSurface({ requireCrossDomainHistory = fals
       runtimeTruthRootBindsCrossDomainHistoryEvidenceWhenPresent: crossDomainHistory?.ok === true,
       crossDomainHistoryBindingDoesNotClaimFullHistoryParity: true,
       crossDomainHistoryBindingDoesNotClaimAllFoundationDomainHistoryParity: true,
+      knowledgeMultiLearnEvidencePresent: knowledgeMultiLearn?.present === true,
+      knowledgeMultiLearnRuntimeTruthBound: knowledgeMultiLearn?.present === true && knowledgeMultiLearn?.ok === true,
+      knowledgeMultiLearnRuntimeTruthRequired: requireKnowledgeMultiLearn === true,
+      runtimeTruthRootBindsKnowledgeMultiLearnEvidenceWhenPresent: knowledgeMultiLearn?.present === true && knowledgeMultiLearn?.ok === true,
+      knowledgeMultiLearnBindingDoesNotClaimThreeOrMoreLearnDirectives: true,
+      knowledgeMultiLearnBindingDoesNotClaimNonLeadingOrInterleavedLearn: true,
+      knowledgeMultiLearnBindingDoesNotClaimFullHistoryParity: true,
+      knowledgeMultiLearnBindingDoesNotClaimGlobalProviderRemoval: true,
       energyProviderBridgeMayCoexistWithBoundedDirectVerification: true,
     },
   };
