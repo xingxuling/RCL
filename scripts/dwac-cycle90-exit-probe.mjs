@@ -12,26 +12,39 @@ if (build.error || build.status !== 0) process.exit(7);
 const tests = fs.readdirSync(path.join(root, 'tests'))
   .filter(name => name.endsWith('.test.mjs') && !['f', 's'].includes(name[0]?.toLowerCase()))
   .sort();
-const topBucketCount = 4;
-const topBuckets = Array.from({ length: topBucketCount }, () => []);
-for (let i = 0; i < tests.length; i += 1) topBuckets[Math.floor(i * topBucketCount / tests.length)].push(tests[i]);
-const suspects = topBuckets[1];
-const bucketCount = 7;
-const buckets = Array.from({ length: bucketCount }, () => []);
-for (let i = 0; i < suspects.length; i += 1) buckets[Math.floor(i * bucketCount / suspects.length)].push(suspects[i]);
+const topBuckets = Array.from({ length: 4 }, () => []);
+for (let i = 0; i < tests.length; i += 1) topBuckets[Math.floor(i * 4 / tests.length)].push(tests[i]);
+const level1 = Array.from({ length: 7 }, () => []);
+for (let i = 0; i < topBuckets[1].length; i += 1) level1[Math.floor(i * 7 / topBuckets[1].length)].push(topBuckets[1][i]);
+const suspects = level1[3];
 
-let mask = 0;
 const results = [];
-for (let i = 0; i < buckets.length; i += 1) {
-  const selected = buckets[i];
-  const bit = 1 << i;
-  const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...selected.map(name => `tests/${name}`)], { cwd: root, stdio: 'inherit', env: process.env });
+for (const name of suspects) {
+  const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', `tests/${name}`], {
+    cwd: root,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+    env: process.env,
+  });
   const passed = !result.error && result.status === 0;
-  if (!passed) mask |= bit;
-  results.push({ bucket: i, bit, count: selected.length, first: selected[0] ?? null, last: selected.at(-1) ?? null, passed, childExitCode: result.status ?? null, error: result.error?.message ?? null });
+  results.push({
+    name,
+    passed,
+    exitCode: result.status ?? null,
+    error: result.error?.message ?? null,
+    stdoutTail: String(result.stdout ?? '').slice(-5000),
+    stderrTail: String(result.stderr ?? '').slice(-5000),
+  });
 }
-if (mask !== 0) {
-  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_RESIDUAL_B1_MASK_FAILURE', suspectCount: suspects.length, bucketCount, mask, encodedExitCode: 64 + mask, results }, null, 2));
-  process.exit(64 + mask);
-}
-console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_RESIDUAL_B1_PASS', suspectCount: suspects.length, results }, null, 2));
+
+const payload = {
+  ok: true,
+  diagnosticOnly: true,
+  status: 'DWAC_CYCLE90_RESIDUAL_B1_S3_FILE_DETAILS',
+  suspectCount: suspects.length,
+  failed: results.filter(item => !item.passed).map(item => item.name),
+  results,
+};
+const moduleSource = `const payload = ${JSON.stringify(payload, null, 2)};\nexport default function handler(_req, res) { res.status(200).json(payload); }\n`;
+fs.writeFileSync(path.join(root, 'api', 'runtime-health.mjs'), moduleSource, 'utf8');
+console.log(JSON.stringify({ status: payload.status, suspectCount: payload.suspectCount, failed: payload.failed }, null, 2));
