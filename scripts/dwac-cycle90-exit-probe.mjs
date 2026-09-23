@@ -30,48 +30,58 @@ function runNpm(name, args, code) {
   runCommand(name, npm, args, code);
 }
 
-function rangeTests(tests, lo, hi) {
-  return tests.filter(name => {
-    const first = name[0].toLowerCase();
-    return first >= lo && first <= hi;
-  });
-}
-
-runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 261);
-runNpm('canonical-native-pretest-build', ['run', 'build:native'], 262);
+runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 5);
+runNpm('canonical-native-pretest-build', ['run', 'build:native'], 6);
 
 const tests = fs.readdirSync(path.join(root, 'tests'))
   .filter(name => name.endsWith('.test.mjs'))
   .sort();
-const first = rangeTests(tests, 'n', 't');
-const second = rangeTests(tests, 'u', 'z');
+const letters = ['n', 'o', 'p', 'q', 'r', 's', 't'];
 
-if (first.length === 0 || second.length === 0) {
-  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_EMPTY_SELECTION', firstCount: first.length, secondCount: second.length }, null, 2));
-  process.exit(263);
+let mask = 0;
+const results = [];
+for (let i = 0; i < letters.length; i += 1) {
+  const letter = letters[i];
+  const bit = 1 << i;
+  const selected = tests.filter(name => name[0]?.toLowerCase() === letter);
+  if (selected.length === 0) {
+    results.push({ letter, bit, count: 0, skipped: true, passed: true });
+    continue;
+  }
+  const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...selected.map(name => `tests/${name}`)], {
+    cwd: root,
+    stdio: 'inherit',
+    env: process.env,
+  });
+  const passed = !result.error && result.status === 0;
+  if (!passed) mask |= bit;
+  results.push({
+    letter,
+    bit,
+    count: selected.length,
+    first: selected[0] ?? null,
+    last: selected.at(-1) ?? null,
+    passed,
+    childExitCode: result.status ?? null,
+    error: result.error?.message ?? null,
+  });
 }
 
-runNode(
-  'canonical-test-suite-bisection-n-through-t',
-  ['--test', '--test-concurrency=1', ...first.map(name => `tests/${name}`)],
-  264,
-);
-runNode(
-  'canonical-test-suite-bisection-u-through-z',
-  ['--test', '--test-concurrency=1', ...second.map(name => `tests/${name}`)],
-  265,
-);
+if (mask !== 0) {
+  console.error(JSON.stringify({
+    ok: false,
+    status: 'DWAC_CYCLE90_DIAGNOSTIC_N_THROUGH_T_LETTER_MASK_FAILURE',
+    mask,
+    encodedExitCode: 64 + mask,
+    results,
+  }, null, 2));
+  process.exit(64 + mask);
+}
 
 console.log(JSON.stringify({
   ok: true,
-  status: 'DWAC_CYCLE90_DIAGNOSTIC_N_THROUGH_Z_PASS',
-  diagnostic: {
-    firstSelection: 'n-t',
-    firstCount: first.length,
-    secondSelection: 'u-z',
-    secondCount: second.length,
-    totalCount: tests.length,
-  },
+  status: 'DWAC_CYCLE90_DIAGNOSTIC_N_THROUGH_T_PASS',
+  results,
   route: {
     mode: 'DEEP_DEVELOPMENT',
     schedulingContext: 'NORTH_STAR_REOBSERVATION',
