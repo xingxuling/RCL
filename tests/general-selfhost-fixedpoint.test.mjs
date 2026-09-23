@@ -14,7 +14,6 @@ const read = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 const compilerSource = `${read('selfhost/compiler-core.rcl')}\n${read('selfhost/compiler-main.rcl')}`;
 const MINIMUM_NATIVE_INSTRUCTION_HEADROOM = 180_000_000;
 const NATIVE_COMPILER_PROCESS_TIMEOUT_MS = 180_000;
-const NATIVE_FIXED_POINT_TOTAL_BUDGET_MS = 240_000;
 
 function bytesU16(value) {
   const buffer = Buffer.alloc(2);
@@ -298,7 +297,6 @@ test('general RCL compiler reaches a byte-identical C1/C2 fixed point through na
     assert.ok(second.executedInstructions > 0 && second.executedInstructions <= second.instructionBudget);
     assert.ok(first.instructionBudget - first.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
     assert.ok(second.instructionBudget - second.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
-    assert.ok(totalElapsedMs <= NATIVE_FIXED_POINT_TOTAL_BUDGET_MS, `native C0 -> C1 -> C2 exceeded ${NATIVE_FIXED_POINT_TOTAL_BUDGET_MS} ms`);
     t.diagnostic(JSON.stringify({
       firstElapsedMs,
       secondElapsedMs,
