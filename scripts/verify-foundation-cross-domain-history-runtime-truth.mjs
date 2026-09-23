@@ -4,12 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  foundationRuntimeCapabilityTruthAttestation,
   runtimeCapabilityTruthSurface,
 } from '../api/capability-truth.mjs';
 import {
   foundationCrossDomainHistoryDeploymentEvidence,
 } from '../src/foundation-cross-domain-history-deployment-evidence.mjs';
+import {
+  replayFoundationRuntimeCapabilityTruthFromSurface,
+} from '../src/foundation-runtime-truth-replay.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const nativeDir = path.join(root, 'native');
@@ -75,16 +77,12 @@ try {
     });
   }
 
-  const registry = surface.deploymentEvidenceRegistry;
-  const replayed = foundationRuntimeCapabilityTruthAttestation({
-    capability: surface,
-    deployment: { ...registry, evidenceSetRoot: registry.evidenceSetRoot },
-    crossDomainHistory: surface.crossDomainHistoryEvidence,
-  });
+  const replayed = replayFoundationRuntimeCapabilityTruthFromSurface(surface);
   if (!isSha256(surface.runtimeTruthRoot) || replayed.runtimeTruthRoot !== surface.runtimeTruthRoot) {
-    fail('Runtime truth root does not replay from canonical capability/deployment/cross-domain evidence.', {
+    fail('Runtime truth root does not replay from the complete canonical capability/deployment/cross-domain/knowledge surface.', {
       runtimeTruthRoot: surface.runtimeTruthRoot,
       replayedRuntimeTruthRoot: replayed.runtimeTruthRoot,
+      knowledgeMultiLearnEvidence: surface.knowledgeMultiLearnEvidence,
     });
   }
 
