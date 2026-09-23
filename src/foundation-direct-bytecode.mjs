@@ -6,7 +6,7 @@ import { lowerDeclaredEnergyToCore } from './foundation-energy-direct-lowering.m
 import {
   FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS,
   lowerDeclaredKnowledgeToCore,
-} from './foundation-knowledge-direct-lowering.mjs';
+} from './foundation-knowledge-derived-direct-lowering.mjs';
 import { lowerFoundationQuantitiesForNativeBytecode } from './foundation-quantity-native-lowering.mjs';
 import {
   FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
