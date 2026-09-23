@@ -29,8 +29,10 @@ if (sTests.length === 0) process.exit(7);
 const top = partition(sTests);
 const level1 = [...(top[1] ?? [])].sort();
 const level2 = partition(level1);
-// Previous level-2 s oracle exited 68 => 68-64=4 => only bucket 2 fails.
-const suspect = [...(level2[2] ?? [])].sort();
+const level2Suspect = [...(level2[2] ?? [])].sort();
+const level3 = partition(level2Suspect);
+// Previous level-3 s oracle exited 65 => 65-64=1 => only bucket 0 fails.
+const suspect = [...(level3[0] ?? [])].sort();
 if (suspect.length === 0) process.exit(8);
 const buckets = partition(suspect);
 
@@ -45,7 +47,7 @@ for (let i = 0; i < buckets.length; i += 1) {
   results.push({ bucket: i, bit, count: selected.length, first: selected[0] ?? null, last: selected.at(-1) ?? null, passed, childExitCode: result.status ?? null, error: result.error?.message ?? null });
 }
 if (mask !== 0) {
-  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL3_MASK_FAILURE', sTestCount: sTests.length, priorFailingPath: [1,2], suspectCount: suspect.length, bucketCount: buckets.length, mask, encodedExitCode: 64 + mask, results }, null, 2));
+  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL4_MASK_FAILURE', sTestCount: sTests.length, priorFailingPath: [1,2,0], suspectCount: suspect.length, bucketCount: buckets.length, mask, encodedExitCode: 64 + mask, results }, null, 2));
   process.exit(64 + mask);
 }
-console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL3_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
+console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL4_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
