@@ -10,5 +10,6 @@ export function replayFoundationRuntimeCapabilityTruthFromSurface(surface) {
     },
     crossDomainHistory: surface?.crossDomainHistoryEvidence ?? null,
     knowledgeMultiLearn: surface?.knowledgeMultiLearnEvidence ?? null,
+    knowledgeDerivedDependency: surface?.knowledgeDerivedDependencyEvidence ?? null,
   });
 }
