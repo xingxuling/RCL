@@ -30,53 +30,62 @@ function runNpm(name, args, code) {
   runCommand(name, npm, args, code);
 }
 
-function rangeTests(tests, lo, hi) {
-  return tests.filter(name => {
-    const first = name[0].toLowerCase();
-    return first >= lo && first <= hi;
-  });
-}
-
-runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 261);
-runNpm('canonical-native-pretest-build', ['run', 'build:native'], 262);
+runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 5);
+runNpm('canonical-native-pretest-build', ['run', 'build:native'], 6);
 
 const tests = fs.readdirSync(path.join(root, 'tests'))
   .filter(name => name.endsWith('.test.mjs'))
   .sort();
-const first = rangeTests(tests, '0', 'f');
-const second = rangeTests(tests, 'g', 'm');
 
-if (first.length === 0 || second.length === 0) {
-  console.error(JSON.stringify({
-    ok: false,
-    status: 'DWAC_CYCLE90_DIAGNOSTIC_EMPTY_SELECTION',
-    firstCount: first.length,
-    secondCount: second.length,
-  }, null, 2));
-  process.exit(263);
+const groups = [
+  { label: '0-9', bit: 1, match: name => /[0-9]/.test(name[0]) },
+  { label: 'a', bit: 2, match: name => name[0].toLowerCase() === 'a' },
+  { label: 'b', bit: 4, match: name => name[0].toLowerCase() === 'b' },
+  { label: 'c', bit: 8, match: name => name[0].toLowerCase() === 'c' },
+  { label: 'd', bit: 16, match: name => name[0].toLowerCase() === 'd' },
+  { label: 'e', bit: 32, match: name => name[0].toLowerCase() === 'e' },
+  { label: 'f', bit: 64, match: name => name[0].toLowerCase() === 'f' },
+];
+
+let mask = 0;
+const results = [];
+for (const group of groups) {
+  const selected = tests.filter(group.match);
+  if (selected.length === 0) {
+    results.push({ label: group.label, count: 0, skipped: true, passed: true });
+    continue;
+  }
+  const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...selected.map(name => `tests/${name}`)], {
+    cwd: root,
+    stdio: 'inherit',
+    env: process.env,
+  });
+  const passed = !result.error && result.status === 0;
+  if (!passed) mask |= group.bit;
+  results.push({
+    label: group.label,
+    count: selected.length,
+    passed,
+    childExitCode: result.status ?? null,
+    error: result.error?.message ?? null,
+  });
 }
 
-runNode(
-  'canonical-test-suite-bisection-0-through-f',
-  ['--test', '--test-concurrency=1', ...first.map(name => `tests/${name}`)],
-  264,
-);
-runNode(
-  'canonical-test-suite-bisection-g-through-m',
-  ['--test', '--test-concurrency=1', ...second.map(name => `tests/${name}`)],
-  265,
-);
+if (mask !== 0) {
+  console.error(JSON.stringify({
+    ok: false,
+    status: 'DWAC_CYCLE90_DIAGNOSTIC_GROUP_MASK_FAILURE',
+    mask,
+    encodedExitCode: 64 + mask,
+    results,
+  }, null, 2));
+  process.exit(64 + mask);
+}
 
 console.log(JSON.stringify({
   ok: true,
-  status: 'DWAC_CYCLE90_DIAGNOSTIC_0_THROUGH_M_PASS',
-  diagnostic: {
-    firstSelection: '0-f',
-    firstCount: first.length,
-    secondSelection: 'g-m',
-    secondCount: second.length,
-    totalCount: tests.length,
-  },
+  status: 'DWAC_CYCLE90_DIAGNOSTIC_0_THROUGH_F_PASS',
+  results,
   route: {
     mode: 'DEEP_DEVELOPMENT',
     schedulingContext: 'NORTH_STAR_REOBSERVATION',
