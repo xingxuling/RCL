@@ -14,26 +14,25 @@ function runCommand(name, command, args, code) {
 }
 function runNode(name, args, code) { runCommand(name, process.execPath, args, code); }
 function runNpm(name, args, code) { runCommand(name, process.platform === 'win32' ? 'npm.cmd' : 'npm', args, code); }
+function partition(items) {
+  const count = Math.min(7, items.length);
+  const buckets = Array.from({ length: count }, () => []);
+  for (let i = 0; i < items.length; i += 1) buckets[Math.floor(i * count / items.length)].push(items[i]);
+  return buckets;
+}
 
 runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 5);
 runNpm('canonical-native-pretest-build', ['run', 'build:native'], 6);
 
-const sTests = fs.readdirSync(path.join(root, 'tests'))
-  .filter(name => name.endsWith('.test.mjs') && name[0]?.toLowerCase() === 's')
-  .sort();
+const sTests = fs.readdirSync(path.join(root, 'tests')).filter(name => name.endsWith('.test.mjs') && name[0]?.toLowerCase() === 's').sort();
 if (sTests.length === 0) process.exit(7);
-
-const topBucketCount = Math.min(7, sTests.length);
-const topBuckets = Array.from({ length: topBucketCount }, () => []);
-for (let i = 0; i < sTests.length; i += 1) topBuckets[Math.floor(i * topBucketCount / sTests.length)].push(sTests[i]);
-
-// Previous s oracle exited 66 => 66-64=2, therefore only top-level bucket 1 fails.
-const suspect = [...(topBuckets[1] ?? [])].sort();
+const top = partition(sTests);
+const level1 = [...(top[1] ?? [])].sort();
+const level2 = partition(level1);
+// Previous level-2 s oracle exited 68 => 68-64=4 => only bucket 2 fails.
+const suspect = [...(level2[2] ?? [])].sort();
 if (suspect.length === 0) process.exit(8);
-
-const bucketCount = Math.min(7, suspect.length);
-const buckets = Array.from({ length: bucketCount }, () => []);
-for (let i = 0; i < suspect.length; i += 1) buckets[Math.floor(i * bucketCount / suspect.length)].push(suspect[i]);
+const buckets = partition(suspect);
 
 let mask = 0;
 const results = [];
@@ -45,10 +44,8 @@ for (let i = 0; i < buckets.length; i += 1) {
   if (!passed) mask |= bit;
   results.push({ bucket: i, bit, count: selected.length, first: selected[0] ?? null, last: selected.at(-1) ?? null, passed, childExitCode: result.status ?? null, error: result.error?.message ?? null });
 }
-
 if (mask !== 0) {
-  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL2_MASK_FAILURE', sTestCount: sTests.length, topFailingBucket: 1, suspectCount: suspect.length, bucketCount, mask, encodedExitCode: 64 + mask, results }, null, 2));
+  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL3_MASK_FAILURE', sTestCount: sTests.length, priorFailingPath: [1,2], suspectCount: suspect.length, bucketCount: buckets.length, mask, encodedExitCode: 64 + mask, results }, null, 2));
   process.exit(64 + mask);
 }
-
-console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL2_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
+console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_S_LEVEL3_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
