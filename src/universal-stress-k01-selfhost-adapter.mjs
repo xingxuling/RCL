@@ -29,6 +29,68 @@ function summaryHasSelfhostEvidence(summary) {
     && tests.includes('tests/selfhost-toolchain.test.mjs');
 }
 
+function performanceGateFromEvidence(performanceEvidence) {
+  const evidence = Array.isArray(performanceEvidence?.evidence)
+    ? performanceEvidence.evidence.filter((item) => typeof item === 'string' && item.length > 0)
+    : [];
+  const declaredTotalBudgetMs = Number(performanceEvidence?.declaredTotalBudgetMs);
+  const measuredTotalElapsedMs = Number(performanceEvidence?.measuredTotalElapsedMs);
+  const hasMetric = Number.isFinite(declaredTotalBudgetMs)
+    && declaredTotalBudgetMs > 0
+    && Number.isFinite(measuredTotalElapsedMs)
+    && measuredTotalElapsedMs >= 0;
+  const metric = hasMetric
+    ? {
+        declaredTotalBudgetMs,
+        measuredTotalElapsedMs,
+        environment: performanceEvidence?.environment ?? null,
+        measuredAt: performanceEvidence?.measuredAt ?? null,
+      }
+    : null;
+
+  if (evidence.length === 0 || !hasMetric) {
+    return gate(
+      UNVERIFIED,
+      [],
+      'native fixed-point determinism is host-independent; attach dedicated wall-clock evidence before claiming the PERFORMANCE gate',
+      metric,
+    );
+  }
+
+  if (performanceEvidence?.status === PASS) {
+    if (measuredTotalElapsedMs > declaredTotalBudgetMs) {
+      return gate(
+        UNVERIFIED,
+        evidence,
+        'dedicated performance evidence is internally inconsistent: PASS is incompatible with the reported wall-clock measurement',
+        metric,
+      );
+    }
+    return gate(
+      PASS,
+      evidence,
+      'dedicated host-performance evidence verifies the declared C0 -> C1 -> C2 wall-clock budget',
+      metric,
+    );
+  }
+
+  if (performanceEvidence?.status === FAIL) {
+    return gate(
+      FAIL,
+      evidence,
+      'dedicated host-performance evidence reports that the declared C0 -> C1 -> C2 wall-clock budget was not met',
+      metric,
+    );
+  }
+
+  return gate(
+    UNVERIFIED,
+    evidence,
+    'dedicated performance evidence exists but does not carry a PASS/FAIL verdict',
+    metric,
+  );
+}
+
 /**
  * K01 is "self-hosting compiler", not "the entire RCL implementation is written in RCL".
  *
@@ -46,6 +108,7 @@ export function buildK01ClaimFromSelfhostSummary(
   {
     receiptId = 'selfhost-summary',
     aiGenerationEvidence = null,
+    performanceEvidence = null,
   } = {},
 ) {
   if (!summary || summary.format !== 'rcl.selfhost.summary.v1') {
@@ -63,7 +126,7 @@ export function buildK01ClaimFromSelfhostSummary(
   const selfCompilerReencodesRbc = boundary.rclStructuredArtifactReencodesCompilerRbc === true;
   const nativeExecutionSubset = boundary.rclOwnedTargetNativeExecutionSubset === true;
   const negativeAndParitySuite = fixedPointEvidence;
-  const performanceBudgetVerified = fixedPointEvidence;
+  const performanceGate = performanceGateFromEvidence(performanceEvidence);
 
   const aiGenerationPass = aiGenerationEvidence?.status === PASS
     && Number(aiGenerationEvidence?.successfulTrials ?? 0) >= Number(aiGenerationEvidence?.requiredTrials ?? 3)
@@ -107,12 +170,7 @@ export function buildK01ClaimFromSelfhostSummary(
         [receiptId],
         'general-selfhost-fixedpoint includes malformed/unsupported-source rejection and JS/self-host differential parity fixtures',
       ),
-      PERFORMANCE: gate(
-        performanceBudgetVerified ? PASS : FAIL,
-        [receiptId],
-        'the native fixed-point test enforces a declared C0 -> C1 -> C2 wall-clock budget; competitive dominance is tracked separately',
-        { declaredTotalBudgetMs: 240000 },
-      ),
+      PERFORMANCE: performanceGate,
       AI_GENERATE: gate(
         aiGenerationPass ? PASS : UNVERIFIED,
         aiGenerationPass ? [...aiGenerationEvidence.evidence] : [],
@@ -145,6 +203,7 @@ export function buildK01ClaimFromSelfhostSummary(
 export function runK01SelfhostProbe({
   repositoryRoot = process.cwd(),
   aiGenerationEvidence = null,
+  performanceEvidence = null,
 } = {}) {
   const verifierPath = path.join(repositoryRoot, 'scripts', 'verify-rcl-selfhost-all.mjs');
   const summaryPath = path.join(repositoryRoot, 'output', 'selfhost', 'selfhost-summary.json');
@@ -187,6 +246,7 @@ export function runK01SelfhostProbe({
   const claim = buildK01ClaimFromSelfhostSummary(summary, {
     receiptId: receipt.receiptRoot,
     aiGenerationEvidence,
+    performanceEvidence,
   });
 
   return {
