@@ -6,7 +6,7 @@ import { lowerDeclaredEnergyToCore } from './foundation-energy-direct-lowering.m
 import {
   FOUNDATION_KNOWLEDGE_MAX_BOUNDED_LEARNS,
   lowerDeclaredKnowledgeToCore,
-} from './foundation-knowledge-derived-direct-lowering.mjs';
+} from './foundation-knowledge-revision-direct-lowering.mjs';
 import { lowerFoundationQuantitiesForNativeBytecode } from './foundation-quantity-native-lowering.mjs';
 import {
   FOUNDATION_CORE_DIRECT_RUNTIME_DOMAINS,
@@ -43,6 +43,7 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
   const facets = Array.isArray(program?.facets) ? program.facets : [];
   const allTargets = [];
   const firstWriteRules = [];
+  let orderedRevisionMutationCount = 0;
 
   for (let index = 0; index < lowered.length; index += 1) {
     const item = lowered[index];
@@ -79,16 +80,22 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
       throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_ORDER_UNPROVEN');
     }
 
+    const revisionExistingTarget = item?.knowledgeMutationMode === 'revision-existing-target';
     for (const target of expectedTargets) {
-      if (allTargets.includes(target)) {
+      const alreadyIntroduced = allTargets.includes(target);
+      if (alreadyIntroduced && !revisionExistingTarget) {
         throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_TARGET_COLLISION');
+      }
+      if (!alreadyIntroduced && revisionExistingTarget) {
+        throw new Error('RCL_KNOWLEDGE_NATIVE_REVISION_TARGET_NOT_PRIOR');
       }
       const matchingFacets = facets.filter(facet => facet?.path === target);
       if (matchingFacets.length !== 1) {
         throw new Error('RCL_KNOWLEDGE_NATIVE_FIRST_WRITE_FACET_IDENTITY_DRIFT');
       }
-      allTargets.push(target);
+      if (!alreadyIntroduced) allTargets.push(target);
     }
+    if (revisionExistingTarget) orderedRevisionMutationCount += 1;
     firstWriteRules.push(item.syntheticRule);
   }
 
@@ -111,6 +118,9 @@ function prepareKnowledgeFirstWriteNativeProgram(program, knowledgeLowering) {
       leadingDirectivesMustBeUnconditionalAtomicMultiTargetRealizes: true,
       omissionPreservesReferencePreLearnRealityBoundary: true,
       omittedFacetsAreCreatedByOrderedLeadingNativeTransactions: true,
+      repeatedKnowledgeTargetAllowedOnlyForOrderedRevisionExistingTarget: orderedRevisionMutationCount > 0,
+      orderedRevisionExistingTargetCount: orderedRevisionMutationCount,
+      revisionExistingTargetMustHaveBeenIntroducedByEarlierLeadingLearn: true,
       omittedFacetCount: allTargets.length,
       genericDeferredFacetSupportClaimed: false,
     },
