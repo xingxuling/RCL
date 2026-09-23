@@ -71,6 +71,8 @@ test('invalid execution attestation cannot compensate prior composite parity suc
 });
 
 test('legacy generic verifier remains explicitly addressable',async()=>{
-  const result=await verifyFoundationDirectNativeParityGeneric({name:'legacy'});
+  assert.equal(typeof verifyFoundationDirectNativeParityGeneric,'function');
+  const result=await verifyFoundationDirectNativeParityGeneric({name:'legacy'},options([{domain:'perception'}]));
   assert.equal(typeof result,'object');
+  assert.equal(result.status,'native-verified');
 });
