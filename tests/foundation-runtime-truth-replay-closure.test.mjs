@@ -34,13 +34,29 @@ const KNOWLEDGE = {
     'mind.trusted', 'mind.score', 'mind.label', 'mind.rank',
     'context.ready', 'context.weight', 'context.zone', 'context.level',
   ],
-  maxBoundaryFormedAtRoots: Array.from({ length: 8 }, (_, index) => ({
-    path: `claim.${index}`,
-    root: index.toString(16).repeat(64),
-  })),
-  truthBoundary: {
-    maxBoundaryRuntimeTruthBound: true,
+  maxBoundaryFormedAtRoots: Array.from({ length: 8 }, (_, index) => ({ path: `claim.${index}`, root: index.toString(16).repeat(64) })),
+  truthBoundary: { maxBoundaryRuntimeTruthBound: true },
+};
+
+const DERIVED = {
+  present: true,
+  ok: true,
+  verified: true,
+  runtimeEvidenceRoot: '1'.repeat(64),
+  attestationRoot: '2'.repeat(64),
+  knowledgeReceiptRoot: '3'.repeat(64),
+  executionBinarySha256: '4'.repeat(64),
+  formedAtRoots: {
+    'mind.trusted': '5'.repeat(64),
+    'mind.score': '6'.repeat(64),
+    'mind.ready': '7'.repeat(64),
   },
+  derivedKnowledge: {
+    path: 'mind.ready',
+    confidence: 0.6,
+    dependencies: ['mind.trusted', 'mind.score'],
+  },
+  truthBoundary: { boundedDerivedKnowledgeDependencySubsetNativeClaimed: true },
 };
 
 const SURFACE = {
@@ -56,6 +72,7 @@ const SURFACE = {
   },
   crossDomainHistoryEvidence: CROSS_DOMAIN,
   knowledgeMultiLearnEvidence: KNOWLEDGE,
+  knowledgeDerivedDependencyEvidence: DERIVED,
 };
 
 function direct(surface = SURFACE, overrides = {}) {
@@ -64,6 +81,7 @@ function direct(surface = SURFACE, overrides = {}) {
     deployment: surface.deploymentEvidenceRegistry,
     crossDomainHistory: surface.crossDomainHistoryEvidence,
     knowledgeMultiLearn: surface.knowledgeMultiLearnEvidence,
+    knowledgeDerivedDependency: surface.knowledgeDerivedDependencyEvidence,
     ...overrides,
   });
 }
@@ -76,6 +94,9 @@ test('runtime truth replay from surface preserves every currently bound evidence
   assert.equal(replayed.crossDomainHistoryBound, true);
   assert.equal(replayed.knowledgeMultiLearnRuntimeBound, true);
   assert.equal(replayed.knowledgeMultiLearnMaxBoundaryRuntimeBound, true);
+  assert.equal(replayed.knowledgeDerivedDependencyRuntimeBound, true);
+  assert.equal(replayed.knowledgeDerivedDependencyPath, 'mind.ready');
+  assert.deepEqual(replayed.knowledgeDerivedDependencyPaths, ['mind.trusted', 'mind.score']);
 });
 
 test('runtime truth replay fails closed by root divergence when Knowledge evidence is omitted', () => {
@@ -88,10 +109,7 @@ test('runtime truth replay fails closed by root divergence when Knowledge eviden
 
 test('runtime truth replay changes when max-boundary Knowledge evidence identity drifts', () => {
   const canonical = replayFoundationRuntimeCapabilityTruthFromSurface(SURFACE);
-  const driftedKnowledge = {
-    ...KNOWLEDGE,
-    maxBoundaryAttestationRoot: 'f'.repeat(64),
-  };
+  const driftedKnowledge = { ...KNOWLEDGE, maxBoundaryAttestationRoot: 'f'.repeat(64) };
   const drifted = direct(SURFACE, { knowledgeMultiLearn: driftedKnowledge });
   assert.notEqual(drifted.runtimeTruthRoot, canonical.runtimeTruthRoot);
 });
@@ -101,4 +119,16 @@ test('runtime truth replay changes when cross-domain history evidence is omitted
   const omitted = direct(SURFACE, { crossDomainHistory: null });
   assert.notEqual(omitted.runtimeTruthRoot, canonical.runtimeTruthRoot);
   assert.equal(omitted.crossDomainHistoryBound, false);
+});
+
+test('runtime truth replay changes when bounded-derived Knowledge evidence is omitted or its identity drifts', () => {
+  const canonical = replayFoundationRuntimeCapabilityTruthFromSurface(SURFACE);
+  const omitted = direct(SURFACE, { knowledgeDerivedDependency: null });
+  assert.notEqual(omitted.runtimeTruthRoot, canonical.runtimeTruthRoot);
+  assert.equal(omitted.knowledgeDerivedDependencyRuntimeBound, false);
+
+  const drifted = direct(SURFACE, {
+    knowledgeDerivedDependency: { ...DERIVED, attestationRoot: 'f'.repeat(64) },
+  });
+  assert.notEqual(drifted.runtimeTruthRoot, canonical.runtimeTruthRoot);
 });
