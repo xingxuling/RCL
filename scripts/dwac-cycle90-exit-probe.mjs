@@ -33,38 +33,39 @@ function runNpm(name, args, code) {
 runNode('cycle89-regression-proof-chain', ['scripts/dwac-cycle89-exit-probe.mjs'], 5);
 runNpm('canonical-native-pretest-build', ['run', 'build:native'], 6);
 
-const tests = fs.readdirSync(path.join(root, 'tests'))
-  .filter(name => name.endsWith('.test.mjs'))
+const fTests = fs.readdirSync(path.join(root, 'tests'))
+  .filter(name => name.endsWith('.test.mjs') && name[0]?.toLowerCase() === 'f')
   .sort();
 
-const groups = [
-  { label: '0-9', bit: 1, match: name => /[0-9]/.test(name[0]) },
-  { label: 'a', bit: 2, match: name => name[0].toLowerCase() === 'a' },
-  { label: 'b', bit: 4, match: name => name[0].toLowerCase() === 'b' },
-  { label: 'c', bit: 8, match: name => name[0].toLowerCase() === 'c' },
-  { label: 'd', bit: 16, match: name => name[0].toLowerCase() === 'd' },
-  { label: 'e', bit: 32, match: name => name[0].toLowerCase() === 'e' },
-  { label: 'f', bit: 64, match: name => name[0].toLowerCase() === 'f' },
-];
+if (fTests.length === 0) {
+  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_EMPTY_F_SELECTION' }, null, 2));
+  process.exit(7);
+}
+
+const bucketCount = Math.min(7, fTests.length);
+const buckets = Array.from({ length: bucketCount }, () => []);
+for (let i = 0; i < fTests.length; i += 1) {
+  buckets[Math.floor(i * bucketCount / fTests.length)].push(fTests[i]);
+}
 
 let mask = 0;
 const results = [];
-for (const group of groups) {
-  const selected = tests.filter(group.match);
-  if (selected.length === 0) {
-    results.push({ label: group.label, count: 0, skipped: true, passed: true });
-    continue;
-  }
+for (let i = 0; i < buckets.length; i += 1) {
+  const selected = buckets[i];
+  const bit = 1 << i;
   const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...selected.map(name => `tests/${name}`)], {
     cwd: root,
     stdio: 'inherit',
     env: process.env,
   });
   const passed = !result.error && result.status === 0;
-  if (!passed) mask |= group.bit;
+  if (!passed) mask |= bit;
   results.push({
-    label: group.label,
+    bucket: i,
+    bit,
     count: selected.length,
+    first: selected[0] ?? null,
+    last: selected.at(-1) ?? null,
     passed,
     childExitCode: result.status ?? null,
     error: result.error?.message ?? null,
@@ -74,7 +75,9 @@ for (const group of groups) {
 if (mask !== 0) {
   console.error(JSON.stringify({
     ok: false,
-    status: 'DWAC_CYCLE90_DIAGNOSTIC_GROUP_MASK_FAILURE',
+    status: 'DWAC_CYCLE90_DIAGNOSTIC_F_BUCKET_MASK_FAILURE',
+    fTestCount: fTests.length,
+    bucketCount,
     mask,
     encodedExitCode: 64 + mask,
     results,
@@ -84,7 +87,9 @@ if (mask !== 0) {
 
 console.log(JSON.stringify({
   ok: true,
-  status: 'DWAC_CYCLE90_DIAGNOSTIC_0_THROUGH_F_PASS',
+  status: 'DWAC_CYCLE90_DIAGNOSTIC_ALL_F_TESTS_PASS',
+  fTestCount: fTests.length,
+  bucketCount,
   results,
   route: {
     mode: 'DEEP_DEVELOPMENT',
