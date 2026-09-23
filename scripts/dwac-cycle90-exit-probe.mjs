@@ -42,10 +42,19 @@ if (fTests.length === 0) {
   process.exit(7);
 }
 
-const bucketCount = Math.min(7, fTests.length);
+// The previous seven-way oracle proved only top-level buckets 0 and 1 fail (exit 67 => mask 3).
+// Reconstruct that exact suspect prefix deterministically, then repartition only that set.
+const topBucketCount = Math.min(7, fTests.length);
+const suspect = fTests.filter((_, i) => Math.floor(i * topBucketCount / fTests.length) < 2);
+if (suspect.length === 0) {
+  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_EMPTY_F_SUSPECT_PREFIX' }, null, 2));
+  process.exit(8);
+}
+
+const bucketCount = Math.min(7, suspect.length);
 const buckets = Array.from({ length: bucketCount }, () => []);
-for (let i = 0; i < fTests.length; i += 1) {
-  buckets[Math.floor(i * bucketCount / fTests.length)].push(fTests[i]);
+for (let i = 0; i < suspect.length; i += 1) {
+  buckets[Math.floor(i * bucketCount / suspect.length)].push(suspect[i]);
 }
 
 let mask = 0;
@@ -75,8 +84,9 @@ for (let i = 0; i < buckets.length; i += 1) {
 if (mask !== 0) {
   console.error(JSON.stringify({
     ok: false,
-    status: 'DWAC_CYCLE90_DIAGNOSTIC_F_BUCKET_MASK_FAILURE',
+    status: 'DWAC_CYCLE90_DIAGNOSTIC_F_SUSPECT_SUBBUCKET_MASK_FAILURE',
     fTestCount: fTests.length,
+    suspectCount: suspect.length,
     bucketCount,
     mask,
     encodedExitCode: 64 + mask,
@@ -87,8 +97,9 @@ if (mask !== 0) {
 
 console.log(JSON.stringify({
   ok: true,
-  status: 'DWAC_CYCLE90_DIAGNOSTIC_ALL_F_TESTS_PASS',
+  status: 'DWAC_CYCLE90_DIAGNOSTIC_F_SUSPECT_PREFIX_PASS',
   fTestCount: fTests.length,
+  suspectCount: suspect.length,
   bucketCount,
   results,
   route: {
