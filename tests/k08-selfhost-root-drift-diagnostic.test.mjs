@@ -45,12 +45,13 @@ const cases = [
   ['config-shape', `reality RootConfig {\n  reckon make_config(kind : Text, learning_rate : Number, beta1 : Number, beta2 : Number, epsilon : Number, weight_decay : Number, gradient_clip : Number) -> Sequence = sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), "OptimizerConfig"), kind), learning_rate), beta1), beta2), epsilon), sequence_append(sequence_append(empty_sequence(), weight_decay), gradient_clip))\n  facet x : Sequence = make_config("adamw", 0.01, 0.9, 0.999, 1 / 100000000, 0.1, 1)\n}`],
 ];
 
-test('K08 diagnostic freezes the known 1e-6 literal source-root canonicalization gap', { timeout: 180_000 }, () => {
+test('K08 diagnostic requires native/bootstrap source-root parity across the frozen matrix', { timeout: 180_000 }, () => {
   const results = cases.map(([name, source]) => rootsForSource(name, source));
   const mismatches = results.filter(item => !item.sameRoot);
-  assert.deepEqual(mismatches.map(item => item.name), ['micro-decimal-known-gap'], `unexpected root parity matrix: ${JSON.stringify(results, null, 2)}`);
-  const known = mismatches[0];
-  assert.equal(known.sameStringsExceptRoot, true);
-  assert.equal(known.sameNumbers, true);
-  assert.equal(known.sameInstructions, true);
+  assert.deepEqual(mismatches, [], `unexpected root parity matrix: ${JSON.stringify(results, null, 2)}`);
+  for (const result of results) {
+    assert.equal(result.sameStringsExceptRoot, true, `${result.name} string table drifted`);
+    assert.equal(result.sameNumbers, true, `${result.name} number table drifted`);
+    assert.equal(result.sameInstructions, true, `${result.name} instruction stream drifted`);
+  }
 });
