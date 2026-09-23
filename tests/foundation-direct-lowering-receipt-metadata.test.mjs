@@ -13,7 +13,7 @@ test('perception lowering emits receipt identity metadata needed for domain pari
     directives: [{ kind: 'Observe', name: 'vision' }],
   };
   const result = lowerDeclaredFoundationToCore(program);
-  assert.equal(result.version, '0.2.0');
+  assert.equal(result.version, '0.6.0');
   assert.equal(result.lowered.length, 1);
   assert.deepEqual(result.lowered[0], {
     domain: 'perception', declaration: 'vision', directive: 'Observe', directiveIndex: 0,
