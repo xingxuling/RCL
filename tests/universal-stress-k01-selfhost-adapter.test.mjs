@@ -37,6 +37,18 @@ function summary(overrides = {}) {
   };
 }
 
+function passingPerformanceEvidence(overrides = {}) {
+  return {
+    status: STRESS_STATUS.PASS,
+    evidence: ['performance:dedicated-host-receipt'],
+    declaredTotalBudgetMs: 240000,
+    measuredTotalElapsedMs: 120000,
+    environment: 'dedicated-host',
+    measuredAt: '2026-09-23T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
 test('K01 correctly distinguishes compiler self-hosting from whole-runtime full self-hosting', () => {
   const claim = buildK01ClaimFromSelfhostSummary(summary());
 
@@ -46,7 +58,7 @@ test('K01 correctly distinguishes compiler self-hosting from whole-runtime full 
   assert.equal(claim.gates.EXECUTE.status, STRESS_STATUS.PASS);
   assert.equal(claim.gates.CORRECT.status, STRESS_STATUS.PASS);
   assert.equal(claim.gates.ROBUST.status, STRESS_STATUS.PASS);
-  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.PASS);
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.UNVERIFIED);
   assert.equal(claim.gates.AI_GENERATE.status, STRESS_STATUS.UNVERIFIED);
   assert.equal(claim.gates.EVIDENCE.status, STRESS_STATUS.PASS);
   assert.equal(claim.status, STRESS_STATUS.BLOCKED);
@@ -77,14 +89,14 @@ test('missing RCL compiler artifact/self-emission witness fails EXPRESS', () => 
   assert.equal(claim.status, STRESS_STATUS.FAIL);
 });
 
-test('fixed-point failure is a compile/correctness/robustness/performance failure', () => {
+test('fixed-point failure is a compile/correctness/robustness failure but does not invent a performance verdict', () => {
   const claim = buildK01ClaimFromSelfhostSummary(summary({
     generalCompilerFixedPoint: { ok: false },
   }));
   assert.equal(claim.gates.COMPILE.status, STRESS_STATUS.FAIL);
   assert.equal(claim.gates.CORRECT.status, STRESS_STATUS.FAIL);
   assert.equal(claim.gates.ROBUST.status, STRESS_STATUS.FAIL);
-  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.FAIL);
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.UNVERIFIED);
 });
 
 test('missing native execution subset fails EXECUTE', () => {
@@ -94,8 +106,44 @@ test('missing native execution subset fails EXECUTE', () => {
   assert.equal(claim.gates.EXECUTE.status, STRESS_STATUS.FAIL);
 });
 
-test('three evidence-bearing AI generation/repair trials close the last K01 gate', () => {
+test('dedicated host-performance evidence closes PERFORMANCE independently from deterministic fixed-point truth', () => {
   const claim = buildK01ClaimFromSelfhostSummary(summary(), {
+    performanceEvidence: passingPerformanceEvidence(),
+  });
+
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.PASS);
+  assert.deepEqual(claim.gates.PERFORMANCE.evidence, ['performance:dedicated-host-receipt']);
+  assert.equal(claim.gates.PERFORMANCE.metric.declaredTotalBudgetMs, 240000);
+  assert.equal(claim.gates.PERFORMANCE.metric.measuredTotalElapsedMs, 120000);
+  assert.equal(claim.status, STRESS_STATUS.BLOCKED);
+});
+
+test('performance evidence fails closed when a PASS verdict contradicts its wall-clock measurement', () => {
+  const claim = buildK01ClaimFromSelfhostSummary(summary(), {
+    performanceEvidence: passingPerformanceEvidence({
+      measuredTotalElapsedMs: 265000,
+    }),
+  });
+
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.UNVERIFIED);
+  assert.equal(claim.status, STRESS_STATUS.BLOCKED);
+});
+
+test('explicit failing performance evidence fails the PERFORMANCE gate', () => {
+  const claim = buildK01ClaimFromSelfhostSummary(summary(), {
+    performanceEvidence: passingPerformanceEvidence({
+      status: STRESS_STATUS.FAIL,
+      measuredTotalElapsedMs: 265000,
+    }),
+  });
+
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.FAIL);
+  assert.equal(claim.status, STRESS_STATUS.FAIL);
+});
+
+test('three evidence-bearing AI generation/repair trials close the last K01 gate only when performance evidence is also attached', () => {
+  const claim = buildK01ClaimFromSelfhostSummary(summary(), {
+    performanceEvidence: passingPerformanceEvidence(),
     aiGenerationEvidence: {
       status: STRESS_STATUS.PASS,
       successfulTrials: 3,
@@ -104,6 +152,7 @@ test('three evidence-bearing AI generation/repair trials close the last K01 gate
     },
   });
 
+  assert.equal(claim.gates.PERFORMANCE.status, STRESS_STATUS.PASS);
   assert.equal(claim.gates.AI_GENERATE.status, STRESS_STATUS.PASS);
   assert.equal(claim.status, STRESS_STATUS.PASS);
 });
