@@ -32,8 +32,10 @@ const level1 = [...(top[0] ?? []), ...(top[1] ?? [])].sort();
 const level2 = partition(level1);
 const level2Suspect = [...(level2[2] ?? []), ...(level2[4] ?? [])].sort();
 const level3 = partition(level2Suspect);
-// Previous level-3 oracle exited 84 => 84-64=20 => buckets 2 and 4 fail.
-const suspect = [...(level3[2] ?? []), ...(level3[4] ?? [])].sort();
+const level3Suspect = [...(level3[2] ?? []), ...(level3[4] ?? [])].sort();
+const level4 = partition(level3Suspect);
+// Previous level-4 oracle exited 67 => 67-64=3 => only buckets 0 and 1 fail.
+const suspect = [...(level4[0] ?? []), ...(level4[1] ?? [])].sort();
 if (suspect.length === 0) process.exit(8);
 const buckets = partition(suspect);
 
@@ -48,7 +50,7 @@ for (let i = 0; i < buckets.length; i += 1) {
   results.push({ bucket: i, bit, count: selected.length, first: selected[0] ?? null, last: selected.at(-1) ?? null, passed, childExitCode: result.status ?? null, error: result.error?.message ?? null });
 }
 if (mask !== 0) {
-  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_F_LEVEL4_MASK_FAILURE', fTestCount: fTests.length, priorFailingPath: [[0,1],[2,4],[2,4]], suspectCount: suspect.length, bucketCount: buckets.length, mask, encodedExitCode: 64 + mask, results }, null, 2));
+  console.error(JSON.stringify({ ok: false, status: 'DWAC_CYCLE90_DIAGNOSTIC_F_LEVEL5_MASK_FAILURE', fTestCount: fTests.length, priorFailingPath: [[0,1],[2,4],[2,4],[0,1]], suspectCount: suspect.length, bucketCount: buckets.length, mask, encodedExitCode: 64 + mask, results }, null, 2));
   process.exit(64 + mask);
 }
-console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_F_LEVEL4_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
+console.log(JSON.stringify({ ok: true, status: 'DWAC_CYCLE90_DIAGNOSTIC_F_LEVEL5_PASS', results, route: { mode: 'DEEP_DEVELOPMENT', schedulingContext: 'NORTH_STAR_REOBSERVATION', sovereigntyGate: 'AUTONOMOUS', selectedBottleneck: 'canonical-full-suite-validation-closure' } }, null, 2));
