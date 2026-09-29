@@ -1,0 +1,18 @@
+reality CoffeeShop {
+  facet wallet.balance : Number = 100
+  facet shop.open : Truth = true
+
+  subject me {
+    warrant wallet.spend on wallet
+  }
+
+  emergence buyCoffee {
+    cause me
+    when shop.open == true
+    needs wallet.spend on wallet
+    alter wallet.balance <- wallet.balance - 30
+    preserve wallet.balance >= 0
+  }
+
+  realize buyCoffee
+}
