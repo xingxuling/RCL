@@ -2,7 +2,7 @@
 
 # RCL v0.94.0-alpha.1 — Reality Compiler Language
 
-**A self-hosting programming language and compiler for governed state transitions, evidence-bound execution, and cross-platform software lowering.**
+**A programming language that makes permissions, state changes, and evidence part of the program.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5-minute Quick Start](GETTING_STARTED.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
@@ -13,50 +13,28 @@
 
 </div>
 
-Canonical source: `xingxuling/RCL@main`
+RCL (Reality Compiler Language) is an experimental open-source language for writing programs whose state changes must obey explicit rules: **who can act, what may change, which conditions must hold, and what evidence records the result**.
 
-> RCL is an evidence-bearing, permission-constrained programming language, compiler, native VM, provider runtime, and verification toolchain.
+This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-RCL is built around one core idea:
+## Why RCL?
 
-```text
-intent
-→ explicit state and authority
-→ candidate transition
-→ validation / invariants
-→ lowering or execution
-→ evidence
-→ governed result
-```
+- **Put authority next to behavior.** Subjects, warrants, guards, mutations, and invariants are language constructs. A state transition declares its permission and validation requirements instead of leaving that contract implicit in surrounding application code.
+- **Make execution inspectable.** Transitions produce witnesses and evidence; the toolchain uses artifact and semantic-state roots to check results across implementations. Evidence remains tied to the profile actually tested.
+- **Keep semantics across execution targets.** RCL owns the state and authority model while native bytecode, Web, and Android paths provide different execution environments. The candidate Native UI model shares an IR and semantic root across Web/Android backends.
+- **Verify the compiler with itself.** The native-core compiler is written in RCL and has a recorded byte-identical `C0 == C1 == C2` fixed point. This is compiler self-hosting, not a claim that the entire runtime is self-hosted.
 
-```mermaid
-flowchart LR
-    A[Intent] --> B[RCL Source]
-    B --> C[Parser / Type / IR]
-    C --> D[Governed Semantics]
-    D --> E{Execution Path}
-    E --> F[Native RBC / VM]
-    E --> G[Web Lowering]
-    E --> H[Android Lowering]
-    F --> I[Evidence]
-    G --> I
-    H --> I
-    I --> J[Governed Result]
-```
+RCL is useful to explore permission-aware application state, auditable automation, and language/runtime research. It is currently an **alpha research toolchain**, not a drop-in replacement for a production language or an operating-system security boundary.
 
-RCL currently has a self-hosted native-core compiler path, a native VM, Web and Android lowering paths, a platform-neutral Native UI semantic model, and a permanent cross-environment stress harness.
-
-The [TaoWind Auxiliary Language Federation v0.1](docs/language-federation/federation-architecture.md) is a candidate shared contract/registry layer. It keeps RCL as the canonical reality IR owner while testing bounded ASIL profiles and independent RSL, IAL, SNLL and CSL language organs without granting them execution authority.
-
-It does **not** claim to be a universal programming language today. The repository instead defines a falsifiable process for testing how far that objective can be pushed.
+[Quick start](#quick-start) · [Examples](#learn-rcl-by-example) · [Current maturity](#what-is-verified-today) · [Architecture](#architecture) · [Contributing](#contributing)
 
 ---
 
-# Start here if you are a programmer
+## Quick start
 
-If the repository looks too abstract on first glance, do this before reading architecture documents.
+Requirements: Git, Node.js 22+, and npm. Start with the JavaScript/reference runtime from source:
 
-## 1. Clone and install
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/xingxuling/RCL.git
@@ -64,9 +42,7 @@ cd RCL
 npm install
 ```
 
-Node.js 22+ is required for the JavaScript/reference toolchain.
-
-## 2. Run the smallest real program
+### 2. Run a complete program
 
 ```bash
 npm run demo
@@ -113,7 +89,9 @@ initial state
 
 The interesting part is not the greeting. It is that **who may change what, under which conditions, while preserving which invariants, is explicit in the program**.
 
-## 3. Try the native path
+### 3. Build and run the native path
+
+On Unix-like systems, the native build uses `make`, a C11 compiler, and OpenSSL/libcrypto development files; see [`native/Makefile`](native/Makefile). Windows uses the separate [`build-native-windows.mjs`](scripts/build-native-windows.mjs) toolchain path. Native build prerequisites are separate from the reference quick start.
 
 ```bash
 npm run build:native
@@ -126,7 +104,7 @@ Then try explicit bytecode compilation + native execution:
 npm run demo:bytecode
 ```
 
-## 4. Full 5-minute walkthrough
+### 4. Continue learning
 
 For the rest of the runnable path — Web state, Native UI, Android, bytecode and self-host verification — use:
 
@@ -138,40 +116,42 @@ Chinese version:
 
 ---
 
-## Why RCL?
+## What is verified today?
 
-Most programming systems begin from operations: call a function, mutate state, send a request.
+The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
-RCL makes the transition itself a first-class object:
+| Area | Current state |
+|---|---|
+| RCL-authored general compiler | **Verified** |
+| Native-core compiler fixed point `C0 == C1 == C2` | **Verified** |
+| Native VM / compiler path | **Present and tested** |
+| Whole-language runtime self-hosting | **Not claimed** |
+| Complete Web vertical slice | **PASS (9/9) for the bounded K02 profile** |
+| Android project / APK generation | **Verified build path** |
+| Android installed execution | **Bounded K03 API 35 emulator profile passes; physical-device validation is not claimed** |
+| Native UI semantic root shared by Web / Android | **Verified for current candidate slices** |
+| Native UI navigation + width-profile adaptation | **Candidate, self-hosted slices verified** |
+| Universal Program Stress | **Active; most of the 400-cell matrix intentionally remains unknown** |
 
-- **who** is acting;
-- **what authority** permits the action;
-- **which state** may change;
-- **which invariants** must remain true;
-- **what evidence** proves the transition;
-- **what happens when validation fails**.
+### Self-hosting
 
-A minimal governed transition looks like this:
+```text
+RCL compiler source
+      ↓
+     C0
+      ↓
+compile compiler with itself
+      ↓
+     C1
+      ↓
+compile again
+      ↓
+     C2
 
-```rcl
-reality Counter {
-  facet app.count : Number = 0
-
-  subject user {
-    warrant app.write on app
-  }
-
-  emergence increment {
-    cause user
-    needs app.write on app
-    alter app.count <- app.count + 1
-    preserve app.count >= 0
-    witness "counter:increment"
-  }
-}
+C0 == C1 == C2
 ```
 
-This says more than “increment a number”. It declares a subject, authority, proposed state change, invariant, and witness.
+RCL distinguishes **native-core self-hosting** from **whole-language runtime self-hosting**. The former is verified; the latter is not claimed.
 
 ---
 
@@ -273,45 +253,6 @@ hello-reality.rcl
 ```
 
 Browse all runnable and evidence-bearing examples under [`examples/`](examples/).
-
----
-
-## What is verified today?
-
-The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
-
-| Area | Current state |
-|---|---|
-| RCL-authored general compiler | **Verified** |
-| Native-core compiler fixed point `C0 == C1 == C2` | **Verified** |
-| Native VM / compiler path | **Present and tested** |
-| Whole-language runtime self-hosting | **Not claimed** |
-| Complete Web vertical slice | **PASS (9/9) for the bounded K02 profile** |
-| Android project / APK generation | **Verified build path** |
-| Android installed execution | **Bounded K03 API 35 emulator profile passes; physical-device validation is not claimed** |
-| Native UI semantic root shared by Web / Android | **Verified for current candidate slices** |
-| Native UI navigation + width-profile adaptation | **Candidate, self-hosted slices verified** |
-| Universal Program Stress | **Active; most of the 400-cell matrix intentionally remains unknown** |
-
-### Self-hosting
-
-```text
-RCL compiler source
-      ↓
-     C0
-      ↓
-compile compiler with itself
-      ↓
-     C1
-      ↓
-compile again
-      ↓
-     C2
-
-C0 == C1 == C2
-```
-
-RCL distinguishes **native-core self-hosting** from **whole-language runtime self-hosting**. The former is verified; the latter is not claimed.
 
 ---
 
