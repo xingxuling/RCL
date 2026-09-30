@@ -286,9 +286,9 @@ The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives
 | Native-core compiler fixed point `C0 == C1 == C2` | **Verified** |
 | Native VM / compiler path | **Present and tested** |
 | Whole-language runtime self-hosting | **Not claimed** |
-| Complete Web vertical slice | **8/9 stress gates evidenced; AI generation gate open** |
+| Complete Web vertical slice | **PASS (9/9) for the bounded K02 profile** |
 | Android project / APK generation | **Verified build path** |
-| Android installed-device behavior | **Not yet verified in the recorded campaign** |
+| Android installed execution | **Bounded K03 API 35 emulator profile passes; physical-device validation is not claimed** |
 | Native UI semantic root shared by Web / Android | **Verified for current candidate slices** |
 | Native UI navigation + width-profile adaptation | **Candidate, self-hosted slices verified** |
 | Universal Program Stress | **Active; most of the 400-cell matrix intentionally remains unknown** |
@@ -344,7 +344,7 @@ flowchart TD
 
 A real Chrome run has verified width-profile adaptation for the current candidate, and the Android backend has produced a real Gradle debug APK build from the same semantic root.
 
-Important boundary: Android installation, configuration-change behavior, interaction, and performance on a real device are still unverified in the recorded campaign.
+The bounded K03 transaction UI has recorded API 35 emulator installation, interaction, rotation/restore, and performance evidence. This does not establish physical-device validation or verification of every Native UI candidate; see [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 See:
 
@@ -398,16 +398,16 @@ Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
 A missing required gate blocks the cell. A failed required gate fails the cell. No weighted score can hide a missing hard requirement.
 
-Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. Current audited coverage is `0 PASS / 8 BLOCKED / 392 UNTESTED`, so K400 remains `INCOMPLETE`. K08-A now proves a frozen Pure RCL XOR MLP through native `rclc -> RBC -> rclvm`; `K233` remains blocked on independently verified `AI_GENERATE` and does not imply a general ML stack.
+Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `24 PASS / 0 BLOCKED / 376 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 ### Current killer-task frontier
 
 | Task | Target | Coverage mode | Current result |
 |---|---|---|---|
-| **K01** | Self-hosting compiler | native semantic | `BLOCKED (8/9)` |
-| **K02** | Complete Web application | lowered execution | `BLOCKED (8/9)` |
-| **K03** | Native Android application | lowered execution | `BLOCKED` |
-| **K04** | 2D game | next campaign | not yet claimed |
+| **K01** | Self-hosting compiler | native semantic | `PASS (9/9), bounded profile` |
+| **K02** | Complete Web application | lowered execution | `PASS (9/9), bounded profile` |
+| **K03** | Native Android application | lowered execution | `PASS (9/9), bounded emulator profile` |
+| **K04** | 2D game | lowered execution | `PASS (9/9), bounded deterministic runtime` |
 
 See [`docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md`](docs/RCL_UNIVERSAL_PROGRAM_STRESS_TEST_v0.1.md), the current [`K400 completion campaign`](docs/K400_COMPLETION_CAMPAIGN_v0.1.md), and the [`K08 RCL-Native AI campaign`](docs/K08_RCL_NATIVE_AI_CAMPAIGN_v0.1.md).
 
@@ -523,7 +523,7 @@ Good contribution targets include:
 - differential tests between reference, self-hosted, and native paths;
 - performance work on the self-host compiler / VM;
 - Native UI resources, accessibility, and real-device verification;
-- independent AI-generation / repair evaluations for K01 and K02.
+- broader independent AI-generation / repair evaluations beyond the frozen K01 and K02 profiles.
 
 Please keep one principle in mind: **a stronger claim requires stronger evidence, not stronger wording.**
 
@@ -536,7 +536,7 @@ This repository currently does **not** claim that:
 - RCL can write every possible program;
 - the whole language runtime is self-hosted;
 - every Foundation domain is native;
-- Android device execution is already verified for the current campaign;
+- Android physical-device execution or every Native UI candidate is already verified;
 - a generated artifact is equivalent to a verified runtime result;
 - Frontier sandbox experiments establish new natural laws or external physical effects.
 
