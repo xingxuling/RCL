@@ -1,0 +1,977 @@
+{
+  "schema": "taowind.world-capsule-registry.v0.1",
+  "version": "0.1.0",
+  "capsuleCount": 12,
+  "optimizationObjective": "maximize inferable world knowledge per explicit semantic structure",
+  "slotSchema": [
+    "objects",
+    "state",
+    "relations",
+    "constraints",
+    "dynamics",
+    "evidence"
+  ],
+  "capsules": [
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "physical-causality",
+      "titleZh": "物理显式因果",
+      "uri": "taowind://knowledge/physical-causality@0.1.0",
+      "scope": "可观测物质、能量、空间、运动、温度与直接因果变化。",
+      "dependencies": [],
+      "slots": {
+        "objects": [
+          "matter",
+          "body",
+          "energy",
+          "field",
+          "surface",
+          "container"
+        ],
+        "state": [
+          "position",
+          "velocity",
+          "temperature",
+          "phase",
+          "energy_level"
+        ],
+        "relations": [
+          "contact",
+          "inside",
+          "supports",
+          "distance",
+          "relative_motion"
+        ],
+        "constraints": [
+          "causal_change_requires_interaction_or_boundary_condition",
+          "finite_resource_and_energy",
+          "state_change_respects_declared_boundary"
+        ],
+        "dynamics": [
+          "force_or_interaction -> motion_change",
+          "temperature_gradient -> heat_transfer",
+          "collision -> momentum_and_energy_redistribution",
+          "support_removed -> gravity_driven_motion",
+          "temperature_crosses_phase_boundary -> phase_change"
+        ],
+        "evidence": [
+          "direct_measurement",
+          "repeatable_experiment",
+          "instrument_observation",
+          "bounded_physical_model"
+        ]
+      },
+      "exports": [
+        "matter",
+        "body",
+        "position",
+        "motion",
+        "force",
+        "energy",
+        "temperature",
+        "phase",
+        "contact",
+        "gravity",
+        "heat_transfer",
+        "collision",
+        "support",
+        "containment"
+      ],
+      "compressionNotes": "优先保存可复用的因果骨架，而不是枚举每个具体物体。",
+      "meaningRoot": "6bedeed6283921827daef6def61134f287e9eefeb0b3cf36cba4637807e4bbc5"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "chemical-emergence",
+      "titleZh": "化学组合涌现",
+      "uri": "taowind://knowledge/chemical-emergence@0.1.0",
+      "scope": "物质组成、反应、浓度、酸碱、氧化、溶解与组合涌现。",
+      "dependencies": [
+        "physical-causality"
+      ],
+      "slots": {
+        "objects": [
+          "substance",
+          "molecule",
+          "mixture",
+          "solution",
+          "reactant",
+          "product"
+        ],
+        "state": [
+          "composition",
+          "concentration",
+          "temperature",
+          "acidity",
+          "oxidation_state"
+        ],
+        "relations": [
+          "dissolved_in",
+          "reacts_with",
+          "catalyzes",
+          "contains_component"
+        ],
+        "constraints": [
+          "reaction_requires_compatible_conditions",
+          "mass_and_charge_accounting_within_model",
+          "composition_constrains_possible_products"
+        ],
+        "dynamics": [
+          "reactants_plus_conditions -> products",
+          "oxygen_exposure_plus_reactive_material -> oxidation",
+          "solvent_compatibility -> dissolution",
+          "fuel_plus_oxidizer_plus_ignition -> combustion"
+        ],
+        "evidence": [
+          "chemical_measurement",
+          "controlled_reaction",
+          "spectral_or_material_analysis",
+          "replicated_observation"
+        ]
+      },
+      "exports": [
+        "substance",
+        "composition",
+        "reaction",
+        "concentration",
+        "acidity",
+        "oxidation",
+        "dissolution",
+        "combustion",
+        "chemical_equilibrium",
+        "chemical_condition"
+      ],
+      "compressionNotes": "把化学视为物理基础上的组合与反应规则，不要求把每种物质硬编码成独立世界。",
+      "meaningRoot": "ffdb042a597d0cc01c5b5b15f33f989b1c0cf2c049e5e77440eea7867ce328bd"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "biological-constraints",
+      "titleZh": "生物原生约束",
+      "uri": "taowind://knowledge/biological-constraints@0.1.0",
+      "scope": "生命体维持自身、资源需求、损伤、疾病、睡眠、繁殖与适应。",
+      "dependencies": [
+        "physical-causality",
+        "chemical-emergence",
+        "external-environment-universe"
+      ],
+      "slots": {
+        "objects": [
+          "organism",
+          "cell",
+          "organ",
+          "nutrient",
+          "pathogen",
+          "offspring"
+        ],
+        "state": [
+          "health",
+          "energy_reserve",
+          "hydration",
+          "sleep_debt",
+          "injury",
+          "infection"
+        ],
+        "relations": [
+          "depends_on_resource",
+          "predates",
+          "symbiosis",
+          "parent_of",
+          "host_of"
+        ],
+        "constraints": [
+          "organism_requires_homeostasis",
+          "organism_requires_energy_and_material",
+          "severe_damage_reduces_function",
+          "biological_capacity_is_bounded"
+        ],
+        "dynamics": [
+          "resource_deficit_over_time -> function_decline",
+          "sleep_deprivation_over_time -> cognitive_and_physical_degradation",
+          "injury -> repair_or_loss_of_function",
+          "pathogen_exposure_plus_susceptibility -> disease_risk",
+          "selection_pressure_over_generations -> adaptation"
+        ],
+        "evidence": [
+          "clinical_observation",
+          "biological_measurement",
+          "controlled_study",
+          "population_evidence"
+        ]
+      },
+      "exports": [
+        "organism",
+        "homeostasis",
+        "nutrition",
+        "respiration",
+        "sleep",
+        "injury",
+        "disease",
+        "reproduction",
+        "adaptation",
+        "survival",
+        "metabolism",
+        "biological_limit"
+      ],
+      "compressionNotes": "常识优先保留“生命必须维持自身”的原生约束。",
+      "meaningRoot": "4a939cd42208066db20ea14315c1335e1e41d6c881911ee18b162b62f0a46a2b"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "individual-agent",
+      "titleZh": "个体主体",
+      "uri": "taowind://knowledge/individual-agent@0.1.0",
+      "scope": "单个行动者的目标、资源、能力、选择、边界与风险。",
+      "dependencies": [
+        "physical-causality",
+        "biological-constraints"
+      ],
+      "slots": {
+        "objects": [
+          "person",
+          "agent",
+          "resource",
+          "tool",
+          "property",
+          "action"
+        ],
+        "state": [
+          "goal",
+          "resource_amount",
+          "capability",
+          "body_state",
+          "risk_level",
+          "ownership"
+        ],
+        "relations": [
+          "owns",
+          "uses",
+          "can_access",
+          "depends_on",
+          "responsible_for"
+        ],
+        "constraints": [
+          "action_requires_capability_and_available_resource",
+          "ownership_does_not_imply_universal_access",
+          "body_and_time_limit_action",
+          "choice_occurs_under_constraints"
+        ],
+        "dynamics": [
+          "goal_plus_available_action -> choice",
+          "resource_shortage -> feasible_actions_shrink",
+          "risk_increase -> cautious_strategy_more_likely",
+          "action -> state_change_and_cost"
+        ],
+        "evidence": [
+          "direct_observation",
+          "self_report_with_uncertainty",
+          "transaction_record",
+          "bounded_behavioral_inference"
+        ]
+      },
+      "exports": [
+        "person",
+        "goal",
+        "action",
+        "resource",
+        "ownership",
+        "capability",
+        "risk",
+        "choice",
+        "cost",
+        "boundary",
+        "body_state",
+        "feasibility"
+      ],
+      "compressionNotes": "把“人”先压成受资源、身体、目标和边界约束的主体，再由认知胶囊补充内部心智。",
+      "meaningRoot": "f7653757acce2fcdb28e46906add0cc21d7bd0d43ec8fd63c64186cdceb7e619"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "cognition",
+      "titleZh": "认知",
+      "uri": "taowind://knowledge/cognition@0.1.0",
+      "scope": "感知、注意、记忆、信念、意图、规划、推理、学习、情绪与元认知。",
+      "dependencies": [
+        "individual-agent",
+        "biological-constraints"
+      ],
+      "slots": {
+        "objects": [
+          "percept",
+          "memory",
+          "belief",
+          "goal_representation",
+          "plan",
+          "hypothesis"
+        ],
+        "state": [
+          "attention_focus",
+          "confidence",
+          "working_memory_load",
+          "emotion_state",
+          "uncertainty"
+        ],
+        "relations": [
+          "supports_belief",
+          "contradicts",
+          "reminds_of",
+          "intends",
+          "attends_to"
+        ],
+        "constraints": [
+          "limited_attention_and_working_memory",
+          "belief_is_not_equal_to_fact",
+          "uncertainty_should_propagate",
+          "learning_requires_signal_or_evidence"
+        ],
+        "dynamics": [
+          "observation -> belief_update",
+          "goal_plus_world_model -> plan",
+          "feedback -> learning",
+          "conflict -> hypothesis_revision",
+          "high_uncertainty -> clarification_or_exploration"
+        ],
+        "evidence": [
+          "behavioral_evidence",
+          "self_report",
+          "task_performance",
+          "memory_trace",
+          "cross_check"
+        ]
+      },
+      "exports": [
+        "perception",
+        "attention",
+        "working_memory",
+        "long_term_memory",
+        "belief",
+        "intention",
+        "planning",
+        "inference",
+        "learning",
+        "emotion",
+        "uncertainty",
+        "metacognition"
+      ],
+      "compressionNotes": "认知胶囊描述“怎么知道与怎么决定”，而不是把所有知识内容塞进心智层。",
+      "meaningRoot": "b6cd4243264b906690714ed36f8cc5dab298515dddc82f18e8fdf63fd77e56aa"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "direct",
+        "historical"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "family-close-group",
+      "titleZh": "家庭与高集中群体",
+      "uri": "taowind://knowledge/family-close-group@0.1.0",
+      "scope": "家庭、亲密关系、照护、依赖、共享资源与高耦合小群体。",
+      "dependencies": [
+        "individual-agent",
+        "cognition",
+        "history-time"
+      ],
+      "slots": {
+        "objects": [
+          "family_member",
+          "guardian",
+          "dependent",
+          "household",
+          "shared_resource"
+        ],
+        "state": [
+          "trust",
+          "dependency",
+          "care_need",
+          "shared_budget",
+          "relationship_status"
+        ],
+        "relations": [
+          "kinship",
+          "cares_for",
+          "lives_with",
+          "depends_on",
+          "shares_resource_with"
+        ],
+        "constraints": [
+          "close_group_actions_have_high_cross_member_effect",
+          "guardianship_creates_asymmetric_responsibility",
+          "shared_resources_create_coordination_constraints"
+        ],
+        "dynamics": [
+          "care_need -> caregiver_action_pressure",
+          "trust_change -> cooperation_change",
+          "resource_shortage -> household_tradeoff",
+          "repeated_interaction -> relationship_history"
+        ],
+        "evidence": [
+          "direct_interaction",
+          "household_record",
+          "testimony",
+          "longitudinal_observation"
+        ]
+      },
+      "exports": [
+        "kinship",
+        "care",
+        "dependency",
+        "shared_resource",
+        "trust",
+        "obligation",
+        "intimacy",
+        "household",
+        "guardianship"
+      ],
+      "compressionNotes": "家庭不是“缩小版国家”，而是高频互动、高依赖、高情感耦合的小群体。",
+      "meaningRoot": "c984d3c8317a5a3f4f6f975aaf91b04d61b64c1297da0594e28e7299c3802591"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "institution-organization",
+      "titleZh": "组织与制度",
+      "uri": "taowind://knowledge/institution-organization@0.1.0",
+      "scope": "学校、公司、机构等具有成员、角色、流程、权限和规则的组织。",
+      "dependencies": [
+        "individual-agent",
+        "cognition",
+        "history-time"
+      ],
+      "slots": {
+        "objects": [
+          "organization",
+          "member",
+          "role",
+          "rule",
+          "procedure",
+          "credential"
+        ],
+        "state": [
+          "membership",
+          "role_assignment",
+          "permission",
+          "compliance",
+          "organization_status"
+        ],
+        "relations": [
+          "member_of",
+          "reports_to",
+          "authorized_by",
+          "governed_by_rule",
+          "certified_by"
+        ],
+        "constraints": [
+          "role_does_not_grant_unbounded_authority",
+          "institutional_action_follows_procedure_or_exception",
+          "rule_violation_can_trigger_sanction"
+        ],
+        "dynamics": [
+          "role_assignment -> permission_change",
+          "rule_change -> feasible_action_change",
+          "procedure_completion -> credential_or_state_change",
+          "violation -> sanction_risk"
+        ],
+        "evidence": [
+          "official_record",
+          "policy_document",
+          "membership_record",
+          "procedure_receipt"
+        ]
+      },
+      "exports": [
+        "member",
+        "role",
+        "rule",
+        "permission",
+        "responsibility",
+        "organization",
+        "school",
+        "company",
+        "procedure",
+        "sanction",
+        "credential"
+      ],
+      "compressionNotes": "学校、公司等先共享“组织”骨架，再由领域胶囊补充学习或商业目标。",
+      "meaningRoot": "8bf054d67c0946ac7fc17c31d5284e9ba052e29037c4ae4754d95ba4f1534577"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "commerce-resource",
+      "titleZh": "商业与资源交换",
+      "uri": "taowind://knowledge/commerce-resource@0.1.0",
+      "scope": "稀缺资源、商品、服务、货币、价格、成本、收入、信用、债务与竞争。",
+      "dependencies": [
+        "individual-agent",
+        "institution-organization",
+        "history-time"
+      ],
+      "slots": {
+        "objects": [
+          "buyer",
+          "seller",
+          "good",
+          "service",
+          "money",
+          "contract",
+          "market"
+        ],
+        "state": [
+          "balance",
+          "price",
+          "cost",
+          "income",
+          "debt",
+          "inventory",
+          "profit"
+        ],
+        "relations": [
+          "buys_from",
+          "sells_to",
+          "owes",
+          "owns",
+          "employs",
+          "competes_with"
+        ],
+        "constraints": [
+          "scarcity_forces_tradeoff",
+          "purchase_requires_payment_or_credit_or_transfer",
+          "ownership_transfer_requires_valid_exchange_or_authority",
+          "persistent_cost_above_income -> resource_pressure"
+        ],
+        "dynamics": [
+          "exchange -> ownership_transfer",
+          "price_change -> incentive_and_choice_change",
+          "income_minus_cost -> profit_or_loss",
+          "debt_plus_time -> repayment_pressure",
+          "competition -> strategy_adjustment"
+        ],
+        "evidence": [
+          "transaction_record",
+          "contract",
+          "accounting_record",
+          "market_observation"
+        ]
+      },
+      "exports": [
+        "scarcity",
+        "good",
+        "service",
+        "money",
+        "price",
+        "cost",
+        "income",
+        "exchange",
+        "ownership_transfer",
+        "credit",
+        "debt",
+        "profit",
+        "loss",
+        "competition",
+        "resource_pressure"
+      ],
+      "compressionNotes": "商业常识优先压成资源、激励、交换和约束，不把每家公司当作独立规则系统。",
+      "meaningRoot": "58b6211831c4c5acce1637ed5e3a4e18d36668cfa2e52833cf32cf64238fbdf4"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "indirect",
+        "historical"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "government-authority",
+      "titleZh": "政府与权威",
+      "uri": "taowind://knowledge/government-authority@0.1.0",
+      "scope": "公共法律、管辖、行政权威、监管、税、许可、公共服务、执法与权利义务。",
+      "dependencies": [
+        "institution-organization",
+        "individual-agent",
+        "history-time"
+      ],
+      "slots": {
+        "objects": [
+          "government",
+          "agency",
+          "law",
+          "court",
+          "license",
+          "public_service"
+        ],
+        "state": [
+          "jurisdiction",
+          "legal_status",
+          "license_status",
+          "tax_obligation",
+          "enforcement_status"
+        ],
+        "relations": [
+          "governs",
+          "regulates",
+          "licenses",
+          "taxes",
+          "adjudicates",
+          "protects_right"
+        ],
+        "constraints": [
+          "public_authority_is_bounded_by_jurisdiction_and_rule",
+          "lawful_action_may_require_due_process",
+          "rights_and_duties_constrain_government_and_individuals"
+        ],
+        "dynamics": [
+          "law_change -> permitted_action_change",
+          "violation_plus_enforcement -> sanction_risk",
+          "license_grant -> legal_capability_change",
+          "tax_rule -> resource_transfer_obligation"
+        ],
+        "evidence": [
+          "statute",
+          "official_notice",
+          "court_record",
+          "agency_record",
+          "public_receipt"
+        ]
+      },
+      "exports": [
+        "law",
+        "jurisdiction",
+        "public_authority",
+        "regulation",
+        "tax",
+        "license",
+        "public_service",
+        "enforcement",
+        "rights",
+        "duty",
+        "due_process"
+      ],
+      "compressionNotes": "政府权威不是绝对权力，而是带管辖、程序、权利义务边界的公共权威。",
+      "meaningRoot": "2a1e509e1b16c485cbb04dc385c87de8bc2d0dc3218d43eb823204a5d70f3a59"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "indirect",
+        "ambient",
+        "historical"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "nation-power",
+      "titleZh": "国家与势力",
+      "uri": "taowind://knowledge/nation-power@0.1.0",
+      "scope": "国家、领土、主权、人口、利益、外交、贸易、冲突、联盟与边界。",
+      "dependencies": [
+        "government-authority",
+        "commerce-resource",
+        "history-time",
+        "external-environment-universe"
+      ],
+      "slots": {
+        "objects": [
+          "state",
+          "territory",
+          "population",
+          "border",
+          "alliance",
+          "external_actor"
+        ],
+        "state": [
+          "sovereignty",
+          "security",
+          "trade_flow",
+          "diplomatic_relation",
+          "conflict_level"
+        ],
+        "relations": [
+          "borders",
+          "trades_with",
+          "allied_with",
+          "competes_with",
+          "recognizes",
+          "claims"
+        ],
+        "constraints": [
+          "territory_and_sovereignty_bound_jurisdiction",
+          "international_action_has_external_reaction",
+          "state_capacity_is_resource_bounded"
+        ],
+        "dynamics": [
+          "interest_conflict -> diplomatic_or_security_pressure",
+          "trade_dependency -> mutual_constraint",
+          "alliance -> security_commitment",
+          "border_change -> jurisdiction_and_population_effect"
+        ],
+        "evidence": [
+          "treaty",
+          "official_record",
+          "trade_data",
+          "multi_source_observation",
+          "historical_record"
+        ]
+      },
+      "exports": [
+        "territory",
+        "sovereignty",
+        "population",
+        "state_interest",
+        "diplomacy",
+        "trade",
+        "conflict",
+        "alliance",
+        "border",
+        "national_power"
+      ],
+      "compressionNotes": "国家层处理大规模利益主体之间的关系，不把“国家”压成单一人格。",
+      "meaningRoot": "7c61c848b7f4908fd26acb054766a4605f6f107508dd6a03dc164cf9331a641f"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "historical",
+      "relationDistance": [
+        "historical"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "history-time",
+      "titleZh": "历史与时间",
+      "uri": "taowind://knowledge/history-time@0.1.0",
+      "scope": "先前状态、时间顺序、不可完整重演、证据受限、路径依赖、记录与重建。",
+      "dependencies": [
+        "physical-causality"
+      ],
+      "slots": {
+        "objects": [
+          "event",
+          "record",
+          "source",
+          "timeline",
+          "artifact",
+          "testimony"
+        ],
+        "state": [
+          "timestamp",
+          "source_quality",
+          "confidence",
+          "preservation_state",
+          "interpretation"
+        ],
+        "relations": [
+          "before",
+          "after",
+          "caused_or_contributed_to",
+          "recorded_by",
+          "contradicted_by",
+          "corroborated_by"
+        ],
+        "constraints": [
+          "past_events_cannot_be_fully_replayed",
+          "absence_of_record_is_not_automatic_proof_of_absence",
+          "source_quality_limits_claim_strength",
+          "current_state_depends_on_prior_state"
+        ],
+        "dynamics": [
+          "event -> trace_or_record",
+          "record_loss -> uncertainty_increase",
+          "new_evidence -> historical_model_update",
+          "prior_state -> path_dependency"
+        ],
+        "evidence": [
+          "primary_record",
+          "artifact",
+          "independent_source",
+          "testimony",
+          "historical_reconstruction"
+        ]
+      },
+      "exports": [
+        "event_record",
+        "chronology",
+        "path_dependency",
+        "irreversibility",
+        "source",
+        "primary_record",
+        "testimony",
+        "reconstruction",
+        "uncertainty",
+        "precedent"
+      ],
+      "compressionNotes": "“历史不可检验”修正为“不可完整重演且证据受限”，避免把历史误当作不可验证。",
+      "meaningRoot": "f244a6a4e5ace339bb09d250ccb4f6af0293f8a761d376d324efc3b272dd9824"
+    },
+    {
+      "schema": "taowind.world-capsule.v0.1",
+      "version": "0.1.0",
+      "epistemicClass": "core",
+      "relationDistance": [
+        "direct",
+        "indirect",
+        "ambient"
+      ],
+      "activationPolicy": {
+        "mode": "lazy",
+        "eagerDependencies": []
+      },
+      "id": "external-environment-universe",
+      "titleZh": "外环境与宇宙",
+      "uri": "taowind://knowledge/external-environment-universe@0.1.0",
+      "scope": "地球所处外环境、太阳/月亮关系、昼夜、季节、潮汐、气候背景与轨道边界。",
+      "dependencies": [
+        "physical-causality"
+      ],
+      "slots": {
+        "objects": [
+          "earth",
+          "sun",
+          "moon",
+          "atmosphere",
+          "orbit",
+          "external_environment"
+        ],
+        "state": [
+          "illumination",
+          "season",
+          "weather_background",
+          "tidal_state",
+          "orbital_position"
+        ],
+        "relations": [
+          "earth_orbits_sun",
+          "moon_orbits_earth",
+          "sun_illuminates_earth",
+          "moon_gravity_influences_tides",
+          "atmosphere_mediates_environment"
+        ],
+        "constraints": [
+          "planetary_environment_sets_boundary_conditions",
+          "astronomical_cycles_change_available_light_and_seasonal_context",
+          "external_influence_can_be_direct_or_mediated"
+        ],
+        "dynamics": [
+          "earth_rotation -> day_night",
+          "earth_orbit_plus_axial_tilt -> seasons",
+          "solar_radiation -> surface_energy_input",
+          "lunar_and_solar_gravity -> tide_component",
+          "large_scale_environment -> local_context"
+        ],
+        "evidence": [
+          "astronomical_observation",
+          "instrument_measurement",
+          "orbital_model",
+          "meteorological_record"
+        ]
+      },
+      "exports": [
+        "environment",
+        "earth",
+        "sun",
+        "moon",
+        "day_night",
+        "season",
+        "climate",
+        "tide",
+        "radiation",
+        "orbit",
+        "external_boundary",
+        "direct_influence",
+        "indirect_influence",
+        "ambient_influence"
+      ],
+      "subcapsules": [
+        {
+          "id": "solar-direct-relation",
+          "relationDistance": "direct",
+          "meaning": "太阳通过辐射与昼夜/季节背景直接影响地球可用能量。"
+        },
+        {
+          "id": "lunar-indirect-relation",
+          "relationDistance": "indirect",
+          "meaning": "月亮主要通过引力与周期关系间接改变潮汐等地球状态。"
+        }
+      ],
+      "compressionNotes": "保留用户提出的“太阳直接关系 / 月亮间接关系”作为关系距离子层。",
+      "meaningRoot": "7edeb5325725657e742bdebf7e5fffa8b52117e3c62e49a51e8f258decf6f06f"
+    }
+  ],
+  "registryRoot": "33c0a780f9af2d5377a50efe7ce606e951fbbe428dd8e09aa841e1181b7e5aba"
+}

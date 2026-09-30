@@ -1,0 +1,17 @@
+{
+  "schema": "rcl.capsule-compute-map.v0.1",
+  "version": "0.1.0",
+  "capsule": "resource-choice",
+  "midMeaningRoot": "17a92568885283d65a566f9a3ca055d3390058ac4c82b481d95f5b4617c86021",
+  "inputs": { "available": "Number", "required": "Number", "confirmedCredit": "Number" },
+  "outputs": {
+    "usable": { "type": "Number", "expression": ["add", "available", "confirmedCredit"] },
+    "margin": { "type": "Number", "expression": ["subtract", ["add", "available", "confirmedCredit"], "required"] },
+    "feasible": { "type": "Truth", "expression": ["gte", ["add", "available", "confirmedCredit"], "required"] }
+  },
+  "bindings": [
+    { "member": "commerce-resource", "slot": "constraints", "atom": "purchase_requires_payment_or_credit_or_transfer" },
+    { "member": "individual-agent", "slot": "dynamics", "atom": "resource_shortage -> feasible_actions_shrink" }
+  ],
+  "scope": "single purchase, same currency, no fees; confirmed usable credit; finite nonnegative inputs"
+}
