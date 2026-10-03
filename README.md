@@ -122,7 +122,7 @@ Chinese version:
 
 ## What is verified today?
 
-The local release target is **`v1.0.0`**; canonical-main merge and remote publication are separate promotion states. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+Canonical `main` is **`v1.0.0`**, merged in [PR #262](https://github.com/xingxuling/RCL/pull/262). The [local release verification](docs/v1.0/verification.json) records 1683 passing tests, 0 failures, 2 skipped cases, Windows/Linux installation checks and 41 self-host verification stages. Remote deployment and npm publication are tracked separately. Capability evidence and maturity profiles live in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 | Area | Current state |
 |---|---|
@@ -277,15 +277,9 @@ Current candidate semantics include:
 - in-app navigation;
 - available-width adaptation profiles.
 
-```mermaid
-flowchart TD
-    A[.rcl source] --> B[Canonical Native UI IR]
-    B --> C[Semantic Root]
-    C --> D[Web Backend]
-    C --> E[Android Backend]
-    D --> F[HTML / CSS / JS]
-    E --> G[Java Views / Gradle]
-```
+![Native UI pipeline from RCL source and a shared semantic root to Web and Android backends](docs/readme-diagrams/native-ui-genome.svg)
+
+[Editable diagram source](docs/readme-diagrams/native-ui-genome.mmd).
 
 A real Chrome run has verified width-profile adaptation for the current candidate, and the Android backend has produced a real Gradle debug APK build from the same semantic root.
 
@@ -312,14 +306,9 @@ UI-local event
 
 A governed reality action follows a different path:
 
-```mermaid
-flowchart LR
-    A[UI Intent] --> B[CandidateReality]
-    B --> C[Governed Gateway]
-    C --> D[Authority / Validation]
-    D --> E[Execution]
-    E --> F[Evidence]
-```
+![Governed UI flow from intent through authority and validation to execution and evidence](docs/readme-diagrams/governed-ui-en.svg)
+
+[Editable diagram source](docs/readme-diagrams/governed-ui-en.mmd).
 
 The UI layer cannot directly commit external reality. Unknown rule references and mixed-authority handlers fail closed in the verified candidate slices.
 
@@ -382,18 +371,9 @@ Opaque delegation may be useful, but it does **not** count as native RCL capabil
 
 RCL also contains an experimental Frontier line for turning unknown-law or unknown-knowledge questions into explicit, falsifiable experiment contracts.
 
-```mermaid
-flowchart LR
-    A[Unknown Question] --> B[Machine-readable Hypothesis]
-    B --> C[Design Grammar]
-    C --> D[Preregistration]
-    D --> E[Instrument / Observation Contract]
-    E --> F[Independent Acquisition]
-    F --> G[Scorer]
-    G --> H[Evidence Ledger]
-    H --> I[Candidate Tournament]
-    I --> J[Evidence Court]
-```
+![Frontier experiment flow from an unknown question to independently acquired observations and an evidence court](docs/readme-diagrams/frontier-experiments-en.svg)
+
+[Editable diagram source](docs/readme-diagrams/frontier-experiments-en.mmd).
 
 Sandbox success validates protocol behavior under constructed worlds; it does **not** establish new physics, external information channels, or other unsupported real-world conclusions.
 
@@ -401,24 +381,9 @@ Sandbox success validates protocol behavior under constructed worlds; it does **
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    A[RCL Source] --> B[Parser / Type / IR]
-    B --> C[Governed Semantics]
-    C --> D1[Native RBC]
-    C --> D2[Web Lowering]
-    C --> D3[Android Lowering]
-    C --> D4[Provider Bridges]
-    D1 --> E1[Native VM / Runtime]
-    D2 --> E2[Browser Host]
-    D3 --> E3[Android Host]
-    D4 --> E4[External Capability]
-    E1 --> F[Evidence]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-    F --> G[Governed Result]
-```
+![RCL architecture: governed semantics reach native, Web, Android and provider execution paths that produce evidence](docs/readme-diagrams/architecture.svg)
+
+[Editable diagram source](docs/readme-diagrams/architecture.mmd).
 
 ---
 

@@ -122,7 +122,7 @@ Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
 ## 当前已经验证到什么程度？
 
-当前本地发布目标为 **`v1.0.0`**；合并正式 main 与远程发布仍是独立的晋级状态。最准确的实时证据边界请查看 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+正式 `main` 已通过 [PR #262](https://github.com/xingxuling/RCL/pull/262) 晋级至 **`v1.0.0`**。[本地发布验证记录](docs/v1.0/verification.json)包含 1683 项通过、0 项失败、2 项跳过、Windows/Linux 独立安装检查和 41 个自举验证阶段。远端部署与 npm 发布分别记录；各项能力的证据与成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 | 能力 | 当前状态 |
 |---|---|
@@ -278,15 +278,9 @@ RCL 正在把 UI 作为语言语义的一部分，而不是把 Web 和 Android �
 - in-app navigation；
 - available-width adaptation profiles。
 
-```mermaid
-flowchart TD
-    A[.rcl source] --> B[Canonical Native UI IR]
-    B --> C[Semantic Root]
-    C --> D[Web Backend]
-    C --> E[Android Backend]
-    D --> F[HTML / CSS / JS]
-    E --> G[Java Views / Gradle]
-```
+![Native UI 流程：RCL 源码与共享语义根连接 Web 和 Android 后端](docs/readme-diagrams/native-ui-genome.svg)
+
+[可编辑图表源码](docs/readme-diagrams/native-ui-genome.mmd)。
 
 真实 Chrome 已验证当前 width-profile adaptation；Android Backend 也已经从同一 semantic root 生成并构建真实 Debug APK。
 
@@ -307,14 +301,9 @@ UI-local event
 
 和现实动作：
 
-```mermaid
-flowchart LR
-    A[UI 意图] --> B[CandidateReality]
-    B --> C[受治理 Gateway]
-    C --> D[Authority / Validation]
-    D --> E[Execution]
-    E --> F[Evidence]
-```
+![受治理 UI 流程：意图经过权威与验证，再进入执行和证据记录](docs/readme-diagrams/governed-ui-zh.svg)
+
+[可编辑图表源码](docs/readme-diagrams/governed-ui-zh.mmd)。
 
 UI 本身不能直接提交外部现实变化。未知规则、混合 authority handler 等情况在已验证切片中会 fail closed。
 
@@ -375,18 +364,9 @@ Opaque delegation 可以很有用，但**不能冒充 RCL 原生能力**。
 
 ## Frontier：把未知问题编译成实验
 
-```mermaid
-flowchart LR
-    A[未知问题] --> B[机器可读假设]
-    B --> C[Design Grammar]
-    C --> D[Preregistration]
-    D --> E[Instrument / Observation Contract]
-    E --> F[Independent Acquisition]
-    F --> G[Scorer]
-    G --> H[Evidence Ledger]
-    H --> I[Candidate Tournament]
-    I --> J[Evidence Court]
-```
+![Frontier 实验流程：未知问题经独立观测、评分与证据账本进入 Evidence Court](docs/readme-diagrams/frontier-experiments-zh.svg)
+
+[可编辑图表源码](docs/readme-diagrams/frontier-experiments-zh.mmd)。
 
 当前 Frontier 沙箱成功只能证明协议能否区分预构造世界，**不能推出新物理、外部未知信息通道或其它现实结论。**
 
@@ -394,24 +374,9 @@ flowchart LR
 
 ## 架构
 
-```mermaid
-flowchart TD
-    A[RCL Source] --> B[Parser / Type / IR]
-    B --> C[Governed Semantics]
-    C --> D1[Native RBC]
-    C --> D2[Web Lowering]
-    C --> D3[Android Lowering]
-    C --> D4[Provider Bridges]
-    D1 --> E1[Native VM / Runtime]
-    D2 --> E2[Browser Host]
-    D3 --> E3[Android Host]
-    D4 --> E4[External Capability]
-    E1 --> F[Evidence]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-    F --> G[Governed Result]
-```
+![RCL 架构：受治理语义经 Native、Web、Android 和 Provider 执行路径生成证据](docs/readme-diagrams/architecture.svg)
+
+[可编辑图表源码](docs/readme-diagrams/architecture.mmd)。
 
 ---
 

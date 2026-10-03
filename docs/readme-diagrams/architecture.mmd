@@ -1,0 +1,16 @@
+flowchart TD
+    A["RCL Source"] --> B["Parser / Type / IR"]
+    B --> C["Governed Semantics"]
+    C --> D1["Native RBC"]
+    C --> D2["Web Lowering"]
+    C --> D3["Android Lowering"]
+    C --> D4["Provider Bridges"]
+    D1 --> E1["Native VM / Runtime"]
+    D2 --> E2["Browser Host"]
+    D3 --> E3["Android Host"]
+    D4 --> E4["External Capability"]
+    E1 --> F["Evidence"]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    F --> G["Governed Result"]
