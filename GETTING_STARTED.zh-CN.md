@@ -4,13 +4,28 @@
 
 ## 1. 克隆并安装
 
-要求：Node.js 22+、npm。
+要求：Node.js 20+、npm。
 
 ```bash
 git clone https://github.com/xingxuling/RCL.git
 cd RCL
 npm install
 ```
+
+
+安装交付的本地 v1.0 压缩包时，在发布目录运行：
+
+```bash
+npm install -g ./taowind-rcl-reality-forge-1.0.0.tgz
+rcl --version
+rcl doctor
+rcl check ./hello-reality.rcl
+rcl run ./hello-reality.rcl
+```
+
+GitHub main 与已部署 MCP 的版本可与此本地包不同。原生执行和 CLI run 使用
+v2 状态根；直接调用 runReality 保留旧 Reference 根，跨运行时比较时需显式
+选择 stateRootAlgorithm。参见[稳定契约](docs/v1.0/language-contract.md)。
 
 ## 2. 跑最小的真实 RCL 程序
 

@@ -1,0 +1,97 @@
+{
+  "format": "rcl.v1.local-release-verification.v1",
+  "status": "LOCAL_VERIFIED_WINDOWS_LINUX",
+  "packageVersion": "1.0.0",
+  "baselineCanonicalCommit": "bd2187a5303a2bdc1e3a05ec98231400854c226a",
+  "branch": "codex/rcl-v1-development",
+  "suite": {
+    "format": "rcl.v1.complete-local-test-suite.v1",
+    "ok": true,
+    "execution": "two non-overlapping batches on unchanged core/test source",
+    "testFileCount": 328,
+    "fixedPointBatch": {
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "remainingBatch": {
+      "tests": 1675,
+      "pass": 1673,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2
+    },
+    "total": {
+      "tests": 1685,
+      "pass": 1683,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2
+    },
+    "sourceDrift": [],
+    "testSourceDrift": [],
+    "skips": [
+      "K08-D real Windows Provider path optional campaign",
+      "AI010 C/JS primitive case is disabled on Windows; independently executed on Linux"
+    ],
+    "githubActions": "NOT_RUN_USER_INSTRUCTION"
+  },
+  "nativeCoreCompiler": {
+    "byteIdentical": true,
+    "generations": [
+      "C0",
+      "C1",
+      "C2"
+    ],
+    "bytes": 268045,
+    "sha256": "47507cd33dd09b72b2d45ba6170bd9c710c5437b32706243c8ff122f2be01299",
+    "platforms": [
+      "windows-x64",
+      "linux-x64"
+    ],
+    "stagesVerified": 41,
+    "eligibleExamples": 119,
+    "unsupportedExamples": 40,
+    "wholeLanguageRuntimeSelfHosting": false
+  },
+  "nativeRoot": {
+    "default": "rcl.semantic-state-root.v2",
+    "legacyNative": "rcl.semantic-state-root.v1",
+    "legacyReference": "rcl.reference-state-root.v0.6",
+    "exactFiniteBinary64": true,
+    "allocationIndependentGraphIdentityClaimed": false
+  },
+  "installation": {
+    "windowsNode": "24.15.0",
+    "linuxNode": "20.20.2",
+    "independentSourceFinalCandidateArchiveSha256": "36fa82240e1d4bddb649dd268a34f2b1d8ed87000f716e97ebe0ae62fec13edd",
+    "publicCliPassed": true,
+    "publicApiPassed": true,
+    "forgeAppPassed": true,
+    "mcpRealHttpProcessPassed": true,
+    "mcpToolCount": 32,
+    "mcpAlgorithmNegotiationPassed": true,
+    "linuxSharedLibraryLoaded": true
+  },
+  "release": {
+    "packagedConformanceTruthVerified": true,
+    "packagedRuntimeSourceTruthVerified": true,
+    "negativeControlsPassed": true,
+    "finalArtifactHashes": "external release-manifest.json and SHA256SUMS; no circular self-hash in package metadata"
+  },
+  "promotion": {
+    "canonicalMainMerged": false,
+    "npmPublished": false,
+    "remoteMcpDeployed": false,
+    "connectedRemoteMcpObservedVersion": "0.94.0-alpha.1",
+    "githubActions": "NOT_RUN_USER_INSTRUCTION"
+  },
+  "ceilings": {
+    "k400": "historical pinned 24 PASS / 376 UNTESTED; no new matrix admission",
+    "physicalAndroidDevice": "NOT_RUN",
+    "newIndependentAiGeneration": "NOT_RUN",
+    "broadGpuProductionCertification": "NOT_CLAIMED"
+  }
+}

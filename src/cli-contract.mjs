@@ -51,13 +51,15 @@ export function printVersion({ json = false } = {}) {
 export function runDoctor() {
   const { pkg, contract } = packageMetadata();
   const nodeMajor = Number(process.versions.node.split('.')[0]);
+  const requiredNode = pkg.engines?.node;
+  const minimumMajor = /^>=(\d+)$/u.exec(requiredNode ?? '')?.[1];
   const checks = [];
 
   checks.push(
     checkRecord(
       'node-runtime',
-      nodeMajor >= 18 ? 'pass' : 'fail',
-      `Node.js ${process.versions.node}; required >=18`,
+      minimumMajor !== undefined && nodeMajor >= Number(minimumMajor) ? 'pass' : 'fail',
+      `Node.js ${process.versions.node}; required ${requiredNode ?? 'unspecified'}`,
     ),
   );
 

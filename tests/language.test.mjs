@@ -1012,7 +1012,7 @@ test('native VM v0.3 stores Symbol, SemanticNode and IrNode values in canonical 
   assert.equal(result.compilerRun.state['compiler.symbols'][0].kind, 'Symbol');
   assert.equal(result.compilerRun.state['compiler.semantic'][0].kind, 'SemanticFacet');
   assert.equal(result.compilerRun.state['compiler.ir'][0].kind, 'IRStore');
-  assert.match(result.compilerRun.vm, /0\.6\.0-alpha\.1/);
+  assert.equal(result.compilerRun.vm, 'rcl-native-vm/' + JSON.parse(fs.readFileSync(path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), 'COMPONENT-VERSIONS.json'), 'utf8')).components.nativeVm.version);
 });
 
 
@@ -1074,7 +1074,7 @@ test('Stage-4 module graph, qualified IR and target RBC are deterministic', () =
   assert.deepEqual(first.symbols, second.symbols);
   assert.deepEqual(first.ir, second.ir);
   assert.deepEqual(first.targetBytecode, second.targetBytecode);
-  assert.match(first.compilerRun.vm, /0\.6\.0-alpha\.1/);
+  assert.equal(first.compilerRun.vm, 'rcl-native-vm/' + JSON.parse(fs.readFileSync(path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), 'COMPONENT-VERSIONS.json'), 'utf8')).components.nativeVm.version);
 });
 
 
@@ -1097,7 +1097,7 @@ test('native VM v0.5 exposes deterministic byte and UTF-8 primitives for self-ho
   assert.deepEqual(result.state['bytes.f64'], [0, 0, 0, 0, 0, 0, 240, 63]);
   assert.deepEqual(result.state['bytes.utf8'], [233, 129, 147]);
   assert.deepEqual(result.state['bytes.joined'], [255, 2, 1]);
-  assert.match(result.vm, /0\.6\.0-alpha\.1/);
+  assert.equal(result.vm, 'rcl-native-vm/' + JSON.parse(fs.readFileSync(path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), 'COMPONENT-VERSIONS.json'), 'utf8')).components.nativeVm.version);
 });
 
 test('sha256_text computes the same SHA-256 digest in JS and native runtimes', async () => {

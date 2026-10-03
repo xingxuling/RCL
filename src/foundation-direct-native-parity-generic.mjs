@@ -48,9 +48,10 @@ async function resolveDefaults(options) {
     const { runNativeBytecode } = await import('./native-vm.mjs');
     resolved.runNative = runNativeBytecode;
   }
-  if (!resolved.semanticStateRoot || !resolved.semanticValue) {
+  if (!resolved.semanticStateRoot || !resolved.semanticValue || !resolved.semanticStateRootForAlgorithm) {
     const semantic = await import('./semantic-state-root.mjs');
     resolved.semanticStateRoot ??= semantic.semanticStateRoot;
+    resolved.semanticStateRootForAlgorithm ??= semantic.semanticStateRootForAlgorithm;
     resolved.semanticValue ??= semantic.semanticValue;
   }
   return resolved;
@@ -428,7 +429,7 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
       gaps:['direct-bytecode-not-available'], truthBoundary:truthBoundary() };
   }
 
-  const reference = await deps.runReference(program, options.referenceRuntime ?? {});
+
   let native;
   try {
     native = await deps.runNative(compiled.bytecode, { requireNativeStateRoot:true, ...(options.nativeRuntime ?? {}) });
@@ -440,10 +441,12 @@ export async function verifyFoundationDirectNativeParity(sourceOrProgram, option
       gaps:[nativeMissing?'native-vm-missing':'native-execution-failed'], truthBoundary:truthBoundary() };
   }
 
+  const reference = await deps.runReference(program, { stateRootAlgorithm: native?.stateRootAlgorithm, ...(options.referenceRuntime ?? {}) });
+  const rootFor = value => native?.stateRootAlgorithm ? deps.semanticStateRootForAlgorithm(value, native.stateRootAlgorithm) : deps.semanticStateRoot(value);
   const referenceState = normalizeState(reference?.state ?? {}, deps.semanticValue);
   const nativeState = normalizeState(native?.state ?? {}, deps.semanticValue);
-  const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
-  const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
+  const referenceRoot = rootFor(reference?.state ?? {});
+  const nativeRoot = native?.semanticStateRoot ?? rootFor(native?.state ?? {});
   const lineage = verifyFoundationDirectLoweringLineage(compiled.foundationDirectLowering, native?.history, reference?.history);
   const domainReceipt = verifyFoundationDomainReceiptParity(compiled.foundationDirectLowering, reference?.history, native?.history, deps.semanticValue);
   const parity = {

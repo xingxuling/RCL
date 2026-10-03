@@ -195,7 +195,7 @@ export function runPureRclXorCampaign(options = {}) {
   const replays = [];
   for (let index = 0; index < replayCount; index += 1) {
     const started = performance.now();
-    const native = runNativeBytecode(rbcPath, { timeout: 120_000, maxBuffer: 64 * 1024 * 1024 });
+    const native = runNativeBytecode(rbcPath, { stateRootAlgorithm: 'rcl.semantic-state-root.v1', timeout: 120_000, maxBuffer: 64 * 1024 * 1024 });
     replays.push({
       index: index + 1,
       runtimeMs: performance.now() - started,

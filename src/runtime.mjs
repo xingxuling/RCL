@@ -1,7 +1,8 @@
 import { compileReality } from './compiler.mjs';
 import { createHash } from 'node:crypto';
 import { RCLRuntimeError } from './errors.mjs';
-import { canonicalReality, realityRoot } from './canonical.mjs';
+import { canonicalReality, realityRoot, RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
+import { semanticStateRootForAlgorithm } from './semantic-state-root.mjs';
 import {
   applyBinary,
   quantity,
@@ -56,7 +57,7 @@ function _evalCore(expr, context) {
   switch (expr.kind) {
     case 'LiteralExpr': return expr.value;
     case 'RecordConstructExpr': {
-      const fields = {};
+      const fields = Object.create(null);
       for (const field of expr.fields ?? []) fields[field.name] = evaluateExpression(field.value, { ...context, depth: depth + 1 });
       return Object.freeze({ __rclKind: 'Record', __rclType: expr.canonicalType, __rclRecord: expr.typeName, ...fields });
     }
@@ -80,7 +81,7 @@ function _evalCore(expr, context) {
       return new _TailCall(selected.expression, { ...context, locals: branchLocals, depth: depth + 1 }, null);
     }
     case 'RecordLiteralExpr': {
-      const fields = {};
+      const fields = Object.create(null);
       for (const field of expr.fields ?? []) fields[field.name] = evaluateExpression(field.expression, { ...context, depth: depth + 1 });
       return Object.freeze(fields);
     }
@@ -651,14 +652,15 @@ function commitState(state, proposed) {
   for (const [key, value] of Object.entries(proposed)) state[key] = value;
 }
 
-function domainRecord(kind, name, before, proposed, changes, extra = {}) {
+function domainRecord(runtime, kind, name, before, proposed, changes, extra = {}) {
   return {
     kind: 'DomainTransition',
     domainKind: kind,
     name,
     status: 'realized',
-    beforeRoot: realityRoot(before),
-    afterRoot: realityRoot(proposed),
+    beforeRoot: runtime.stateRoot(before),
+    afterRoot: runtime.stateRoot(proposed),
+    stateRootAlgorithm: runtime.stateRootAlgorithm,
     changes,
     ...extra,
   };
@@ -673,12 +675,12 @@ function recordHistory(runtime, record) {
 async function executeRule(rule, mode, runtime) {
   const { program, state, functions, hostAdapters } = runtime;
   const before = structuredClone(state);
-  const beforeRoot = realityRoot(before);
+  const beforeRoot = runtime.stateRoot(before);
   const condition = evaluateExpression(rule.when, { state: before, locals: new Map(), functions });
   if (!condition) {
     return {
       kind: mode === 'foresee' ? 'Projection' : 'Transition', rule: rule.name, mode,
-      status: 'not-triggered', beforeRoot, afterRoot: beforeRoot,
+      status: 'not-triggered', beforeRoot, afterRoot: beforeRoot, stateRootAlgorithm: runtime.stateRootAlgorithm,
       changes: [], witnesses: rule.witnesses,
     };
   }
@@ -702,7 +704,7 @@ async function executeRule(rule, mode, runtime) {
     rule: rule.name, ruleKind: rule.kind, mode,
     status: mode === 'foresee' ? 'projected' : 'realized',
     actor: actorFor(rule), from: rule.from, into: rule.into,
-    beforeRoot, afterRoot: realityRoot(proposed), changes,
+    beforeRoot, afterRoot: runtime.stateRoot(proposed), stateRootAlgorithm: runtime.stateRootAlgorithm, changes,
     authority: {
       needs: rule.needs,
       activeWarrants: grants.map(grant => ({ subject: grant.subject, capability: grant.capability, target: grant.target })),
@@ -723,7 +725,7 @@ function reflectMeta(domain, runtime) {
   const proposed = applyProposed(before, changes);
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_META_BOUND_BROKEN', `Meta reality '${domain.name}'`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('meta-computational', domain.name, before, proposed, changes, {
+  const record = domainRecord(runtime, 'meta-computational', domain.name, before, proposed, changes, {
     inspections: [...domain.inspections],
     foundation: foundationSummary(runtime.program),
     authorityClass: 'metacomputational-self-inspection',
@@ -745,7 +747,7 @@ function advancePhysical(law, directive, runtime) {
     const proposed = applyProposed(before, changes);
     verifyPreserves(law.conserves, proposed, runtime.functions, locals, 'RCL_PHYSICAL_LAW_BROKEN', `Physical law '${law.name}'`);
     commitState(runtime.state, proposed);
-    const record = domainRecord('physical', law.name, before, proposed, changes, {
+    const record = domainRecord(runtime, 'physical', law.name, before, proposed, changes, {
       step: index + 1, dt, witnesses: [...law.witnesses], authorityClass: 'natural-law',
     });
     recordHistory(runtime, record); records.push(record);
@@ -764,7 +766,7 @@ function observePerception(perception, runtime) {
   const proposed = applyProposed(before, changes);
   verifyPreserves(perception.preserves, proposed, runtime.functions, new Map(), 'RCL_PERCEPTION_BOUND_BROKEN', `Perception '${perception.name}'`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('perceptual', perception.name, before, proposed, changes, {
+  const record = domainRecord(runtime, 'perceptual', perception.name, before, proposed, changes, {
     observer: perception.observer, sourceReality: perception.source, authorityClass: 'observation',
   });
   recordHistory(runtime, record);
@@ -782,7 +784,7 @@ function propagateNeural(neural, directive, runtime) {
       const proposed = applyProposed(before, changes);
       verifyPreserves(pathway.preserves, proposed, runtime.functions, new Map(), 'RCL_NEURAL_BOUND_BROKEN', `Neural pathway '${pathway.name}'`);
       commitState(runtime.state, proposed);
-      const record = domainRecord('neural', pathway.name, before, proposed, changes, {
+      const record = domainRecord(runtime, 'neural', pathway.name, before, proposed, changes, {
         step: step + 1, witnesses: [...pathway.witnesses], authorityClass: 'intrinsic-neural-dynamics',
       });
       recordHistory(runtime, record); records.push(record);
@@ -813,7 +815,7 @@ function liveLife(living, directive, runtime) {
       const proposed = applyProposed(before, changes.filter(change => change.source !== 'living:sense'));
       verifyPreserves(living.maintains, proposed, runtime.functions, new Map(), 'RCL_LIFE_MAINTENANCE_BROKEN', `Living reality '${living.name}'`);
       commitState(runtime.state, proposed);
-      const record = domainRecord('living', cycle.name, before, proposed, changes, {
+      const record = domainRecord(runtime, 'living', cycle.name, before, proposed, changes, {
         step: step + 1, body: living.body, needs: living.needs, witnesses: [...cycle.witnesses], authorityClass: 'intrinsic-life-cycle',
       });
       recordHistory(runtime, record); records.push(record);
@@ -847,7 +849,7 @@ function inheritGenetic(genetic, directive, runtime) {
     verifyPreserves(genetic.preserves, proposed, runtime.functions, new Map(), 'RCL_GENETIC_BOUND_BROKEN', `Genetic reality '${genetic.name}'`);
     commitState(runtime.state, proposed);
     const changes = [...mutationChanges, ...expressionChanges];
-    const record = domainRecord('genetic', genetic.name, before, proposed, changes, {
+    const record = domainRecord(runtime, 'genetic', genetic.name, before, proposed, changes, {
       generation: generation + 1, witnesses: [...genetic.witnesses], authorityClass: 'lineage-transformation',
     });
     recordHistory(runtime, record); records.push(record);
@@ -888,7 +890,7 @@ function quantifyDomain(domain, runtime) {
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_QUANTITATIVE_BOUND_BROKEN', `Quantitative reality '${domain.name}'`);
   commitState(runtime.state, proposed);
   const changes = [...measureChanges, ...deriveChanges];
-  const record = domainRecord('quantitative', domain.name, before, proposed, changes, {
+  const record = domainRecord(runtime, 'quantitative', domain.name, before, proposed, changes, {
     measurements: domain.measures.map(decl => ({ path: decl.path, scale: decl.scale, evidence: decl.evidence, calibratedBy: decl.calibratedBy })),
     authorityClass: 'evidentiary-measurement',
   });
@@ -988,7 +990,7 @@ function learnKnowledge(domain, runtime) {
 
   verifyPreserves(domain.preserves, working, runtime.functions, new Map(), 'RCL_KNOWLEDGE_BOUND_BROKEN', `Knowledge reality '${domain.name}'`);
   commitState(runtime.state, working);
-  const record = domainRecord('knowledge', domain.name, before, working, changes, {
+  const record = domainRecord(runtime, 'knowledge', domain.name, before, working, changes, {
     knowledgeClaims: changes.map(change => ({
       path: change.target,
       confidence: change.after.confidence,
@@ -1053,7 +1055,7 @@ function interpretNaturalLanguage(domain, runtime) {
 
   verifyPreserves(domain.preserves, working, runtime.functions, new Map(), 'RCL_LANGUAGE_BOUND_BROKEN', `Natural-language plane '${domain.name}'`);
   commitState(runtime.state, working);
-  const record = domainRecord('natural-language-plane', domain.name, before, working, changes, {
+  const record = domainRecord(runtime, 'natural-language-plane', domain.name, before, working, changes, {
     utterances: domain.utterances.map(item => item.path),
     intents: domain.intents.map(item => item.path),
     authorityClass: 'symbolic-interpretation',
@@ -1105,7 +1107,7 @@ function runUnderstanding(domain, runtime) {
 
   verifyPreserves(domain.preserves, working, runtime.functions, new Map(), 'RCL_UNDERSTANDING_BOUND_BROKEN', `Understanding plane '${domain.name}'`);
   commitState(runtime.state, working);
-  const record = domainRecord('understanding-plane', domain.name, before, working, changes, {
+  const record = domainRecord(runtime, 'understanding-plane', domain.name, before, working, changes, {
     explanations: changes.map(change => ({ path: change.target, explanation: change.after.explanation, confidence: change.after.confidence })),
     authorityClass: 'world-model-formation',
   });
@@ -1144,7 +1146,7 @@ function runCreation(domain, runtime) {
 
   verifyPreserves(domain.preserves, working, runtime.functions, new Map(), 'RCL_CREATION_BOUND_BROKEN', `Creative plane '${domain.name}'`);
   commitState(runtime.state, working);
-  const record = domainRecord('creative-plane', domain.name, before, working, changes, {
+  const record = domainRecord(runtime, 'creative-plane', domain.name, before, working, changes, {
     candidates: domain.candidates.map(item => ({ path: item.path, score: working[item.path].score, active: working[item.path].active })),
     selected: { path: domain.selection.path, value: selectedValue.value, score: selectedValue.score, target: selectedValue.target },
     authorityClass: 'bounded-novelty-generation',
@@ -1174,7 +1176,7 @@ function energizeEnergy(domain, runtime) {
   }
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_ENERGY_BOUND_BROKEN', `Energy reality '${domain.name}'`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('energy', domain.name, before, proposed, changes, { flows, witnesses: domain.witnesses, authorityClass: 'energy-budget-flow' });
+  const record = domainRecord(runtime, 'energy', domain.name, before, proposed, changes, { flows, witnesses: domain.witnesses, authorityClass: 'energy-budget-flow' });
   recordHistory(runtime, record); return record;
 }
 
@@ -1205,7 +1207,7 @@ function constituteElements(domain, runtime) {
   }
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_ELEMENT_BOUND_BROKEN', `Element reality '${domain.name}'`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('element', domain.name, before, proposed, changes, { species: domain.species.length, compounds: domain.compounds.length, authorityClass: 'constituent-composition' });
+  const record = domainRecord(runtime, 'element', domain.name, before, proposed, changes, { species: domain.species.length, compounds: domain.compounds.length, authorityClass: 'constituent-composition' });
   recordHistory(runtime, record); return record;
 }
 
@@ -1239,7 +1241,7 @@ function investigateScience(domain, runtime) {
   }
   verifyPreserves(domain.preserves, working, runtime.functions, new Map(), 'RCL_SCIENCE_BOUND_BROKEN', `Science reality '${domain.name}'`);
   commitState(runtime.state, working);
-  const record = domainRecord('science', domain.name, before, working, changes, { hypotheses: domain.hypotheses.length, experiments: domain.experiments.length, conclusions: domain.conclusions.length, authorityClass: 'falsifiable-evidence-method' });
+  const record = domainRecord(runtime, 'science', domain.name, before, working, changes, { hypotheses: domain.hypotheses.length, experiments: domain.experiments.length, conclusions: domain.conclusions.length, authorityClass: 'falsifiable-evidence-method' });
   recordHistory(runtime, record); return record;
 }
 
@@ -1252,7 +1254,7 @@ function embodyReality(domain, runtime) {
   const target = `${domain.name}.state`; const changes = [{ target, before: proposed[target] ?? null, after: value, source: 'body:embodiment' }]; proposed[target] = value;
   if (!value.maintained) throw new RCLRuntimeError('RCL_BODY_HOMEOSTASIS', `Embodiment '${domain.name}' failed maintain clauses`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('body', domain.name, before, proposed, changes, { systems: value.systems, organs: value.organs, bindings: value.bindings, coherence, authorityClass: 'embodied-boundary-homeostasis' });
+  const record = domainRecord(runtime, 'body', domain.name, before, proposed, changes, { systems: value.systems, organs: value.organs, bindings: value.bindings, coherence, authorityClass: 'embodied-boundary-homeostasis' });
   recordHistory(runtime, record); return record;
 }
 
@@ -1270,7 +1272,7 @@ function integrateSpirit(domain, runtime) {
   const target = `${domain.name}.state`; const changes = [{ target, before: proposed[target] ?? null, after: value, source: 'spirit:integration' }]; proposed[target] = value;
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_SPIRIT_BOUND_BROKEN', `Spirit reality '${domain.name}'`);
   commitState(runtime.state, proposed);
-  const record = domainRecord('spirit', domain.name, before, proposed, changes, { coherence, identity: value.identity, authorityClass: 'identity-meaning-will-integration' });
+  const record = domainRecord(runtime, 'spirit', domain.name, before, proposed, changes, { coherence, identity: value.identity, authorityClass: 'identity-meaning-will-integration' });
   recordHistory(runtime, record); return record;
 }
 
@@ -1322,7 +1324,7 @@ function synchronizeSpacetime(domain, directive, runtime) {
       frameRoots: Object.fromEntries(domain.frames.map(frame => [frame.name, realityRoot(frame)])),
       causalRoot: realityRoot(domain.relations),
     };
-    const record = domainRecord('meta-spacetime', domain.name, before, proposed, changes, {
+    const record = domainRecord(runtime, 'meta-spacetime', domain.name, before, proposed, changes, {
       step: step + 1,
       frames: domain.frames,
       relations: domain.relations,
@@ -1363,7 +1365,7 @@ function activateAcceleration(domain, runtime) {
   };
   runtime.accelerationProfiles.set(domain.name, profile);
   const before = structuredClone(runtime.state);
-  const record = domainRecord('meta-acceleration', domain.name, before, before, [], {
+  const record = domainRecord(runtime, 'meta-acceleration', domain.name, before, before, [], {
     profile: { ...profile, cache: undefined },
     authorityClass: 'meta-execution-optimization',
   });
@@ -1399,7 +1401,7 @@ function compressReality(domain, runtime) {
     }
     commitState(runtime.state, proposed);
   }
-  const record = domainRecord('meta-compression', domain.name, before, proposed, changes, {
+  const record = domainRecord(runtime, 'meta-compression', domain.name, before, proposed, changes, {
     capsule: {
       target: capsule.target,
       codec: capsule.codec,
@@ -1431,7 +1433,7 @@ function restoreReality(domain, runtime) {
     proposed[key] = value;
   }
   commitState(runtime.state, proposed);
-  const record = domainRecord('meta-compression-restore', domain.name, before, proposed, changes, {
+  const record = domainRecord(runtime, 'meta-compression-restore', domain.name, before, proposed, changes, {
     originalRoot: capsule.originalRoot,
     restoredRoot: realityRoot(restored),
     authorityClass: 'meta-representation-restoration',
@@ -1441,7 +1443,7 @@ function restoreReality(domain, runtime) {
 }
 
 function initializeState(program, functions, providers = {}) {
-  const state = {};
+  const state = Object.create(null);
   const pending = program.facets.filter(facet => !facet.deferred);
   let passes = 0;
   while (pending.length > 0 && passes <= program.facets.length + 1) {
@@ -1475,11 +1477,14 @@ function initializeState(program, functions, providers = {}) {
 }
 
 export async function runReality(compiledOrSource, options = {}) {
+  const stateRootAlgorithm = options.stateRootAlgorithm ?? RCL_REFERENCE_STATE_ROOT_ALGORITHM;
+  if (stateRootAlgorithm !== RCL_REFERENCE_STATE_ROOT_ALGORITHM) semanticStateRootForAlgorithm({}, stateRootAlgorithm);
   const program = typeof compiledOrSource === 'string' ? compileReality(compiledOrSource, options.compilerOptions ?? options) : compiledOrSource;
   const functions = new Map(program.reckons.map(fn => [fn.name, fn]));
   const state = initializeState(program, functions, options.providers ?? {});
   const runtime = {
-    program, state, functions,
+    program, state, functions, stateRootAlgorithm,
+    stateRoot: value => stateRootAlgorithm === RCL_REFERENCE_STATE_ROOT_ALGORITHM ? realityRoot(value) : semanticStateRootForAlgorithm(value, stateRootAlgorithm),
     hostAdapters: options.hostAdapters ?? {},
     providers: options.providers ?? {},
     history: [], projections: [],
@@ -1542,7 +1547,8 @@ export async function runReality(compiledOrSource, options = {}) {
     programRoot: program.programRoot,
     foundation: foundationSummary(program),
     state: structuredClone(state),
-    stateRoot: realityRoot(state),
+    stateRoot: runtime.stateRoot(state),
+    stateRootAlgorithm,
     history: runtime.history,
     projections: runtime.projections,
     naturalLanguageReality: buildNaturalLanguageReality(program, state, runtime.history),

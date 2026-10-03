@@ -27,6 +27,7 @@ const readme = await readFile(path.join(root, 'README.md'), 'utf8');
 const nativeSource = await readFile(path.join(root, 'native', 'rclvm.c'), 'utf8');
 const typedReferenceSource = await readFile(path.join(root, 'src', 'typed-reference-abi.mjs'), 'utf8');
 const semanticRootSource = await readFile(path.join(root, 'src', 'semantic-state-root.mjs'), 'utf8');
+const semanticRootV2Source = await readFile(path.join(root, 'src', 'semantic-state-root-v2.mjs'), 'utf8');
 
 if (packageJson.name !== contractJson.package) {
   errors.push(`package name ${packageJson.name} does not match VERSION-CONTRACT.json`);
@@ -37,7 +38,7 @@ if (packageJson.version !== contractJson.packageVersion) {
 if (contractJson.repository !== 'xingxuling/RCL' || contractJson.canonicalBranch !== 'main' || contractJson.canonical !== true) {
   errors.push('RCL is not declared as the canonical main-branch source');
 }
-if (!readme.includes('# RCL v0.94.0-alpha.1') || !readme.includes('Canonical source: `xingxuling/RCL@main`')) {
+if (!readme.includes('# RCL v' + packageJson.version) || !readme.includes('Canonical source: `xingxuling/RCL@main`')) {
   errors.push('README does not expose the current version and canonical-source declaration');
 }
 
@@ -100,6 +101,12 @@ const nativeVmVersion = sourceMatch(nativeSource, /#define\s+RCL_VM_VERSION\s+"(
 const typedReferenceVersion = sourceMatch(typedReferenceSource, /RCL_TYPED_REFERENCE_ABI_VERSION\s*=\s*'([^']+)'/, 'RCL_TYPED_REFERENCE_ABI_VERSION', errors);
 const typedReferenceFormat = sourceMatch(typedReferenceSource, /RCL_TYPED_REFERENCE_ABI_FORMAT\s*=\s*'([^']+)'/, 'RCL_TYPED_REFERENCE_ABI_FORMAT', errors);
 const semanticRootAlgorithm = sourceMatch(semanticRootSource, /RCL_NATIVE_STATE_ROOT_ALGORITHM\s*=\s*'([^']+)'/, 'RCL_NATIVE_STATE_ROOT_ALGORITHM', errors);
+const semanticRootSuccessor = sourceMatch(semanticRootV2Source, /RCL_SEMANTIC_STATE_ROOT_V2\s*=\s*'([^']+)'/, 'RCL_SEMANTIC_STATE_ROOT_V2', errors);
+if (contractJson.claims?.nativeSemanticAuthorityRoot?.successor?.algorithm !== semanticRootSuccessor
+    || !componentContract.components?.semanticStateRoot?.acceptedNativeAlgorithms?.includes(semanticRootSuccessor)
+    || !nativeSource.includes(semanticRootSuccessor ?? '__missing__')) {
+  errors.push('semantic state-root successor is not bound across native, JS and version contracts');
+}
 
 if (componentContract.components?.nativeVm?.version !== nativeVmVersion) {
   errors.push(`native VM component contract drift: contract=${componentContract.components?.nativeVm?.version}; source=${nativeVmVersion}`);
@@ -108,8 +115,11 @@ if (componentContract.components?.typedReferenceAbi?.version !== typedReferenceV
     || componentContract.components?.typedReferenceAbi?.format !== typedReferenceFormat) {
   errors.push('typed-reference ABI component contract drift');
 }
-if (componentContract.components?.semanticStateRoot?.algorithm !== semanticRootAlgorithm
-    || contractJson.claims?.nativeSemanticAuthorityRoot?.algorithm !== semanticRootAlgorithm
+if (componentContract.components?.semanticStateRoot?.algorithm !== semanticRootSuccessor
+    || contractJson.claims?.nativeSemanticAuthorityRoot?.algorithm !== semanticRootSuccessor
+    || componentContract.components?.semanticStateRoot?.legacyAlgorithm !== semanticRootAlgorithm
+    || contractJson.claims?.nativeSemanticAuthorityRoot?.legacyAlgorithm !== semanticRootAlgorithm
+    || !semanticRootSource.includes('RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM = RCL_SEMANTIC_STATE_ROOT_V2')
     || !nativeSource.includes(semanticRootAlgorithm ?? '__missing__')) {
   errors.push('semantic state-root algorithm is not aligned across source and contracts');
 }

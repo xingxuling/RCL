@@ -139,6 +139,10 @@ class Pool {
 
   string(value) {
     const text = String(value);
+    if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(text)) {
+      throw new TypeError('RCL_BYTECODE_TEXT_SCALAR_REQUIRED');
+    }
+    if (text.includes('\0')) throw new TypeError('RCL_NATIVE_TEXT_NUL_UNSUPPORTED');
     if (this.stringIds.has(text)) return this.stringIds.get(text);
     const id = this.strings.length;
     this.strings.push(text);

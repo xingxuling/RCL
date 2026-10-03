@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { resolveNpmCli } from './npm-cli-path.mjs';
 import {
   createFoundationRuntimeTruthContract,
   verifyFoundationRuntimeTruthContract,
@@ -20,7 +21,8 @@ const stageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-developer-release-'
 function copyFilter(source) {
   const relative = path.relative(root, source).replaceAll('\\', '/');
   if (!relative) return true;
-  return !['.git', 'node_modules', 'dist', 'output', '.DS_Store'].some(
+  if (relative.split('/').some(part => ['target', 'node_modules', '.git', '.zig-cache', '__pycache__', '.pytest_cache'].includes(part))) return false;
+  return !['.git', '.github', '_tools', 'node_modules', 'build', 'dist', 'output', 'releases', '.DS_Store'].some(
     (blocked) => relative === blocked || relative.startsWith(`${blocked}/`),
   );
 }
@@ -47,7 +49,7 @@ function runStageNode(label, args) {
 }
 
 try {
-  fs.rmSync(outDir, { recursive: true, force: true });
+  if (outDir === root) throw new Error('RCL_RELEASE_OUTPUT_MUST_BE_SEPARATE_FROM_SOURCE_ROOT');
   fs.mkdirSync(outDir, { recursive: true });
   fs.cpSync(root, stageRoot, { recursive: true, filter: copyFilter });
 
@@ -57,22 +59,10 @@ try {
     ...stagedPackage.bin,
     rcl: './src/reality-hub-cli.mjs',
   };
-  stagedPackage.engines = { node: '>=18' };
-  stagedPackage.files = [
-    'src/**',
-    'examples/**',
-    'selfhost/**',
-    'native/**',
-    'bootstrap/**',
-    'api/**',
-    'docs/**',
-    'benchmarks/**',
-    'VERSION-CONTRACT.json',
-    'foundation-conformance.json',
-    'foundation-conformance-truth.json',
-    'runtime-truth-contract.json',
-  ];
+  stagedPackage.engines = { ...sourcePackage.engines };
+  stagedPackage.files = [...sourcePackage.files];
   stagedPackage.scripts = {
+    ...sourcePackage.scripts,
     mcp: 'node src/rcl-mcp-server.mjs',
     demo: 'node src/reality-hub-cli.mjs run examples/hello-reality.rcl',
     'verify:install':
@@ -137,7 +127,7 @@ try {
     'tests/cli-public-contract.test.mjs',
   ]);
 
-  const packed = spawnSync('npm', ['pack', '--json', '--pack-destination', outDir], {
+  const packed = spawnSync(process.execPath, [resolveNpmCli(), 'pack', '--json', '--ignore-scripts', '--pack-destination', outDir], {
     cwd: stageRoot,
     encoding: 'utf8',
   });
@@ -156,7 +146,8 @@ try {
     format: 'taowind.rcl.developer-release.v1',
     package: stagedPackage.name,
     version: stagedPackage.version,
-    channel: 'alpha',
+    channel: stagedPackage.version.includes('-') ? 'prerelease' : 'stable',
+    publication: 'LOCAL_ARTIFACT_NOT_PUBLISHED',
     runtimeRequirement: stagedPackage.engines.node,
     artifact: {
       fileName: packInfo.filename,
@@ -245,17 +236,17 @@ try {
 
   fs.writeFileSync(
     path.join(outDir, 'install.ps1'),
-    `$ErrorActionPreference = "Stop"\n$Package = Join-Path $PSScriptRoot "${packInfo.filename}"\nnpm install -g $Package\nrcl --version\nrcl doctor\nrcl check (Join-Path $PSScriptRoot "hello-reality.rcl")\n`,
+    `$ErrorActionPreference = "Stop"\n$Package = Join-Path $PSScriptRoot "${packInfo.filename}"\nnpm install -g $Package\nif ($LASTEXITCODE -ne 0) { throw "RCL_INSTALL_FAILED" }\nrcl --version\nif ($LASTEXITCODE -ne 0) { throw "RCL_VERSION_FAILED" }\nrcl doctor\nif ($LASTEXITCODE -ne 0) { throw "RCL_DOCTOR_FAILED" }\nrcl check (Join-Path $PSScriptRoot "hello-reality.rcl")\nif ($LASTEXITCODE -ne 0) { throw "RCL_CHECK_FAILED" }\n`,
   );
 
   const notes = [
     `# RCL Developer Release ${stagedPackage.version}`,
     '',
-    'This package is staged from the canonical repository and replaces only the public rcl bin entry with the Reality Hub contract wrapper. All advanced commands delegate to the existing CLI.',
+    'This local release is staged from the RCL development checkout. Source and installed rcl entrypoints share the Reality Hub contract wrapper; advanced commands delegate to the existing CLI. Canonical-main merge and remote publication are independent promotion states.',
     '',
-    'Release metadata, Tutor Skill sources, integration contracts, tests and CI files are deliberately excluded from the runtime npm archive so the artifact hash is not self-referential.',
+    'The archive includes source assets, integration contracts, Tutor Skill sources, native build support and tests. Historical release archives, generated output, compiler caches and CI configuration are excluded.',
     '',
-    'The published package.json exposes only scripts whose referenced files are included in the runtime archive: mcp, demo and verify:install.',
+    'The package preserves the declared source toolchain scripts and runtime assets. verify:install checks the public CLI from the installed package. The Node engine requirement matches the source package.',
     '',
     'The packaged Foundation capability truth, Foundation conformance report and compact canonical truth snapshot are verified inside the exact staged source tree. They record implementation-bound canonical truth only; deployment-bound evidence is not fabricated in the release archive.',
     '',

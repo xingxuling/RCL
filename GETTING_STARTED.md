@@ -4,13 +4,29 @@ This guide is for programmers who want to understand RCL by running something fi
 
 ## 1. Clone and install
 
-Requirements: Node.js 22+ and npm.
+Requirements: Node.js 20+ and npm.
 
 ```bash
 git clone https://github.com/xingxuling/RCL.git
 cd RCL
 npm install
 ```
+
+
+For the delivered local v1.0 archive, install the .tgz from its release directory:
+
+```bash
+npm install -g ./taowind-rcl-reality-forge-1.0.0.tgz
+rcl --version
+rcl doctor
+rcl check ./hello-reality.rcl
+rcl run ./hello-reality.rcl
+```
+
+GitHub main and a deployed MCP can have a different version from this local
+archive. Native execution and CLI run use state root v2. Direct runReality calls
+preserve their legacy reference root; select stateRootAlgorithm explicitly for
+cross-runtime parity. See [the stable contract](docs/v1.0/language-contract.md).
 
 ## 2. Run the smallest real RCL program
 

@@ -277,6 +277,7 @@ test('Windows native manifest tracks the exact required prebuilt path set and ha
   const expectedSources = [
     'native/rclvm.c',
     'native/rclvm.h',
+    'native/semantic_state_v2.h',
     'native/rclc.c',
     'native/rclvmd.c',
     'native/provider_demo.c',
@@ -321,7 +322,8 @@ test('Windows rclvm DLL supports an external import-library link and runtime loa
   try {
     const sourcePath = path.join(directory, 'abi-smoke.c');
     const executablePath = path.join(directory, 'abi-smoke.exe');
-    fs.writeFileSync(sourcePath, `#include <string.h>\n#include "rclvm.h"\nint main(void) {\n  char error[128] = {0};\n  if (!rclvm_version() || strncmp(rclvm_version(), "0.", 2) != 0) return 10;\n  if (rclvm_validate_bytecode(NULL, 0, error, sizeof(error)) != 0) return 11;\n  RclVmInstance *vm = rclvm_instance_create();\n  if (!vm) return 12;\n  rclvm_instance_destroy(vm);\n  return 0;\n}\n`);
+    const componentVersion = JSON.parse(fs.readFileSync(path.join(ROOT, 'COMPONENT-VERSIONS.json'), 'utf8')).components.nativeVm.version;
+    fs.writeFileSync(sourcePath, `#include <string.h>\n#include "rclvm.h"\nint main(void) {\n  char error[128] = {0};\n  if (!rclvm_version() || strcmp(rclvm_version(), "${componentVersion}") != 0) return 10;\n  if (rclvm_validate_bytecode(NULL, 0, error, sizeof(error)) != 0) return 11;\n  RclVmInstance *vm = rclvm_instance_create();\n  if (!vm) return 12;\n  rclvm_instance_destroy(vm);\n  return 0;\n}\n`);
     const compile = spawnSync(zig, [
       'cc', '-target', 'x86_64-windows-gnu', '-std=c11', '-DRCLVM_USE_DLL',
       `-I${path.join(ROOT, 'native')}`,

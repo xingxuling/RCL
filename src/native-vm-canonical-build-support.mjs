@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER } from './generated/native-semantic-state-v2-support.mjs';
+export { RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER } from './generated/native-semantic-state-v2-support.mjs';
 
 export const RCL_NATIVE_VM_CANONICAL_BUILD_SUPPORT_FORMAT = 'taowind.rcl-native-vm-build-support.v0.1';
 export const RCL_NATIVE_VM_CANONICAL_BUILD_SUPPORT_VERSION = '0.1.0';
@@ -20,10 +22,10 @@ OBJECT := rclvm.o
 
 all: $(TARGET) $(STATIC_LIB) $(SHARED_LIB) $(SERVER) $(COMPILER) $(PROVIDER_DEMO) $(FOUNDATION_PROVIDER) $(EMBEDDED_BENCHMARK)
 
-$(OBJECT): $(SOURCE) rclvm.h
+$(OBJECT): $(SOURCE) rclvm.h semantic_state_v2.h
 	$(CC) $(CFLAGS) $(PICFLAGS) -DRCLVM_EMBEDDED_ONLY -c -o $@ $(SOURCE)
 
-$(TARGET): $(SOURCE) rclvm.h
+$(TARGET): $(SOURCE) rclvm.h semantic_state_v2.h
 	$(CC) $(CFLAGS) -o $@ $(SOURCE) $(LDFLAGS)
 
 $(STATIC_LIB): $(OBJECT)
@@ -139,5 +141,6 @@ export function nativeVmCanonicalBuildSupportRoots() {
   return {
     makefileSha256: crypto.createHash('sha256').update(RCL_NATIVE_VM_CANONICAL_MAKEFILE).digest('hex'),
     headerSha256: crypto.createHash('sha256').update(RCL_NATIVE_VM_CANONICAL_HEADER).digest('hex'),
+    semanticV2HeaderSha256: crypto.createHash('sha256').update(RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER).digest('hex'),
   };
 }

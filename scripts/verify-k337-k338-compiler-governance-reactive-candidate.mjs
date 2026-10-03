@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+// Frozen v0.1 evidence uses native root v1; replay must not inherit a newer default.
 import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -48,7 +49,7 @@ export function evaluateK337K338CompilerGovernanceReactiveSource(options = {}) {
     artifactSha256 = sha256(compilation.bytecode);
     record(checks, 'native-selfhost-compile', true);
     record(checks, 'bootstrap-byte-parity', Buffer.from(compilation.bytecode).equals(bootstrapBytecode));
-    const payload = runNativeBytecode(outputPath, { requireNativeStateRoot: true });
+    const payload = runNativeBytecode(outputPath, { stateRootAlgorithm: 'rcl.semantic-state-root.v1', requireNativeStateRoot: true });
     stateRoot = payload.semanticStateRoot;
     record(checks, 'expected-state', equal(payload.state, contract.expectedState), { actual: payload.state });
     record(checks, 'rule-order', equal(payload.history.map((item) => item.rule), contract.required.transactionRuleOrder));

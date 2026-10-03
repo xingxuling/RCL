@@ -24,6 +24,7 @@ const recordPrebuilt = process.argv.includes('--record-prebuilt');
 const sourceFiles = [
   'native/rclvm.c',
   'native/rclvm.h',
+  'native/semantic_state_v2.h',
   'native/rclc.c',
   'native/rclvmd.c',
   'native/provider_demo.c',

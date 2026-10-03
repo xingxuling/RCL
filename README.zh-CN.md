@@ -1,19 +1,19 @@
 <div align="center">
 
-# RCL v0.94.0-alpha.1 — Reality Compiler Language
+# RCL v1.0.0 — Reality Compiler Language
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5 分钟上手](GETTING_STARTED.zh-CN.md) · [网站 / Playground](https://rcl-rncs-mcp.vercel.app) · [当前状态](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v0.94.0--alpha.1-orange.svg)](package.json)
+[![Package](https://img.shields.io/badge/package-v1.0.0-blue.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
 
-RCL（Reality Compiler Language）是一门实验性开源编程语言，面向需要明确约束状态变化的程序：**谁可以行动、允许改变什么、哪些条件必须成立，以及如何记录执行结果的证据**。
+RCL（Reality Compiler Language）是一门开源编程语言，面向需要明确约束状态变化的程序：**谁可以行动、允许改变什么、哪些条件必须成立，以及如何记录执行结果的证据**。
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
@@ -24,15 +24,19 @@ RCL（Reality Compiler Language）是一门实验性开源编程语言，面向�
 - **跨执行目标保留语义。** RCL 拥有状态与权限模型，原生字节码、Web 和 Android 路径提供不同的执行环境。候选 Native UI 模型在 Web / Android 后端之间共享 IR 与语义根。
 - **用编译器验证编译器。** Native-Core 编译器用 RCL 编写，已有字节完全一致的 `C0 == C1 == C2` 固定点记录。这是编译器自举，不代表整套运行时已经完全自举。
 
-RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。当前仍是 **Alpha 研究工具链**，不是可直接替换成熟生产语言的方案，也不是操作系统级安全边界。
+RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。v1.0 稳定核心语言、原生状态根协议、公共 CLI 和可安装源码工具链；研究扩展仍按各自证据与成熟度分类。
 
 [快速开始](#快速开始) · [示例](#程序员建议按这些示例看) · [当前成熟度](#当前已经验证到什么程度) · [架构](#架构) · [参与贡献](#欢迎贡献)
 
 ---
 
+## v1.0
+
+原生 VM 与 `rcl run` 默认使用 `rcl.semantic-state-root.v2`，以精确有限 binary64 编码绑定最终状态与转移前后根。历史原生 v1 凭据仍可显式选择算法验证。`runReality` Reference API 保留其独立的 `rcl.reference-state-root.v0.6` 默认；使用 `stateRootAlgorithm` 可选择跨运行时 v2。参见[稳定契约](docs/v1.0/language-contract.md)、[状态根协议](docs/v1.0/semantic-state-root-v2.md)与[发布验收](docs/v1.0/acceptance.md)。
+
 ## 快速开始
 
-依赖：Git、Node.js 22+ 与 npm。先从源码运行 JavaScript / Reference Runtime：
+依赖：Git、Node.js 20+ 与 npm。先从源码运行 JavaScript / Reference Runtime：
 
 ### 1. 克隆并安装
 
@@ -118,7 +122,7 @@ Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
 ## 当前已经验证到什么程度？
 
-当前 package 基线仍为 **`v0.94.0-alpha.1`**。最准确的实时证据边界请查看 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+当前本地发布目标为 **`v1.0.0`**；合并正式 main 与远程发布仍是独立的晋级状态。最准确的实时证据边界请查看 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 | 能力 | 当前状态 |
 |---|---|

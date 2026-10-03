@@ -46,8 +46,12 @@ test('K08-C Tensor candidate executes bounded canonical tensor semantics through
   assert.deepEqual(state['tensor.reduce_mean_axis1'][7], [2, 5]);
   assert.deepEqual(state['tensor.reduce_max_axis0'][7], [4, 5, 6]);
   assert.deepEqual(state['tensor.reduce_max_axis1'][7], [3, 6]);
-  assert.deepEqual(state['tensor.exp'][7], [1, 2.71828182845905]);
-  assert.deepEqual(state['tensor.log'][7], [0, 1.38629436111989, 2.1972245773142]);
+  // The bounded kernels approximate transcendental functions; compare with an
+  // independent math oracle rather than the former 15-digit JSON rounding.
+  assert.equal(state['tensor.exp'][7].length, 2);
+  assert.equal(state['tensor.log'][7].length, 3);
+  [0, 1].forEach((value, index) => assert.ok(Math.abs(state['tensor.exp'][7][index] - Math.exp(value)) <= 1e-14));
+  [1, 4, 9].forEach((value, index) => assert.ok(Math.abs(state['tensor.log'][7][index] - Math.log(value)) <= 1e-10));
   assert.deepEqual(state['tensor.sqrt'][7], [1, 2, 3]);
   for (const row of [state['tensor.softmax'][7].slice(0, 3), state['tensor.softmax'][7].slice(3)]) {
     assert.ok(Math.abs(row.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
