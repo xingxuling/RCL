@@ -11,7 +11,7 @@ test('current native VM emits and verifies rcl.semantic-state-root.v1', () => {
   const result = runRealityNative(`reality NativeSemanticAuthority {
     facet world.ready : Truth = true
     facet world.count : Number = 2
-  }`, { requireNativeStateRoot: true });
+  }`, { stateRootAlgorithm: RCL_NATIVE_STATE_ROOT_ALGORITHM, requireNativeStateRoot: true });
 
   assert.equal(result.stateRootAlgorithm, RCL_NATIVE_STATE_ROOT_ALGORITHM);
   assert.equal(result.stateRootVerified, true);
@@ -26,7 +26,7 @@ test('reference and native semantic state roots agree', async () => {
     facet world.ready : Truth = true
     facet world.count : Number = 7
   }`, {
-    nativeRuntime: { requireNativeStateRoot: true },
+    nativeRuntime: { stateRootAlgorithm: RCL_NATIVE_STATE_ROOT_ALGORITHM, requireNativeStateRoot: true },
   });
 
   assert.equal(parity.ok, true);

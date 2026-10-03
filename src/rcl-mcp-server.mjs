@@ -201,10 +201,18 @@ function compileSourceSummary(source, args = {}) {
   };
   if (bool(args.runNative)) {
     const timeout = numberInRange(args.timeoutMs, 5000, 1000, 30000);
-    const native = runNativeBytecode(bytecode, { timeout });
+    const native = runNativeBytecode(bytecode, {
+      timeout,
+      requireNativeStateRoot: true,
+      ...(args.stateRootAlgorithm === undefined ? {} : { stateRootAlgorithm: args.stateRootAlgorithm }),
+    });
     payload.nativeRun = {
       status: native.status,
       state: native.state,
+      stateRoot: native.stateRoot,
+      stateRootAlgorithm: native.stateRootAlgorithm,
+      stateRootVerified: native.stateRootVerified,
+      nativeVmExecutionAttestation: native.nativeVmExecutionAttestation,
       projections: native.projections,
       historyLength: native.history?.length ?? 0,
     };
@@ -865,6 +873,7 @@ export function listRclMcpTools() {
         properties: {
           source: { type: 'string', description: 'RCL source text to compile.' },
           runNative: { type: 'boolean', description: 'Run the compiled RBC with native/rclvm.exe. Defaults to false.' },
+          stateRootAlgorithm: { type: 'string', enum: ['rcl.semantic-state-root.v1', 'rcl.semantic-state-root.v2'] },
           timeoutMs: { type: 'number', description: 'Native VM timeout in milliseconds, clamped to 1000-30000.' },
         },
         required: ['source'],
@@ -880,6 +889,7 @@ export function listRclMcpTools() {
         properties: {
           file: { type: 'string' },
           runNative: { type: 'boolean' },
+          stateRootAlgorithm: { type: 'string', enum: ['rcl.semantic-state-root.v1', 'rcl.semantic-state-root.v2'] },
           timeoutMs: { type: 'number' },
           includeBytecodeHex: { type: 'boolean' },
         },
@@ -895,6 +905,7 @@ export function listRclMcpTools() {
         type: 'object',
         properties: {
           source: { type: 'string' },
+          stateRootAlgorithm: { type: 'string', enum: ['rcl.semantic-state-root.v1', 'rcl.semantic-state-root.v2'] },
           timeoutMs: { type: 'number' },
         },
         required: ['source'],
@@ -909,6 +920,7 @@ export function listRclMcpTools() {
         type: 'object',
         properties: {
           file: { type: 'string' },
+          stateRootAlgorithm: { type: 'string', enum: ['rcl.semantic-state-root.v1', 'rcl.semantic-state-root.v2'] },
           timeoutMs: { type: 'number' },
         },
         required: ['file'],

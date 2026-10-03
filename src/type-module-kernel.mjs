@@ -373,6 +373,9 @@ function lowerDeclaration(moduleName, decl, resolveType, diagnostics) {
     return {
       ...base,
       fields: decl.fields.map(field => {
+        if (['__rclKind', '__rclType', '__rclObjectId', '__rclFieldOffsets', '__rclPayloadOffsets', '__rclRecord', '__rclUnion'].includes(field.name)) {
+          diagnostics.push(diagnostic('RCL_RECORD_FIELD_RESERVED', 'Record field collides with native layout metadata: ' + field.name, field.location));
+        }
         if (seen.has(field.name)) diagnostics.push(diagnostic('RCL_RECORD_FIELD_DUPLICATE', `Record '${decl.name}' has duplicate field '${field.name}'`, field.location));
         seen.add(field.name);
         const type = resolveType(field.type, params, field.location);

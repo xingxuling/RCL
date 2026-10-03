@@ -11,8 +11,10 @@ import {
 } from './native-vm-execution-attestation.mjs';
 import {
   RCL_NATIVE_STATE_ROOT_ALGORITHM,
+  RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM,
   RCLSemanticStateRootError,
   semanticStateRoot,
+  semanticStateRootForAlgorithm,
   semanticValue,
   verifyNativeSemanticStateRoot,
 } from './semantic-state-root.mjs';
@@ -47,6 +49,7 @@ function verifyNativePayload(payload, options) {
   try {
     return verifyNativeSemanticStateRoot(payload, {
       requireNativeRoot: options.requireNativeStateRoot === true,
+      expectedAlgorithm: options.stateRootAlgorithm,
     });
   } catch (error) {
     if (error instanceof RCLSemanticStateRootError) {
@@ -87,6 +90,12 @@ function resolveRunnableNativeVm(options) {
 }
 
 export function runNativeBytecode(bytecodeOrPath, options = {}) {
+  const stateRootAlgorithm = options.stateRootAlgorithm
+    ?? options.env?.RCL_SEMANTIC_STATE_ROOT_ALGORITHM
+    ?? process.env.RCL_SEMANTIC_STATE_ROOT_ALGORITHM
+    ?? RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM;
+  semanticStateRootForAlgorithm({}, stateRootAlgorithm);
+  options = { ...options, stateRootAlgorithm };
   const materialization = resolveRunnableNativeVm(options);
   const vmPath = materialization.vmPath;
 
@@ -104,7 +113,11 @@ export function runNativeBytecode(bytecodeOrPath, options = {}) {
   try {
     const result = spawnSync(vmPath, [bytecodePath], {
       encoding: 'utf8',
-      env: { ...process.env, ...(options.env ?? {}) },
+      env: {
+        ...process.env,
+        ...(options.env ?? {}),
+        ...(options.stateRootAlgorithm === undefined ? {} : { RCL_SEMANTIC_STATE_ROOT_ALGORITHM: options.stateRootAlgorithm }),
+      },
       maxBuffer: options.maxBuffer ?? 16 * 1024 * 1024,
       timeout: options.timeout ?? 30_000,
     });
@@ -175,14 +188,15 @@ function equalJson(left, right) {
 export async function verifyNativeParity(source, options = {}) {
   const [{ runReality }, { compileReality }] = await Promise.all([import('./runtime.mjs'), import('./compiler.mjs')]);
   const program = compileReality(source);
-  const reference = await runReality(program, options.referenceRuntime ?? {});
   const native = runRealityNative(program, options.nativeRuntime ?? {});
-  const referenceSemanticStateRoot = semanticStateRoot(reference.state);
+  const reference = await runReality(program, { stateRootAlgorithm: native.stateRootAlgorithm, ...(options.referenceRuntime ?? {}) });
+  const referenceSemanticStateRoot = semanticStateRootForAlgorithm(reference.state, native.stateRootAlgorithm);
   const parity = {
     state: equalJson(semanticValue(native.state), semanticValue(reference.state)),
     projections: native.projections.length === reference.projections.length,
     history: native.history.length === reference.history.length,
-    roots: native.history.every((record, index) => record.beforeRoot === reference.history[index]?.beforeRoot && record.afterRoot === reference.history[index]?.afterRoot),
+    roots: native.history.every((record, index) => record.beforeRoot === reference.history[index]?.beforeRoot && record.afterRoot === reference.history[index]?.afterRoot
+      && record.stateRootAlgorithm === reference.history[index]?.stateRootAlgorithm),
     semanticStateRoot: native.semanticStateRoot === referenceSemanticStateRoot,
   };
   const nativeAuthority = {

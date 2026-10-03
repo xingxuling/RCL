@@ -1,0 +1,15 @@
+export const SELFHOST_SOURCE_TRUTH_MODULES = Object.freeze([
+  ['lexer', 'src/lexer.mjs', 'source.lexer_sha'],
+  ['parser', 'src/parser.mjs', 'source.parser_sha'],
+  ['compiler', 'src/compiler.mjs', 'source.compiler_sha'],
+  ['runtime', 'src/runtime.mjs', 'source.runtime_sha'],
+  ['bytecode', 'src/bytecode.mjs', 'source.bytecode_sha'],
+  ['bootstrap', 'src/bootstrap.mjs', 'source.bootstrap_sha'],
+  ['native_vm', 'src/native-vm.mjs', 'source.native_vm_sha'],
+  ['v094_file_emission', 'src/autonomous-sandbox-file-emission-protocol.mjs', 'source.v094_file_emission_sha'],
+  ['semantic_state_root', 'src/semantic-state-root.mjs', 'source.semantic_state_root_sha'],
+  ['semantic_state_root_v2', 'src/semantic-state-root-v2.mjs', 'source.semantic_state_root_v2_sha'],
+  ['canonical_f64', 'src/canonical-f64.mjs', 'source.canonical_f64_sha'],
+  ['reference_canonical', 'src/canonical.mjs', 'source.reference_canonical_sha'],
+  ['type_module_kernel', 'src/type-module-kernel.mjs', 'source.type_module_kernel_sha'],
+].map(row => Object.freeze(row)));

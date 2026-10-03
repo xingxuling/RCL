@@ -1,6 +1,6 @@
 {
   "name": "@taowind/rcl-reality-forge",
-  "version": "0.94.0-alpha.1",
+  "version": "1.0.0",
   "description": "RCL (Reality Compiler Language): an evidence-bearing, permission-constrained reality transaction language, compiler, native VM, provider runtime, and verification toolchain.",
   "type": "module",
   "license": "Apache-2.0",
@@ -8,7 +8,7 @@
     ".": "./src/index.mjs"
   },
   "bin": {
-    "rcl": "./src/cli.mjs",
+    "rcl": "./src/reality-hub-cli.mjs",
     "rcl-forge": "./src/forge-cli.mjs",
     "rcl-mcp": "./src/rcl-mcp-server.mjs"
   },
@@ -391,7 +391,10 @@
     "evidence:k04-game": "node scripts/run-k04-direct-evidence.mjs",
     "evidence:k04-game-runtime": "node scripts/run-k04-game-runtime-evidence.mjs",
     "evidence:k04-game-ai-generate": "node scripts/run-k04-game-independent-ai-generation.mjs",
-    "verify:k04-game-ai-generate": "node scripts/verify-k04-game-ai-generation-receipt.mjs"
+    "verify:k04-game-ai-generate": "node scripts/verify-k04-game-ai-generation-receipt.mjs",
+    "verify:install": "node src/reality-hub-cli.mjs doctor && node src/reality-hub-cli.mjs check examples/hello-reality.rcl",
+    "test:semantic-state-root": "node --test --test-concurrency=1 tests/native-semantic-state-root-contract.test.mjs tests/native-semantic-state-root-native.test.mjs tests/semantic-state-root-v2-stable.test.mjs",
+    "verify:semantic-state-support": "node scripts/build-native-semantic-state-support.mjs --check"
   },
   "engines": {
     "node": ">=20"
@@ -403,5 +406,41 @@
   "homepage": "https://github.com/xingxuling/RCL#readme",
   "bugs": {
     "url": "https://github.com/xingxuling/RCL/issues"
-  }
+  },
+  "files": [
+    "adapters/**",
+    "api/**",
+    "benchmarks/**",
+    "bootstrap/**",
+    "data/**",
+    "docs/**",
+    "evidence/**",
+    "examples/**",
+    "experiments/**",
+    "federation/**",
+    "integrations/**",
+    "language-federation/**",
+    "native/**",
+    "scripts/**",
+    "selfhost/**",
+    "skills/**",
+    "src/**",
+    "tests/**",
+    "tools/**",
+    "VERSION-CONTRACT.json",
+    "COMPONENT-VERSIONS.json",
+    "DOWNSTREAM-CONSUMERS.json",
+    "foundation-conformance.json",
+    "foundation-conformance-truth.json",
+    "runtime-truth-contract.json",
+    "RCL_USCE_CANDIDATE_VERIFY_CONTRACT_v0.1.json",
+    "README.zh-CN.md",
+    "GETTING_STARTED.md",
+    "GETTING_STARTED.zh-CN.md",
+    "CURRENT-STATUS.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "CONTEXT.md",
+    "README-K01-EVIDENCE.md"
+  ]
 }

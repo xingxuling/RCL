@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from '../src/bytecode.mjs';
 import { runNativeBytecode, runNativeCompiler } from '../src/native-vm.mjs';
 import { evidenceRoot } from '../src/universal-program-stress.mjs';
+// Frozen v0.1 evidence uses native root v1; replay must not inherit a newer default.
 import { readCanonicalCompilerArtifact } from '../src/canonical-source-archive.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -41,7 +42,7 @@ export function verifyK321K322CompilerAlgorithmCliCandidate(options = {}) {
       const nativePath = path.join(directory, 'candidate.rbc');
       const compilation = runNativeCompiler(COMPILER_RBC_PATH, sourcePath, nativePath, { timeout: 30_000 });
       check(checks, 'native-compiler-byte-parity', Buffer.from(compilation.bytecode).equals(bootstrap));
-      const runtime = runNativeBytecode(nativePath, { timeout: 10_000, requireNativeStateRoot: true });
+      const runtime = runNativeBytecode(nativePath, { stateRootAlgorithm: 'rcl.semantic-state-root.v1', timeout: 10_000, requireNativeStateRoot: true });
       semanticStateRoot = runtime.semanticStateRoot;
       check(checks, 'native-cli-algorithm-results', runtime.state?.['result.gcd'] === 21
         && runtime.state?.['result.fibonacci'] === 144

@@ -44,9 +44,10 @@ async function resolveDeps(options) {
   if (!deps.compileDirectBytecode) ({ tryCompileFoundationRealityToBytecode:deps.compileDirectBytecode } = await import('./foundation-direct-bytecode.mjs'));
   if (!deps.runReference) ({ runReality:deps.runReference } = await import('./runtime.mjs'));
   if (!deps.runNative) ({ runNativeBytecode:deps.runNative } = await import('./native-vm.mjs'));
-  if (!deps.semanticStateRoot || !deps.semanticValue) {
+  if (!deps.semanticStateRoot || !deps.semanticValue || !deps.semanticStateRootForAlgorithm) {
     const semantic = await import('./semantic-state-root.mjs');
     deps.semanticStateRoot ??= semantic.semanticStateRoot;
+    deps.semanticStateRootForAlgorithm ??= semantic.semanticStateRootForAlgorithm;
     deps.semanticValue ??= semantic.semanticValue;
   }
   if (!deps.verifyLineage || !deps.verifyGenericReceipt) {
@@ -75,7 +76,7 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
     };
   }
 
-  const reference = await deps.runReference(program, options.referenceRuntime ?? {});
+
   let native;
   try {
     native = await deps.runNative(compiled.bytecode, { requireNativeStateRoot:true, ...(options.nativeRuntime ?? {}) });
@@ -91,10 +92,12 @@ export async function verifyFoundationDirectNativeParityComposite(sourceOrProgra
 
   const lowering = compiled.foundationDirectLowering ?? { lowered:[], summary:{loweredCount:0} };
   const nonLivingLowering = filterLowering(lowering, item => item?.domain !== 'living');
+  const reference = await deps.runReference(program, { stateRootAlgorithm: native?.stateRootAlgorithm, ...(options.referenceRuntime ?? {}) });
+  const rootFor = value => native?.stateRootAlgorithm ? deps.semanticStateRootForAlgorithm(value, native.stateRootAlgorithm) : deps.semanticStateRoot(value);
   const referenceState = normalize(reference?.state ?? {}, deps.semanticValue);
   const nativeState = normalize(native?.state ?? {}, deps.semanticValue);
-  const referenceRoot = deps.semanticStateRoot(reference?.state ?? {});
-  const nativeRoot = native?.semanticStateRoot ?? deps.semanticStateRoot(native?.state ?? {});
+  const referenceRoot = rootFor(reference?.state ?? {});
+  const nativeRoot = native?.semanticStateRoot ?? rootFor(native?.state ?? {});
   const nativeExecutionAttestation = native?.nativeVmExecutionAttestation ?? null;
   const genericLineage = deps.verifyLineage(nonLivingLowering, native?.history, reference?.history);
   const genericReceipt = deps.verifyGenericReceipt(nonLivingLowering, reference?.history, native?.history, deps.semanticValue);

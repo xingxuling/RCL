@@ -3,7 +3,7 @@ import { compileReality } from './compiler.mjs';
 import { tryCompileFoundationRealityToBytecode } from './foundation-direct-bytecode.mjs';
 import { runReality } from './runtime.mjs';
 import { runNativeBytecode } from './native-vm.mjs';
-import { semanticStateRoot, semanticValue } from './semantic-state-root.mjs';
+import { semanticStateRoot, semanticStateRootForAlgorithm, semanticValue } from './semantic-state-root.mjs';
 
 export const FOUNDATION_ENERGY_NATIVE_PARITY_FORMAT = 'taowind.rcl-foundation-energy-native-parity.v0.1';
 export const FOUNDATION_ENERGY_NATIVE_PARITY_VERSION = '0.1.0';
@@ -236,7 +236,7 @@ export async function verifyFoundationEnergyNativeParity(sourceOrProgram, option
     };
   }
 
-  const reference = await runReference(program, options.referenceRuntime ?? {});
+
   let native;
   try {
     native = await runNative(compiled.bytecode, {
@@ -258,10 +258,12 @@ export async function verifyFoundationEnergyNativeParity(sourceOrProgram, option
     };
   }
 
+  const reference = await runReference(program, { stateRootAlgorithm: native?.stateRootAlgorithm, ...(options.referenceRuntime ?? {}) });
+  const rootFor = value => native?.stateRootAlgorithm ? semanticStateRootForAlgorithm(value, native.stateRootAlgorithm) : semanticRoot(value);
   const referenceState = normalize(reference?.state ?? {}, semantic);
   const nativeState = normalize(native?.state ?? {}, semantic);
-  const referenceRoot = semanticRoot(reference?.state ?? {});
-  const nativeRoot = native?.semanticStateRoot ?? semanticRoot(native?.state ?? {});
+  const referenceRoot = rootFor(reference?.state ?? {});
+  const nativeRoot = native?.semanticStateRoot ?? rootFor(native?.state ?? {});
   const receiptParity = verifyFoundationEnergyReceiptParity(
     lowering,
     reference?.history,

@@ -19,7 +19,7 @@
 #include <string.h>
 #include "rclvm.h"
 
-#define RCL_VM_VERSION "0.6.0-alpha.1"
+#define RCL_VM_VERSION "1.0.0"
 #define INITIAL_STACK_CAPACITY 4096
 #define MAX_STATE 2048
 #define MAX_WARRANTS 1024
@@ -355,12 +355,16 @@ typedef struct {
   uint64_t typed_heap_mark_count;
   TypedHeapEntry typed_heap_objects[MAX_TYPED_HEAP_OBJECTS];
   size_t typed_heap_count;
+  const char *state_root_algorithm;
+  char semantic_state_root[65];
 } VM;
 
 typedef struct {
   char *data;
   size_t length;
   size_t capacity;
+  int precise_numbers;
+  int nonfinite_number;
 } StringBuilder;
 
 typedef struct {
@@ -376,6 +380,8 @@ static size_t utf8_decode_at(const char *text, size_t byte_length, size_t offset
 static void sb_init(StringBuilder *sb) {
   sb->capacity = 256;
   sb->length = 0;
+  sb->precise_numbers = 0;
+  sb->nonfinite_number = 0;
   sb->data = (char *)malloc(sb->capacity);
   if (!sb->data) { fprintf(stderr, "out of memory\n"); exit(2); }
   sb->data[0] = '\0';
@@ -1000,6 +1006,23 @@ static void json_escape_sb(StringBuilder *sb, const char *text) {
   sb_append_char(sb, '"');
 }
 
+static const char *native_state_root_algorithm(void) {
+  const char *algorithm = getenv("RCL_SEMANTIC_STATE_ROOT_ALGORITHM");
+  if (!algorithm) {
+#ifdef RCL_SEMANTIC_ROOT_V2_CANDIDATE
+    return "rcl.semantic-state-root.v1";
+#else
+    return "rcl.semantic-state-root.v2";
+#endif
+  }
+  if (strcmp(algorithm, "rcl.semantic-state-root.v1") == 0) return "rcl.semantic-state-root.v1";
+  if (strcmp(algorithm, "rcl.semantic-state-root.v2") == 0) return "rcl.semantic-state-root.v2";
+#ifdef RCL_SEMANTIC_ROOT_V2_CANDIDATE
+  if (strcmp(algorithm, "rcl.semantic-state-root.v2-candidate") == 0) return "rcl.semantic-state-root.v2-candidate";
+#endif
+  return NULL;
+}
+
 static void value_json_sb(StringBuilder *sb, const Value *value);
 
 static void span_json_sb(StringBuilder *sb, const Span *span) {
@@ -1021,9 +1044,9 @@ static void value_json_sb(StringBuilder *sb, const Value *value) {
   char number[64];
   switch (value->type) {
     case VALUE_NUMBER:
-      if (!isfinite(value->number)) { sb_append(sb, "null"); break; }
+      if (!isfinite(value->number)) { sb->nonfinite_number = 1; sb_append(sb, "null"); break; }
       if (value->number == 0.0) { sb_append(sb, "0"); break; }
-      snprintf(number, sizeof(number), "%.15g", value->number); sb_append(sb, number); break;
+      snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", value->number); sb_append(sb, number); break;
     case VALUE_BOOL: sb_append(sb, value->boolean ? "true" : "false"); break;
     case VALUE_STRING: json_escape_sb(sb, value->string); break;
     case VALUE_SEQUENCE: sequence_json_sb(sb, value->sequence); break;
@@ -1035,7 +1058,7 @@ static void value_json_sb(StringBuilder *sb, const Value *value) {
       sb_append(sb, "{\"kind\":\"FacetDecl\",\"path\":"); json_escape_sb(sb, value->ast->path);
       sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, value->ast->value_type);
       sb_append(sb, ",\"value\":{\"kind\":\"LiteralExpr\",\"value\":");
-      if (strcmp(value->ast->literal_kind, "Number") == 0) { double n = strtod(value->ast->literal_text, NULL); snprintf(number, sizeof(number), "%.15g", n); sb_append(sb, number); }
+      if (strcmp(value->ast->literal_kind, "Number") == 0) { double n = strtod(value->ast->literal_text, NULL); if (!isfinite(n)) sb->nonfinite_number = 1; snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", n); sb_append(sb, number); }
       else if (strcmp(value->ast->literal_kind, "Truth") == 0) sb_append(sb, strcmp(value->ast->literal_text, "true") == 0 ? "true" : "false");
       else json_escape_sb(sb, value->ast->literal_text);
       sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, value->ast->literal_kind); sb_append(sb, "},\"span\":"); span_json_sb(sb, &value->ast->span); sb_append_char(sb, '}'); break;
@@ -1129,7 +1152,7 @@ static void semantic_sequence_json_sb(StringBuilder *sb, const Sequence *sequenc
 static void semantic_literal_expr_json_sb(StringBuilder *sb, const AstNode *ast) {
   char number[64];
   sb_append(sb, "{\"kind\":\"LiteralExpr\",\"value\":");
-  if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); snprintf(number, sizeof(number), "%.15g", n); sb_append(sb, number); }
+  if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); if (!isfinite(n)) sb->nonfinite_number = 1; snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", n); sb_append(sb, number); }
   else if (strcmp(ast->literal_kind, "Truth") == 0) sb_append(sb, strcmp(ast->literal_text, "true") == 0 ? "true" : "false");
   else json_escape_sb(sb, ast->literal_text);
   sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->literal_kind); sb_append_char(sb, '}');
@@ -1182,17 +1205,45 @@ static void semantic_ir_json_sb(StringBuilder *sb, const IrNode *ir) {
   sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ir->value_type); sb_append_char(sb, '}');
 }
 
+static int semantic_intent_slots_json_sb(StringBuilder *sb, const Value *value) {
+  if (value->type != VALUE_SEQUENCE || value->sequence->count % 2) return 0;
+  const Sequence *slots = value->sequence;
+  for (size_t i = 0; i < slots->count; i += 2) {
+    if (sequence_item(slots, i)->type != VALUE_STRING) return 0;
+  }
+  size_t count = slots->count / 2;
+  SemanticFieldRef *fields = (SemanticFieldRef *)malloc(sizeof(SemanticFieldRef) * (count ? count : 1));
+  if (!fields) { fprintf(stderr, "out of memory\n"); exit(2); }
+  for (size_t i = 0; i < count; i++) fields[i] = (SemanticFieldRef){ sequence_item(slots, i * 2)->string, i * 2 + 1 };
+  qsort(fields, count, sizeof(SemanticFieldRef), compare_semantic_field_refs);
+  sb_append_char(sb, '{');
+  for (size_t i = 0; i < count; i++) {
+    if (i) sb_append_char(sb, ',');
+    json_escape_sb(sb, fields[i].name); sb_append_char(sb, ':');
+    semantic_value_json_sb(sb, sequence_item(slots, fields[i].index));
+  }
+  sb_append_char(sb, '}');
+  free(fields);
+  return 1;
+}
+
 static void semantic_typed_record_json_sb(StringBuilder *sb, const TypedRecord *record) {
   SemanticFieldRef *fields = (SemanticFieldRef *)malloc(sizeof(SemanticFieldRef) * (record->field_count ? record->field_count : 1));
   if (!fields) { fprintf(stderr, "out of memory\n"); exit(2); }
   for (size_t i = 0; i < record->field_count; i++) fields[i] = (SemanticFieldRef){ record->field_names[i], i };
   qsort(fields, record->field_count, sizeof(SemanticFieldRef), compare_semantic_field_refs);
+  int kind_index = typed_record_field_index(record, "kind");
+  int intent = sb->precise_numbers && kind_index >= 0 && record->field_values[kind_index].type == VALUE_STRING
+    && strcmp(record->field_values[kind_index].string, "Intent") == 0;
   sb_append_char(sb, '{');
   for (size_t i = 0; i < record->field_count; i++) {
     if (i) sb_append_char(sb, ',');
     json_escape_sb(sb, fields[i].name);
     sb_append_char(sb, ':');
-    semantic_value_json_sb(sb, &record->field_values[fields[i].index]);
+    const Value *field_value = &record->field_values[fields[i].index];
+    if (!(intent && strcmp(fields[i].name, "slots") == 0 && semantic_intent_slots_json_sb(sb, field_value))) {
+      semantic_value_json_sb(sb, field_value);
+    }
   }
   sb_append_char(sb, '}');
   free(fields);
@@ -1333,6 +1384,28 @@ cleanup:
 #endif
 }
 
+#include "semantic_state_v2.h"
+
+static int state_root_v2(const State *state, char output[65], const char **error) {
+  StringBuilder json, canonical;
+  sb_init(&json); sb_init(&canonical);
+  json.precise_numbers = 1;
+  semantic_state_json_sb(&json, state);
+  int ok = !json.nonfinite_number;
+  if (!ok) *error = "Finite binary64 state required";
+  if (ok) ok = root_v2_canonical_json(json.data, &canonical, error);
+  unsigned char digest[RCL_SHA256_DIGEST_LENGTH];
+  if (ok && !rcl_sha256((const unsigned char *)canonical.data, canonical.length, digest)) {
+    *error = "SHA256 calculation failed"; ok = 0;
+  }
+  if (ok) {
+    for (int i = 0; i < RCL_SHA256_DIGEST_LENGTH; i++) snprintf(output + i * 2, 3, "%02x", digest[i]);
+    output[64] = '\0';
+  }
+  free(json.data); free(canonical.data);
+  return ok;
+}
+
 static void state_root(const State *state, char output[65]) {
   StringBuilder sb;
   sb_init(&sb);
@@ -1345,6 +1418,28 @@ static void state_root(const State *state, char output[65]) {
   for (int i = 0; i < RCL_SHA256_DIGEST_LENGTH; i++) snprintf(output + i * 2, 3, "%02x", digest[i]);
   output[64] = '\0';
   free(sb.data);
+}
+
+static int selected_state_root(VM *vm, const State *state, char output[65]) {
+  if (!vm->state_root_algorithm) {
+    vm_fail(vm, "RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH", "Semantic state root algorithm was not initialized");
+    return 0;
+  }
+  if (strcmp(vm->state_root_algorithm, "rcl.semantic-state-root.v2") == 0) {
+    const char *error = NULL;
+    if (!state_root_v2(state, output, &error)) {
+      vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", error ? error : "Invalid v2 semantic state");
+      return 0;
+    }
+  } else state_root(state, output);
+  return 1;
+}
+
+static int reserved_layout_field(const char *name) {
+  return strcmp(name, "__rclKind") == 0 || strcmp(name, "__rclType") == 0
+    || strcmp(name, "__rclObjectId") == 0 || strcmp(name, "__rclFieldOffsets") == 0
+    || strcmp(name, "__rclPayloadOffsets") == 0 || strcmp(name, "__rclRecord") == 0
+    || strcmp(name, "__rclUnion") == 0;
 }
 
 static uint16_t memory_u16_le(const uint8_t *bytes, size_t length, size_t offset, int *ok) {
@@ -1419,6 +1514,13 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
     offset += 4;
     if (string_length > 16u * 1024u * 1024u) return validation_fail(error, "RCL_NATIVE_STRING_LIMIT", "RBC string exceeds the 16 MiB limit");
     if (offset > length || length - offset < string_length) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC string data is truncated");
+    if (memchr(bytes + offset, 0, string_length)) return validation_fail(error, "RCL_NATIVE_TEXT_NUL_UNSUPPORTED", "Native Text cannot contain NUL bytes");
+    for (size_t cursor = 0; cursor < string_length;) {
+      uint32_t codepoint; int valid = 1;
+      size_t width = utf8_decode_at((const char *)bytes + offset, string_length, cursor, &codepoint, &valid);
+      if (!valid || !width) return validation_fail(error, "RCL_NATIVE_TEXT_UTF8_REQUIRED", "RBC strings must contain valid UTF-8 Unicode scalars");
+      cursor += width;
+    }
     offset += string_length;
   }
   if (number_count > (length - offset) / 8) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC number pool is truncated");
@@ -2407,7 +2509,7 @@ static int execute_program(VM *vm) {
       case OP_BEGIN_TX:
         if (vm->tx.active) { vm_fail(vm, "RCL_NATIVE_TX_NESTED", "Nested native transactions are not supported"); break; }
         transaction_reset(&vm->tx); vm->tx.active = 1; vm->tx.mode = instruction.a; vm->tx.rule_kind = instruction.flags ? 1 : 0;
-        vm->tx.rule = xstrdup(pool_string(vm, instruction.b)); vm->tx.actor = xstrdup(pool_string(vm, instruction.c)); state_root(&vm->state, vm->tx.before_root);
+        vm->tx.rule = xstrdup(pool_string(vm, instruction.b)); vm->tx.actor = xstrdup(pool_string(vm, instruction.c)); selected_state_root(vm, &vm->state, vm->tx.before_root);
         break;
       case OP_CHECK_WARRANT: {
         const char *subject = pool_string(vm, instruction.a), *capability = pool_string(vm, instruction.b), *target = pool_string(vm, instruction.c);
@@ -2453,7 +2555,8 @@ static int execute_program(VM *vm) {
         State projected; if (!state_clone_into(&projected, &vm->state)) { vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot clone projected state"); break; }
         for (size_t i = 0; i < vm->tx.change_count; i++) if (!state_set(&projected, vm->tx.changes[i].target, &vm->tx.changes[i].after)) { vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot apply projected state"); break; }
         if (vm->error.code) { state_free(&projected); break; }
-        char after_root[65]; state_root(&projected, after_root);
+        char after_root[65];
+        if (!selected_state_root(vm, &projected, after_root)) { state_free(&projected); break; }
         if (vm->tx.mode == 0) {
           if (vm->projection_count >= MAX_RECORDS || !record_copy_from_tx(&vm->projections[vm->projection_count++], &vm->tx, after_root, &projected)) vm_fail(vm, "RCL_NATIVE_RECORD_LIMIT", "Cannot record projection");
         } else {
@@ -2529,6 +2632,13 @@ static int execute_program(VM *vm) {
         if (instruction.c < 0 || vm->stack_count < (size_t)instruction.c) { vm_fail(vm, "RCL_NATIVE_TYPED_RECORD_STACK", "Typed record constructor stack underflow"); break; }
         size_t field_count = (size_t)instruction.c;
         char **field_names = split_field_names(vm, pool_string(vm, instruction.b), field_count);
+        if (vm->error.code) { free_string_array(field_names, field_count); break; }
+        for (size_t i = 0; i < field_count; i++) {
+          if (reserved_layout_field(field_names[i])) {
+            vm_fail(vm, "RCL_RECORD_FIELD_RESERVED", "Typed record field collides with native layout metadata");
+            break;
+          }
+        }
         if (vm->error.code) { free_string_array(field_names, field_count); break; }
         Value *field_values = (Value *)calloc(field_count ? field_count : 1, sizeof(Value));
         if (!field_values) { fprintf(stderr, "out of memory\n"); exit(2); }
@@ -2665,11 +2775,17 @@ static int execute_program(VM *vm) {
 }
 
 static void print_value_json(FILE *out, const Value *value) {
-  StringBuilder sb; sb_init(&sb); value_json_sb(&sb, value); fputs(sb.data, out); free(sb.data);
+  StringBuilder sb; sb_init(&sb);
+  const char *algorithm = native_state_root_algorithm();
+  sb.precise_numbers = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v1") != 0;
+  value_json_sb(&sb, value); fputs(sb.data, out); free(sb.data);
 }
 
 static void print_state_json(FILE *out, const State *state) {
-  StringBuilder sb; sb_init(&sb); state_json_sb(&sb, state); fputs(sb.data, out); free(sb.data);
+  StringBuilder sb; sb_init(&sb);
+  const char *algorithm = native_state_root_algorithm();
+  sb.precise_numbers = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v1") != 0;
+  state_json_sb(&sb, state); fputs(sb.data, out); free(sb.data);
 }
 
 static void print_json_string(FILE *out, const char *text) {
@@ -2743,6 +2859,7 @@ static void print_record(FILE *out, VM *vm, const Record *record) {
   fputs(",\"actor\":", out); print_json_string(out, record->actor);
   fputs(",\"from\":null,\"into\":null,\"beforeRoot\":", out); print_json_string(out, record->before_root);
   fputs(",\"afterRoot\":", out); print_json_string(out, record->after_root);
+  fputs(",\"stateRootAlgorithm\":", out); print_json_string(out, vm->state_root_algorithm);
   fputs(",\"changes\":", out); print_changes(out, record);
   fputs(",\"authority\":", out); print_authority(out, vm, record);
   fputs(",\"witnesses\":", out); print_witnesses(out, record);
@@ -2754,13 +2871,11 @@ static void print_record(FILE *out, VM *vm, const Record *record) {
 static void print_success(VM *vm, FILE *out) {
   const char *program = vm->program.strings[vm->program.program_name_index];
   const char *source_root = vm->program.strings[vm->program.source_root_index];
-  char semantic_state_root[65];
-  state_root(&vm->state, semantic_state_root);
   fprintf(out, "{\"vm\":\"rcl-native-vm/%s\",\"bytecodeVersion\":\"%u.%u\",\"program\":", RCL_VM_VERSION, vm->program.major, vm->program.minor);
   print_json_string(out, program);
   fputs(",\"sourceRoot\":", out); print_json_string(out, source_root);
-  fputs(",\"stateRootAlgorithm\":\"rcl.semantic-state-root.v1\"", out);
-  fputs(",\"stateRoot\":", out); print_json_string(out, semantic_state_root);
+  fputs(",\"stateRootAlgorithm\":", out); print_json_string(out, vm->state_root_algorithm);
+  fputs(",\"stateRoot\":", out); print_json_string(out, vm->semantic_state_root);
   typed_heap_mark_from_roots(vm);
   fputs(",\"status\":\"ok\",\"typedHeap\":{\"allocated\":", out); fprintf(out, "%" PRIu64, vm->typed_heap_allocated);
   fputs(",\"registered\":", out); fprintf(out, "%zu", vm->typed_heap_count);
@@ -2908,7 +3023,21 @@ int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_j
     return 0;
   }
   vm_clear_transient(&instance->vm, reset_state != 0);
-  int ok = execute_program(&instance->vm);
+  const char *algorithm = native_state_root_algorithm();
+  int ok = algorithm != NULL;
+  if (!ok) vm_fail(&instance->vm, "RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH", "Unsupported semantic state root algorithm");
+  if (ok) {
+    instance->vm.state_root_algorithm = algorithm;
+    ok = execute_program(&instance->vm);
+  }
+  if (ok) {
+    instance->vm.state_root_algorithm = algorithm;
+    if (strcmp(algorithm, "rcl.semantic-state-root.v2") == 0) {
+      const char *root_error = NULL;
+      ok = state_root_v2(&instance->vm.state, instance->vm.semantic_state_root, &root_error);
+      if (!ok) vm_fail(&instance->vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error ? root_error : "Invalid semantic state");
+    } else state_root(&instance->vm.state, instance->vm.semantic_state_root);
+  }
   if (result_json) *result_json = capture_vm_output(&instance->vm, ok);
   if (!ok && error && error_capacity) snprintf(error, error_capacity, "%s: %s", instance->vm.error.code ? instance->vm.error.code : "RCL_NATIVE_FAILURE", instance->vm.error.message);
   return ok;

@@ -15,7 +15,7 @@ function replaceOnce(source, needle, replacement, label) {
 }
 
 export function materializeSemanticStateRootV2Candidate(sourceText = fs.readFileSync(SOURCE, 'utf8')) {
-  let source = sourceText;
+  let source = '#define RCL_SEMANTIC_ROOT_V2_CANDIDATE 1\n' + sourceText;
   source = replaceOnce(source,
 `static void value_json_sb(StringBuilder *sb, const Value *value);`,
 `static int semantic_state_root_v2_enabled(void);
@@ -51,7 +51,7 @@ static void semantic_number_json_sb(StringBuilder *sb, double value) {
   if (!isfinite(value)) { sb_append(sb, "null"); return; }
   if (value == 0.0) { sb_append(sb, "0"); return; }
   char number[64];
-  snprintf(number, sizeof(number), "%.15g", value);
+  snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", value);
   sb_append(sb, number);
 }
 
@@ -77,15 +77,7 @@ static void semantic_unsigned_integer_json_sb(StringBuilder *sb, uint64_t value)
 
 static void semantic_value_json_sb(StringBuilder *sb, const Value *value);`, 'helper');
 
-  source = replaceOnce(source,
-`    case VALUE_NUMBER:
-      if (!isfinite(value->number)) { sb_append(sb, "null"); break; }
-      if (value->number == 0.0) { sb_append(sb, "0"); break; }
-      snprintf(number, sizeof(number), "%.15g", value->number); sb_append(sb, number); break;`,
-`    case VALUE_NUMBER:
-      if (!isfinite(value->number)) { sb_append(sb, "null"); break; }
-      if (value->number == 0.0) { sb_append(sb, "0"); break; }
-      snprintf(number, sizeof(number), semantic_state_root_v2_enabled() ? "%.17g" : "%.15g", value->number); sb_append(sb, number); break;`, 'public-number-output');
+
 
   source = replaceOnce(source,
 `static void semantic_value_json_sb(StringBuilder *sb, const Value *value) {
@@ -113,15 +105,10 @@ static void semantic_value_json_sb(StringBuilder *sb, const Value *value);`, 'he
     );
   }
   source = source.replace(
-    'if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); snprintf(number, sizeof(number), "%.15g", n); sb_append(sb, number); }',
+    'if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); if (!isfinite(n)) sb->nonfinite_number = 1; snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", n); sb_append(sb, number); }',
     'if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); semantic_number_json_sb(sb, n); }',
   );
-  source = replaceOnce(source,
-`  fputs(",\\\"stateRootAlgorithm\\\":\\\"rcl.semantic-state-root.v1\\\"", out);`,
-`  fputs(",\\\"stateRootAlgorithm\\\":", out);
-  print_json_string(out, semantic_state_root_v2_enabled()
-    ? "rcl.semantic-state-root.v2-candidate"
-    : "rcl.semantic-state-root.v1");`, 'algorithm-output');
+
 
   return source;
 }

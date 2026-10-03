@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+export const RCL_REFERENCE_STATE_ROOT_ALGORITHM = 'rcl.reference-state-root.v0.6';
 
 export function canonicalReality(value) {
   if (value === null || value === undefined) return 'null';

@@ -1,4 +1,11 @@
 export * from './index-pre-v095-v096.mjs';
+export { RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
+export { semanticStateRootForAlgorithm, RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM } from './semantic-state-root.mjs';
+export {
+  RCL_SEMANTIC_STATE_ROOT_V2,
+  semanticStateCanonicalV2Stable,
+  semanticStateRootV2Stable,
+} from './semantic-state-root-v2.mjs';
 
 export {
   RCL_SAME_SOURCE_MULTI_INSTANCE_VERSION,

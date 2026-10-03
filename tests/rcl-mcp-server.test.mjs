@@ -100,6 +100,10 @@ test('RCL MCP compile tool compiles and native-runs RCL source', async () => {
   assert.ok(compiled.result.structuredContent.byteLength > 36);
   assert.equal(compiled.result.structuredContent.nativeRun.status, 'ok');
   assert.equal(compiled.result.structuredContent.nativeRun.state['world.greeting'], 'Hello, reality.');
+  assert.equal(compiled.result.structuredContent.nativeRun.stateRootAlgorithm, 'rcl.semantic-state-root.v2');
+  assert.equal(compiled.result.structuredContent.nativeRun.stateRootVerified, true);
+  assert.match(compiled.result.structuredContent.nativeRun.stateRoot, /^[a-f0-9]{64}$/u);
+  assert.ok(compiled.result.structuredContent.nativeRun.nativeVmExecutionAttestation);
 
   const examples = await handleRclMcpRequest({
     jsonrpc: '2.0',

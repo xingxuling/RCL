@@ -5,21 +5,13 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { compileReality } from '../src/compiler.mjs';
 import { runReality } from '../src/runtime.mjs';
+import { SELFHOST_SOURCE_TRUTH_MODULES } from '../src/selfhost-source-truth-manifest.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const rclPath = path.join(root, 'selfhost', 'rcl-source-selfhost-stage0.rcl');
 const outputPath = path.join(root, 'output', 'selfhost', 'stage0-verification.json');
 
-const coreModules = [
-  ['lexer', 'src/lexer.mjs', 'source.lexer_sha'],
-  ['parser', 'src/parser.mjs', 'source.parser_sha'],
-  ['compiler', 'src/compiler.mjs', 'source.compiler_sha'],
-  ['runtime', 'src/runtime.mjs', 'source.runtime_sha'],
-  ['bytecode', 'src/bytecode.mjs', 'source.bytecode_sha'],
-  ['bootstrap', 'src/bootstrap.mjs', 'source.bootstrap_sha'],
-  ['native_vm', 'src/native-vm.mjs', 'source.native_vm_sha'],
-  ['v094_file_emission', 'src/autonomous-sandbox-file-emission-protocol.mjs', 'source.v094_file_emission_sha'],
-];
+const coreModules = SELFHOST_SOURCE_TRUTH_MODULES;
 
 function sha256(text) {
   return crypto.createHash('sha256').update(text).digest('hex');

@@ -17,7 +17,9 @@ import {
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-developer-release-truth-proof-'));
-const outDir = path.join(tmpRoot, 'release');
+const releaseIndex = process.argv.indexOf('--release');
+if (releaseIndex !== -1 && !process.argv[releaseIndex + 1]) throw new Error('RCL_RELEASE_PATH_REQUIRED');
+const outDir = releaseIndex === -1 ? path.join(tmpRoot, 'release') : path.resolve(process.argv[releaseIndex + 1]);
 
 function fail(message, details = {}) {
   console.error(JSON.stringify({
@@ -62,7 +64,7 @@ function extractArchiveText(archivePath, member) {
 }
 
 try {
-  const build = spawnSync(
+  const build = releaseIndex !== -1 ? { status: 0 } : spawnSync(
     process.execPath,
     ['scripts/build-developer-release.mjs', outDir],
     { cwd: ROOT, encoding: 'utf8', env: process.env },

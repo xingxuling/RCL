@@ -7,6 +7,7 @@ import test from 'node:test';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const CLI = path.join(ROOT, 'src', 'reality-hub-cli.mjs');
+const PACKAGE = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
 function invoke(args) {
   return spawnSync(process.execPath, [CLI, ...args], {
@@ -18,14 +19,14 @@ function invoke(args) {
 test('public CLI exposes a stable version command', () => {
   const result = invoke(['--version']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /@taowind\/rcl-reality-forge 0\.94\.0-alpha\.1/);
+  assert.equal(result.stdout.trim(), PACKAGE.name + ' ' + PACKAGE.version);
 });
 
 test('public CLI exposes canonical version metadata as JSON', () => {
   const result = invoke(['version', '--json']);
   assert.equal(result.status, 0, result.stderr);
   const payload = JSON.parse(result.stdout);
-  assert.equal(payload.version, '0.94.0-alpha.1');
+  assert.equal(payload.version, PACKAGE.version);
   assert.equal(payload.canonical, true);
   assert.equal(payload.canonicalRepository, 'xingxuling/RCL');
 });

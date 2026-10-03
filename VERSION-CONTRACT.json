@@ -4,7 +4,7 @@
   "canonicalBranch": "main",
   "canonical": true,
   "package": "@taowind/rcl-reality-forge",
-  "packageVersion": "0.94.0-alpha.1",
+  "packageVersion": "1.0.0",
   "componentVersionContract": "COMPONENT-VERSIONS.json",
   "downstreamConsumerContract": "DOWNSTREAM-CONSUMERS.json",
   "technicalDebtRegister": "docs/governance/RCL_TECHNICAL_DEBT_REGISTER_v0.1.md",
@@ -19,11 +19,22 @@
   "claims": {
     "nativeCoreSelfHosting": true,
     "nativeSemanticAuthorityRoot": {
-      "algorithm": "rcl.semantic-state-root.v1",
+      "algorithm": "rcl.semantic-state-root.v2",
       "producer": "native/rclvm.c",
       "verifier": "src/semantic-state-root.mjs",
       "strictOption": "requireNativeStateRoot",
-      "status": "verified"
+      "status": "native-verified-local-windows-linux",
+      "successor": {
+        "algorithm": "rcl.semantic-state-root.v2",
+        "selectionOption": "stateRootAlgorithm",
+        "status": "stable-default-verified-windows-linux",
+        "linuxExecution": "PASS_LOCAL_CONTAINER_NODE20_DEBIAN_X64",
+        "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+        "specification": "docs/v1.0/semantic-state-root-v2.md",
+        "windowsExecution": "PASS_LOCAL_WINDOWS_X64"
+      },
+      "legacyAlgorithm": "rcl.semantic-state-root.v1",
+      "selectionOption": "stateRootAlgorithm"
     },
     "wholeLanguageRuntimeSelfHosting": false,
     "advancedDomainRuntime": "JavaScript Reference Runtime plus implementation-bound direct lowering for 8 declared Foundation domains and 5 Native Provider bridge batches covering 16 bridge domains",
@@ -157,7 +168,18 @@
       "tests/native-semantic-state-root-native.test.mjs",
       "tests/foundation-knowledge-direct-lowering.test.mjs"
     ],
-    "ciRequired": true,
-    "ciRun": null
+    "ciRequired": false,
+    "ciRun": null,
+    "ciPolicy": "NOT_RUN_USER_INSTRUCTION"
+  },
+  "sourcePromotion": {
+    "baselineCanonicalCommit": "bd2187a5303a2bdc1e3a05ec98231400854c226a",
+    "developmentBranch": "codex/rcl-v1-development",
+    "localVersion": "1.0.0",
+    "mergedToCanonicalMain": false,
+    "publishedRelease": false,
+    "deployedRemoteMcp": false,
+    "localReleaseVerified": true,
+    "verificationRecord": "docs/v1.0/verification.json"
   }
 }

@@ -37,5 +37,19 @@
       "syncRequired": true,
       "requiredAction": "run the declared vendor synchronization workflow from a verified canonical checkout, then regenerate native artifact and test evidence"
     }
-  ]
+  ],
+  "semanticStateRootMigration": {
+    "targetPackageVersion": "1.0.0",
+    "defaultNativeAlgorithm": "rcl.semantic-state-root.v2",
+    "legacyNativeAlgorithm": "rcl.semantic-state-root.v1",
+    "legacyReferenceAlgorithm": "rcl.reference-state-root.v0.6",
+    "requiredReceiptFields": [
+      "stateRoot",
+      "stateRootAlgorithm"
+    ],
+    "explicitAlgorithmNegotiationRequired": true,
+    "historicalDigestsMustNotBeRelabeled": true,
+    "consumerSynchronizationExecuted": false,
+    "requiredAction": "bind upstream commit and artifact hashes; negotiate the algorithm; rebuild native artifacts and verify finite Number/Text/typed-state parity before any synchronization claim"
+  }
 }

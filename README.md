@@ -1,19 +1,19 @@
 <div align="center">
 
-# RCL v0.94.0-alpha.1 — Reality Compiler Language
+# RCL v1.0.0 — Reality Compiler Language
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5-minute Quick Start](GETTING_STARTED.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v0.94.0--alpha.1-orange.svg)](package.json)
+[![Package](https://img.shields.io/badge/package-v1.0.0-blue.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
 
-RCL (Reality Compiler Language) is an experimental open-source language for writing programs whose state changes must obey explicit rules: **who can act, what may change, which conditions must hold, and what evidence records the result**.
+RCL (Reality Compiler Language) is an open-source language for writing programs whose state changes must obey explicit rules: **who can act, what may change, which conditions must hold, and what evidence records the result**.
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
@@ -24,15 +24,19 @@ This repository contains the language implementation, an RCL-authored native-cor
 - **Keep semantics across execution targets.** RCL owns the state and authority model while native bytecode, Web, and Android paths provide different execution environments. The candidate Native UI model shares an IR and semantic root across Web/Android backends.
 - **Verify the compiler with itself.** The native-core compiler is written in RCL and has a recorded byte-identical `C0 == C1 == C2` fixed point. This is compiler self-hosting, not a claim that the entire runtime is self-hosted.
 
-RCL is useful to explore permission-aware application state, auditable automation, and language/runtime research. It is currently an **alpha research toolchain**, not a drop-in replacement for a production language or an operating-system security boundary.
+RCL is useful to explore permission-aware application state, auditable automation, and language/runtime research. Version 1.0 stabilizes the core language, native state-root protocol, public CLI and installable source toolchain. Research extensions retain their individual evidence and maturity profiles.
 
 [Quick start](#quick-start) · [Examples](#learn-rcl-by-example) · [Current maturity](#what-is-verified-today) · [Architecture](#architecture) · [Contributing](#contributing)
 
 ---
 
+## Version 1.0
+
+The native VM and `rcl run` default to `rcl.semantic-state-root.v2`, using exact finite binary64 encoding for final states and transaction roots. Historical native v1 receipts remain verifiable through explicit algorithm selection. The `runReality` reference API preserves its distinct `rcl.reference-state-root.v0.6` default; pass `stateRootAlgorithm` for cross-runtime v2 execution. See the [stable contracts](docs/v1.0/language-contract.md), [root protocol](docs/v1.0/semantic-state-root-v2.md) and [release acceptance](docs/v1.0/acceptance.md).
+
 ## Quick start
 
-Requirements: Git, Node.js 22+, and npm. Start with the JavaScript/reference runtime from source:
+Requirements: Git, Node.js 20+, and npm. Start with the JavaScript/reference runtime from source:
 
 ### 1. Clone and install
 
@@ -118,7 +122,7 @@ Chinese version:
 
 ## What is verified today?
 
-The package baseline remains **`v0.94.0-alpha.1`**. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+The local release target is **`v1.0.0`**; canonical-main merge and remote publication are separate promotion states. Exact current evidence lives in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 | Area | Current state |
 |---|---|

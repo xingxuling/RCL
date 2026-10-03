@@ -15,10 +15,10 @@ OBJECT := rclvm.o
 
 all: $(TARGET) $(STATIC_LIB) $(SHARED_LIB) $(SERVER) $(COMPILER) $(PROVIDER_DEMO) $(FOUNDATION_PROVIDER) $(EMBEDDED_BENCHMARK)
 
-$(OBJECT): $(SOURCE) rclvm.h
+$(OBJECT): $(SOURCE) rclvm.h semantic_state_v2.h
 	$(CC) $(CFLAGS) $(PICFLAGS) -DRCLVM_EMBEDDED_ONLY -c -o $@ $(SOURCE)
 
-$(TARGET): $(SOURCE) rclvm.h
+$(TARGET): $(SOURCE) rclvm.h semantic_state_v2.h
 	$(CC) $(CFLAGS) -o $@ $(SOURCE) $(LDFLAGS)
 
 $(STATIC_LIB): $(OBJECT)

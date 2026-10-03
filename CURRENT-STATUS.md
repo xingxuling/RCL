@@ -1,14 +1,20 @@
-# Current RCL Status: v0.94.0-alpha.1
+# Current RCL Status: v1.0.0 locally verified release
 
 - Canonical source: `xingxuling/RCL@main`.
-- Package baseline: `v0.94.0-alpha.1`.
+- Locally verified package/native VM: `v1.0.0`; canonical-main baseline is `bd2187a5303a2bdc1e3a05ec98231400854c226a` at `v0.94.0-alpha.1`.
 - Verified native ceiling: Stage40 native-core RCL self-hosting.
 - Current research frontier: Universal Program Stress v0.1 with a permanent `20 × 20 = 400` environment/program matrix and nine non-compensatory gates.
 - The repository contains the native-core compiler/VM path and fixed-point artifacts described in the main README.
-- The current native VM emits `rcl.semantic-state-root.v1`; the JavaScript boundary independently recomputes the canonical semantic state root, rejects algorithm/root mismatch, and supports strict evidence enforcement through `requireNativeStateRoot: true`.
+- The v1.0 native VM defaults to `rcl.semantic-state-root.v2` for final-state and transaction roots; explicit v1 selection preserves historical verification. Native root v2 uses typed JSON nodes and exact finite binary64 bits; the JavaScript boundary independently recomputes the canonical semantic state root, rejects algorithm/root mismatch, and supports strict evidence enforcement through `requireNativeStateRoot: true`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## Local v1.0 verification
+
+Local release acceptance is complete: 1683 tests pass, zero fail and two have explicit skip boundaries across all 328 test files. Stage0–40 pass, Windows/Linux native-core compiler fixed points agree, and independent Windows/Linux package installation, public CLI/API, Forge and 32-tool MCP HTTP processes pass. Exact source/package truth and negative controls pass release verifiers. `docs/v1.0/verification.json` and `docs/v1.0/acceptance.md` record the scope. GitHub Actions were not run. Canonical main and the connected remote MCP remain at the audited 0.94.0-alpha.1 baseline; this local release has not been pushed, merged, published or remotely deployed.
+
+The research matrix and hosted campaign descriptions below are retained historical, pinned evidence. They do not establish fresh v1.0 hardware, Android-device, CI or remote deployment proof.
 
 ## Universal Program Stress frontier
 

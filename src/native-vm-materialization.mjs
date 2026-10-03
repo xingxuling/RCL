@@ -7,6 +7,7 @@ import {
   RCL_NATIVE_VM_CANONICAL_BUILD_SUPPORT_FORMAT,
   RCL_NATIVE_VM_CANONICAL_HEADER,
   RCL_NATIVE_VM_CANONICAL_MAKEFILE,
+  RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER,
   nativeVmCanonicalBuildSupportRoots,
 } from './native-vm-canonical-build-support.mjs';
 
@@ -54,12 +55,15 @@ function validCachedBinary(vmPath, manifestPath, sourceRoot) {
 function resolveBuildSupport(nativeDir) {
   const repositoryMakefile = readTextIfPresent(path.join(nativeDir, 'Makefile'));
   const repositoryHeader = readTextIfPresent(path.join(nativeDir, 'rclvm.h'));
+  const repositorySemanticV2Header = readTextIfPresent(path.join(nativeDir, 'semantic_state_v2.h'));
   return {
     makefile: repositoryMakefile ?? RCL_NATIVE_VM_CANONICAL_MAKEFILE,
     header: repositoryHeader ?? RCL_NATIVE_VM_CANONICAL_HEADER,
+    semanticV2Header: repositorySemanticV2Header ?? RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER,
     provenance: {
       makefile: repositoryMakefile === null ? 'embedded-canonical-support' : 'repository-source',
       header: repositoryHeader === null ? 'embedded-canonical-support' : 'repository-source',
+      semanticV2Header: repositorySemanticV2Header === null ? 'embedded-canonical-support' : 'repository-source',
     },
   };
 }
@@ -201,6 +205,7 @@ export function materializeNativeVm(root, options = {}) {
     sourceSha256: sha256(source),
     makefileSha256: sha256(support.makefile),
     headerSha256: sha256(support.header),
+    semanticV2HeaderSha256: sha256(support.semanticV2Header),
     buildTool: makePath,
     directCompilerFallback,
     fallbackCompiler,
@@ -232,6 +237,7 @@ export function materializeNativeVm(root, options = {}) {
   fs.copyFileSync(sourcePath, path.join(stageDir, 'rclvm.c'));
   fs.writeFileSync(path.join(stageDir, 'Makefile'), support.makefile);
   fs.writeFileSync(path.join(stageDir, 'rclvm.h'), support.header);
+  fs.writeFileSync(path.join(stageDir, 'semantic_state_v2.h'), support.semanticV2Header);
 
   const spawn = options.spawnSyncImpl ?? spawnSync;
   let buildStrategy = 'makefile';
