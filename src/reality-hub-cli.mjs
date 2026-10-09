@@ -5,6 +5,13 @@ import { checkSourceFile, printPublicHelp, printVersion, runDoctor } from './cli
 const args = process.argv.slice(2);
 const command = args[0];
 
+if (command === 'session') {
+  const { runSessionCli } = await import('./session-cli.mjs');
+  const result = await runSessionCli(args.slice(1));
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(result.ok === false ? 1 : 0);
+}
+
 if (command === '--version' || command === '-v') {
   printVersion();
   process.exit(0);

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0 - locally verified on Windows, 2026-10-10
+
+- Add source-owned scalar input facets and stateful reference/native sessions.
+- Add RBC 1.3 session entry/input/warrant-refresh operations, native conditional
+  warrants, C embedding APIs and an extended native daemon protocol.
+- Add an RCL-authored native session compiler with bootstrap differential checks.
+- Add durable source-bound journals, native/reference replay, OS writer locks,
+  idempotent retry, revision checks and explicit incomplete-tail recovery.
+- Add public session APIs/CLI, persistent examples and process-death/corruption
+  controls. Nineteen session checks and independent Windows installation pass.
+- Preserve independent state-root/typed-reference ABI identities and historical
+  K400 evidence. No Actions, hosted release or downstream synchronization.
+
 ## 1.0.0 - locally verified 2026-10-03
 
 - Add exact finite binary64 semantic state root v2 and make it the native default, including transaction/projection roots with explicit algorithm IDs.

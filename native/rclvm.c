@@ -19,7 +19,7 @@
 #include <string.h>
 #include "rclvm.h"
 
-#define RCL_VM_VERSION "1.0.0"
+#define RCL_VM_VERSION "2.0.0"
 #define INITIAL_STACK_CAPACITY 4096
 #define MAX_STATE 2048
 #define MAX_WARRANTS 1024
@@ -82,6 +82,9 @@ enum {
   OP_DEREF_TYPED_REF = 42,
   OP_GET_TYPED_REF_ID = 43,
   OP_MOD = 44,
+  OP_SESSION_ENTRY = 45,
+  OP_INPUT_DECL = 46,
+  OP_CLEAR_WARRANTS = 47,
 };
 
 enum {
@@ -1494,9 +1497,9 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
   uint32_t instruction_count = memory_u32_le(bytes, length, 28, &ok);
   uint32_t reserved = memory_u32_le(bytes, length, 32, &ok);
   if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC header is truncated");
-  if (major != 1 || minor < 1 || minor > 2) {
+  if (major != 1 || minor < 1 || minor > 3) {
     char message[128];
-    snprintf(message, sizeof(message), "Unsupported RBC version %u.%u; native VM supports 1.1 and 1.2", major, minor);
+    snprintf(message, sizeof(message), "Unsupported RBC version %u.%u; native VM supports 1.1 through 1.3", major, minor);
     return validation_fail(error, "RCL_NATIVE_BYTECODE_VERSION", message);
   }
   if (reserved != 0) return validation_fail(error, "RCL_NATIVE_BAD_HEADER", "RBC reserved header field must be zero");
@@ -1538,7 +1541,11 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
     int32_t b = memory_i32_le(bytes, length, at + 8, &ok);
     int32_t c = memory_i32_le(bytes, length, at + 12, &ok);
     if (!ok) return validation_fail(error, "RCL_NATIVE_TRUNCATED", "RBC instruction operand is truncated");
-    if (op > OP_MOD) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
+    if (op > OP_CLEAR_WARRANTS) return validation_fail(error, "RCL_NATIVE_OPCODE_UNKNOWN", "RBC contains an unknown opcode");
+    if (minor < 3 && (op >= OP_SESSION_ENTRY || (op == OP_GRANT_WARRANT && instruction_flags))) {
+      return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.3 feature requires a 1.3 header");
+    }
+    if (op == OP_GRANT_WARRANT && (instruction_flags & ~1u)) return validation_fail(error, "RCL_NATIVE_BYTECODE_FLAGS", "GRANT_WARRANT contains unknown flags");
     if (minor == 1 && (op == OP_MOD || ((op == OP_CALL_PROVIDER || op == OP_STAGE_STORE) && (instruction_flags & 1)))) {
       return validation_fail(error, "RCL_NATIVE_BYTECODE_FEATURE_VERSION", "RBC 1.2 feature is encoded under a 1.1 header");
     }
@@ -1555,6 +1562,12 @@ static int validate_bytecode_bytes(const uint8_t *bytes, size_t length, VmError 
         valid = pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && pool_index_valid(c, string_count); break;
       case OP_BEGIN_TX:
         valid = pool_index_valid(b, string_count) && pool_index_valid(c, string_count); break;
+      case OP_SESSION_ENTRY:
+        valid = pool_index_valid(a, string_count) && (b == 0 || b == 1) && c == 0 && instruction_flags == 0; break;
+      case OP_INPUT_DECL:
+        valid = pool_index_valid(a, string_count) && b >= 1 && b <= 3 && c == 0 && instruction_flags == 0; break;
+      case OP_CLEAR_WARRANTS:
+        valid = a == 0 && b == 0 && c == 0 && instruction_flags == 0; break;
       case OP_CALL_PROVIDER:
         valid = (instruction_flags & 1) || (pool_index_valid(a, string_count) && pool_index_valid(b, string_count) && pool_index_valid(c, string_count)); break;
       case OP_MAKE_TYPED_RECORD: case OP_MAKE_TYPED_UNION:
@@ -2430,8 +2443,7 @@ static int call_continuation_returns(const VM *vm, uint32_t pc) {
   return 0;
 }
 
-static int execute_program(VM *vm) {
-  uint32_t pc = 0;
+static int execute_program_from(VM *vm, uint32_t pc) {
   while (pc < vm->program.instruction_count && !vm->error.code) {
     if (++vm->executed_instructions > RCLVM_MAX_EXECUTED_INSTRUCTIONS) { vm_fail(vm, "RCL_NATIVE_BUDGET_EXCEEDED", "Native VM instruction budget exceeded (300000000)"); break; }
     Instruction instruction = vm->program.instructions[pc++];
@@ -2503,9 +2515,20 @@ static int execute_program(VM *vm) {
         if (!comparison) { if (instruction.a < 0 || (uint32_t)instruction.a >= vm->program.instruction_count) vm_fail(vm, "RCL_NATIVE_JUMP_RANGE", "Jump target out of range"); else pc = (uint32_t)instruction.a; }
         break;
       case OP_GRANT_WARRANT:
+        if (instruction.flags & 1) {
+          value = stack_pop(vm);
+          if (value.type != VALUE_BOOL) { value_free(&value); vm_fail(vm, "RCL_NATIVE_WARRANT_CONDITION_TYPE", "Conditional warrant requires Truth"); break; }
+          comparison = value.boolean; value_free(&value);
+          if (!comparison) break;
+        }
         if (vm->warrant_count >= MAX_WARRANTS) { vm_fail(vm, "RCL_NATIVE_WARRANT_LIMIT", "Native VM warrant capacity exceeded"); break; }
         vm->warrants[vm->warrant_count++] = (Warrant){ xstrdup(pool_string(vm, instruction.a)), xstrdup(pool_string(vm, instruction.b)), xstrdup(pool_string(vm, instruction.c)) };
         break;
+      case OP_CLEAR_WARRANTS:
+        for (size_t i = 0; i < vm->warrant_count; i++) { free(vm->warrants[i].subject); free(vm->warrants[i].capability); free(vm->warrants[i].target); }
+        vm->warrant_count = 0;
+        break;
+      case OP_SESSION_ENTRY: case OP_INPUT_DECL: break;
       case OP_BEGIN_TX:
         if (vm->tx.active) { vm_fail(vm, "RCL_NATIVE_TX_NESTED", "Nested native transactions are not supported"); break; }
         transaction_reset(&vm->tx); vm->tx.active = 1; vm->tx.mode = instruction.a; vm->tx.rule_kind = instruction.flags ? 1 : 0;
@@ -2774,6 +2797,8 @@ static int execute_program(VM *vm) {
   return vm->error.code == NULL;
 }
 
+static int execute_program(VM *vm) { return execute_program_from(vm, 0); }
+
 static void print_value_json(FILE *out, const Value *value) {
   StringBuilder sb; sb_init(&sb);
   const char *algorithm = native_state_root_algorithm();
@@ -2923,7 +2948,7 @@ static void vm_free(VM *vm) {
   free_program(&vm->program);
 }
 
-struct RclVmInstance { VM vm; int loaded; };
+struct RclVmInstance { VM vm; int loaded; int session_initialized; };
 
 static void vm_clear_transient(VM *vm, int clear_state) {
   for (size_t i = 0; i < vm->stack_count; i++) value_free(&vm->stack[i]);
@@ -2984,6 +3009,7 @@ void rclvm_instance_destroy(RclVmInstance *instance) {
 
 int rclvm_instance_load_file(RclVmInstance *instance, const char *path, char *error, size_t error_capacity) {
   if (!instance || !path) return 0;
+  instance->session_initialized = 0;
   if (instance->loaded) {
     vm_free(&instance->vm);
     ProviderRegistration saved[MAX_PROVIDERS]; size_t saved_count = instance->vm.provider_count;
@@ -2992,6 +3018,7 @@ int rclvm_instance_load_file(RclVmInstance *instance, const char *path, char *er
     instance->vm.next_typed_object_id = 1;
     memcpy(instance->vm.providers, saved, sizeof(saved)); instance->vm.provider_count = saved_count;
   }
+  instance->loaded = 0;
   if (!load_program(path, &instance->vm.program, &instance->vm.error)) {
     if (error && error_capacity) snprintf(error, error_capacity, "%s: %s", instance->vm.error.code ? instance->vm.error.code : "RCL_NATIVE_LOAD", instance->vm.error.message);
     return 0;
@@ -3046,7 +3073,113 @@ int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_j
 int rclvm_instance_reset(RclVmInstance *instance, int clear_state) {
   if (!instance) return 0;
   vm_clear_transient(&instance->vm, clear_state != 0);
+  if (clear_state) instance->session_initialized = 0;
   return 1;
+}
+
+int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!instance || !instance->loaded || !(instance->vm.program.flags & 4)) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_BYTECODE_REQUIRED");
+    return 0;
+  }
+  const char *algorithm = native_state_root_algorithm();
+  if (!algorithm || strcmp(algorithm, "rcl.semantic-state-root.v2") != 0) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_REQUIRES_STATE_ROOT_V2");
+    return 0;
+  }
+  for (uint32_t i = 0; i < instance->vm.program.instruction_count; i++) {
+    uint8_t op = instance->vm.program.instructions[i].op;
+    if (op == OP_CALL_PROVIDER || op == OP_MAKE_TYPED_REF || op == OP_DEREF_TYPED_REF || op == OP_GET_TYPED_REF_ID) {
+      if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_EXTERNAL_OR_REF_OPERATION_UNSUPPORTED");
+      return 0;
+    }
+  }
+  int ok = rclvm_instance_run(instance, 1, result_json, error, error_capacity);
+  instance->session_initialized = ok;
+  return ok;
+}
+
+int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,
+  const RclVmInputV1 *inputs, size_t input_count, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!instance || !instance->loaded || !instance->session_initialized || !rule || (realize != 0 && realize != 1)
+      || input_count > MAX_STATE || (input_count && !inputs)) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_NOT_INITIALIZED_OR_INVALID_COMMAND");
+    return 0;
+  }
+  VM *vm = &instance->vm;
+  vm_clear_transient(vm, 0);
+  vm->state_root_algorithm = "rcl.semantic-state-root.v2";
+  uint32_t entry = UINT32_MAX;
+  for (uint32_t i = 0; i < vm->program.instruction_count; i++) {
+    Instruction *in = &vm->program.instructions[i];
+    if (in->op == OP_SESSION_ENTRY && in->b == realize && strcmp(pool_string(vm, in->a), rule) == 0) {
+      if (entry != UINT32_MAX) { vm_fail(vm, "RCL_SESSION_ENTRY_AMBIGUOUS", "Duplicate session rule entry"); break; }
+      entry = i;
+    }
+  }
+  if (entry == UINT32_MAX && !vm->error.code) vm_fail(vm, "RCL_RULE_UNKNOWN", "Unknown session rule");
+  for (size_t i = 0; i < input_count && !vm->error.code; i++) {
+    const RclVmInputV1 *input = &inputs[i];
+    if (!input->path) { vm_fail(vm, "RCL_SESSION_INPUT_NOT_DECLARED", "Input path required"); break; }
+    for (size_t j = 0; j < i; j++) if (strcmp(input->path, inputs[j].path) == 0) vm_fail(vm, "RCL_SESSION_INPUT_DUPLICATE", "Duplicate observation");
+    uint32_t declared_type = 0;
+    for (uint32_t j = 0; j < vm->program.instruction_count && vm->program.instructions[j].op != OP_HALT; j++) {
+      Instruction *in = &vm->program.instructions[j];
+      if (in->op == OP_INPUT_DECL && strcmp(pool_string(vm, in->a), input->path) == 0) {
+        if (declared_type) vm_fail(vm, "RCL_SESSION_INPUT_DUPLICATE", "Duplicate input declaration");
+        declared_type = (uint32_t)in->b;
+      }
+    }
+    if (!declared_type) { vm_fail(vm, "RCL_SESSION_INPUT_NOT_DECLARED", "Only source-declared inputs accept observations"); break; }
+    const StateEntry *current = state_find_const(&vm->state, input->path);
+    if (declared_type != input->type || !current || (uint32_t)current->value.type != input->type
+        || (input->type == 1 && !isfinite(input->number)) || (input->type == 2 && input->truth != 0 && input->truth != 1)) {
+      vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Observation type differs from its declared type"); break;
+    }
+    if (input->type == 3) {
+      if (!input->text || input->text_length > 1024u * 1024u || memchr(input->text, 0, input->text_length)) {
+        vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Text must be bounded and contain no NUL"); break;
+      }
+      size_t offset = 0;
+      while (offset < input->text_length) {
+        uint32_t cp; int valid;
+        size_t width = utf8_decode_at(input->text, input->text_length, offset, &cp, &valid);
+        if (!width || !valid) { vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Text must contain Unicode scalars"); break; }
+        offset += width;
+      }
+    }
+  }
+  State before = {0};
+  int copied = !vm->error.code && state_clone_into(&before, &vm->state);
+  if (!copied && !vm->error.code) vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot clone session state");
+  if (copied) {
+    for (size_t i = 0; i < input_count && !vm->error.code; i++) {
+      const RclVmInputV1 *input = &inputs[i];
+      Value value = input->type == 1 ? value_number(input->number == 0 ? 0 : input->number)
+        : input->type == 2 ? value_bool(input->truth) : value_string_n(input->text, input->text_length);
+      if (!state_set(&vm->state, input->path, &value)) vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot apply observation");
+      value_free(&value);
+    }
+    if (!vm->error.code) execute_program_from(vm, entry);
+    if (!vm->error.code) {
+      const char *root_error = NULL;
+      if (!state_root_v2(&vm->state, vm->semantic_state_root, &root_error)) vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error);
+    }
+    if (vm->error.code || !realize || vm->history_count == 0) {
+      state_free(&vm->state); vm->state = before; memset(&before, 0, sizeof(before));
+    }
+    state_free(&before);
+  }
+  int ok = vm->error.code == NULL;
+  if (ok) {
+    const char *root_error = NULL;
+    if (!state_root_v2(&vm->state, vm->semantic_state_root, &root_error)) { vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error); ok = 0; }
+  }
+  if (result_json) *result_json = capture_vm_output(vm, ok);
+  if (!ok && error && error_capacity) snprintf(error, error_capacity, "%s: %s", vm->error.code ? vm->error.code : "RCL_NATIVE_FAILURE", vm->error.message);
+  return ok;
 }
 
 int rclvm_instance_get_state_text(

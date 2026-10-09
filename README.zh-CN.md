@@ -1,13 +1,13 @@
 <div align="center">
 
-# RCL v1.0.0 — Reality Compiler Language
+# RCL v2.0.0 — Reality Compiler Language
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5 分钟上手](GETTING_STARTED.zh-CN.md) · [网站 / Playground](https://rcl-rncs-mcp.vercel.app) · [当前状态](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v1.0.0-blue.svg)](package.json)
+[![Package](https://img.shields.io/badge/package-v2.0.0-blue.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
@@ -18,6 +18,15 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
 ## 为什么使用 RCL？
+
+2.0 增加可持续运行的原生会话：源码声明有类型的输入，RCL 规则检查当前授权并提交状态；本地交易日志支持进程重启、确定性重放与请求重试去重。Windows 本地发布验收已通过。使用方法见[会话契约](docs/v2.0/session-contract.md)和[当前状态](CURRENT-STATUS.md)。
+
+```text
+rcl session init examples/sessions/governed-counter.rcl ./counter-state
+rcl session invoke ./counter-state examples/sessions/increment-command.json
+rcl session inspect ./counter-state
+rcl session verify ./counter-state --reference
+```
 
 - **把权限和行为写在一起。** 主体、授权凭证、前置条件、状态修改与不变量都是语言构造。状态变化直接声明自身的权限和验证要求，不必只靠外围应用代码隐式约定。
 - **让执行结果可检查。** 状态变化产生 witness 与 evidence；工具链用工件根和语义状态根核对不同实现的结果。证据始终绑定实际验证过的范围。

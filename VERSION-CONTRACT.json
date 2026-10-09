@@ -4,7 +4,7 @@
   "canonicalBranch": "main",
   "canonical": true,
   "package": "@taowind/rcl-reality-forge",
-  "packageVersion": "1.0.0",
+  "packageVersion": "2.0.0",
   "componentVersionContract": "COMPONENT-VERSIONS.json",
   "downstreamConsumerContract": "DOWNSTREAM-CONSUMERS.json",
   "technicalDebtRegister": "docs/governance/RCL_TECHNICAL_DEBT_REGISTER_v0.1.md",
@@ -31,7 +31,9 @@
         "linuxExecution": "PASS_LOCAL_CONTAINER_NODE20_DEBIAN_X64",
         "hostedCi": "NOT_RUN_USER_INSTRUCTION",
         "specification": "docs/v1.0/semantic-state-root-v2.md",
-        "windowsExecution": "PASS_LOCAL_WINDOWS_X64"
+        "windowsExecution": "PASS_LOCAL_WINDOWS_X64",
+        "historicalVerifiedPackageVersion": "1.0.0",
+        "currentReleaseEvidence": "docs/v2.0/verification.json"
       },
       "legacyAlgorithm": "rcl.semantic-state-root.v1",
       "selectionOption": "stateRootAlgorithm"
@@ -89,7 +91,19 @@
         ]
       }
     },
-    "downstreamByteIdentity": false
+    "downstreamByteIdentity": false,
+    "governedSessions": {
+      "status": "LOCAL_VERIFIED_WINDOWS_X64",
+      "componentVersion": "1.0.0",
+      "nativeExecution": true,
+      "typedScalarInputs": true,
+      "conditionalWarrants": true,
+      "durableCommandReplay": true,
+      "externalEffectsSupported": false,
+      "distributedExactlyOnceClaimed": false,
+      "specification": "docs/v2.0/session-contract.md",
+      "evidence": "docs/v2.0/verification.json"
+    }
   },
   "downstreamCopies": [
     {
@@ -113,7 +127,10 @@
     "npm run test:foundation-native-meta-batch-b",
     "npm run conformance:foundation",
     "npm test",
-    "npm run verify:selfhost-examples"
+    "npm run verify:selfhost-examples",
+    "npm run test:sessions",
+    "npm run verify:native-core-support",
+    "npm run verify:v2-release"
   ],
   "authority": {
     "canonicalLanguage": "RCL",
@@ -173,13 +190,14 @@
     "ciPolicy": "NOT_RUN_USER_INSTRUCTION"
   },
   "sourcePromotion": {
-    "baselineCanonicalCommit": "bd2187a5303a2bdc1e3a05ec98231400854c226a",
-    "developmentBranch": "codex/rcl-v1-development",
-    "localVersion": "1.0.0",
+    "baselineCanonicalCommit": "afe83b231754e8ae3adeb8058356e87165f7ad91",
+    "baselineVersion": "1.0.0",
+    "developmentBranch": "codex/rcl-v2-capability-development",
+    "localVersion": "2.0.0",
     "mergedToCanonicalMain": false,
     "publishedRelease": false,
     "deployedRemoteMcp": false,
     "localReleaseVerified": true,
-    "verificationRecord": "docs/v1.0/verification.json"
+    "verificationRecord": "docs/v2.0/verification.json"
   }
 }

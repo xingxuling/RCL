@@ -1,9 +1,9 @@
 reality RCLSourceSelfHostStage0 {
   facet source.lexer_sha : Text = "c513ba3662f729ca6bba13f765b86cb515c3107ac67992d3f64eb71e16667941"
-  facet source.parser_sha : Text = "781934d647e6318e08ecc9dace6f7e651105abb2f886869ddc7f592f2aecf241"
+  facet source.parser_sha : Text = "8bc4758a4fa06dc98ee1d88196c8785e0384248c7122e832bca60a80b365b34a"
   facet source.compiler_sha : Text = "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
-  facet source.runtime_sha : Text = "62a470d0c73a7e38df7bab299778cc897b9b07635e03b90269e0a48e868ffeee"
-  facet source.bytecode_sha : Text = "2dc27b32b614344420fbfd70535cf07206f97c2a28821e0c6ebc8651605ddb23"
+  facet source.runtime_sha : Text = "c1ebe8f0bd23e479d6faa92d6930b48a69761519f516c80b766dbf1cd18347d6"
+  facet source.bytecode_sha : Text = "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
   facet source.bootstrap_sha : Text = "b0fa390362597c7fdc90e987f3271bac24ea71327886fe21ea2982a57ef92877"
   facet source.native_vm_sha : Text = "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
   facet source.v094_file_emission_sha : Text = "ef5198d23beeb143b18535043f279227cf7ab26fbb66ad8d2b0026d381463fdb"
@@ -18,10 +18,20 @@ reality RCLSourceSelfHostStage0 {
 
   facet source.reference_canonical_sha : Text = "ed7fb873f75419295639ed43d9b698d2a2c3a9a5e75ef57c1cdfcd9908bef6b6"
 
-  facet source.core_module_count : Number = 13
+  facet source.session_contract_sha : Text = "1084f73b58cde636e2fda4a3a15a1d7d105148c5adcf4cd94571bd9658a290a2"
+
+  facet source.native_session_sha : Text = "94d7025cb44e5f6c054dbdeb9f8e6b7c9617c5af6d4bc54cc705dce7069e8b48"
+
+  facet source.durable_session_sha : Text = "158af4043037d6b5974d8a9e4ce22fcd3e8ce4fb444184159962992132dcdaf0"
+
+  facet source.session_compiler_sha : Text = "2306bb4a4fc90fc5c14a96c55d96c507018302aa6dd70535e1e10b3d96ed6c1b"
+
+  facet source.session_cli_sha : Text = "faab881a1d421b33e79e717a9a11f087405b5b01ef97e1a139619d9b4122d4dc"
+
+  facet source.core_module_count : Number = 18
   facet source.bootstrap_stage_count : Number = 9
   facet source.rcl_owned_runtime_count : Number = 0
-  facet source.js_reference_runtime_count : Number = 13
+  facet source.js_reference_runtime_count : Number = 18
 
   facet selfhost.stage : Text = "stage0_source_truth_model"
   facet selfhost.frontier : Text = "rcl_describes_and_audits_core_before_rewriting_runtime"
@@ -59,7 +69,7 @@ reality RCLSourceSelfHostStage0 {
 
   emergence establish_stage0_truth_model {
     cause selfhost_agent
-    when source.core_module_count == 13
+    when source.core_module_count == 18
     needs selfhost.write on selfhost
 
     alter selfhost.stage_status <- "PROXY_VERIFIED"
@@ -67,7 +77,7 @@ reality RCLSourceSelfHostStage0 {
     alter selfhost.claim <- "rcl_source_is_modeled_not_rewritten"
 
     preserve source.rcl_owned_runtime_count == 0
-      and source.js_reference_runtime_count == 13
+      and source.js_reference_runtime_count == 18
       and platform.windows_native_status == "NATIVE_WINDOWS_VERIFIED"
       and gate.full_self_hosting == false
       and gate.rcl_stage0_model_compiles == true

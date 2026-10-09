@@ -1,8 +1,10 @@
 import { compileReality } from './compiler.mjs';
 import { RCLCompileError } from './errors.mjs';
+import { validateSessionProgram, RCL_SESSION_INPUT_TYPES } from './session-contract.mjs';
 
 export const RCL_BYTECODE_VERSION = Object.freeze({ major: 1, minor: 1 });
 export const RCL_BYTECODE_FEATURE_VERSION = Object.freeze({ major: 1, minor: 2 });
+export const RCL_BYTECODE_SESSION_FEATURE_VERSION = Object.freeze({ major: 1, minor: 3 });
 export const RCL_BYTECODE_MAGIC = 'RCLB';
 
 export const OPCODES = Object.freeze({
@@ -51,6 +53,9 @@ export const OPCODES = Object.freeze({
   DEREF_TYPED_REF: 42,
   GET_TYPED_REF_ID: 43,
   MOD: 44,
+  SESSION_ENTRY: 45,
+  INPUT_DECL: 46,
+  CLEAR_WARRANTS: 47,
 });
 
 export const BUILTINS = Object.freeze({
@@ -238,10 +243,6 @@ function validateNativeSubset(program) {
     if (facet.deferred || !facet.value) {
       diagnostics.push(diagnostic('RCL_NATIVE_FACET_UNSUPPORTED', `Native VM v0.2 requires an executable facet initializer`, { path: facet.path, valueType: facet.valueType }));
     }
-  }
-
-  for (const warrant of program.warrants) {
-    if (warrant.condition) diagnostics.push(diagnostic('RCL_NATIVE_CONDITIONAL_WARRANT', 'Native VM v0.1 does not yet support conditional warrants', { subject: warrant.subject, capability: warrant.capability }));
   }
 
   for (const rule of program.rules) {
@@ -574,7 +575,9 @@ function encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, 
   const stringsSize = stringBytes.reduce((sum, bytes) => sum + 4 + bytes.length, 0);
   const numbersSize = pool.numbers.length * 8;
   const instructionSize = 16;
-  const minorVersion = instructions.some(instruction => (
+  const sessionFeatures = instructions.some(instruction => instruction.op >= OPCODES.SESSION_ENTRY
+    || (instruction.op === OPCODES.GRANT_WARRANT && instruction.flags));
+  const minorVersion = sessionFeatures ? RCL_BYTECODE_SESSION_FEATURE_VERSION.minor : instructions.some(instruction => (
     instruction.op === OPCODES.MOD
     || (instruction.op === OPCODES.CALL_PROVIDER && (instruction.flags & 1) === 1)
     || (instruction.op === OPCODES.STAGE_STORE && (instruction.flags & 1) === 1)
@@ -609,7 +612,8 @@ function encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, 
   return buffer;
 }
 
-function lowerToBytecode(program) {
+function lowerToBytecode(program, { session = false } = {}) {
+  if (session) validateSessionProgram(program);
   const diagnostics = validateNativeSubset(program);
   if (diagnostics.length) return { ok: false, diagnostics, program: null, bytecode: null };
 
@@ -619,22 +623,43 @@ function lowerToBytecode(program) {
   const sourceRootIndex = pool.string(program.programRoot);
   const functions = new Map(program.reckons.map((decl, index) => [decl.name, { decl, label: `reckon_${index}_${decl.name}` }]));
   const mainContext = { locals: new Map(), functions };
+  const directives = session ? program.rules.flatMap(rule => [{ kind: 'Realize', rule: rule.name }, { kind: 'Foresee', rule: rule.name }]) : program.directives;
+  if (session) {
+    // Share the ordinary compiler's pool order with the RCL-authored backend.
+    // Only entry layout changes; the source/program root remains the original.
+    const ordinary = lowerToBytecode({ ...program, directives });
+    if (!ordinary.ok) return ordinary;
+    const decoded = decodeBytecode(ordinary.bytecode);
+    decoded.strings.forEach(value => pool.string(value));
+    decoded.numbers.forEach(value => pool.number(value));
+  }
 
   for (const facet of program.facets) {
     compileExpression(facet.value, asm, pool, mainContext);
     asm.emit(OPCODES.STORE_STATE, pool.string(facet.path));
+    if (session && facet.input) asm.emit(OPCODES.INPUT_DECL, pool.string(facet.path), RCL_SESSION_INPUT_TYPES[facet.valueType]);
   }
-  for (const warrant of program.warrants) {
-    asm.emit(OPCODES.GRANT_WARRANT, pool.string(warrant.subject), pool.string(warrant.capability), pool.string(warrant.target));
-  }
+  const conditional = program.warrants.some(warrant => warrant.condition);
+  const emitWarrants = (refresh = false) => {
+    if (refresh) asm.emit(OPCODES.CLEAR_WARRANTS);
+    for (const warrant of program.warrants) {
+      if (warrant.condition) compileExpression(warrant.condition, asm, pool, mainContext);
+      asm.emit(OPCODES.GRANT_WARRANT, pool.string(warrant.subject), pool.string(warrant.capability), pool.string(warrant.target), warrant.condition ? 1 : 0);
+    }
+  };
+  if (!session && !conditional) emitWarrants();
 
   const rules = new Map(program.rules.map(rule => [rule.name, rule]));
-  program.directives.forEach((directive, index) => {
+  if (session) asm.emit(OPCODES.HALT);
+  directives.forEach((directive, index) => {
     const rule = rules.get(directive.rule);
     if (!rule) throw new Error(`Unknown rule '${directive.rule}' during bytecode lowering`);
+    if (session) asm.emit(OPCODES.SESSION_ENTRY, pool.string(rule.name), directive.kind === 'Realize' ? 1 : 0);
+    if (session || conditional) emitWarrants(true);
     compileRuleInvocation(rule, directive.kind === 'Realize' ? 'realize' : 'foresee', asm, pool, index, mainContext);
+    if (session) asm.emit(OPCODES.HALT);
   });
-  asm.emit(OPCODES.HALT);
+  if (!session) asm.emit(OPCODES.HALT);
   for (const fn of functions.values()) {
     asm.label(fn.label);
     const locals = new Map(fn.decl.params.map((param, index) => [param.name, index]));
@@ -642,7 +667,7 @@ function lowerToBytecode(program) {
     asm.emit(OPCODES.RETURN);
   }
   const instructions = asm.finish();
-  const bytecode = encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex });
+  const bytecode = encodeProgram({ pool, instructions, programNameIndex, sourceRootIndex, flags: session ? 4 : 0 });
   return { ok: true, diagnostics: [], program, bytecode };
 }
 
@@ -658,6 +683,13 @@ export function tryCompileRealityToBytecode(sourceOrProgram) {
 
 export function compileRealityToBytecode(sourceOrProgram) {
   const result = tryCompileRealityToBytecode(sourceOrProgram);
+  if (!result.ok) throw new RCLCompileError(result.diagnostics);
+  return result.bytecode;
+}
+
+export function compileRealitySessionBytecode(sourceOrProgram) {
+  const program = typeof sourceOrProgram === 'string' ? compileReality(sourceOrProgram) : sourceOrProgram;
+  const result = lowerToBytecode(program, { session: true });
   if (!result.ok) throw new RCLCompileError(result.diagnostics);
   return result.bytecode;
 }

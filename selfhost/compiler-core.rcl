@@ -253,6 +253,8 @@ reality RCLGeneralSelfHostCompiler {
   reckon facet_owner(node : Sequence) -> Text = sequence_get(node, 3)
   reckon facet_line(node : Sequence) -> Number = sequence_get(node, 4)
   reckon facet_column(node : Sequence) -> Number = sequence_get(node, 5)
+  reckon facet_input(node : Sequence) -> Truth = choose(length(node) > 6, sequence_get(node, 6), false)
+  reckon mark_input(node : Sequence, input : Truth) -> Sequence = choose(input, sequence_append(node, true), node)
 
   reckon make_reckon(name : Text, params : Sequence, return_type : Text, expression : Sequence) -> Sequence =
     sequence_append(
@@ -274,7 +276,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon parse_facet_after_expression(tokens : Sequence, start : Number, path : Text, value_type : Text, expression_state : Sequence) -> Sequence =
     make_node_state(state_index(expression_state),
-      make_facet(path, value_type, state_node(expression_state), "", token_line_at(tokens, start), token_column_at(tokens, start)))
+      mark_input(make_facet(path, value_type, state_node(expression_state), "", token_line_at(tokens, start), token_column_at(tokens, start)), token_text_at(tokens, start) == "input"))
 
   reckon parse_facet(tokens : Sequence, index : Number) -> Sequence =
     parse_facet_after_path(tokens, index, parse_path(tokens, index + 1))
@@ -293,7 +295,7 @@ reality RCLGeneralSelfHostCompiler {
     parse_reckon_after_params(tokens, token_text_at(tokens, index + 1), parse_params(tokens, index + 3, empty_sequence()))
 
   reckon own_facet(node : Sequence, owner : Text) -> Sequence =
-    make_facet(owner + "." + facet_path(node), facet_type(node), facet_expression(node), owner, facet_line(node), facet_column(node))
+    mark_input(make_facet(owner + "." + facet_path(node), facet_type(node), facet_expression(node), owner, facet_line(node), facet_column(node)), facet_input(node))
 
   reckon parse_owned_facet_after(owner : Text, item_state : Sequence) -> Sequence =
     make_node_state(state_index(item_state), own_facet(state_node(item_state), owner))
@@ -307,12 +309,19 @@ reality RCLGeneralSelfHostCompiler {
   reckon warrant_subject(node : Sequence) -> Text = sequence_get(node, 0)
   reckon warrant_capability(node : Sequence) -> Text = sequence_get(node, 1)
   reckon warrant_target(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon warrant_conditional(node : Sequence) -> Truth = length(node) > 3
+  reckon warrant_condition(node : Sequence) -> Sequence = sequence_get(node, 3)
 
-  reckon parse_warrant_after_target(subject : Text, capability : Text, target_state : Sequence) -> Sequence =
-    make_node_state(state_index(target_state), make_warrant(subject, capability, state_text(target_state)))
+  reckon parse_warrant_condition(subject : Text, capability : Text, target : Text, expression_state : Sequence) -> Sequence =
+    make_node_state(state_index(expression_state), sequence_append(make_warrant(subject, capability, target), state_node(expression_state)))
+
+  reckon parse_warrant_after_target(tokens : Sequence, subject : Text, capability : Text, target_state : Sequence) -> Sequence =
+    choose(token_text_at(tokens, state_index(target_state)) == "while",
+      parse_warrant_condition(subject, capability, state_text(target_state), parse_expression(tokens, state_index(target_state) + 1, 0)),
+      make_node_state(state_index(target_state), make_warrant(subject, capability, state_text(target_state))))
 
   reckon parse_warrant_after_capability(tokens : Sequence, subject : Text, capability_state : Sequence) -> Sequence =
-    parse_warrant_after_target(subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1))
+    parse_warrant_after_target(tokens, subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1))
 
   reckon parse_warrant(tokens : Sequence, index : Number, subject : Text) -> Sequence =
     parse_warrant_after_capability(tokens, subject, parse_path(tokens, index + 1))
@@ -322,7 +331,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon parse_subject_body(tokens : Sequence, index : Number, name : Text, facets : Sequence, warrants : Sequence) -> Sequence =
     choose(token_text_at(tokens, index) == "}", make_subject_state(index + 1, name, facets, warrants),
-      choose(token_text_at(tokens, index) == "facet",
+      choose(token_text_at(tokens, index) == "facet" or token_text_at(tokens, index) == "input",
         parse_subject_after_facet(tokens, name, parse_owned_facet(tokens, index, name), facets, warrants),
         parse_subject_after_warrant(tokens, name, parse_warrant(tokens, index, name), facets, warrants)))
 
@@ -1278,7 +1287,7 @@ reality RCLGeneralSelfHostCompiler {
     choose(token_kind_at(tokens, index) == "EOF", syntax_failure(tokens, index, "RCL_REALITY_UNCLOSED"),
       choose(token_text_at(tokens, index) == "}",
         make_node_state(index + 1, make_program(token_text_at(tokens, 1), facets, reckons, subjects, warrants, rules, directives, extras)),
-        choose(token_text_at(tokens, index) == "facet",
+        choose(token_text_at(tokens, index) == "facet" or token_text_at(tokens, index) == "input",
         parse_top_after_facet(tokens, parse_facet(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
         choose(token_text_at(tokens, index) == "reckon",
           parse_top_after_reckon(tokens, parse_reckon(tokens, index), facets, reckons, subjects, warrants, rules, directives, extras),
@@ -1676,7 +1685,7 @@ reality RCLGeneralSelfHostCompiler {
           + ",\"valueType\":" + json_quote(sequence_get(sequence_get(items, index), 1)) + "}"))
 
   reckon canonical_facet(node : Sequence) -> Text =
-    "{\"kind\":\"FacetDecl\",\"location\":{\"column\":" + text(facet_column(node))
+    "{" + choose(facet_input(node), "\"input\":true,", "") + "\"kind\":\"FacetDecl\",\"location\":{\"column\":" + text(facet_column(node))
       + ",\"line\":" + text(facet_line(node)) + "},\"owner\":"
       + choose(facet_owner(node) == "", "null", json_quote(facet_owner(node)))
       + ",\"path\":" + json_quote(facet_path(node)) + ",\"value\":" + canonical_expression(facet_expression(node))
@@ -1704,7 +1713,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon canonical_warrant(node : Sequence) -> Text =
     "{\"capability\":" + json_quote(warrant_capability(node))
-      + ",\"condition\":null,\"kind\":\"WarrantDecl\",\"subject\":" + json_quote(warrant_subject(node))
+      + ",\"condition\":" + choose(warrant_conditional(node), canonical_expression(warrant_condition(node)), "null") + ",\"kind\":\"WarrantDecl\",\"subject\":" + json_quote(warrant_subject(node))
       + ",\"target\":" + json_quote(warrant_target(node)) + "}"
 
   reckon canonical_warrants(items : Sequence, index : Number, output : Text) -> Text =
@@ -2246,15 +2255,44 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon build_string_pool(program : Sequence, root : Text) -> Sequence =
     collect_reckon_strings(program_reckons(program), 0,
-      collect_directive_strings(program_directives(program), 0, program_rules(program), program_reckons(program),
-        collect_warrant_strings(program_warrants(program), 0,
-          collect_facet_strings(program_facets(program), 0,
-            append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root)))))
+      choose(has_conditional_warrants(program_warrants(program), 0),
+        collect_dynamic_directive_strings(program_directives(program), 0, program_rules(program), program_reckons(program), program_warrants(program),
+          collect_facet_strings(program_facets(program), 0, append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root))),
+        collect_directive_strings(program_directives(program), 0, program_rules(program), program_reckons(program),
+          collect_warrant_strings(program_warrants(program), 0,
+            collect_facet_strings(program_facets(program), 0, append_unique_text(append_unique_text(empty_sequence(), program_name(program)), root))))))
 
   reckon build_number_pool(program : Sequence) -> Sequence =
     collect_reckon_numbers(program_reckons(program), 0,
-      collect_directive_numbers(program_directives(program), 0, program_rules(program),
-        collect_facet_numbers(program_facets(program), 0, empty_sequence())))
+      choose(has_conditional_warrants(program_warrants(program), 0),
+        collect_dynamic_directive_numbers(program_directives(program), 0, program_rules(program), program_warrants(program), collect_facet_numbers(program_facets(program), 0, empty_sequence())),
+        collect_directive_numbers(program_directives(program), 0, program_rules(program), collect_facet_numbers(program_facets(program), 0, empty_sequence()))))
+
+  reckon has_conditional_warrants(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), false,
+      choose(warrant_conditional(sequence_get(items, index)), true, has_conditional_warrants(items, index + 1)))
+
+  reckon collect_dynamic_warrant_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_dynamic_warrant_strings(items, index + 1,
+        append_unique_text(append_unique_text(append_unique_text(
+          choose(warrant_conditional(sequence_get(items, index)), collect_expression_strings(warrant_condition(sequence_get(items, index)), empty_sequence(), output), output),
+          warrant_subject(sequence_get(items, index))), warrant_capability(sequence_get(items, index))), warrant_target(sequence_get(items, index)))))
+
+  reckon collect_dynamic_warrant_numbers(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_dynamic_warrant_numbers(items, index + 1,
+        choose(warrant_conditional(sequence_get(items, index)), collect_expression_numbers(warrant_condition(sequence_get(items, index)), empty_sequence(), output), output)))
+
+  reckon collect_dynamic_directive_strings(items : Sequence, index : Number, rules : Sequence, reckons : Sequence, warrants : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_dynamic_directive_strings(items, index + 1, rules, reckons, warrants,
+        collect_rule_strings_complete(find_rule(rules, 0, directive_name(sequence_get(items, index))), reckons, collect_dynamic_warrant_strings(warrants, 0, output))))
+
+  reckon collect_dynamic_directive_numbers(items : Sequence, index : Number, rules : Sequence, warrants : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_dynamic_directive_numbers(items, index + 1, rules, warrants,
+        collect_rule_numbers(find_rule(rules, 0, directive_name(sequence_get(items, index))), collect_dynamic_warrant_numbers(warrants, 0, output))))
 
   reckon builtin_id(name : Text) -> Number =
     choose(name == "contains", 1,
@@ -2384,8 +2422,14 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon main_instruction_count(program : Sequence) -> Number =
     facet_instruction_count(program_facets(program), 0,
-      length(program_warrants(program))
+      choose(has_conditional_warrants(program_warrants(program), 0),
+        length(program_directives(program)) * dynamic_warrant_count(program_warrants(program), 0, 1), length(program_warrants(program)))
         + directive_instruction_count(program_directives(program), 0, program_rules(program), 0) + 1)
+
+  reckon dynamic_warrant_count(items : Sequence, index : Number, output : Number) -> Number =
+    choose(index >= length(items), output,
+      dynamic_warrant_count(items, index + 1, output + 1
+        + choose(warrant_conditional(sequence_get(items, index)), expression_count(warrant_condition(sequence_get(items, index))), 0)))
 
   reckon function_address(items : Sequence, name : Text, index : Number, address : Number) -> Number =
     choose(reckon_name(sequence_get(items, index)) == name, address,
@@ -2506,6 +2550,19 @@ reality RCLGeneralSelfHostCompiler {
             find_text(strings, 0, warrant_capability(sequence_get(items, index))),
             find_text(strings, 0, warrant_target(sequence_get(items, index)))), output)))
 
+  reckon emit_dynamic_warrants(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_dynamic_warrants(items, index + 1, reckons, strings, numbers, main_count, start,
+        append_all(sequence_append(empty_sequence(), make_flagged_instruction(22,
+            find_text(strings, 0, warrant_subject(sequence_get(items, index))),
+            find_text(strings, 0, warrant_capability(sequence_get(items, index))),
+            find_text(strings, 0, warrant_target(sequence_get(items, index))), choose(warrant_conditional(sequence_get(items, index)), 1, 0))),
+          choose(warrant_conditional(sequence_get(items, index)),
+            append_all(emit_expression(warrant_condition(sequence_get(items, index)), empty_sequence(), reckons, strings, numbers, main_count, start + length(output)), output), output))))
+
+  reckon emit_warrant_refresh(items : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
+    emit_dynamic_warrants(items, 0, reckons, strings, numbers, main_count, start, one_instruction(47, 0, 0, 0))
+
   reckon emit_rule_needs(items : Sequence, index : Number, actor : Text, strings : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       emit_rule_needs(items, index + 1, actor, strings,
@@ -2561,6 +2618,14 @@ reality RCLGeneralSelfHostCompiler {
             choose(directive_kind(sequence_get(items, index)) == "Realize", 1, 0),
             reckons, strings, numbers, main_count, start + length(output)), output)))
 
+  reckon emit_dynamic_directives(items : Sequence, index : Number, rules : Sequence, reckons : Sequence, warrants : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_dynamic_directives(items, index + 1, rules, reckons, warrants, strings, numbers, main_count,
+        append_all(emit_rule_invocation(find_rule(rules, 0, directive_name(sequence_get(items, index))),
+            choose(directive_kind(sequence_get(items, index)) == "Realize", 1, 0), reckons, strings, numbers, main_count,
+            length(output) + dynamic_warrant_count(warrants, 0, 1)),
+          append_all(emit_warrant_refresh(warrants, reckons, strings, numbers, main_count, length(output)), output))))
+
   reckon emit_reckons(items : Sequence, index : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       emit_reckons(items, index + 1, reckons, strings, numbers, main_count, start,
@@ -2574,11 +2639,12 @@ reality RCLGeneralSelfHostCompiler {
       emit_reckons(program_reckons(program), 0, program_reckons(program), strings, numbers,
         main_instruction_count(program), main_instruction_count(program), empty_sequence()),
       append_all(one_instruction(31, 0, 0, 0),
-        emit_directives(program_directives(program), 0, program_rules(program), program_reckons(program), strings, numbers,
-          main_instruction_count(program), 0,
-          emit_warrants(program_warrants(program), 0, strings,
-            emit_facets(program_facets(program), 0, program_reckons(program), strings, numbers,
-              main_instruction_count(program), 0, empty_sequence())))))
+        choose(has_conditional_warrants(program_warrants(program), 0),
+          emit_dynamic_directives(program_directives(program), 0, program_rules(program), program_reckons(program), program_warrants(program), strings, numbers, main_instruction_count(program),
+            emit_facets(program_facets(program), 0, program_reckons(program), strings, numbers, main_instruction_count(program), 0, empty_sequence())),
+          emit_directives(program_directives(program), 0, program_rules(program), program_reckons(program), strings, numbers, main_instruction_count(program), 0,
+            emit_warrants(program_warrants(program), 0, strings,
+              emit_facets(program_facets(program), 0, program_reckons(program), strings, numbers, main_instruction_count(program), 0, empty_sequence()))))))
 
   reckon encode_string_record(value : Text) -> Sequence =
     sequence_concat(bytes_u32le(length(utf8_bytes(value))), utf8_bytes(value))
@@ -2610,11 +2676,20 @@ reality RCLGeneralSelfHostCompiler {
           or (sequence_get(sequence_get(items, index), 0) == 35 and instruction_flags(sequence_get(items, index)) == 1),
         true, instructions_require_v12(items, index + 1)))
 
+  reckon instructions_require_v13(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), false,
+      choose(sequence_get(sequence_get(items, index), 0) >= 45
+          or (sequence_get(sequence_get(items, index), 0) == 22 and instruction_flags(sequence_get(items, index)) == 1),
+        true, instructions_require_v13(items, index + 1)))
+
   reckon encode_header(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number, minor : Number) -> Sequence =
+    encode_header_with_flags(program_index, root_index, string_count, number_count, instruction_count, minor, 0)
+
+  reckon encode_header_with_flags(program_index : Number, root_index : Number, string_count : Number, number_count : Number, instruction_count : Number, minor : Number, flags : Number) -> Sequence =
     sequence_concat(utf8_bytes("RCLB"),
       sequence_concat(bytes_u16le(1),
         sequence_concat(bytes_u16le(minor),
-          sequence_concat(bytes_u32le(0),
+          sequence_concat(bytes_u32le(flags),
             sequence_concat(bytes_u32le(program_index),
               sequence_concat(bytes_u32le(root_index),
                 sequence_concat(bytes_u32le(string_count),
@@ -2624,7 +2699,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon encode_rbc(program : Sequence, root : Text, strings : Sequence, numbers : Sequence, instructions : Sequence) -> Sequence =
     sequence_concat(
       encode_header(find_text(strings, 0, program_name(program)), find_text(strings, 0, root),
-        length(strings), length(numbers), length(instructions), choose(instructions_require_v12(instructions, 0), 2, 1)),
+        length(strings), length(numbers), length(instructions), choose(instructions_require_v13(instructions, 0), 3, choose(instructions_require_v12(instructions, 0), 2, 1))),
       sequence_concat(encode_string_pool(strings, 0, empty_sequence()),
         sequence_concat(encode_number_pool(numbers, 0, empty_sequence()),
           encode_instructions(instructions, 0, empty_sequence()))))

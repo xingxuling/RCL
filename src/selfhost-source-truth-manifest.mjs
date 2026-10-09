@@ -12,4 +12,9 @@ export const SELFHOST_SOURCE_TRUTH_MODULES = Object.freeze([
   ['canonical_f64', 'src/canonical-f64.mjs', 'source.canonical_f64_sha'],
   ['reference_canonical', 'src/canonical.mjs', 'source.reference_canonical_sha'],
   ['type_module_kernel', 'src/type-module-kernel.mjs', 'source.type_module_kernel_sha'],
+  ['session_contract', 'src/session-contract.mjs', 'source.session_contract_sha'],
+  ['native_session', 'src/native-session.mjs', 'source.native_session_sha'],
+  ['durable_session', 'src/durable-session.mjs', 'source.durable_session_sha'],
+  ['session_compiler', 'src/session-compiler.mjs', 'source.session_compiler_sha'],
+  ['session_cli', 'src/session-cli.mjs', 'source.session_cli_sha'],
 ].map(row => Object.freeze(row)));

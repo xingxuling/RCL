@@ -1,0 +1,41 @@
+reality GovernedCounter {
+  input event.delta : Number = 0
+  input event.label : Text = ""
+  facet counter.value : Number = 0
+  facet counter.lastLabel : Text = ""
+  facet access.enabled : Truth = true
+
+  subject operator {
+    warrant counter.write on counter while access.enabled
+  }
+  subject administrator {
+    warrant access.write on access
+  }
+
+  emergence increment {
+    cause operator
+    when event.delta != 0
+    needs counter.write on counter
+    alter counter.value <- counter.value + event.delta
+    alter counter.lastLabel <- event.label
+    preserve counter.value >= 0
+    preserve counter.value <= 100
+    witness "counter:governed-increment"
+  }
+
+  emergence revoke {
+    cause administrator
+    when access.enabled
+    needs access.write on access
+    alter access.enabled <- false
+    witness "counter:access-revoked"
+  }
+
+  emergence grant {
+    cause administrator
+    when not access.enabled
+    needs access.write on access
+    alter access.enabled <- true
+    witness "counter:access-restored"
+  }
+}

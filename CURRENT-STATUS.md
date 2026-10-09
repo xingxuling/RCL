@@ -1,7 +1,8 @@
-# Current RCL Status: v1.0.0 locally verified release
+# Current RCL Status: v2.0.0 locally verified Windows release
 
 - Canonical source: `xingxuling/RCL@main`.
-- Locally verified package/native VM: `v1.0.0`; canonical-main baseline is `bd2187a5303a2bdc1e3a05ec98231400854c226a` at `v0.94.0-alpha.1`.
+- Locally verified package/native VM: `v2.0.0`; canonical-main baseline is `afe83b231754e8ae3adeb8058356e87165f7ad91` at `v1.0.0`.
+- New capability: stateful native/reference governed sessions, source-declared scalar inputs, current-state conditional warrants, RCL-authored session compilation and durable command replay. Nineteen session checks and independent Windows installation pass.
 - Verified native ceiling: Stage40 native-core RCL self-hosting.
 - Current research frontier: Universal Program Stress v0.1 with a permanent `20 × 20 = 400` environment/program matrix and nine non-compensatory gates.
 - The repository contains the native-core compiler/VM path and fixed-point artifacts described in the main README.
@@ -10,9 +11,41 @@
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
-## Local v1.0 verification
+## Local v2.0 verification
 
-Local release acceptance is complete: 1683 tests pass, zero fail and two have explicit skip boundaries across all 328 test files. Stage0–40 pass, Windows/Linux native-core compiler fixed points agree, and independent Windows/Linux package installation, public CLI/API, Forge and 32-tool MCP HTTP processes pass. Exact source/package truth and negative controls pass release verifiers. `docs/v1.0/verification.json` and `docs/v1.0/acceptance.md` record the scope. GitHub Actions were not run. Canonical main and the connected remote MCP remain at the audited 0.94.0-alpha.1 baseline; this local release has not been pushed, merged, published or remotely deployed.
+The session capability checks include real process death/restart, OS writer
+exclusion, retry deduplication, stale revisions, preserve/authority rejection,
+projection atomicity, incomplete-tail recovery and independently executed
+native/reference/RCL-compiler parity. Public CLI invocations run through distinct
+processes. See `docs/v2.0/acceptance.md` and `docs/v2.0/session-contract.md`.
+
+All 332 test files were covered in the full regression plus source-bound focused
+repairs/rechecks: 1702 PASS, zero remaining FAIL and two documented SKIP boundaries.
+Stage0–40 pass; native C0 == C1 == C2 remains exact at 277414 bytes, SHA-256
+11921b62040145eb72580978ea8e5994b4981b690c59eb679d2e228239defbf4.
+Eligible example byte parity passes 120 cases, with 40 explicit unsupported cases.
+The counter upgrade comparison records 50 repeated v1.0 RUN calls finishing at 1,
+while 50 v2.0 native session calls finish at 50; warm native invocation p95 is
+about 3 ms in that bounded profile. Native tools were rebuilt and the installable
+package was independently installed outside the source checkout. Public API/CLI,
+native RCL compilation, root verification and durable restart/retry pass there.
+See `docs/v2.0/verification.json` for exact code/evidence bindings.
+
+Fresh v2.0 Linux execution is NOT_RUN: the local Ubuntu WSL disk is unavailable
+and the Docker Linux engine is not running. Historical v1.0 Linux receipts are
+not relabeled as v2.0 proof. Fresh Android-device, broad production/hardware and
+remote-deployment acceptance remain outside this local Windows session release.
+GitHub Actions remain NOT_RUN_USER_INSTRUCTION. This local 2.0 release has not
+been pushed, merged, published, deployed or synchronized into downstream copies.
+
+## Historical v1.0 verification
+
+The historical 1.0 release records 1683 passing tests, zero failures and two
+explicit skips across 328 files, Stage0–40 and Windows/Linux installation and
+fixed-point evidence. Those receipts remain pinned to their original source.
+Version 1.0 was subsequently merged to canonical main in PR #262; the separately
+connected remote MCP is not refreshed or redeployed by this development task.
+`docs/v1.0/verification.json` and `docs/v1.0/acceptance.md` retain the original scope.
 
 The research matrix and hosted campaign descriptions below are retained historical, pinned evidence. They do not establish fresh v1.0 hardware, Android-device, CI or remote deployment proof.
 

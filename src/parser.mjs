@@ -33,6 +33,7 @@ class Parser {
   parseTopLevel() {
     switch (this.current().value) {
       case 'facet': return this.parseFacet(null);
+      case 'input': return this.parseFacet(null);
       case 'subject': return this.parseSubject();
       case 'reckon': return this.parseReckon();
       case 'host': return this.parseHost();
@@ -142,7 +143,8 @@ class Parser {
   }
 
   parseFacet(prefix) {
-    const start = this.expect('facet');
+    const input = this.at('input');
+    const start = this.expect(input ? 'input' : 'facet');
     const local = this.parsePath();
     const path = prefix ? `${prefix}.${local}` : local;
     this.expect(':');
@@ -155,6 +157,7 @@ class Parser {
       value: this.parseExpression(),
       owner: prefix,
       location: { line: start.line, column: start.column },
+      ...(input ? { input: true } : {}),
     };
   }
 
@@ -163,7 +166,7 @@ class Parser {
     const name = this.expectType('IDENT', 'Expected subject name').value;
     this.expect('{'); const facets = []; const warrants = [];
     while (!this.at('}')) {
-      if (this.at('facet')) facets.push(this.parseFacet(name));
+      if (this.at('facet') || this.at('input')) facets.push(this.parseFacet(name));
       else if (this.at('warrant')) warrants.push(this.parseWarrant(name));
       else throw new RCLSyntaxError(`Unknown subject declaration '${this.current().value}'`, this.current());
     }

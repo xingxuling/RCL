@@ -1,13 +1,13 @@
 <div align="center">
 
-# RCL v1.0.0 — Reality Compiler Language
+# RCL v2.0.0 — Reality Compiler Language
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5-minute Quick Start](GETTING_STARTED.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v1.0.0-blue.svg)](package.json)
+[![Package](https://img.shields.io/badge/package-v2.0.0-blue.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
@@ -24,7 +24,14 @@ This repository contains the language implementation, an RCL-authored native-cor
 - **Keep semantics across execution targets.** RCL owns the state and authority model while native bytecode, Web, and Android paths provide different execution environments. The candidate Native UI model shares an IR and semantic root across Web/Android backends.
 - **Verify the compiler with itself.** The native-core compiler is written in RCL and has a recorded byte-identical `C0 == C1 == C2` fixed point. This is compiler self-hosting, not a claim that the entire runtime is self-hosted.
 
-RCL is useful to explore permission-aware application state, auditable automation, and language/runtime research. Version 1.0 stabilizes the core language, native state-root protocol, public CLI and installable source toolchain. Research extensions retain their individual evidence and maturity profiles.
+RCL is useful to explore permission-aware application state, auditable automation, and language/runtime research. Version 2.0 adds long-running native governed sessions, source-declared typed observations, dynamic warrants and durable command replay. This release is locally verified on Windows; see [current status](CURRENT-STATUS.md) and [the session contract](docs/v2.0/session-contract.md). Research extensions retain their individual evidence and maturity profiles.
+
+```text
+rcl session init examples/sessions/governed-counter.rcl ./counter-state
+rcl session invoke ./counter-state examples/sessions/increment-command.json
+rcl session inspect ./counter-state
+rcl session verify ./counter-state --reference
+```
 
 [Quick start](#quick-start) · [Examples](#learn-rcl-by-example) · [Current maturity](#what-is-verified-today) · [Architecture](#architecture) · [Contributing](#contributing)
 

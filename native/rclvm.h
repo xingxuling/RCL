@@ -46,6 +46,17 @@ typedef struct {
   void *userdata;
 } RclVmProviderV1;
 
+/* Session inputs are observations declared by INPUT_DECL in the bound RBC.
+ * Types 1/2/3 are finite Number / Truth / Unicode-scalar Text. */
+typedef struct {
+  const char *path;
+  uint32_t type;
+  double number;
+  int truth;
+  const char *text;
+  size_t text_length;
+} RclVmInputV1;
+
 RCLVM_API const char *rclvm_version(void);
 RCLVM_API int rclvm_validate_bytecode(const uint8_t *bytes, size_t length, char *error, size_t error_capacity);
 RCLVM_API RclVmInstance *rclvm_instance_create(void);
@@ -53,6 +64,9 @@ RCLVM_API void rclvm_instance_destroy(RclVmInstance *instance);
 RCLVM_API int rclvm_instance_load_file(RclVmInstance *instance, const char *path, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_register_provider(RclVmInstance *instance, const RclVmProviderV1 *provider, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_json, char *error, size_t error_capacity);
+RCLVM_API int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity);
+RCLVM_API int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,
+  const RclVmInputV1 *inputs, size_t input_count, char **result_json, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_reset(RclVmInstance *instance, int clear_state);
 RCLVM_API int rclvm_instance_get_state_text(
   RclVmInstance *instance,

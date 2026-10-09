@@ -297,6 +297,16 @@ test('general RCL compiler reaches a byte-identical C1/C2 fixed point through na
     assert.ok(second.executedInstructions > 0 && second.executedInstructions <= second.instructionBudget);
     assert.ok(first.instructionBudget - first.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
     assert.ok(second.instructionBudget - second.executedInstructions >= MINIMUM_NATIVE_INSTRUCTION_HEADROOM);
+    const evidenceDirectory = path.join(ROOT, 'output', 'v2.0');
+    fs.mkdirSync(evidenceDirectory, { recursive: true });
+    fs.writeFileSync(path.join(evidenceDirectory, 'native-compiler-fixed-point.json'), JSON.stringify({
+      format: 'rcl.native-compiler-fixed-point.v1', status: 'PASS',
+      compilerSourceSha256: crypto.createHash('sha256').update(compilerSource).digest('hex'),
+      bytes: c0.length, generations: [c0, first.bytecode, second.bytecode].map(bytes => crypto.createHash('sha256').update(bytes).digest('hex')),
+      byteIdentical: true, firstElapsedMs, secondElapsedMs,
+      instructionBudget: first.instructionBudget,
+      executedInstructions: [first.executedInstructions, second.executedInstructions],
+    }, null, 2) + '\n');
     t.diagnostic(JSON.stringify({
       firstElapsedMs,
       secondElapsedMs,

@@ -228,5 +228,13 @@ Core execution:
   rcl bytecode <file.rcl>       Emit self-hosted RBC bytecode
   rcl native <file.rcl>         Compile and execute through the host native VM
 
+Persistent governed sessions:
+  rcl session init <source.rcl> <directory>
+  rcl session invoke <directory> <command.json>
+  rcl session inspect <directory>
+  rcl session verify <directory> --reference
+  rcl session recover <directory> --repair-incomplete-tail
+  rcl session compile <source.rcl> <output.rbc>
+
 Use the project README for the complete advanced command catalogue.`);
 }

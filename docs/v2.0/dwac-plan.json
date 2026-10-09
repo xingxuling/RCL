@@ -1,0 +1,1352 @@
+{
+  "authority": "ADVISORY_ONLY",
+  "source": "Hengjie-Core/structural_generation/dwac_structural",
+  "modeSourceSha256": "2b721815111508f03ae8df4a02e54dfc95852371997cfde1de08e08b3cfa709b",
+  "modes": {
+    "audit": {
+      "mode": "NORTH_STAR",
+      "reason": "direction is stable and the next move should maximize north-star gain without burst throughput",
+      "scores": {
+        "WHOLE_ARTIFACT": 0.2,
+        "DEEP_DEVELOPMENT": 0.27,
+        "NORTH_STAR": 0.755,
+        "NORTH_STAR_BURST": 0.168
+      }
+    },
+    "development": {
+      "mode": "DEEP_DEVELOPMENT",
+      "reason": "one evidence-rich central bottleneck dominates; deepen before recompiling globally",
+      "scores": {
+        "WHOLE_ARTIFACT": 0.1,
+        "DEEP_DEVELOPMENT": 0.8975,
+        "NORTH_STAR": 0.4125,
+        "NORTH_STAR_BURST": 0.2125
+      }
+    },
+    "release": {
+      "mode": "WHOLE_ARTIFACT",
+      "reason": "broad coupled artifact pressure dominates; compile the system graph first",
+      "scores": {
+        "WHOLE_ARTIFACT": 0.86,
+        "DEEP_DEVELOPMENT": 0.2825,
+        "NORTH_STAR": 0.2,
+        "NORTH_STAR_BURST": 0.0
+      }
+    }
+  },
+  "artifactPlan": {
+    "status": "REPRESENTABLE_PROVIDER_GAP",
+    "representable": true,
+    "intent": {
+      "action": "compile",
+      "subject": "compiler artifact for compiler-runtime",
+      "desired_capabilities": [
+        "artifact.build",
+        "artifact.run",
+        "artifact.plan",
+        "artifact.accept"
+      ],
+      "artifact_families": [
+        "compiler"
+      ],
+      "target_environments": [
+        "compiler-runtime"
+      ],
+      "interfaces": [
+        "provider"
+      ],
+      "state_model": {},
+      "persistence": {},
+      "network_model": {},
+      "concurrency_model": {},
+      "data_model": {},
+      "interaction_model": {},
+      "intelligence_model": {},
+      "media_model": {},
+      "physical_interfaces": [],
+      "security_requirements": {},
+      "deployment_requirements": {},
+      "lifecycle_requirements": {
+        "operations": [
+          "build",
+          "run",
+          "repair",
+          "upgrade",
+          "migration",
+          "rollback"
+        ]
+      },
+      "quality_requirements": {},
+      "evidence_requirements": {},
+      "artifact_type_refs": [
+        {
+          "namespace": "taowind",
+          "family": "compiler",
+          "kind": "application",
+          "version": "v0.1"
+        }
+      ],
+      "metadata": {
+        "coverage_cell": "compiler-runtime::compiler"
+      }
+    },
+    "artifact_graph": {
+      "artifact_id": "cell-compiler-runtime-compiler",
+      "artifact_type": {
+        "namespace": "taowind",
+        "family": "compiler",
+        "kind": "application",
+        "version": "v0.1",
+        "identifier": "taowind.compiler/application"
+      },
+      "intent": {
+        "action": "compile",
+        "subject": "compiler artifact for compiler-runtime",
+        "desired_capabilities": [
+          "artifact.build",
+          "artifact.run",
+          "artifact.plan",
+          "artifact.accept"
+        ],
+        "artifact_families": [
+          "compiler"
+        ],
+        "target_environments": [
+          "compiler-runtime"
+        ],
+        "interfaces": [
+          "provider"
+        ],
+        "state_model": {},
+        "persistence": {},
+        "network_model": {},
+        "concurrency_model": {},
+        "data_model": {},
+        "interaction_model": {},
+        "intelligence_model": {},
+        "media_model": {},
+        "physical_interfaces": [],
+        "security_requirements": {},
+        "deployment_requirements": {},
+        "lifecycle_requirements": {
+          "operations": [
+            "build",
+            "run",
+            "repair",
+            "upgrade",
+            "migration",
+            "rollback"
+          ]
+        },
+        "quality_requirements": {},
+        "evidence_requirements": {},
+        "artifact_type_refs": [
+          {
+            "namespace": "taowind",
+            "family": "compiler",
+            "kind": "application",
+            "version": "v0.1"
+          }
+        ],
+        "metadata": {
+          "coverage_cell": "compiler-runtime::compiler"
+        }
+      },
+      "nodes": [
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.001.source-code",
+          "node_type": {
+            "name": "source_code",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/source_code",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.root"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 1
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.002.configuration",
+          "node_type": {
+            "name": "configuration",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/configuration",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.node.001.source-code"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 2
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.003.test",
+          "node_type": {
+            "name": "test",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/test",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.node.002.configuration"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 3
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.004.package",
+          "node_type": {
+            "name": "package",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/package",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.node.003.test"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 4
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.005.deployment",
+          "node_type": {
+            "name": "deployment",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/deployment",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.node.004.package"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 5
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.node.006.evidence",
+          "node_type": {
+            "name": "evidence",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/evidence",
+            "builtin": true
+          },
+          "role": "artifact_component",
+          "dependencies": [
+            "cell-compiler-runtime-compiler.node.005.deployment"
+          ],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.node.type.v0.1"
+          ],
+          "payload": {
+            "intent_subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "ordinal": 6
+          }
+        },
+        {
+          "node_id": "cell-compiler-runtime-compiler.root",
+          "node_type": {
+            "name": "mixed",
+            "namespace": "taowind",
+            "version": "v0.1",
+            "identifier": "taowind/mixed",
+            "builtin": true
+          },
+          "role": "universal_artifact",
+          "dependencies": [],
+          "required_capabilities": [
+            "artifact.build",
+            "artifact.run",
+            "artifact.plan",
+            "artifact.accept"
+          ],
+          "canonical_owners": [
+            "dwac"
+          ],
+          "acceptance_refs": [
+            "artifact.graph.express.v0.1"
+          ],
+          "payload": {
+            "action": "compile",
+            "subject": "compiler artifact for compiler-runtime"
+          },
+          "metadata": {
+            "generic_intent": false
+          }
+        }
+      ],
+      "required_capabilities": [
+        "artifact.accept",
+        "artifact.build",
+        "artifact.plan",
+        "artifact.run"
+      ],
+      "metadata": {
+        "environment": "compiler-runtime",
+        "program_family": "compiler"
+      }
+    },
+    "lifecycle": {
+      "artifact_id": "cell-compiler-runtime-compiler",
+      "artifact_kind": "compiler",
+      "nodes": [
+        {
+          "node_id": "build",
+          "operation": "build",
+          "description": "",
+          "required_capabilities": [
+            "artifact.build"
+          ],
+          "produces": [
+            "build.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "deploy",
+          "operation": "deploy",
+          "description": "",
+          "required_capabilities": [
+            "artifact.deploy"
+          ],
+          "produces": [
+            "deploy.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "migration",
+          "operation": "migration",
+          "description": "",
+          "required_capabilities": [
+            "artifact.migration"
+          ],
+          "produces": [
+            "migration.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "observe",
+          "operation": "observation",
+          "description": "",
+          "required_capabilities": [
+            "artifact.observe"
+          ],
+          "produces": [
+            "observation.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "package",
+          "operation": "package",
+          "description": "",
+          "required_capabilities": [
+            "artifact.package"
+          ],
+          "produces": [
+            "package.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "repair",
+          "operation": "repair",
+          "description": "",
+          "required_capabilities": [
+            "artifact.repair"
+          ],
+          "produces": [
+            "repair.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "rollback",
+          "operation": "rollback",
+          "description": "",
+          "required_capabilities": [
+            "artifact.rollback"
+          ],
+          "produces": [
+            "rollback.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "run",
+          "operation": "run",
+          "description": "",
+          "required_capabilities": [
+            "artifact.run"
+          ],
+          "produces": [
+            "run.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "test",
+          "operation": "test",
+          "description": "",
+          "required_capabilities": [
+            "artifact.test"
+          ],
+          "produces": [
+            "test.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        },
+        {
+          "node_id": "upgrade",
+          "operation": "upgrade",
+          "description": "",
+          "required_capabilities": [
+            "artifact.upgrade"
+          ],
+          "produces": [
+            "upgrade.result"
+          ],
+          "condition": null,
+          "metadata": {}
+        }
+      ],
+      "edges": [
+        {
+          "source": "build",
+          "target": "test",
+          "kind": "sequence",
+          "condition": null
+        },
+        {
+          "source": "test",
+          "target": "package",
+          "kind": "success",
+          "condition": null
+        },
+        {
+          "source": "test",
+          "target": "repair",
+          "kind": "feedback",
+          "condition": null
+        },
+        {
+          "source": "repair",
+          "target": "test",
+          "kind": "retry",
+          "condition": null
+        },
+        {
+          "source": "package",
+          "target": "migration",
+          "kind": "migration",
+          "condition": null
+        },
+        {
+          "source": "migration",
+          "target": "upgrade",
+          "kind": "upgrade",
+          "condition": null
+        },
+        {
+          "source": "upgrade",
+          "target": "deploy",
+          "kind": "sequence",
+          "condition": null
+        },
+        {
+          "source": "deploy",
+          "target": "run",
+          "kind": "sequence",
+          "condition": null
+        },
+        {
+          "source": "run",
+          "target": "observe",
+          "kind": "sequence",
+          "condition": null
+        },
+        {
+          "source": "observe",
+          "target": "repair",
+          "kind": "feedback",
+          "condition": null
+        },
+        {
+          "source": "observe",
+          "target": "rollback",
+          "kind": "rollback",
+          "condition": null
+        },
+        {
+          "source": "rollback",
+          "target": "build",
+          "kind": "rollback",
+          "condition": null
+        }
+      ],
+      "allows_cycles": true
+    },
+    "capability_needs": [
+      {
+        "capability_id": "artifact.build",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.build",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "required_by": [
+          "cell-compiler-runtime-compiler"
+        ]
+      },
+      {
+        "capability_id": "artifact.run",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.run",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "required_by": [
+          "cell-compiler-runtime-compiler"
+        ]
+      },
+      {
+        "capability_id": "artifact.plan",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.plan",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "required_by": [
+          "cell-compiler-runtime-compiler"
+        ]
+      },
+      {
+        "capability_id": "artifact.accept",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.accept",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "required_by": [
+          "cell-compiler-runtime-compiler"
+        ]
+      }
+    ],
+    "capability_gaps": [
+      {
+        "gap_id": "gap.provider.artifact-build",
+        "required_capability": "artifact.build",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.build",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "current_candidates": [],
+        "missing": [
+          "provider"
+        ],
+        "closure_routes": [
+          {
+            "stage": "asset_archaeology",
+            "action": "search_existing_contracts"
+          },
+          {
+            "stage": "capability_absorption",
+            "action": "bind_verified_provider"
+          },
+          {
+            "stage": "gds_research",
+            "action": "research_missing_mechanism"
+          }
+        ],
+        "stop_rule": "STOP_BEFORE_UNVERIFIED_EXECUTION",
+        "evidence_refs": [],
+        "status": "OPEN"
+      },
+      {
+        "gap_id": "gap.provider.artifact-run",
+        "required_capability": "artifact.run",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.run",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "current_candidates": [],
+        "missing": [
+          "provider"
+        ],
+        "closure_routes": [
+          {
+            "stage": "asset_archaeology",
+            "action": "search_existing_contracts"
+          },
+          {
+            "stage": "capability_absorption",
+            "action": "bind_verified_provider"
+          },
+          {
+            "stage": "gds_research",
+            "action": "research_missing_mechanism"
+          }
+        ],
+        "stop_rule": "STOP_BEFORE_UNVERIFIED_EXECUTION",
+        "evidence_refs": [],
+        "status": "OPEN"
+      },
+      {
+        "gap_id": "gap.provider.artifact-plan",
+        "required_capability": "artifact.plan",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.plan",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "current_candidates": [],
+        "missing": [
+          "provider"
+        ],
+        "closure_routes": [
+          {
+            "stage": "asset_archaeology",
+            "action": "search_existing_contracts"
+          },
+          {
+            "stage": "capability_absorption",
+            "action": "bind_verified_provider"
+          },
+          {
+            "stage": "gds_research",
+            "action": "research_missing_mechanism"
+          }
+        ],
+        "stop_rule": "STOP_BEFORE_UNVERIFIED_EXECUTION",
+        "evidence_refs": [],
+        "status": "OPEN"
+      },
+      {
+        "gap_id": "gap.provider.artifact-accept",
+        "required_capability": "artifact.accept",
+        "why_required": "required by compiler-runtime and compiler artifact planning",
+        "canonical_owner": "provider",
+        "desired_signature": {
+          "capability_id": "artifact.accept",
+          "canonical_owner": "provider",
+          "version": "v0.1",
+          "accepted_inputs": [
+            "ArtifactGraph"
+          ],
+          "emitted_outputs": [
+            "ArtifactRef"
+          ],
+          "supported_artifact_types": [
+            "taowind.compiler/application"
+          ],
+          "supported_environments": [
+            "compiler-runtime"
+          ],
+          "semantic_effects": [
+            "plan-or-execute-artifact-step"
+          ],
+          "side_effects": [],
+          "authority_scope": [],
+          "evidence_class": "UNVERIFIED",
+          "deterministic": false,
+          "idempotent": false,
+          "stateful": false,
+          "resource_requirements": {},
+          "isolation_requirements": {},
+          "quality_claims": {},
+          "known_limits": [
+            "provider availability and evidence remain external"
+          ]
+        },
+        "current_candidates": [],
+        "missing": [
+          "provider"
+        ],
+        "closure_routes": [
+          {
+            "stage": "asset_archaeology",
+            "action": "search_existing_contracts"
+          },
+          {
+            "stage": "capability_absorption",
+            "action": "bind_verified_provider"
+          },
+          {
+            "stage": "gds_research",
+            "action": "research_missing_mechanism"
+          }
+        ],
+        "stop_rule": "STOP_BEFORE_UNVERIFIED_EXECUTION",
+        "evidence_refs": [],
+        "status": "OPEN"
+      }
+    ],
+    "contracts": {
+      "build": {
+        "toolchain": "compiler-runtime",
+        "commands": [],
+        "dependencies": [],
+        "environment": {},
+        "authority_scope": [],
+        "acceptance_refs": [],
+        "evidence_refs": []
+      },
+      "run": {
+        "runtime": "compiler-runtime",
+        "entrypoint": "compiler:main",
+        "environment": {},
+        "ports": [],
+        "health_checks": [],
+        "authority_scope": [],
+        "evidence_refs": []
+      },
+      "package": {
+        "format": "compiler-package",
+        "artifacts": [],
+        "dependencies": [],
+        "metadata": {}
+      },
+      "deployment": {
+        "target": "compiler-runtime",
+        "strategy": "provider",
+        "configuration": {},
+        "authority_scope": [],
+        "rollback": {},
+        "evidence_refs": []
+      },
+      "concurrency": {
+        "processes": [],
+        "threads": [],
+        "async_tasks": [],
+        "actors": [],
+        "queues": [],
+        "streams": [],
+        "events": [],
+        "ordering": "unspecified",
+        "idempotency": "unspecified",
+        "backpressure": "unspecified",
+        "failure_domains": []
+      },
+      "network": {
+        "protocol": "declared-or-provider",
+        "ports": [],
+        "routes": [],
+        "authentication": {},
+        "authorization": {},
+        "rate_limits": [],
+        "events": [],
+        "webhooks": []
+      },
+      "distribution": {
+        "partitions": [],
+        "replication": {},
+        "consistency": "unspecified",
+        "ordering": "unspecified",
+        "leader": {},
+        "leases": [],
+        "retry": {},
+        "idempotency": "unspecified",
+        "backpressure": "unspecified",
+        "failure_domains": []
+      },
+      "database": [],
+      "services": [],
+      "interfaces": [],
+      "media_assets": [],
+      "binaries": [],
+      "intelligence": [],
+      "security": {
+        "identity": {},
+        "authentication": {},
+        "authorization": {},
+        "secret_boundary": {},
+        "network_boundary": {},
+        "filesystem_boundary": {},
+        "data_classification": {},
+        "sandbox": {
+          "required": true
+        },
+        "supply_chain": {},
+        "dependency_policy": {},
+        "audit": {
+          "required": true
+        },
+        "rollback": {},
+        "kill_switch": {
+          "required": true
+        }
+      }
+    },
+    "provider_needs": [
+      "artifact.build",
+      "artifact.run",
+      "artifact.plan",
+      "artifact.accept"
+    ],
+    "acceptance": {
+      "contract_id": "acceptance.cell-compiler-runtime-compiler",
+      "non_compensatory": true,
+      "checks": [
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.express",
+          "kind": "schema",
+          "gate": "EXPRESS",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.compile",
+          "kind": "compile",
+          "gate": "COMPILE",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.lower",
+          "kind": "compile",
+          "gate": "LOWER",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.execute",
+          "kind": "runtime_health",
+          "gate": "EXECUTE",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.correct",
+          "kind": "integration_test",
+          "gate": "CORRECT",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.robust",
+          "kind": "property",
+          "gate": "ROBUST",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.performance",
+          "kind": "performance",
+          "gate": "PERFORMANCE",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.ai_generate",
+          "kind": "compile",
+          "gate": "AI_GENERATE",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        },
+        {
+          "check_id": "acceptance.cell-compiler-runtime-compiler.evidence",
+          "kind": "evidence",
+          "gate": "EVIDENCE",
+          "required": true,
+          "status": "UNTESTED",
+          "evidence_refs": [],
+          "details": {
+            "source": "universal-artifact-plan",
+            "execution_required": true
+          }
+        }
+      ],
+      "evaluation": {
+        "status": "UNTESTED",
+        "passed": false,
+        "non_compensatory": true,
+        "failed_checks": [],
+        "pending_checks": [
+          "acceptance.cell-compiler-runtime-compiler.express",
+          "acceptance.cell-compiler-runtime-compiler.compile",
+          "acceptance.cell-compiler-runtime-compiler.lower",
+          "acceptance.cell-compiler-runtime-compiler.execute",
+          "acceptance.cell-compiler-runtime-compiler.correct",
+          "acceptance.cell-compiler-runtime-compiler.robust",
+          "acceptance.cell-compiler-runtime-compiler.performance",
+          "acceptance.cell-compiler-runtime-compiler.ai_generate",
+          "acceptance.cell-compiler-runtime-compiler.evidence"
+        ],
+        "rcl_gates": {
+          "EXPRESS": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.express"
+            ],
+            "evidence_refs": []
+          },
+          "COMPILE": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.compile"
+            ],
+            "evidence_refs": []
+          },
+          "LOWER": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.lower"
+            ],
+            "evidence_refs": []
+          },
+          "EXECUTE": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.execute"
+            ],
+            "evidence_refs": []
+          },
+          "CORRECT": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.correct"
+            ],
+            "evidence_refs": []
+          },
+          "ROBUST": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.robust"
+            ],
+            "evidence_refs": []
+          },
+          "PERFORMANCE": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.performance"
+            ],
+            "evidence_refs": []
+          },
+          "AI_GENERATE": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.ai_generate"
+            ],
+            "evidence_refs": []
+          },
+          "EVIDENCE": {
+            "status": "UNTESTED",
+            "check_ids": [
+              "acceptance.cell-compiler-runtime-compiler.evidence"
+            ],
+            "evidence_refs": []
+          }
+        }
+      },
+      "metadata": {}
+    },
+    "metadata": {
+      "environment_descriptor": {
+        "environment_id": "compiler-runtime",
+        "version": "v0.1",
+        "transport": "provider",
+        "node_types": [
+          "source_code",
+          "configuration",
+          "test",
+          "package",
+          "deployment",
+          "evidence"
+        ],
+        "required_capabilities": [
+          "artifact.build",
+          "artifact.run"
+        ],
+        "metadata": {}
+      },
+      "program_family_descriptor": {
+        "family_id": "compiler",
+        "version": "v0.1",
+        "node_types": [
+          "source_code",
+          "test"
+        ],
+        "required_capabilities": [
+          "artifact.plan",
+          "artifact.accept"
+        ],
+        "lifecycle_operations": [
+          "build",
+          "run",
+          "repair",
+          "upgrade",
+          "migration",
+          "rollback"
+        ],
+        "metadata": {}
+      },
+      "canonical_ownership": {
+        "artifact_structure": "dwac",
+        "authority_evidence": "rcl"
+      },
+      "provider_free_planning": true,
+      "canonical_promotion_performed": false
+    }
+  },
+  "providersExecuted": false,
+  "implementationOwner": "Codex/RCL",
+  "federationWorkflow": "229a8d72-2253-42b8-9ab9-657fcb49e7c6"
+}

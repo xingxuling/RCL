@@ -2,7 +2,7 @@
   "format": "rcl.component-version-contract.v1",
   "package": {
     "name": "@taowind/rcl-reality-forge",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "source": "package.json"
   },
   "policy": {
@@ -13,7 +13,7 @@
   "components": {
     "nativeVm": {
       "id": "rcl-native-vm",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "source": "native/rclvm.c#RCL_VM_VERSION",
       "relationToPackage": "independent-runtime-component"
     },
@@ -36,6 +36,28 @@
       "verifier": "src/semantic-state-root.mjs",
       "relationToPackage": "versioned-authority-algorithm",
       "legacyAlgorithm": "rcl.semantic-state-root.v1"
+    },
+    "governedSessions": {
+      "id": "rcl-governed-session",
+      "version": "1.0.0",
+      "format": "rcl.governed-session.v1",
+      "source": "src/session-contract.mjs#RCL_SESSION_VERSION",
+      "relationToPackage": "independent-runtime-component"
+    },
+    "durableSessions": {
+      "id": "rcl-durable-session",
+      "version": "1.0.0",
+      "format": "rcl.session-journal.v1",
+      "source": "src/durable-session.mjs#RCL_DURABLE_SESSION_VERSION",
+      "relationToPackage": "independent-storage-component"
+    },
+    "sessionBytecode": {
+      "id": "rcl-session-bytecode",
+      "version": "1.3",
+      "format": "RCLB",
+      "sessionFlag": 4,
+      "source": "src/bytecode.mjs#RCL_BYTECODE_SESSION_FEATURE_VERSION",
+      "relationToPackage": "independent-bytecode-feature-version"
     }
   }
 }

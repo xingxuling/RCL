@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { RCLRuntimeError } from './errors.mjs';
 import { canonicalReality, realityRoot, RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
 import { semanticStateRootForAlgorithm } from './semantic-state-root.mjs';
+import { RCL_SESSION_FORMAT, validateSessionProgram, normalizeSessionCommand, sessionResult } from './session-contract.mjs';
 import {
   applyBinary,
   quantity,
@@ -1474,6 +1475,50 @@ function initializeState(program, functions, providers = {}) {
     });
   }
   return state;
+}
+
+export function createRealitySession(compiledOrSource) {
+  const program = structuredClone(typeof compiledOrSource === 'string' ? compileReality(compiledOrSource) : compiledOrSource);
+  validateSessionProgram(program);
+  const functions = new Map(program.reckons.map(fn => [fn.name, fn]));
+  const runtime = {
+    program, functions, state: initializeState(program, functions),
+    stateRootAlgorithm: 'rcl.semantic-state-root.v2',
+    stateRoot: value => semanticStateRootForAlgorithm(value, 'rcl.semantic-state-root.v2'),
+    hostAdapters: {}, providers: {}, history: [], projections: [], currentSpacetime: null,
+  };
+  const snapshot = () => ({
+    format: RCL_SESSION_FORMAT, backend: 'reference', program: program.name,
+    programRoot: program.programRoot, state: structuredClone(runtime.state),
+    stateRoot: runtime.stateRoot(runtime.state), stateRootAlgorithm: runtime.stateRootAlgorithm,
+  });
+  // Serial execution prevents overlapping async invocations from sharing a proposal.
+  let pending = Promise.resolve();
+  return Object.freeze({
+    snapshot,
+    invoke(input) {
+      const command = normalizeSessionCommand(program, input);
+      const operation = pending.then(async () => {
+        const before = structuredClone(runtime.state);
+        const historyLength = runtime.history.length;
+        const projectionLength = runtime.projections.length;
+        runtime.state = Object.assign(Object.create(null), before, command.inputs);
+        try {
+          const record = await executeRule(program.rules.find(rule => rule.name === command.rule), command.mode, runtime);
+          // Projections and false guards do not commit observations either.
+          if (command.mode === 'foresee' || record.status === 'not-triggered') runtime.state = before;
+          return sessionResult(program, command, before, runtime.state, record);
+        } catch (error) {
+          runtime.state = before;
+          runtime.history.length = historyLength;
+          runtime.projections.length = projectionLength;
+          throw error;
+        }
+      });
+      pending = operation.catch(() => {});
+      return operation;
+    },
+  });
 }
 
 export async function runReality(compiledOrSource, options = {}) {
