@@ -44,8 +44,11 @@ package/native VM 1.0.0. Development branch: codex/rcl-v2-capability-development
 
 ## Execution constraints
 
-GitHub Actions: NOT_RUN_USER_INSTRUCTION. No push, merge, publication, remote
-deployment or downstream synchronization is part of local release acceptance.
+GitHub Actions: NOT_RUN_USER_INSTRUCTION. Local release acceptance was completed
+before any remote delivery. The user's subsequent 2026-10-10 commit/push request
+authorized delivery to codex/rcl-v2-capability-development; CURRENT-STATUS.md
+records that delivery. Main merge, publication, remote deployment and downstream
+synchronization are outside that request.
 Synced project sources and unrelated worktrees are read-only.
 DWAC mode sequence: NORTH_STAR audit, DEEP_DEVELOPMENT implementation,
 WHOLE_ARTIFACT release. Routing is advisory; Codex owns implementation/review.

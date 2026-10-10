@@ -35,8 +35,11 @@ Fresh v2.0 Linux execution is NOT_RUN: the local Ubuntu WSL disk is unavailable
 and the Docker Linux engine is not running. Historical v1.0 Linux receipts are
 not relabeled as v2.0 proof. Fresh Android-device, broad production/hardware and
 remote-deployment acceptance remain outside this local Windows session release.
-GitHub Actions remain NOT_RUN_USER_INSTRUCTION. This local 2.0 release has not
-been pushed, merged, published, deployed or synchronized into downstream copies.
+GitHub Actions remain NOT_RUN_USER_INSTRUCTION. Following the user's explicit
+2026-10-10 commit/push request, the verified 2.0 source was pushed to
+`xingxuling/RCL@codex/rcl-v2-capability-development`. Canonical-main merge,
+package publication, remote deployment and downstream synchronization remain
+separate from this branch delivery.
 
 ## Historical v1.0 verification
 
