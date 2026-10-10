@@ -17,29 +17,36 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
+**2.0 源码已推送到 [`codex/rcl-v2-capability-development`](https://github.com/xingxuling/RCL/tree/codex/rcl-v2-capability-development)，Windows 本地发布验收通过。** 正式 `main` 仍为 1.0.0，2.0 分支等待主线集成。npm 发布和远端部署分别记录。
+
 ## 为什么使用 RCL？
-
-2.0 增加可持续运行的原生会话：源码声明有类型的输入，RCL 规则检查当前授权并提交状态；本地交易日志支持进程重启、确定性重放与请求重试去重。Windows 本地发布验收已通过。使用方法见[会话契约](docs/v2.0/session-contract.md)和[当前状态](CURRENT-STATUS.md)。
-
-```text
-rcl session init examples/sessions/governed-counter.rcl ./counter-state
-rcl session invoke ./counter-state examples/sessions/increment-command.json
-rcl session inspect ./counter-state
-rcl session verify ./counter-state --reference
-```
 
 - **把权限和行为写在一起。** 主体、授权凭证、前置条件、状态修改与不变量都是语言构造。状态变化直接声明自身的权限和验证要求，不必只靠外围应用代码隐式约定。
 - **让执行结果可检查。** 状态变化产生 witness 与 evidence；工具链用工件根和语义状态根核对不同实现的结果。证据始终绑定实际验证过的范围。
 - **跨执行目标保留语义。** RCL 拥有状态与权限模型，原生字节码、Web 和 Android 路径提供不同的执行环境。候选 Native UI 模型在 Web / Android 后端之间共享 IR 与语义根。
 - **用编译器验证编译器。** Native-Core 编译器用 RCL 编写，已有字节完全一致的 `C0 == C1 == C2` 固定点记录。这是编译器自举，不代表整套运行时已经完全自举。
 
-RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。v1.0 稳定核心语言、原生状态根协议、公共 CLI 和可安装源码工具链；研究扩展仍按各自证据与成熟度分类。
+RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。2.0 将受治理核心扩展为可持续调用的原生程序与本地持久会话；研究扩展仍按各自证据与成熟度分类。
 
-[快速开始](#快速开始) · [示例](#程序员建议按这些示例看) · [当前成熟度](#当前已经验证到什么程度) · [架构](#架构) · [参与贡献](#欢迎贡献)
+[2.0 新能力](#v20) · [快速开始](#快速开始) · [持久会话](#4-运行持久会话) · [示例](#程序员建议按这些示例看) · [验证范围](#当前已经验证到什么程度) · [架构](#架构)
 
 ---
 
-## v1.0
+## v2.0
+
+2.0 让同一段 RCL 程序能够接收多次输入，并在进程重启后继续运行：
+
+- **原生持续会话：** 初始化一次，按名字调用源码中的规则，保留已提交状态。参考实现与原生 VM 使用同一套受治理事务契约。
+- **源码声明输入：** `input` facet 接收有类型的 Number、Truth、Text 观测；其它状态变化由规则所有。每次调用都根据当前状态重新检查条件授权。
+- **原子候选状态：** guard、授权和 preserve 共同决定是否提交。拒绝、未触发规则和 `foresee` 预测都保留原已提交状态与输入。
+- **本地持久重放：** 日志绑定源码、字节码、命令和精确状态根；新原生进程重放并核对已提交记录。请求 ID 防止重试重复，预期修订号拒绝过期更新。
+- **RCL 编写的会话编译器：** 原生会话编译器由 RCL 编写，目标字节码与 bootstrap 编译器逐字节核对。会话使用 RBC 1.3；状态根 v2 与既有 typed-reference ABI 保持独立版本。
+
+有界计数示例中，v1.0 守护进程默认 `RUN` 连续调用 50 次，每次结果仍为 **1**；v2.0 会话保留状态并累计到 **50**。该计数会话的热调用 p95 约 **3 毫秒**，包含进程通信与独立状态根验证，不包含持久日志写入。见[验证记录](docs/v2.0/verification.json)和[会话验收](docs/v2.0/acceptance.md)。
+
+持久会话范围为本地协作写入者与纯 RCL 规则，日志上限为 64 MiB / 10,000 条已接受命令。Provider 外部效果、分布式恰好一次执行和硬件断电恢复不在该范围内。输入、调用者认证责任与恢复契约见[会话文档](docs/v2.0/session-contract.md)。
+
+### 从 1.0 保留的稳定核心
 
 原生 VM 与 `rcl run` 默认使用 `rcl.semantic-state-root.v2`，以精确有限 binary64 编码绑定最终状态与转移前后根。历史原生 v1 凭据仍可显式选择算法验证。`runReality` Reference API 保留其独立的 `rcl.reference-state-root.v0.6` 默认；使用 `stateRootAlgorithm` 可选择跨运行时 v2。参见[稳定契约](docs/v1.0/language-contract.md)、[状态根协议](docs/v1.0/semantic-state-root-v2.md)与[发布验收](docs/v1.0/acceptance.md)。
 
@@ -50,10 +57,13 @@ RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / �
 ### 1. 克隆并安装
 
 ```bash
-git clone https://github.com/xingxuling/RCL.git
+git clone --branch codex/rcl-v2-capability-development https://github.com/xingxuling/RCL.git
 cd RCL
 npm install
+node src/reality-hub-cli.mjs --version
 ```
+
+版本命令输出 `2.0.0`。正式 `main` 仍为 1.0.0，因此获取 2.0 时需要上面的分支选择。以下源码示例直接调用公共 CLI 入口，无需预先全局安装 `rcl`。
 
 ### 2. 运行一个完整程序
 
@@ -117,7 +127,29 @@ npm run demo:native
 npm run demo:bytecode
 ```
 
-### 4. 继续学习
+### 4. 运行持久会话
+
+```bash
+npm run demo:session
+```
+
+[持久计数示例](examples/sessions/persistent-counter-demo.mjs)会提交输入、预测变化、重启原生进程、重试原请求、撤销授权，并验证原生与参考重放。默认每次运行使用独立的状态目录。
+
+从源码目录逐步查看命令时，请使用一个新的 `counter-state` 目录：
+
+```bash
+node src/reality-hub-cli.mjs session init examples/sessions/governed-counter.rcl ./counter-state
+node src/reality-hub-cli.mjs session invoke ./counter-state examples/sessions/increment-command.json
+node src/reality-hub-cli.mjs session invoke ./counter-state examples/sessions/increment-command.json
+node src/reality-hub-cli.mjs session inspect ./counter-state
+node src/reality-hub-cli.mjs session verify ./counter-state --reference
+```
+
+首次调用计数为 `3`；相同请求的重试返回 `replayed: true`，日志修订号仍为 `1`。发出新命令时，使用新的 `requestId` 和当前的 `expectedRevision`，见[命令示例](examples/sessions/increment-command.json)。
+
+会话命令需要原生守护进程与编译器。已验证的 Windows 源码包含绑定源码字节的预构建工具；改动原生源码后可用 `npm run build:native` 重建。Unix 构建使用前文的依赖；2.0 的新 Linux 运行验证尚未执行。
+
+### 5. 继续学习
 
 Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
@@ -131,13 +163,19 @@ Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
 ## 当前已经验证到什么程度？
 
-正式 `main` 已通过 [PR #262](https://github.com/xingxuling/RCL/pull/262) 晋级至 **`v1.0.0`**。[本地发布验证记录](docs/v1.0/verification.json)包含 1683 项通过、0 项失败、2 项跳过、Windows/Linux 独立安装检查和 41 个自举验证阶段。远端部署与 npm 发布分别记录；各项能力的证据与成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+[2.0 验证记录](docs/v2.0/verification.json)绑定实际源码与工件：**332 个测试文件已覆盖，1702 项通过、0 项剩余失败、2 项明确跳过**，其中包括 19 项会话检查。Stage0–40 通过，120 个可支持示例逐字节一致，40 个示例明确保留不支持状态。原生编译器在 277,414 字节上复现 `C0 == C1 == C2`。安装包也已在源码目录之外实际安装，执行公共 API、CLI、原生 RCL 编译和持久恢复重试。
+
+这是 **2.0 的 Windows 本地证据**。新 Linux、Android 设备与远端部署验收分别记录；未运行 GitHub Actions。[1.0 的历史记录](docs/v1.0/verification.json)包含 Windows/Linux 检查，属于正式 `main` 上 [PR #262](https://github.com/xingxuling/RCL/pull/262) 的基线，未改称为 2.0 证据。各项能力和成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 | 能力 | 当前状态 |
 |---|---|
 | RCL 编写的通用编译器 | **已验证** |
 | Native-Core 编译器固定点 `C0 == C1 == C2` | **已验证** |
 | Native VM / Compiler Path | **存在并已测试** |
+| 原生 / 参考持续会话与有类型输入 | **Windows 本地验证；19 项会话检查通过** |
+| 条件授权、拒绝与预测原子性 | **原生 / 参考差分检查通过** |
+| 持久恢复、重试去重与写入者隔离 | **真实进程终止、OS 锁与日志控制检查通过** |
+| 2.0 独立安装与公共 API / CLI | **Windows 本地验证通过** |
 | 整门语言 Runtime 全自举 | **不宣称** |
 | 完整 Web 垂直切片 | **有界 K02 profile 已通过 9/9 个 Gate** |
 | Android 工程 / APK 构建路径 | **已验证** |
@@ -176,6 +214,7 @@ C0 == C1 == C2
 | 示例 | 主要展示 | 源文件 |
 |---|---|---|
 | First Light | 最小状态 + 权威 + 状态变化 | [`examples/hello-reality.rcl`](examples/hello-reality.rcl) |
+| 持久计数会话 | 有类型输入、条件授权、原生进程恢复与重试 | [`examples/sessions/persistent-counter-demo.mjs`](examples/sessions/persistent-counter-demo.mjs) |
 | 受治理 Web 状态 | guard、mutation、invariant、evidence | [`examples/universal-stress/k02-complete-web-app.rcl`](examples/universal-stress/k02-complete-web-app.rcl) |
 | Native UI 计数器 | state、derived、binding、layout、style、event | [`examples/native-ui/counter.rcl`](examples/native-ui/counter.rcl) |
 | 应用内导航 | route 与原子化 UI-local navigation | [`examples/native-ui/navigation.rcl`](examples/native-ui/navigation.rcl) |
@@ -387,6 +426,8 @@ Opaque delegation 可以很有用，但**不能冒充 RCL 原生能力**。
 
 [可编辑图表源码](docs/readme-diagrams/architecture.mmd)。
 
+2.0 会话路径复用图中的编译器与原生 VM：[RCL 会话编译器](selfhost/session-compiler-core.rcl) → RBC 1.3 → [原生会话适配器](src/native-session.mjs) → [持久日志与重放](src/durable-session.mjs)。输入、事务和恢复边界见[会话契约](docs/v2.0/session-contract.md)。
+
 ---
 
 ## 常用命令
@@ -397,6 +438,9 @@ npm run demo
 npm run build:native
 npm run demo:native
 npm run demo:bytecode
+npm run demo:session
+npm run test:sessions
+npm run verify:v2-release
 npm run build:selfhost-compiler
 npm run verify:selfhost-fixedpoint
 npm run verify:selfhost-examples
@@ -411,11 +455,16 @@ npm run verify:selfhost-examples
 ```text
 src/                         语言 / Runtime / Reference Implementation
 selfhost/                    RCL 编写的编译器源码与 fixed-point artifact
+selfhost/session-compiler-*  RCL 编写的会话字节码编译器
+src/native-session.mjs       命名规则调用与有类型观测
+src/durable-session.mjs      源码绑定日志、OS 写入锁与重放
 native/                      Native VM / Compiler / Provider Boundary
 examples/                    可运行示例与 Evidence Fixtures
+examples/sessions/           持久计数与命令示例
 tests/                       Conformance / Regression / Stress Tests
 scripts/                     Build / Verification / Stress Runner
 docs/                        架构、Campaign、Evidence、Governance
+docs/v2.0/                   会话契约与本地发布验证
 CURRENT-STATUS.md            当前人类可读权威状态
 VERSION-CONTRACT.json        机器可读 Capability Contract
 COMPONENT-VERSIONS.json      受治理 Component Identity
