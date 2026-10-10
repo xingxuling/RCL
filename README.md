@@ -17,7 +17,7 @@ RCL (Reality Compiler Language) is an open-source language for writing programs 
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-**Version 2.0 source is available on [`codex/rcl-v2-capability-development`](https://github.com/xingxuling/RCL/tree/codex/rcl-v2-capability-development), with local Windows release verification complete.** Canonical `main` remains at 1.0.0; the 2.0 branch has been pushed and is awaiting main integration. Package publication and remote deployment have separate status records.
+**RCL 2.0 is available on canonical [`main`](https://github.com/xingxuling/RCL/tree/main), with local Windows release verification complete.** Package publication and remote deployment have separate status records; source integration does not relabel historical platform evidence.
 
 ## Why RCL?
 
@@ -57,13 +57,13 @@ Requirements: Git, Node.js 20+, and npm. Start with the JavaScript/reference run
 ### 1. Clone and install
 
 ```bash
-git clone --branch codex/rcl-v2-capability-development https://github.com/xingxuling/RCL.git
+git clone https://github.com/xingxuling/RCL.git
 cd RCL
 npm install
 node src/reality-hub-cli.mjs --version
 ```
 
-The version command prints `2.0.0`. The branch selection above is required while canonical `main` remains at 1.0.0. Source examples below use the public CLI entrypoint directly, so a global `rcl` installation is optional.
+The version command prints `2.0.0`. Source examples below use the public CLI entrypoint directly, so a global `rcl` installation is optional.
 
 ### 2. Run a complete program
 
@@ -165,7 +165,7 @@ Chinese version:
 
 The [2.0 verification record](docs/v2.0/verification.json) binds the tested source and artifacts: **1702 passing cases, zero remaining failures and two documented skips across 332 test files**, including 19 session checks. Stage0–40 pass, 120 eligible examples have exact byte parity, and 40 examples retain explicit unsupported status. The native compiler reproduces `C0 == C1 == C2` at 277,414 bytes. The package was installed outside the source checkout and its public API/CLI, native RCL compilation and durable restart/retry were exercised there.
 
-This is **local Windows 2.0 evidence**. Fresh Linux, Android-device and remote-deployment acceptance are separate. GitHub Actions were not run. The [1.0 record](docs/v1.0/verification.json), including Windows/Linux checks, remains historical evidence for the [PR #262](https://github.com/xingxuling/RCL/pull/262) baseline on canonical `main`; those receipts are not relabeled as 2.0 proof. Capability evidence and maturity profiles live in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+This is **local Windows 2.0 evidence**. Fresh Linux, Android-device and remote-deployment acceptance are separate. GitHub Actions were not run. The [1.0 record](docs/v1.0/verification.json), including Windows/Linux checks, remains historical evidence for the [PR #262](https://github.com/xingxuling/RCL/pull/262) baseline that preceded this 2.0 main integration; those receipts are not relabeled as 2.0 proof. Capability evidence and maturity profiles live in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 | Area | Current state |
 |---|---|

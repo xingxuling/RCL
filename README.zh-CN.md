@@ -17,7 +17,7 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**2.0 源码已推送到 [`codex/rcl-v2-capability-development`](https://github.com/xingxuling/RCL/tree/codex/rcl-v2-capability-development)，Windows 本地发布验收通过。** 正式 `main` 仍为 1.0.0，2.0 分支等待主线集成。npm 发布和远端部署分别记录。
+**正式 [`main`](https://github.com/xingxuling/RCL/tree/main) 已包含 RCL 2.0，Windows 本地发布验收通过。** npm 发布和远端部署分别记录；主线集成不会重新标记历史平台证据。
 
 ## 为什么使用 RCL？
 
@@ -57,13 +57,13 @@ RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / �
 ### 1. 克隆并安装
 
 ```bash
-git clone --branch codex/rcl-v2-capability-development https://github.com/xingxuling/RCL.git
+git clone https://github.com/xingxuling/RCL.git
 cd RCL
 npm install
 node src/reality-hub-cli.mjs --version
 ```
 
-版本命令输出 `2.0.0`。正式 `main` 仍为 1.0.0，因此获取 2.0 时需要上面的分支选择。以下源码示例直接调用公共 CLI 入口，无需预先全局安装 `rcl`。
+版本命令输出 `2.0.0`。以下源码示例直接调用公共 CLI 入口，无需预先全局安装 `rcl`。
 
 ### 2. 运行一个完整程序
 
@@ -165,7 +165,7 @@ Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
 [2.0 验证记录](docs/v2.0/verification.json)绑定实际源码与工件：**332 个测试文件已覆盖，1702 项通过、0 项剩余失败、2 项明确跳过**，其中包括 19 项会话检查。Stage0–40 通过，120 个可支持示例逐字节一致，40 个示例明确保留不支持状态。原生编译器在 277,414 字节上复现 `C0 == C1 == C2`。安装包也已在源码目录之外实际安装，执行公共 API、CLI、原生 RCL 编译和持久恢复重试。
 
-这是 **2.0 的 Windows 本地证据**。新 Linux、Android 设备与远端部署验收分别记录；未运行 GitHub Actions。[1.0 的历史记录](docs/v1.0/verification.json)包含 Windows/Linux 检查，属于正式 `main` 上 [PR #262](https://github.com/xingxuling/RCL/pull/262) 的基线，未改称为 2.0 证据。各项能力和成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+这是 **2.0 的 Windows 本地证据**。新 Linux、Android 设备与远端部署验收分别记录；未运行 GitHub Actions。[1.0 的历史记录](docs/v1.0/verification.json)包含 Windows/Linux 检查，属于本次 2.0 主线集成之前 [PR #262](https://github.com/xingxuling/RCL/pull/262) 的基线，未改称为 2.0 证据。各项能力和成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 | 能力 | 当前状态 |
 |---|---|

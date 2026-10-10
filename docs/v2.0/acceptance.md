@@ -46,9 +46,10 @@ package/native VM 1.0.0. Development branch: codex/rcl-v2-capability-development
 
 GitHub Actions: NOT_RUN_USER_INSTRUCTION. Local release acceptance was completed
 before any remote delivery. The user's subsequent 2026-10-10 commit/push request
-authorized delivery to codex/rcl-v2-capability-development; CURRENT-STATUS.md
-records that delivery. Main merge, publication, remote deployment and downstream
-synchronization are outside that request.
+authorized delivery to codex/rcl-v2-capability-development. The user's subsequent
+repository-homepage correction was addressed by integrating that verified source
+and both READMEs into main; CURRENT-STATUS.md records the integration. Package
+publication, remote deployment and downstream synchronization remain separate.
 Synced project sources and unrelated worktrees are read-only.
 DWAC mode sequence: NORTH_STAR audit, DEEP_DEVELOPMENT implementation,
 WHOLE_ARTIFACT release. Routing is advisory; Codex owns implementation/review.

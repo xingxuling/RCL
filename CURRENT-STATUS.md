@@ -1,12 +1,12 @@
 # Current RCL Status: v2.0.0 locally verified Windows release
 
 - Canonical source: `xingxuling/RCL@main`.
-- Locally verified package/native VM: `v2.0.0`; canonical-main baseline is `afe83b231754e8ae3adeb8058356e87165f7ad91` at `v1.0.0`.
+- Canonical-main package/native VM: `v2.0.0`, locally verified on Windows. The pre-2.0 main baseline remains pinned to `afe83b231754e8ae3adeb8058356e87165f7ad91` at `v1.0.0`.
 - New capability: stateful native/reference governed sessions, source-declared scalar inputs, current-state conditional warrants, RCL-authored session compilation and durable command replay. Nineteen session checks and independent Windows installation pass.
 - Verified native ceiling: Stage40 native-core RCL self-hosting.
 - Current research frontier: Universal Program Stress v0.1 with a permanent `20 × 20 = 400` environment/program matrix and nine non-compensatory gates.
 - The repository contains the native-core compiler/VM path and fixed-point artifacts described in the main README.
-- The v1.0 native VM defaults to `rcl.semantic-state-root.v2` for final-state and transaction roots; explicit v1 selection preserves historical verification. Native root v2 uses typed JSON nodes and exact finite binary64 bits; the JavaScript boundary independently recomputes the canonical semantic state root, rejects algorithm/root mismatch, and supports strict evidence enforcement through `requireNativeStateRoot: true`.
+- The native VM retains the `rcl.semantic-state-root.v2` default established in 1.0 for final-state and transaction roots; explicit v1 selection preserves historical verification. Native root v2 uses typed JSON nodes and exact finite binary64 bits; the JavaScript boundary independently recomputes the canonical semantic state root, rejects algorithm/root mismatch, and supports strict evidence enforcement through `requireNativeStateRoot: true`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
@@ -35,11 +35,13 @@ Fresh v2.0 Linux execution is NOT_RUN: the local Ubuntu WSL disk is unavailable
 and the Docker Linux engine is not running. Historical v1.0 Linux receipts are
 not relabeled as v2.0 proof. Fresh Android-device, broad production/hardware and
 remote-deployment acceptance remain outside this local Windows session release.
-GitHub Actions remain NOT_RUN_USER_INSTRUCTION. Following the user's explicit
-2026-10-10 commit/push request, the verified 2.0 source was pushed to
-`xingxuling/RCL@codex/rcl-v2-capability-development`. Canonical-main merge,
-package publication, remote deployment and downstream synchronization remain
-separate from this branch delivery.
+GitHub Actions remain NOT_RUN_USER_INSTRUCTION. Following the user's 2026-10-10
+repository-homepage correction, the verified 2.0 implementation and updated
+bilingual READMEs were integrated into canonical `main` by a normal fast-forward.
+The original development history remains on `codex/rcl-v2-capability-development`.
+Package publication, remote deployment and downstream synchronization remain
+separate from source integration. The local verification record retains its
+original pre-integration provenance and scope.
 
 ## Historical v1.0 verification
 
