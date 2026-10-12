@@ -1,0 +1,159 @@
+{
+  "format": "rcl.k400-portable-delivery.v1",
+  "date": "2026-10-13",
+  "implementationCommit": "7f0a5277011561b45023a16594351c455b3b7119",
+  "sourceMaterial": "git archive of tracked implementation files only; no ignored build/tool directories",
+  "firstAdmission": {
+    "admitted": true,
+    "reportRoot": "49dfed1133aee6ec408bb05e1b7677234d4149766f7431a719ae488b1215bef1"
+  },
+  "portableAdmissions": [
+    {
+      "admitted": true,
+      "id": "relations",
+      "eligibleCells": [
+        "K046",
+        "K006",
+        "K026",
+        "K086"
+      ],
+      "reportRoot": "4e4ac6b0d192e737d9244caefdc6f249a759dee94a3019955aafe8b27636dd7b"
+    },
+    {
+      "admitted": true,
+      "id": "simulation-scientific",
+      "eligibleCells": [
+        "K049",
+        "K052",
+        "K009",
+        "K012",
+        "K029",
+        "K032",
+        "K089",
+        "K092"
+      ],
+      "reportRoot": "e2a3d3493004ee20577867c657ee025ff5e875468b59155bf4e3f00f54c35d72"
+    },
+    {
+      "admitted": true,
+      "id": "algorithm-posix",
+      "eligibleCells": [
+        "K021",
+        "K022",
+        "K081",
+        "K082"
+      ],
+      "reportRoot": "7427b3a295d1aabbb09a41798e7533949bffebd069612f279910698370aa28b8"
+    }
+  ],
+  "freshDirectoryCli": {
+    "wasi": {
+      "ok": true,
+      "target": "wasm-vm",
+      "artifactHash": "f7a3fe585cbdb40d31912b29c6686b0f5c2fa9dc1797bfcda702fbd80213a430",
+      "stateRoot": "a732ebb8934cddfdba58c60d0a2581a2c465566c8d7f9d980988327270f4ef9b",
+      "sourceRoot": "0f483aa7b27f42446d4b1f83057b31898900e7a09027eaad82ed4c7e2720eecb",
+      "targetBinding": {
+        "execution": "Node WASI Preview 1, wasm32 native C VM",
+        "os": "WASI",
+        "arch": "wasm32",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false
+      }
+    },
+    "linux": {
+      "ok": true,
+      "target": "linux",
+      "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+      "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+      "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+      "targetBinding": {
+        "execution": "Linux WSL2 native C process",
+        "os": "Linux",
+        "arch": "x86_64",
+        "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+        "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+        "compilerLocation": "Linux target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      }
+    },
+    "android": {
+      "ok": true,
+      "target": "android",
+      "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+      "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+      "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+      "targetBinding": {
+        "execution": "Android native Linux ABI C process via ADB",
+        "os": "Android",
+        "arch": "x86_64",
+        "abi": "x86_64",
+        "apiLevel": "35",
+        "emulator": true,
+        "deviceSerial": "emulator-5554",
+        "physicalDeviceClaimed": false,
+        "mobileUiClaimed": false,
+        "compilerLocation": "Android target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      }
+    }
+  },
+  "focusedTests": {
+    "pass": 25,
+    "fail": 0,
+    "files": [
+      "research-readiness",
+      "cli-public-contract",
+      "portable-native-vm",
+      "k400-portable-profiles",
+      "k400-expansion-receipts",
+      "native-wasi"
+    ]
+  },
+  "k400": {
+    "pass": 44,
+    "untested": 356,
+    "verdict": "INCOMPLETE",
+    "goalMinimumPass": 200,
+    "goalComplete": false
+  },
+  "versionPromotionFrozen": true,
+  "formalLanguageRelease": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "physicalAndroidDeviceClaimed": false
+}
