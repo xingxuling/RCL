@@ -1,14 +1,16 @@
 <div align="center">
 
-# RCL v2.0.0 — Reality Compiler Language
+# RCL — Reality Compiler Language
+
+**研究预览 · K400 24/400（6%）· INCOMPLETE · U3**
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5 分钟上手](GETTING_STARTED.zh-CN.md) · [网站 / Playground](https://rcl-rncs-mcp.vercel.app) · [当前状态](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v2.0.0-blue.svg)](package.json)
-[![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
+[![Build identity](https://img.shields.io/badge/build--identity-2.0.0-gray.svg)](package.json)
+[![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
@@ -17,7 +19,7 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**正式 [`main`](https://github.com/xingxuling/RCL/tree/main) 已包含 RCL 2.0，Windows 本地发布验收通过。** npm 发布和远端部署分别记录；主线集成不会重新标记历史平台证据。
+**RCL 当前是研究预览：K400 登记 24/400 PASS、376 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
 
 ## 为什么使用 RCL？
 
@@ -26,15 +28,17 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 - **跨执行目标保留语义。** RCL 拥有状态与权限模型，原生字节码、Web 和 Android 路径提供不同的执行环境。候选 Native UI 模型在 Web / Android 后端之间共享 IR 与语义根。
 - **用编译器验证编译器。** Native-Core 编译器用 RCL 编写，已有字节完全一致的 `C0 == C1 == C2` 固定点记录。这是编译器自举，不代表整套运行时已经完全自举。
 
-RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。2.0 将受治理核心扩展为可持续调用的原生程序与本地持久会话；研究扩展仍按各自证据与成熟度分类。
+RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / 运行时研究。现有实现将受治理核心扩展为可持续调用的原生程序与本地持久会话；各项能力保留有界证据，整门语言的发展按 K400 验收。
 
-[2.0 新能力](#v20) · [快速开始](#快速开始) · [持久会话](#4-运行持久会话) · [示例](#程序员建议按这些示例看) · [验证范围](#当前已经验证到什么程度) · [架构](#架构)
+[已验证能力](#v20) · [快速开始](#快速开始) · [持久会话](#4-运行持久会话) · [示例](#程序员建议按这些示例看) · [验证范围](#当前已经验证到什么程度) · [架构](#架构)
 
 ---
 
-## v2.0
+<a id="v20"></a>
 
-2.0 让同一段 RCL 程序能够接收多次输入，并在进程重启后继续运行：
+## 历史实现里程碑（原 2.0 编号）
+
+原编号 2.0.0 的实现让同一段 RCL 程序能够接收多次输入，并在进程重启后继续运行：
 
 - **原生持续会话：** 初始化一次，按名字调用源码中的规则，保留已提交状态。参考实现与原生 VM 使用同一套受治理事务契约。
 - **源码声明输入：** `input` facet 接收有类型的 Number、Truth、Text 观测；其它状态变化由规则所有。每次调用都根据当前状态重新检查条件授权。

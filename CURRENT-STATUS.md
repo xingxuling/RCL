@@ -1,7 +1,16 @@
-# Current RCL Status: v2.0.0 locally verified Windows release
+# Current RCL Status: research preview, K400 incomplete
+
+**RESEARCH_PREVIEW · K400 24/400 PASS (6%) · 376 UNTESTED · INCOMPLETE · U3**
+
+The 2026-10-13 maturity correction withdraws the interpretation of the previous
+2.0 promotion as a verified whole-language release. Package/native identity
+2.0.0 stays in historical artifacts; version advancement is frozen. Current
+progress is assessed against K400 cells and their non-compensatory gates.
+CLI version JSON and doctor recompute this research status from registered K400
+evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 
 - Canonical source: `xingxuling/RCL@main`.
-- Canonical-main package/native VM: `v2.0.0`, locally verified on Windows. The pre-2.0 main baseline remains pinned to `afe83b231754e8ae3adeb8058356e87165f7ad91` at `v1.0.0`.
+- Historical package/native build identity: `2.0.0`; bounded Windows implementation verification is recorded separately from whole-language maturity. The pre-2.0 source baseline remains pinned to `afe83b231754e8ae3adeb8058356e87165f7ad91` at `1.0.0`.
 - New capability: stateful native/reference governed sessions, source-declared scalar inputs, current-state conditional warrants, RCL-authored session compilation and durable command replay. Nineteen session checks and independent Windows installation pass.
 - Verified native ceiling: Stage40 native-core RCL self-hosting.
 - Current research frontier: Universal Program Stress v0.1 with a permanent `20 × 20 = 400` environment/program matrix and nine non-compensatory gates.

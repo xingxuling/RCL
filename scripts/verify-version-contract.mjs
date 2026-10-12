@@ -1,6 +1,7 @@
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getResearchReadiness } from '../src/research-readiness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -28,6 +29,9 @@ const nativeSource = await readFile(path.join(root, 'native', 'rclvm.c'), 'utf8'
 const typedReferenceSource = await readFile(path.join(root, 'src', 'typed-reference-abi.mjs'), 'utf8');
 const semanticRootSource = await readFile(path.join(root, 'src', 'semantic-state-root.mjs'), 'utf8');
 const semanticRootV2Source = await readFile(path.join(root, 'src', 'semantic-state-root-v2.mjs'), 'utf8');
+let researchReadiness;
+try { researchReadiness = getResearchReadiness(); }
+catch (error) { errors.push(error.message); }
 
 if (packageJson.name !== contractJson.package) {
   errors.push(`package name ${packageJson.name} does not match VERSION-CONTRACT.json`);
@@ -38,8 +42,14 @@ if (packageJson.version !== contractJson.packageVersion) {
 if (contractJson.repository !== 'xingxuling/RCL' || contractJson.canonicalBranch !== 'main' || contractJson.canonical !== true) {
   errors.push('RCL is not declared as the canonical main-branch source');
 }
-if (!readme.includes('# RCL v' + packageJson.version) || !readme.includes('Canonical source: `xingxuling/RCL@main`')) {
+if (!readme.includes('# RCL — Reality Compiler Language') || !readme.includes('Build identity: `' + packageJson.version + '`')
+    || !readme.includes('Canonical source: `xingxuling/RCL@main`')) {
   errors.push('README does not expose the current version and canonical-source declaration');
+}
+if (researchReadiness && (!readme.includes('RESEARCH_PREVIEW')
+    || !readme.includes(`${researchReadiness.k400.passedCells}/${researchReadiness.k400.totalCells}`)
+    || !readme.includes(researchReadiness.k400.verdict))) {
+  errors.push('README research maturity must match the current K400 evidence');
 }
 
 const expectedDescription = 'RCL (Reality Compiler Language): an evidence-bearing, permission-constrained reality transaction language, compiler, native VM, provider runtime, and verification toolchain.';
@@ -179,6 +189,7 @@ const report = {
   repository: contractJson.repository,
   canonicalBranch: contractJson.canonicalBranch,
   packageVersion: packageJson.version,
+  researchReadiness,
   verifiedCeiling: contractJson.verifiedCeiling,
   components: {
     nativeVmVersion,

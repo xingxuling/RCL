@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getResearchReadiness } from './research-readiness.mjs';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = path.resolve(MODULE_DIR, '..');
@@ -38,6 +39,7 @@ export function getVersionPayload() {
     canonical: contract.canonical === true,
     verifiedCeiling: contract.verifiedCeiling,
     boundary: contract.boundary,
+    researchReadiness: getResearchReadiness(),
   };
 }
 
@@ -54,6 +56,10 @@ export function runDoctor() {
   const requiredNode = pkg.engines?.node;
   const minimumMajor = /^>=(\d+)$/u.exec(requiredNode ?? '')?.[1];
   const checks = [];
+  const researchReadiness = getResearchReadiness();
+  checks.push(checkRecord('research-maturity', 'warn',
+    `RESEARCH_PREVIEW; K400 ${researchReadiness.k400.passedCells}/${researchReadiness.k400.totalCells} ${researchReadiness.k400.verdict}; version advancement frozen`,
+    researchReadiness.evidencePath));
 
   checks.push(
     checkRecord(
@@ -145,6 +151,7 @@ export function runDoctor() {
     platform: process.platform,
     architecture: process.arch,
     runtime: `node ${process.versions.node}`,
+    researchReadiness,
     compilerBoundary: {
       nativeCoreCompilerSelfHosting: contract.boundary.nativeCoreCompilerSelfHosting,
       fullSelfHosting: contract.boundary.fullSelfHosting,

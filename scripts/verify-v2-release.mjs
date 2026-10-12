@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { compileRealitySessionNative } from '../src/session-compiler.mjs';
 import { openDurableRealitySession, verifyDurableRealitySession } from '../src/durable-session.mjs';
+import { getResearchReadiness } from '../src/research-readiness.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -39,6 +40,8 @@ try {
   const verification = await verifyDurableRealitySession(directory, { verifyReference: true });
   const report = {
     format: 'rcl.v2-release-acceptance.v1', status: 'PASS', version: metadata.version, platform: process.platform,
+    verificationScope: 'bounded local session implementation; not whole-language release acceptance',
+    formalLanguageRelease: false, researchReadiness: getResearchReadiness(),
     nativeSourceBound: snapshot.native.sourceBound, native: snapshot.native, compiler: compiled.evidence, verification,
     sourceHash: hash(Buffer.from(source)), distinctNativeProcesses: true, idempotentRestartRetry: true,
     localFilesystemProfileOnly: true, hostedCi: 'NOT_RUN_USER_INSTRUCTION', publishedRelease: false,

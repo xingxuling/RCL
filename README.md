@@ -1,14 +1,16 @@
 <div align="center">
 
-# RCL v2.0.0 — Reality Compiler Language
+# RCL — Reality Compiler Language
+
+**RESEARCH_PREVIEW · K400 24/400 (6%) · INCOMPLETE · U3**
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [5-minute Quick Start](GETTING_STARTED.md) · [Website / Playground](https://rcl-rncs-mcp.vercel.app) · [Current Status](CURRENT-STATUS.md)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/package-v2.0.0-blue.svg)](package.json)
-[![Status](https://img.shields.io/badge/status-active%20research-6f42c1.svg)](CURRENT-STATUS.md)
+[![Build identity](https://img.shields.io/badge/build--identity-2.0.0-gray.svg)](package.json)
+[![Status](https://img.shields.io/badge/status-research%20preview-orange.svg)](CURRENT-STATUS.md)
 [![Self-hosting](https://img.shields.io/badge/native--core%20self--hosting-verified-brightgreen.svg)](CURRENT-STATUS.md)
 
 </div>
@@ -17,7 +19,7 @@ RCL (Reality Compiler Language) is an open-source language for writing programs 
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-**RCL 2.0 is available on canonical [`main`](https://github.com/xingxuling/RCL/tree/main), with local Windows release verification complete.** Package publication and remote deployment have separate status records; source integration does not relabel historical platform evidence.
+**RCL is a research preview. K400 currently records 24/400 PASS and 376 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
 
 ## Why RCL?
 
@@ -26,15 +28,17 @@ This repository contains the language implementation, an RCL-authored native-cor
 - **Keep semantics across execution targets.** RCL owns the state and authority model while native bytecode, Web, and Android paths provide different execution environments. The candidate Native UI model shares an IR and semantic root across Web/Android backends.
 - **Verify the compiler with itself.** The native-core compiler is written in RCL and has a recorded byte-identical `C0 == C1 == C2` fixed point. This is compiler self-hosting, not a claim that the entire runtime is self-hosted.
 
-RCL is useful for exploring permission-aware application state, auditable automation, and language/runtime research. Version 2.0 extends the governed core into stateful native execution and durable local sessions. Research extensions retain their individual evidence and maturity profiles.
+RCL is useful for exploring permission-aware application state, auditable automation, and language/runtime research. The current implementation extends the governed core into stateful native execution and durable local sessions. Each profile retains its bounded evidence; whole-language development is assessed through K400.
 
-[Version 2.0](#version-20) · [Quick start](#quick-start) · [Persistent sessions](#4-run-a-persistent-session) · [Examples](#learn-rcl-by-example) · [Verification](#what-is-verified-today) · [Architecture](#architecture)
+[Implementation capabilities](#version-20) · [Quick start](#quick-start) · [Persistent sessions](#4-run-a-persistent-session) · [Examples](#learn-rcl-by-example) · [Verification](#what-is-verified-today) · [Architecture](#architecture)
 
 ---
 
-## Version 2.0
+<a id="version-20"></a>
 
-Version 2.0 makes a program callable across multiple inputs and process lifetimes:
+## Historical 2.0 implementation milestone
+
+The implementation carrying build identity 2.0.0 makes a program callable across multiple inputs and process lifetimes:
 
 - **Stateful native sessions:** initialize once, invoke a declared rule by name, and retain admitted state between calls. Reference and native implementations share the governed transaction contract.
 - **Source-declared inputs:** `input` facets accept typed Number, Truth or Text observations. Rules own other state changes, and conditional warrants are checked against current state for each invocation.

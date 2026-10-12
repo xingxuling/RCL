@@ -29,6 +29,9 @@ test('public CLI exposes canonical version metadata as JSON', () => {
   assert.equal(payload.version, PACKAGE.version);
   assert.equal(payload.canonical, true);
   assert.equal(payload.canonicalRepository, 'xingxuling/RCL');
+  assert.equal(payload.researchReadiness.status, 'RESEARCH_PREVIEW');
+  assert.equal(payload.researchReadiness.k400.passedCells, 24);
+  assert.equal(payload.researchReadiness.formalLanguageRelease, false);
 });
 
 test('doctor reports runtime and explicit compiler boundaries', () => {
@@ -40,6 +43,8 @@ test('doctor reports runtime and explicit compiler boundaries', () => {
   assert.equal(payload.compilerBoundary.fullSelfHosting, false);
   assert.equal(payload.compilerBoundary.jsReferenceRuntimeStillRequired, true);
   assert.equal(payload.summary.fail, 0);
+  assert.equal(payload.researchReadiness.versionPromotionFrozen, true);
+  assert.equal(payload.checks.find(check => check.id === 'research-maturity').status, 'warn');
 });
 
 test('check accepts the canonical hello-reality example without execution', () => {
