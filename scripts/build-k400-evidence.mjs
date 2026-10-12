@@ -26,6 +26,8 @@ import { verifyK340CompilerMixedParadigmReceipt } from './verify-k340-compiler-m
 import { verifyK337K338CompilerGovernanceReactiveReceipt } from './verify-k337-k338-compiler-governance-reactive-receipt.mjs';
 import { verifyK321K322CompilerAlgorithmCliReceipt } from './verify-k321-k322-compiler-algorithm-cli-receipt.mjs';
 import { verifyPortableAlgorithmReceipt } from './verify-k400-expansion-receipts.mjs';
+import { verifyPortableProfileReceipt } from './verify-k400-portable-profiles.mjs';
+import { PORTABLE_PROFILES, PROFILE_DIRECTORY } from './k400-portable-profile-definitions.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -888,6 +890,16 @@ if (portableExpansion.admitted) {
     evidence.claims.push(claim); existingIds.add(claim.id);
   }
   evidence.sourceReceipts.push('examples/universal-stress/expansion-wave1/algorithm-runtime.json');
+}
+for (const profile of PORTABLE_PROFILES) {
+  const admission = verifyPortableProfileReceipt(profile.id);
+  if (!admission.admitted) continue;
+  const existingIds = new Set(evidence.claims.map(claim => claim.id));
+  for (const claim of admission.claims) {
+    if (existingIds.has(claim.id)) throw new Error('RCL_K400_EXPANSION_DUPLICATE:' + claim.id);
+    evidence.claims.push(claim); existingIds.add(claim.id);
+  }
+  evidence.sourceReceipts.push(PROFILE_DIRECTORY + '/' + profile.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

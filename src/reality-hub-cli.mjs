@@ -5,6 +5,13 @@ import { checkSourceFile, printPublicHelp, printVersion, runDoctor } from './cli
 const args = process.argv.slice(2);
 const command = args[0];
 
+if (command === 'portable-run') {
+  const { runPortableCli } = await import('./portable-cli.mjs');
+  const result = runPortableCli(args.slice(1));
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(result.ok ? 0 : 1);
+}
+
 if (command === 'session') {
   const { runSessionCli } = await import('./session-cli.mjs');
   const result = await runSessionCli(args.slice(1));

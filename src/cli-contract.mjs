@@ -234,6 +234,8 @@ Core execution:
   rcl run <file.rcl>            Execute with the JavaScript reference runtime
   rcl bytecode <file.rcl>       Emit self-hosted RBC bytecode
   rcl native <file.rcl>         Compile and execute through the host native VM
+  rcl portable-run <target> <file.rcl>
+                               Use windows, wasm-vm, linux or android explicitly
 
 Persistent governed sessions:
   rcl session init <source.rcl> <directory>

@@ -3355,6 +3355,1814 @@
           "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
         }
       }
+    },
+    {
+      "id": "windows::database",
+      "environment": "windows",
+      "programFamily": "database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::database",
+      "environment": "wasm-vm",
+      "programFamily": "database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "linux::database",
+      "environment": "linux",
+      "programFamily": "database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "android::database",
+      "environment": "android",
+      "programFamily": "database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/relations-runtime.json",
+            "examples/universal-stress/portable-profiles/relations-contract.json",
+            "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "windows::simulation",
+      "environment": "windows",
+      "programFamily": "simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "windows::scientific",
+      "environment": "windows",
+      "programFamily": "scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::simulation",
+      "environment": "wasm-vm",
+      "programFamily": "simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::scientific",
+      "environment": "wasm-vm",
+      "programFamily": "scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "linux::simulation",
+      "environment": "linux",
+      "programFamily": "simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "linux::scientific",
+      "environment": "linux",
+      "programFamily": "scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "android::simulation",
+      "environment": "android",
+      "programFamily": "simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "android::scientific",
+      "environment": "android",
+      "programFamily": "scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-contract.json",
+            "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "linux::algorithm",
+      "environment": "linux",
+      "programFamily": "algorithm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "linux::cli",
+      "environment": "linux",
+      "programFamily": "cli",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "android::algorithm",
+      "environment": "android",
+      "programFamily": "algorithm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
+    },
+    {
+      "id": "android::cli",
+      "environment": "android",
+      "programFamily": "cli",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim",
+        "20 target rounds and 10 pre-sealed parametric cases; three fresh candidate-only repair contexts replayed on every credited target.",
+        "Linux is real WSL2 execution; Android is x86_64 emulator native execution with no mobile UI/physical-device credit.",
+        "WASI compiles on the Windows host and executes WebAssembly; Linux/Android also compile on their actual targets. No new hosted CI or secure OS sandbox is claimed."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "target-selfhost-compile-or-host-compile-explicit",
+        "pre-sealed-oracles",
+        "independent-exact-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-contract.json",
+            "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+            "examples/universal-stress/portable-profiles/independent-batch.json"
+          ],
+          "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
+        }
+      }
     }
   ],
   "competitiveComparisons": [],
@@ -3463,7 +5271,10 @@
     "examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json",
     "examples/native-ui/browser-performance-contract.v0.1.json",
     "examples/native-ui/evidence/browser-runtime-result.json",
-    "examples/universal-stress/expansion-wave1/algorithm-runtime.json"
+    "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+    "examples/universal-stress/portable-profiles/relations-runtime.json",
+    "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
+    "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json"
   ],
   "notes": [
     "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",

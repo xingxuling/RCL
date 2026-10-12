@@ -1,0 +1,69 @@
+{
+  "format": "rcl.k400-portable-profile-contract.v1",
+  "id": "relations",
+  "profile": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim",
+  "goalMinimumPassCells": 200,
+  "frozenBeforeIndependentTrials": true,
+  "caseSelection": "sealed before generation; test file and oracles not provided to generators",
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "donor": {
+    "path": "examples/universal-stress/k326-compiler-database.rcl",
+    "sha256": "f28093884180e528a379750001278a76de6c73250472bc9ec6d90d41a8e3c3a1",
+    "decision": "ADAPT"
+  },
+  "casesPath": "examples/universal-stress/portable-profiles/relations-sealed-cases.json",
+  "casesHash": "e0b18a0bcb8ebf4f07467dc2716dc5cb102411363908a632eccde9546fba4690",
+  "families": [
+    "database"
+  ],
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android"
+  ],
+  "eligibleCells": [
+    "K046",
+    "K006",
+    "K026",
+    "K086"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "requestedToolPolicy": "read only named frozen candidate files; no other filesystem, memory, network, tools or writes",
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false
+  },
+  "authorityProfile": "local source-bound target execution and exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "b403ba034b3112077b919fb01029c8079e0d9422331510f68e4a1bc09b8b084d"
+}

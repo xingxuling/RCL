@@ -1,0 +1,39 @@
+{
+  "format": "rcl.k400-fresh-context-repair-batch.v1",
+  "generatorKind": "codex-collaboration-fork-none-proposal",
+  "humanAuthorization": "explicit user authorization for independent proposal-only subagents in this K400 goal",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "requestedToolPolicy": "read only named frozen candidate files; no other filesystem, memory, network, tools or writes",
+  "osIsolationClaimed": false,
+  "contexts": [
+    {
+      "context": "/root/portable_repair_a",
+      "trialIndex": 0,
+      "response": [
+        {"id":"relations","file":"candidate.rcl","old":"has_customer(customers, 0, order_customer(row)) or","new":"not has_customer(customers, 0, order_customer(row)) or","diagnosis":"The rejection condition is inverted for customer foreign keys: existing customers are rejected and missing customers are allowed. Negating this check rejects missing customers while preserving the duplicate-key and negative-amount checks."},
+        {"id":"simulation-scientific","file":"candidate.rcl","old":"state_position(state) - state_velocity(state)","new":"state_position(state) + state_velocity(state)","diagnosis":"The stored position subtracts the old velocity while the trajectory appends the position plus that velocity. Adding the old velocity makes the stored position match the intended explicit step and trajectory."},
+        {"id":"algorithm-posix","file":"candidate.rcl","old":"gcd(b, b % a)","new":"gcd(b, a % b)","diagnosis":"Euclidean reduction requires the remainder of a divided by b. The reversed remainder can cycle and divides by zero when a is zero and b is nonzero. The corrected reduction preserves the nonnegative base result for signed inputs and zero boundaries."}
+      ]
+    },
+    {
+      "context": "/root/portable_repair_b",
+      "trialIndex": 1,
+      "response": [
+        {"id":"relations","file":"candidate.rcl","old":"customer_region(sequence_get(customers, cursor)) != region","new":"customer_region(sequence_get(customers, cursor)) == region","diagnosis":"The predicate counts customers outside the requested region. Equality counts only matching customers; the existing base case returns zero for empty relations and absent regions."},
+        {"id":"simulation-scientific","file":"candidate.rcl","old":"acceleration * steps * (steps + 1) / 2","new":"acceleration * steps * (steps - 1) / 2","diagnosis":"Position advances with the old velocity, so acceleration contributes over indices zero through steps minus one. Their sum is steps times steps minus one divided by two."},
+        {"id":"algorithm-posix","file":"candidate.rcl","old":"fibonacci(n - 1) + fibonacci(n - 3)","new":"fibonacci(n - 1) + fibonacci(n - 2)","diagnosis":"The recurrence skips the immediately preceding second value. Using n minus two restores the sum of the previous two values while preserving F(0)=0 and F(1)=1."}
+      ]
+    },
+    {
+      "context": "/root/portable_repair_c",
+      "trialIndex": 2,
+      "response": [
+        {"id":"relations","file":"candidate.rcl","old":"        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))","new":"        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))","diagnosis":"The sum function contributes one for each matching order, producing a count. Contribute the order amount while preserving the approval and region filters."},
+        {"id":"simulation-scientific","file":"candidate.rcl","old":"initial_velocity + acceleration + steps","new":"initial_velocity + acceleration * steps","diagnosis":"Each discrete step adds acceleration to velocity. Multiplying acceleration by steps matches the integrator and preserves initial velocity for zero steps."},
+        {"id":"algorithm-posix","file":"candidate.rcl","old":"n + n + sum_squares(n - 1)","new":"n * n + sum_squares(n - 1)","diagnosis":"The recurrence adds twice n instead of its square. Multiply n by itself; the existing nonpositive base case remains zero."}
+      ]
+    }
+  ]
+}

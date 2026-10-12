@@ -75,3 +75,30 @@ test('unhandled advanced commands delegate to the existing CLI', () => {
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.trim().length > 0);
 });
+
+test('portable-run exposes real WASI native-core execution through the public CLI', () => {
+  const result = invoke(['portable-run', 'wasm-vm', 'examples/universal-stress/expansion-wave1/algorithm.rcl']);
+  assert.equal(result.status, 0, result.stderr);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.ok, true);
+  assert.equal(payload.target, 'wasm-vm');
+  assert.equal(payload.result.state['result.gcd'], 21);
+  assert.equal(payload.result.stateRootVerified, true);
+  assert.equal(payload.targetBinding.binary.path, 'native/wasi/rclvm.wasm');
+});
+
+test('portable-run rejects unknown targets, surplus flags and invalid source with structured failures', () => {
+  for (const args of [
+    ['portable-run', 'invented', 'examples/hello-reality.rcl'],
+    ['portable-run', 'windows', 'examples/hello-reality.rcl', '--anything'],
+  ]) {
+    const result = invoke(args);
+    assert.equal(result.status, 1); assert.equal(JSON.parse(result.stdout).ok, false);
+  }
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-portable-cli-invalid-'));
+  try {
+    const file = path.join(directory, 'invalid.rcl'); fs.writeFileSync(file, 'not a reality');
+    const result = invoke(['portable-run', 'wasm-vm', file]);
+    assert.equal(result.status, 1); assert.equal(JSON.parse(result.stdout).ok, false);
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});

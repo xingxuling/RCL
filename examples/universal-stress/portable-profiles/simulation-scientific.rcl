@@ -1,0 +1,47 @@
+reality PortableSimulationScientific {
+  reckon make_state(position : Number, velocity : Number, trajectory : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), position), velocity), trajectory)
+
+  reckon state_position(state : Sequence) -> Number = sequence_get(state, 0)
+  reckon state_velocity(state : Sequence) -> Number = sequence_get(state, 1)
+  reckon state_trajectory(state : Sequence) -> Sequence = sequence_get(state, 2)
+
+  reckon advance(state : Sequence, acceleration : Number) -> Sequence =
+    make_state(
+      state_position(state) + state_velocity(state),
+      state_velocity(state) + acceleration,
+      sequence_append(state_trajectory(state), state_position(state) + state_velocity(state)))
+
+  reckon simulate(state : Sequence, acceleration : Number, completed : Number, steps : Number) -> Sequence =
+    choose(completed >= steps,
+      state,
+      simulate(advance(state, acceleration), acceleration, completed + 1, steps))
+
+  reckon closed_form_position(initial_position : Number, initial_velocity : Number, acceleration : Number, steps : Number) -> Number =
+    initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2
+
+  reckon closed_form_velocity(initial_velocity : Number, acceleration : Number, steps : Number) -> Number =
+    initial_velocity + acceleration * steps
+
+  reckon discrete_work_invariant(initial_velocity : Number, acceleration : Number, steps : Number, displacement : Number, final_velocity : Number) -> Truth =
+    final_velocity * final_velocity - initial_velocity * initial_velocity ==
+      2 * acceleration * displacement + steps * acceleration * acceleration
+
+  facet contract.id : Text = "k400-portable-simulation-scientific-v1"
+  facet contract.owner : Text = "RCL"
+  facet contract.execution : Text = "RCL_OWNED_PORTABLE_RBC"
+  facet model.kind : Text = "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR"
+  facet input.initial_position : Number = 0
+  facet input.initial_velocity : Number = 3
+  facet input.acceleration : Number = 2
+  facet input.steps : Number = 10
+  facet simulation.initial_state : Sequence = make_state(input.initial_position, input.initial_velocity, sequence_append(empty_sequence(), input.initial_position))
+  facet simulation.final_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, input.steps)
+  facet result.position : Number = state_position(simulation.final_state)
+  facet result.velocity : Number = state_velocity(simulation.final_state)
+  facet result.trajectory : Sequence = state_trajectory(simulation.final_state)
+  facet oracle.position : Number = closed_form_position(input.initial_position, input.initial_velocity, input.acceleration, input.steps)
+  facet oracle.velocity : Number = closed_form_velocity(input.initial_velocity, input.acceleration, input.steps)
+  facet boundary.zero_step_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, 0)
+  facet boundary.one_step_state : Sequence = simulate(simulation.initial_state, input.acceleration, 0, 1)
+}

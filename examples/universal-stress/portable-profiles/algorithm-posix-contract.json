@@ -1,0 +1,68 @@
+{
+  "format": "rcl.k400-portable-profile-contract.v1",
+  "id": "algorithm-posix",
+  "profile": "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim",
+  "goalMinimumPassCells": 200,
+  "frozenBeforeIndependentTrials": true,
+  "caseSelection": "sealed before generation; test file and oracles not provided to generators",
+  "sourcePath": "examples/universal-stress/portable-profiles/algorithm-posix.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "donor": {
+    "path": "examples/universal-stress/expansion-wave1/algorithm.rcl",
+    "sha256": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+    "decision": "REUSE"
+  },
+  "casesPath": "examples/universal-stress/portable-profiles/algorithm-posix-sealed-cases.json",
+  "casesHash": "f3dba9f38e6b1afe5901dfa36da482da7c6d365988c1954486e3c312c5eaa805",
+  "families": [
+    "algorithm",
+    "cli"
+  ],
+  "environments": [
+    "linux",
+    "android"
+  ],
+  "eligibleCells": [
+    "K021",
+    "K022",
+    "K081",
+    "K082"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "requestedToolPolicy": "read only named frozen candidate files; no other filesystem, memory, network, tools or writes",
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false
+  },
+  "authorityProfile": "local source-bound target execution and exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "gcd",
+      "index": 0,
+      "intent": "Compute the nonnegative greatest common divisor with Euclidean reduction, including negative values and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "index": 1,
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "index": 2,
+      "intent": "Compute the sum of integer squares from 1 through n, returning zero for nonpositive n.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "0889062dee1b37141d0a92124d143461169fe6374e907aa9a81c29bc2057bc29"
+}

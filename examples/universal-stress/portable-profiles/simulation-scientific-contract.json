@@ -1,0 +1,74 @@
+{
+  "format": "rcl.k400-portable-profile-contract.v1",
+  "id": "simulation-scientific",
+  "profile": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim",
+  "goalMinimumPassCells": 200,
+  "frozenBeforeIndependentTrials": true,
+  "caseSelection": "sealed before generation; test file and oracles not provided to generators",
+  "sourcePath": "examples/universal-stress/portable-profiles/simulation-scientific.rcl",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "donor": {
+    "path": "examples/universal-stress/k329-k332-compiler-simulation-scientific.rcl",
+    "sha256": "70a98620ec97336fa4a80e47d77f061e8e32f421899073cb3ef6cdfa1a19d849",
+    "decision": "ADAPT"
+  },
+  "casesPath": "examples/universal-stress/portable-profiles/simulation-scientific-sealed-cases.json",
+  "casesHash": "ccc5f07762a51eeb9d65abfb3d65f9ce56537799f966ee6857f1485add82dda2",
+  "families": [
+    "simulation",
+    "scientific"
+  ],
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android"
+  ],
+  "eligibleCells": [
+    "K049",
+    "K052",
+    "K009",
+    "K012",
+    "K029",
+    "K032",
+    "K089",
+    "K092"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "requestedToolPolicy": "read only named frozen candidate files; no other filesystem, memory, network, tools or writes",
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false
+  },
+  "authorityProfile": "local source-bound target execution and exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "advance-position",
+      "index": 0,
+      "intent": "Each explicit step advances position by the old velocity, then adds acceleration to velocity, and appends the new position to the trajectory.",
+      "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e"
+    },
+    {
+      "id": "closed-position",
+      "index": 1,
+      "intent": "The closed-form position must match explicit integration where position is advanced with old velocity before acceleration changes that velocity.",
+      "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99"
+    },
+    {
+      "id": "closed-velocity",
+      "index": 2,
+      "intent": "The final velocity after a given number of constant-acceleration discrete steps must match the explicit step integrator, including zero steps.",
+      "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6"
+    }
+  ],
+  "contractRoot": "38d4727daf0ce689aa3ee2fc0bd094982ba0c81c9e9ae3a9fb1b64e4cbe6b12c"
+}

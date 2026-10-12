@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 28/400 PASS (7%) · 372 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 44/400 PASS (11%) · 356 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,19 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 portable native execution
+
+The same C VM now executes on Windows, wasm32-WASI, Linux WSL2 and the connected
+x86_64 Android emulator. Linux/Android also execute the RCL compiler RBC on their
+targets. The newer POSIX, relational and simulation profiles use twenty rounds
+per target, ten pre-sealed input cases and three fresh candidate-only repair
+contexts to verify exact RBC bytes and state-root-v2 parity. The first
+Windows/WASI algorithm profile uses post-generation parametric checks, as
+recorded in its separate receipt. The new public API and `rcl portable-run` command expose explicit target
+selection without fallback. This campaign adds twenty cells to the 24-cell
+baseline; the >=200-cell goal remains active. See
+`docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md` for the exact scopes and receipts.
 
 ## 2026-10-12 native compiler warrant admission
 
