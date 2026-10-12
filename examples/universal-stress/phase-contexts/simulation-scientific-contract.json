@@ -1,0 +1,101 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "simulation-scientific",
+  "scope": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/simulation-scientific.rcl",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "casesPath": "examples/universal-stress/phase-contexts/simulation-scientific-cases.json",
+  "casesHash": "de935f89f19282c105d585942ea68eb7c474fa5f84a9eed63b88e07ca8230d1e",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "simulation",
+    "scientific"
+  ],
+  "baseline": {
+    "initial_position": 0,
+    "initial_velocity": 3,
+    "acceleration": 2,
+    "steps": 10
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K369",
+    "K372",
+    "K349",
+    "K352"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "advance-position",
+      "index": 0,
+      "intent": "Each explicit step advances position by the old velocity, then adds acceleration to velocity, and appends the new position to the trajectory.",
+      "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e"
+    },
+    {
+      "id": "closed-position",
+      "index": 1,
+      "intent": "The closed-form position must match explicit integration where position is advanced with old velocity before acceleration changes that velocity.",
+      "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99"
+    },
+    {
+      "id": "closed-velocity",
+      "index": 2,
+      "intent": "The final velocity after a given number of constant-acceleration discrete steps must match the explicit step integrator, including zero steps.",
+      "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6"
+    }
+  ],
+  "contractRoot": "4bf1c2b058c07c9ffa9aa212e82995e5a6819a0a7d55cb4ad9ef8ca0fba0b129"
+}

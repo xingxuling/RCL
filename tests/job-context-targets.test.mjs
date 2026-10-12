@@ -22,6 +22,7 @@ async function using(environment,check){
 }
 test('cold handler execution has distinct exited process identities',async()=>using('serverless',async(target,artifact,root)=>{
   const control=target.verifyColdStart(artifact,root);assert.equal(control.freshHandlers,true);assert.equal(control.terminationObserved,true);
+  assert.equal(control.processExited,true);
   assert.equal(new Set(control.handlerPids).size,2);assert.throws(()=>target.execute(artifact,'0'.repeat(64)),/SOURCE_ROOT_MISMATCH/u);
 }));
 test('SQLite invokes native RCL inside real commits, reopen recovery and rollback',async()=>using('database',async(target,artifact,root,execution)=>{

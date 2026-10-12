@@ -1,0 +1,53 @@
+reality NativeAutomationGate {
+  input event.root : Text = ""
+  input event.success : Truth = true
+  facet pipeline.enabled : Truth = true
+  facet pipeline.active : Truth = false
+  facet pipeline.admitted : Number = 0
+  facet pipeline.completed : Number = 0
+  facet pipeline.failed : Number = 0
+  facet pipeline.lastRoot : Text = ""
+  subject dispatcher {
+    warrant pipeline.dispatch on pipeline while pipeline.enabled
+  }
+  subject worker {
+    warrant pipeline.complete on pipeline while pipeline.active
+  }
+  subject coordinator {
+    warrant pipeline.control on pipeline
+  }
+  emergence admit {
+    cause dispatcher
+    when event.root != "" and not pipeline.active
+    needs pipeline.dispatch on pipeline
+    alter pipeline.active <- true
+    alter pipeline.admitted <- pipeline.admitted + 1
+    alter pipeline.lastRoot <- event.root
+    preserve pipeline.admitted == pipeline.completed + pipeline.failed + 1
+    witness "automation:source-owned-admission"
+  }
+  emergence finish {
+    cause worker
+    when pipeline.active
+    needs pipeline.complete on pipeline
+    alter pipeline.active <- false
+    alter pipeline.completed <- pipeline.completed + choose(event.success, 1, 0)
+    alter pipeline.failed <- pipeline.failed + choose(event.success, 0, 1)
+    preserve pipeline.admitted == pipeline.completed + pipeline.failed
+    witness "automation:source-owned-completion"
+  }
+  emergence pause {
+    cause coordinator
+    when pipeline.enabled and not pipeline.active
+    needs pipeline.control on pipeline
+    alter pipeline.enabled <- false
+    witness "automation:paused"
+  }
+  emergence resume {
+    cause coordinator
+    when not pipeline.enabled
+    needs pipeline.control on pipeline
+    alter pipeline.enabled <- true
+    witness "automation:resumed"
+  }
+}

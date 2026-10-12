@@ -33,6 +33,8 @@ import { GENOMES } from './k400-genomes/index.mjs';
 import { DIRECTORY as GENOME_DIRECTORY } from './k400-genomes/shared.mjs';
 import { CONTEXT_PROFILES, CONTEXT_DIRECTORY } from './k400-context-definitions.mjs';
 import { verifyContextProfile } from './k400-context-engine.mjs';
+import { JOB_PROFILES, JOB_DIRECTORY } from './k400-job-definitions.mjs';
+import { verifyJobProfile } from './k400-job-engine.mjs';
 import { verifyGenome } from './k400-genome-engine.mjs';
 
 const root = process.cwd();
@@ -949,6 +951,26 @@ for (const definition of CONTEXT_PROFILES) {
     ])];
   }
   evidence.sourceReceipts.push(CONTEXT_DIRECTORY + '/' + definition.id + '-runtime.json');
+}
+for (const definition of JOB_PROFILES) {
+  const admission = verifyJobProfile(definition);
+  if (!admission.admitted) continue;
+  for (const claim of admission.claims) {
+    const existing = evidence.claims.find(item => item.id === claim.id);
+    if (!existing) { evidence.claims.push(claim); continue; }
+    if ((existing.environment !== undefined && existing.environment !== claim.environment)
+      || (existing.programFamily !== undefined && existing.programFamily !== claim.programFamily)
+      || !UNIVERSAL_STRESS_GATES.every(gate => existing.gates[gate]?.status === 'PASS' && claim.gates[gate]?.status === 'PASS')) {
+      throw new Error('RCL_K400_PROFILE_COLLISION_REQUIRES_REVIEW:' + claim.id);
+    }
+    existing.additionalProfiles ??= [];
+    existing.additionalProfiles.push({ id: 'job:' + definition.id, reportRoot: admission.reportRoot, scope: definition.scope,
+      lastVerifiedDate: claim.lastVerifiedDate, coverageMode: claim.coverageMode, evidence: claim.gates.EVIDENCE.evidence });
+    for (const gate of UNIVERSAL_STRESS_GATES) existing.gates[gate].evidence = [...new Set([
+      ...existing.gates[gate].evidence, ...claim.gates[gate].evidence,
+    ])];
+  }
+  evidence.sourceReceipts.push(JOB_DIRECTORY + '/' + definition.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

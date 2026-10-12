@@ -10,6 +10,7 @@ export { createPortableServerlessTarget } from './portable-serverless-target.mjs
 export { createPortableDatabaseTarget } from './portable-database-target.mjs';
 export { createPortableDataflowTarget } from './portable-dataflow-target.mjs';
 export { createJobContextTarget } from './job-context-targets.mjs';
+export { createPhaseContextTarget } from './phase-context-targets.mjs';
 export { compileRealitySessionNative } from './session-compiler.mjs';
 export { openDurableRealitySession, verifyDurableRealitySession, RCL_DURABLE_SESSION_VERSION, RCL_SESSION_JOURNAL_FORMAT } from './durable-session.mjs';
 export { compileRealitySessionBytecode, RCL_BYTECODE_SESSION_FEATURE_VERSION } from './bytecode.mjs';

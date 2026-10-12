@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-phase-proposals.v1",
+  "contractRoot": "df77690549390acc01e8dc9697f5d07de871f96635b7071c2f6b139250e4d9f2",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/phase-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_phase_context_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "has_customer(customers, 0, order_customer(row)) == false or",
+        "diagnosis": "The foreign-key check rejects existing customers. Reject missing customers while retaining duplicate-key and negative-amount rejection and the single-row append."
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_phase_context_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+        "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+        "diagnosis": "The aggregation counts nonmatching customers. Equality counts the requested region, with the existing recursion returning zero for empty input or an absent region."
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_phase_context_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))",
+        "diagnosis": "The sum accumulates one per matching order. Accumulate each matching order's amount while preserving approval, customer-region joining, and the separate count function."
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "governance-reactive",
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/governance-reactive.rcl",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesPath": "examples/universal-stress/phase-contexts/governance-reactive-cases.json",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "definitionFile": "scripts/k400-genomes/governance.mjs",
+  "definitionHash": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "security-sensitive",
+    "reactive"
+  ],
+  "baseline": {
+    "valid": true,
+    "phase": 0,
+    "audit": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K377",
+    "K378",
+    "K357",
+    "K358"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "index": 0,
+      "intent": "The maintainer needs the exact compiler.inspect warrant on source to authorize the candidate; do not change rule requirements or grant unrelated permissions.",
+      "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b"
+    },
+    {
+      "id": "emit-trigger",
+      "index": 1,
+      "intent": "After candidate authorization sets phase one and accepted true, emission must trigger once and advance the phase to two.",
+      "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c"
+    },
+    {
+      "id": "audit-increment",
+      "index": 2,
+      "intent": "Each successful transaction increments the audit counter by exactly one, while its projected-state invariant must remain satisfied.",
+      "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36"
+    }
+  ],
+  "contractRoot": "e2b67c2a4e1e87dd9f0c29a7f99f37f40cb216007bdc255b0499c32b44ba4fdb"
+}

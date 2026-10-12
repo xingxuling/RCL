@@ -1,0 +1,3576 @@
+{
+  "format": "rcl.k400-job-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_JOBS",
+  "id": "learning",
+  "generatedAt": "2026-10-12T22:08:26.534Z",
+  "contractRoot": "2e053a89ac4e4ae39f92dfd80ca62116496cad3254abd09a74caf46a33a95713",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/job-contexts/learning-proposals.json",
+  "proposalsHash": "191cb56f02563cb2b089cb63bbd737fdb887ce4941ba7da3cc62a8bf57258b37",
+  "batchHash": "19a62a4e6d782cde1fcace4eb5322bb7db50badacfef43362ac8dfb6365ce0f6",
+  "eligibleCells": [
+    "K133",
+    "K153",
+    "K313"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-job-engine.mjs",
+      "sha256": "7e55448608f352c35f80a85f26eecd8831310539ff5d5b251dd4737358c60669"
+    },
+    {
+      "path": "scripts/k400-job-definitions.mjs",
+      "sha256": "847e4e3e52e8b1f3df0f5b360cc5d68faf23521947b803e0d0eb293d5151aad6"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/job-context-targets.mjs",
+      "sha256": "7275dce6acc128ae0745625a47e5ca1571de33f9b7b6391337da8d1f8ef83c04"
+    },
+    {
+      "path": "src/portable-serverless-target.mjs",
+      "sha256": "b6aceaf143fe233357995ae992acd72c7e9881e57679495a79947ed45a9d3071"
+    },
+    {
+      "path": "src/portable-database-target.mjs",
+      "sha256": "c1753587cfceb298b748a9b309c215badd4c02afb3b5d9c646cb3bded19fa2b7"
+    },
+    {
+      "path": "src/portable-dataflow-target.mjs",
+      "sha256": "c7b0fc54974bbf547c2b936a579cd8571ad36a6de6129775e43bdbf4737d8c36"
+    },
+    {
+      "path": "src/portable-dataflow-worker.mjs",
+      "sha256": "8ce8cc7c11c09ab16b5265518541a64ae7aaa69768d3e5a17f421ae1894aeaf3"
+    },
+    {
+      "path": "src/portable-http-target.mjs",
+      "sha256": "9bf98aa8302a71b400d9fec8776bec8e7335b814494a81fc77a0dd0d5907ac36"
+    },
+    {
+      "path": "src/portable-http-worker.mjs",
+      "sha256": "b8e2eaa3a1a348e40941a4ee3b74ace440d619c3bb1281d7662384e2eed64ad0"
+    },
+    {
+      "path": "src/portable-http-client.mjs",
+      "sha256": "0384d782ab466a1a1128fbe2c41dc47303598fd5de62fbf3f1d0f645fc013f57"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "scripts/k400-genomes/learning.mjs",
+      "sha256": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802"
+    }
+  ],
+  "backends": {
+    "serverless": {
+      "binding": {
+        "execution": "Fresh local HTTP handler and native RCL compiler/VM for each request",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "serverless",
+        "transport": "HTTP_LOOPBACK_127_0_0_1",
+        "hostedDeploymentClaimed": false,
+        "warmProcessReused": false,
+        "cloudFaasClaimed": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1342.3684000000003,
+          "compileTrace": {
+            "handlerPid": 80160,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 1
+          },
+          "executeMs": 1911.3933999999995,
+          "runtimeTrace": {
+            "handlerPid": 66968,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 2
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1271.9470000000001,
+          "compileTrace": {
+            "handlerPid": 85680,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 3
+          },
+          "executeMs": 1214.1471999999994,
+          "runtimeTrace": {
+            "handlerPid": 85900,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 4
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1553.761300000001,
+          "compileTrace": {
+            "handlerPid": 13700,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 5
+          },
+          "executeMs": 1340.6807000000008,
+          "runtimeTrace": {
+            "handlerPid": 24048,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 6
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1317.346599999999,
+          "compileTrace": {
+            "handlerPid": 11616,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 7
+          },
+          "executeMs": 1156.1236999999983,
+          "runtimeTrace": {
+            "handlerPid": 82744,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 8
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1220.0950000000012,
+          "compileTrace": {
+            "handlerPid": 76700,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 9
+          },
+          "executeMs": 1487.6916,
+          "runtimeTrace": {
+            "handlerPid": 62300,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 10
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1358.493699999999,
+          "compileTrace": {
+            "handlerPid": 61728,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 11
+          },
+          "executeMs": 1262.2402000000002,
+          "runtimeTrace": {
+            "handlerPid": 64164,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 12
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1223.2403000000013,
+          "compileTrace": {
+            "handlerPid": 18004,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 13
+          },
+          "executeMs": 1298.7394000000022,
+          "runtimeTrace": {
+            "handlerPid": 44716,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 14
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1419.0260999999991,
+          "compileTrace": {
+            "handlerPid": 84060,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 15
+          },
+          "executeMs": 1260.1725000000006,
+          "runtimeTrace": {
+            "handlerPid": 71696,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 16
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1307.9877000000015,
+          "compileTrace": {
+            "handlerPid": 45008,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 17
+          },
+          "executeMs": 1241.5838999999978,
+          "runtimeTrace": {
+            "handlerPid": 70560,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 18
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1525.2138999999988,
+          "compileTrace": {
+            "handlerPid": 56612,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 19
+          },
+          "executeMs": 1250.7700000000004,
+          "runtimeTrace": {
+            "handlerPid": 72536,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 20
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1230.8660999999993,
+          "compileTrace": {
+            "handlerPid": 85052,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 21
+          },
+          "executeMs": 1239.190499999997,
+          "runtimeTrace": {
+            "handlerPid": 74532,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 22
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1479.1915999999983,
+          "compileTrace": {
+            "handlerPid": 83060,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 23
+          },
+          "executeMs": 1301.224000000002,
+          "runtimeTrace": {
+            "handlerPid": 75168,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 24
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1094.6295000000027,
+          "compileTrace": {
+            "handlerPid": 79520,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 25
+          },
+          "executeMs": 1154.5310000000027,
+          "runtimeTrace": {
+            "handlerPid": 76640,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 26
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1253.9310000000041,
+          "compileTrace": {
+            "handlerPid": 85512,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 27
+          },
+          "executeMs": 1273.875199999995,
+          "runtimeTrace": {
+            "handlerPid": 85100,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 28
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1274.2024999999994,
+          "compileTrace": {
+            "handlerPid": 82284,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 29
+          },
+          "executeMs": 1147.3375000000015,
+          "runtimeTrace": {
+            "handlerPid": 80084,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 30
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1213.5216999999975,
+          "compileTrace": {
+            "handlerPid": 54660,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 31
+          },
+          "executeMs": 1200.7966000000015,
+          "runtimeTrace": {
+            "handlerPid": 80888,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 32
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1291.898699999998,
+          "compileTrace": {
+            "handlerPid": 75380,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 33
+          },
+          "executeMs": 1144.117299999998,
+          "runtimeTrace": {
+            "handlerPid": 76204,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 34
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1179.939099999996,
+          "compileTrace": {
+            "handlerPid": 3640,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 35
+          },
+          "executeMs": 1072.7442999999985,
+          "runtimeTrace": {
+            "handlerPid": 69932,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 36
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1154.5035999999964,
+          "compileTrace": {
+            "handlerPid": 84228,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 37
+          },
+          "executeMs": 1259.9182999999975,
+          "runtimeTrace": {
+            "handlerPid": 83056,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 38
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1221.8758000000016,
+          "compileTrace": {
+            "handlerPid": 71428,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 39
+          },
+          "executeMs": 1270.115700000002,
+          "runtimeTrace": {
+            "handlerPid": 34592,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 40
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 1277.6059999999998,
+          "compileTrace": {
+            "handlerPid": 64816,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 41
+          },
+          "executeMs": 1147.302300000003,
+          "runtimeTrace": {
+            "handlerPid": 69660,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 42
+          },
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 1356.7423999999955,
+          "compileTrace": {
+            "handlerPid": 82560,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 43
+          },
+          "executeMs": 1207.9272999999957,
+          "runtimeTrace": {
+            "handlerPid": 3944,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 44
+          },
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 1196.827400000002,
+          "compileTrace": {
+            "handlerPid": 84368,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 45
+          },
+          "executeMs": 1185.1227999999974,
+          "runtimeTrace": {
+            "handlerPid": 4512,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 46
+          },
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 1326.4802999999956,
+          "compileTrace": {
+            "handlerPid": 64792,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 47
+          },
+          "executeMs": 1216.4696999999942,
+          "runtimeTrace": {
+            "handlerPid": 81132,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 48
+          },
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 1090.1287999999986,
+          "compileTrace": {
+            "handlerPid": 6436,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 49
+          },
+          "executeMs": 986.4190000000017,
+          "runtimeTrace": {
+            "handlerPid": 76624,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 50
+          },
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 1103.6406999999963,
+          "compileTrace": {
+            "handlerPid": 85780,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 51
+          },
+          "executeMs": 1056.1814000000013,
+          "runtimeTrace": {
+            "handlerPid": 77224,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 52
+          },
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 1089.4152999999933,
+          "compileTrace": {
+            "handlerPid": 83496,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 53
+          },
+          "executeMs": 1070.6907999999967,
+          "runtimeTrace": {
+            "handlerPid": 47808,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 54
+          },
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 1082.9663,
+          "compileTrace": {
+            "handlerPid": 60244,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 55
+          },
+          "executeMs": 986.8289000000077,
+          "runtimeTrace": {
+            "handlerPid": 79924,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 56
+          },
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 1013.644100000005,
+          "compileTrace": {
+            "handlerPid": 83368,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 57
+          },
+          "executeMs": 1118.763300000006,
+          "runtimeTrace": {
+            "handlerPid": 85388,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 58
+          },
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 1372.4724000000133,
+          "compileTrace": {
+            "handlerPid": 8876,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 59
+          },
+          "executeMs": 1129.3494999999966,
+          "runtimeTrace": {
+            "handlerPid": 72880,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 60
+          },
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)))",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)))",
+            "diagnosis": "The bias update has its signs reversed. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "executeMs": 1071.10119999999,
+            "runtimeTrace": {
+              "handlerPid": 61776,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 62
+            },
+            "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+            "sourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+            "sourceRoot": "4008a34897b45cf0ea846534b087bc0f2bd00a7f7e027643c01969d5a94be888",
+            "compileMs": 1092.8427999999985,
+            "compileTrace": {
+              "handlerPid": 77828,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 61
+            },
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1127.2578999999969,
+          "compileTrace": {
+            "handlerPid": 84220,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 63
+          },
+          "executeMs": 1047.7630999999965,
+          "runtimeTrace": {
+            "handlerPid": 72852,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 64
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "learning-1",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared score function subtracts the learned bias. Adding it restores the requested scoring rule for training and inference."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "executeMs": 1186.9790999999968,
+            "runtimeTrace": {
+              "handlerPid": 85832,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 66
+            },
+            "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+            "sourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+            "sourceRoot": "9b614c65e53062521f8d807c23b7931e13ef15b0dc2463999e4f4e22086f0b0c",
+            "compileMs": 1110.9406000000017,
+            "compileTrace": {
+              "handlerPid": 82108,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 65
+            },
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1359.0476000000053,
+          "compileTrace": {
+            "handlerPid": 77604,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 67
+          },
+          "executeMs": 1378.5573000000004,
+          "runtimeTrace": {
+            "handlerPid": 69044,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 68
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "learning-2",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-weight update reverses the label-dependent direction. A misclassified positive example should add its node feature; a negative example should subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "executeMs": 1269.7796999999991,
+            "runtimeTrace": {
+              "handlerPid": 81308,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 70
+            },
+            "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+            "sourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+            "sourceRoot": "d2e53d94a3022a4085b89c02fd6ca54144d2873e63d09985c6db329f54ec3dc3",
+            "compileMs": 1168.5329999999958,
+            "compileTrace": {
+              "handlerPid": 69868,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 69
+            },
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1133.7024999999994,
+          "compileTrace": {
+            "handlerPid": 8600,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 71
+          },
+          "executeMs": 1117.2247000000061,
+          "runtimeTrace": {
+            "handlerPid": 80040,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 72
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1525.2138999999988,
+        "executeP95Ms": 1487.6916
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "freshHandlers": true,
+        "terminationObserved": true,
+        "processExited": true,
+        "handlerPids": [
+          82160,
+          84268
+        ],
+        "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+        "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+        "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "database": {
+      "binding": {
+        "execution": "SQLite scalar-function native RCL execution with persisted result transactions",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false,
+        "context": "database",
+        "sqliteVersion": "3.51.3",
+        "engine": "SQLite",
+        "opaqueSqlSemanticDelegation": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 114.06759999999485,
+          "compileTrace": null,
+          "executeMs": 91.34570000000531,
+          "runtimeTrace": {
+            "runId": "ed6bd896-3327-4702-95dd-f2309c43e312",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 113.89449999999488,
+          "compileTrace": null,
+          "executeMs": 84.3173999999999,
+          "runtimeTrace": {
+            "runId": "1418c51c-79d0-4f58-bc1a-3564aa476bee",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 120.53770000000077,
+          "compileTrace": null,
+          "executeMs": 115.86100000000442,
+          "runtimeTrace": {
+            "runId": "856f0d46-c6eb-4324-838e-4ef3083f7128",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 114.8912999999884,
+          "compileTrace": null,
+          "executeMs": 84.2566000000079,
+          "runtimeTrace": {
+            "runId": "a04df00d-7a99-4726-a246-ad72397d0d0e",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 130.90230000000156,
+          "compileTrace": null,
+          "executeMs": 104.98550000000978,
+          "runtimeTrace": {
+            "runId": "78f8fdbf-4c93-4b9d-ae26-24561dae2725",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 126.56840000000375,
+          "compileTrace": null,
+          "executeMs": 90.18449999998847,
+          "runtimeTrace": {
+            "runId": "763c30ca-0c19-4210-bdfe-71c188451671",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 148.021900000007,
+          "compileTrace": null,
+          "executeMs": 97.91879999999946,
+          "runtimeTrace": {
+            "runId": "93ef33e7-ea76-45d1-ad14-5a1a65ce905d",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 118.23190000001341,
+          "compileTrace": null,
+          "executeMs": 97.2676000000065,
+          "runtimeTrace": {
+            "runId": "3c8bb0ec-0f0d-4415-a052-4204ab96a4fe",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 118.70050000000629,
+          "compileTrace": null,
+          "executeMs": 85.33100000000559,
+          "runtimeTrace": {
+            "runId": "3c7bc590-34ec-42b7-bed6-c8e381c3ef99",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 116.00880000001052,
+          "compileTrace": null,
+          "executeMs": 79.95350000000326,
+          "runtimeTrace": {
+            "runId": "16e36fa3-733c-4e1f-9762-d4b195aee53a",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 110.58690000000934,
+          "compileTrace": null,
+          "executeMs": 96.88380000001052,
+          "runtimeTrace": {
+            "runId": "d000bf6a-7658-462e-b4c3-507f7622643d",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 120.857600000003,
+          "compileTrace": null,
+          "executeMs": 97.96179999999003,
+          "runtimeTrace": {
+            "runId": "387b3a6c-07c2-43a6-9fb0-de5811acdcb0",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 111.46900000001187,
+          "compileTrace": null,
+          "executeMs": 81.20739999999932,
+          "runtimeTrace": {
+            "runId": "bbc63349-ed0d-41bf-a14d-4833720c1db6",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 115.44150000000081,
+          "compileTrace": null,
+          "executeMs": 91.2835999999952,
+          "runtimeTrace": {
+            "runId": "1b5ca032-7d90-4ba8-b26c-6995a0f78de3",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 109.14960000000428,
+          "compileTrace": null,
+          "executeMs": 90.2323000000033,
+          "runtimeTrace": {
+            "runId": "a2afdba8-7303-45f6-be43-c1fba31c8ff5",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 127.142399999997,
+          "compileTrace": null,
+          "executeMs": 89.6481000000058,
+          "runtimeTrace": {
+            "runId": "aa3d04ab-e52c-4902-a7b1-3e6c59b34f76",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 119.66640000000189,
+          "compileTrace": null,
+          "executeMs": 92.80319999999483,
+          "runtimeTrace": {
+            "runId": "da808ec5-c020-44af-8310-0149b5e1bc6c",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 117.38069999999425,
+          "compileTrace": null,
+          "executeMs": 91.89250000000175,
+          "runtimeTrace": {
+            "runId": "6ec80c90-0d34-4a14-ac85-9bda56c58e71",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 116.45789999999397,
+          "compileTrace": null,
+          "executeMs": 87.1131999999925,
+          "runtimeTrace": {
+            "runId": "ea9122b4-d9c3-4b36-b5d6-0c9ddb2a1d3c",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 122.71510000000126,
+          "compileTrace": null,
+          "executeMs": 90.76819999999134,
+          "runtimeTrace": {
+            "runId": "0233bd30-61a9-4dca-a052-b39e587c01fd",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 96.6015999999945,
+          "compileTrace": null,
+          "executeMs": 83.71709999999439,
+          "runtimeTrace": {
+            "runId": "1813b695-5dac-49a3-b6ce-1c248682fba6",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 115.52369999999064,
+          "compileTrace": null,
+          "executeMs": 83.01469999999972,
+          "runtimeTrace": {
+            "runId": "1d16be73-97ef-45c9-b921-781f69f4d9a3",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 101.49610000000393,
+          "compileTrace": null,
+          "executeMs": 91.67919999999867,
+          "runtimeTrace": {
+            "runId": "e0949993-de10-4ab6-a0f8-a9d40f7cffb6",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 115.722299999994,
+          "compileTrace": null,
+          "executeMs": 93.33580000000075,
+          "runtimeTrace": {
+            "runId": "3f607c33-82df-420c-bfeb-5e756b3668ea",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 126.07530000001134,
+          "compileTrace": null,
+          "executeMs": 89.10379999999714,
+          "runtimeTrace": {
+            "runId": "7279184b-32f5-4218-99b3-a9ff283bcb95",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 108.12750000000233,
+          "compileTrace": null,
+          "executeMs": 95.89390000001004,
+          "runtimeTrace": {
+            "runId": "7df9c85f-bbdd-49e4-b15b-efd8b90245e3",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 130.17059999999765,
+          "compileTrace": null,
+          "executeMs": 87.86260000000766,
+          "runtimeTrace": {
+            "runId": "be2d73f9-7305-432c-8a3d-52b9205c61e8",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 114.85460000000603,
+          "compileTrace": null,
+          "executeMs": 93.50789999999688,
+          "runtimeTrace": {
+            "runId": "53dcccfd-9f9b-430e-947e-33ce829f3f05",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 121.18869999999879,
+          "compileTrace": null,
+          "executeMs": 84.72729999999865,
+          "runtimeTrace": {
+            "runId": "d2484c4a-454a-45e9-9d8c-68d22582e305",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 116.52609999998822,
+          "compileTrace": null,
+          "executeMs": 81.37369999999646,
+          "runtimeTrace": {
+            "runId": "533e6884-6d26-4046-8eba-f1d2eb88f0f7",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)))",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)))",
+            "diagnosis": "The bias update has its signs reversed. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "executeMs": 96.29790000000503,
+            "runtimeTrace": {
+              "runId": "d8c9495c-1fb0-42ce-931f-f1f72a8fb5ee",
+              "committed": true,
+              "sqlFunction": "rcl_execute",
+              "sqlInvocations": 1,
+              "sqliteVersion": "3.51.3"
+            },
+            "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+            "sourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+            "sourceRoot": "4008a34897b45cf0ea846534b087bc0f2bd00a7f7e027643c01969d5a94be888",
+            "compileMs": 127.70999999999185,
+            "compileTrace": null,
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 136.3981000000058,
+          "compileTrace": null,
+          "executeMs": 113.5332999999955,
+          "runtimeTrace": {
+            "runId": "31ae2673-abc9-49f7-a9f4-4e041e8ea817",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "learning-1",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared score function subtracts the learned bias. Adding it restores the requested scoring rule for training and inference."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "executeMs": 96.93469999999797,
+            "runtimeTrace": {
+              "runId": "f622205c-3699-41dc-be7a-c9f1d719c285",
+              "committed": true,
+              "sqlFunction": "rcl_execute",
+              "sqlInvocations": 1,
+              "sqliteVersion": "3.51.3"
+            },
+            "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+            "sourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+            "sourceRoot": "9b614c65e53062521f8d807c23b7931e13ef15b0dc2463999e4f4e22086f0b0c",
+            "compileMs": 141.27700000000186,
+            "compileTrace": null,
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 122.56269999999495,
+          "compileTrace": null,
+          "executeMs": 101.78119999999763,
+          "runtimeTrace": {
+            "runId": "9af41aef-e73d-4d2f-a4cb-2c6118176e6f",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "learning-2",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-weight update reverses the label-dependent direction. A misclassified positive example should add its node feature; a negative example should subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "executeMs": 96.15649999999732,
+            "runtimeTrace": {
+              "runId": "f2f9d5cb-4e2f-4690-94e6-8077d5462d74",
+              "committed": true,
+              "sqlFunction": "rcl_execute",
+              "sqlInvocations": 1,
+              "sqliteVersion": "3.51.3"
+            },
+            "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+            "sourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+            "sourceRoot": "d2e53d94a3022a4085b89c02fd6ca54144d2873e63d09985c6db329f54ec3dc3",
+            "compileMs": 130.97370000000228,
+            "compileTrace": null,
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 114.47350000000733,
+          "compileTrace": null,
+          "executeMs": 101.88520000000426,
+          "runtimeTrace": {
+            "runId": "7ecbc52f-aa2b-41bb-90d9-7cfdc0809720",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 130.90230000000156,
+        "executeP95Ms": 104.98550000000978
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "reopened": true,
+        "persistedRunId": "59c02c07-c9e6-4a44-86fe-45a881621870",
+        "replayRunId": "ce4918e2-22d1-43c3-9bc1-922678649534",
+        "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+        "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+        "rollback": {
+          "status": "PASS",
+          "wrongRootRejected": true,
+          "before": 38,
+          "after": 38,
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3"
+        },
+        "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "dataflow-runtime": {
+      "binding": {
+        "execution": "Bounded source-binding/native-execution/receipt-sink worker-thread pipeline",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "dataflow-runtime",
+        "threadId": 1,
+        "maxInFlight": 1,
+        "externalStreamClaimed": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 124.39999999999418,
+          "compileTrace": null,
+          "executeMs": 84.19569999999658,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 2,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 116.75599999999395,
+          "compileTrace": null,
+          "executeMs": 75.42510000000766,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 4,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 116.7152999999962,
+          "compileTrace": null,
+          "executeMs": 91.5396999999939,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 6,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 123.54069999999774,
+          "compileTrace": null,
+          "executeMs": 87.96600000000035,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 8,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 112.84829999999783,
+          "compileTrace": null,
+          "executeMs": 90.76110000000335,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 10,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 121.3292999999976,
+          "compileTrace": null,
+          "executeMs": 88.8643000000011,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 12,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 118.30250000000524,
+          "compileTrace": null,
+          "executeMs": 77.4435999999987,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 14,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 120.62759999999253,
+          "compileTrace": null,
+          "executeMs": 78.4707999999955,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 16,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 115.20759999999427,
+          "compileTrace": null,
+          "executeMs": 79.07600000000093,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 18,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 111.94690000000992,
+          "compileTrace": null,
+          "executeMs": 85.53610000001208,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 20,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 126.6301000000094,
+          "compileTrace": null,
+          "executeMs": 94.7664999999979,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 22,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 119.74009999999544,
+          "compileTrace": null,
+          "executeMs": 92.91069999999308,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 24,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 127.05990000000747,
+          "compileTrace": null,
+          "executeMs": 85.84469999998691,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 26,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 115.27529999999388,
+          "compileTrace": null,
+          "executeMs": 86.6640999999945,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 28,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 127.54929999999877,
+          "compileTrace": null,
+          "executeMs": 81.5,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 30,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 119.07309999999416,
+          "compileTrace": null,
+          "executeMs": 91.14319999999134,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 32,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 111.51520000000892,
+          "compileTrace": null,
+          "executeMs": 88.00170000000799,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 34,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 125.18889999999374,
+          "compileTrace": null,
+          "executeMs": 89.73430000001099,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 36,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 130.02270000000135,
+          "compileTrace": null,
+          "executeMs": 84.46869999999763,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 38,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 130.81019999999262,
+          "compileTrace": null,
+          "executeMs": 86.83900000000722,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 40,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 124.5332999999955,
+          "compileTrace": null,
+          "executeMs": 82.70410000000265,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 42,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387"
+          },
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 132.3225999999995,
+          "compileTrace": null,
+          "executeMs": 107.704899999997,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 44,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9"
+          },
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 127.48179999999411,
+          "compileTrace": null,
+          "executeMs": 92.75930000000517,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 46,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5"
+          },
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 123.07880000000296,
+          "compileTrace": null,
+          "executeMs": 78.76870000000054,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 48,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60"
+          },
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 109.82009999999718,
+          "compileTrace": null,
+          "executeMs": 313.3387000000075,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 50,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4"
+          },
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 123.39530000000377,
+          "compileTrace": null,
+          "executeMs": 81.1768000000011,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 52,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102"
+          },
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 121.22859999998764,
+          "compileTrace": null,
+          "executeMs": 89.51690000000235,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 54,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e"
+          },
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 111.77399999999034,
+          "compileTrace": null,
+          "executeMs": 91.62169999998878,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 56,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d"
+          },
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 117.60399999999208,
+          "compileTrace": null,
+          "executeMs": 77.86770000000251,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 58,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b"
+          },
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 122.44400000000314,
+          "compileTrace": null,
+          "executeMs": 83.55710000000545,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 60,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f"
+          },
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)))",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)))",
+            "diagnosis": "The bias update has its signs reversed. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "executeMs": 85.53789999999572,
+            "runtimeTrace": {
+              "threadId": 1,
+              "delivery": 62,
+              "stages": [
+                "source-binding",
+                "native-execution",
+                "receipt-sink"
+              ],
+              "inputHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61"
+            },
+            "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+            "sourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+            "sourceRoot": "4008a34897b45cf0ea846534b087bc0f2bd00a7f7e027643c01969d5a94be888",
+            "compileMs": 114.56549999999697,
+            "compileTrace": null,
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 118.54929999999877,
+          "compileTrace": null,
+          "executeMs": 91.69759999999951,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 64,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "learning-1",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared score function subtracts the learned bias. Adding it restores the requested scoring rule for training and inference."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "executeMs": 96.75290000000678,
+            "runtimeTrace": {
+              "threadId": 1,
+              "delivery": 66,
+              "stages": [
+                "source-binding",
+                "native-execution",
+                "receipt-sink"
+              ],
+              "inputHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9"
+            },
+            "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+            "sourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+            "sourceRoot": "9b614c65e53062521f8d807c23b7931e13ef15b0dc2463999e4f4e22086f0b0c",
+            "compileMs": 117.20769999999902,
+            "compileTrace": null,
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 121.85930000001099,
+          "compileTrace": null,
+          "executeMs": 92.26840000000084,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 68,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "learning-2",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-weight update reverses the label-dependent direction. A misclassified positive example should add its node feature; a negative example should subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "executeMs": 89.66310000000522,
+            "runtimeTrace": {
+              "threadId": 1,
+              "delivery": 70,
+              "stages": [
+                "source-binding",
+                "native-execution",
+                "receipt-sink"
+              ],
+              "inputHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46"
+            },
+            "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+            "sourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+            "sourceRoot": "d2e53d94a3022a4085b89c02fd6ca54144d2873e63d09985c6db329f54ec3dc3",
+            "compileMs": 127.64990000000398,
+            "compileTrace": null,
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 120.53080000000773,
+          "compileTrace": null,
+          "executeMs": 86.6426000000065,
+          "runtimeTrace": {
+            "threadId": 1,
+            "delivery": 72,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 130.02270000000135,
+        "executeP95Ms": 92.91069999999308
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "backpressureRejected": true,
+        "threadId": 1,
+        "delivery": 74,
+        "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+        "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+        "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 9,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+      "history": [],
+      "projections": []
+    },
+    "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 0,
+        "inference.nodes": 0,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 0,
+        "input.epochs": 0,
+        "input.hotness": 0,
+        "input.nodes": 0,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 0,
+        "training.final_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+      "history": [],
+      "projections": []
+    },
+    "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 1,
+        "inference.nodes": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 2,
+        "input.epochs": 1,
+        "input.hotness": 1,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 1,
+        "training.final_parameters": [
+          2,
+          0,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+      "history": [],
+      "projections": []
+    },
+    "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 1,
+        "inference.nodes": 3,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 8,
+        "input.epochs": 2,
+        "input.hotness": 1,
+        "input.nodes": 3,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 2,
+        "training.final_parameters": [
+          2,
+          2,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+      "history": [],
+      "projections": []
+    },
+    "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 3,
+        "inference.nodes": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 3,
+        "input.epochs": 3,
+        "input.hotness": 3,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 3,
+        "training.final_parameters": [
+          1,
+          1,
+          -1
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+      "history": [],
+      "projections": []
+    },
+    "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 3,
+        "inference.nodes": 3,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 11,
+        "input.epochs": 4,
+        "input.hotness": 3,
+        "input.nodes": 3,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 4,
+        "training.final_parameters": [
+          3,
+          1,
+          -1
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+      "history": [],
+      "projections": []
+    },
+    "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 0,
+        "inference.hotness": 5,
+        "inference.nodes": -2,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -4,
+        "input.epochs": 8,
+        "input.hotness": 5,
+        "input.nodes": -2,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 8,
+        "training.final_parameters": [
+          3,
+          1,
+          -3
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+      "history": [],
+      "projections": []
+    },
+    "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 0,
+        "inference.hotness": 1,
+        "inference.nodes": 1,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -1,
+        "input.epochs": 16,
+        "input.hotness": 1,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+      "history": [],
+      "projections": []
+    },
+    "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 0,
+        "inference.hotness": 0,
+        "inference.nodes": 0,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -5,
+        "input.epochs": 20,
+        "input.hotness": 0,
+        "input.nodes": 0,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 20,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+      "history": [],
+      "projections": []
+    },
+    "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": -3,
+        "inference.nodes": 6,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 10,
+        "input.epochs": 24,
+        "input.hotness": -3,
+        "input.nodes": 6,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 24,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+      "history": [],
+      "projections": []
+    },
+    "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": 0.5,
+        "inference.nodes": 1.5,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 0,
+        "input.epochs": 12,
+        "input.hotness": 0.5,
+        "input.nodes": 1.5,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 12,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+      "history": [],
+      "projections": []
+    },
+    "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 15,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          9
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "4387241b21ca3d84ca8acfac861077a1c19a6fd0c6585d867f72a67c028ec104",
+      "history": [],
+      "projections": []
+    },
+    "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 15,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          -9
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "3709e4e8dc28ffcb92700a03b4570b0cd897d6c44a0c71f0610c3b5ca4af00ff",
+      "history": [],
+      "projections": []
+    },
+    "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 34,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          10,
+          2,
+          -10
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "534c184f47e29cef81c25cfd3f72d2983bdc373ba737ce9fb9fc8752f5197863",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; native execution in fresh local handlers, SQLite SQL-function transactions and a bounded worker-thread dataflow pipeline; no cloud FaaS, arbitrary SQL, external stream or OS sandbox claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "57d1570975468d2368f707b2d0c0c19cc82ccd3b6b1c600e1f8277eb85443b67"
+}

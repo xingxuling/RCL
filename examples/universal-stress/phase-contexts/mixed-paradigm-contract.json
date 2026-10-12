@@ -1,0 +1,95 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "mixed-paradigm",
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/mixed-paradigm.rcl",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesPath": "examples/universal-stress/phase-contexts/mixed-paradigm-cases.json",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "definitionFile": "scripts/k400-genomes/mixed.mjs",
+  "definitionHash": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "mixed-paradigm"
+  ],
+  "baseline": {
+    "batch_size": 8
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K380",
+    "K360"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "index": 0,
+      "intent": "Compute the sum of squares for the functional stage, agreeing with the closed-form invariant before transactional commit.",
+      "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d"
+    },
+    {
+      "id": "analyze-warrant",
+      "index": 1,
+      "intent": "The builder needs the exact compiler.analyze warrant on source before analyzing a positive batch; do not change the declared requirements.",
+      "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4"
+    },
+    {
+      "id": "phase-trigger",
+      "index": 2,
+      "intent": "Emission follows successful analysis at phase one, then advances to phase two; preserve the digest and all authority requirements.",
+      "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167"
+    }
+  ],
+  "contractRoot": "525280fe0ffeff728c16056158cc105313752251c397d611eeaa35994739936a"
+}

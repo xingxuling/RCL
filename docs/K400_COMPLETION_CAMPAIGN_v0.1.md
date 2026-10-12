@@ -1,12 +1,12 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `106 PASS / 0 BLOCKED / 294 UNTESTED`
+**Current evidence:** `142 PASS / 0 BLOCKED / 258 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `fa065eb1aafea764e094f1c8559e4d780c32558e11f71c58c50ca86f6d8c2a10`
+**Report root:** `8c35778ed7750501e87f00fee0f8ce303582d846996a8ab8d86194872c7c190f`
 **Date:** 2026-10-13
 
-The active development goal is at least 200 verified cells. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106; the >=200 goal remains active.
+The active development goal is at least 200 verified cells. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106. The [native job campaign](K400_JOB_CONTEXTS_2026-10-13.md) adds 36 more, reaching 142; the >=200 goal remains active.
 
 ## 1. Completion contract
 

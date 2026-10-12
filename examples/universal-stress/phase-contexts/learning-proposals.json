@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-phase-proposals.v1",
+  "contractRoot": "ca2cecc8ecf74627875d8ab23d23a877920e31b3d532ff7bce78fd1192abe0f2",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/phase-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_phase_context_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+        "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_phase_context_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+        "diagnosis": "The shared scoring function subtracts the learned bias despite training updating it additively. Adding the bias aligns training, evaluation, and inference."
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_phase_context_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+        "diagnosis": "The node-weight update has reversed signs. A misclassified positive label must add the node feature, and a negative label must subtract it."
+      }
+    }
+  ]
+}

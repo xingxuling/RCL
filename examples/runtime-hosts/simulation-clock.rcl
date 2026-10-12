@@ -1,0 +1,39 @@
+reality NativeSimulationClock {
+  input event.time : Number = 0
+  input event.root : Text = ""
+  facet world.time : Number = 0
+  facet world.frames : Number = 0
+  facet world.enabled : Truth = true
+  facet world.lastRoot : Text = ""
+  subject clock_driver {
+    warrant world.advance on world while world.enabled
+  }
+  subject coordinator {
+    warrant world.control on world
+  }
+  emergence advance {
+    cause clock_driver
+    when event.time > world.time and event.root != ""
+    needs world.advance on world
+    alter world.time <- event.time
+    alter world.frames <- world.frames + 1
+    alter world.lastRoot <- event.root
+    preserve world.time >= 0
+    preserve world.frames > 0
+    witness "simulation:source-owned-clock"
+  }
+  emergence pause {
+    cause coordinator
+    when world.enabled
+    needs world.control on world
+    alter world.enabled <- false
+    witness "simulation:paused"
+  }
+  emergence resume {
+    cause coordinator
+    when not world.enabled
+    needs world.control on world
+    alter world.enabled <- true
+    witness "simulation:resumed"
+  }
+}

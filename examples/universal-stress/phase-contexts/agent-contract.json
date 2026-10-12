@@ -1,0 +1,100 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "agent",
+  "scope": "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/agent.rcl",
+  "sourceHash": "dbc1e9646ebd63380f571510738225a40e572192c983a2a606f969154680328e",
+  "casesPath": "examples/universal-stress/phase-contexts/agent-cases.json",
+  "casesHash": "1ea4af53538abf6b5c16e5f27111ca7f8d163f201e38534e293937d943ebf40c",
+  "definitionFile": "scripts/k400-genomes/agent.mjs",
+  "definitionHash": "d267577fd88eacbb1f57b3ba717b8ce21fa98dba099254135cf391e9f24f3f6f",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "agent"
+  ],
+  "baseline": {
+    "capability": 1,
+    "budget": 5,
+    "max_risk": 3,
+    "approval": 1,
+    "kill": 0,
+    "observe": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K374",
+    "K354"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "capability",
+      "index": 0,
+      "intent": "Reject an action whose required capability does not equal the granted capability; all other eligibility checks still apply.",
+      "mutatedSourceHash": "2114c52234a65a098adda5c4db9fc91638286afa1992aae3e589b623a8c761eb"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject actions whose cost exceeds the available budget; equal cost is permitted if all other checks pass.",
+      "mutatedSourceHash": "6f4e59abb12a6156438da3a96e8de323f0198d636bbd65e69a7758ee332ba9d9"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "An action requiring human approval must be rejected while approval is absent and may be considered when approval is present.",
+      "mutatedSourceHash": "ad8079068c79259d12f4a19518bd86f41a77790a51ab22b4580d7c2d6329430a"
+    }
+  ],
+  "contractRoot": "57eb07fe7fcdb30c7569d294d7d7943d189ead893337c05f1a7aa5c930a58cae"
+}

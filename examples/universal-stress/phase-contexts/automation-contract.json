@@ -1,0 +1,98 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "automation",
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/automation.rcl",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesPath": "examples/universal-stress/phase-contexts/automation-cases.json",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "definitionFile": "scripts/k400-genomes/automation.mjs",
+  "definitionHash": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "automation"
+  ],
+  "baseline": {
+    "failures": 1,
+    "attempts": 2,
+    "approval": 1,
+    "kill": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K376",
+    "K356"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "dependency",
+      "index": 0,
+      "intent": "A task dependency names a previously completed task index; reject a dependency at or beyond the number of completed tasks.",
+      "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286"
+    },
+    {
+      "id": "retry",
+      "index": 1,
+      "intent": "Success requires one additional attempt after all planned failures; reject when failures consume the entire attempt budget.",
+      "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "Stop a workflow before an approval-required task if human approval is absent; approved tasks may proceed if dependencies and retries permit.",
+      "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8"
+    }
+  ],
+  "contractRoot": "ba6a25f66ec453b3b9bdedf5bd39b50f85ea4423314f4c5bcbf8e1c9efb0552c"
+}

@@ -1,0 +1,97 @@
+{
+  "format": "rcl.k400-phase-contract.v1",
+  "id": "learning",
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; native RCL session owns forecast/commit logical clock and job admission/completion around local native kernels; no physical simulation/time, external tools, canonical RNCS world or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/learning.rcl",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesPath": "examples/universal-stress/phase-contexts/learning-cases.json",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "definitionFile": "scripts/k400-genomes/learning.mjs",
+  "definitionHash": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802",
+  "phaseDefinitionFile": "scripts/k400-phase-definitions.mjs",
+  "phaseDefinitionHash": "628845a672d5a3b056bf9ec12b90b8a57d2c52e952cef52b81822628dc504531",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "controllerSources": [
+    {
+      "environment": "simulation-runtime",
+      "path": "examples/runtime-hosts/simulation-clock.rcl",
+      "sha256": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb"
+    },
+    {
+      "environment": "automation-runtime",
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5"
+    }
+  ],
+  "controllerCompilerSources": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    }
+  ],
+  "environments": [
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "machine-learning"
+  ],
+  "baseline": {
+    "epochs": 16,
+    "nodes": 4,
+    "hotness": 2
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K373",
+    "K353"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "native RCL clock forecast/commit and backward-time rejection",
+    "native RCL disabled-dispatch rejection and resume"
+  ],
+  "authorityProfile": "local source/binary-bound native RCL controllers and kernels, frozen cases and unchanged independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "index": 0,
+      "intent": "Train a binary perceptron: for a misclassified sample add its features and one to the bias for a positive label; subtract them for a negative label.",
+      "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057"
+    },
+    {
+      "id": "score-bias",
+      "index": 1,
+      "intent": "Inference uses the dot product of feature weights with features plus the learned bias, consistently during training and prediction.",
+      "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299"
+    },
+    {
+      "id": "weight-direction",
+      "index": 2,
+      "intent": "The node-feature perceptron weight moves toward a misclassified positive sample and away from a misclassified negative sample.",
+      "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67"
+    }
+  ],
+  "contractRoot": "ca2cecc8ecf74627875d8ab23d23a877920e31b3d532ff7bce78fd1192abe0f2"
+}

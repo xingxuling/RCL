@@ -1,0 +1,214 @@
+{
+  "format": "rcl.k400-independent-phase-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "batches": [
+    {
+      "context": "/root/k400_phase_context_a",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+          "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+          "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "choose(action_capability(action) == granted_capability,",
+          "new": "choose(action_capability(action) != granted_capability,",
+          "diagnosis": "The capability rejection condition is reversed. Reject mismatches while preserving the remaining eligibility checks."
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "task_dependency(task) > completed",
+          "new": "task_dependency(task) >= completed",
+          "diagnosis": "A dependency equal to the completed count names an unfinished task index. Reject it along with larger indices."
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "event_priority(left) > event_priority(right)",
+          "new": "event_priority(left) < event_priority(right)",
+          "diagnosis": "Priority ordering is descending. Use increasing priority values while retaining increasing time and identifier ordering."
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "warrant compiler.no_inspect on source",
+          "new": "warrant compiler.inspect on source",
+          "diagnosis": "The maintainer lacks the exact inspection warrant required by authorization. Correct that warrant without changing requirements or other permissions."
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+          "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+          "diagnosis": "The recurrence sums twice each integer instead of its square, violating the closed-form invariant required for commit."
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "has_customer(customers, 0, order_customer(row)) or",
+          "new": "has_customer(customers, 0, order_customer(row)) == false or",
+          "diagnosis": "The foreign-key check rejects existing customers. Reject missing customers while retaining duplicate-key and negative-amount rejection and the single-row append."
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "state_position(state) - state_velocity(state),",
+          "new": "state_position(state) + state_velocity(state),",
+          "diagnosis": "Position advances with the wrong velocity sign. Add the old velocity so the new position agrees with the appended trajectory entry."
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "choose(b == 0, absolute(a), gcd(b, b % a))",
+          "new": "choose(b == 0, absolute(a), gcd(absolute(b), absolute(a) % absolute(b)))",
+          "diagnosis": "The Euclidean remainder uses the wrong dividend and divisor. Normalize magnitudes and reduce by the nonzero second argument, including negative and zero inputs."
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_phase_context_b",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+          "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+          "diagnosis": "The shared scoring function subtracts the learned bias despite training updating it additively. Adding the bias aligns training, evaluation, and inference."
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "choose(action_cost(action) < budget,",
+          "new": "choose(action_cost(action) > budget,",
+          "diagnosis": "The budget rejection predicate is reversed. Rejecting only costs above budget permits equality while preserving the remaining eligibility checks."
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+          "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+          "diagnosis": "Success consumes one attempt after the planned failures. Strict comparison rejects failures that exhaust the attempt budget."
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+          "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+          "diagnosis": "The event-budget rejection predicate is reversed. Rejecting counts above the budget permits counts equal to it."
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "when compiler.accepted == true and compiler.phase == 2",
+          "new": "when compiler.accepted == true and compiler.phase == 1",
+          "diagnosis": "Authorization advances to phase one, so emission must trigger there. Its existing transition to phase two then disables the emission guard."
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "warrant compiler.no_analyze on source",
+          "new": "warrant compiler.analyze on source",
+          "diagnosis": "The builder warrant does not match the analysis requirement. Granting the exact compiler.analyze warrant on source preserves the emergence requirements."
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+          "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+          "diagnosis": "The aggregation counts nonmatching customers. Equality counts the requested region, with the existing recursion returning zero for empty input or an absent region."
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+          "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+          "diagnosis": "Position advances using the old velocity before acceleration updates it. The acceleration contribution therefore sums indices zero through steps minus one."
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 3))",
+          "new": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 2))",
+          "diagnosis": "The recurrence skips the second immediate predecessor. Using n minus two preserves F0=0 and F1=1 and restores the requested Fibonacci recurrence."
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_phase_context_c",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+          "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+          "diagnosis": "The node-weight update has reversed signs. A misclassified positive label must add the node feature, and a negative label must subtract it."
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "action_requires_approval(action) == 1 and human_approval == 1",
+          "new": "action_requires_approval(action) == 1 and human_approval != 1",
+          "diagnosis": "The approval rejection condition rejects approved actions and permits unapproved actions. Reject when required approval is absent; retain capability, budget, risk, kill-switch, and observation checks."
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+          "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval != 1",
+          "diagnosis": "The workflow approval gate is inverted. Stop before attempting an approval-required task unless approval equals one, preserving dependency, retry, and compensation behavior."
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "temporal_commit_capability == 1",
+          "new": "temporal_commit_capability != 1",
+          "diagnosis": "The external-time gate rejects the granted capability. Reject every capability value other than one while retaining the backward-time rejection."
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+          "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+          "diagnosis": "Authorization increments the audit counter twice, contradicting its projected-state invariant. Increment once so each successful transaction contributes exactly one."
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "when compiler.phase == 2 and compiler.digest == input.batch_size * (input.batch_size + 1) * (2 * input.batch_size + 1) / 6",
+          "new": "when compiler.phase == 1 and compiler.digest == input.batch_size * (input.batch_size + 1) * (2 * input.batch_size + 1) / 6",
+          "diagnosis": "Emission waits for phase two although analysis produces phase one. Enable emission from phase one and retain its transition to phase two, digest invariants, and authority requirements."
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))",
+          "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region))",
+          "diagnosis": "The sum accumulates one per matching order. Accumulate each matching order's amount while preserving approval, customer-region joining, and the separate count function."
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "initial_velocity + acceleration + steps",
+          "new": "initial_velocity + acceleration * steps",
+          "diagnosis": "The velocity formula adds acceleration and steps instead of their product. Each explicit integration step adds acceleration, and zero steps must retain the initial velocity."
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+          "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+          "diagnosis": "The recurrence adds twice each integer instead of its square. Multiply n by itself and retain the zero result for nonpositive inputs."
+        }
+      ]
+    }
+  ]
+}

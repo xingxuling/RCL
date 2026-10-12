@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-phase-proposals.v1",
+  "contractRoot": "454f621edb48646a9a9b6eefced99e2edbf2db316d097d65981a23b133fc6952",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/phase-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_phase_context_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "choose(b == 0, absolute(a), gcd(b, b % a))",
+        "new": "choose(b == 0, absolute(a), gcd(absolute(b), absolute(a) % absolute(b)))",
+        "diagnosis": "The Euclidean remainder uses the wrong dividend and divisor. Normalize magnitudes and reduce by the nonzero second argument, including negative and zero inputs."
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_phase_context_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 3))",
+        "new": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 2))",
+        "diagnosis": "The recurrence skips the second immediate predecessor. Using n minus two preserves F0=0 and F1=1 and restores the requested Fibonacci recurrence."
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_phase_context_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence adds twice each integer instead of its square. Multiply n by itself and retain the zero result for nonpositive inputs."
+      }
+    }
+  ]
+}

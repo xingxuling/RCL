@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-phase-proposals.v1",
+  "contractRoot": "525280fe0ffeff728c16056158cc105313752251c397d611eeaa35994739936a",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/phase-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_phase_context_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence sums twice each integer instead of its square, violating the closed-form invariant required for commit."
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_phase_context_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source",
+        "diagnosis": "The builder warrant does not match the analysis requirement. Granting the exact compiler.analyze warrant on source preserves the emergence requirements."
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_phase_context_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "when compiler.phase == 2 and compiler.digest == input.batch_size * (input.batch_size + 1) * (2 * input.batch_size + 1) / 6",
+        "new": "when compiler.phase == 1 and compiler.digest == input.batch_size * (input.batch_size + 1) * (2 * input.batch_size + 1) / 6",
+        "diagnosis": "Emission waits for phase two although analysis produces phase one. Enable emission from phase one and retain its transition to phase two, digest invariants, and authority requirements."
+      }
+    }
+  ]
+}

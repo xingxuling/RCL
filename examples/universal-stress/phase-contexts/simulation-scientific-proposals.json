@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-phase-proposals.v1",
+  "contractRoot": "4bf1c2b058c07c9ffa9aa212e82995e5a6819a0a7d55cb4ad9ef8ca0fba0b129",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/phase-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_phase_context_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state),",
+        "new": "state_position(state) + state_velocity(state),",
+        "diagnosis": "Position advances with the wrong velocity sign. Add the old velocity so the new position agrees with the appended trajectory entry."
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_phase_context_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+        "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+        "diagnosis": "Position advances using the old velocity before acceleration updates it. The acceleration contribution therefore sums indices zero through steps minus one."
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_phase_context_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_velocity + acceleration + steps",
+        "new": "initial_velocity + acceleration * steps",
+        "diagnosis": "The velocity formula adds acceleration and steps instead of their product. Each explicit integration step adds acceleration, and zero steps must retain the initial velocity."
+      }
+    }
+  ]
+}

@@ -1,0 +1,4469 @@
+{
+  "format": "rcl.k400-job-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_JOBS",
+  "id": "governance-reactive",
+  "generatedAt": "2026-10-12T22:17:11.773Z",
+  "contractRoot": "164ea917c27f597ffc640e2c89de88b95fba2659feaa465ebee7941458d38c47",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/job-contexts/governance-reactive-proposals.json",
+  "proposalsHash": "7edc3b96ebf9d57a490f52f85296394c408be4012a9224e1c1d44ca715f9d03b",
+  "batchHash": "19a62a4e6d782cde1fcace4eb5322bb7db50badacfef43362ac8dfb6365ce0f6",
+  "eligibleCells": [
+    "K137",
+    "K138",
+    "K157",
+    "K158",
+    "K317",
+    "K318"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-job-engine.mjs",
+      "sha256": "7e55448608f352c35f80a85f26eecd8831310539ff5d5b251dd4737358c60669"
+    },
+    {
+      "path": "scripts/k400-job-definitions.mjs",
+      "sha256": "847e4e3e52e8b1f3df0f5b360cc5d68faf23521947b803e0d0eb293d5151aad6"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/job-context-targets.mjs",
+      "sha256": "7275dce6acc128ae0745625a47e5ca1571de33f9b7b6391337da8d1f8ef83c04"
+    },
+    {
+      "path": "src/portable-serverless-target.mjs",
+      "sha256": "b6aceaf143fe233357995ae992acd72c7e9881e57679495a79947ed45a9d3071"
+    },
+    {
+      "path": "src/portable-database-target.mjs",
+      "sha256": "c1753587cfceb298b748a9b309c215badd4c02afb3b5d9c646cb3bded19fa2b7"
+    },
+    {
+      "path": "src/portable-dataflow-target.mjs",
+      "sha256": "c7b0fc54974bbf547c2b936a579cd8571ad36a6de6129775e43bdbf4737d8c36"
+    },
+    {
+      "path": "src/portable-dataflow-worker.mjs",
+      "sha256": "8ce8cc7c11c09ab16b5265518541a64ae7aaa69768d3e5a17f421ae1894aeaf3"
+    },
+    {
+      "path": "src/portable-http-target.mjs",
+      "sha256": "9bf98aa8302a71b400d9fec8776bec8e7335b814494a81fc77a0dd0d5907ac36"
+    },
+    {
+      "path": "src/portable-http-worker.mjs",
+      "sha256": "b8e2eaa3a1a348e40941a4ee3b74ace440d619c3bb1281d7662384e2eed64ad0"
+    },
+    {
+      "path": "src/portable-http-client.mjs",
+      "sha256": "0384d782ab466a1a1128fbe2c41dc47303598fd5de62fbf3f1d0f645fc013f57"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "scripts/k400-genomes/governance.mjs",
+      "sha256": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec"
+    }
+  ],
+  "backends": {
+    "serverless": {
+      "binding": {
+        "execution": "Fresh local HTTP handler and native RCL compiler/VM for each request",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "serverless",
+        "transport": "HTTP_LOOPBACK_127_0_0_1",
+        "hostedDeploymentClaimed": false,
+        "warmProcessReused": false,
+        "cloudFaasClaimed": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1195.7946999999695,
+          "compileTrace": {
+            "handlerPid": 84916,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 1
+          },
+          "executeMs": 1505.251099999994,
+          "runtimeTrace": {
+            "handlerPid": 64816,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 2
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1189.033199999947,
+          "compileTrace": {
+            "handlerPid": 85216,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 3
+          },
+          "executeMs": 1084.7935999999754,
+          "runtimeTrace": {
+            "handlerPid": 74824,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 4
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1093.467299999902,
+          "compileTrace": {
+            "handlerPid": 85952,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 5
+          },
+          "executeMs": 1241.6789000000572,
+          "runtimeTrace": {
+            "handlerPid": 82844,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 6
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1409.579299999983,
+          "compileTrace": {
+            "handlerPid": 78740,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 7
+          },
+          "executeMs": 1246.3239000000758,
+          "runtimeTrace": {
+            "handlerPid": 85076,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 8
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1138.6118999999017,
+          "compileTrace": {
+            "handlerPid": 75236,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 9
+          },
+          "executeMs": 1153.513099999982,
+          "runtimeTrace": {
+            "handlerPid": 79160,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 10
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1202.1930000000866,
+          "compileTrace": {
+            "handlerPid": 79440,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 11
+          },
+          "executeMs": 1425.8647000000346,
+          "runtimeTrace": {
+            "handlerPid": 84176,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 12
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1183.2264000000432,
+          "compileTrace": {
+            "handlerPid": 85856,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 13
+          },
+          "executeMs": 1281.6367999999784,
+          "runtimeTrace": {
+            "handlerPid": 85852,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 14
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1175.4360000001034,
+          "compileTrace": {
+            "handlerPid": 84000,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 15
+          },
+          "executeMs": 1277.2212999999756,
+          "runtimeTrace": {
+            "handlerPid": 65332,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 16
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1397.034800000023,
+          "compileTrace": {
+            "handlerPid": 81120,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 17
+          },
+          "executeMs": 1225.6988000000129,
+          "runtimeTrace": {
+            "handlerPid": 59536,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 18
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1177.2114999999758,
+          "compileTrace": {
+            "handlerPid": 82956,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 19
+          },
+          "executeMs": 1166.9726999999257,
+          "runtimeTrace": {
+            "handlerPid": 73284,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 20
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1506.5778000000864,
+          "compileTrace": {
+            "handlerPid": 70492,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 21
+          },
+          "executeMs": 1174.2066999999806,
+          "runtimeTrace": {
+            "handlerPid": 67204,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 22
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1101.6099000000395,
+          "compileTrace": {
+            "handlerPid": 46236,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 23
+          },
+          "executeMs": 1107.4928000000073,
+          "runtimeTrace": {
+            "handlerPid": 66336,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 24
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1053.5544999999693,
+          "compileTrace": {
+            "handlerPid": 39276,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 25
+          },
+          "executeMs": 1286.6633000000147,
+          "runtimeTrace": {
+            "handlerPid": 62532,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 26
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 996.2195000000065,
+          "compileTrace": {
+            "handlerPid": 75508,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 27
+          },
+          "executeMs": 1170.5180999999866,
+          "runtimeTrace": {
+            "handlerPid": 82736,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 28
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1260.4629999999888,
+          "compileTrace": {
+            "handlerPid": 12336,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 29
+          },
+          "executeMs": 1221.1273999999976,
+          "runtimeTrace": {
+            "handlerPid": 66052,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 30
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1167.3181000000332,
+          "compileTrace": {
+            "handlerPid": 75452,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 31
+          },
+          "executeMs": 1177.7186999999685,
+          "runtimeTrace": {
+            "handlerPid": 65732,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 32
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1245.5219999999972,
+          "compileTrace": {
+            "handlerPid": 82556,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 33
+          },
+          "executeMs": 1041.5108000000473,
+          "runtimeTrace": {
+            "handlerPid": 8,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 34
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1011.3260999999475,
+          "compileTrace": {
+            "handlerPid": 82068,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 35
+          },
+          "executeMs": 1243.5354999999981,
+          "runtimeTrace": {
+            "handlerPid": 28788,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 36
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1123.2623000000603,
+          "compileTrace": {
+            "handlerPid": 45936,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 37
+          },
+          "executeMs": 1068.7545999999857,
+          "runtimeTrace": {
+            "handlerPid": 82628,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 38
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1020.8087000000523,
+          "compileTrace": {
+            "handlerPid": 11328,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 39
+          },
+          "executeMs": 1010.0559000000358,
+          "runtimeTrace": {
+            "handlerPid": 66308,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 40
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 1107.8344999999972,
+          "compileTrace": {
+            "handlerPid": 27364,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 41
+          },
+          "executeMs": 1065.155700000003,
+          "runtimeTrace": {
+            "handlerPid": 80824,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 42
+          },
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 978.159500000067,
+          "compileTrace": {
+            "handlerPid": 83020,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 43
+          },
+          "executeMs": 1008.5990000000456,
+          "runtimeTrace": {
+            "handlerPid": 82388,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 44
+          },
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 1227.828300000052,
+          "compileTrace": {
+            "handlerPid": 76296,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 45
+          },
+          "executeMs": 996.764099999913,
+          "runtimeTrace": {
+            "handlerPid": 84828,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 46
+          },
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 1100.4203999999445,
+          "compileTrace": {
+            "handlerPid": 85684,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 47
+          },
+          "executeMs": 1185.5801999999676,
+          "runtimeTrace": {
+            "handlerPid": 69024,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 48
+          },
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 1089.71809999994,
+          "compileTrace": {
+            "handlerPid": 25788,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 49
+          },
+          "executeMs": 1130.95140000002,
+          "runtimeTrace": {
+            "handlerPid": 83300,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 50
+          },
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 1032.4784999999683,
+          "compileTrace": {
+            "handlerPid": 85740,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 51
+          },
+          "executeMs": 1216.7069999999367,
+          "runtimeTrace": {
+            "handlerPid": 66784,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 52
+          },
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 1011.2014000000199,
+          "compileTrace": {
+            "handlerPid": 85804,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 53
+          },
+          "executeMs": 1019.3519000000088,
+          "runtimeTrace": {
+            "handlerPid": 73592,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 54
+          },
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 991.4685000000754,
+          "compileTrace": {
+            "handlerPid": 81472,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 55
+          },
+          "executeMs": 1004.0507999999681,
+          "runtimeTrace": {
+            "handlerPid": 85848,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 56
+          },
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 1000.6219000000274,
+          "compileTrace": {
+            "handlerPid": 83936,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 57
+          },
+          "executeMs": 1126.6491999999853,
+          "runtimeTrace": {
+            "handlerPid": 84964,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 58
+          },
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 1008.921100000036,
+          "compileTrace": {
+            "handlerPid": 73996,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 59
+          },
+          "executeMs": 1016.8625999999931,
+          "runtimeTrace": {
+            "handlerPid": 71796,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 60
+          },
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the required compiler.inspect permission on source. The replacement preserves the requirements and other warrants."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1\",\"httpStatus\":400}"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1015.2517000000225,
+          "compileTrace": {
+            "handlerPid": 74484,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 61
+          },
+          "executeMs": 1007.8639999999432,
+          "runtimeTrace": {
+            "handlerPid": 45888,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 62
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "governance-reactive-1",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization enters phase one. Emission must trigger there; its transition to phase two prevents it from triggering again."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "executeMs": 1032.0062000000617,
+            "runtimeTrace": {
+              "handlerPid": 78776,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 64
+            },
+            "artifactHash": "3a944a6206f89b4573f1c1eeba53de91717a297564eea56820a93ba1375d4af1",
+            "sourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+            "sourceRoot": "17dd84da9ebafdb03aaacb9da3c4a1cbc8aa6a2a01f415b43a3d15decd352b83",
+            "compileMs": 1131.9734000000171,
+            "compileTrace": {
+              "handlerPid": 60344,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 63
+            },
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1027.855899999966,
+          "compileTrace": {
+            "handlerPid": 65512,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 65
+          },
+          "executeMs": 1001.7946999999695,
+          "runtimeTrace": {
+            "handlerPid": 81576,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 66
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "governance-reactive-2",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit count twice, contradicting its projected-state invariant. Incrementing once aligns both successful transactions with their existing invariants."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_REALITY_BOUND_BROKEN\\\",\\\"message\\\":\\\"A preserve clause rejected the projected reality\\\"}\\n\",\"httpStatus\":400}",
+            "artifactHash": "57935456d3b83a34273354e6be8d18ae59fd3891610a0fe87b90d420c33ab323",
+            "sourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+            "sourceRoot": "92592e8e01578c173cc7aeb3f9d9d408c87374e68711dfb83f4e42def6fb5bfb",
+            "compileMs": 1021.077099999995,
+            "compileTrace": {
+              "handlerPid": 66888,
+              "terminationObserved": true,
+              "processExited": true,
+              "request": 67
+            }
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 1086.387699999963,
+          "compileTrace": {
+            "handlerPid": 74960,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 68
+          },
+          "executeMs": 988.3763999999501,
+          "runtimeTrace": {
+            "handlerPid": 78584,
+            "terminationObserved": true,
+            "processExited": true,
+            "request": 69
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1409.579299999983,
+        "executeP95Ms": 1425.8647000000346
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "freshHandlers": true,
+        "terminationObserved": true,
+        "processExited": true,
+        "handlerPids": [
+          81200,
+          32656
+        ],
+        "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+        "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+        "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "database": {
+      "binding": {
+        "execution": "SQLite scalar-function native RCL execution with persisted result transactions",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false,
+        "context": "database",
+        "sqliteVersion": "3.51.3",
+        "engine": "SQLite",
+        "opaqueSqlSemanticDelegation": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 67.08500000007916,
+          "compileTrace": null,
+          "executeMs": 83.39029999997001,
+          "runtimeTrace": {
+            "runId": "2addb0d0-ad1e-41b2-b910-f00cedd3c184",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.95750000001863,
+          "compileTrace": null,
+          "executeMs": 98.68960000004154,
+          "runtimeTrace": {
+            "runId": "3690c64c-5752-4915-8b7e-39c94c3065c8",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 63.52029999997467,
+          "compileTrace": null,
+          "executeMs": 84.56380000000354,
+          "runtimeTrace": {
+            "runId": "01fd3b02-dfe7-493d-a4b8-09307e0e99ef",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 67.86589999997523,
+          "compileTrace": null,
+          "executeMs": 87.0344000000041,
+          "runtimeTrace": {
+            "runId": "7cb32f1e-86dd-4fda-860c-3d5f4f89866e",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 69.43299999996088,
+          "compileTrace": null,
+          "executeMs": 84.02969999995548,
+          "runtimeTrace": {
+            "runId": "c4627b65-f72d-4d27-b641-ce911abae86b",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.44560000009369,
+          "compileTrace": null,
+          "executeMs": 90.9594999999972,
+          "runtimeTrace": {
+            "runId": "f44a0326-b0f8-4274-9039-a343268a39b4",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.24240000010468,
+          "compileTrace": null,
+          "executeMs": 82.95299999997951,
+          "runtimeTrace": {
+            "runId": "40df90d2-8138-4bdc-80ce-eb7d39888dca",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 68.03310000000056,
+          "compileTrace": null,
+          "executeMs": 75.94550000003073,
+          "runtimeTrace": {
+            "runId": "03abb145-55db-44ce-94c4-5655f9284c58",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 70.60250000003725,
+          "compileTrace": null,
+          "executeMs": 109.9106000000611,
+          "runtimeTrace": {
+            "runId": "442f6423-2a13-4bc1-8ddb-bd11e42c92b1",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 70.7546999999322,
+          "compileTrace": null,
+          "executeMs": 82.82940000004601,
+          "runtimeTrace": {
+            "runId": "44d0370d-2ff6-4ed7-9961-c2dd9f2aac79",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 66.9429999999702,
+          "compileTrace": null,
+          "executeMs": 94.89139999996405,
+          "runtimeTrace": {
+            "runId": "94917303-6435-4bb1-b74c-d32e4ceff41d",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.11050000006799,
+          "compileTrace": null,
+          "executeMs": 78.81949999998324,
+          "runtimeTrace": {
+            "runId": "cfcb0ed6-a0ae-4a17-97d6-790d6ee9d08b",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 67.16679999988992,
+          "compileTrace": null,
+          "executeMs": 98.99800000002142,
+          "runtimeTrace": {
+            "runId": "3565141d-02dc-4f49-bcb5-50e3ad9c35ff",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.65969999996014,
+          "compileTrace": null,
+          "executeMs": 101.52160000009462,
+          "runtimeTrace": {
+            "runId": "a968d667-35a3-4509-bb8a-8308aa47da23",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 70.001600000076,
+          "compileTrace": null,
+          "executeMs": 86.48950000002515,
+          "runtimeTrace": {
+            "runId": "f27b0a15-79c3-4697-ba33-c0240ff69919",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.83539999998175,
+          "compileTrace": null,
+          "executeMs": 88.19990000000689,
+          "runtimeTrace": {
+            "runId": "0968f25a-3c1c-4e09-8885-b644df445694",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 66.89159999997355,
+          "compileTrace": null,
+          "executeMs": 83.7554999999702,
+          "runtimeTrace": {
+            "runId": "439aadfe-a978-416e-b8d1-be663f30427d",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 68.86479999998119,
+          "compileTrace": null,
+          "executeMs": 85.35569999995641,
+          "runtimeTrace": {
+            "runId": "eee1002b-a566-4bab-95b9-c39cfd74f8fe",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 67.9771999999648,
+          "compileTrace": null,
+          "executeMs": 149.59109999996144,
+          "runtimeTrace": {
+            "runId": "121b2137-4bb0-4efc-9c03-e1aa9d6b9cc8",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 138.50620000006165,
+          "compileTrace": null,
+          "executeMs": 126.99440000008326,
+          "runtimeTrace": {
+            "runId": "63482eb8-b403-4adf-ac7e-61d8e53cf284",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 72.64059999992605,
+          "compileTrace": null,
+          "executeMs": 85.08870000008028,
+          "runtimeTrace": {
+            "runId": "80f9d18b-f002-4ed3-9302-05779e1fe9f8",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 88.23780000000261,
+          "compileTrace": null,
+          "executeMs": 124.09210000000894,
+          "runtimeTrace": {
+            "runId": "7816e934-8493-431d-8a87-293d125a459b",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 75.75130000000354,
+          "compileTrace": null,
+          "executeMs": 102.69779999996535,
+          "runtimeTrace": {
+            "runId": "bf4d10f6-373f-4284-bc83-4f2dbcebf613",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 90.26659999997355,
+          "compileTrace": null,
+          "executeMs": 95.74320000002626,
+          "runtimeTrace": {
+            "runId": "1f3223df-2370-4b98-a783-31921786ae6b",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 77.79429999995045,
+          "compileTrace": null,
+          "executeMs": 106.82229999999981,
+          "runtimeTrace": {
+            "runId": "0b83b744-e2e1-4528-8ea0-580cea632387",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 77.9594999999972,
+          "compileTrace": null,
+          "executeMs": 99.13999999989755,
+          "runtimeTrace": {
+            "runId": "b0ddb0db-c8cf-4eb1-8971-0b469482516d",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 76.37789999996312,
+          "compileTrace": null,
+          "executeMs": 124.39949999994133,
+          "runtimeTrace": {
+            "runId": "9c33bbd0-0024-44bd-b340-4623d372372c",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 88.57239999994636,
+          "compileTrace": null,
+          "executeMs": 127.04550000000745,
+          "runtimeTrace": {
+            "runId": "9563487c-ca23-4947-9318-a1d7eff9841a",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 92.17840000009164,
+          "compileTrace": null,
+          "executeMs": 105.48600000003353,
+          "runtimeTrace": {
+            "runId": "c83988d7-436d-445b-bb3e-59edfc277e42",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 76.86170000000857,
+          "compileTrace": null,
+          "executeMs": 113.28209999995306,
+          "runtimeTrace": {
+            "runId": "4204b63c-eb6e-45d9-bf34-b594557c4ca1",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the required compiler.inspect permission on source. The replacement preserves the requirements and other warrants."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.11119999992661,
+          "compileTrace": null,
+          "executeMs": 104.00289999996312,
+          "runtimeTrace": {
+            "runId": "661d49e4-c813-4484-9121-90b07b025da0",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "governance-reactive-1",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization enters phase one. Emission must trigger there; its transition to phase two prevents it from triggering again."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "executeMs": 90.34369999996852,
+            "runtimeTrace": {
+              "runId": "730ead06-7371-4724-bd6d-f2f8837c4660",
+              "committed": true,
+              "sqlFunction": "rcl_execute",
+              "sqlInvocations": 1,
+              "sqliteVersion": "3.51.3"
+            },
+            "artifactHash": "3a944a6206f89b4573f1c1eeba53de91717a297564eea56820a93ba1375d4af1",
+            "sourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+            "sourceRoot": "17dd84da9ebafdb03aaacb9da3c4a1cbc8aa6a2a01f415b43a3d15decd352b83",
+            "compileMs": 63.87340000004042,
+            "compileTrace": null,
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.42799999995623,
+          "compileTrace": null,
+          "executeMs": 126.80749999999534,
+          "runtimeTrace": {
+            "runId": "22eb76f3-5d0a-44b3-807e-3829111002c3",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "governance-reactive-2",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit count twice, contradicting its projected-state invariant. Incrementing once aligns both successful transactions with their existing invariants."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\n",
+            "artifactHash": "57935456d3b83a34273354e6be8d18ae59fd3891610a0fe87b90d420c33ab323",
+            "sourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+            "sourceRoot": "92592e8e01578c173cc7aeb3f9d9d408c87374e68711dfb83f4e42def6fb5bfb",
+            "compileMs": 92.39319999993313,
+            "compileTrace": null
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 87.54920000000857,
+          "compileTrace": null,
+          "executeMs": 105.93700000003446,
+          "runtimeTrace": {
+            "runId": "d3c61b5a-0140-4e6c-85d7-34c5dd94c6b8",
+            "committed": true,
+            "sqlFunction": "rcl_execute",
+            "sqlInvocations": 1,
+            "sqliteVersion": "3.51.3"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 75.11050000006799,
+        "executeP95Ms": 126.99440000008326
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "reopened": true,
+        "persistedRunId": "849fe8bb-25d5-4491-87b1-4c63b6764923",
+        "replayRunId": "16045276-1233-474b-947d-686dff49935c",
+        "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+        "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+        "rollback": {
+          "status": "PASS",
+          "wrongRootRejected": true,
+          "before": 36,
+          "after": 36,
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b"
+        },
+        "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "dataflow-runtime": {
+      "binding": {
+        "execution": "Bounded source-binding/native-execution/receipt-sink worker-thread pipeline",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "dataflow-runtime",
+        "threadId": 5,
+        "maxInFlight": 1,
+        "externalStreamClaimed": false,
+        "hostRuntime": {
+          "nodeVersion": "v24.15.0",
+          "binaryPath": "C:\\Program Files\\nodejs\\node.exe",
+          "sha256": "3331e1ffe19874215472217c5e94f5a0c6d8e18c4ac7111d3937aa0ad5e9b4a5"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 87.54560000007041,
+          "compileTrace": null,
+          "executeMs": 99.15659999998752,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 2,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 84.19070000003558,
+          "compileTrace": null,
+          "executeMs": 88.0580000000773,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 4,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 67.9932999999728,
+          "compileTrace": null,
+          "executeMs": 76.07210000010673,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 6,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.41610000003129,
+          "compileTrace": null,
+          "executeMs": 89.2900999999838,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 8,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.21820000000298,
+          "compileTrace": null,
+          "executeMs": 88.71129999996629,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 10,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.9651999999769,
+          "compileTrace": null,
+          "executeMs": 93.89859999995679,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 12,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 69.00930000003427,
+          "compileTrace": null,
+          "executeMs": 100.94049999990966,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 14,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.18819999997504,
+          "compileTrace": null,
+          "executeMs": 93.05920000001788,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 16,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 68.58380000002217,
+          "compileTrace": null,
+          "executeMs": 95.64379999996163,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 18,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 72.24739999999292,
+          "compileTrace": null,
+          "executeMs": 98.67619999998715,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 20,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 68.52370000001974,
+          "compileTrace": null,
+          "executeMs": 96.83270000002813,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 22,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 81.25030000007246,
+          "compileTrace": null,
+          "executeMs": 174.59789999993518,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 24,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 96.12829999998212,
+          "compileTrace": null,
+          "executeMs": 103.77590000000782,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 26,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 98.03940000000875,
+          "compileTrace": null,
+          "executeMs": 78.95130000007339,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 28,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.43499999993946,
+          "compileTrace": null,
+          "executeMs": 110.54740000003949,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 30,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.33940000005532,
+          "compileTrace": null,
+          "executeMs": 77.3175999999512,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 32,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.89490000007208,
+          "compileTrace": null,
+          "executeMs": 91.70730000000913,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 34,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.2445000000298,
+          "compileTrace": null,
+          "executeMs": 92.99379999993835,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 36,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.96939999994356,
+          "compileTrace": null,
+          "executeMs": 99.01780000003055,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 38,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.70250000001397,
+          "compileTrace": null,
+          "executeMs": 92.3527999999933,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 40,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 69.19819999998435,
+          "compileTrace": null,
+          "executeMs": 87.98810000007506,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 42,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1"
+          },
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 79.99459999997634,
+          "compileTrace": null,
+          "executeMs": 91.07499999995343,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 44,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064"
+          },
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 85.83089999994263,
+          "compileTrace": null,
+          "executeMs": 105.15659999998752,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 46,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c"
+          },
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 74.27469999995083,
+          "compileTrace": null,
+          "executeMs": 89.51329999999143,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 48,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03"
+          },
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 79.59519999998156,
+          "compileTrace": null,
+          "executeMs": 131.22529999993276,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 50,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1"
+          },
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 87.6197000000393,
+          "compileTrace": null,
+          "executeMs": 79.61170000000857,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 52,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620"
+          },
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 77.46160000003874,
+          "compileTrace": null,
+          "executeMs": 87.05079999996815,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 54,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd"
+          },
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 73.01670000003651,
+          "compileTrace": null,
+          "executeMs": 89.23339999991003,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 56,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc"
+          },
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 64.23519999999553,
+          "compileTrace": null,
+          "executeMs": 95.03360000008252,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 58,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8"
+          },
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 70.56620000000112,
+          "compileTrace": null,
+          "executeMs": 97.58279999997467,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 60,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6"
+          },
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_job_context_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the required compiler.inspect permission on source. The replacement preserves the requirements and other warrants."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.49439999996684,
+          "compileTrace": null,
+          "executeMs": 94.39050000009593,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 63,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_job_context_b",
+          "proposal": {
+            "id": "governance-reactive-1",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization enters phase one. Emission must trigger there; its transition to phase two prevents it from triggering again."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "executeMs": 82.77710000006482,
+            "runtimeTrace": {
+              "threadId": 5,
+              "delivery": 65,
+              "stages": [
+                "source-binding",
+                "native-execution",
+                "receipt-sink"
+              ],
+              "inputHash": "3a944a6206f89b4573f1c1eeba53de91717a297564eea56820a93ba1375d4af1"
+            },
+            "artifactHash": "3a944a6206f89b4573f1c1eeba53de91717a297564eea56820a93ba1375d4af1",
+            "sourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+            "sourceRoot": "17dd84da9ebafdb03aaacb9da3c4a1cbc8aa6a2a01f415b43a3d15decd352b83",
+            "compileMs": 96.2497999999905,
+            "compileTrace": null,
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.05900000000838,
+          "compileTrace": null,
+          "executeMs": 81.3412000000244,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 67,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_job_context_c",
+          "proposal": {
+            "id": "governance-reactive-2",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit count twice, contradicting its projected-state invariant. Incrementing once aligns both successful transactions with their existing invariants."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\n",
+            "artifactHash": "57935456d3b83a34273354e6be8d18ae59fd3891610a0fe87b90d420c33ab323",
+            "sourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+            "sourceRoot": "92592e8e01578c173cc7aeb3f9d9d408c87374e68711dfb83f4e42def6fb5bfb",
+            "compileMs": 76.78700000001118,
+            "compileTrace": null
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.3986000000732,
+          "compileTrace": null,
+          "executeMs": 78.81010000000242,
+          "runtimeTrace": {
+            "threadId": 5,
+            "delivery": 71,
+            "stages": [
+              "source-binding",
+              "native-execution",
+              "receipt-sink"
+            ],
+            "inputHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+          },
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 96.12829999998212,
+        "executeP95Ms": 110.54740000003949
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "backpressureRejected": true,
+        "threadId": 5,
+        "delivery": 73,
+        "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+        "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+        "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 2,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "afterRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "afterRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 2,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+      "history": [],
+      "projections": []
+    },
+    "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 3,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 1,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "456c8e3b00c517fde7fe16b2944337314c0034dd8ffb7f37b4a0d2211bd0b516",
+          "afterRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "afterRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 2,
+              "after": 3,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "456c8e3b00c517fde7fe16b2944337314c0034dd8ffb7f37b4a0d2211bd0b516",
+          "afterRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 2,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 1,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "afterRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 2,
+              "after": 3,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 3,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 1,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 12,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 10,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "465ffef6d8996d9e3bba851b474a71ae13888d0c77413e6f46d3605318759504",
+          "afterRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 10,
+              "after": 11,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "afterRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 11,
+              "after": 12,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "465ffef6d8996d9e3bba851b474a71ae13888d0c77413e6f46d3605318759504",
+          "afterRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 10,
+              "after": 11,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 11,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 10,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "afterRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 11,
+              "after": 12,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 12,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 10,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 10,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.audit": 10,
+        "input.phase": 0,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+      "history": [],
+      "projections": []
+    },
+    "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 1,
+        "input.audit": 0,
+        "input.phase": 1,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+      "history": [],
+      "projections": []
+    },
+    "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 2,
+        "input.audit": 0,
+        "input.phase": 2,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+      "history": [],
+      "projections": []
+    },
+    "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 20,
+        "compiler.emitted": false,
+        "compiler.phase": 2,
+        "input.audit": 20,
+        "input.phase": 2,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+      "history": [],
+      "projections": []
+    },
+    "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 102,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 100,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "efe226a1ed2f5a0a851d2de8fb98c173d74165eb434722ad99b97573ef725ba1",
+          "afterRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 100,
+              "after": 101,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "afterRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 101,
+              "after": 102,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "efe226a1ed2f5a0a851d2de8fb98c173d74165eb434722ad99b97573ef725ba1",
+          "afterRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 100,
+              "after": 101,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 101,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 100,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "afterRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 101,
+              "after": 102,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 102,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 100,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 7,
+        "compiler.emitted": false,
+        "compiler.phase": 3,
+        "input.audit": 7,
+        "input.phase": 3,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+      "history": [],
+      "projections": []
+    },
+    "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 1002,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 1000,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "ee9a21515074e323850afc810e72c3087cdd9fe608370609cf6736f406aa2df6",
+          "afterRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1000,
+              "after": 1001,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "afterRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1001,
+              "after": 1002,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "ee9a21515074e323850afc810e72c3087cdd9fe608370609cf6736f406aa2df6",
+          "afterRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1000,
+              "after": 1001,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1001,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 1000,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "afterRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1001,
+              "after": 1002,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1002,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 1000,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 1,
+        "compiler.emitted": false,
+        "compiler.phase": 1,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    }
+  },
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; native execution in fresh local handlers, SQLite SQL-function transactions and a bounded worker-thread dataflow pipeline; no cloud FaaS, arbitrary SQL, external stream or OS sandbox claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "87eb99561e0be49de55bf6889f2571e649bf1714536a77f2bb9ce6951c185b5c"
+}

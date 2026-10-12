@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 106/400 PASS (26.5%) · 294 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 142/400 PASS (35.5%) · 258 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -32,12 +32,15 @@ That checkpoint recorded 71 PASS / 329 UNTESTED. The subsequent nine-profile
 execution-context campaign completed all nine gates on authenticated HTTP,
 persistent C ABI instances and two independent worker processes. Same-instance
 reset and actual peer termination/replacement replay are checked. It adds 35
-unique cells, bringing the current aggregate to 106 PASS / 294 UNTESTED.
+unique cells, reaching the 106-cell checkpoint. The subsequent native job
+campaign adds 36 distinct coordinates across cold local handlers, SQLite
+transactions/recovery and worker-thread dataflow: 142 PASS / 258 UNTESTED.
+See `docs/K400_JOB_CONTEXTS_2026-10-13.md`.
 Equivalent independent repairs additionally pass all ten pre-sealed inputs;
 older campaigns retain their original exact-restoration requirements.
-Cold handlers, SQLite transactions/recovery and worker-thread dataflow now have
-targeted controls and frozen independent candidates, but no K400 credit before
-their separate full campaign. See `docs/K400_EXECUTION_CONTEXTS_2026-10-13.md`.
+Native RCL clock and admission/completion controller hosts now have actual
+controls, frozen contracts and independent candidates, but no new K400 credit
+until their full campaign. See `docs/K400_JOB_CONTEXTS_2026-10-13.md`.
 See `docs/K400_GENOME_CAMPAIGN_2026-10-13.md`.
 
 The same C VM now executes on Windows, wasm32-WASI, Linux WSL2 and the connected
