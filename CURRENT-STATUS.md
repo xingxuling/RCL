@@ -11,7 +11,28 @@
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
-## 2026-10-12 session integrity maintenance
+## 2026-10-12 native compiler warrant admission
+
+The shared RCL compiler core now validates every conditional-warrant expression
+before lowering, including unused declarations. It checks references, known
+condition types, operator operands, builtin/user-call arguments and return types
+of reachable predicate reckons. A visited-call set supports recursive/mutually
+recursive predicates. Dynamic Sequence element types remain Unknown under the
+existing native-core contract. Compiler failures now include the specific source
+diagnostic in the native failure message; synthetic 1:1 semantic spans remain a
+separate diagnostics gap.
+
+Fresh Windows evidence: 89/89 focused checks across ten files, including 41 new
+compiler-admission cases and all 37 session checks; 120 eligible examples have
+exact byte parity with 40 explicit unsupported cases. Native self-compilation
+reaches C0 == C1 == C2 at 297797 bytes, SHA-256
+b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce.
+See `docs/maintenance/warrant-compiler-admission-2026-10-12.json`. Native C binaries,
+package/native version 2.0.0, root/bytecode protocols and historical evidence were
+reused unchanged. Full repository regression, new platform/installation acceptance
+and GitHub Actions were not run for this scoped compiler maintenance.
+
+## 2026-10-12 session integrity maintenance (previous source snapshot)
 
 Package/native versions remain 2.0.0. Every native session reply now binds the
 source/program and requested transition before the adapter accepts state. Invalid
@@ -43,7 +64,7 @@ processes. See `docs/v2.0/acceptance.md` and `docs/v2.0/session-contract.md`.
 
 All 332 test files were covered in the full regression plus source-bound focused
 repairs/rechecks: 1702 PASS, zero remaining FAIL and two documented SKIP boundaries.
-Stage0–40 pass; native C0 == C1 == C2 remains exact at 277414 bytes, SHA-256
+At the original release snapshot, Stage0–40 pass and native C0 == C1 == C2 is exact at 277414 bytes, SHA-256
 11921b62040145eb72580978ea8e5994b4981b690c59eb679d2e228239defbf4.
 Eligible example byte parity passes 120 cases, with 40 explicit unsupported cases.
 The counter upgrade comparison records 50 repeated v1.0 RUN calls finishing at 1,

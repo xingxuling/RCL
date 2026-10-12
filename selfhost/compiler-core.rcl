@@ -1988,7 +1988,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon program_root(program : Sequence) -> Text = sha256_text(canonical_program(program))
 
   reckon semantic_check(condition : Truth, code : Text, detail : Text) -> Truth =
-    semantic_assert(condition, code, detail, make_span(0, 1, 1, 0))
+    semantic_assert(condition, code, code + ":" + detail, make_span(0, 1, 1, 0))
 
   reckon find_facet_index(items : Sequence, index : Number, path : Text) -> Number =
     choose(index >= length(items), -1,
@@ -2028,6 +2028,152 @@ reality RCLGeneralSelfHostCompiler {
                     validate_expression_array(expr_args(node), 0, locals, facets, reckons), false),
                   validate_user_call(node, locals, facets, reckons,
                     find_reckon_index(reckons, 0, expr_text(node))))))))))
+
+  reckon predicate_accepts(expected : Text, actual : Text) -> Truth =
+    actual == "Unknown" or expected == "Any" or expected == actual
+      or (expected == "TextOrSequence" and (actual == "Text" or actual == "Sequence"))
+
+  reckon predicate_checked_type(actual : Text, expected : Text, code : Text, detail : Text) -> Text =
+    choose(semantic_check(predicate_accepts(expected, actual), code, detail + ":" + expected + ":" + actual), actual, actual)
+
+  reckon predicate_local_index(items : Sequence, index : Number, name : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(sequence_get(items, index), 0) == name, index, predicate_local_index(items, index + 1, name)))
+
+  reckon predicate_path_type(name : Text, locals : Sequence, facets : Sequence, local_index : Number) -> Text =
+    choose(local_index >= 0, sequence_get(sequence_get(locals, local_index), 1),
+      facet_type(sequence_get(facets, find_facet_index(facets, 0, name))))
+
+  reckon predicate_builtin_signature(id : Number) -> Text =
+    choose(id >= 1 and id <= 3, "Text,Text:Truth",
+      choose(id == 4, "TextOrSequence:Number",
+      choose(id == 5 or id == 6 or id == 8 or id == 70, "Text:Text",
+      choose(id == 7, "Any:Text",
+      choose(id == 9 or id == 10, "Text,Text:Text",
+      choose(id == 11, "Text:Number",
+      choose(id == 12, ":Sequence",
+      choose(id == 13, "Sequence,Any:Sequence",
+      choose(id == 14, "Sequence,Number:Unknown",
+      choose(id == 15, "Text,Number:Text",
+      choose(id == 16, "Text,Number,Number:Text",
+      choose(id >= 17 and id <= 20, "Text:Truth",
+      choose(id == 21, "Number,Number,Number,Number:Span",
+      choose(id == 22, "Text,Text,Span:Token",
+      choose(id == 23 or id == 24, "Token:Text",
+      choose(id == 25, "Token:Span",
+      choose(id >= 26 and id <= 29, "Span:Number",
+      choose(id == 30, "Text,Text,Text,Text,Span:AstNode",
+      choose(id >= 31 and id <= 35, "AstNode:Text",
+      choose(id == 36, "AstNode:Span",
+      choose(id == 37, "Number,Sequence:ParseState",
+      choose(id == 38, "ParseState:Number",
+      choose(id == 39, "ParseState:Sequence",
+      choose(id == 40, "Token,Text,Text:Truth",
+      choose(id == 41, "Text,Text,Number,Span:Symbol",
+      choose(id == 42 or id == 43, "Symbol:Text",
+      choose(id == 44, "Symbol:Number",
+      choose(id == 45, "Symbol:Span",
+      choose(id == 46, "Truth,Text,Text,Span:Truth",
+      choose(id == 47, "Text,Text,Text,Text,Number,Span:SemanticNode",
+      choose(id >= 48 and id <= 51, "SemanticNode:Text",
+      choose(id == 52, "SemanticNode:Number",
+      choose(id == 53, "SemanticNode:Span",
+      choose(id == 54, "Text,Text,Text,Text,Text,Number,Span:IrNode",
+      choose(id >= 55 and id <= 59, "IrNode:Text",
+      choose(id == 60, "IrNode:Number",
+      choose(id == 61, "IrNode:Span",
+      choose(id == 62, "Sequence,Sequence:Sequence",
+      choose(id >= 63 and id <= 67, "Number:Sequence",
+      choose(id == 68 or id == 69, "Text:Sequence",
+      "Unknown:Unknown"))))))))))))))))))))))))))))))))))))))))
+
+  reckon predicate_argument_types(items : Sequence, index : Number, locals : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      predicate_argument_types(items, index + 1, locals, facets, reckons, visited,
+        sequence_append(output, predicate_expression_type(sequence_get(items, index), locals, facets, reckons, visited))))
+
+  reckon predicate_builtin_arguments(types : Sequence, index : Number, signature : Text, name : Text) -> Truth =
+    choose(index >= length(types), semantic_check(signature == "", "RCL_CALL_ARITY", name),
+      choose(semantic_check(signature != "", "RCL_CALL_ARITY", name),
+        choose(semantic_check(predicate_accepts(split_before(signature, ","), sequence_get(types, index)), "RCL_CALL_TYPE", name + ":" + text(index)),
+          predicate_builtin_arguments(types, index + 1, choose(contains(signature, ","), split_after(signature, ","), ""), name), false), false))
+
+  reckon predicate_builtin_type(types : Sequence, signature : Text, name : Text) -> Text =
+    choose(predicate_builtin_arguments(types, 0, split_before(signature, ":"), name), split_after(signature, ":"), "Unknown")
+
+  reckon predicate_choose_type(condition : Text, yes : Text, no : Text) -> Text =
+    choose(semantic_check(predicate_accepts("Truth", condition), "RCL_TYPE_CHOOSE", "condition"),
+      choose(semantic_check(yes == no or yes == "Unknown" or no == "Unknown", "RCL_TYPE_CHOOSE", "branches"),
+        choose(yes == "Unknown", no, yes), "Unknown"), "Unknown")
+
+  reckon predicate_special_call_type(name : Text, types : Sequence) -> Text =
+    choose(name == "choose",
+      choose(semantic_check(length(types) == 3, "RCL_CALL_ARITY", name),
+        predicate_choose_type(sequence_get(types, 0), sequence_get(types, 1), sequence_get(types, 2)), "Unknown"),
+      predicate_builtin_type(types,
+        choose(name == "provider_call", "Text,Text,Text:Text",
+          choose(name == "typed_ref", "Any:TypedRef", choose(name == "typed_deref", "TypedRef:Unknown", "TypedRef:Number"))), name))
+
+  reckon predicate_user_arguments(types : Sequence, params : Sequence, index : Number, name : Text) -> Truth =
+    choose(index >= length(types), semantic_check(index == length(params), "RCL_SEMANTIC_CALL_ARITY", name),
+      choose(semantic_check(index < length(params), "RCL_SEMANTIC_CALL_ARITY", name),
+        choose(semantic_check(predicate_accepts(sequence_get(sequence_get(params, index), 1), sequence_get(types, index)),
+            "RCL_CALL_TYPE", name + ":" + text(index)),
+          predicate_user_arguments(types, params, index + 1, name), false), false))
+
+  reckon predicate_function_result(actual : Text, node : Sequence) -> Text =
+    choose(semantic_check(predicate_accepts(reckon_return_type(node), actual), "RCL_RECKON_RETURN_TYPE", reckon_name(node)),
+      reckon_return_type(node), "Unknown")
+
+  reckon predicate_function_type(node : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
+    choose(find_text(visited, 0, reckon_name(node)) >= 0, reckon_return_type(node),
+      predicate_function_result(predicate_expression_type(reckon_expression(node), reckon_params(node), facets, reckons, sequence_append(visited, reckon_name(node))), node))
+
+  reckon predicate_user_type(types : Sequence, node : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
+    choose(predicate_user_arguments(types, reckon_params(node), 0, reckon_name(node)),
+      predicate_function_type(node, facets, reckons, visited), "Unknown")
+
+  reckon predicate_call_type(name : Text, types : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
+    choose(builtin_id(name) > 0, predicate_builtin_type(types, predicate_builtin_signature(builtin_id(name)), name),
+      choose(name == "choose" or name == "provider_call" or name == "typed_ref" or name == "typed_deref" or name == "typed_ref_id",
+        predicate_special_call_type(name, types),
+        predicate_user_type(types, sequence_get(reckons, find_reckon_index(reckons, 0, name)), facets, reckons, visited)))
+
+  reckon predicate_unary_type(operator : Text, actual : Text) -> Text =
+    choose(operator == not_operator(),
+      choose(semantic_check(predicate_accepts("Truth", actual), "RCL_TYPE_UNARY", operator), "Truth", "Unknown"),
+      predicate_checked_type(actual, "Number", "RCL_TYPE_UNARY", operator))
+
+  reckon predicate_binary_type(operator : Text, left : Text, right : Text) -> Text =
+    choose(operator == "and" or operator == "or",
+      choose(semantic_check(predicate_accepts("Truth", left) and predicate_accepts("Truth", right), "RCL_TYPE_LOGIC", operator), "Truth", "Unknown"),
+      choose(left == "Unknown" or right == "Unknown",
+        choose(operator == "==" or operator == "!=" or operator == "<" or operator == "<=" or operator == ">" or operator == ">=", "Truth", "Unknown"),
+        choose(operator == "==" or operator == "!=",
+          choose(semantic_check(left == right, "RCL_TYPE_BINARY", operator), "Truth", "Unknown"),
+          choose(operator == "<" or operator == "<=" or operator == ">" or operator == ">=",
+            choose(semantic_check(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator), "Truth", "Unknown"),
+            choose(operator == "+" and left == "Text" and right == "Text", "Text",
+              choose(semantic_check(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator), "Number", "Unknown"))))))
+
+  reckon predicate_expression_type(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
+    choose(expr_kind(node) == "LiteralExpr", expr_text(node),
+      choose(expr_kind(node) == "PathExpr", predicate_path_type(expr_text(node), locals, facets, predicate_local_index(locals, 0, expr_text(node))),
+        choose(expr_kind(node) == "UnaryExpr", predicate_unary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited)),
+          choose(expr_kind(node) == "BinaryExpr",
+            predicate_binary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited), predicate_expression_type(expr_right(node), locals, facets, reckons, visited)),
+            predicate_call_type(expr_text(node), predicate_argument_types(expr_args(node), 0, locals, facets, reckons, visited, empty_sequence()), facets, reckons, visited)))))
+
+  reckon validate_warrant_condition(node : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(validate_expression(warrant_condition(node), empty_sequence(), facets, reckons),
+      semantic_check(predicate_accepts("Truth", predicate_expression_type(warrant_condition(node), empty_sequence(), facets, reckons, empty_sequence())),
+        "RCL_WARRANT_CONDITION_TYPE", warrant_subject(node) + ":" + warrant_capability(node)), false)
+
+  reckon validate_warrants(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(warrant_conditional(sequence_get(items, index)),
+        choose(validate_warrant_condition(sequence_get(items, index), facets, reckons), validate_warrants(items, index + 1, facets, reckons), false),
+        validate_warrants(items, index + 1, facets, reckons)))
 
   reckon validate_facets(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -2126,8 +2272,9 @@ reality RCLGeneralSelfHostCompiler {
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
       choose(validate_reckons(program_reckons(program), 0, program_facets(program), program_reckons(program)),
-        choose(validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)),
-          validate_uis(uis(program), 0, program_rules(program)), false), false), false)
+        choose(validate_warrants(program_warrants(program), 0, program_facets(program), program_reckons(program)),
+          choose(validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)),
+            validate_uis(uis(program), 0, program_rules(program)), false), false), false), false)
 
   reckon validated_program(program : Sequence) -> Sequence =
     choose(validate_program(program), program, program)

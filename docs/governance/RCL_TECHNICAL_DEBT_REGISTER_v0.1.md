@@ -42,6 +42,8 @@ source-bound local checks; hosted CI is NOT_RUN_USER_INSTRUCTION.
 | TD-015 | RESOLVED | CLI admission | Trusted history pins were unavailable and unknown flags could be ignored. | Anchored invoke/inspect/verify/recover and strict flag admission before mutation. |
 | TD-016 | RESOLVED | Session receipts | Repeated alterations had inconsistent reference/native receipt lists. | Canonical per-field session changes and native/reference durable restart parity. |
 | TD-017 | ACTIVE | Journal lifecycle | Full-prefix replay is bounded to 64 MiB / 10,000 commands with no compaction/migration. | Versioned checkpoint admission preserving source/state binding, writer ownership and trusted history anchors. |
+| TD-018 | RESOLVED | Compiler admission | Conditional warrants omitted reference/type validation in the RCL-authored compiler. | Shared RCL predicate admission, direct native compiler rejection controls, valid-program byte/runtime parity and a rebuilt native fixed point; `docs/maintenance/warrant-compiler-admission-2026-10-12.json`. |
+| TD-019 | ACTIVE | Compiler diagnostics | Semantic errors use synthetic 1:1 spans despite carrying specific diagnostic/context text. | Preserve actual token locations in the internal AST without changing admitted program roots, then verify source-position diagnostics. |
 
 ## Operating rule for the historical register
 

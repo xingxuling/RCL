@@ -48,6 +48,8 @@ RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / �
 
 **2026-10-12 维护，版本仍为 2.0.0：** 异常原生证据会关闭会话及其持久写入者；排队请求固定为调用时的内容；命令行支持可信历史校验并拒绝无效参数；同字段重复修改的原生与参考会话回执保持一致。[维护记录](docs/maintenance/session-integrity-2026-10-12.md)绑定本轮源码与 **61 项通过的相关检查**，其中 37 项为会话检查。未运行 GitHub Actions。
 
+**编译器检查继续完善：** RCL 编写的编译器现已在生成字节码前检查条件授权中的未知引用、运算类型、调用参数及相关函数返回类型。[编译器维护记录](docs/maintenance/warrant-compiler-admission-2026-10-12.md)绑定 **89 项通过的相关检查**、120 个可支持示例的字节码一致性及重新验证的原生 `C0 == C1 == C2` 固定点。版本仍为 2.0.0；此前维护记录继续绑定各自的源码快照。
+
 ### 从 1.0 保留的稳定核心
 
 原生 VM 与 `rcl run` 默认使用 `rcl.semantic-state-root.v2`，以精确有限 binary64 编码绑定最终状态与转移前后根。历史原生 v1 凭据仍可显式选择算法验证。`runReality` Reference API 保留其独立的 `rcl.reference-state-root.v0.6` 默认；使用 `stateRootAlgorithm` 可选择跨运行时 v2。参见[稳定契约](docs/v1.0/language-contract.md)、[状态根协议](docs/v1.0/semantic-state-root-v2.md)与[发布验收](docs/v1.0/acceptance.md)。
@@ -165,7 +167,7 @@ Web 状态、Native UI、Android、Bytecode、自举编译器验证都放在：
 
 ## 当前已经验证到什么程度？
 
-冻结的[原始 2.0 验证记录](docs/v2.0/verification.json)绑定当时源码与工件：**332 个测试文件已覆盖，1702 项通过、0 项剩余失败、2 项明确跳过**，其中包括 19 项会话检查。Stage0–40 通过，120 个可支持示例逐字节一致，40 个示例明确保留不支持状态。原生编译器在 277,414 字节上复现 `C0 == C1 == C2`。安装包也已在源码目录之外实际安装，执行公共 API、CLI、原生 RCL 编译和持久恢复重试。后续维护使用单独的[源码绑定证据](docs/maintenance/session-integrity-2026-10-12.json)。
+冻结的[原始 2.0 验证记录](docs/v2.0/verification.json)绑定当时源码与工件：**332 个测试文件已覆盖，1702 项通过、0 项剩余失败、2 项明确跳过**，其中包括 19 项会话检查。Stage0–40 通过，120 个可支持示例逐字节一致，40 个示例明确保留不支持状态。当时的原生编译器在 277,414 字节上复现 `C0 == C1 == C2`。安装包也已在源码目录之外实际安装，执行公共 API、CLI、原生 RCL 编译和持久恢复重试。后续维护使用单独的[会话证据](docs/maintenance/session-integrity-2026-10-12.json)与[编译器证据](docs/maintenance/warrant-compiler-admission-2026-10-12.json)。
 
 这是 **2.0 的 Windows 本地证据**。新 Linux、Android 设备与远端部署验收分别记录；未运行 GitHub Actions。[1.0 的历史记录](docs/v1.0/verification.json)包含 Windows/Linux 检查，属于本次 2.0 主线集成之前 [PR #262](https://github.com/xingxuling/RCL/pull/262) 的基线，未改称为 2.0 证据。各项能力和成熟度边界见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 

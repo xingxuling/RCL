@@ -1,0 +1,382 @@
+{
+  "format": "rcl.warrant-compiler-admission-maintenance.v1",
+  "status": "PASS_LOCAL_WINDOWS_X64",
+  "date": "2026-10-12",
+  "generatedAt": "2026-10-12T11:51:12.762Z",
+  "baseCanonicalCommit": "450a794242d623909d714bccb55c475a2084c84d",
+  "branch": "codex/rcl-warrant-compiler-admission",
+  "packageVersion": "2.0.0",
+  "nativeVmVersion": "2.0.0",
+  "versionBumped": false,
+  "platform": "win32",
+  "arch": "x64",
+  "nodeVersion": "v24.15.0",
+  "owner": "selfhost/compiler-core.rcl",
+  "generalAndSessionEntriesShareAdmission": true,
+  "admission": {
+    "invalidCases": 23,
+    "validCases": 18,
+    "directNativeEntries": 2,
+    "targetJavaScriptValidationBypassed": true,
+    "preservesExistingOutputOnRejection": true,
+    "checksReachablePredicateBodies": true,
+    "recursivePredicatesSupported": true,
+    "unknownSequenceElementTypesRemainDynamic": true,
+    "wholeLanguageTypeCheckerParityClaimed": false,
+    "diagnosticEnvelope": "RCLC_COMPILER_FAILURE",
+    "detailedDiagnosticInMessage": true,
+    "preciseSemanticSourcePositions": false
+  },
+  "planning": {
+    "route": "DEEP_DEVELOPMENT",
+    "owner": "local DWAC FourDevelopmentModeRouter",
+    "scores": {
+      "WHOLE_ARTIFACT": 0.109,
+      "DEEP_DEVELOPMENT": 0.9035,
+      "NORTH_STAR": 0.926,
+      "NORTH_STAR_BURST": 0.542
+    },
+    "federationPlanning": "UNAVAILABLE_HTTP_429",
+    "laya": {
+      "status": "ABSTAIN",
+      "confidence": 0.024,
+      "authorityGranted": false
+    },
+    "role": "advisory routing only",
+    "genericExecutorClaimed": false
+  },
+  "reuse": {
+    "REUSE": [
+      "existing AST/name validation/builtin ABI",
+      "general and session compiler entries",
+      "native VM/binaries",
+      "session runtime and root/bytecode protocols"
+    ],
+    "ADAPT": [
+      "RCL predicate admission and diagnostic context",
+      "existing checked compiler artifact"
+    ],
+    "KEEP_SEPARATE": [
+      "bounded typing profile",
+      "historical evidence",
+      "advisory routing",
+      "position diagnostics and journal lifecycle follow-up"
+    ]
+  },
+  "verification": {
+    "command": "node --test --test-reporter=tap --test-concurrency=1 tests/warrant-compiler-admission.test.mjs tests/selfhost-toolchain.test.mjs tests/governed-session.test.mjs tests/durable-session.test.mjs tests/session-selfhost-compiler.test.mjs tests/native-session-protocol.test.mjs tests/session-integrity.test.mjs tests/session-cli-integrity.test.mjs tests/cli-public-contract.test.mjs tests/selfhost-stage0-source-truth.test.mjs",
+    "testFiles": [
+      "tests/warrant-compiler-admission.test.mjs",
+      "tests/selfhost-toolchain.test.mjs",
+      "tests/governed-session.test.mjs",
+      "tests/durable-session.test.mjs",
+      "tests/session-selfhost-compiler.test.mjs",
+      "tests/native-session-protocol.test.mjs",
+      "tests/session-integrity.test.mjs",
+      "tests/session-cli-integrity.test.mjs",
+      "tests/cli-public-contract.test.mjs",
+      "tests/selfhost-stage0-source-truth.test.mjs"
+    ],
+    "tests": 89,
+    "pass": 89,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 37150.5674,
+    "compilerAdmissionTests": 41,
+    "sessionTests": 37,
+    "checkedInArtifactUsed": true,
+    "versionContract": "PASS",
+    "fixedPointCommand": "node scripts/build-selfhost-compiler.mjs",
+    "fixedPoint": {
+      "ok": true,
+      "format": "rcl.selfhost.compiler.fixed-point.v1",
+      "outputPath": "selfhost/compiler.rbc",
+      "bytes": 297797,
+      "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+      "sourceSha256": "07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452",
+      "byteIdentical": true,
+      "generations": {
+        "c0": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+        "c1": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+        "c2": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+      },
+      "native": {
+        "c0ToC1": {
+          "status": "ok",
+          "bytes": 297797,
+          "peakStackDepth": 880,
+          "peakCallFrames": 217
+        },
+        "c1ToC2": {
+          "status": "ok",
+          "bytes": 297797,
+          "peakStackDepth": 880,
+          "peakCallFrames": 217
+        }
+      }
+    },
+    "exampleParityCommand": "node scripts/verify-selfhost-example-parity.mjs",
+    "exampleParity": {
+      "artifactParity": true,
+      "eligible": 120,
+      "unsupported": 40,
+      "failures": 0
+    },
+    "fullRepositorySuite": "NOT_RERUN_SCOPED_MAINTENANCE",
+    "standaloneInstallation": "NOT_RERUN",
+    "hostedCi": "NOT_RUN_USER_INSTRUCTION"
+  },
+  "baselineReproduction": {
+    "productionSource": "baseCanonicalCommit",
+    "tests": 40,
+    "pass": 18,
+    "fail": 22,
+    "firstInvalidProfile": "checked general compiler; failed first-profile assertions prevent subsequent session-profile checks",
+    "failures": "old compiler admitted invalid condition source",
+    "log": "docs/maintenance/warrant-compiler-admission-2026-10-12/before-fix.tap"
+  },
+  "sourceBindings": [
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "bytes": 222534,
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/compiler-main.rcl",
+      "bytes": 2680,
+      "sha256": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d"
+    },
+    {
+      "path": "selfhost/compiler.rbc",
+      "bytes": 297797,
+      "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "bytes": 5615,
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "bytes": 2743,
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    },
+    {
+      "path": "src/session-compiler.mjs",
+      "bytes": 2154,
+      "sha256": "2306bb4a4fc90fc5c14a96c55d96c507018302aa6dd70535e1e10b3d96ed6c1b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "bytes": 4172,
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "bytes": 32750,
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "bytes": 31927,
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/parser.mjs",
+      "bytes": 75083,
+      "sha256": "8bc4758a4fa06dc98ee1d88196c8785e0384248c7122e832bca60a80b365b34a"
+    },
+    {
+      "path": "src/type-system.mjs",
+      "bytes": 96516,
+      "sha256": "f0e7d52ef073ba56d4a9c34acf464dec1fe9304b2e3576dbf5a33983e65d4d60"
+    },
+    {
+      "path": "src/native-session.mjs",
+      "bytes": 13231,
+      "sha256": "e19b10513b9b7cca106003b99be8ccf24cfcf5eedfe3ae2db0963fc94f79becc"
+    },
+    {
+      "path": "src/durable-session.mjs",
+      "bytes": 13990,
+      "sha256": "255da9e88b3893e4b1a66b5b5f1727c1495ff23214b5b9a99c1a31f6fadc6787"
+    },
+    {
+      "path": "src/session-contract.mjs",
+      "bytes": 5101,
+      "sha256": "44f3af97c857daed51e8de37f2db700982c4e8145ea51c1dc0eb50512713843d"
+    },
+    {
+      "path": "package.json",
+      "bytes": 45972,
+      "sha256": "ed70e6f722bc29edcc479c35faf7dd5bd2487b2cd9c6ece75d9b3b8f24bf0c40"
+    },
+    {
+      "path": "VERSION-CONTRACT.json",
+      "bytes": 8584,
+      "sha256": "d7e6e81224955b8e471eff033d59340f043a0964d3e0856e3cf2f7e780408510"
+    },
+    {
+      "path": "COMPONENT-VERSIONS.json",
+      "bytes": 2149,
+      "sha256": "5dc353f89109f15b4919bd5d23f6ed3bb4a1a0ee69d29a9641d5c6c8115cea01"
+    },
+    {
+      "path": "tests/warrant-compiler-admission.test.mjs",
+      "bytes": 3633,
+      "sha256": "49512acf69c48d462aa83ad9329e1b5e42c258da796ad6cefba916abb4c9fa7b"
+    },
+    {
+      "path": "tests/selfhost-toolchain.test.mjs",
+      "bytes": 3250,
+      "sha256": "7489c5bb681060e5dcb3cbed15f72c9c85e1c7c9e856e08a0aee2edaab97d772"
+    },
+    {
+      "path": "tests/governed-session.test.mjs",
+      "bytes": 5905,
+      "sha256": "a9c681d52980a4ab69bf07b73a3cafdf4db389ebeed5350c3929d2e2558e7736"
+    },
+    {
+      "path": "tests/durable-session.test.mjs",
+      "bytes": 10329,
+      "sha256": "b33bfd2c01e1538523827962170333cb2b9f8ec02bbe0eb783a8cf51933a9832"
+    },
+    {
+      "path": "tests/session-selfhost-compiler.test.mjs",
+      "bytes": 3028,
+      "sha256": "068a121fd44c9f512c18272097c1f3ad69c6d88b3a8516806621ac8ef5150c02"
+    },
+    {
+      "path": "tests/native-session-protocol.test.mjs",
+      "bytes": 3453,
+      "sha256": "fa152c3b89e753a50bc47146f71e89b080c447d3c65848e5e43708f2b9c5e50c"
+    },
+    {
+      "path": "tests/session-integrity.test.mjs",
+      "bytes": 9719,
+      "sha256": "817496cb9ee314018c671af5937ac2d844a9ad726f705862b681fe294d4ec369"
+    },
+    {
+      "path": "tests/session-cli-integrity.test.mjs",
+      "bytes": 5869,
+      "sha256": "50cbfcb767f655921ce2049cc8138c21d30229061fb6f102bae07d9cdc7356f1"
+    },
+    {
+      "path": "tests/cli-public-contract.test.mjs",
+      "bytes": 2798,
+      "sha256": "83fda3be6ab16e7d462e630e746c6523b2169d024ea58900e7fd42be15428775"
+    },
+    {
+      "path": "tests/selfhost-stage0-source-truth.test.mjs",
+      "bytes": 1061,
+      "sha256": "b3ce96fd8c40eb3c7761d1cf8767241ad6792de3bda2e5544371ef3f9c91822f"
+    },
+    {
+      "path": "tests/fixtures/warrant-predicate-cases.mjs",
+      "bytes": 3907,
+      "sha256": "d7ad250f2d12d29b4e69522bd5111bcdd9a0a38402fa9d99ad9f29787d1ee2d8"
+    },
+    {
+      "path": "tests/fixtures/session-fault-daemon.c",
+      "bytes": 2278,
+      "sha256": "c4f5c645e99bd5ea354be318f1632f92ca2d151d24ccb4711005ba296877bbfc"
+    }
+  ],
+  "reusedNativeBindings": [
+    {
+      "path": "native/rclvm.c",
+      "bytes": 163616,
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "bytes": 3100,
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclvmd.c",
+      "bytes": 8128,
+      "sha256": "22a4ba4cac4ab289859db1a71d9fe0e2d036f17d18325884c474857c39867600"
+    },
+    {
+      "path": "native/rclc.c",
+      "bytes": 9654,
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/native-windows-manifest.json",
+      "bytes": 1642,
+      "sha256": "64158567170171f33d69c5ae11cc797a71443b78b2d7afbeb6305bd28b2dbb33"
+    },
+    {
+      "path": "native/rclc.exe",
+      "bytes": 337920,
+      "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+    },
+    {
+      "path": "native/rclvmd.exe",
+      "bytes": 337408,
+      "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7"
+    },
+    {
+      "path": "native/rclvm.dll",
+      "bytes": 331264,
+      "sha256": "3846f71020cd329f5595628331902bf52ce693b052e4b2fb1fbff0e6e591d0fa"
+    },
+    {
+      "path": "native/rclvm.lib",
+      "bytes": 5476,
+      "sha256": "80b9897b4167f199d73aae175396b5a317bdfef5ec94fe653be98ae54a693b6e"
+    }
+  ],
+  "logNormalization": "UTF-8, LF line endings and trailing-whitespace removal; assertions and metrics retained",
+  "logs": [
+    {
+      "path": "docs/maintenance/warrant-compiler-admission-2026-10-12/before-fix.tap",
+      "bytes": 24130,
+      "sha256": "b5b549309cb954ef64bcfffabd50b4e582ebb687161c2bb38c4c0d5e16b72678"
+    },
+    {
+      "path": "docs/maintenance/warrant-compiler-admission-2026-10-12/focused-checks.tap",
+      "bytes": 20155,
+      "sha256": "9b80151690f7dc81104507431cafc04f83ba39b27513e04161460678866fc28f"
+    },
+    {
+      "path": "docs/maintenance/warrant-compiler-admission-2026-10-12/fixed-point.json",
+      "bytes": 845,
+      "sha256": "ffbe75025bdc5e26388a7c1c9c17e87a6080abb27d4429c67888e5d80e4dbc5b"
+    },
+    {
+      "path": "docs/maintenance/warrant-compiler-admission-2026-10-12/example-parity.json",
+      "bytes": 28442,
+      "sha256": "8275e4dc4171a6b39a6ee9c3661d171120c44926df204f5ad2c798bbef319528"
+    },
+    {
+      "path": "docs/maintenance/warrant-compiler-admission-2026-10-12/version-contract.json",
+      "bytes": 1176,
+      "sha256": "7a53237ce5fbe188469637497bf55dc29e14e173b5a3164f463b48b21894d31e"
+    }
+  ],
+  "frozenPriorEvidence": [
+    {
+      "path": "docs/v2.0/verification.json",
+      "bytes": 10157,
+      "sha256": "5bef00f1a27ae00e3114def3d13f52047fe75e58dddab935f452154b6c6c4284"
+    },
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12.json",
+      "bytes": 12442,
+      "sha256": "1aa9b3cd28fc66fb8b088355988d4aa425c65246f0269094cdfc4c44a540f601"
+    }
+  ],
+  "boundaries": {
+    "linux": "NOT_RUN",
+    "androidHardware": "NOT_RUN",
+    "remoteDeployment": "NOT_RUN",
+    "publishedPackage": false,
+    "journalCompaction": false,
+    "journalMigration": false,
+    "k400Promotion": false,
+    "wholeRuntimeSelfHosting": false
+  }
+}

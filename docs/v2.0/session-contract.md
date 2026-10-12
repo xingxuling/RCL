@@ -94,6 +94,19 @@ the target program is compiled by RCL running in the native VM. This does not
 claim whole-language or whole-runtime self-hosting. compileRealitySessionBytecode
 and an explicit compiler:'bootstrap' option expose the bootstrap path separately.
 
+The native RCL compiler now statically visits every conditional warrant, including
+declarations whose rules are not invoked. It rejects unknown references/calls,
+known non-Truth conditions, invalid operators, builtin/user-call argument errors
+and incorrect return types in reachable predicate reckons before producing an
+artifact. Recursive predicates are checked through declared signatures and a
+visited-call set. Dynamic Sequence element types remain Unknown, matching the
+existing bootstrap contract; native runtime checks still apply.
+The general and session compiler entries share this admission logic. Native
+compiler failures retain the RCLC_COMPILER_FAILURE envelope with the specific
+source diagnostic in the message. This bounded native-core improvement does not
+claim complete parity with every JavaScript language/type-checker extension.
+See [compiler maintenance evidence](../maintenance/warrant-compiler-admission-2026-10-12.json).
+
 ## Durable local contract
 
 The directory stores immutable source.rcl/session.rbc, a hash-linked journal.jsonl
