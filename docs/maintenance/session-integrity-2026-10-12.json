@@ -1,0 +1,367 @@
+{
+  "format": "rcl.session-integrity-maintenance.v1",
+  "status": "PASS_LOCAL_WINDOWS_X64",
+  "date": "2026-10-12",
+  "generatedAt": "2026-10-12T10:33:19.714Z",
+  "baseCanonicalCommit": "edf09e670566b4259b64ca68054f88eb61a5e395",
+  "branch": "codex/rcl-session-integrity-hardening",
+  "packageVersion": "2.0.0",
+  "nativeVmVersion": "2.0.0",
+  "versionBumped": false,
+  "platform": "win32",
+  "arch": "x64",
+  "nodeVersion": "v24.15.0",
+  "changes": [
+    "native-reply-integrity-and-fail-closed-writer",
+    "immutable-queued-command-identity-and-inputs",
+    "cli-trusted-history-pins-and-strict-arguments",
+    "reference-native-repeated-alteration-receipt-parity"
+  ],
+  "planning": {
+    "route": "DEEP_DEVELOPMENT",
+    "owner": "local DWAC FourDevelopmentModeRouter",
+    "role": "advisory planning only",
+    "federationStatus": "CANDIDATE",
+    "workflowId": "1d4cade6-f4f9-4dd1-afbe-1f7a3a3eb718",
+    "traceId": "b3351870-4c47-433d-9d77-04a2cfb1a5c1",
+    "laya": {
+      "status": "ABSTAIN",
+      "authorityGranted": false
+    },
+    "genericExecutorClaimed": false
+  },
+  "reuseDecisions": {
+    "REUSE": [
+      "src/compiler.mjs",
+      "src/bytecode.mjs",
+      "src/runtime.mjs",
+      "src/semantic-state-root.mjs",
+      "src/semantic-state-root-v2.mjs",
+      "src/session-compiler.mjs",
+      "selfhost/compiler-core.rcl",
+      "selfhost/compiler-main.rcl",
+      "selfhost/compiler.rbc",
+      "selfhost/session-compiler-core.rcl",
+      "selfhost/session-compiler-main.rcl",
+      "native/rclvm.c",
+      "native/rclvm.h",
+      "native/rclvmd.c",
+      "native/semantic_state_v2.h",
+      "native/native-windows-manifest.json",
+      "native/rclvm.dll",
+      "native/rclvm.lib",
+      "native/rclvmd.exe"
+    ],
+    "ADAPT": [
+      "src/session-contract.mjs",
+      "src/native-session.mjs",
+      "src/durable-session.mjs",
+      "src/session-cli.mjs",
+      "src/cli-contract.mjs",
+      "src/selfhost-source-truth-manifest.mjs",
+      "selfhost/rcl-source-selfhost-stage0.rcl"
+    ],
+    "KEEP_SEPARATE": [
+      "test fault transport",
+      "historical release records",
+      "DWAC and Laya advisory results"
+    ]
+  },
+  "verification": {
+    "command": "node --test --test-reporter=tap --test-concurrency=1 tests/governed-session.test.mjs tests/durable-session.test.mjs tests/session-selfhost-compiler.test.mjs tests/native-session-protocol.test.mjs tests/session-integrity.test.mjs tests/session-cli-integrity.test.mjs tests/cli-public-contract.test.mjs tests/selfhost-stage0-source-truth.test.mjs tests/semantic-state-root-v2-stable.test.mjs",
+    "testFiles": [
+      "tests/governed-session.test.mjs",
+      "tests/durable-session.test.mjs",
+      "tests/session-selfhost-compiler.test.mjs",
+      "tests/native-session-protocol.test.mjs",
+      "tests/session-integrity.test.mjs",
+      "tests/session-cli-integrity.test.mjs",
+      "tests/cli-public-contract.test.mjs",
+      "tests/selfhost-stage0-source-truth.test.mjs",
+      "tests/semantic-state-root-v2-stable.test.mjs"
+    ],
+    "tests": 61,
+    "pass": 61,
+    "fail": 0,
+    "skipped": 0,
+    "sessionTests": 37,
+    "durationMs": 45940.1679,
+    "stage0BoundModules": 18,
+    "versionContract": "PASS",
+    "releaseCompatibilityRestartRetry": "PASS",
+    "compilerFixedPoint": "NOT_RERUN_COMPILER_UNCHANGED",
+    "fullRepositorySuite": "NOT_RERUN_SCOPED_MAINTENANCE",
+    "standalonePackageInstallation": "NOT_RERUN",
+    "hostedCi": "NOT_RUN_USER_INSTRUCTION"
+  },
+  "reproductions": [
+    {
+      "name": "primary-gap-regressions",
+      "productionSource": "baseCanonicalCommit",
+      "expectedFailure": true,
+      "tests": 14,
+      "pass": 0,
+      "fail": 14,
+      "log": "docs/maintenance/session-integrity-2026-10-12/before-fix.txt"
+    },
+    {
+      "name": "repeated-alteration-receipts",
+      "productionSource": "work in progress before receipt consolidation; base sessionResult implementation",
+      "expectedFailure": true,
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "log": "docs/maintenance/session-integrity-2026-10-12/duplicate-alter-before-fix.tap"
+    }
+  ],
+  "faultHarness": {
+    "execution": "real native VM DLL through current embedding ABI, reply damaged after commit",
+    "writerLockImplemented": false,
+    "productionPeerProofClaimed": false,
+    "separateRealDaemonLockAndDeathTests": true
+  },
+  "sourceBindings": [
+    {
+      "path": "src/session-contract.mjs",
+      "bytes": 5101,
+      "sha256": "44f3af97c857daed51e8de37f2db700982c4e8145ea51c1dc0eb50512713843d"
+    },
+    {
+      "path": "src/native-session.mjs",
+      "bytes": 13231,
+      "sha256": "e19b10513b9b7cca106003b99be8ccf24cfcf5eedfe3ae2db0963fc94f79becc"
+    },
+    {
+      "path": "src/durable-session.mjs",
+      "bytes": 13990,
+      "sha256": "255da9e88b3893e4b1a66b5b5f1727c1495ff23214b5b9a99c1a31f6fadc6787"
+    },
+    {
+      "path": "src/session-cli.mjs",
+      "bytes": 4207,
+      "sha256": "e8929773d8e2f3337d4db6af8a4907ab4695c4f62e60aa4536e62b6ba4b74a8a"
+    },
+    {
+      "path": "src/cli-contract.mjs",
+      "bytes": 7975,
+      "sha256": "9560e871768cd9a1bc3726f60c050dfb6d7b62792bd0b0d9397807fd273a5a17"
+    },
+    {
+      "path": "src/selfhost-source-truth-manifest.mjs",
+      "bytes": 1438,
+      "sha256": "d8b544ac25d5f7cf949e66b0b070764973a77f7af8e2a45958fdee415b28e71c"
+    },
+    {
+      "path": "selfhost/rcl-source-selfhost-stage0.rcl",
+      "bytes": 4689,
+      "sha256": "9aaf0dd0ab90aab2f73e829eec4ef013f0336fcfa77a6cd0524a3cd7624dbe43"
+    },
+    {
+      "path": "package.json",
+      "bytes": 45865,
+      "sha256": "09c1281d8016070b6350302819e6ea6ab3bbcf322c5f0d3a2ed3983f2fb3d9fe"
+    },
+    {
+      "path": "VERSION-CONTRACT.json",
+      "bytes": 8227,
+      "sha256": "32e4584520c653f9106cf9b4e80ffed8e0192c50efa4f2ccfb87d3ebdcbca250"
+    },
+    {
+      "path": "COMPONENT-VERSIONS.json",
+      "bytes": 2149,
+      "sha256": "5dc353f89109f15b4919bd5d23f6ed3bb4a1a0ee69d29a9641d5c6c8115cea01"
+    },
+    {
+      "path": "tests/governed-session.test.mjs",
+      "bytes": 5905,
+      "sha256": "a9c681d52980a4ab69bf07b73a3cafdf4db389ebeed5350c3929d2e2558e7736"
+    },
+    {
+      "path": "tests/durable-session.test.mjs",
+      "bytes": 10329,
+      "sha256": "b33bfd2c01e1538523827962170333cb2b9f8ec02bbe0eb783a8cf51933a9832"
+    },
+    {
+      "path": "tests/session-selfhost-compiler.test.mjs",
+      "bytes": 3028,
+      "sha256": "068a121fd44c9f512c18272097c1f3ad69c6d88b3a8516806621ac8ef5150c02"
+    },
+    {
+      "path": "tests/native-session-protocol.test.mjs",
+      "bytes": 3453,
+      "sha256": "fa152c3b89e753a50bc47146f71e89b080c447d3c65848e5e43708f2b9c5e50c"
+    },
+    {
+      "path": "tests/session-integrity.test.mjs",
+      "bytes": 9719,
+      "sha256": "817496cb9ee314018c671af5937ac2d844a9ad726f705862b681fe294d4ec369"
+    },
+    {
+      "path": "tests/session-cli-integrity.test.mjs",
+      "bytes": 5869,
+      "sha256": "50cbfcb767f655921ce2049cc8138c21d30229061fb6f102bae07d9cdc7356f1"
+    },
+    {
+      "path": "tests/cli-public-contract.test.mjs",
+      "bytes": 2798,
+      "sha256": "83fda3be6ab16e7d462e630e746c6523b2169d024ea58900e7fd42be15428775"
+    },
+    {
+      "path": "tests/selfhost-stage0-source-truth.test.mjs",
+      "bytes": 1061,
+      "sha256": "b3ce96fd8c40eb3c7761d1cf8767241ad6792de3bda2e5544371ef3f9c91822f"
+    },
+    {
+      "path": "tests/semantic-state-root-v2-stable.test.mjs",
+      "bytes": 14916,
+      "sha256": "afc1d1190613c4971be6db8e88c70ec3d144bfa419f80a7d4ce76769e596fdce"
+    },
+    {
+      "path": "tests/fixtures/session-fault-daemon.c",
+      "bytes": 2278,
+      "sha256": "c4f5c645e99bd5ea354be318f1632f92ca2d151d24ccb4711005ba296877bbfc"
+    }
+  ],
+  "reusedBindings": [
+    {
+      "path": "src/compiler.mjs",
+      "bytes": 32750,
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "bytes": 31927,
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/runtime.mjs",
+      "bytes": 97547,
+      "sha256": "c1ebe8f0bd23e479d6faa92d6930b48a69761519f516c80b766dbf1cd18347d6"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "bytes": 6221,
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "bytes": 4944,
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/session-compiler.mjs",
+      "bytes": 2154,
+      "sha256": "2306bb4a4fc90fc5c14a96c55d96c507018302aa6dd70535e1e10b3d96ed6c1b"
+    },
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "bytes": 211974,
+      "sha256": "11abd3b0308f08607f96f993cce5754a1986e28c0c079433efac0b1459933d30"
+    },
+    {
+      "path": "selfhost/compiler-main.rcl",
+      "bytes": 2680,
+      "sha256": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d"
+    },
+    {
+      "path": "selfhost/compiler.rbc",
+      "bytes": 277414,
+      "sha256": "11921b62040145eb72580978ea8e5994b4981b690c59eb679d2e228239defbf4"
+    },
+    {
+      "path": "selfhost/session-compiler-core.rcl",
+      "bytes": 5615,
+      "sha256": "08dbc18f92f976df14e4e87e84f7b1964d6c6b0dc5f6a918804a10b7cbc5e53d"
+    },
+    {
+      "path": "selfhost/session-compiler-main.rcl",
+      "bytes": 2743,
+      "sha256": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4"
+    },
+    {
+      "path": "native/rclvm.c",
+      "bytes": 163616,
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "bytes": 3100,
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclvmd.c",
+      "bytes": 8128,
+      "sha256": "22a4ba4cac4ab289859db1a71d9fe0e2d036f17d18325884c474857c39867600"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "bytes": 8997,
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/native-windows-manifest.json",
+      "bytes": 1642,
+      "sha256": "64158567170171f33d69c5ae11cc797a71443b78b2d7afbeb6305bd28b2dbb33"
+    },
+    {
+      "path": "native/rclvm.dll",
+      "bytes": 331264,
+      "sha256": "3846f71020cd329f5595628331902bf52ce693b052e4b2fb1fbff0e6e591d0fa"
+    },
+    {
+      "path": "native/rclvm.lib",
+      "bytes": 5476,
+      "sha256": "80b9897b4167f199d73aae175396b5a317bdfef5ec94fe653be98ae54a693b6e"
+    },
+    {
+      "path": "native/rclvmd.exe",
+      "bytes": 337408,
+      "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7"
+    }
+  ],
+  "logNormalization": "UTF-8, LF line endings and trailing-whitespace removal; assertion content and metrics retained",
+  "logs": [
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12/before-fix.txt",
+      "bytes": 19512,
+      "sha256": "caa3aed863f73dfb1f308284391f0e7d8f4ffff68acb2bfb889872dcba51ce23"
+    },
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12/duplicate-alter-before-fix.tap",
+      "bytes": 4385,
+      "sha256": "16519e7d9d00942db97e0bcb4c09ae11a733691545d25571444b3c78d5af52bc"
+    },
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12/focused-checks.tap",
+      "bytes": 13770,
+      "sha256": "1c6c62f7a6689930affa2bb74a6c225101ddb14ff7612dee931a6f5b94e6d0d5"
+    },
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12/version-contract.json",
+      "bytes": 1176,
+      "sha256": "7a53237ce5fbe188469637497bf55dc29e14e173b5a3164f463b48b21894d31e"
+    },
+    {
+      "path": "docs/maintenance/session-integrity-2026-10-12/release-contract.json",
+      "bytes": 2072,
+      "sha256": "cb0597feed3e75289e04fc7dd00b41067ae89bf58447420b3614342e165886cf"
+    }
+  ],
+  "frozenOriginalReleaseEvidence": {
+    "path": "docs/v2.0/verification.json",
+    "bytes": 10157,
+    "sha256": "5bef00f1a27ae00e3114def3d13f52047fe75e58dddab935f452154b6c6c4284",
+    "relabeledAsCurrentSourceProof": false
+  },
+  "boundaries": {
+    "linux": "NOT_RUN",
+    "androidHardware": "NOT_RUN",
+    "remoteDeployment": "NOT_RUN",
+    "publishedPackage": false,
+    "distributedExactlyOnce": false,
+    "journalCompaction": false,
+    "journalMigration": false,
+    "maliciousNativePeerAuthentication": false,
+    "historicalPerformanceBenchmarkReusedAsFresh": false
+  }
+}

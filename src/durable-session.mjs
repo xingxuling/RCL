@@ -181,13 +181,16 @@ export async function openDurableRealitySession(directory, options = {}) {
     snapshot,
     invoke(input) {
       if (poisoned || closing) return Promise.reject(sessionError('RCL_SESSION_CLOSED_OR_DURABILITY_UNCERTAIN'));
+      let requestId, expectedRevision, command, commandRoot;
+      try {
+        requestId = requestKey(input?.requestId);
+        expectedRevision = input?.expectedRevision;
+        if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) throw sessionError('RCL_SESSION_EXPECTED_REVISION_REQUIRED');
+        command = normalizeSessionCommand(program, input);
+        commandRoot = commandIdentity(program.programRoot, command, expectedRevision);
+      } catch (error) { return Promise.reject(error); }
       const operation = pending.then(async () => {
         if (poisoned) throw sessionError('RCL_SESSION_DURABILITY_UNCERTAIN');
-        const requestId = requestKey(input?.requestId);
-        const expectedRevision = input?.expectedRevision;
-        if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) throw sessionError('RCL_SESSION_EXPECTED_REVISION_REQUIRED');
-        const command = normalizeSessionCommand(program, input);
-        const commandRoot = commandIdentity(program.programRoot, command, expectedRevision);
         const existing = requests.get(requestId);
         if (existing) {
           if (existing.commandRoot !== commandRoot) throw sessionError('RCL_SESSION_IDEMPOTENCY_CONFLICT');
@@ -196,24 +199,34 @@ export async function openDurableRealitySession(directory, options = {}) {
         if (expectedRevision !== revision) throw sessionError('RCL_SESSION_REVISION_CONFLICT');
         if (revision >= MAX_COMMANDS) throw sessionError('RCL_SESSION_JOURNAL_LIMIT');
         const beforeStateRoot = engine.snapshot().stateRoot;
-        const result = await engine.invoke(command);
-        const record = rooted({
-          format: COMMAND, sessionId, sequence: revision + 1, previousRoot: head.root,
-          programRoot: program.programRoot, requestId, expectedRevision, command, commandRoot,
-          beforeStateRoot, afterStateRoot: result.afterRoot, resultRoot: root(result), result,
-          stateRootAlgorithm: 'rcl.semantic-state-root.v2',
-        });
+        let result, record, uncertain = false;
         try {
+          try { result = await engine.invoke(command); }
+          catch (error) {
+            if (!/^RCL_SESSION_NATIVE_/u.test(error.code ?? '')) throw error;
+            uncertain = true; throw error;
+          }
+          // Once execution succeeds, failures in evidence construction or storage
+          // leave the commit's durability uncertain and must also close the writer.
+          uncertain = true;
+          record = rooted({
+            format: COMMAND, sessionId, sequence: revision + 1, previousRoot: head.root,
+            programRoot: program.programRoot, requestId, expectedRevision, command, commandRoot,
+            beforeStateRoot, afterStateRoot: result.afterRoot, resultRoot: root(result), result,
+            stateRootAlgorithm: 'rcl.semantic-state-root.v2',
+          });
           if (reference && root(await reference.invoke(command)) !== record.resultRoot) throw sessionError('RCL_SESSION_REFERENCE_REPLAY_MISMATCH');
           appendRecord(journalPath, record);
+          head = record; revision++; requests.set(requestId, record);
+          const acknowledged = { receipt: structuredClone(record), result: structuredClone(result), replayed: false };
+          return acknowledged;
         } catch (error) {
+          if (!uncertain) throw error;
           // An unacknowledged write may be complete, partial or absent. Stop this
           // writer; reopening verifies/replays the durable prefix before a retry.
           poisoned = true; await engine.close();
           throw sessionError('RCL_SESSION_DURABILITY_UNCERTAIN', error.message, { cause: error.code });
         }
-        head = record; revision++; requests.set(requestId, record);
-        return { receipt: structuredClone(record), result: structuredClone(result), replayed: false };
       });
       pending = operation.catch(() => {});
       return operation;

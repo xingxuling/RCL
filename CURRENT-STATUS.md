@@ -11,7 +11,29 @@
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
-## Local v2.0 verification
+## 2026-10-12 session integrity maintenance
+
+Package/native versions remain 2.0.0. Every native session reply now binds the
+source/program and requested transition before the adapter accepts state. Invalid
+evidence or transport loss closes the native/durable writer; native snapshots
+retain only the last verified state, while durable reads/invocations require a
+reopen and verified replay. Queued durable commands capture their original request
+identity, expected revision and inputs. CLI history pins and strict argument
+validation are available for inspect/verify/invoke/recover. Session receipts also
+consolidate repeated alterations by field so native/reference replay agrees.
+
+The scoped Windows checks pass 61/61 across nine files, including 37 session
+checks, public CLI, root-v2 compatibility and the refreshed 18-module Stage0 source
+binding. Fault tests link a small transport fixture to the real native VM DLL;
+its deliberately damaged replies prove rejection/retry behavior, not writer-lock
+implementation. Separate genuine-daemon tests cover OS locks and process death.
+See `docs/maintenance/session-integrity-2026-10-12.md` and its JSON evidence record.
+The general compiler/native C sources and artifacts were reused unchanged. The
+full-suite/fixed-point/installation records below retain their original source
+bindings; they were not rerun or rewritten for this maintenance. GitHub Actions
+remain NOT_RUN_USER_INSTRUCTION.
+
+## Original local v2.0 verification (frozen release record)
 
 The session capability checks include real process death/restart, OS writer
 exclusion, retry deduplication, stale revisions, preserve/authority rejection,

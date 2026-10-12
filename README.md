@@ -42,9 +42,11 @@ Version 2.0 makes a program callable across multiple inputs and process lifetime
 - **Durable local replay:** bind the source, bytecode, commands and exact state roots in a journal. A new native process replays and verifies the committed prefix; request IDs prevent duplicate retries and expected revisions reject stale updates.
 - **RCL-authored session compilation:** the native session compiler is written in RCL and its target bytecode is checked against the bootstrap compiler. Session operations use RBC 1.3; state-root v2 and existing typed-reference ABI identities remain independent.
 
-In the bounded counter comparison, 50 calls through the v1.0 daemon's default `RUN` profile each finish at **1**; 50 v2.0 session calls retain state and finish at **50**. Warm native API invocation p95 was about **3 ms**, including IPC and independent root verification, for this counter profile. This measurement excludes durable journal writes. See the [verification record](docs/v2.0/verification.json) and [session acceptance](docs/v2.0/acceptance.md).
+In the original 2.0 counter comparison, 50 calls through the v1.0 daemon's default `RUN` profile each finish at **1**; 50 v2.0 session calls retain state and finish at **50**. Warm native API invocation p95 was about **3 ms**, including IPC and independent root verification, for that source snapshot. This historical measurement excludes durable journal writes and is not a fresh benchmark of later maintenance. See the [verification record](docs/v2.0/verification.json) and [session acceptance](docs/v2.0/acceptance.md).
 
 The durable profile covers local cooperative writers and pure RCL rules. Journals are bounded to 64 MiB / 10,000 accepted commands. Provider effects, distributed exactly-once execution and hardware power-loss recovery are outside that profile. Full details and caller-authentication responsibilities are in the [session contract](docs/v2.0/session-contract.md).
+
+**2026-10-12 maintenance, still 2.0.0:** invalid native evidence now closes the session and its durable writer; queued requests capture the caller's original values; the CLI exposes trusted history pins and rejects invalid flags; repeated alterations produce matching native/reference receipts. [The maintenance record](docs/maintenance/session-integrity-2026-10-12.md) binds **61 passing focused checks**, including 37 session checks, to the updated source. No GitHub Actions were run.
 
 ### Stable core inherited from 1.0
 
@@ -163,7 +165,7 @@ Chinese version:
 
 ## What is verified today?
 
-The [2.0 verification record](docs/v2.0/verification.json) binds the tested source and artifacts: **1702 passing cases, zero remaining failures and two documented skips across 332 test files**, including 19 session checks. Stage0–40 pass, 120 eligible examples have exact byte parity, and 40 examples retain explicit unsupported status. The native compiler reproduces `C0 == C1 == C2` at 277,414 bytes. The package was installed outside the source checkout and its public API/CLI, native RCL compilation and durable restart/retry were exercised there.
+The frozen [original 2.0 verification record](docs/v2.0/verification.json) binds its tested source and artifacts: **1702 passing cases, zero remaining failures and two documented skips across 332 test files**, including 19 session checks. Stage0–40 pass, 120 eligible examples have exact byte parity, and 40 examples retain explicit unsupported status. The native compiler reproduces `C0 == C1 == C2` at 277,414 bytes. The package was installed outside the source checkout and its public API/CLI, native RCL compilation and durable restart/retry were exercised there. Later maintenance has its own scoped [source-bound evidence](docs/maintenance/session-integrity-2026-10-12.json).
 
 This is **local Windows 2.0 evidence**. Fresh Linux, Android-device and remote-deployment acceptance are separate. GitHub Actions were not run. The [1.0 record](docs/v1.0/verification.json), including Windows/Linux checks, remains historical evidence for the [PR #262](https://github.com/xingxuling/RCL/pull/262) baseline that preceded this 2.0 main integration; those receipts are not relabeled as 2.0 proof. Capability evidence and maturity profiles live in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
@@ -172,7 +174,7 @@ This is **local Windows 2.0 evidence**. Fresh Linux, Android-device and remote-d
 | RCL-authored general compiler | **Verified** |
 | Native-core compiler fixed point `C0 == C1 == C2` | **Verified** |
 | Native VM / compiler path | **Present and tested** |
-| Stateful native/reference sessions and typed inputs | **Windows local verification; 19 session checks pass** |
+| Stateful native/reference sessions and typed inputs | **Windows local verification; 37 current session checks pass** |
 | Conditional warrants, rejection and projection atomicity | **Native/reference differential checks pass** |
 | Durable restart, retry deduplication and writer exclusion | **Real process-death, OS-lock and journal controls pass** |
 | Independent 2.0 installation and public API/CLI | **Windows local verification passes** |

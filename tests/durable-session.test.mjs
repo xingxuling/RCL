@@ -119,6 +119,8 @@ test('rejected rules do not append state, inputs or journal records', async () =
     assert.equal(session.snapshot().stateRoot, initial.stateRoot);
     assert.equal(session.snapshot().journalRoot, initial.journalRoot);
     assert.ok(bytes.equals(fs.readFileSync(path.join(directory, 'journal.jsonl'))));
+    assert.equal((await session.invoke(first)).result.state['counter.value'], 3);
+    assert.equal(session.snapshot().revision, 1, 'A normal preserve rejection leaves the writer reusable');
   } finally { await session?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
 });
 

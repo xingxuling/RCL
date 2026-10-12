@@ -1,0 +1,341 @@
+✖ CLI checks trusted head and revision before inspecting, invoking or verifying (3824.7083ms)
+✖ CLI recovery validates a trusted anchor before changing an incomplete tail (864.3956ms)
+✖ CLI rejects malformed, duplicate and inappropriate flags before creating artifacts (429.4869ms)
+✖ a real VM commit with invalid root evidence closes the native session (8557.9593ms)
+✖ a real VM commit with invalid source evidence closes the native session (224.4685ms)
+✖ a real VM commit with invalid shape evidence closes the native session (61.0838ms)
+✖ a real VM commit with invalid rule evidence closes the native session (63.418ms)
+✖ a real VM commit with invalid before evidence closes the native session (64.9374ms)
+✖ a real VM commit with invalid after evidence closes the native session (66.1809ms)
+✖ a real VM commit with invalid projection evidence closes the native session (66.5203ms)
+✖ initial native evidence must bind the source before a session becomes usable (71.2229ms)
+✖ unverified native commits poison the durable writer and replay permits a safe retry (208.9221ms)
+✖ durable commands capture request identity and scalar inputs before entering the queue (181.1696ms)
+✖ native transport death poisons a durable writer and releases the real OS lock (170.4863ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 0
+ℹ fail 14
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18247.6164
+
+✖ failing tests:
+
+test at tests\session-cli-integrity.test.mjs:18:1
+✖ CLI checks trusted head and revision before inspecting, invoking or verifying (3824.7083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-cli-integrity.test.mjs:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\session-cli-integrity.test.mjs:38:1
+✖ CLI recovery validates a trusted anchor before changing an incomplete tail (864.3956ms)
+  AssertionError [ERR_ASSERTION]: {
+    "ok": true,
+    "format": "rcl.governed-session.v1",
+    "backend": "native",
+    "program": "GovernedCounter",
+    "programRoot": "050437bef48d834795a0be9e80c12f916aad780b60b23fb91106fc6ba7f5c429",
+    "state": {
+      "access.enabled": true,
+      "counter.lastLabel": "",
+      "counter.value": 0,
+      "event.delta": 0,
+      "event.label": ""
+    },
+    "stateRoot": "16cfefcea164e1b9893c84cedb715926c3922fd53c089e13bd57687471856423",
+    "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+    "native": {
+      "processId": 70384,
+      "daemonRoot": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "sourceRoot": "0cc58a610bffb176ec7a292137ba15ce727015ce4bf1b5775d893353ef490426",
+      "sourceBound": true,
+      "bytecodeRoot": "115fdd284570af22df10ce7936b11beec226584b8b11ee34f9ca6c33fc49a16a",
+      "stateRootsIndependentlyVerified": true
+    },
+    "revision": 0,
+    "journalRoot": "557e57500888628fc5c424d11721fa9378035ec8732c1819e2432886e233fc1a",
+    "sessionId": "5089b344-4fcd-4f04-ad19-d7ffb3ddc13b",
+    "directory": "C:\\Users\\User\\AppData\\Local\\Temp\\rcl-cli-recovery-3K35gj\\state",
+    "recovery": {
+      "discardedIncompleteBytes": 15,
+      "backupPath": "C:\\Users\\User\\AppData\\Local\\Temp\\rcl-cli-recovery-3K35gj\\state\\recovery-tail-b39bcdc8-9912-41dc-b8ef-8998b999bd3a.bin",
+      "verifiedPrefixRoot": "557e57500888628fc5c424d11721fa9378035ec8732c1819e2432886e233fc1a"
+    }
+  }
+
+
+  0 !== 1
+
+      at invoke (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-cli-integrity.test.mjs:14:10)
+      at TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-cli-integrity.test.mjs:46:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\session-cli-integrity.test.mjs:56:1
+✖ CLI rejects malformed, duplicate and inappropriate flags before creating artifacts (429.4869ms)
+  AssertionError [ERR_ASSERTION]: {
+    "ok": true,
+    "format": "rcl.governed-session.v1",
+    "backend": "native",
+    "program": "GovernedCounter",
+    "programRoot": "050437bef48d834795a0be9e80c12f916aad780b60b23fb91106fc6ba7f5c429",
+    "state": {
+      "access.enabled": true,
+      "counter.lastLabel": "",
+      "counter.value": 0,
+      "event.delta": 0,
+      "event.label": ""
+    },
+    "stateRoot": "16cfefcea164e1b9893c84cedb715926c3922fd53c089e13bd57687471856423",
+    "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+    "native": {
+      "processId": 73804,
+      "daemonRoot": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "sourceRoot": "0cc58a610bffb176ec7a292137ba15ce727015ce4bf1b5775d893353ef490426",
+      "sourceBound": true,
+      "bytecodeRoot": "115fdd284570af22df10ce7936b11beec226584b8b11ee34f9ca6c33fc49a16a",
+      "stateRootsIndependentlyVerified": true
+    },
+    "revision": 0,
+    "journalRoot": "facf7b44a78159f4f56c808a8cf0a510d2b5d4f65aa2a333786437272d42406b",
+    "sessionId": "4f57ea6a-7b16-4e0e-8606-38793423cfa7",
+    "directory": "C:\\Users\\User\\AppData\\Local\\Temp\\rcl-cli-flags-b52GZh\\absent",
+    "recovery": null
+  }
+
+
+  0 !== 1
+
+      at invoke (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-cli-integrity.test.mjs:14:10)
+      at TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-cli-integrity.test.mjs:61:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid root evidence closes the native session (8557.9593ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  RCLSemanticStateRootError: Native state root 07aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee does not match semantic state root 47aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RCLSemanticStateRootError: Native state root 07aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee does not match semantic state root 47aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee
+        at verifyNativeSemanticStateRoot (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/semantic-state-root.mjs:86:11)
+        at send (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:112:12)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:146:24,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid source evidence closes the native session (224.4685ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid shape evidence closes the native session (61.0838ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  TypeError: Cannot read properties of undefined (reading 'at')
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: TypeError: Cannot read properties of undefined (reading 'at')
+        at file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:148:68
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid rule evidence closes the native session (63.418ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid before evidence closes the native session (64.9374ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid after evidence closes the native session (66.1809ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:51:3
+✖ a real VM commit with invalid projection evidence closes the native session (66.5203ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:55:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:63:1
+✖ initial native evidence must bind the source before a session becomes usable (71.2229ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  RCLRuntimeError: RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH: RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:64:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RCLRuntimeError: RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH: RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH
+        at sessionError (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/session-contract.mjs:11:10)
+        at createNativeRealitySession (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:128:95)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:64:3)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:831:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:68:1
+✖ unverified native commits poison the durable writer and replay permits a safe retry (208.9221ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  RCLSemanticStateRootError: Native state root 07aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee does not match semantic state root 47aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:75:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RCLSemanticStateRootError: Native state root 07aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee does not match semantic state root 47aed9bf7eb282c79a0ee0c90eab0d6de27c92a4508d422d1a73a354c5c2e6ee
+        at verifyNativeSemanticStateRoot (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/semantic-state-root.mjs:86:11)
+        at send (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:112:12)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:146:24,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\session-integrity.test.mjs:88:1
+✖ durable commands capture request identity and scalar inputs before entering the queue (181.1696ms)
+  Error [RCLRuntimeError]: RCL_SESSION_REVISION_CONFLICT: RCL_SESSION_REVISION_CONFLICT
+      at sessionError (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/session-contract.mjs:11:10)
+      at file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/durable-session.mjs:196:50
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    code: 'RCL_SESSION_REVISION_CONFLICT',
+    details: {}
+  }
+
+test at tests\session-integrity.test.mjs:107:1
+✖ native transport death poisons a durable writer and releases the real OS lock (170.4863ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  RCLRuntimeError: RCL_SESSION_NATIVE_CLOSED: Native daemon exited 1:
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/tests/session-integrity.test.mjs:113:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RCLRuntimeError: RCL_SESSION_NATIVE_CLOSED: Native daemon exited 1:
+        at sessionError (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/session-contract.mjs:11:10)
+        at ChildProcess.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/src/native-session.mjs:87:43)
+        at ChildProcess.emit (node:events:509:28)
+        at ChildProcess._handle.onexit (node:internal/child_process:295:12),
+    operator: 'rejects',
+    diff: 'simple'
+  }

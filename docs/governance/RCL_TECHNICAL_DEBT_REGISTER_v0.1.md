@@ -28,6 +28,21 @@ This register separates verified closure, active engineering debt, platform bloc
 | TD-011 | ACTIVE | Release engineering | Published prerelease artifacts predate the current semantic-root and authority-contract work. | Produce a fresh release candidate only after canonical CI, package verification and downstream compatibility notes pass. |
 | TD-012 | ACTIVE | Branch hygiene | Historical feature branches remain numerous and are not classified as retained evidence, merged candidates or disposable branches. | Generate a branch inventory, preserve named evidence anchors, then delete only branches proven merged or superseded. |
 
-## Operating rule
+## 2026-10-12 session maintenance delta
+
+The original register rows above retain their historical scope; this scoped
+maintenance does not re-audit every earlier platform/governance item. The current
+package stays 2.0.0. See `docs/maintenance/session-integrity-2026-10-12.json` for
+source-bound local checks; hosted CI is NOT_RUN_USER_INSTRUCTION.
+
+| ID | Status | Area | Debt | Closure evidence or next gate |
+|---|---|---|---|---|
+| TD-013 | RESOLVED | Native session integrity | Invalid source/record/root evidence did not reliably close the peer or poison a durable writer. | Mandatory reply binding, genuine-VM fault controls, transport-death controls and safe reopen/retry. |
+| TD-014 | RESOLVED | Request capture | Queued durable requests could observe later caller mutations. | Synchronous normalization/identity capture and mutable-request regression. |
+| TD-015 | RESOLVED | CLI admission | Trusted history pins were unavailable and unknown flags could be ignored. | Anchored invoke/inspect/verify/recover and strict flag admission before mutation. |
+| TD-016 | RESOLVED | Session receipts | Repeated alterations had inconsistent reference/native receipt lists. | Canonical per-field session changes and native/reference durable restart parity. |
+| TD-017 | ACTIVE | Journal lifecycle | Full-prefix replay is bounded to 64 MiB / 10,000 commands with no compaction/migration. | Versioned checkpoint admission preserving source/state binding, writer ownership and trusted history anchors. |
+
+## Operating rule for the historical register
 
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.

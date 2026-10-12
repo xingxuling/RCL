@@ -62,11 +62,22 @@ export function normalizeSessionCommand(program, input) {
 }
 
 export function sessionResult(program, command, before, after, record) {
+  // Both runtimes evaluate alterations against the decision state. The native
+  // transaction retains one change per target, with the last proposed value.
+  // Keep that existing receipt shape in the reference session as well.
+  const changes = new Map();
+  if (record && record.status !== 'not-triggered') {
+    for (const item of record.changes) {
+      const change = structuredClone(item), previous = changes.get(change.target);
+      if (previous) change.before = previous.before;
+      changes.set(change.target, change);
+    }
+  }
   const transition = record && record.status !== 'not-triggered' ? {
     rule: command.rule, mode: command.mode, status: record.status, actor: record.actor,
     beforeRoot: record.beforeRoot, afterRoot: record.afterRoot,
     stateRootAlgorithm: record.stateRootAlgorithm,
-    changes: structuredClone(record.changes), witnesses: [...record.witnesses],
+    changes: [...changes.values()], witnesses: [...record.witnesses],
     authority: structuredClone(record.authority),
   } : null;
   return {

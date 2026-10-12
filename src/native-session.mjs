@@ -12,6 +12,59 @@ import { RCL_SESSION_FORMAT, RCL_SESSION_INPUT_TYPES, normalizeSessionCommand, s
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const root = semanticStateRootV2Stable;
+const evidence = (condition, code) => { if (!condition) throw sessionError(code); };
+
+function verifySessionReply(program, payload, before, command) {
+  evidence(payload.status === 'ok' && payload.program === program.name
+    && payload.sourceRoot === program.programRoot, 'RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH');
+  evidence(Array.isArray(payload.history) && Array.isArray(payload.projections), 'RCL_SESSION_NATIVE_RECORDS_INVALID');
+  const result = verifyNativeSemanticStateRoot(payload, { requireNativeRoot: true, expectedAlgorithm: 'rcl.semantic-state-root.v2' });
+  if (!command) {
+    evidence(!result.history.length && !result.projections.length, 'RCL_SESSION_NATIVE_INITIAL_RECORDS_INVALID');
+    return result;
+  }
+  const records = command.mode === 'realize' ? result.history : result.projections;
+  const other = command.mode === 'realize' ? result.projections : result.history;
+  evidence(records.length <= 1 && !other.length, 'RCL_SESSION_NATIVE_RECORDS_INVALID');
+  const record = records[0];
+  if (!record) {
+    evidence(result.stateRoot === root(before), 'RCL_SESSION_NATIVE_UNRECORDED_STATE_CHANGE');
+    return sessionResult(program, command, before, result.state, null);
+  }
+  const rule = program.rules.find(item => item.name === command.rule);
+  const targets = [...new Set(rule.alters.map(alter => alter.target))];
+  const actor = rule.kind === 'Emergence' ? rule.cause : rule.from;
+  const decision = Object.assign(Object.create(null), before, command.inputs);
+  evidence(record.rule === rule.name && record.ruleKind === rule.kind && record.mode === command.mode
+    && record.kind === (command.mode === 'realize' ? 'Transition' : 'Projection')
+    && record.status === (command.mode === 'realize' ? 'realized' : 'projected')
+    && record.actor === actor && record.beforeRoot === root(decision), 'RCL_SESSION_NATIVE_TRANSITION_BINDING_MISMATCH');
+  evidence(Array.isArray(record.changes) && record.changes.length === targets.length
+    && Array.isArray(record.witnesses) && root(record.witnesses) === root(rule.witnesses)
+    && Array.isArray(record.hostCalls) && !record.hostCalls.length
+    && object(record.authority) && Array.isArray(record.authority.needs)
+    && root(record.authority.needs) === root(rule.needs)
+    && Array.isArray(record.authority.activeWarrants), 'RCL_SESSION_NATIVE_TRANSITION_SHAPE_INVALID');
+  for (const grant of record.authority.activeWarrants) {
+    evidence(object(grant) && grant.subject === actor && program.warrants.some(warrant =>
+      warrant.subject === grant.subject && warrant.capability === grant.capability && warrant.target === grant.target),
+    'RCL_SESSION_NATIVE_TRANSITION_AUTHORITY_INVALID');
+  }
+  const proposed = structuredClone(decision);
+  record.changes.forEach((change, index) => {
+    evidence(object(change) && change.target === targets[index] && typeof change.source === 'string'
+      && root(change.before) === root(decision[change.target]), 'RCL_SESSION_NATIVE_TRANSITION_CHANGES_INVALID');
+    proposed[change.target] = change.after;
+  });
+  evidence(record.afterRoot === root(proposed), 'RCL_SESSION_NATIVE_TRANSITION_ROOT_MISMATCH');
+  if (command.mode === 'foresee') {
+    evidence(object(record.projectedState) && root(record.projectedState) === record.afterRoot
+      && result.stateRoot === root(before), 'RCL_SESSION_NATIVE_PROJECTION_STATE_MISMATCH');
+  } else evidence(result.stateRoot === record.afterRoot, 'RCL_SESSION_NATIVE_COMMITTED_STATE_MISMATCH');
+  return sessionResult(program, command, before, result.state, record);
+}
 
 function daemonBinding(daemonPath, custom) {
   const daemonRoot = sha256(fs.readFileSync(daemonPath));
@@ -99,17 +152,31 @@ export async function createNativeRealitySession(sourceOrProgram, options = {}) 
       catch { waiter.reject(sessionError('RCL_SESSION_NATIVE_OUTPUT_INVALID')); fail(sessionError('RCL_SESSION_NATIVE_OUTPUT_INVALID')); child.kill(); }
     }
   });
-  const send = async command => {
+  const invalidEvidence = error => {
+    const failure = sessionError('RCL_SESSION_NATIVE_EVIDENCE_INVALID', error.message, { cause: error.code ?? 'RCL_SESSION_NATIVE_REPLY_INVALID' });
+    fail(failure); child.kill();
+    return failure;
+  };
+  const send = async (command, accept) => {
     if (closed) throw sessionError('RCL_SESSION_NATIVE_CLOSED', stderr);
     const response = next();
     child.stdin.write(`${command}\n`, error => { if (error) fail(sessionError('RCL_SESSION_NATIVE_PROCESS', error.message)); });
     const envelope = await response;
-    const payload = envelope.result ?? envelope;
+    let payload;
+    try {
+      evidence(object(envelope), 'RCL_SESSION_NATIVE_ENVELOPE_INVALID');
+      payload = Object.hasOwn(envelope, 'result') ? envelope.result : envelope;
+      evidence(object(payload), 'RCL_SESSION_NATIVE_PAYLOAD_INVALID');
+    } catch (error) { throw invalidEvidence(error); }
     if (payload.status === 'error') {
-      const code = payload.code ?? /^([A-Z0-9_]+)/u.exec(payload.message ?? '')?.[1] ?? 'RCL_SESSION_NATIVE_FAILURE';
-      throw sessionError(code, payload.message);
+      // Only structured VM failures have the session-step rollback contract.
+      if (typeof payload.code !== 'string' || !/^RCL_[A-Z0-9_]+$/u.test(payload.code) || typeof payload.message !== 'string') {
+        throw invalidEvidence(sessionError('RCL_SESSION_NATIVE_FAILURE', payload.message));
+      }
+      throw sessionError(payload.code, payload.message);
     }
-    return verifyNativeSemanticStateRoot(payload, { requireNativeRoot: true, expectedAlgorithm: 'rcl.semantic-state-root.v2' });
+    try { return accept(payload); }
+    catch (error) { throw invalidEvidence(error); }
   };
   const close = async () => {
     if (child.exitCode === null && child.signalCode === null) {
@@ -124,8 +191,7 @@ export async function createNativeRealitySession(sourceOrProgram, options = {}) 
   try {
     const greeting = await ready;
     if (greeting.status !== 'ready') throw sessionError('RCL_SESSION_NATIVE_NOT_READY');
-    const initial = await send('INIT');
-    if (initial.sourceRoot !== undefined && initial.sourceRoot !== program.programRoot) throw sessionError('RCL_SESSION_NATIVE_SOURCE_ROOT_MISMATCH');
+    const initial = await send('INIT', payload => verifySessionReply(program, payload));
     state = initial.state;
   } catch (error) { await close(); throw error; }
   let pending = Promise.resolve();
@@ -143,10 +209,10 @@ export async function createNativeRealitySession(sourceOrProgram, options = {}) 
       const wire = encodeSessionInputs(program, command.inputs).toString('hex');
       const operation = pending.then(async () => {
         const before = structuredClone(state);
-        const result = await send(`STEP ${command.mode === 'realize' ? 1 : 0} ${command.rule} ${wire}`);
-        state = result.state;
-        const record = command.mode === 'realize' ? result.history.at(-1) : result.projections.at(-1);
-        return sessionResult(program, command, before, state, record);
+        const result = await send(`STEP ${command.mode === 'realize' ? 1 : 0} ${command.rule} ${wire}`,
+          payload => verifySessionReply(program, payload, before, command));
+        state = structuredClone(result.state);
+        return result;
       });
       pending = operation.catch(() => {});
       return operation;

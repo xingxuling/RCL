@@ -232,9 +232,10 @@ Persistent governed sessions:
   rcl session init <source.rcl> <directory>
   rcl session invoke <directory> <command.json>
   rcl session inspect <directory>
-  rcl session verify <directory> --reference
+  rcl session verify <directory> [--reference]
   rcl session recover <directory> --repair-incomplete-tail
-  rcl session compile <source.rcl> <output.rbc>
+  rcl session compile <source.rcl> <output.rbc> [--bootstrap]
+  Existing sessions: --expected-root <sha256> --minimum-revision <integer>
 
 Use the project README for the complete advanced command catalogue.`);
 }
