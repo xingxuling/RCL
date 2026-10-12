@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "97b469a22216b5af693325d2052be2036a767aac14a6d3e92fca5411906ec353",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed",
+        "diagnosis": "A dependency index equal to the completed count is not yet completed. Rejecting equality closes the boundary error while preserving the negative no-dependency sentinel."
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "automation-1",
+        "file": "candidate.rcl",
+        "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+        "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+        "diagnosis": "Success consumes an additional attempt after the planned failures. Equality exhausts the attempt budget and must take the failure branch."
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "automation-2",
+        "file": "candidate.rcl",
+        "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+        "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval != 1",
+        "diagnosis": "The approval gate is inverted. Required approval must be present before processing the task; approved tasks continue through the existing dependency and retry checks."
+      }
+    }
+  ]
+}

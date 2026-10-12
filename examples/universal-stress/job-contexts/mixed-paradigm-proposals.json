@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "223aaee002a9cb938b56f5b6f6badab7f8abbd758eeac772c635d14d67ad6709",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence sums doubled integers instead of squares. Multiplication makes the functional result agree with the closed-form sum-of-squares invariant."
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "mixed-paradigm-1",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source",
+        "diagnosis": "The builder's warrant does not match the analysis requirement. Grant the exact compiler.analyze warrant on source while retaining the existing requirements."
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "mixed-paradigm-2",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1",
+        "diagnosis": "Successful analysis sets phase one, but emission requires phase two. Requiring phase one enables the intended transition while retaining the digest check, authority requirements, and phase-two update."
+      }
+    }
+  ]
+}

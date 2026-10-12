@@ -1,0 +1,75 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/contexts/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K106",
+    "K286",
+    "K246"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "6a277b690430258d895ba20392517f8deaede60666124a1af35611589f4c8c7d"
+}

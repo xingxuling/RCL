@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "2026887302e0a764eeeedb62dc8f5823004800d0e1027c4d6c026bd4f5639925",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "has_customer(customers, 0, order_customer(row)) == false or",
+        "diagnosis": "The foreign-key condition currently rejects existing customers and permits missing ones. Negating it preserves duplicate-key and negative-amount rejection and the single-row append."
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "relations-1",
+        "file": "candidate.rcl",
+        "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+        "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+        "diagnosis": "The aggregate counts customers outside the requested region. Count matching customers; the existing termination branch yields zero for empty input and an absent region."
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "relations-2",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+        "diagnosis": "The sum adds one per matching order. Adding each order's amount preserves the approval and customer-region join predicates and leaves the separate count function intact."
+      }
+    }
+  ]
+}

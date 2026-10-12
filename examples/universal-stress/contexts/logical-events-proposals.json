@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "c5d88695734117c9ede9727a4a48fe0f480a0dd0b200e3bb6ae30801fb3801f1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "tie-order",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "event_priority(left) > event_priority(right)",
+        "new": "event_priority(left) < event_priority(right)",
+        "diagnosis": "The priority comparison sorts descending; it must sort ascending while retaining the time and identifier comparisons."
+      }
+    },
+    {
+      "id": "budget",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+        "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+        "diagnosis": "The event budget rejection condition is reversed. Reject only when the due active event count exceeds the budget, permitting equality."
+      }
+    },
+    {
+      "id": "time-authority",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "choose(temporal_commit_capability == 1,",
+        "new": "choose(temporal_commit_capability != 1,",
+        "diagnosis": "The capability rejection condition is inverted. Reject capabilities unequal to one, then retain the existing backward-time rejection."
+      }
+    }
+  ]
+}

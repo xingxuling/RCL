@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "2f5e9e51934d8b4d922e838b57731dc17d939ec26d90897d24006463b9e3931a",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state),",
+        "new": "state_position(state) + state_velocity(state),",
+        "diagnosis": "The position update subtracts the old velocity while the trajectory appends the forward position. Addition aligns the state and trajectory with the explicit step."
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "simulation-scientific-1",
+        "file": "candidate.rcl",
+        "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+        "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+        "diagnosis": "Each integration step advances position using the old velocity. The acceleration contribution therefore sums from zero through steps minus one."
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "simulation-scientific-2",
+        "file": "candidate.rcl",
+        "old": "initial_velocity + acceleration + steps",
+        "new": "initial_velocity + acceleration * steps",
+        "diagnosis": "Each integration step adds acceleration to velocity. The closed form therefore needs acceleration multiplied by the step count, with zero steps retaining the initial velocity."
+      }
+    }
+  ]
+}

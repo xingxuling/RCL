@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "31a843880bb1b0d69ecd8485fd9587bda4a5446b5f40e8e7b2166335d9f661de",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed",
+        "diagnosis": "A dependency equal to the completed count does not name a previously completed index and must be blocked; the existing no-dependency sentinel remains permitted."
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+        "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+        "diagnosis": "Success consumes one additional attempt after the planned failures. Equality leaves no attempt for success and must reject."
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+        "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+        "diagnosis": "The workflow approval condition is inverted. It should return the rejection result before attempting an approval-required task when approval is absent."
+      }
+    }
+  ]
+}

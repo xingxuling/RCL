@@ -1,0 +1,77 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "agent",
+  "scope": "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/agent.rcl",
+  "sourceHash": "dbc1e9646ebd63380f571510738225a40e572192c983a2a606f969154680328e",
+  "casesPath": "examples/universal-stress/contexts/agent-cases.json",
+  "casesHash": "1ea4af53538abf6b5c16e5f27111ca7f8d163f201e38534e293937d943ebf40c",
+  "definitionFile": "scripts/k400-genomes/agent.mjs",
+  "definitionHash": "d267577fd88eacbb1f57b3ba717b8ce21fa98dba099254135cf391e9f24f3f6f",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "agent"
+  ],
+  "baseline": {
+    "capability": 1,
+    "budget": 5,
+    "max_risk": 3,
+    "approval": 1,
+    "kill": 0,
+    "observe": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K114",
+    "K294",
+    "K254"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "capability",
+      "index": 0,
+      "intent": "Reject an action whose required capability does not equal the granted capability; all other eligibility checks still apply.",
+      "mutatedSourceHash": "2114c52234a65a098adda5c4db9fc91638286afa1992aae3e589b623a8c761eb"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject actions whose cost exceeds the available budget; equal cost is permitted if all other checks pass.",
+      "mutatedSourceHash": "6f4e59abb12a6156438da3a96e8de323f0198d636bbd65e69a7758ee332ba9d9"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "An action requiring human approval must be rejected while approval is absent and may be considered when approval is present.",
+      "mutatedSourceHash": "ad8079068c79259d12f4a19518bd86f41a77790a51ab22b4580d7c2d6329430a"
+    }
+  ],
+  "contractRoot": "25628af858de1da4b9cc04df2fde20c4a9b8f0d04ec6b8bd6a667c9d8fe9b748"
+}

@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 71/400 PASS (17.75%) · 329 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 106/400 PASS (26.5%) · 294 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -28,9 +28,16 @@ and mixed paradigms across the same four actual targets. K098 receives another
 complete bounded profile without duplicate cell credit. All six contracts pin
 ten cases before independent generation; transaction evidence includes exact
 authority/witness matching and independently reconstructed root continuity.
-The current aggregate is 71 PASS / 329 UNTESTED, still INCOMPLETE. The new
-authenticated HTTP native compiler/VM organ has targeted runtime evidence;
-it receives no new server cell before its separate nine-gate admission.
+That checkpoint recorded 71 PASS / 329 UNTESTED. The subsequent nine-profile
+execution-context campaign completed all nine gates on authenticated HTTP,
+persistent C ABI instances and two independent worker processes. Same-instance
+reset and actual peer termination/replacement replay are checked. It adds 35
+unique cells, bringing the current aggregate to 106 PASS / 294 UNTESTED.
+Equivalent independent repairs additionally pass all ten pre-sealed inputs;
+older campaigns retain their original exact-restoration requirements.
+Cold handlers, SQLite transactions/recovery and worker-thread dataflow now have
+targeted controls and frozen independent candidates, but no K400 credit before
+their separate full campaign. See `docs/K400_EXECUTION_CONTEXTS_2026-10-13.md`.
 See `docs/K400_GENOME_CAMPAIGN_2026-10-13.md`.
 
 The same C VM now executes on Windows, wasm32-WASI, Linux WSL2 and the connected
@@ -232,7 +239,7 @@ Authority document: `docs/K03_NATIVE_ANDROID_APP_STRESS_CAMPAIGN_v0.1.md`.
 
 ### K400 Server Web/Reactive closure
 
-Current result: `PASS (9/9)` for K124 `server::web` and K138 `server::reactive` on the bounded generated Node loopback profile; coverage remains `lowered-execution`.
+Current result: `PASS (9/9)` for K104 `server::web` and K118 `server::reactive` on the bounded generated Node loopback profile; its original coverage remains `lowered-execution`. Frozen historical receipts retain their K124/K138 labels.
 
 The pre-acquisition runtime contract required 20 fresh ephemeral `127.0.0.1` server rounds, transaction p95 at most `100 ms`, and full-replay/startup-proxy p95 at most `1000 ms`. All 20 rounds passed state, observe, add/reset, authority and unknown-route rejection checks. Measured transaction p95 was `2.782 ms`; full-replay p95 was `66.846 ms`; runtime receipt root is `e0f4f5eaec5407564bc0a53358987d3208c768a0c4eb35698d0fbf8b4c47fe10`.
 

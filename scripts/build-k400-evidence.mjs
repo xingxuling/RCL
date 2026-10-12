@@ -7,6 +7,7 @@ import {
   STRESS_STATUS,
   UNIVERSAL_STRESS_GATES,
   validateUniversalStressEvidence,
+  campaignCellIdFor,
 } from '../src/universal-program-stress.mjs';
 import { verifyK02AiGenerationReceipt } from './verify-k02-ai-generation-receipt.mjs';
 import { verifyK01AiGenerationReceipt } from './verify-k01-ai-generation-receipt.mjs';
@@ -30,6 +31,8 @@ import { verifyPortableProfileReceipt } from './verify-k400-portable-profiles.mj
 import { PORTABLE_PROFILES, PROFILE_DIRECTORY } from './k400-portable-profile-definitions.mjs';
 import { GENOMES } from './k400-genomes/index.mjs';
 import { DIRECTORY as GENOME_DIRECTORY } from './k400-genomes/shared.mjs';
+import { CONTEXT_PROFILES, CONTEXT_DIRECTORY } from './k400-context-definitions.mjs';
+import { verifyContextProfile } from './k400-context-engine.mjs';
 import { verifyGenome } from './k400-genome-engine.mjs';
 
 const root = process.cwd();
@@ -842,8 +845,8 @@ const evidence = {
       ? `K03 closes K083, K085 and K098 AI_GENERATE through 3/3 independent Android repairs, emulator receipt binding and GitHub run ${k03Ai.githubAuthority.runId}.`
       : 'K03 has a 3/3 local independent Android repair candidate bound to the real emulator receipt; Android cells remain BLOCKED until GitHub replay is bound.',
     k04ServerAiAdmitted
-      ? `K04 closes K124 and K138 through 20/20 loopback runtime rounds, 3/3 independent Server repairs and GitHub run ${k04ServerAi.githubAuthority.runId}.`
-      : 'K04 has 20/20 rooted loopback runtime rounds and a 3/3 local independent Server repair candidate; K124 and K138 remain UNTESTED until GitHub-hosted replay is bound.',
+      ? `K04 closes ${campaignCellIdFor('server', 'web')} and ${campaignCellIdFor('server', 'reactive')} through 20/20 loopback rounds, 3/3 independent Server repairs and GitHub run ${k04ServerAi.githubAuthority.runId}. Frozen historical receipts retain their K124/K138 labels.`
+      : 'K04 has 20/20 rooted loopback rounds and a local independent Server repair candidate; server web/reactive remain unclaimed until their historical hosted replay is bound.',
     k04GameAiAdmitted
       ? `K04 closes K188 through deterministic fixed-step game execution, three independent game repairs and GitHub run ${k04GameAi.githubAuthority.runId}.`
       : 'K04 has deterministic fixed-step game execution and a 3/3 local independent game repair candidate; K188 remains UNTESTED until GitHub-hosted replay is bound.',
@@ -926,6 +929,26 @@ for (const definition of GENOMES) {
     ])];
   }
   evidence.sourceReceipts.push(GENOME_DIRECTORY + '/' + definition.id + '-runtime.json');
+}
+for (const definition of CONTEXT_PROFILES) {
+  const admission = verifyContextProfile(definition);
+  if (!admission.admitted) continue;
+  for (const claim of admission.claims) {
+    const existing = evidence.claims.find(item => item.id === claim.id);
+    if (!existing) { evidence.claims.push(claim); continue; }
+    if ((existing.environment !== undefined && existing.environment !== claim.environment)
+      || (existing.programFamily !== undefined && existing.programFamily !== claim.programFamily)
+      || !UNIVERSAL_STRESS_GATES.every(gate => existing.gates[gate]?.status === 'PASS' && claim.gates[gate]?.status === 'PASS')) {
+      throw new Error('RCL_K400_PROFILE_COLLISION_REQUIRES_REVIEW:' + claim.id);
+    }
+    existing.additionalProfiles ??= [];
+    existing.additionalProfiles.push({ id: 'context:' + definition.id, reportRoot: admission.reportRoot, scope: definition.scope,
+      lastVerifiedDate: claim.lastVerifiedDate, coverageMode: claim.coverageMode, evidence: claim.gates.EVIDENCE.evidence });
+    for (const gate of UNIVERSAL_STRESS_GATES) existing.gates[gate].evidence = [...new Set([
+      ...existing.gates[gate].evidence, ...claim.gates[gate].evidence,
+    ])];
+  }
+  evidence.sourceReceipts.push(CONTEXT_DIRECTORY + '/' + definition.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

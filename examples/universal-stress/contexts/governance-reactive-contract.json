@@ -1,0 +1,78 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "governance-reactive",
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/governance-reactive.rcl",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesPath": "examples/universal-stress/contexts/governance-reactive-cases.json",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "definitionFile": "scripts/k400-genomes/governance.mjs",
+  "definitionHash": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "security-sensitive",
+    "reactive"
+  ],
+  "baseline": {
+    "valid": true,
+    "phase": 0,
+    "audit": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K117",
+    "K118",
+    "K297",
+    "K298",
+    "K257",
+    "K258"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "index": 0,
+      "intent": "The maintainer needs the exact compiler.inspect warrant on source to authorize the candidate; do not change rule requirements or grant unrelated permissions.",
+      "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b"
+    },
+    {
+      "id": "emit-trigger",
+      "index": 1,
+      "intent": "After candidate authorization sets phase one and accepted true, emission must trigger once and advance the phase to two.",
+      "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c"
+    },
+    {
+      "id": "audit-increment",
+      "index": 2,
+      "intent": "Each successful transaction increments the audit counter by exactly one, while its projected-state invariant must remain satisfied.",
+      "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36"
+    }
+  ],
+  "contractRoot": "63262c118f48b5ffba4515531a562608e4011e6f0476c6e06a28aed87d5cd6be"
+}

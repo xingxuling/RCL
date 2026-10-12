@@ -1,0 +1,74 @@
+{
+  "format": "rcl.k400-job-contract.v1",
+  "id": "logical-events",
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; native execution in fresh local handlers, SQLite SQL-function transactions and a bounded worker-thread dataflow pipeline; no cloud FaaS, arbitrary SQL, external stream or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/logical-events.rcl",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesPath": "examples/universal-stress/job-contexts/logical-events-cases.json",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "definitionFile": "scripts/k400-genomes/realtime.mjs",
+  "definitionHash": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b",
+  "jobDefinitionFile": "scripts/k400-job-definitions.mjs",
+  "jobDefinitionHash": "847e4e3e52e8b1f3df0f5b360cc5d68faf23521947b803e0d0eb293d5151aad6",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "serverless",
+    "database",
+    "dataflow-runtime"
+  ],
+  "families": [
+    "realtime"
+  ],
+  "baseline": {
+    "current": 0,
+    "target": 4,
+    "budget": 4
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K131",
+    "K151",
+    "K311"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "fresh terminated request handlers",
+    "SQLite reopen recovery and rejected-result rollback",
+    "worker-thread pipeline backpressure"
+  ],
+  "authorityProfile": "local source/binary-bound job execution, frozen cases and unchanged fresh independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "tie-order",
+      "index": 0,
+      "intent": "Sort events by increasing time, then increasing priority value, then increasing identifier, using a total deterministic order.",
+      "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject an advance when the count of due active events exceeds the event budget; equality is allowed.",
+      "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2"
+    },
+    {
+      "id": "time-authority",
+      "index": 2,
+      "intent": "An external time proposal requires temporal commit capability equal to one and cannot move logical time backwards.",
+      "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c"
+    }
+  ],
+  "contractRoot": "dde5eb663e22ba88d7672d4a856562c369a120b62bf7d74042e471ef4b5a69ca"
+}

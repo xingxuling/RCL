@@ -1,0 +1,5511 @@
+{
+  "format": "rcl.k400-context-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_CONTEXTS",
+  "id": "relations",
+  "generatedAt": "2026-10-12T21:31:08.937Z",
+  "contractRoot": "6a277b690430258d895ba20392517f8deaede60666124a1af35611589f4c8c7d",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/contexts/relations-proposals.json",
+  "proposalsHash": "f96d61c9b23460632e571ab5a3cd8484054bdbe414673eba0eeb30b9cc18aee5",
+  "batchHash": "59ba8070cf1ede11884c4edeee89fb0c9e01cf96affdeee92da918f46ff59e4a",
+  "eligibleCells": [
+    "K106",
+    "K286",
+    "K246"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-context-engine.mjs",
+      "sha256": "cd13883865bbf6ed671e49918ce82935bcf9429c0ae0888170f909c0ae91ca2d"
+    },
+    {
+      "path": "scripts/k400-context-definitions.mjs",
+      "sha256": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/execution-context-targets.mjs",
+      "sha256": "849f450ee1fedd24f5a89dbe306bea79b41381f22a72c7ebc41a4aceb2452c80"
+    },
+    {
+      "path": "src/portable-embedded-target.mjs",
+      "sha256": "26d6711646d1c206dcfa9a51cf76f0ef031280562d46dac33e2c270078ccf3b8"
+    },
+    {
+      "path": "src/portable-replica-target.mjs",
+      "sha256": "ea722580756f8eacb6073dee7b1bc0d455c98de7a2ae422010b3ecf1cd9ff2b3"
+    },
+    {
+      "path": "src/portable-http-target.mjs",
+      "sha256": "9bf98aa8302a71b400d9fec8776bec8e7335b814494a81fc77a0dd0d5907ac36"
+    },
+    {
+      "path": "src/portable-http-worker.mjs",
+      "sha256": "b8e2eaa3a1a348e40941a4ee3b74ace440d619c3bb1281d7662384e2eed64ad0"
+    },
+    {
+      "path": "src/portable-http-client.mjs",
+      "sha256": "0384d782ab466a1a1128fbe2c41dc47303598fd5de62fbf3f1d0f645fc013f57"
+    },
+    {
+      "path": "src/embedded-vm.mjs",
+      "sha256": "8427daf66aea0753dc86f1b0c275b461d1669eeb4679cc8394d2c3789235ff7f"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "native/rclvmd.c",
+      "sha256": "22a4ba4cac4ab289859db1a71d9fe0e2d036f17d18325884c474857c39867600"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "scripts/k400-portable-profile-definitions.mjs",
+      "sha256": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830"
+    }
+  ],
+  "backends": {
+    "server": {
+      "binding": {
+        "execution": "Native RCL compiler/VM behind authenticated loopback HTTP",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "server",
+        "transport": "HTTP_LOOPBACK_127_0_0_1",
+        "workerPid": 68260,
+        "hostedDeploymentClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 398.0313000000315,
+          "executeMs": 239.23670000000857,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 304.78390000003856,
+          "executeMs": 231.50360000005458,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 353.6962000000058,
+          "executeMs": 249.45719999994617,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 330.69309999991674,
+          "executeMs": 280.99809999996796,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 361.6012000000337,
+          "executeMs": 290.8325000000186,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 326.6301000000676,
+          "executeMs": 263.9996000000974,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 456.63120000006165,
+          "executeMs": 307.9019000000553,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 426.83199999993667,
+          "executeMs": 294.40340000006836,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 358.20100000000093,
+          "executeMs": 284.45100000000093,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 392.06019999994896,
+          "executeMs": 337.29980000003707,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 335.69650000007823,
+          "executeMs": 260.84050000004936,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 332.66890000004787,
+          "executeMs": 263.1050999999279,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 794.4158000000753,
+          "executeMs": 731.8212000000058,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 352.5054999999702,
+          "executeMs": 262.50290000007953,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 383.29330000001937,
+          "executeMs": 265.232299999916,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 323.6840999999549,
+          "executeMs": 301.17579999996815,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 343.80810000002384,
+          "executeMs": 259.5886000000173,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 339.05059999995865,
+          "executeMs": 345.79590000002645,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 341.9325999999419,
+          "executeMs": 294.1284999999916,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 344.7851999999257,
+          "executeMs": 304.3466999999946,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 0,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "c45ea9ce5208e27aaea2080a828a4a2948312e03bd75a871209a114e31df028a",
+          "sourceHash": "e6cbb2e30da978e0c2f01d1e2c92a7a75d069f9f70189e1004d30700dc066bac",
+          "sourceRoot": "445db32f7f0e6fd94b84644e728866e96b70d8e35fa8cc3be804dc2a1c47f255",
+          "compileMs": 360.89429999992717,
+          "executeMs": 345.3978000000352,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+          "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "80f133a9afa7de0b645997ee61f23b12a053088780830183a0162da1973ed728",
+          "sourceHash": "6dd89b6d1d53ed0411a98db729c1dbf2ba8d2b41adb18267e898aa2ea35f73e7",
+          "sourceRoot": "cc66ad45a3a17f76ee6f547463b80c8fee4575e1ee41b20c7edcc48ac47d9c12",
+          "compileMs": 334.36290000006557,
+          "executeMs": 263.8665000000037,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+          "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "region": 99,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "d9365e2b0bea33a0e6485b5f0d7b9737a55a997939298fd947d76ed720a74990",
+          "sourceHash": "51577199f628b66feb56271e8909397551fb759e374287ef6f1e8da347008a18",
+          "sourceRoot": "8712f468236787916711d3c6a13df9fa3196258388695cdc4dd16a228e33ca4f",
+          "compileMs": 332.29769999999553,
+          "executeMs": 274.08420000004116,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+          "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "6941290ab904e53a8e2f184d2d66c5c37f1a4c4abddcf89179c4c2486b2e0f88",
+          "sourceHash": "a6355ebfa05fe9ba43062e6ed6df4bbd7067444b0910efbf94b0df6e6ba490c3",
+          "sourceRoot": "dd8198b3f8cfe471f0b6cbe68e508dcb7f549bb5000c77b314a6ae14758173b1",
+          "compileMs": 345.17619999998715,
+          "executeMs": 302.0716000000248,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+          "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 0,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "8882da59fe145db6f053bbf52cdeec8ec9d665e134dfb295833afbc57eaeb865",
+          "sourceHash": "f9be52e717895cf17f90fc4770fefe9162c930c28fdfca446c30b54af0b84c15",
+          "sourceRoot": "bfbb368d35c099752828cf7384470ea7af9d9a17c0100c0dcf95e7ab76b1fec4",
+          "compileMs": 368.72060000000056,
+          "executeMs": 280.4589000000851,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+          "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "region": 10,
+            "valid_amount": -1,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "52807681c7deeda3adeb130389d05ea37610d1dc55e3fad935a5e9006edf01ce",
+          "sourceHash": "9d2f308111ed5beb3302a2a9f23101f0e28cb1a9feeeb237aeee0cdcb8e19a1f",
+          "sourceRoot": "33613ac768529e45a018bbb8262a43a83a35cd5f11a7519b41e9bdf0d1953d59",
+          "compileMs": 363.1380000000354,
+          "executeMs": 262.10470000002533,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+          "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 250,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "6900f27ee87106c9410e75f04a54d4b9b98a68b28f293789e00c55c085be5274",
+          "sourceHash": "5cc385feb9058e47654af96dcf06c02a1e5276948c59d955027d491cbad742b7",
+          "sourceRoot": "d0fe72fd239bbc59c29af9fea67c5b7eab68bbc4c06bc311ff8dfbac8e956af5",
+          "compileMs": 348.23930000001565,
+          "executeMs": 293.53330000001006,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+          "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": true
+          },
+          "artifactHash": "87190f27838e49e81bae82a88ad85e0bbe02773923b220f51a89c3afe3db816e",
+          "sourceHash": "c7865d73f52cd23cadbe43e7922fcad7da6e6955cf322309920878922d0c3a15",
+          "sourceRoot": "683f6aa62fb39b3c8d236fd3e8a4c72447ebec553e61ae1babff2e4f07a04886",
+          "compileMs": 334.9605000000447,
+          "executeMs": 255.79209999996237,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+          "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "region": 0,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": true
+          },
+          "artifactHash": "49461822eda883a8f219075c739dca285fdc313173969addf29d03ae81cb89fc",
+          "sourceHash": "39f70738ddfb7ea41e63aa8ec2e5edad5d18c49402c5031813775496119a79c3",
+          "sourceRoot": "a2ab5c1d8ef25f32a6ba6a3d46f6713c74c5c90747ef9617642bb85a5a9e0d9c",
+          "compileMs": 335.7921000000788,
+          "executeMs": 252.90820000006352,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+          "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "region": 20,
+            "valid_amount": -25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "300fe07b134044a4766c1edf7c1f4dd7a3adbdffd2bc02d52250ea706e64dad1",
+          "sourceHash": "d338c470c4118815e6ef57639d768c60b9d19c340e5822d6cb3daf23e20c1d83",
+          "sourceRoot": "0365f487e0d00151d3be05da0562e3ae299e53a1c40b0365f0856e03e54af10d",
+          "compileMs": 315.9174999999814,
+          "executeMs": 242.15870000002906,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+          "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+        }
+      ],
+      "trials": [
+        {
+          "id": "foreign-key",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "has_customer(customers, 0, order_customer(row)) or",
+            "new": "has_customer(customers, 0, order_customer(row)) == false or",
+            "diagnosis": "The foreign-key rejection condition is inverted: it rejects existing customers and allows missing customers. Duplicate-key, amount, and single-append behavior remain intact."
+          },
+          "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+          "broken": {
+            "kind": "success",
+            "executeMs": 260.08049999992363,
+            "runtimeTrace": {
+              "transport": "HTTP_LOOPBACK_127_0_0_1",
+              "workerPid": 68260
+            },
+            "artifactHash": "0e3434820d2568015354cd104b979ddc576bf40f93c19558774e74a430ef6078",
+            "sourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+            "sourceRoot": "98a9f8f5b7efaf1ce293867c31369850682b0d37dd34842592996c04e19e66bc",
+            "compileMs": 324.82030000002123,
+            "valueRef": "40a38efdce90124fd8bbff0541540c2ae779c06c5fdbfaa3836b4be02cddfdf3"
+          },
+          "exactCanonicalRestoration": false,
+          "semanticRepairCases": [
+            {
+              "index": 0,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 0,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "43b6d74e253599236d54a3f33332705d07f2648791582b984628712f21fb7811",
+              "sourceHash": "e96991a0cdc02e72ebdd0ed4d7723a1b45d504af516b2550cc58e3a0748a0778",
+              "sourceRoot": "ab2f226aad99a1aa73e6a50fb8b63969cc888bfbcc90d7980b0029a605fc4cde",
+              "compileMs": 311.43579999997746,
+              "executeMs": 286.9049000000814,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+              "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+            },
+            {
+              "index": 1,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6069ecea379641d0e945981f2be249dc148ece4dd9267913c6b739d06656e33",
+              "sourceHash": "c8fca2f2526dbc8311c22987d7b456e501b2bec053cd6bf3bcf2d1200b49bf08",
+              "sourceRoot": "9fe3cc58f616c42df0f28b9102937788393a70baefaf0dbbf7b96513a9b1bd26",
+              "compileMs": 395.25989999994636,
+              "executeMs": 272.3220000000438,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+              "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+            },
+            {
+              "index": 2,
+              "inputs": {
+                "region": 99,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "f3279e678b8eec6502a7245ed3778a7153d6415022400f3023223b18e92d2139",
+              "sourceHash": "5861be91cf57478678276cb98a7b13371ddc545710c60df09b5f27a5230de8fe",
+              "sourceRoot": "99ab427b8a8bd7ac86a388354e0c39e88cbf94a3da1bb087b2aff1954a5dea07",
+              "compileMs": 398.7072000000626,
+              "executeMs": 274.34390000009444,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+              "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+            },
+            {
+              "index": 3,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "8d7733a18548fd544f6374df44a9531c7f934e4b4ea7bec9ac2abdd0c66b2608",
+              "sourceHash": "2063798e77500b734ff0812a89f6be3506efcc9d7511996c1c5c9144bda29f92",
+              "sourceRoot": "273976334287c2aef17be692b06ed1b23543ca5367519bf1c186d9f9f5307eee",
+              "compileMs": 351.0516999999527,
+              "executeMs": 273.0936999999685,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+              "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+            },
+            {
+              "index": 4,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 0,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "d93e83106290319949c92d37227aa7d2da3f335aaa0aefa5dc026c04f91d4179",
+              "sourceHash": "d680c58af23fab79c8d01013bfca65c486e84dc86e13c90247a73412bbb33230",
+              "sourceRoot": "694c38c6fbd20237d88b1835831332a6ea1a1fc0d05ef2f043f16ade95b03494",
+              "compileMs": 438.42540000006557,
+              "executeMs": 316.5006000000285,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+              "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+            },
+            {
+              "index": 5,
+              "inputs": {
+                "region": 10,
+                "valid_amount": -1,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "591d6183f0f055b610dfd9d98f25532c4fb73c45a7c2d200e81fb5cf34467336",
+              "sourceHash": "b11e8f8023528e657fd5f49ab44f79ec9076327f46556ce5c4f4487d05e313be",
+              "sourceRoot": "6346ab695f36fccf416464af62146d861fa6ecfb1b656fac7c9948ab8885a181",
+              "compileMs": 373.8163000000641,
+              "executeMs": 383.40480000001844,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+              "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+            },
+            {
+              "index": 6,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 250,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6627d32983056a233fbfe6860dccfae38b5e0c47dc83bedd449022763dbd5c0",
+              "sourceHash": "c4765222b80c783c3e7ffa59b3f4eb21f75f5170231d36da5bf09fd5eb2dca68",
+              "sourceRoot": "f9c6bad587a907e59d9ae8ba3b89747f61d98a6a842cb8270470350bc80ee751",
+              "compileMs": 363.2517999999691,
+              "executeMs": 279.5971000000136,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+              "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+            },
+            {
+              "index": 7,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": true
+              },
+              "artifactHash": "734ca572844423b36f4effbac3b55d6e32c1b0c8dc62a947a583dd21662afaa8",
+              "sourceHash": "1ffd144ad372a0b18d186bdec97316b9ce071af4196b2222732d25b464b867a3",
+              "sourceRoot": "282ba6e57cbadefd4823d39a1d2efac1ae4d0bdd138488bfe8b54f5c94ccac15",
+              "compileMs": 449.0836999999592,
+              "executeMs": 286.80449999996927,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+              "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+            },
+            {
+              "index": 8,
+              "inputs": {
+                "region": 0,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": true
+              },
+              "artifactHash": "6c74adc351ef409c64257dd47d92384dd5cb86d07ae988d8a188ea85b7bc5bd8",
+              "sourceHash": "5c8aa6d0aba446290e6bd82e9e35e491af1a9af43f68ee250ed66d1c254d128d",
+              "sourceRoot": "a8573800af9fef2072ecce2a737c79b1f2525d6acabd63190b9ee07141135d0e",
+              "compileMs": 386.50050000008196,
+              "executeMs": 262.40689999994356,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+              "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+            },
+            {
+              "index": 9,
+              "inputs": {
+                "region": 20,
+                "valid_amount": -25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "0610c8283d7e3870293fd184de1ca6ebfb0da0dd1bad888b001f0519cfe6cf7d",
+              "sourceHash": "bcba55fb8016ed2126f32075d0af5ca0d0990739c80b7d4547e623bc4295c1f6",
+              "sourceRoot": "0873d5556c0c5b76eec32f76c4a24b187127921ada1ca111f12a3cce96b52153",
+              "compileMs": 330.51459999999497,
+              "executeMs": 259.8185999999987,
+              "runtimeTrace": {
+                "transport": "HTTP_LOOPBACK_127_0_0_1",
+                "workerPid": 68260
+              },
+              "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+              "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+            }
+          ],
+          "artifactHash": "54187cdea05656afa1eb1b624f469f84a708630d94790f5cb9534a79e822822a",
+          "sourceHash": "ad4c3966cf8ce8377052ebcdd5fd958d524989a762313881f4392b15b9c274e8",
+          "sourceRoot": "235fb22115630d5caa691ab3dfc092f83b9bec46cc0f7e107eb0e66beb3a47c4",
+          "compileMs": 341.71209999988787,
+          "executeMs": 259.66110000002664,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "selection",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+            "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+            "diagnosis": "The count currently includes customers outside the requested region. Equality counts matches; the existing termination branch returns zero for empty relations and absent regions."
+          },
+          "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+          "broken": {
+            "kind": "success",
+            "executeMs": 243.40730000007898,
+            "runtimeTrace": {
+              "transport": "HTTP_LOOPBACK_127_0_0_1",
+              "workerPid": 68260
+            },
+            "artifactHash": "aebea489d546fdbd522aef67fff8e539888c2f324df12ad07594b48aa7b2a257",
+            "sourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+            "sourceRoot": "f1af5a6fd6720dfcd187aebe00fe9119bf7bb50830de6be22b26450578792494",
+            "compileMs": 337.514499999932,
+            "valueRef": "58c947ec14f6aba61ecc4509997209f6e314b3e619064b9c77cab7a9a9313c72"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 310.94510000001173,
+          "executeMs": 243.3976000000257,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "aggregation",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "diagnosis": "The sum function counts qualifying orders instead of summing their amounts. Add each matching approved order's amount, retaining the customer-region join and the separate count function."
+          },
+          "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+          "broken": {
+            "kind": "success",
+            "executeMs": 234.09320000000298,
+            "runtimeTrace": {
+              "transport": "HTTP_LOOPBACK_127_0_0_1",
+              "workerPid": 68260
+            },
+            "artifactHash": "028c007c01363afd3e77d94f4ef44aed1a1d75a1debf08d85ae64e5d23731691",
+            "sourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+            "sourceRoot": "cf9b428738beca3925febcb3c9b8cd72d5db3331485157727d45d9b878de1180",
+            "compileMs": 317.66359999997076,
+            "valueRef": "607795cb949a9cedb20ca9c86ab93258a1711f1ced43d7d4ff2ed12233210767"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 346.55770000000484,
+          "executeMs": 247.66520000004675,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 68260
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 456.63120000006165,
+        "executeP95Ms": 345.79590000002645
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "authorizationRejected": true,
+        "workerPid": 68260,
+        "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+        "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+        "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "embedded-runtime": {
+      "binding": {
+        "execution": "Caller-owned native C ABI instance via rclvmd RUN_RESET",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvmd.exe",
+          "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "embedded-runtime",
+        "protocol": "RCL_NATIVE_DAEMON_C_ABI",
+        "microcontrollerOrHardwareClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 134.79570000001695,
+          "executeMs": 45.45600000000559,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 1
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 139.1479999999283,
+          "executeMs": 2.3125,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 135.0914000000339,
+          "executeMs": 3.0328999999910593,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 3
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 143.9985999999335,
+          "executeMs": 2.368999999947846,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 4
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 128.73059999989346,
+          "executeMs": 2.125400000018999,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 5
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 136.78449999995064,
+          "executeMs": 3.495799999916926,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 6
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 136.6474000000162,
+          "executeMs": 2.167200000025332,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 7
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 145.11650000000373,
+          "executeMs": 2.283299999893643,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 8
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 148.78389999992214,
+          "executeMs": 2.40949999995064,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 9
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 140.98629999998957,
+          "executeMs": 2.1334999999962747,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 10
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 151.9266999999527,
+          "executeMs": 3.123600000049919,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 11
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 143.56670000008307,
+          "executeMs": 2.258299999986775,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 12
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 166.14500000001863,
+          "executeMs": 2.5420000000158325,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 13
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 164.19089999992866,
+          "executeMs": 2.8463999999221414,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 14
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 153.29610000003595,
+          "executeMs": 2.1106999999610707,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 15
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 137.9782000000123,
+          "executeMs": 2.1300000000046566,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 16
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 144.38710000005085,
+          "executeMs": 2.665199999930337,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 17
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 141.96739999996498,
+          "executeMs": 2.165400000056252,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 18
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 151.44069999991916,
+          "executeMs": 2.1971999999368563,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 19
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 140.99559999990743,
+          "executeMs": 2.309999999939464,
+          "runtimeTrace": {
+            "instancePid": 73772,
+            "instanceRun": 20
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 0,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "c45ea9ce5208e27aaea2080a828a4a2948312e03bd75a871209a114e31df028a",
+          "sourceHash": "e6cbb2e30da978e0c2f01d1e2c92a7a75d069f9f70189e1004d30700dc066bac",
+          "sourceRoot": "445db32f7f0e6fd94b84644e728866e96b70d8e35fa8cc3be804dc2a1c47f255",
+          "compileMs": 140.7267999999458,
+          "executeMs": 45.95979999995325,
+          "runtimeTrace": {
+            "instancePid": 83444,
+            "instanceRun": 21
+          },
+          "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+          "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "80f133a9afa7de0b645997ee61f23b12a053088780830183a0162da1973ed728",
+          "sourceHash": "6dd89b6d1d53ed0411a98db729c1dbf2ba8d2b41adb18267e898aa2ea35f73e7",
+          "sourceRoot": "cc66ad45a3a17f76ee6f547463b80c8fee4575e1ee41b20c7edcc48ac47d9c12",
+          "compileMs": 129.6081000000704,
+          "executeMs": 41.0042999999132,
+          "runtimeTrace": {
+            "instancePid": 78844,
+            "instanceRun": 22
+          },
+          "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+          "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "region": 99,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "d9365e2b0bea33a0e6485b5f0d7b9737a55a997939298fd947d76ed720a74990",
+          "sourceHash": "51577199f628b66feb56271e8909397551fb759e374287ef6f1e8da347008a18",
+          "sourceRoot": "8712f468236787916711d3c6a13df9fa3196258388695cdc4dd16a228e33ca4f",
+          "compileMs": 143.09600000001956,
+          "executeMs": 41.73679999995511,
+          "runtimeTrace": {
+            "instancePid": 28444,
+            "instanceRun": 23
+          },
+          "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+          "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "6941290ab904e53a8e2f184d2d66c5c37f1a4c4abddcf89179c4c2486b2e0f88",
+          "sourceHash": "a6355ebfa05fe9ba43062e6ed6df4bbd7067444b0910efbf94b0df6e6ba490c3",
+          "sourceRoot": "dd8198b3f8cfe471f0b6cbe68e508dcb7f549bb5000c77b314a6ae14758173b1",
+          "compileMs": 138.8005000000121,
+          "executeMs": 39.97120000002906,
+          "runtimeTrace": {
+            "instancePid": 82592,
+            "instanceRun": 24
+          },
+          "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+          "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 0,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "8882da59fe145db6f053bbf52cdeec8ec9d665e134dfb295833afbc57eaeb865",
+          "sourceHash": "f9be52e717895cf17f90fc4770fefe9162c930c28fdfca446c30b54af0b84c15",
+          "sourceRoot": "bfbb368d35c099752828cf7384470ea7af9d9a17c0100c0dcf95e7ab76b1fec4",
+          "compileMs": 139.28609999991022,
+          "executeMs": 42.223300000070594,
+          "runtimeTrace": {
+            "instancePid": 76972,
+            "instanceRun": 25
+          },
+          "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+          "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "region": 10,
+            "valid_amount": -1,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "52807681c7deeda3adeb130389d05ea37610d1dc55e3fad935a5e9006edf01ce",
+          "sourceHash": "9d2f308111ed5beb3302a2a9f23101f0e28cb1a9feeeb237aeee0cdcb8e19a1f",
+          "sourceRoot": "33613ac768529e45a018bbb8262a43a83a35cd5f11a7519b41e9bdf0d1953d59",
+          "compileMs": 127.62490000005346,
+          "executeMs": 40.851200000033714,
+          "runtimeTrace": {
+            "instancePid": 76616,
+            "instanceRun": 26
+          },
+          "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+          "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 250,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "6900f27ee87106c9410e75f04a54d4b9b98a68b28f293789e00c55c085be5274",
+          "sourceHash": "5cc385feb9058e47654af96dcf06c02a1e5276948c59d955027d491cbad742b7",
+          "sourceRoot": "d0fe72fd239bbc59c29af9fea67c5b7eab68bbc4c06bc311ff8dfbac8e956af5",
+          "compileMs": 147.21429999999236,
+          "executeMs": 40.31420000002254,
+          "runtimeTrace": {
+            "instancePid": 72032,
+            "instanceRun": 27
+          },
+          "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+          "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": true
+          },
+          "artifactHash": "87190f27838e49e81bae82a88ad85e0bbe02773923b220f51a89c3afe3db816e",
+          "sourceHash": "c7865d73f52cd23cadbe43e7922fcad7da6e6955cf322309920878922d0c3a15",
+          "sourceRoot": "683f6aa62fb39b3c8d236fd3e8a4c72447ebec553e61ae1babff2e4f07a04886",
+          "compileMs": 139.671800000011,
+          "executeMs": 37.43559999996796,
+          "runtimeTrace": {
+            "instancePid": 17816,
+            "instanceRun": 28
+          },
+          "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+          "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "region": 0,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": true
+          },
+          "artifactHash": "49461822eda883a8f219075c739dca285fdc313173969addf29d03ae81cb89fc",
+          "sourceHash": "39f70738ddfb7ea41e63aa8ec2e5edad5d18c49402c5031813775496119a79c3",
+          "sourceRoot": "a2ab5c1d8ef25f32a6ba6a3d46f6713c74c5c90747ef9617642bb85a5a9e0d9c",
+          "compileMs": 148.81889999995474,
+          "executeMs": 36.57519999996293,
+          "runtimeTrace": {
+            "instancePid": 81860,
+            "instanceRun": 29
+          },
+          "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+          "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "region": 20,
+            "valid_amount": -25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "300fe07b134044a4766c1edf7c1f4dd7a3adbdffd2bc02d52250ea706e64dad1",
+          "sourceHash": "d338c470c4118815e6ef57639d768c60b9d19c340e5822d6cb3daf23e20c1d83",
+          "sourceRoot": "0365f487e0d00151d3be05da0562e3ae299e53a1c40b0365f0856e03e54af10d",
+          "compileMs": 155.58279999997467,
+          "executeMs": 50.509599999990314,
+          "runtimeTrace": {
+            "instancePid": 79928,
+            "instanceRun": 30
+          },
+          "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+          "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+        }
+      ],
+      "trials": [
+        {
+          "id": "foreign-key",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "has_customer(customers, 0, order_customer(row)) or",
+            "new": "has_customer(customers, 0, order_customer(row)) == false or",
+            "diagnosis": "The foreign-key rejection condition is inverted: it rejects existing customers and allows missing customers. Duplicate-key, amount, and single-append behavior remain intact."
+          },
+          "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+          "broken": {
+            "kind": "success",
+            "executeMs": 45.80389999994077,
+            "runtimeTrace": {
+              "instancePid": 20352,
+              "instanceRun": 31
+            },
+            "artifactHash": "0e3434820d2568015354cd104b979ddc576bf40f93c19558774e74a430ef6078",
+            "sourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+            "sourceRoot": "98a9f8f5b7efaf1ce293867c31369850682b0d37dd34842592996c04e19e66bc",
+            "compileMs": 169.01490000006743,
+            "valueRef": "40a38efdce90124fd8bbff0541540c2ae779c06c5fdbfaa3836b4be02cddfdf3"
+          },
+          "exactCanonicalRestoration": false,
+          "semanticRepairCases": [
+            {
+              "index": 0,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 0,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "43b6d74e253599236d54a3f33332705d07f2648791582b984628712f21fb7811",
+              "sourceHash": "e96991a0cdc02e72ebdd0ed4d7723a1b45d504af516b2550cc58e3a0748a0778",
+              "sourceRoot": "ab2f226aad99a1aa73e6a50fb8b63969cc888bfbcc90d7980b0029a605fc4cde",
+              "compileMs": 155.62069999997038,
+              "executeMs": 44.349700000020675,
+              "runtimeTrace": {
+                "instancePid": 70100,
+                "instanceRun": 32
+              },
+              "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+              "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+            },
+            {
+              "index": 1,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6069ecea379641d0e945981f2be249dc148ece4dd9267913c6b739d06656e33",
+              "sourceHash": "c8fca2f2526dbc8311c22987d7b456e501b2bec053cd6bf3bcf2d1200b49bf08",
+              "sourceRoot": "9fe3cc58f616c42df0f28b9102937788393a70baefaf0dbbf7b96513a9b1bd26",
+              "compileMs": 169.77390000002924,
+              "executeMs": 39.900499999988824,
+              "runtimeTrace": {
+                "instancePid": 75336,
+                "instanceRun": 33
+              },
+              "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+              "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+            },
+            {
+              "index": 2,
+              "inputs": {
+                "region": 99,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "f3279e678b8eec6502a7245ed3778a7153d6415022400f3023223b18e92d2139",
+              "sourceHash": "5861be91cf57478678276cb98a7b13371ddc545710c60df09b5f27a5230de8fe",
+              "sourceRoot": "99ab427b8a8bd7ac86a388354e0c39e88cbf94a3da1bb087b2aff1954a5dea07",
+              "compileMs": 143.0187000000151,
+              "executeMs": 43.20169999997597,
+              "runtimeTrace": {
+                "instancePid": 78072,
+                "instanceRun": 34
+              },
+              "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+              "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+            },
+            {
+              "index": 3,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "8d7733a18548fd544f6374df44a9531c7f934e4b4ea7bec9ac2abdd0c66b2608",
+              "sourceHash": "2063798e77500b734ff0812a89f6be3506efcc9d7511996c1c5c9144bda29f92",
+              "sourceRoot": "273976334287c2aef17be692b06ed1b23543ca5367519bf1c186d9f9f5307eee",
+              "compileMs": 144.21059999999125,
+              "executeMs": 40.19519999995828,
+              "runtimeTrace": {
+                "instancePid": 82052,
+                "instanceRun": 35
+              },
+              "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+              "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+            },
+            {
+              "index": 4,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 0,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "d93e83106290319949c92d37227aa7d2da3f335aaa0aefa5dc026c04f91d4179",
+              "sourceHash": "d680c58af23fab79c8d01013bfca65c486e84dc86e13c90247a73412bbb33230",
+              "sourceRoot": "694c38c6fbd20237d88b1835831332a6ea1a1fc0d05ef2f043f16ade95b03494",
+              "compileMs": 158.65200000000186,
+              "executeMs": 43.72860000003129,
+              "runtimeTrace": {
+                "instancePid": 77412,
+                "instanceRun": 36
+              },
+              "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+              "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+            },
+            {
+              "index": 5,
+              "inputs": {
+                "region": 10,
+                "valid_amount": -1,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "591d6183f0f055b610dfd9d98f25532c4fb73c45a7c2d200e81fb5cf34467336",
+              "sourceHash": "b11e8f8023528e657fd5f49ab44f79ec9076327f46556ce5c4f4487d05e313be",
+              "sourceRoot": "6346ab695f36fccf416464af62146d861fa6ecfb1b656fac7c9948ab8885a181",
+              "compileMs": 379.0135999999475,
+              "executeMs": 40.286800000001676,
+              "runtimeTrace": {
+                "instancePid": 46944,
+                "instanceRun": 37
+              },
+              "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+              "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+            },
+            {
+              "index": 6,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 250,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6627d32983056a233fbfe6860dccfae38b5e0c47dc83bedd449022763dbd5c0",
+              "sourceHash": "c4765222b80c783c3e7ffa59b3f4eb21f75f5170231d36da5bf09fd5eb2dca68",
+              "sourceRoot": "f9c6bad587a907e59d9ae8ba3b89747f61d98a6a842cb8270470350bc80ee751",
+              "compileMs": 150.00130000000354,
+              "executeMs": 45.77169999992475,
+              "runtimeTrace": {
+                "instancePid": 37872,
+                "instanceRun": 38
+              },
+              "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+              "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+            },
+            {
+              "index": 7,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": true
+              },
+              "artifactHash": "734ca572844423b36f4effbac3b55d6e32c1b0c8dc62a947a583dd21662afaa8",
+              "sourceHash": "1ffd144ad372a0b18d186bdec97316b9ce071af4196b2222732d25b464b867a3",
+              "sourceRoot": "282ba6e57cbadefd4823d39a1d2efac1ae4d0bdd138488bfe8b54f5c94ccac15",
+              "compileMs": 143.2900999999838,
+              "executeMs": 55.81529999990016,
+              "runtimeTrace": {
+                "instancePid": 82656,
+                "instanceRun": 39
+              },
+              "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+              "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+            },
+            {
+              "index": 8,
+              "inputs": {
+                "region": 0,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": true
+              },
+              "artifactHash": "6c74adc351ef409c64257dd47d92384dd5cb86d07ae988d8a188ea85b7bc5bd8",
+              "sourceHash": "5c8aa6d0aba446290e6bd82e9e35e491af1a9af43f68ee250ed66d1c254d128d",
+              "sourceRoot": "a8573800af9fef2072ecce2a737c79b1f2525d6acabd63190b9ee07141135d0e",
+              "compileMs": 186.72889999998733,
+              "executeMs": 56.750800000038,
+              "runtimeTrace": {
+                "instancePid": 82444,
+                "instanceRun": 40
+              },
+              "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+              "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+            },
+            {
+              "index": 9,
+              "inputs": {
+                "region": 20,
+                "valid_amount": -25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "0610c8283d7e3870293fd184de1ca6ebfb0da0dd1bad888b001f0519cfe6cf7d",
+              "sourceHash": "bcba55fb8016ed2126f32075d0af5ca0d0990739c80b7d4547e623bc4295c1f6",
+              "sourceRoot": "0873d5556c0c5b76eec32f76c4a24b187127921ada1ca111f12a3cce96b52153",
+              "compileMs": 184.69250000000466,
+              "executeMs": 40.174300000071526,
+              "runtimeTrace": {
+                "instancePid": 75208,
+                "instanceRun": 41
+              },
+              "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+              "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+            }
+          ],
+          "artifactHash": "54187cdea05656afa1eb1b624f469f84a708630d94790f5cb9534a79e822822a",
+          "sourceHash": "ad4c3966cf8ce8377052ebcdd5fd958d524989a762313881f4392b15b9c274e8",
+          "sourceRoot": "235fb22115630d5caa691ab3dfc092f83b9bec46cc0f7e107eb0e66beb3a47c4",
+          "compileMs": 170.81640000001062,
+          "executeMs": 48.49809999996796,
+          "runtimeTrace": {
+            "instancePid": 69044,
+            "instanceRun": 42
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "selection",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+            "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+            "diagnosis": "The count currently includes customers outside the requested region. Equality counts matches; the existing termination branch returns zero for empty relations and absent regions."
+          },
+          "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+          "broken": {
+            "kind": "success",
+            "executeMs": 47.31800000008661,
+            "runtimeTrace": {
+              "instancePid": 65656,
+              "instanceRun": 43
+            },
+            "artifactHash": "aebea489d546fdbd522aef67fff8e539888c2f324df12ad07594b48aa7b2a257",
+            "sourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+            "sourceRoot": "f1af5a6fd6720dfcd187aebe00fe9119bf7bb50830de6be22b26450578792494",
+            "compileMs": 159.7600000000093,
+            "valueRef": "58c947ec14f6aba61ecc4509997209f6e314b3e619064b9c77cab7a9a9313c72"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 178.42619999998715,
+          "executeMs": 63.228699999977835,
+          "runtimeTrace": {
+            "instancePid": 74876,
+            "instanceRun": 44
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "aggregation",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "diagnosis": "The sum function counts qualifying orders instead of summing their amounts. Add each matching approved order's amount, retaining the customer-region join and the separate count function."
+          },
+          "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+          "broken": {
+            "kind": "success",
+            "executeMs": 46.71870000008494,
+            "runtimeTrace": {
+              "instancePid": 82860,
+              "instanceRun": 45
+            },
+            "artifactHash": "028c007c01363afd3e77d94f4ef44aed1a1d75a1debf08d85ae64e5d23731691",
+            "sourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+            "sourceRoot": "cf9b428738beca3925febcb3c9b8cd72d5db3331485157727d45d9b878de1180",
+            "compileMs": 171.06260000006296,
+            "valueRef": "607795cb949a9cedb20ca9c86ab93258a1711f1ced43d7d4ff2ed12233210767"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 161.80470000009518,
+          "executeMs": 50.34550000005402,
+          "runtimeTrace": {
+            "instancePid": 61612,
+            "instanceRun": 46
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 164.19089999992866,
+        "executeP95Ms": 3.495799999916926
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "sameInstance": true,
+        "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+        "instancePid": 61612,
+        "firstRun": 47,
+        "nextRun": 48,
+        "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+        "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL daemon exited with 1: {\"status\":\"error\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "distributed-runtime": {
+      "binding": {
+        "execution": "Two independent native RCL workers with checked HTTP result quorum",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "distributed-runtime",
+        "transport": "TWO_HTTP_LOOPBACK_WORKERS",
+        "workerPid": 15192,
+        "hostedDeploymentClaimed": false,
+        "workerPids": [
+          15192,
+          16100
+        ],
+        "multiHostClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 739.7956999999005,
+          "executeMs": 567.3725000000559,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 798.7687000000151,
+          "executeMs": 551.6079000000609,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 675.6354000000283,
+          "executeMs": 513.4054000000469,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 701.9473999999464,
+          "executeMs": 551.2465999999549,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 633.2774999999674,
+          "executeMs": 487.49829999997746,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 614.4701999999816,
+          "executeMs": 481.40810000000056,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 628.50270000007,
+          "executeMs": 481.6247999999905,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 642.4884000000311,
+          "executeMs": 479.5107999999309,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 636.7939999999944,
+          "executeMs": 555.5000999999465,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 618.390699999989,
+          "executeMs": 472.0381000000052,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 606.9992999999085,
+          "executeMs": 492.86719999997877,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 701.3197000001092,
+          "executeMs": 676.6257999999216,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 754.0542000000132,
+          "executeMs": 715.1519000000553,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 1071.76390000002,
+          "executeMs": 718.9003999999259,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 1010.8147999999346,
+          "executeMs": 728.2801000000909,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 783.4087999999756,
+          "executeMs": 591.902999999933,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 948.9626999999164,
+          "executeMs": 720.8164000000106,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 766.248799999943,
+          "executeMs": 573.3038999999408,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 782.0858000000007,
+          "executeMs": 641.9112999999197,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 783.4731000000611,
+          "executeMs": 633.4593999999342,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 0,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "c45ea9ce5208e27aaea2080a828a4a2948312e03bd75a871209a114e31df028a",
+          "sourceHash": "e6cbb2e30da978e0c2f01d1e2c92a7a75d069f9f70189e1004d30700dc066bac",
+          "sourceRoot": "445db32f7f0e6fd94b84644e728866e96b70d8e35fa8cc3be804dc2a1c47f255",
+          "compileMs": 692.6238000000594,
+          "executeMs": 577.0670999999857,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+          "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "80f133a9afa7de0b645997ee61f23b12a053088780830183a0162da1973ed728",
+          "sourceHash": "6dd89b6d1d53ed0411a98db729c1dbf2ba8d2b41adb18267e898aa2ea35f73e7",
+          "sourceRoot": "cc66ad45a3a17f76ee6f547463b80c8fee4575e1ee41b20c7edcc48ac47d9c12",
+          "compileMs": 789.9239999999991,
+          "executeMs": 589.1680000000633,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+          "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "region": 99,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "d9365e2b0bea33a0e6485b5f0d7b9737a55a997939298fd947d76ed720a74990",
+          "sourceHash": "51577199f628b66feb56271e8909397551fb759e374287ef6f1e8da347008a18",
+          "sourceRoot": "8712f468236787916711d3c6a13df9fa3196258388695cdc4dd16a228e33ca4f",
+          "compileMs": 731.8078000000678,
+          "executeMs": 545.8701000000583,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+          "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "6941290ab904e53a8e2f184d2d66c5c37f1a4c4abddcf89179c4c2486b2e0f88",
+          "sourceHash": "a6355ebfa05fe9ba43062e6ed6df4bbd7067444b0910efbf94b0df6e6ba490c3",
+          "sourceRoot": "dd8198b3f8cfe471f0b6cbe68e508dcb7f549bb5000c77b314a6ae14758173b1",
+          "compileMs": 695.1524999999674,
+          "executeMs": 558.1927000000142,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+          "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "region": 20,
+            "valid_amount": 0,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "8882da59fe145db6f053bbf52cdeec8ec9d665e134dfb295833afbc57eaeb865",
+          "sourceHash": "f9be52e717895cf17f90fc4770fefe9162c930c28fdfca446c30b54af0b84c15",
+          "sourceRoot": "bfbb368d35c099752828cf7384470ea7af9d9a17c0100c0dcf95e7ab76b1fec4",
+          "compileMs": 701.981599999941,
+          "executeMs": 589.797300000093,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+          "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "region": 10,
+            "valid_amount": -1,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "52807681c7deeda3adeb130389d05ea37610d1dc55e3fad935a5e9006edf01ce",
+          "sourceHash": "9d2f308111ed5beb3302a2a9f23101f0e28cb1a9feeeb237aeee0cdcb8e19a1f",
+          "sourceRoot": "33613ac768529e45a018bbb8262a43a83a35cd5f11a7519b41e9bdf0d1953d59",
+          "compileMs": 822.0398999999743,
+          "executeMs": 630.454000000027,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+          "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 250,
+            "approved": 1,
+            "empty": false
+          },
+          "artifactHash": "6900f27ee87106c9410e75f04a54d4b9b98a68b28f293789e00c55c085be5274",
+          "sourceHash": "5cc385feb9058e47654af96dcf06c02a1e5276948c59d955027d491cbad742b7",
+          "sourceRoot": "d0fe72fd239bbc59c29af9fea67c5b7eab68bbc4c06bc311ff8dfbac8e956af5",
+          "compileMs": 726.467799999984,
+          "executeMs": 746.4535000000615,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+          "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "region": 10,
+            "valid_amount": 25,
+            "approved": 1,
+            "empty": true
+          },
+          "artifactHash": "87190f27838e49e81bae82a88ad85e0bbe02773923b220f51a89c3afe3db816e",
+          "sourceHash": "c7865d73f52cd23cadbe43e7922fcad7da6e6955cf322309920878922d0c3a15",
+          "sourceRoot": "683f6aa62fb39b3c8d236fd3e8a4c72447ebec553e61ae1babff2e4f07a04886",
+          "compileMs": 723.0350999999791,
+          "executeMs": 600.1577999999281,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+          "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "region": 0,
+            "valid_amount": 25,
+            "approved": 0,
+            "empty": true
+          },
+          "artifactHash": "49461822eda883a8f219075c739dca285fdc313173969addf29d03ae81cb89fc",
+          "sourceHash": "39f70738ddfb7ea41e63aa8ec2e5edad5d18c49402c5031813775496119a79c3",
+          "sourceRoot": "a2ab5c1d8ef25f32a6ba6a3d46f6713c74c5c90747ef9617642bb85a5a9e0d9c",
+          "compileMs": 747.83050000004,
+          "executeMs": 626.9561000000685,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+          "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "region": 20,
+            "valid_amount": -25,
+            "approved": 0,
+            "empty": false
+          },
+          "artifactHash": "300fe07b134044a4766c1edf7c1f4dd7a3adbdffd2bc02d52250ea706e64dad1",
+          "sourceHash": "d338c470c4118815e6ef57639d768c60b9d19c340e5822d6cb3daf23e20c1d83",
+          "sourceRoot": "0365f487e0d00151d3be05da0562e3ae299e53a1c40b0365f0856e03e54af10d",
+          "compileMs": 760.5600000000559,
+          "executeMs": 893.6056000000099,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+          "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+        }
+      ],
+      "trials": [
+        {
+          "id": "foreign-key",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "has_customer(customers, 0, order_customer(row)) or",
+            "new": "has_customer(customers, 0, order_customer(row)) == false or",
+            "diagnosis": "The foreign-key rejection condition is inverted: it rejects existing customers and allows missing customers. Duplicate-key, amount, and single-append behavior remain intact."
+          },
+          "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+          "broken": {
+            "kind": "success",
+            "executeMs": 611.7624999999534,
+            "runtimeTrace": {
+              "replicaPids": [
+                15192,
+                16100
+              ],
+              "replicaExecutions": 2
+            },
+            "artifactHash": "0e3434820d2568015354cd104b979ddc576bf40f93c19558774e74a430ef6078",
+            "sourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9",
+            "sourceRoot": "98a9f8f5b7efaf1ce293867c31369850682b0d37dd34842592996c04e19e66bc",
+            "compileMs": 746.8225999999559,
+            "valueRef": "40a38efdce90124fd8bbff0541540c2ae779c06c5fdbfaa3836b4be02cddfdf3"
+          },
+          "exactCanonicalRestoration": false,
+          "semanticRepairCases": [
+            {
+              "index": 0,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 0,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "43b6d74e253599236d54a3f33332705d07f2648791582b984628712f21fb7811",
+              "sourceHash": "e96991a0cdc02e72ebdd0ed4d7723a1b45d504af516b2550cc58e3a0748a0778",
+              "sourceRoot": "ab2f226aad99a1aa73e6a50fb8b63969cc888bfbcc90d7980b0029a605fc4cde",
+              "compileMs": 768.3077000000048,
+              "executeMs": 637.0676000000676,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+              "valueRef": "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d"
+            },
+            {
+              "index": 1,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6069ecea379641d0e945981f2be249dc148ece4dd9267913c6b739d06656e33",
+              "sourceHash": "c8fca2f2526dbc8311c22987d7b456e501b2bec053cd6bf3bcf2d1200b49bf08",
+              "sourceRoot": "9fe3cc58f616c42df0f28b9102937788393a70baefaf0dbbf7b96513a9b1bd26",
+              "compileMs": 726.078600000008,
+              "executeMs": 603.342399999965,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+              "valueRef": "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b"
+            },
+            {
+              "index": 2,
+              "inputs": {
+                "region": 99,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "f3279e678b8eec6502a7245ed3778a7153d6415022400f3023223b18e92d2139",
+              "sourceHash": "5861be91cf57478678276cb98a7b13371ddc545710c60df09b5f27a5230de8fe",
+              "sourceRoot": "99ab427b8a8bd7ac86a388354e0c39e88cbf94a3da1bb087b2aff1954a5dea07",
+              "compileMs": 764.7121999999508,
+              "executeMs": 622.4060999999056,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+              "valueRef": "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10"
+            },
+            {
+              "index": 3,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "8d7733a18548fd544f6374df44a9531c7f934e4b4ea7bec9ac2abdd0c66b2608",
+              "sourceHash": "2063798e77500b734ff0812a89f6be3506efcc9d7511996c1c5c9144bda29f92",
+              "sourceRoot": "273976334287c2aef17be692b06ed1b23543ca5367519bf1c186d9f9f5307eee",
+              "compileMs": 788.1190000000643,
+              "executeMs": 587.7947000000859,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+              "valueRef": "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3"
+            },
+            {
+              "index": 4,
+              "inputs": {
+                "region": 20,
+                "valid_amount": 0,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "d93e83106290319949c92d37227aa7d2da3f335aaa0aefa5dc026c04f91d4179",
+              "sourceHash": "d680c58af23fab79c8d01013bfca65c486e84dc86e13c90247a73412bbb33230",
+              "sourceRoot": "694c38c6fbd20237d88b1835831332a6ea1a1fc0d05ef2f043f16ade95b03494",
+              "compileMs": 755.7432999999728,
+              "executeMs": 637.5457999999635,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+              "valueRef": "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136"
+            },
+            {
+              "index": 5,
+              "inputs": {
+                "region": 10,
+                "valid_amount": -1,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "591d6183f0f055b610dfd9d98f25532c4fb73c45a7c2d200e81fb5cf34467336",
+              "sourceHash": "b11e8f8023528e657fd5f49ab44f79ec9076327f46556ce5c4f4487d05e313be",
+              "sourceRoot": "6346ab695f36fccf416464af62146d861fa6ecfb1b656fac7c9948ab8885a181",
+              "compileMs": 731.0873000000138,
+              "executeMs": 525.860400000005,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+              "valueRef": "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802"
+            },
+            {
+              "index": 6,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 250,
+                "approved": 1,
+                "empty": false
+              },
+              "artifactHash": "d6627d32983056a233fbfe6860dccfae38b5e0c47dc83bedd449022763dbd5c0",
+              "sourceHash": "c4765222b80c783c3e7ffa59b3f4eb21f75f5170231d36da5bf09fd5eb2dca68",
+              "sourceRoot": "f9c6bad587a907e59d9ae8ba3b89747f61d98a6a842cb8270470350bc80ee751",
+              "compileMs": 742.0309000000125,
+              "executeMs": 591.8114999999525,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+              "valueRef": "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1"
+            },
+            {
+              "index": 7,
+              "inputs": {
+                "region": 10,
+                "valid_amount": 25,
+                "approved": 1,
+                "empty": true
+              },
+              "artifactHash": "734ca572844423b36f4effbac3b55d6e32c1b0c8dc62a947a583dd21662afaa8",
+              "sourceHash": "1ffd144ad372a0b18d186bdec97316b9ce071af4196b2222732d25b464b867a3",
+              "sourceRoot": "282ba6e57cbadefd4823d39a1d2efac1ae4d0bdd138488bfe8b54f5c94ccac15",
+              "compileMs": 1005.9037999999709,
+              "executeMs": 562.3084999999264,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+              "valueRef": "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4"
+            },
+            {
+              "index": 8,
+              "inputs": {
+                "region": 0,
+                "valid_amount": 25,
+                "approved": 0,
+                "empty": true
+              },
+              "artifactHash": "6c74adc351ef409c64257dd47d92384dd5cb86d07ae988d8a188ea85b7bc5bd8",
+              "sourceHash": "5c8aa6d0aba446290e6bd82e9e35e491af1a9af43f68ee250ed66d1c254d128d",
+              "sourceRoot": "a8573800af9fef2072ecce2a737c79b1f2525d6acabd63190b9ee07141135d0e",
+              "compileMs": 861.2925999999279,
+              "executeMs": 582.2523999999976,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+              "valueRef": "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e"
+            },
+            {
+              "index": 9,
+              "inputs": {
+                "region": 20,
+                "valid_amount": -25,
+                "approved": 0,
+                "empty": false
+              },
+              "artifactHash": "0610c8283d7e3870293fd184de1ca6ebfb0da0dd1bad888b001f0519cfe6cf7d",
+              "sourceHash": "bcba55fb8016ed2126f32075d0af5ca0d0990739c80b7d4547e623bc4295c1f6",
+              "sourceRoot": "0873d5556c0c5b76eec32f76c4a24b187127921ada1ca111f12a3cce96b52153",
+              "compileMs": 711.4135999999708,
+              "executeMs": 576.5420000000158,
+              "runtimeTrace": {
+                "replicaPids": [
+                  15192,
+                  16100
+                ],
+                "replicaExecutions": 2
+              },
+              "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+              "valueRef": "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9"
+            }
+          ],
+          "artifactHash": "54187cdea05656afa1eb1b624f469f84a708630d94790f5cb9534a79e822822a",
+          "sourceHash": "ad4c3966cf8ce8377052ebcdd5fd958d524989a762313881f4392b15b9c274e8",
+          "sourceRoot": "235fb22115630d5caa691ab3dfc092f83b9bec46cc0f7e107eb0e66beb3a47c4",
+          "compileMs": 719.143800000078,
+          "executeMs": 609.7245999999577,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "selection",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+            "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+            "diagnosis": "The count currently includes customers outside the requested region. Equality counts matches; the existing termination branch returns zero for empty relations and absent regions."
+          },
+          "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+          "broken": {
+            "kind": "success",
+            "executeMs": 532.8128000000725,
+            "runtimeTrace": {
+              "replicaPids": [
+                15192,
+                16100
+              ],
+              "replicaExecutions": 2
+            },
+            "artifactHash": "aebea489d546fdbd522aef67fff8e539888c2f324df12ad07594b48aa7b2a257",
+            "sourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292",
+            "sourceRoot": "f1af5a6fd6720dfcd187aebe00fe9119bf7bb50830de6be22b26450578792494",
+            "compileMs": 1016.577900000033,
+            "valueRef": "58c947ec14f6aba61ecc4509997209f6e314b3e619064b9c77cab7a9a9313c72"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 794.128100000089,
+          "executeMs": 609.2838999999221,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        },
+        {
+          "id": "aggregation",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "relations",
+            "file": "candidate.rcl",
+            "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+            "diagnosis": "The sum function counts qualifying orders instead of summing their amounts. Add each matching approved order's amount, retaining the customer-region join and the separate count function."
+          },
+          "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+          "broken": {
+            "kind": "success",
+            "executeMs": 623.5365999999922,
+            "runtimeTrace": {
+              "replicaPids": [
+                15192,
+                16100
+              ],
+              "replicaExecutions": 2
+            },
+            "artifactHash": "028c007c01363afd3e77d94f4ef44aed1a1d75a1debf08d85ae64e5d23731691",
+            "sourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d",
+            "sourceRoot": "cf9b428738beca3925febcb3c9b8cd72d5db3331485157727d45d9b878de1180",
+            "compileMs": 754.3569000000134,
+            "valueRef": "607795cb949a9cedb20ca9c86ab93258a1711f1ced43d7d4ff2ed12233210767"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+          "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+          "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+          "compileMs": 766.1788999999408,
+          "executeMs": 595.2754999999888,
+          "runtimeTrace": {
+            "replicaPids": [
+              15192,
+              16100
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+          "valueRef": "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1010.8147999999346,
+        "executeP95Ms": 720.8164000000106
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "terminalObserved": true,
+        "lostPid": 16100,
+        "newPid": 83964,
+        "artifactHash": "bf54609350b0f7e24ad6d139686757463f8c53e8ae8b51c775157f2e5fc48ca2",
+        "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+        "sourceRoot": "373220177c6ea7889ed6a718f6c92550b816d9908721f9b381019236ae0f9384",
+        "replicaPids": [
+          15192,
+          83964
+        ]
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "b7e4b20ac5ce6f9c1f958e67ee0e281a3ad935c94675805e64bd6495e49e6460": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 3,
+        "query.region_10_committed_sum": 185,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "7d36308764922a9b5a839eabdf0c3f06e4b9667ff175e5723f634cf53f15a051",
+      "history": [],
+      "projections": []
+    },
+    "c9a5dcc187576660b992b83e791da44eff3c6ab2c5654e02892e1ecf34be4a7d": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            0,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 0,
+        "query.region_10_committed_join_count": 3,
+        "query.region_10_committed_sum": 160,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              0,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "142d08dec37658029e590f27af80ce8ca54ee463b928d9dcbfc8d203ccd872d7",
+      "history": [],
+      "projections": []
+    },
+    "2f3dedc2ea6ecfff446ec24f93630f67c357b6d31483cd639ea553e14f4d018b": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 20,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 1,
+        "query.region_10_committed_sum": 40,
+        "query.region_10_customer_count": 1,
+        "query.region_10_initial_join_count": 1,
+        "query.region_10_initial_sum": 40,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "65f94e472055dace1e091b680239e085a4233ac67c1723a85ceed5a8055b2195",
+      "history": [],
+      "projections": []
+    },
+    "61be88881294b4956133f80f6a206b10939d029dcbdad571d1ef497dd937aa10": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 99,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 0,
+        "query.region_10_committed_sum": 0,
+        "query.region_10_customer_count": 0,
+        "query.region_10_initial_join_count": 0,
+        "query.region_10_initial_sum": 0,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "de785888eb55cbdc35d18446b22b85df9e26b61a22c9ce48240a1c5c92bb2209",
+      "history": [],
+      "projections": []
+    },
+    "56b8afba9ea993f324f8b968b428cdc03a4b9af0729a374d9cb308ee5d32afc3": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            0
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 0,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 2,
+        "query.region_10_committed_sum": 160,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              0
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "45c2eea77339d17f400b01e6ba7ad1d6b0678f4c4db0f32ad3be3723661041d6",
+      "history": [],
+      "projections": []
+    },
+    "4de9fc50946a7415d83944976cecd2a59ded0e476d157aa55dc7394850755136": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            0,
+            0
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 0,
+        "input.empty": false,
+        "input.region": 20,
+        "input.valid_amount": 0,
+        "query.region_10_committed_join_count": 1,
+        "query.region_10_committed_sum": 40,
+        "query.region_10_customer_count": 1,
+        "query.region_10_initial_join_count": 1,
+        "query.region_10_initial_sum": 40,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              0,
+              0
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "e432ba7f2fe4a37e54252b7bcca5dc78856a8cbee99b5ee45fb6b4e9720be48d",
+      "history": [],
+      "projections": []
+    },
+    "ac042b0a478595acdf34b8e620e9be2ac3249a942822d991efd9f35e44764802": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": -1,
+        "query.region_10_committed_join_count": 2,
+        "query.region_10_committed_sum": 160,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ]
+      },
+      "stateRoot": "8f8f8d7acbfbab97fe62d55f8a0c15c4b8be8716c605ba03c226a0499d194274",
+      "history": [],
+      "projections": []
+    },
+    "91d4c29067763b971b24f509d6dad798bb13b2de3ff01ce0ea319a027efcf9e1": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            250,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 250,
+        "query.region_10_committed_join_count": 3,
+        "query.region_10_committed_sum": 410,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              250,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "13972a053ababe925f985abb5cb31d3b50f287f3d277f3661c172f9e4a1cc542",
+      "history": [],
+      "projections": []
+    },
+    "e2de6286f9c6af342180478bc9194e37547c54d74ac2ef460d173a532eb265b4": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [],
+        "database.customers": [],
+        "database.orders": [],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": true,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 0,
+        "query.region_10_committed_sum": 0,
+        "query.region_10_customer_count": 0,
+        "query.region_10_initial_join_count": 0,
+        "query.region_10_initial_sum": 0,
+        "transaction.duplicate": [
+          [],
+          0
+        ],
+        "transaction.negative": [
+          [],
+          0
+        ],
+        "transaction.orphan": [
+          [],
+          0
+        ],
+        "transaction.valid": [
+          [],
+          0
+        ]
+      },
+      "stateRoot": "ba78d06409bc04026decf9696c212ea2b7cd295c985e73357a6ccc7910f9f142",
+      "history": [],
+      "projections": []
+    },
+    "baaedb0a914407d11cd136ecd2d473caf700284653c2e9e81e75a7aab9e6c87e": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [],
+        "database.customers": [],
+        "database.orders": [],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 0,
+        "input.empty": true,
+        "input.region": 0,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 0,
+        "query.region_10_committed_sum": 0,
+        "query.region_10_customer_count": 0,
+        "query.region_10_initial_join_count": 0,
+        "query.region_10_initial_sum": 0,
+        "transaction.duplicate": [
+          [],
+          0
+        ],
+        "transaction.negative": [
+          [],
+          0
+        ],
+        "transaction.orphan": [
+          [],
+          0
+        ],
+        "transaction.valid": [
+          [],
+          0
+        ]
+      },
+      "stateRoot": "016c36120c0e4b59144048e1741caabea69a130c6edbf5920cf2b890d3a63969",
+      "history": [],
+      "projections": []
+    },
+    "f1256f34a8b2e64ecec44bce5ba22c712f2da7a5f09e43b0b412b1d23d169be9": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 0,
+        "input.empty": false,
+        "input.region": 20,
+        "input.valid_amount": -25,
+        "query.region_10_committed_join_count": 1,
+        "query.region_10_committed_sum": 40,
+        "query.region_10_customer_count": 1,
+        "query.region_10_initial_join_count": 1,
+        "query.region_10_initial_sum": 40,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ]
+      },
+      "stateRoot": "7f30a627e2bbf2e69da51d9d8918c04a6d21b64113bda5ebd7595971cdd0940f",
+      "history": [],
+      "projections": []
+    },
+    "40a38efdce90124fd8bbff0541540c2ae779c06c5fdbfaa3836b4be02cddfdf3": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 2,
+        "query.region_10_committed_sum": 160,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              99,
+              25,
+              1
+            ]
+          ],
+          1
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ]
+      },
+      "stateRoot": "e681f8ed0c22ddb9257f4adf4cbb235db4edae372fdbcefd8b6e69cdae189650",
+      "history": [],
+      "projections": []
+    },
+    "58c947ec14f6aba61ecc4509997209f6e314b3e619064b9c77cab7a9a9313c72": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 3,
+        "query.region_10_committed_sum": 185,
+        "query.region_10_customer_count": 1,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 160,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "99ba036b12bd845cfcefded58ca6d367265f96956c4a1a301831513d67cc9ada",
+      "history": [],
+      "projections": []
+    },
+    "607795cb949a9cedb20ca9c86ab93258a1711f1ced43d7d4ff2ed12233210767": {
+      "state": {
+        "boundary.profile": "BOUNDED_IN_MEMORY_INTEGER_RELATIONS_NOT_SQL_ENGINE",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-relations-v1",
+        "contract.owner": "RCL",
+        "database.committed_orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ],
+          [
+            104,
+            3,
+            25,
+            1
+          ]
+        ],
+        "database.customers": [
+          [
+            1,
+            10,
+            500
+          ],
+          [
+            2,
+            20,
+            300
+          ],
+          [
+            3,
+            10,
+            400
+          ]
+        ],
+        "database.orders": [
+          [
+            100,
+            1,
+            70,
+            1
+          ],
+          [
+            101,
+            2,
+            40,
+            1
+          ],
+          [
+            102,
+            1,
+            30,
+            0
+          ],
+          [
+            103,
+            3,
+            90,
+            1
+          ]
+        ],
+        "donor.sql": "PRIMARY_KEY_FOREIGN_KEY_SELECT_JOIN_AGGREGATE_ATOMIC_INSERT",
+        "input.approved": 1,
+        "input.empty": false,
+        "input.region": 10,
+        "input.valid_amount": 25,
+        "query.region_10_committed_join_count": 3,
+        "query.region_10_committed_sum": 3,
+        "query.region_10_customer_count": 2,
+        "query.region_10_initial_join_count": 2,
+        "query.region_10_initial_sum": 2,
+        "transaction.duplicate": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.negative": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.orphan": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ]
+          ],
+          0
+        ],
+        "transaction.valid": [
+          [
+            [
+              100,
+              1,
+              70,
+              1
+            ],
+            [
+              101,
+              2,
+              40,
+              1
+            ],
+            [
+              102,
+              1,
+              30,
+              0
+            ],
+            [
+              103,
+              3,
+              90,
+              1
+            ],
+            [
+              104,
+              3,
+              25,
+              1
+            ]
+          ],
+          1
+        ]
+      },
+      "stateRoot": "4b42d6dbd7f5f3439114a23a274ab352756cb714ba5768cc1cad285365b73d4a",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "7249a41f7f9c1d17c65d5c2ff740433a599a45fc369f9962c36d7caec8fdf797"
+}

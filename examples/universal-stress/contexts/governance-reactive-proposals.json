@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "63262c118f48b5ffba4515531a562608e4011e6f0476c6e06a28aed87d5cd6be",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_inspect on source",
+        "new": "warrant compiler.inspect on source",
+        "diagnosis": "The maintainer lacks the exact compiler.inspect warrant required by authorize_candidate."
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "when compiler.accepted == true and compiler.phase == 2",
+        "new": "when compiler.accepted == true and compiler.phase == 1",
+        "diagnosis": "Authorization advances the compiler to phase one. Emission must trigger there before its existing transition to phase two."
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+        "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+        "diagnosis": "Authorization increments audit by two although its projected-state invariant requires input.audit plus one. Incrementing by one also leaves emission's second increment consistent with its invariant."
+      }
+    }
+  ]
+}

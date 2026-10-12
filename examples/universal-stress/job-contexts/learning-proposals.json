@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "2e053a89ac4e4ae39f92dfd80ca62116496cad3254abd09a74caf46a33a95713",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)))",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)))",
+        "diagnosis": "The bias update has its signs reversed. A misclassified positive sample must add one; a negative sample must subtract one."
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "learning-1",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+        "diagnosis": "The shared score function subtracts the learned bias. Adding it restores the requested scoring rule for training and inference."
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "learning-2",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+        "diagnosis": "The node-weight update reverses the label-dependent direction. A misclassified positive example should add its node feature; a negative example should subtract it."
+      }
+    }
+  ]
+}

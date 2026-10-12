@@ -1,0 +1,79 @@
+{
+  "format": "rcl.k400-job-contract.v1",
+  "id": "algorithm-cli",
+  "scope": "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; native execution in fresh local handlers, SQLite SQL-function transactions and a bounded worker-thread dataflow pipeline; no cloud FaaS, arbitrary SQL, external stream or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/algorithm-posix.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "casesPath": "examples/universal-stress/job-contexts/algorithm-cli-cases.json",
+  "casesHash": "f23064a66ea16d27bab2c42729ed525b0eaa8503f25d746796613e4cce73a841",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "jobDefinitionFile": "scripts/k400-job-definitions.mjs",
+  "jobDefinitionHash": "847e4e3e52e8b1f3df0f5b360cc5d68faf23521947b803e0d0eb293d5151aad6",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "serverless",
+    "database",
+    "dataflow-runtime"
+  ],
+  "families": [
+    "algorithm",
+    "cli"
+  ],
+  "baseline": {
+    "gcd_a": 1071,
+    "gcd_b": 462,
+    "fibonacci_n": 12,
+    "sum_squares_n": 24
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K121",
+    "K122",
+    "K141",
+    "K142",
+    "K301",
+    "K302"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "fresh terminated request handlers",
+    "SQLite reopen recovery and rejected-result rollback",
+    "worker-thread pipeline backpressure"
+  ],
+  "authorityProfile": "local source/binary-bound job execution, frozen cases and unchanged fresh independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "gcd",
+      "index": 0,
+      "intent": "Compute the nonnegative greatest common divisor with Euclidean reduction, including negative values and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "index": 1,
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "index": 2,
+      "intent": "Compute the sum of integer squares from 1 through n, returning zero for nonpositive n.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "caff200a1cf8a486534e5db2ed20f7f00cb4d3d6f2eab92a5bf070c1c5203b80"
+}

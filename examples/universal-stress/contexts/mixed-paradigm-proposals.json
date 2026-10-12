@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "874763f412c9cead61f5253bb1af7e19f6295231067f3efba43bca8cac2cac60",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence sums doubled integers instead of squares, contradicting the transaction's closed-form invariant."
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source",
+        "diagnosis": "The builder's warrant does not match the declared compiler.analyze requirement. Correct the warrant while preserving the emergence requirements."
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "when compiler.phase == 2 and compiler.digest",
+        "new": "when compiler.phase == 1 and compiler.digest",
+        "diagnosis": "Analysis transitions to phase one, but emission requires phase two. Requiring phase one permits emission after analysis while preserving its digest check, authority requirements, and phase-two transition."
+      }
+    }
+  ]
+}

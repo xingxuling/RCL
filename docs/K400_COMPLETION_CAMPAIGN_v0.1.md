@@ -1,12 +1,12 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `71 PASS / 0 BLOCKED / 329 UNTESTED`
+**Current evidence:** `106 PASS / 0 BLOCKED / 294 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `17a67fbb608ada16b289ade328f77db174407304c51a6131a419abb8b6258897`
+**Report root:** `fa065eb1aafea764e094f1c8559e4d780c32558e11f71c58c50ca86f6d8c2a10`
 **Date:** 2026-10-13
 
-The active development goal is at least 200 verified cells. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) records source reuse, actual runtime adapters and independent generation; it adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates; the >=200 goal remains active.
+The active development goal is at least 200 verified cells. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106; the >=200 goal remains active.
 
 ## 1. Completion contract
 
@@ -56,8 +56,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K083` | `android::gui` | `PASS` | none for the bounded K03 Android GUI slice |
 | `K085` | `android::mobile` | `PASS` | none for the bounded K03 mobile transaction slice |
 | `K098` | `android::reactive` | `PASS` | none for the bounded K03 reactive/lifecycle slice |
-| `K124` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile |
-| `K138` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile |
+| `K104` | `server::web` | `PASS` | none for the bounded generated Node loopback Web/server profile; historical receipts retain K124 labels |
+| `K118` | `server::reactive` | `PASS` | none for the bounded generated Node loopback reactive profile; historical receipts retain K138 labels |
 | `K188` | `game-runtime::game` | `PASS` | none for the bounded deterministic K04 fixed-step 2D game profile; arbitrary engines and game generation remain unverified |
 | `K321` | `compiler-runtime::algorithm` | `PASS` | none for the bounded frozen recursive GCD/Fibonacci/sum-of-squares native CLI profile |
 | `K322` | `compiler-runtime::cli` | `PASS` | none for the same bounded native compiler-to-CLI execution profile |

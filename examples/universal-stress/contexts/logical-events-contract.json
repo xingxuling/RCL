@@ -1,0 +1,74 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "logical-events",
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/logical-events.rcl",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesPath": "examples/universal-stress/contexts/logical-events-cases.json",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "definitionFile": "scripts/k400-genomes/realtime.mjs",
+  "definitionHash": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "realtime"
+  ],
+  "baseline": {
+    "current": 0,
+    "target": 4,
+    "budget": 4
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K111",
+    "K291",
+    "K251"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "tie-order",
+      "index": 0,
+      "intent": "Sort events by increasing time, then increasing priority value, then increasing identifier, using a total deterministic order.",
+      "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject an advance when the count of due active events exceeds the event budget; equality is allowed.",
+      "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2"
+    },
+    {
+      "id": "time-authority",
+      "index": 2,
+      "intent": "An external time proposal requires temporal commit capability equal to one and cannot move logical time backwards.",
+      "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c"
+    }
+  ],
+  "contractRoot": "c5d88695734117c9ede9727a4a48fe0f480a0dd0b200e3bb6ae30801fb3801f1"
+}

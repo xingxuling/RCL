@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "286802c1facc392d05fe6a2a9003a9256cbe6f341127be8e035e08cd923ed73b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state)",
+        "new": "state_position(state) + state_velocity(state)",
+        "diagnosis": "The position update subtracts the old velocity, conflicting with explicit integration and the appended trajectory position."
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+        "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+        "diagnosis": "Position advances using velocity before acceleration. Summing those velocities requires steps times steps minus one divided by two for the acceleration contribution."
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_velocity + acceleration + steps",
+        "new": "initial_velocity + acceleration * steps",
+        "diagnosis": "The closed-form velocity adds acceleration and steps independently. Multiplying them matches constant acceleration over the specified steps and returns initial velocity at zero steps."
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "caff200a1cf8a486534e5db2ed20f7f00cb4d3d6f2eab92a5bf070c1c5203b80",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "choose(b == 0, absolute(a), gcd(b, b % a))",
+        "new": "choose(b == 0, absolute(a), gcd(absolute(b), absolute(a) % absolute(b)))",
+        "diagnosis": "The remainder operands are reversed, allowing a zero divisor when a is zero. Normalizing both operands and using a modulo b gives a nonnegative Euclidean GCD, including negative and zero inputs."
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "algorithm-cli-1",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 3))",
+        "new": "choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 2))",
+        "diagnosis": "The recurrence skips the second immediate predecessor. Use n minus two while retaining the existing zero and one base cases."
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "algorithm-cli-2",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence adds twice each integer instead of its square. Multiplication restores the sum of squares while preserving zero for nonpositive inputs."
+      }
+    }
+  ]
+}

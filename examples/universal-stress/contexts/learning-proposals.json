@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "32abdb31975f22c3d9ded3fae1b9645959f51df9273c34534b4e8ed5c3024d12",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+        "diagnosis": "The misclassification bias update has reversed signs; positive labels require +1 and negative labels require -1."
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+        "diagnosis": "The shared score function subtracts the learned bias. Adding it aligns training and inference with the specified dot product plus bias."
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+        "diagnosis": "The node-feature update has reversed signs. A misclassified positive sample should increase the weight by its node feature; a negative sample should decrease it."
+      }
+    }
+  ]
+}

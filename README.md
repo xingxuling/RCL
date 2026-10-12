@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**RESEARCH_PREVIEW · K400 71/400 (17.75%) · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 106/400 (26.5%) · INCOMPLETE · U3**
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
@@ -19,7 +19,7 @@ RCL (Reality Compiler Language) is an open-source language for writing programs 
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-**RCL is a research preview. K400 currently records 71/400 PASS and 329 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
+**RCL is a research preview. K400 currently records 106/400 PASS and 294 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
 
 ## Why RCL?
 
@@ -402,7 +402,7 @@ Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
 A missing required gate blocks the cell. A failed required gate fails the cell. No weighted score can hide a missing hard requirement.
 
-Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `71 PASS / 0 BLOCKED / 329 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator algorithm, CLI, relation and simulation/scientific execution. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `106 PASS / 0 BLOCKED / 294 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator execution. The [execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) verifies authenticated HTTP, persistent embedded instances and two-worker recovery, adding 35 distinct cells. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 ### Current killer-task frontier
 

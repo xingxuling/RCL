@@ -1,0 +1,79 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "simulation-scientific",
+  "scope": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/simulation-scientific.rcl",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "casesPath": "examples/universal-stress/contexts/simulation-scientific-cases.json",
+  "casesHash": "de935f89f19282c105d585942ea68eb7c474fa5f84a9eed63b88e07ca8230d1e",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "simulation",
+    "scientific"
+  ],
+  "baseline": {
+    "initial_position": 0,
+    "initial_velocity": 3,
+    "acceleration": 2,
+    "steps": 10
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K109",
+    "K112",
+    "K289",
+    "K292",
+    "K249",
+    "K252"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "advance-position",
+      "index": 0,
+      "intent": "Each explicit step advances position by the old velocity, then adds acceleration to velocity, and appends the new position to the trajectory.",
+      "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e"
+    },
+    {
+      "id": "closed-position",
+      "index": 1,
+      "intent": "The closed-form position must match explicit integration where position is advanced with old velocity before acceleration changes that velocity.",
+      "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99"
+    },
+    {
+      "id": "closed-velocity",
+      "index": 2,
+      "intent": "The final velocity after a given number of constant-acceleration discrete steps must match the explicit step integrator, including zero steps.",
+      "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6"
+    }
+  ],
+  "contractRoot": "286802c1facc392d05fe6a2a9003a9256cbe6f341127be8e035e08cd923ed73b"
+}

@@ -1,0 +1,75 @@
+{
+  "format": "rcl.k400-context-contract.v1",
+  "id": "automation",
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/automation.rcl",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesPath": "examples/universal-stress/contexts/automation-cases.json",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "definitionFile": "scripts/k400-genomes/automation.mjs",
+  "definitionHash": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a",
+  "contextDefinitionFile": "scripts/k400-context-definitions.mjs",
+  "contextDefinitionHash": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "server",
+    "embedded-runtime",
+    "distributed-runtime"
+  ],
+  "families": [
+    "automation"
+  ],
+  "baseline": {
+    "failures": 1,
+    "attempts": 2,
+    "approval": 1,
+    "kill": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K116",
+    "K296",
+    "K256"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "HTTP authorization rejection",
+    "same embedded instance/reset",
+    "observed peer death and replacement replay"
+  ],
+  "authorityProfile": "local source/binary-bound target execution, frozen cases and fresh exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "dependency",
+      "index": 0,
+      "intent": "A task dependency names a previously completed task index; reject a dependency at or beyond the number of completed tasks.",
+      "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286"
+    },
+    {
+      "id": "retry",
+      "index": 1,
+      "intent": "Success requires one additional attempt after all planned failures; reject when failures consume the entire attempt budget.",
+      "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "Stop a workflow before an approval-required task if human approval is absent; approved tasks may proceed if dependencies and retries permit.",
+      "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8"
+    }
+  ],
+  "contractRoot": "31a843880bb1b0d69ecd8485fd9587bda4a5446b5f40e8e7b2166335d9f661de"
+}

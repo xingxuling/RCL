@@ -1,0 +1,4777 @@
+{
+  "format": "rcl.k400-context-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_CONTEXTS",
+  "id": "mixed-paradigm",
+  "generatedAt": "2026-10-12T21:29:19.292Z",
+  "contractRoot": "874763f412c9cead61f5253bb1af7e19f6295231067f3efba43bca8cac2cac60",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/contexts/mixed-paradigm-proposals.json",
+  "proposalsHash": "6f006a69e508f5167621f4caa0188f214cc86f299510c511c2b183d104805822",
+  "batchHash": "59ba8070cf1ede11884c4edeee89fb0c9e01cf96affdeee92da918f46ff59e4a",
+  "eligibleCells": [
+    "K120",
+    "K300",
+    "K260"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-context-engine.mjs",
+      "sha256": "cd13883865bbf6ed671e49918ce82935bcf9429c0ae0888170f909c0ae91ca2d"
+    },
+    {
+      "path": "scripts/k400-context-definitions.mjs",
+      "sha256": "bb774c5e47e639ff8a6fef204adaef71fabdf44236e3dfb6e9771c55a8dd948d"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/execution-context-targets.mjs",
+      "sha256": "849f450ee1fedd24f5a89dbe306bea79b41381f22a72c7ebc41a4aceb2452c80"
+    },
+    {
+      "path": "src/portable-embedded-target.mjs",
+      "sha256": "26d6711646d1c206dcfa9a51cf76f0ef031280562d46dac33e2c270078ccf3b8"
+    },
+    {
+      "path": "src/portable-replica-target.mjs",
+      "sha256": "ea722580756f8eacb6073dee7b1bc0d455c98de7a2ae422010b3ecf1cd9ff2b3"
+    },
+    {
+      "path": "src/portable-http-target.mjs",
+      "sha256": "9bf98aa8302a71b400d9fec8776bec8e7335b814494a81fc77a0dd0d5907ac36"
+    },
+    {
+      "path": "src/portable-http-worker.mjs",
+      "sha256": "b8e2eaa3a1a348e40941a4ee3b74ace440d619c3bb1281d7662384e2eed64ad0"
+    },
+    {
+      "path": "src/portable-http-client.mjs",
+      "sha256": "0384d782ab466a1a1128fbe2c41dc47303598fd5de62fbf3f1d0f645fc013f57"
+    },
+    {
+      "path": "src/embedded-vm.mjs",
+      "sha256": "8427daf66aea0753dc86f1b0c275b461d1669eeb4679cc8394d2c3789235ff7f"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "native/rclvmd.c",
+      "sha256": "22a4ba4cac4ab289859db1a71d9fe0e2d036f17d18325884c474857c39867600"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "scripts/k400-genomes/mixed.mjs",
+      "sha256": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb"
+    }
+  ],
+  "backends": {
+    "server": {
+      "binding": {
+        "execution": "Native RCL compiler/VM behind authenticated loopback HTTP",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "server",
+        "transport": "HTTP_LOOPBACK_127_0_0_1",
+        "workerPid": 73124,
+        "hostedDeploymentClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 351.45330000005197,
+          "executeMs": 326.4406000000308,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 1,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 273.3052000000025,
+          "executeMs": 324.49280000000726,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 2,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 655.094299999997,
+          "executeMs": 299.59310000005644,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 3,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 294.7902999999933,
+          "executeMs": 322.0533000000287,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 4,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 278.44270000001416,
+          "executeMs": 300.19760000001406,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 5,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 327.42719999997644,
+          "executeMs": 312.826699999976,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 6,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 307.4967000000179,
+          "executeMs": 282.6655000000028,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 7,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 276.05080000002636,
+          "executeMs": 280.86469999997644,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 8,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 273.1464000000269,
+          "executeMs": 270.944599999988,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 9,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 267.8327000000281,
+          "executeMs": 296.78839999996126,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 10,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 264.719700000016,
+          "executeMs": 290.7646999999997,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 11,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 269.89039999997476,
+          "executeMs": 277.9162999999826,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 12,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 243.81809999997495,
+          "executeMs": 281.4875999999931,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 13,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 263.31339999998454,
+          "executeMs": 273.8629999999539,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 14,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 262.7519999999786,
+          "executeMs": 270.8244999999879,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 15,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 287.84440000000177,
+          "executeMs": 310.05549999995856,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 16,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 311.90869999997085,
+          "executeMs": 283.2457000000286,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 17,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 258.66029999998864,
+          "executeMs": 281.26519999996526,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 18,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 269.40200000000186,
+          "executeMs": 273.9921000000322,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 19,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 272.5237999999663,
+          "executeMs": 309.67070000001695,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "batch_size": 0
+          },
+          "artifactHash": "11f52911a9885078f359e52e28ca7f6fb25ba7b38f8296df724536bae52d8643",
+          "sourceHash": "717fd4c904d949aeb756e92f105c55fff32dfc027b74aaefe9370bff4972f7d6",
+          "sourceRoot": "7a8be210032e151ca45083d878ac43e81ee88bf509dbb72176600f94c0c1dc7d",
+          "compileMs": 282.4079999999958,
+          "executeMs": 266.71669999998994,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "f55007d92e34e0657252caf1413998debb4217354eb2d0b3db6fdd2e5f83ee1a",
+          "valueRef": "bfee15ae5ff59f7c8bffafdc2c9c675b135e476eb9d23de4d5780c1a4b1a1c3c"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "batch_size": -1
+          },
+          "artifactHash": "5fb44be1cb1c1cd596ac36ae89608a438ea104ef7c807e3509a303e166f395cc",
+          "sourceHash": "a5306d1c4c16b610310fa602c0e2877fe71ceab445c869cbeb17b3a733c76a0a",
+          "sourceRoot": "75911fc63949f0b3832c9c142aad78a881bb3aa7b72ba06044cdf267b459e883",
+          "compileMs": 269.5671999999904,
+          "executeMs": 264.80650000000605,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3038e243d9f9b5aa912568d19f7a8bc304bc3df6dddf6c97ffafe66d1c79539f",
+          "valueRef": "16ef50f0133dc9a73915c0ed0bdd33c682a124b301e8f67f9e8aea04921a68a4"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "batch_size": 1
+          },
+          "artifactHash": "17f8293994a248c631fbecffa00214d7281dc085b422cd5a64faef60498d0952",
+          "sourceHash": "0f1975bf69d630f843aee0e09d86a998445dd981828188d2800940221f1d74d1",
+          "sourceRoot": "ce1da92263da0ef615b41b0ad81a716bec50d18b9cdf1d2669c49ec3f49f42d9",
+          "compileMs": 273.9613000000245,
+          "executeMs": 274.6359999999986,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+          "valueRef": "3245791c8ed82937b9c03e59b532b6b5b7f3e4970ca9579cc709e5ee066a0cc7"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "batch_size": 2
+          },
+          "artifactHash": "6dbf1df96b0915ef8d8e316da64ea4ff552b86c855b3e0674d33f1965f21b236",
+          "sourceHash": "d7faab5a4480755c9311de5025b085aeecb1766fcbbeba7887616fadcfe5f370",
+          "sourceRoot": "534cdc3f2fc2885bc91b39e27f5c738f733b466da589390f4f255fe81d0c246d",
+          "compileMs": 272.1410999999498,
+          "executeMs": 260.4810999999754,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+          "valueRef": "29de8303270b5ca983184ed0f28ab7075182c0692c8ea2324bc6984a89da5c7a"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "batch_size": 3
+          },
+          "artifactHash": "dfbf0a2a6c43c3fc40cfd45d282cba14391e0ce3af0a3eecd5582d88a876bfe9",
+          "sourceHash": "5bac025c28600d4b4d959e395faeadc7f3d85f1b2689a48241bd2629f7a66b30",
+          "sourceRoot": "af0825bf8c810eab490b4910174b52a5e072e94fabd3187b7db5fe7f8a923d2b",
+          "compileMs": 254.5276999999769,
+          "executeMs": 280.62349999998696,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+          "valueRef": "5ca021d25cd7203b836a9f1364dfe48f1bc221dce944e4673306a7ef0c977cbe"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "batch_size": 4
+          },
+          "artifactHash": "874d548db792c503b97bba3e9847ada62ddf25cce376c255af79d1b0a5787faf",
+          "sourceHash": "055d4d8211fc9f0993bd00f219017e1234e4d60680e7a617549fcffc833954a4",
+          "sourceRoot": "1a5e8766c9f69959bcb14cfa42e5866a1f78d8cbef95b2bc9ba7e90dd2dd36a9",
+          "compileMs": 258.9655999999959,
+          "executeMs": 263.0887999999686,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+          "valueRef": "d3caefe2a252940f8c7f3a82613e0353ea12ededae8954ac12a9ecd603e6bd78"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "batch_size": 5
+          },
+          "artifactHash": "253852aa01067918ad4690a4390cd5a0d032365ceb61cc3f1668a037676acbdc",
+          "sourceHash": "6fc1ca4bb69dd58eeed5e70bab2901175f9ce62c882903fbec73b3a2065f398f",
+          "sourceRoot": "de302d62bb342a4115fb4e1274b3532ea3622f8e589dd51e985e0caa574803d0",
+          "compileMs": 309.8486999999732,
+          "executeMs": 296.1926000000094,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+          "valueRef": "378bd306edf7717338f1a99cd3596ebfd69f7268a5602bda79ce68511f90ef23"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "batch_size": 10
+          },
+          "artifactHash": "1255c4f6858f60c2d3f388d49b5eb178a98f8ad28ff40042d21f230f0a262d89",
+          "sourceHash": "6266f4b19875b45eba4e5a77f7eb08ad8e7039b93d085bbebbb0e2f8afbfdde1",
+          "sourceRoot": "c7c3b21ce2502c714b95d63130c71175ab2c0943f4d10382e0141060bff631ed",
+          "compileMs": 275.85839999996824,
+          "executeMs": 272.13890000001993,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+          "valueRef": "a614960753fd3e0c3869880fbacad8a53be70017be5de10dea9b3d8f914a0b09"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "batch_size": 12
+          },
+          "artifactHash": "73a1b91862e932043a58068fab526ff781da0537853bb870ddbd3de43370011c",
+          "sourceHash": "91ee1073d4694572459b78438e99e07ac96f07caa9feb8f1ab4cd4235c8b6167",
+          "sourceRoot": "df086eb5dc6842cd58f67d187fe1f11248084a40811b1c00011c1c32bc5e4cb4",
+          "compileMs": 280.1658999999636,
+          "executeMs": 272.0492999999551,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+          "valueRef": "90ae640acc090712d8fc07ff4e9e2c5718cb0f8c1565a25d3090ac1a235c398a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "batch_size": 16
+          },
+          "artifactHash": "f1f03368a5640bb5b5b6d5cdb6ee2f1afdc43ba19e36ec1a84948fa0a55ed64f",
+          "sourceHash": "7be2869321686fd022c03698b6e71c350385f61b52d95b5def18292d3df9409d",
+          "sourceRoot": "40b9049b666ff489f9deef77df8ab8a5ccf2f34259783f0554147bdf99ac95d0",
+          "compileMs": 281.14379999996163,
+          "executeMs": 268.1219000000274,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+          "valueRef": "eac0d7e2ab09d7648da00f4799128deb5a17b4a11b19be28c25b98fd845d872e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "recursive-square",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+            "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+            "diagnosis": "The recurrence sums doubled integers instead of squares, contradicting the transaction's closed-form invariant."
+          },
+          "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_REALITY_BOUND_BROKEN\\\",\\\"message\\\":\\\"A preserve clause rejected the projected reality\\\"}\\n\",\"httpStatus\":400}",
+            "artifactHash": "4f29f94cbc8b124686bb33d63645ee56052e653da4cec381db2685517337c4af",
+            "sourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+            "sourceRoot": "197c40d933e76d147ef2179f9597df97196c7b79910e49cb6380f8b19b9f1262",
+            "compileMs": 299.5427000000491
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 278.55019999999786,
+          "executeMs": 287.5675999999512,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "analyze-warrant",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_analyze on source",
+            "new": "warrant compiler.analyze on source",
+            "diagnosis": "The builder's warrant does not match the declared compiler.analyze requirement. Correct the warrant while preserving the emergence requirements."
+          },
+          "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:analyze_batch:builder:compiler.analyze:source at 1:1\",\"httpStatus\":400}"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 273.53020000003744,
+          "executeMs": 257.4978000000119,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "phase-trigger",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "when compiler.phase == 2 and compiler.digest",
+            "new": "when compiler.phase == 1 and compiler.digest",
+            "diagnosis": "Analysis transitions to phase one, but emission requires phase two. Requiring phase one permits emission after analysis while preserving its digest check, authority requirements, and phase-two transition."
+          },
+          "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+          "broken": {
+            "kind": "success",
+            "executeMs": 264.2366000000038,
+            "runtimeTrace": {
+              "transport": "HTTP_LOOPBACK_127_0_0_1",
+              "workerPid": 73124
+            },
+            "artifactHash": "e08b81e3de1924f30e083d0bcab7f060e41bdd39fe0cbbda5a351319cde5a1c6",
+            "sourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+            "sourceRoot": "94463955bdf82559265440f8d5dbc9f9833d49e8f10b841e6ef5e1f7e321568b",
+            "compileMs": 267.6058999999659,
+            "valueRef": "2431103614c5fc4651384dc3dd8b0c07bda2e66e27b4cd15c67ae227c259258e"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 273.9517999999807,
+          "executeMs": 256.46280000003753,
+          "runtimeTrace": {
+            "transport": "HTTP_LOOPBACK_127_0_0_1",
+            "workerPid": 73124
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 351.45330000005197,
+        "executeP95Ms": 324.49280000000726
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "authorizationRejected": true,
+        "workerPid": 73124,
+        "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+        "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+        "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "embedded-runtime": {
+      "binding": {
+        "execution": "Caller-owned native C ABI instance via rclvmd RUN_RESET",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvmd.exe",
+          "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "embedded-runtime",
+        "protocol": "RCL_NATIVE_DAEMON_C_ABI",
+        "microcontrollerOrHardwareClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 91.80459999997402,
+          "executeMs": 50.51439999998547,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 1
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 1,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 97.41480000002775,
+          "executeMs": 3.492499999993015,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 2,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 79.71409999998286,
+          "executeMs": 2.7978000000002794,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 3
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 3,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 88.68700000003446,
+          "executeMs": 2.6304999999701977,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 4
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 4,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 96.84620000002906,
+          "executeMs": 3.000700000033248,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 5
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 5,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 88.83989999996265,
+          "executeMs": 2.2507999999797903,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 6
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 6,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 104.83580000000075,
+          "executeMs": 2.9408999999868684,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 7
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 7,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 101.87219999998342,
+          "executeMs": 3.3176999999559484,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 8
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 8,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 89.56810000003316,
+          "executeMs": 2.6283999999868684,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 9
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 9,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 88.84739999996964,
+          "executeMs": 2.5302999999839813,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 10
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 10,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 99.07449999998789,
+          "executeMs": 4.014199999975972,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 11
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 11,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 105.65829999995185,
+          "executeMs": 2.4373999999952503,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 12
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 12,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 114.16300000000047,
+          "executeMs": 3.06339999998454,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 13
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 13,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 89.937099999981,
+          "executeMs": 3.1596999999601394,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 14
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 14,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 104.58689999999478,
+          "executeMs": 3.4893999999621883,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 15
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 15,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 106.28240000002552,
+          "executeMs": 4.801399999996647,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 16
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 16,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 101.66640000004554,
+          "executeMs": 3.446300000010524,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 17
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 17,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 101.24189999996452,
+          "executeMs": 2.93660000001546,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 18
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 18,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 98.062099999981,
+          "executeMs": 2.7911999999778345,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 19
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 19,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 117.7780999999959,
+          "executeMs": 4.412500000034925,
+          "runtimeTrace": {
+            "instancePid": 82576,
+            "instanceRun": 20
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "batch_size": 0
+          },
+          "artifactHash": "11f52911a9885078f359e52e28ca7f6fb25ba7b38f8296df724536bae52d8643",
+          "sourceHash": "717fd4c904d949aeb756e92f105c55fff32dfc027b74aaefe9370bff4972f7d6",
+          "sourceRoot": "7a8be210032e151ca45083d878ac43e81ee88bf509dbb72176600f94c0c1dc7d",
+          "compileMs": 120.50729999999749,
+          "executeMs": 54.59049999999115,
+          "runtimeTrace": {
+            "instancePid": 70536,
+            "instanceRun": 21
+          },
+          "stateRoot": "f55007d92e34e0657252caf1413998debb4217354eb2d0b3db6fdd2e5f83ee1a",
+          "valueRef": "bfee15ae5ff59f7c8bffafdc2c9c675b135e476eb9d23de4d5780c1a4b1a1c3c"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "batch_size": -1
+          },
+          "artifactHash": "5fb44be1cb1c1cd596ac36ae89608a438ea104ef7c807e3509a303e166f395cc",
+          "sourceHash": "a5306d1c4c16b610310fa602c0e2877fe71ceab445c869cbeb17b3a733c76a0a",
+          "sourceRoot": "75911fc63949f0b3832c9c142aad78a881bb3aa7b72ba06044cdf267b459e883",
+          "compileMs": 116.50700000004144,
+          "executeMs": 99.00800000003073,
+          "runtimeTrace": {
+            "instancePid": 78776,
+            "instanceRun": 22
+          },
+          "stateRoot": "3038e243d9f9b5aa912568d19f7a8bc304bc3df6dddf6c97ffafe66d1c79539f",
+          "valueRef": "16ef50f0133dc9a73915c0ed0bdd33c682a124b301e8f67f9e8aea04921a68a4"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "batch_size": 1
+          },
+          "artifactHash": "17f8293994a248c631fbecffa00214d7281dc085b422cd5a64faef60498d0952",
+          "sourceHash": "0f1975bf69d630f843aee0e09d86a998445dd981828188d2800940221f1d74d1",
+          "sourceRoot": "ce1da92263da0ef615b41b0ad81a716bec50d18b9cdf1d2669c49ec3f49f42d9",
+          "compileMs": 91.01449999999022,
+          "executeMs": 45.47010000003502,
+          "runtimeTrace": {
+            "instancePid": 80324,
+            "instanceRun": 23
+          },
+          "stateRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+          "valueRef": "3245791c8ed82937b9c03e59b532b6b5b7f3e4970ca9579cc709e5ee066a0cc7"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "batch_size": 2
+          },
+          "artifactHash": "6dbf1df96b0915ef8d8e316da64ea4ff552b86c855b3e0674d33f1965f21b236",
+          "sourceHash": "d7faab5a4480755c9311de5025b085aeecb1766fcbbeba7887616fadcfe5f370",
+          "sourceRoot": "534cdc3f2fc2885bc91b39e27f5c738f733b466da589390f4f255fe81d0c246d",
+          "compileMs": 85.84540000004927,
+          "executeMs": 90.7155999999959,
+          "runtimeTrace": {
+            "instancePid": 70176,
+            "instanceRun": 24
+          },
+          "stateRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+          "valueRef": "29de8303270b5ca983184ed0f28ab7075182c0692c8ea2324bc6984a89da5c7a"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "batch_size": 3
+          },
+          "artifactHash": "dfbf0a2a6c43c3fc40cfd45d282cba14391e0ce3af0a3eecd5582d88a876bfe9",
+          "sourceHash": "5bac025c28600d4b4d959e395faeadc7f3d85f1b2689a48241bd2629f7a66b30",
+          "sourceRoot": "af0825bf8c810eab490b4910174b52a5e072e94fabd3187b7db5fe7f8a923d2b",
+          "compileMs": 106.02720000001136,
+          "executeMs": 48.994499999971595,
+          "runtimeTrace": {
+            "instancePid": 77904,
+            "instanceRun": 25
+          },
+          "stateRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+          "valueRef": "5ca021d25cd7203b836a9f1364dfe48f1bc221dce944e4673306a7ef0c977cbe"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "batch_size": 4
+          },
+          "artifactHash": "874d548db792c503b97bba3e9847ada62ddf25cce376c255af79d1b0a5787faf",
+          "sourceHash": "055d4d8211fc9f0993bd00f219017e1234e4d60680e7a617549fcffc833954a4",
+          "sourceRoot": "1a5e8766c9f69959bcb14cfa42e5866a1f78d8cbef95b2bc9ba7e90dd2dd36a9",
+          "compileMs": 77.03680000000168,
+          "executeMs": 43.62089999997988,
+          "runtimeTrace": {
+            "instancePid": 45880,
+            "instanceRun": 26
+          },
+          "stateRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+          "valueRef": "d3caefe2a252940f8c7f3a82613e0353ea12ededae8954ac12a9ecd603e6bd78"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "batch_size": 5
+          },
+          "artifactHash": "253852aa01067918ad4690a4390cd5a0d032365ceb61cc3f1668a037676acbdc",
+          "sourceHash": "6fc1ca4bb69dd58eeed5e70bab2901175f9ce62c882903fbec73b3a2065f398f",
+          "sourceRoot": "de302d62bb342a4115fb4e1274b3532ea3622f8e589dd51e985e0caa574803d0",
+          "compileMs": 82.82149999996182,
+          "executeMs": 44.31380000000354,
+          "runtimeTrace": {
+            "instancePid": 79972,
+            "instanceRun": 27
+          },
+          "stateRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+          "valueRef": "378bd306edf7717338f1a99cd3596ebfd69f7268a5602bda79ce68511f90ef23"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "batch_size": 10
+          },
+          "artifactHash": "1255c4f6858f60c2d3f388d49b5eb178a98f8ad28ff40042d21f230f0a262d89",
+          "sourceHash": "6266f4b19875b45eba4e5a77f7eb08ad8e7039b93d085bbebbb0e2f8afbfdde1",
+          "sourceRoot": "c7c3b21ce2502c714b95d63130c71175ab2c0943f4d10382e0141060bff631ed",
+          "compileMs": 77.10869999998249,
+          "executeMs": 45.7390000000014,
+          "runtimeTrace": {
+            "instancePid": 72892,
+            "instanceRun": 28
+          },
+          "stateRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+          "valueRef": "a614960753fd3e0c3869880fbacad8a53be70017be5de10dea9b3d8f914a0b09"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "batch_size": 12
+          },
+          "artifactHash": "73a1b91862e932043a58068fab526ff781da0537853bb870ddbd3de43370011c",
+          "sourceHash": "91ee1073d4694572459b78438e99e07ac96f07caa9feb8f1ab4cd4235c8b6167",
+          "sourceRoot": "df086eb5dc6842cd58f67d187fe1f11248084a40811b1c00011c1c32bc5e4cb4",
+          "compileMs": 76.10269999998854,
+          "executeMs": 45.184099999954924,
+          "runtimeTrace": {
+            "instancePid": 57596,
+            "instanceRun": 29
+          },
+          "stateRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+          "valueRef": "90ae640acc090712d8fc07ff4e9e2c5718cb0f8c1565a25d3090ac1a235c398a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "batch_size": 16
+          },
+          "artifactHash": "f1f03368a5640bb5b5b6d5cdb6ee2f1afdc43ba19e36ec1a84948fa0a55ed64f",
+          "sourceHash": "7be2869321686fd022c03698b6e71c350385f61b52d95b5def18292d3df9409d",
+          "sourceRoot": "40b9049b666ff489f9deef77df8ab8a5ccf2f34259783f0554147bdf99ac95d0",
+          "compileMs": 75.59890000004089,
+          "executeMs": 58.98430000001099,
+          "runtimeTrace": {
+            "instancePid": 55840,
+            "instanceRun": 30
+          },
+          "stateRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+          "valueRef": "eac0d7e2ab09d7648da00f4799128deb5a17b4a11b19be28c25b98fd845d872e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "recursive-square",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+            "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+            "diagnosis": "The recurrence sums doubled integers instead of squares, contradicting the transaction's closed-form invariant."
+          },
+          "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}",
+            "artifactHash": "4f29f94cbc8b124686bb33d63645ee56052e653da4cec381db2685517337c4af",
+            "sourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+            "sourceRoot": "197c40d933e76d147ef2179f9597df97196c7b79910e49cb6380f8b19b9f1262",
+            "compileMs": 84.00689999997849
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 80.33359999995446,
+          "executeMs": 54.29610000003595,
+          "runtimeTrace": {
+            "instancePid": 72176,
+            "instanceRun": 31
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "analyze-warrant",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_analyze on source",
+            "new": "warrant compiler.analyze on source",
+            "diagnosis": "The builder's warrant does not match the declared compiler.analyze requirement. Correct the warrant while preserving the emergence requirements."
+          },
+          "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:analyze_batch:builder:compiler.analyze:source at 1:1"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 86.97419999999693,
+          "executeMs": 2.573000000033062,
+          "runtimeTrace": {
+            "instancePid": 72176,
+            "instanceRun": 32
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "phase-trigger",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "when compiler.phase == 2 and compiler.digest",
+            "new": "when compiler.phase == 1 and compiler.digest",
+            "diagnosis": "Analysis transitions to phase one, but emission requires phase two. Requiring phase one permits emission after analysis while preserving its digest check, authority requirements, and phase-two transition."
+          },
+          "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+          "broken": {
+            "kind": "success",
+            "executeMs": 45.68900000001304,
+            "runtimeTrace": {
+              "instancePid": 82028,
+              "instanceRun": 33
+            },
+            "artifactHash": "e08b81e3de1924f30e083d0bcab7f060e41bdd39fe0cbbda5a351319cde5a1c6",
+            "sourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+            "sourceRoot": "94463955bdf82559265440f8d5dbc9f9833d49e8f10b841e6ef5e1f7e321568b",
+            "compileMs": 63.36190000001807,
+            "valueRef": "2431103614c5fc4651384dc3dd8b0c07bda2e66e27b4cd15c67ae227c259258e"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 75.27449999999953,
+          "executeMs": 43.17399999999907,
+          "runtimeTrace": {
+            "instancePid": 43288,
+            "instanceRun": 34
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 114.16300000000047,
+        "executeP95Ms": 4.801399999996647
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "sameInstance": true,
+        "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+        "instancePid": 43288,
+        "firstRun": 35,
+        "nextRun": 36,
+        "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+        "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL daemon exited with 1: {\"status\":\"error\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "distributed-runtime": {
+      "binding": {
+        "execution": "Two independent native RCL workers with checked HTTP result quorum",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false,
+        "context": "distributed-runtime",
+        "transport": "TWO_HTTP_LOOPBACK_WORKERS",
+        "workerPid": 78376,
+        "hostedDeploymentClaimed": false,
+        "workerPids": [
+          78376,
+          77660
+        ],
+        "multiHostClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 652.7229999999981,
+          "executeMs": 626.8787000000011,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 1,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 639.1222999999882,
+          "executeMs": 591.3053999999538,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 2,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 641.4968999999692,
+          "executeMs": 632.5825999999652,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 3,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 658.8809999999357,
+          "executeMs": 640.4944000000833,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 4,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 632.6787000000477,
+          "executeMs": 658.6960999999428,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 5,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 918.8824000000022,
+          "executeMs": 545.5967999999411,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 6,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 534.8233000000473,
+          "executeMs": 623.4618000000482,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 7,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 598.9627000000328,
+          "executeMs": 605.594800000079,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 8,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 533.5684000001056,
+          "executeMs": 560.9274999999907,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 9,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 556.5450999999885,
+          "executeMs": 627.2746000000043,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 10,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 635.6931999999797,
+          "executeMs": 610.234800000093,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 11,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 578.4948999999324,
+          "executeMs": 586.8634000000311,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 12,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 548.4684000000125,
+          "executeMs": 569.5965000001015,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 13,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 569.8005000000121,
+          "executeMs": 552.1003999999957,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 14,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 526.3921000000555,
+          "executeMs": 592.99729999993,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 15,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 626.01529999997,
+          "executeMs": 720.7950000000419,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 16,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 563.6727999999421,
+          "executeMs": 694.154899999965,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 17,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 570.3571999999695,
+          "executeMs": 710.5558999999193,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 18,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 644.8978000000352,
+          "executeMs": 586.8473999999696,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "index": 19,
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 646.0508999999147,
+          "executeMs": 574.7029999999795,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "batch_size": 0
+          },
+          "artifactHash": "11f52911a9885078f359e52e28ca7f6fb25ba7b38f8296df724536bae52d8643",
+          "sourceHash": "717fd4c904d949aeb756e92f105c55fff32dfc027b74aaefe9370bff4972f7d6",
+          "sourceRoot": "7a8be210032e151ca45083d878ac43e81ee88bf509dbb72176600f94c0c1dc7d",
+          "compileMs": 571.0249000000767,
+          "executeMs": 564.2401000000536,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "f55007d92e34e0657252caf1413998debb4217354eb2d0b3db6fdd2e5f83ee1a",
+          "valueRef": "bfee15ae5ff59f7c8bffafdc2c9c675b135e476eb9d23de4d5780c1a4b1a1c3c"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "batch_size": -1
+          },
+          "artifactHash": "5fb44be1cb1c1cd596ac36ae89608a438ea104ef7c807e3509a303e166f395cc",
+          "sourceHash": "a5306d1c4c16b610310fa602c0e2877fe71ceab445c869cbeb17b3a733c76a0a",
+          "sourceRoot": "75911fc63949f0b3832c9c142aad78a881bb3aa7b72ba06044cdf267b459e883",
+          "compileMs": 566.1022999999113,
+          "executeMs": 598.7419999999693,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3038e243d9f9b5aa912568d19f7a8bc304bc3df6dddf6c97ffafe66d1c79539f",
+          "valueRef": "16ef50f0133dc9a73915c0ed0bdd33c682a124b301e8f67f9e8aea04921a68a4"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "batch_size": 1
+          },
+          "artifactHash": "17f8293994a248c631fbecffa00214d7281dc085b422cd5a64faef60498d0952",
+          "sourceHash": "0f1975bf69d630f843aee0e09d86a998445dd981828188d2800940221f1d74d1",
+          "sourceRoot": "ce1da92263da0ef615b41b0ad81a716bec50d18b9cdf1d2669c49ec3f49f42d9",
+          "compileMs": 783.1964000000153,
+          "executeMs": 547.8871999999974,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+          "valueRef": "3245791c8ed82937b9c03e59b532b6b5b7f3e4970ca9579cc709e5ee066a0cc7"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "batch_size": 2
+          },
+          "artifactHash": "6dbf1df96b0915ef8d8e316da64ea4ff552b86c855b3e0674d33f1965f21b236",
+          "sourceHash": "d7faab5a4480755c9311de5025b085aeecb1766fcbbeba7887616fadcfe5f370",
+          "sourceRoot": "534cdc3f2fc2885bc91b39e27f5c738f733b466da589390f4f255fe81d0c246d",
+          "compileMs": 604.4307999999728,
+          "executeMs": 572.4813999999315,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+          "valueRef": "29de8303270b5ca983184ed0f28ab7075182c0692c8ea2324bc6984a89da5c7a"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "batch_size": 3
+          },
+          "artifactHash": "dfbf0a2a6c43c3fc40cfd45d282cba14391e0ce3af0a3eecd5582d88a876bfe9",
+          "sourceHash": "5bac025c28600d4b4d959e395faeadc7f3d85f1b2689a48241bd2629f7a66b30",
+          "sourceRoot": "af0825bf8c810eab490b4910174b52a5e072e94fabd3187b7db5fe7f8a923d2b",
+          "compileMs": 641.5471000000834,
+          "executeMs": 653.3343999999342,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+          "valueRef": "5ca021d25cd7203b836a9f1364dfe48f1bc221dce944e4673306a7ef0c977cbe"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "batch_size": 4
+          },
+          "artifactHash": "874d548db792c503b97bba3e9847ada62ddf25cce376c255af79d1b0a5787faf",
+          "sourceHash": "055d4d8211fc9f0993bd00f219017e1234e4d60680e7a617549fcffc833954a4",
+          "sourceRoot": "1a5e8766c9f69959bcb14cfa42e5866a1f78d8cbef95b2bc9ba7e90dd2dd36a9",
+          "compileMs": 625.8877000000793,
+          "executeMs": 717.513799999957,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+          "valueRef": "d3caefe2a252940f8c7f3a82613e0353ea12ededae8954ac12a9ecd603e6bd78"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "batch_size": 5
+          },
+          "artifactHash": "253852aa01067918ad4690a4390cd5a0d032365ceb61cc3f1668a037676acbdc",
+          "sourceHash": "6fc1ca4bb69dd58eeed5e70bab2901175f9ce62c882903fbec73b3a2065f398f",
+          "sourceRoot": "de302d62bb342a4115fb4e1274b3532ea3622f8e589dd51e985e0caa574803d0",
+          "compileMs": 691.8420999998925,
+          "executeMs": 532.4506999999285,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+          "valueRef": "378bd306edf7717338f1a99cd3596ebfd69f7268a5602bda79ce68511f90ef23"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "batch_size": 10
+          },
+          "artifactHash": "1255c4f6858f60c2d3f388d49b5eb178a98f8ad28ff40042d21f230f0a262d89",
+          "sourceHash": "6266f4b19875b45eba4e5a77f7eb08ad8e7039b93d085bbebbb0e2f8afbfdde1",
+          "sourceRoot": "c7c3b21ce2502c714b95d63130c71175ab2c0943f4d10382e0141060bff631ed",
+          "compileMs": 495.54489999997895,
+          "executeMs": 678.0740000000224,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+          "valueRef": "a614960753fd3e0c3869880fbacad8a53be70017be5de10dea9b3d8f914a0b09"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "batch_size": 12
+          },
+          "artifactHash": "73a1b91862e932043a58068fab526ff781da0537853bb870ddbd3de43370011c",
+          "sourceHash": "91ee1073d4694572459b78438e99e07ac96f07caa9feb8f1ab4cd4235c8b6167",
+          "sourceRoot": "df086eb5dc6842cd58f67d187fe1f11248084a40811b1c00011c1c32bc5e4cb4",
+          "compileMs": 680.4246999999741,
+          "executeMs": 801.8716000000713,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+          "valueRef": "90ae640acc090712d8fc07ff4e9e2c5718cb0f8c1565a25d3090ac1a235c398a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "batch_size": 16
+          },
+          "artifactHash": "f1f03368a5640bb5b5b6d5cdb6ee2f1afdc43ba19e36ec1a84948fa0a55ed64f",
+          "sourceHash": "7be2869321686fd022c03698b6e71c350385f61b52d95b5def18292d3df9409d",
+          "sourceRoot": "40b9049b666ff489f9deef77df8ab8a5ccf2f34259783f0554147bdf99ac95d0",
+          "compileMs": 638.6596000000136,
+          "executeMs": 677.9078000000445,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+          "valueRef": "eac0d7e2ab09d7648da00f4799128deb5a17b4a11b19be28c25b98fd845d872e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "recursive-square",
+          "context": "/root/k400_context_a",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+            "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+            "diagnosis": "The recurrence sums doubled integers instead of squares, contradicting the transaction's closed-form invariant."
+          },
+          "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_REALITY_BOUND_BROKEN\\\",\\\"message\\\":\\\"A preserve clause rejected the projected reality\\\"}\\n\",\"httpStatus\":400}",
+            "artifactHash": "4f29f94cbc8b124686bb33d63645ee56052e653da4cec381db2685517337c4af",
+            "sourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d",
+            "sourceRoot": "197c40d933e76d147ef2179f9597df97196c7b79910e49cb6380f8b19b9f1262",
+            "compileMs": 653.6570000000065
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 672.1739999999991,
+          "executeMs": 668.4930999999633,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "analyze-warrant",
+          "context": "/root/k400_context_b",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_analyze on source",
+            "new": "warrant compiler.analyze on source",
+            "diagnosis": "The builder's warrant does not match the declared compiler.analyze requirement. Correct the warrant while preserving the emergence requirements."
+          },
+          "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:analyze_batch:builder:compiler.analyze:source at 1:1\",\"httpStatus\":400}"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 596.7537000000011,
+          "executeMs": 706.905299999984,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        },
+        {
+          "id": "phase-trigger",
+          "context": "/root/k400_context_c",
+          "proposal": {
+            "id": "mixed-paradigm",
+            "file": "candidate.rcl",
+            "old": "when compiler.phase == 2 and compiler.digest",
+            "new": "when compiler.phase == 1 and compiler.digest",
+            "diagnosis": "Analysis transitions to phase one, but emission requires phase two. Requiring phase one permits emission after analysis while preserving its digest check, authority requirements, and phase-two transition."
+          },
+          "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+          "broken": {
+            "kind": "success",
+            "executeMs": 682.5672000000486,
+            "runtimeTrace": {
+              "replicaPids": [
+                78376,
+                77660
+              ],
+              "replicaExecutions": 2
+            },
+            "artifactHash": "e08b81e3de1924f30e083d0bcab7f060e41bdd39fe0cbbda5a351319cde5a1c6",
+            "sourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167",
+            "sourceRoot": "94463955bdf82559265440f8d5dbc9f9833d49e8f10b841e6ef5e1f7e321568b",
+            "compileMs": 671.9585000000661,
+            "valueRef": "2431103614c5fc4651384dc3dd8b0c07bda2e66e27b4cd15c67ae227c259258e"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+          "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+          "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+          "compileMs": 792.5036000000546,
+          "executeMs": 693.6446999999462,
+          "runtimeTrace": {
+            "replicaPids": [
+              78376,
+              77660
+            ],
+            "replicaExecutions": 2
+          },
+          "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "valueRef": "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 658.8809999999357,
+        "executeP95Ms": 710.5558999999193
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "terminalObserved": true,
+        "lostPid": 77660,
+        "newPid": 67428,
+        "artifactHash": "925bd8a269646253617f548e1012853ebf5947e897abb2c4c2362e40f75fd106",
+        "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+        "sourceRoot": "a90a31d8e68c4a32829a06e0fb3a1b2cd10fbd8052306597d8c3c3fdc2eb0a80",
+        "replicaPids": [
+          78376,
+          67428
+        ]
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "{\"ok\":false,\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\",\"httpStatus\":400}",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"ok\":false,\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_PORTABLE_TARGET_COMMAND_FAILED:{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"RCL_NATIVE_LOAD\\\",\\\"message\\\":\\\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\\\"}\\n\",\"httpStatus\":400}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "dd3e4d351e16d27d5703ed4e47178d9c651d1696337434d47e95398ae07187cc": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 204,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 8
+      },
+      "stateRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "c081cf9507298e3d737eb45bee75c20a7acb0029c2e9970889b50007e34d4094",
+          "afterRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 204,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "afterRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "c081cf9507298e3d737eb45bee75c20a7acb0029c2e9970889b50007e34d4094",
+          "afterRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 204,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 204,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 8
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "afterRoot": "3b23339b44c743b6061d5e18033a3277dee6e4e31f99f63e0459612f54a0017b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 204,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 8
+          }
+        }
+      ]
+    },
+    "bfee15ae5ff59f7c8bffafdc2c9c675b135e476eb9d23de4d5780c1a4b1a1c3c": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.digest": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.batch_size": 0
+      },
+      "stateRoot": "f55007d92e34e0657252caf1413998debb4217354eb2d0b3db6fdd2e5f83ee1a",
+      "history": [],
+      "projections": []
+    },
+    "16ef50f0133dc9a73915c0ed0bdd33c682a124b301e8f67f9e8aea04921a68a4": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.digest": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.batch_size": -1
+      },
+      "stateRoot": "3038e243d9f9b5aa912568d19f7a8bc304bc3df6dddf6c97ffafe66d1c79539f",
+      "history": [],
+      "projections": []
+    },
+    "3245791c8ed82937b9c03e59b532b6b5b7f3e4970ca9579cc709e5ee066a0cc7": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 1,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 1
+      },
+      "stateRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "5e7ceb7fd3eaf4171bd8141da34723ef912cc2d1105e499208db83128538fdb2",
+          "afterRoot": "5d0501d603e31e0a700c3257df1c0ccbe099175e9c56b69516e1b0c2778ef8ca",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "5d0501d603e31e0a700c3257df1c0ccbe099175e9c56b69516e1b0c2778ef8ca",
+          "afterRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "5e7ceb7fd3eaf4171bd8141da34723ef912cc2d1105e499208db83128538fdb2",
+          "afterRoot": "5d0501d603e31e0a700c3257df1c0ccbe099175e9c56b69516e1b0c2778ef8ca",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 1,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 1
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "5d0501d603e31e0a700c3257df1c0ccbe099175e9c56b69516e1b0c2778ef8ca",
+          "afterRoot": "f7f6e4f7acae3f095729a06d71434b958f0435efb18656a1bbe146e32d6aa0fb",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 1,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 1
+          }
+        }
+      ]
+    },
+    "29de8303270b5ca983184ed0f28ab7075182c0692c8ea2324bc6984a89da5c7a": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 5,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 2
+      },
+      "stateRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "7dbe31fd870880d1a8fef233cebefcef9a49492ec2c7709de0d4824e610bb50d",
+          "afterRoot": "f17a0426b54c6caad21c1d4f015a77d3a7dcc6aa76d710e2fa90d9b8b7f5da4a",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 5,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "f17a0426b54c6caad21c1d4f015a77d3a7dcc6aa76d710e2fa90d9b8b7f5da4a",
+          "afterRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "7dbe31fd870880d1a8fef233cebefcef9a49492ec2c7709de0d4824e610bb50d",
+          "afterRoot": "f17a0426b54c6caad21c1d4f015a77d3a7dcc6aa76d710e2fa90d9b8b7f5da4a",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 5,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 5,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 2
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "f17a0426b54c6caad21c1d4f015a77d3a7dcc6aa76d710e2fa90d9b8b7f5da4a",
+          "afterRoot": "64e70aaecd75dae3ced41b4852786796b3be95c707a72926170c0f5ad35f1f5b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 5,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 2
+          }
+        }
+      ]
+    },
+    "5ca021d25cd7203b836a9f1364dfe48f1bc221dce944e4673306a7ef0c977cbe": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 14,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 3
+      },
+      "stateRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "670afd49ed23da2e4c74dbaabac73c1fbcf40bfaaf42a68fd5d716cee681bc7a",
+          "afterRoot": "febf691fa5ceb9011ef8e2366aec3286639a5b343aacd282264b05c633707d37",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 14,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "febf691fa5ceb9011ef8e2366aec3286639a5b343aacd282264b05c633707d37",
+          "afterRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "670afd49ed23da2e4c74dbaabac73c1fbcf40bfaaf42a68fd5d716cee681bc7a",
+          "afterRoot": "febf691fa5ceb9011ef8e2366aec3286639a5b343aacd282264b05c633707d37",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 14,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 14,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 3
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "febf691fa5ceb9011ef8e2366aec3286639a5b343aacd282264b05c633707d37",
+          "afterRoot": "7d47079e810cd7ebb7a467aba09e40af38a4d6caf18f0611c147f13b47e4784b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 14,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 3
+          }
+        }
+      ]
+    },
+    "d3caefe2a252940f8c7f3a82613e0353ea12ededae8954ac12a9ecd603e6bd78": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 30,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 4
+      },
+      "stateRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "61979d5e91984c4e031286c0158102ca8e33e52a26326a4c5bcb4f5c727241f4",
+          "afterRoot": "b7596616af1ace0864469b7c5997355f08968e6e788b4127b7f6287766a473ce",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 30,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b7596616af1ace0864469b7c5997355f08968e6e788b4127b7f6287766a473ce",
+          "afterRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "61979d5e91984c4e031286c0158102ca8e33e52a26326a4c5bcb4f5c727241f4",
+          "afterRoot": "b7596616af1ace0864469b7c5997355f08968e6e788b4127b7f6287766a473ce",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 30,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 30,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 4
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b7596616af1ace0864469b7c5997355f08968e6e788b4127b7f6287766a473ce",
+          "afterRoot": "0b2a818f40f68500c547d86a8dcfb885ad14508b9b70f7f214c35b4d96fdf021",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 30,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 4
+          }
+        }
+      ]
+    },
+    "378bd306edf7717338f1a99cd3596ebfd69f7268a5602bda79ce68511f90ef23": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 55,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 5
+      },
+      "stateRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "847b6796eb52cf75b3a734f534ec3f84f91bf104fa947aea1236bfe2be169b86",
+          "afterRoot": "948c51bf56766c7f6208b740794c3681a02484d0f00c8822c99a0c23dd2d5ba6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 55,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "948c51bf56766c7f6208b740794c3681a02484d0f00c8822c99a0c23dd2d5ba6",
+          "afterRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "847b6796eb52cf75b3a734f534ec3f84f91bf104fa947aea1236bfe2be169b86",
+          "afterRoot": "948c51bf56766c7f6208b740794c3681a02484d0f00c8822c99a0c23dd2d5ba6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 55,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 55,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 5
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "948c51bf56766c7f6208b740794c3681a02484d0f00c8822c99a0c23dd2d5ba6",
+          "afterRoot": "0026ea3bb47692450eedd69a330959ae3d061af23b0d067646cd1f31e7daeaa3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 55,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 5
+          }
+        }
+      ]
+    },
+    "a614960753fd3e0c3869880fbacad8a53be70017be5de10dea9b3d8f914a0b09": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 385,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 10
+      },
+      "stateRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "82c6ef30ec9e0e1183a10b54f61a9a954d308b1f9946551dffa25b738e4ebd72",
+          "afterRoot": "85f1ebd5be1519922a8cff68573048c61b9f83b429d06ffbdd75ba1334b8959b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 385,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "85f1ebd5be1519922a8cff68573048c61b9f83b429d06ffbdd75ba1334b8959b",
+          "afterRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "82c6ef30ec9e0e1183a10b54f61a9a954d308b1f9946551dffa25b738e4ebd72",
+          "afterRoot": "85f1ebd5be1519922a8cff68573048c61b9f83b429d06ffbdd75ba1334b8959b",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 385,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 385,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 10
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "85f1ebd5be1519922a8cff68573048c61b9f83b429d06ffbdd75ba1334b8959b",
+          "afterRoot": "28f45afafeb24e11c738ffe3b00a134df9e4c6f39a24c80b0ad42629d3303d39",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 385,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 10
+          }
+        }
+      ]
+    },
+    "90ae640acc090712d8fc07ff4e9e2c5718cb0f8c1565a25d3090ac1a235c398a": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 650,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 12
+      },
+      "stateRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "98da4c72195ea445b27877846400075b57b613a086de81caeba4a877013b3329",
+          "afterRoot": "a59d4e54e4e3aee0791b2fe8393986a6509689f31cfc532536f74c469f4bf03f",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 650,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "a59d4e54e4e3aee0791b2fe8393986a6509689f31cfc532536f74c469f4bf03f",
+          "afterRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "98da4c72195ea445b27877846400075b57b613a086de81caeba4a877013b3329",
+          "afterRoot": "a59d4e54e4e3aee0791b2fe8393986a6509689f31cfc532536f74c469f4bf03f",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 650,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 650,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 12
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "a59d4e54e4e3aee0791b2fe8393986a6509689f31cfc532536f74c469f4bf03f",
+          "afterRoot": "01633ecefa5a86f0df2ba21aa95d3f47c297c744048639b866d1449da43076fd",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 650,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 12
+          }
+        }
+      ]
+    },
+    "eac0d7e2ab09d7648da00f4799128deb5a17b4a11b19be28c25b98fd845d872e": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 1496,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.batch_size": 16
+      },
+      "stateRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b9e0efe52899df2d5cc97148105edd23886d89396af4f5b5ae5e132c585acac3",
+          "afterRoot": "57113bdd55a2204d6dd6716e3a900f7ec058c61f787a4021d29e54ab7d841b32",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 1496,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "57113bdd55a2204d6dd6716e3a900f7ec058c61f787a4021d29e54ab7d841b32",
+          "afterRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b9e0efe52899df2d5cc97148105edd23886d89396af4f5b5ae5e132c585acac3",
+          "afterRoot": "57113bdd55a2204d6dd6716e3a900f7ec058c61f787a4021d29e54ab7d841b32",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 1496,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 1496,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 16
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "57113bdd55a2204d6dd6716e3a900f7ec058c61f787a4021d29e54ab7d841b32",
+          "afterRoot": "ac241fbbe06dc3d0c1fa0d798fb62874e530c6d477298d65a9f35b326bcf97dd",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:reactive-authority:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 1496,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.batch_size": 16
+          }
+        }
+      ]
+    },
+    "2431103614c5fc4651384dc3dd8b0c07bda2e66e27b4cd15c67ae227c259258e": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.digest": 204,
+        "compiler.emitted": false,
+        "compiler.phase": 1,
+        "input.batch_size": 8
+      },
+      "stateRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "c081cf9507298e3d737eb45bee75c20a7acb0029c2e9970889b50007e34d4094",
+          "afterRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 204,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "analyze_batch",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "builder",
+          "from": null,
+          "into": null,
+          "beforeRoot": "c081cf9507298e3d737eb45bee75c20a7acb0029c2e9970889b50007e34d4094",
+          "afterRoot": "4677f8d3a5a2e428f4b57df5e2996dfdd62d018445a7b51ff7fde8ebd26107e5",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.digest",
+              "before": 0,
+              "after": 204,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "builder",
+                "capability": "compiler.analyze",
+                "target": "source"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "builder",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k340:functional-transaction:analyzed"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.digest": 204,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.batch_size": 8
+          }
+        }
+      ]
+    }
+  },
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; executed via real loopback HTTP, caller-owned embedded instance and two-worker replicated transport; no public deployment/microcontroller/multi-host claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "691f0f99011e3baab69c86c1eb45c8c25fd91e7c8de3af12f3ccaa49e97b08a8"
+}

@@ -47,4 +47,4 @@ Only a successfully verified runtime receipt enters the consolidated matrix. Mis
 
 `createPortableHttpTarget` adds a real authenticated local HTTP worker that invokes the native RCL compiler and VM. It reuses the existing loopback server transport pattern and portable native execution path, without adding another RCL rule interpreter. Replies bind source/bytecode hashes, worker identity, program roots and semantic roots. Wrong authorization, malformed source, corrupt RBC and a mismatched expected program root are rejected.
 
-The HTTP organ currently has targeted execution and negative-control evidence. It grants no new server coordinate until a separately frozen campaign completes all nine K400 gates. It claims no public deployment, hardened network service or secure sandbox.
+At this 71-cell checkpoint, the HTTP organ has targeted execution and negative-control evidence. The subsequent [execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) completes all nine gates and adds 35 distinct coordinates, bringing the aggregate to 106. Public deployment, hardened network service and secure sandbox claims remain unverified.

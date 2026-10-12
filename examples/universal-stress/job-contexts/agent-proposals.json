@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-job-proposals.v1",
+  "contractRoot": "2c39c32c025badd790082000f28113242acc89c7e5a7e22327ec92c918e0cd06",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/job-contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "capability",
+      "context": "/root/k400_job_context_a",
+      "proposal": {
+        "id": "agent",
+        "file": "candidate.rcl",
+        "old": "choose(action_capability(action) == granted_capability,",
+        "new": "choose(action_capability(action) != granted_capability,",
+        "diagnosis": "The capability rejection condition currently rejects matches and permits mismatches. Inverting it preserves the remaining eligibility checks."
+      }
+    },
+    {
+      "id": "budget",
+      "context": "/root/k400_job_context_b",
+      "proposal": {
+        "id": "agent-1",
+        "file": "candidate.rcl",
+        "old": "choose(action_cost(action) < budget,",
+        "new": "choose(action_cost(action) > budget,",
+        "diagnosis": "The budget rejection condition is reversed. Reject costs above budget while permitting equality subject to the remaining checks."
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_job_context_c",
+      "proposal": {
+        "id": "agent-2",
+        "file": "candidate.rcl",
+        "old": "action_requires_approval(action) == 1 and human_approval == 1",
+        "new": "action_requires_approval(action) == 1 and human_approval != 1",
+        "diagnosis": "The rejection condition rejects approved actions and permits unapproved ones. Rejecting when approval is not one preserves the remaining eligibility checks."
+      }
+    }
+  ]
+}

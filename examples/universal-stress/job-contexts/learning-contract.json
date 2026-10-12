@@ -1,0 +1,74 @@
+{
+  "format": "rcl.k400-job-contract.v1",
+  "id": "learning",
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; native execution in fresh local handlers, SQLite SQL-function transactions and a bounded worker-thread dataflow pipeline; no cloud FaaS, arbitrary SQL, external stream or OS sandbox claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/learning.rcl",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesPath": "examples/universal-stress/job-contexts/learning-cases.json",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "definitionFile": "scripts/k400-genomes/learning.mjs",
+  "definitionHash": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802",
+  "jobDefinitionFile": "scripts/k400-job-definitions.mjs",
+  "jobDefinitionHash": "847e4e3e52e8b1f3df0f5b360cc5d68faf23521947b803e0d0eb293d5151aad6",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "serverless",
+    "database",
+    "dataflow-runtime"
+  ],
+  "families": [
+    "machine-learning"
+  ],
+  "baseline": {
+    "epochs": 16,
+    "nodes": 4,
+    "hotness": 2
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K133",
+    "K153",
+    "K313"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "fresh terminated request handlers",
+    "SQLite reopen recovery and rejected-result rollback",
+    "worker-thread pipeline backpressure"
+  ],
+  "authorityProfile": "local source/binary-bound job execution, frozen cases and unchanged fresh independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "index": 0,
+      "intent": "Train a binary perceptron: for a misclassified sample add its features and one to the bias for a positive label; subtract them for a negative label.",
+      "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057"
+    },
+    {
+      "id": "score-bias",
+      "index": 1,
+      "intent": "Inference uses the dot product of feature weights with features plus the learned bias, consistently during training and prediction.",
+      "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299"
+    },
+    {
+      "id": "weight-direction",
+      "index": 2,
+      "intent": "The node-feature perceptron weight moves toward a misclassified positive sample and away from a misclassified negative sample.",
+      "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67"
+    }
+  ],
+  "contractRoot": "2e053a89ac4e4ae39f92dfd80ca62116496cad3254abd09a74caf46a33a95713"
+}

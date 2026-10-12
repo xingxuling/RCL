@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-context-proposals.v1",
+  "contractRoot": "6a277b690430258d895ba20392517f8deaede60666124a1af35611589f4c8c7d",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/contexts/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_context_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "has_customer(customers, 0, order_customer(row)) == false or",
+        "diagnosis": "The foreign-key rejection condition is inverted: it rejects existing customers and allows missing customers. Duplicate-key, amount, and single-append behavior remain intact."
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_context_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "choose(customer_region(sequence_get(customers, cursor)) != region,",
+        "new": "choose(customer_region(sequence_get(customers, cursor)) == region,",
+        "diagnosis": "The count currently includes customers outside the requested region. Equality counts matches; the existing termination branch returns zero for empty relations and absent regions."
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_context_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region(customers, orders, cursor + 1, region)",
+        "diagnosis": "The sum function counts qualifying orders instead of summing their amounts. Add each matching approved order's amount, retaining the customer-region join and the separate count function."
+      }
+    }
+  ]
+}
