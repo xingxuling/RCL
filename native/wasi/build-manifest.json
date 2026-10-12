@@ -1,0 +1,45 @@
+{
+  "format": "rcl.native-wasi-build.v1",
+  "status": "BUILT_NOT_RUNTIME_VERIFIED",
+  "target": "wasm32-wasi",
+  "zigVersion": "0.16.0",
+  "sources": [
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/build-native-wasi.mjs",
+      "sha256": "a7b56899c4058f25072dfa397dbf18c9693c9d5bc1d69e93129eb26fd3d92dff"
+    }
+  ],
+  "wasm": {
+    "path": "native/wasi/rclvm.wasm",
+    "bytes": 1428999,
+    "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+  },
+  "vmImplementationOwner": "native/rclvm.c",
+  "cryptoOwner": "Zig standard SHA-256",
+  "wasiHostOwner": "Node WASI",
+  "securitySandboxClaimed": false
+}

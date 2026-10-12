@@ -6,6 +6,7 @@ import { COVERAGE_MODE, buildUniversalStressMatrix, UNIVERSAL_STRESS_GATES } fro
 
 const evidence = JSON.parse(fs.readFileSync(new URL('../examples/universal-stress/k400-current-evidence.json', import.meta.url), 'utf8'));
 const policy = JSON.parse(fs.readFileSync(new URL('../VERSION-CONTRACT.json', import.meta.url), 'utf8')).researchStatus;
+const registeredPassCount = evidence.claims.filter(claim => UNIVERSAL_STRESS_GATES.every(gate => claim.gates[gate]?.status === 'PASS')).length;
 
 test('current research maturity comes from the K400 evidence rather than the package number', () => {
   const report = getResearchReadiness();
@@ -13,10 +14,10 @@ test('current research maturity comes from the K400 evidence rather than the pac
   assert.equal(report.formalLanguageRelease, false);
   assert.equal(report.versionPromotionFrozen, true);
   assert.equal(report.k400.totalCells, 400);
-  assert.equal(report.k400.passedCells, 24);
-  assert.equal(report.k400.statusCounts.UNTESTED, 376);
+  assert.equal(report.k400.passedCells, registeredPassCount);
+  assert.equal(report.k400.statusCounts.UNTESTED, 400 - evidence.claims.length);
   assert.equal(report.k400.verdict, 'INCOMPLETE');
-  assert.equal(report.passedFraction, 0.06);
+  assert.equal(report.passedFraction, registeredPassCount / 400);
 });
 
 test('raising the build identity or claiming a formal release fails the frozen policy', () => {
@@ -35,7 +36,7 @@ test('duplicate or unknown cell claims cannot inflate the maturity report', () =
 test('one missing required gate blocks its cell even when every other gate passes', () => {
   const incomplete = structuredClone(evidence); delete incomplete.claims[0].gates.CORRECT;
   const result = evaluateResearchReadiness(incomplete, policy, '2.0.0');
-  assert.equal(result.k400.passedCells, 23);
+  assert.equal(result.k400.passedCells, registeredPassCount - 1);
   assert.equal(result.k400.statusCounts.BLOCKED, 1);
   assert.equal(result.k400.verdict, 'INCOMPLETE');
 });

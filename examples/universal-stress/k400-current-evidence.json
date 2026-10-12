@@ -2947,6 +2947,414 @@
           "justification": "Existing RCL recursion, arithmetic and state semantics execute through the ordinary native compiler and VM CLI without a task-specific opcode or opaque algorithm provider."
         }
       ]
+    },
+    {
+      "id": "wasm-vm::algorithm",
+      "environment": "wasm-vm",
+      "programFamily": "algorithm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "knownLimits": [
+        "bounded RCL-owned recursion/arithmetic and native command-line observable results",
+        "Local source-bound replay; no hosted CI authority claimed.",
+        "Independent generators used fresh proposal contexts with no tools requested; hardened OS isolation is not claimed.",
+        "No interactive shell, public deployment, arbitrary algorithms, browser or Linux credit."
+      ],
+      "changes": [],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "independent-repair-and-parametric-oracle"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::cli",
+      "environment": "wasm-vm",
+      "programFamily": "cli",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "knownLimits": [
+        "bounded RCL-owned recursion/arithmetic and native command-line observable results",
+        "Local source-bound replay; no hosted CI authority claimed.",
+        "Independent generators used fresh proposal contexts with no tools requested; hardened OS isolation is not claimed.",
+        "No interactive shell, public deployment, arbitrary algorithms, browser or Linux credit."
+      ],
+      "changes": [],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "independent-repair-and-parametric-oracle"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        }
+      }
+    },
+    {
+      "id": "windows::algorithm",
+      "environment": "windows",
+      "programFamily": "algorithm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "knownLimits": [
+        "bounded RCL-owned recursion/arithmetic and native command-line observable results",
+        "Local source-bound replay; no hosted CI authority claimed.",
+        "Independent generators used fresh proposal contexts with no tools requested; hardened OS isolation is not claimed.",
+        "No interactive shell, public deployment, arbitrary algorithms, browser or Linux credit."
+      ],
+      "changes": [],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "independent-repair-and-parametric-oracle"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        }
+      }
+    },
+    {
+      "id": "windows::cli",
+      "environment": "windows",
+      "programFamily": "cli",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "knownLimits": [
+        "bounded RCL-owned recursion/arithmetic and native command-line observable results",
+        "Local source-bound replay; no hosted CI authority claimed.",
+        "Independent generators used fresh proposal contexts with no tools requested; hardened OS isolation is not claimed.",
+        "No interactive shell, public deployment, arbitrary algorithms, browser or Linux credit."
+      ],
+      "changes": [],
+      "requiredGenes": [
+        "portable-native-rbc-vm",
+        "root-v2",
+        "independent-repair-and-parametric-oracle"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
+            "examples/universal-stress/expansion-wave1/algorithm-contract.json",
+            "examples/universal-stress/expansion-wave1/algorithm-independent-proposals.json"
+          ],
+          "note": "20 process executions per backend, bootstrap parity, independent oracle, 10 parametric inputs and 3 independent repaired-source replays."
+        }
+      }
     }
   ],
   "competitiveComparisons": [],
@@ -3054,7 +3462,8 @@
     "examples/native-ai/evidence/native-autodiff-v0.1/k08-g-native-autodiff-evidence.json",
     "examples/native-ai/evidence/native-autodiff-v0.1/github-replay.json",
     "examples/native-ui/browser-performance-contract.v0.1.json",
-    "examples/native-ui/evidence/browser-runtime-result.json"
+    "examples/native-ui/evidence/browser-runtime-result.json",
+    "examples/universal-stress/expansion-wave1/algorithm-runtime.json"
   ],
   "notes": [
     "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",

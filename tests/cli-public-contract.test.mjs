@@ -8,6 +8,7 @@ import test from 'node:test';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const CLI = path.join(ROOT, 'src', 'reality-hub-cli.mjs');
 const PACKAGE = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+const EVIDENCE = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples/universal-stress/k400-current-evidence.json'), 'utf8'));
 
 function invoke(args) {
   return spawnSync(process.execPath, [CLI, ...args], {
@@ -30,7 +31,8 @@ test('public CLI exposes canonical version metadata as JSON', () => {
   assert.equal(payload.canonical, true);
   assert.equal(payload.canonicalRepository, 'xingxuling/RCL');
   assert.equal(payload.researchReadiness.status, 'RESEARCH_PREVIEW');
-  assert.equal(payload.researchReadiness.k400.passedCells, 24);
+  assert.equal(payload.researchReadiness.k400.passedCells, EVIDENCE.claims.filter(claim =>
+    Object.keys(claim.gates).length === 9 && Object.values(claim.gates).every(gate => gate.status === 'PASS')).length);
   assert.equal(payload.researchReadiness.formalLanguageRelease, false);
 });
 

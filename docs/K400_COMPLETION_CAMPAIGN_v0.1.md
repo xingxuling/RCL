@@ -1,10 +1,12 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `24 PASS / 0 BLOCKED / 376 UNTESTED`
+**Current evidence:** `28 PASS / 0 BLOCKED / 372 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `914c20f17db5fe4f58063c5c31d5cdb7e6e09fba9d13475c34e441c3bd78dbe7`
-**Date:** 2026-09-04
+**Report root:** `0cdf08b1e6aea6a2b54ac965ae6b029818af3327208c16225b2e1032bbe13a85`
+**Date:** 2026-10-13
+
+The active development goal is at least 200 verified cells. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) records source reuse, actual runtime adapters and independent generation; this checkpoint adds four cells and does not complete that goal.
 
 ## 1. Completion contract
 
@@ -66,6 +68,8 @@ The checked-in input is deterministically rebuilt from the current Native UI evi
 | `K337` | `compiler-runtime::security-sensitive` | `PASS` | none for the bounded two-transaction governance profile; self-host static warrant validation remains an explicit RCL gap |
 | `K338` | `compiler-runtime::reactive` | `PASS` | none for the same bounded state-triggered governance profile |
 | `K340` | `compiler-runtime::mixed-paradigm` | `PASS` | none for the bounded recursive + declarative + transactional + reactive native profile; self-host static warrant validation remains an explicit RCL gap |
+| `K001` / `K002` | `wasm-vm::algorithm` / `wasm-vm::cli` | `PASS` | none for the frozen recursive-algorithm command-line profile on the C VM compiled to wasm32-WASI |
+| `K041` / `K042` | `windows::algorithm` / `windows::cli` | `PASS` | none for the same frozen profile on the actual Windows native C VM |
 
 `AI_GENERATE` requires independent, reproducible generation or repair receipts. The development process that authored the implementation cannot mark its own work as independent evidence. Android build artifacts are not device execution evidence.
 

@@ -1,0 +1,50 @@
+{
+  "format": "rcl.k400-independent-proposals.v1",
+  "contractRoot": "d015d4b741f1cd77479d0d3cd5bd03bf461933297509916cd008ac017287066d",
+  "generatorKind": "codex-collaboration-fresh-context-proposal",
+  "humanAuthorization": "explicit authorization for independent proposal-only subagents in this goal",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "requestedToolPolicy": "no tools, memory, filesystem, network or writes",
+  "osIsolationClaimed": false,
+  "trials": [
+    {
+      "id": "gcd",
+      "generatorContext": "/root/k400_trial_gcd",
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "choose(b == 0, absolute(a), gcd(b, b % a))",
+        "new": "choose(b == 0, absolute(a), gcd(b, a % b))",
+        "diagnosis": "Euclidean reduction requires a % b. The b == 0 base case prevents a zero divisor and absolute(a) returns a nonnegative result for signed inputs."
+      }
+    },
+    {
+      "id": "fibonacci",
+      "generatorContext": "/root/k400_trial_fibonacci",
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "    choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 3))",
+        "new": "    choose(n <= 1, n, fibonacci(n - 1) + fibonacci(n - 2))",
+        "diagnosis": "Use the two immediately preceding terms, F(n-1) and F(n-2), while preserving F(0)=0 and F(1)=1."
+      }
+    },
+    {
+      "id": "sum-squares",
+      "generatorContext": "/root/k400_trial_sum_squares",
+      "proposal": {
+        "file": "candidate.rcl",
+        "old": "    choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "    choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "The recurrence adds twice n instead of its square. Multiplication adds n squared while preserving zero for n <= 0."
+      }
+    }
+  ],
+  "supersededAcquisition": {
+    "contexts": ["/root/k400_gcd_independent", "/root/k400_fibonacci_independent"],
+    "status": "REJECTED_PROMPT_FORMAT_MISMATCH",
+    "cause": "The parent supplied single-line function declarations while the frozen candidate used a two-line declaration. Returned full-line edits did not match frozen candidate bytes.",
+    "countedAsSuccessful": false
+  },
+  "admission": "PENDING_NATIVE_REPLAY_AND_HOLDOUT_EVALUATION"
+}

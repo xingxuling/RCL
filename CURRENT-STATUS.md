@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 24/400 PASS (6%) · 376 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 28/400 PASS (7%) · 372 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity

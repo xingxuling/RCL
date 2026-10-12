@@ -1,0 +1,55 @@
+{
+  "format": "rcl.k400-portable-algorithm-campaign.v1",
+  "frozenBeforeIndependentTrials": true,
+  "goalMinimumPassCells": 200,
+  "baselinePass": 24,
+  "eligibleCells": [
+    "K001",
+    "K002",
+    "K041",
+    "K042"
+  ],
+  "profile": "bounded RCL-owned recursion/arithmetic and native command-line observable results",
+  "sourcePath": "examples/universal-stress/expansion-wave1/algorithm.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 1000
+  },
+  "hiddenInputVariationsRequired": true,
+  "negativeControls": [
+    "semantic mutation",
+    "truncated RBC",
+    "malformed source"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "requestedTools": "none",
+    "osIsolationClaimed": false,
+    "outputFormat": "single exact text proposal"
+  },
+  "authorityProfile": "local source-bound runtime, independent generation and deterministic replay; no hosted CI claimed",
+  "trials": [
+    {
+      "id": "gcd",
+      "intent": "Compute the greatest common divisor with the Euclidean algorithm, including negative inputs and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "intent": "Compute the sum of integer squares from 1 through n; return zero when n is zero or negative.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "d015d4b741f1cd77479d0d3cd5bd03bf461933297509916cd008ac017287066d"
+}
