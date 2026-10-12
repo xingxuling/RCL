@@ -1,0 +1,52 @@
+reality NativeExpressionCompiler {
+  facet input.a : Number = 2
+  facet input.b : Number = 3
+  facet input.c : Number = 4
+  facet input.d : Number = 5
+  facet input.parenthesized : Truth = true
+  facet input.invalid : Truth = false
+  reckon pair(kind : Number, value : Number) -> Sequence = sequence_append(sequence_append(empty_sequence(), kind), value)
+  reckon kind_at(tokens : Sequence, cursor : Number) -> Number = choose(cursor >= length(tokens), -1, sequence_get(sequence_get(tokens, cursor), 0))
+  reckon parsed(cursor : Number, code : Sequence, valid : Number) -> Sequence = sequence_append(sequence_append(sequence_append(empty_sequence(), cursor), code), valid)
+  reckon position(result : Sequence) -> Number = sequence_get(result, 0)
+  reckon code(result : Sequence) -> Sequence = sequence_get(result, 1)
+  reckon valid(result : Sequence) -> Number = sequence_get(result, 2)
+
+  reckon parse_factor(tokens : Sequence, cursor : Number, output : Sequence) -> Sequence =
+    choose(kind_at(tokens, cursor) == 0, parsed(cursor + 1, sequence_append(output, pair(0, sequence_get(sequence_get(tokens, cursor), 1))), 1),
+      choose(kind_at(tokens, cursor) == 3, close_parenthesis(tokens, parse_expression(tokens, cursor + 1, output)), parsed(cursor, output, 0)))
+  reckon close_parenthesis(tokens : Sequence, result : Sequence) -> Sequence =
+    choose(valid(result) == 1 and kind_at(tokens, position(result)) == 4, parsed(position(result) + 1, code(result), 1), parsed(position(result), code(result), 0))
+  reckon parse_term(tokens : Sequence, cursor : Number, output : Sequence) -> Sequence = term_tail(tokens, parse_factor(tokens, cursor, output))
+  reckon term_tail(tokens : Sequence, left : Sequence) -> Sequence =
+    choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,
+      finish_term(tokens, parse_factor(tokens, position(left) + 1, code(left))), left)
+  reckon finish_term(tokens : Sequence, right : Sequence) -> Sequence =
+    choose(valid(right) == 1, term_tail(tokens, parsed(position(right), sequence_append(code(right), pair(3, 0)), 1)), right)
+  reckon parse_expression(tokens : Sequence, cursor : Number, output : Sequence) -> Sequence = expression_tail(tokens, parse_term(tokens, cursor, output))
+  reckon expression_tail(tokens : Sequence, left : Sequence) -> Sequence =
+    choose(valid(left) == 1 and (kind_at(tokens, position(left)) == 1 or kind_at(tokens, position(left)) == 5),
+      finish_expression(tokens, parse_term(tokens, position(left) + 1, code(left)), kind_at(tokens, position(left))), left)
+  reckon finish_expression(tokens : Sequence, right : Sequence, operator : Number) -> Sequence =
+    choose(valid(right) == 1, expression_tail(tokens, parsed(position(right), sequence_append(code(right), pair(choose(operator == 1, 1, 2), 0)), 1)), right)
+  reckon take_prefix(stack : Sequence, count : Number, cursor : Number, output : Sequence) -> Sequence =
+    choose(cursor >= count, output, take_prefix(stack, count, cursor + 1, sequence_append(output, sequence_get(stack, cursor))))
+  reckon binary_value(operator : Number, left : Number, right : Number) -> Number = choose(operator == 1, left + right, choose(operator == 2, left - right, left * right))
+  reckon execute_code(instructions : Sequence, cursor : Number, stack : Sequence) -> Sequence =
+    choose(cursor >= length(instructions), choose(length(stack) == 1, pair(1, sequence_get(stack, 0)), pair(0, 0)),
+      choose(sequence_get(sequence_get(instructions, cursor), 0) == 0,
+        execute_code(instructions, cursor + 1, sequence_append(stack, sequence_get(sequence_get(instructions, cursor), 1))),
+        choose(length(stack) < 2, pair(0, 0), execute_code(instructions, cursor + 1,
+          sequence_append(take_prefix(stack, length(stack) - 2, 0, empty_sequence()),
+            binary_value(sequence_get(sequence_get(instructions, cursor), 0), sequence_get(stack, length(stack) - 2), sequence_get(stack, length(stack) - 1)))))))
+  facet expression.unwrapped : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
+    empty_sequence(), pair(0, input.a)), pair(1, 0)), pair(0, input.b)), pair(2, 0)), pair(0, input.c)), pair(5, 0)), pair(0, input.d))
+  facet expression.wrapped : Sequence = sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
+    empty_sequence(), pair(3, 0)), pair(0, input.a)), pair(1, 0)), pair(0, input.b)), pair(4, 0)), pair(2, 0)), pair(0, input.c)), pair(5, 0)), pair(0, input.d))
+  facet expression.tokens : Sequence = choose(input.invalid, sequence_append(choose(input.parenthesized, expression.wrapped, expression.unwrapped), pair(4, 0)),
+    choose(input.parenthesized, expression.wrapped, expression.unwrapped))
+  facet compiler.parsed : Sequence = parse_expression(expression.tokens, 0, empty_sequence())
+  facet compiler.valid : Truth = valid(compiler.parsed) == 1 and position(compiler.parsed) == length(expression.tokens)
+  facet compiler.bytecode : Sequence = code(compiler.parsed)
+  facet result.execution : Sequence = choose(compiler.valid, execute_code(compiler.bytecode, 0, empty_sequence()), pair(0, 0))
+}

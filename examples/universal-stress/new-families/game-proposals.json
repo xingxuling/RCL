@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-new-family-proposals.v1",
+  "contractRoot": "d3d4a53663bf2ee6e284bea4ae7537c30dfefba4c5572154ad9e992362c7998d",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/new-families/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_new_family_a",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "  reckon step(state : Sequence) -> Sequence = finish_step(state, clamp_x(x(state) + input.move + input.speed), y(state) + next_velocity(state), next_velocity(state))",
+        "new": "  reckon step(state : Sequence) -> Sequence = finish_step(state, clamp_x(x(state) + input.move * input.speed), y(state) + next_velocity(state), next_velocity(state))",
+        "diagnosis": "Horizontal displacement adds direction and speed instead of multiplying them. Multiplication preserves zero and negative directions, then clamps the resulting position to the existing bounds."
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_new_family_b",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0",
+        "new": "reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0",
+        "diagnosis": "With downward-positive coordinates, negative positions are airborne. Landing must trigger at or past ground zero so the existing landing branch resets vertical position and velocity while preserving airborne motion."
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_new_family_c",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "choose(collected(state) >= 0 and next_x >= input.star, 1, 0)",
+        "new": "choose(collected(state) == 0 and next_x >= input.star, 1, 0)",
+        "diagnosis": "The nonnegative collection check allows repeated pickup after reaching the star threshold. Requiring collected to equal zero permits one pickup, keeps score at zero or one, and leaves terminal enemy-stop behavior unchanged."
+      }
+    }
+  ]
+}

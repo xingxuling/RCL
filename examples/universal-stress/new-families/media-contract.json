@@ -1,0 +1,93 @@
+{
+  "format": "rcl.k400-new-family-contract.v1",
+  "id": "media",
+  "scope": "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/media.rcl",
+  "sourceHash": "54982263685a07f45279fb5cbc738c4afc121412f75cafec63c6b19b8c0a523e",
+  "casesPath": "examples/universal-stress/new-families/media-cases.json",
+  "casesHash": "f98a504b1110201a86774414f00425a5065eb1a23c50834e6222f4e8faff1ba9",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android",
+    "server",
+    "embedded-runtime",
+    "distributed-runtime",
+    "serverless",
+    "database",
+    "dataflow-runtime",
+    "simulation-runtime",
+    "automation-runtime"
+  ],
+  "families": [
+    "media"
+  ],
+  "baseline": {
+    "red": 20,
+    "green": 20,
+    "blue": 20,
+    "gain": 2,
+    "offset": -5,
+    "invert": false,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K055",
+    "K015",
+    "K035",
+    "K095",
+    "K115",
+    "K295",
+    "K255",
+    "K135",
+    "K155",
+    "K315",
+    "K375",
+    "K355"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "on-target native/bytecode execution with context-specific controls",
+    "typed roots and source-declared transaction continuity"
+  ],
+  "authorityProfile": "local source/binary-bound native program and host execution; no hosted CI, whole-family or release claim",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "index": 0,
+      "intent": "Clamp each transformed RGB channel to the inclusive range zero through 255 before optional inversion.",
+      "mutatedSourceHash": "34472644dde98bb037dd67d1f087f1517181fdd8406efdd71e14dc8bd45fc137"
+    },
+    {
+      "id": "row-flip",
+      "index": 1,
+      "intent": "Horizontal flipping swaps the two RGB pixels within each row, preserving row order and each pixel channel order.",
+      "mutatedSourceHash": "c5713977190a50660435da69918f2c4806c018d37d2ed91e1b61f6b9a8e7f9fc"
+    },
+    {
+      "id": "run-decode",
+      "index": 2,
+      "intent": "Decode every run by appending its sample exactly count times; retain empty inputs and exact run-length round trips.",
+      "mutatedSourceHash": "e3c39257ac678034fee5c12ea2662db2f5f2455c76f60b5d8b1c7e6e11ed4e31"
+    }
+  ],
+  "contractRoot": "70738c6d5a7d2999cdeddc4e9f3d4008a190b5337be2f255276584a0cba25ee7"
+}

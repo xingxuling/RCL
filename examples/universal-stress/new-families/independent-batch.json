@@ -1,0 +1,34 @@
+{
+  "format": "rcl.k400-independent-new-family-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "batches": [
+    {
+      "context": "/root/k400_new_family_a",
+      "returnedProposals": [
+        {"id":"media","file":"candidate.rcl","old":"  reckon clamp_channel(value : Number) -> Number = choose(value < 0, 0, choose(value < 255, 255, value))","new":"  reckon clamp_channel(value : Number) -> Number = choose(value < 0, 0, choose(value > 255, 255, value))","diagnosis":"The upper-bound comparison is reversed. Changing it clamps transformed samples to the inclusive range 0 through 255 before optional inversion."},
+        {"id":"compiler","file":"candidate.rcl","old":"  reckon term_tail(tokens : Sequence, left : Sequence) -> Sequence =\n    choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,\n      finish_term(tokens, parse_factor(tokens, position(left) + 1, code(left))), left)","new":"  reckon term_tail(tokens : Sequence, left : Sequence) -> Sequence =\n    choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,\n      finish_term(tokens, parse_factor(tokens, position(left) + 1, code(left))), left)","diagnosis":"The term parser consumes addition token 1 while emitting multiplication. Consuming multiplication token 2 restores precedence, with addition and subtraction handled by the expression parser. Parenthesis handling and complete-input validation remain intact."},
+        {"id":"game","file":"candidate.rcl","old":"  reckon step(state : Sequence) -> Sequence = finish_step(state, clamp_x(x(state) + input.move + input.speed), y(state) + next_velocity(state), next_velocity(state))","new":"  reckon step(state : Sequence) -> Sequence = finish_step(state, clamp_x(x(state) + input.move * input.speed), y(state) + next_velocity(state), next_velocity(state))","diagnosis":"Horizontal displacement adds direction and speed instead of multiplying them. Multiplication preserves zero and negative directions, then clamps the resulting position to the existing bounds."}
+      ]
+    },
+    {
+      "context": "/root/k400_new_family_b",
+      "returnedProposals": [
+        {"id":"media","file":"candidate.rcl","old":"cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)","new":"cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)","diagnosis":"The first RGB pixel currently reads itself, while the second reads the first. Adding three to the first pixel's channel indices swaps both pixels within each six-channel row, preserving row and channel order."},
+        {"id":"compiler","file":"candidate.rcl","old":"pair(choose(operator == 1, 2, 1), 0)","new":"pair(choose(operator == 1, 1, 2), 0)","diagnosis":"Addition and subtraction opcodes are reversed. Emit opcode one for the plus token and opcode two for the minus token, preserving the existing postfix operand order."},
+        {"id":"game","file":"candidate.rcl","old":"reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0","new":"reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0","diagnosis":"With downward-positive coordinates, negative positions are airborne. Landing must trigger at or past ground zero so the existing landing branch resets vertical position and velocity while preserving airborne motion."}
+      ]
+    },
+    {
+      "context": "/root/k400_new_family_c",
+      "returnedProposals": [
+        {"id":"media","file":"candidate.rcl","old":"repeat_sample(value, count - 2, sequence_append(output, value))","new":"repeat_sample(value, count - 1, sequence_append(output, value))","diagnosis":"Each recursion appends one sample but subtracts two from the remaining count. Subtracting one makes decoding append exactly count samples, preserving empty-input termination and exact RLE round trips."},
+        {"id":"compiler","file":"candidate.rcl","old":"choose(operator == 1, left + right, choose(operator == 2, right - left, left * right))","new":"choose(operator == 1, left + right, choose(operator == 2, left - right, left * right))","diagnosis":"Subtraction reverses the supplied stack operands. Using left minus right retains the existing addition and multiplication behavior."},
+        {"id":"game","file":"candidate.rcl","old":"choose(collected(state) >= 0 and next_x >= input.star, 1, 0)","new":"choose(collected(state) == 0 and next_x >= input.star, 1, 0)","diagnosis":"The nonnegative collection check allows repeated pickup after reaching the star threshold. Requiring collected to equal zero permits one pickup, keeps score at zero or one, and leaves terminal enemy-stop behavior unchanged."}
+      ]
+    }
+  ]
+}

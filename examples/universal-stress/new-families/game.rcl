@@ -1,0 +1,54 @@
+reality NativePlatformGame {
+  facet input.frames : Number = 12
+  facet input.move : Number = 1
+  facet input.speed : Number = 2
+  facet input.jump_frame : Number = 2
+  facet input.gravity : Number = 1
+  facet input.star : Number = 8
+  facet input.enemy : Number = 18
+  facet input.width : Number = 20
+  reckon world(x : Number, y : Number, velocity : Number, score : Number, alive : Number, collected : Number, frame : Number, trail : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), x), y), velocity), score), alive), collected), frame), trail)
+  reckon x(state : Sequence) -> Number = sequence_get(state, 0)
+  reckon y(state : Sequence) -> Number = sequence_get(state, 1)
+  reckon velocity(state : Sequence) -> Number = sequence_get(state, 2)
+  reckon score(state : Sequence) -> Number = sequence_get(state, 3)
+  reckon alive(state : Sequence) -> Number = sequence_get(state, 4)
+  reckon collected(state : Sequence) -> Number = sequence_get(state, 5)
+  reckon frame(state : Sequence) -> Number = sequence_get(state, 6)
+  reckon trail(state : Sequence) -> Sequence = sequence_get(state, 7)
+  reckon initial() -> Sequence = world(0, 0, 0, 0, 1, 0, 0, empty_sequence())
+  reckon clamp_x(value : Number) -> Number = choose(value < 0, 0, choose(value > input.width, input.width, value))
+  reckon next_velocity(state : Sequence) -> Number = choose(frame(state) == input.jump_frame and y(state) == 0, -4, velocity(state)) + input.gravity
+  reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0
+  reckon pickup(state : Sequence, next_x : Number) -> Number = choose(collected(state) == 0 and next_x >= input.star, 1, 0)
+  reckon frame_sample(at : Number, px : Number, py : Number, points : Number, living : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), at), px), py), points), living)
+  reckon finish_step(state : Sequence, next_x : Number, proposed_y : Number, proposed_velocity : Number) -> Sequence =
+    finish_landing(state, next_x, choose(lands(proposed_y), 0, proposed_y), choose(lands(proposed_y), 0, proposed_velocity))
+  reckon finish_landing(state : Sequence, next_x : Number, next_y : Number, next_velocity : Number) -> Sequence =
+    finish_score(state, next_x, next_y, next_velocity, score(state) + pickup(state, next_x), collected(state) + pickup(state, next_x),
+      choose(next_x == input.enemy and next_y == 0, 0, 1))
+  reckon finish_score(state : Sequence, next_x : Number, next_y : Number, next_velocity : Number, next_score : Number, next_collected : Number, next_alive : Number) -> Sequence =
+    world(next_x, next_y, next_velocity, next_score, next_alive, next_collected, frame(state) + 1,
+      sequence_append(trail(state), frame_sample(frame(state) + 1, next_x, next_y, next_score, next_alive)))
+  reckon step(state : Sequence) -> Sequence = finish_step(state, clamp_x(x(state) + input.move * input.speed), y(state) + next_velocity(state), next_velocity(state))
+  reckon play(remaining : Number, state : Sequence) -> Sequence = choose(remaining <= 0 or alive(state) == 0, state, play(remaining - 1, step(state)))
+  facet game.snapshot : Sequence = initial()
+  subject player {
+    warrant game.commit on game
+  }
+  emergence commit {
+    cause player
+    when input.frames >= 0
+    needs game.commit on game
+    alter game.snapshot <- play(input.frames, initial())
+    preserve x(game.snapshot) >= 0
+    preserve x(game.snapshot) <= input.width
+    preserve score(game.snapshot) >= 0
+    preserve score(game.snapshot) <= 1
+    witness "game:source-owned-platform-trajectory"
+  }
+  foresee commit
+  realize commit
+}

@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 142/400 PASS (35.5%) · 258 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 202/400 PASS (50.5%) · 198 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -38,9 +38,15 @@ transactions/recovery and worker-thread dataflow: 142 PASS / 258 UNTESTED.
 See `docs/K400_JOB_CONTEXTS_2026-10-13.md`.
 Equivalent independent repairs additionally pass all ten pre-sealed inputs;
 older campaigns retain their original exact-restoration requirements.
-Native RCL clock and admission/completion controller hosts now have actual
-controls, frozen contracts and independent candidates, but no new K400 credit
-until their full campaign. See `docs/K400_JOB_CONTEXTS_2026-10-13.md`.
+The completed native RCL clock and admission/completion campaign adds 24
+distinct coordinates, reaching 166. Its complete controller ledgers replay
+against the independent reference session, including source-root and denial
+controls. Three new RCL expression/media/game kernels then pass twelve actual
+contexts each, adding another 36 distinct coordinates: **202 PASS / 198
+UNTESTED**. The >=200 development milestone is met; whole K400 remains
+INCOMPLETE and package promotion stays frozen. See
+`docs/K400_NATIVE_PHASES_2026-10-13.md` and
+`docs/K400_NEW_FAMILIES_2026-10-13.md`.
 See `docs/K400_GENOME_CAMPAIGN_2026-10-13.md`.
 
 The same C VM now executes on Windows, wasm32-WASI, Linux WSL2 and the connected
@@ -51,7 +57,7 @@ contexts to verify exact RBC bytes and state-root-v2 parity. The first
 Windows/WASI algorithm profile uses post-generation parametric checks, as
 recorded in its separate receipt. The new public API and `rcl portable-run` command expose explicit target
 selection without fallback. This campaign adds twenty cells to the 24-cell
-baseline; the >=200-cell goal remains active. See
+baseline. The subsequent campaigns reach the >=200-cell milestone. See
 `docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md` for the exact scopes and receipts.
 
 ## 2026-10-12 native compiler warrant admission

@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**研究预览 · K400 142/400（35.5%）· INCOMPLETE · U3**
+**研究预览 · K400 202/400（50.5%）· INCOMPLETE · U3**
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
@@ -19,7 +19,9 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**RCL 当前是研究预览：K400 登记 142/400 PASS、258 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
+**RCL 当前是研究预览：K400 登记 202/400 PASS、198 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
+
+最新的 [RCL 原生程序](docs/K400_NEW_FAMILIES_2026-10-13.md)实现了表达式词元编译、RGB 变换与游程编码往返，以及固定步长的平台游戏规则。三者均通过十二种实际执行环境、冻结输入和原样独立修复验收；各自仍是有界能力，剩余 198 格继续开放。
 
 ## 为什么使用 RCL？
 
@@ -60,7 +62,7 @@ RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / �
 
 ## 可移植原生执行
 
-[原生核心程序族批次](docs/K400_GENOME_CAMPAIGN_2026-10-13.md)还验证了四个目标中的有界学习、代理推演、工作流、逻辑事件、治理/响应式和混合范式程序，各自包含十组预先封存的输入和三组独立修复重放。新 API `createPortableHttpTarget` 提供真实的本地 HTTP 编译/执行与访问令牌校验；其独立通关批次尚未完成，暂不新增服务端格子。
+[原生核心程序族批次](docs/K400_GENOME_CAMPAIGN_2026-10-13.md)还验证了四个目标中的有界学习、代理推演、工作流、逻辑事件、治理/响应式和混合范式程序，各自包含十组预先封存的输入和三组独立修复重放。API `createPortableHttpTarget` 提供真实的本地 HTTP 编译/执行与访问令牌校验；[已完成的执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)还验证了持续嵌入式实例和双进程恢复。
 
 同一套 C 虚拟机现在能作为 Windows 程序、wasm32-WASI 模块、Linux 程序和 x86_64 Android 模拟器中的原生程序运行。Linux/Android 在目标环境中执行 RCL 编写的编译器；WASI 使用 Windows 主机中的 RCL 编译器。目前已验证算法/命令行、内存关系查询与事务、离散模拟/科学计算，目标之间的字节码和语义状态根一致。
 
@@ -401,7 +403,7 @@ RCL 当前长期验证主线是一张固定的：
 
 缺一个必要 Gate 就是 BLOCKED；必要 Gate 失败就是 FAIL，不能靠其它高分抵消。
 
-当前记录为 `142 PASS / 0 BLOCKED / 258 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+当前记录为 `202 PASS / 0 BLOCKED / 198 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。[原生 RCL 阶段批次](docs/K400_NATIVE_PHASES_2026-10-13.md)通过绑定源码的时钟和任务控制器新增 24 格；[表达式、媒体与游戏批次](docs/K400_NEW_FAMILIES_2026-10-13.md)将三个新 RCL 程序放入十二种实际执行环境，新增 36 格，达到 202 格，完成“至少 200 格”的开发里程碑。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 ### 当前 Killer Tasks
 

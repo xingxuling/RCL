@@ -1,0 +1,39 @@
+reality NativeMediaKernel {
+  facet input.red : Number = 20
+  facet input.green : Number = 20
+  facet input.blue : Number = 20
+  facet input.gain : Number = 2
+  facet input.offset : Number = -5
+  facet input.invert : Truth = false
+  facet input.empty : Truth = false
+
+  reckon clamp_channel(value : Number) -> Number = choose(value < 0, 0, choose(value > 255, 255, value))
+  reckon transform_channel(value : Number) -> Number =
+    choose(input.invert, 255 - clamp_channel(value * input.gain + input.offset), clamp_channel(value * input.gain + input.offset))
+  reckon transform_samples(samples : Sequence, cursor : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(samples), output, transform_samples(samples, cursor + 1, sequence_append(output, transform_channel(sequence_get(samples, cursor)))))
+  reckon flip_index(cursor : Number) -> Number =
+    cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)
+  reckon flip_rows(samples : Sequence, cursor : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(samples), output, flip_rows(samples, cursor + 1, sequence_append(output, sequence_get(samples, flip_index(cursor)))))
+  reckon make_run(value : Number, count : Number) -> Sequence = sequence_append(sequence_append(empty_sequence(), value), count)
+  reckon emit_run(output : Sequence, value : Number, count : Number) -> Sequence = choose(count > 0, sequence_append(output, make_run(value, count)), output)
+  reckon encode_runs(samples : Sequence, cursor : Number, value : Number, count : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(samples), emit_run(output, value, count),
+      choose(count == 0 or sequence_get(samples, cursor) == value,
+        encode_runs(samples, cursor + 1, sequence_get(samples, cursor), count + 1, output),
+        encode_runs(samples, cursor + 1, sequence_get(samples, cursor), 1, emit_run(output, value, count))))
+  reckon repeat_sample(value : Number, count : Number, output : Sequence) -> Sequence =
+    choose(count <= 0, output, repeat_sample(value, count - 1, sequence_append(output, value)))
+  reckon decode_runs(runs : Sequence, cursor : Number, output : Sequence) -> Sequence =
+    choose(cursor >= length(runs), output, decode_runs(runs, cursor + 1,
+      repeat_sample(sequence_get(sequence_get(runs, cursor), 0), sequence_get(sequence_get(runs, cursor), 1), output)))
+
+  facet image.original : Sequence = choose(input.empty, empty_sequence(),
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(
+      empty_sequence(), input.red), input.green), input.blue), 255), 128), 0), input.red), input.green), input.blue), 0), 0), 0))
+  facet image.transformed : Sequence = transform_samples(image.original, 0, empty_sequence())
+  facet image.flipped : Sequence = flip_rows(image.transformed, 0, empty_sequence())
+  facet codec.runs : Sequence = encode_runs(image.flipped, 0, 0, 0, empty_sequence())
+  facet codec.decoded : Sequence = decode_runs(codec.runs, 0, empty_sequence())
+}

@@ -46,3 +46,5 @@ Validation: six targeted admission checks, 27 maturity/matrix checks and five ac
 Their controller sources are `examples/runtime-hosts/simulation-clock.rcl` and `automation-gate.rcl`. Targeted controls pass on actual source-bound native daemons. Separate ten-case contracts and controller/compiler hashes were frozen before three new independent contexts; the original repair responses are retained under `examples/universal-stress/phase-contexts/`.
 
 These controller hosts grant no new K400 cells before their separate full campaign. They claim no physical world/time, external tool effect, canonical RNCS-world ownership, full runtime self-hosting or hardened OS sandbox. Controller compilation reuses the RCL session compiler with its declared JavaScript compiler bootstrap and native target-byte parity.
+
+Subsequent verification: the separate [native phase campaign](K400_NATIVE_PHASES_2026-10-13.md) completed both controller hosts and added 24 distinct coordinates, reaching 166. The [new RCL program campaign](K400_NEW_FAMILIES_2026-10-13.md) then reached 202. The 142-cell result above remains this job campaign's historical checkpoint.

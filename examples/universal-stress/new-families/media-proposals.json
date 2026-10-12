@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-new-family-proposals.v1",
+  "contractRoot": "70738c6d5a7d2999cdeddc4e9f3d4008a190b5337be2f255276584a0cba25ee7",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/new-families/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_new_family_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "  reckon clamp_channel(value : Number) -> Number = choose(value < 0, 0, choose(value < 255, 255, value))",
+        "new": "  reckon clamp_channel(value : Number) -> Number = choose(value < 0, 0, choose(value > 255, 255, value))",
+        "diagnosis": "The upper-bound comparison is reversed. Changing it clamps transformed samples to the inclusive range 0 through 255 before optional inversion."
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_new_family_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)",
+        "diagnosis": "The first RGB pixel currently reads itself, while the second reads the first. Adding three to the first pixel's channel indices swaps both pixels within each six-channel row, preserving row and channel order."
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_new_family_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+        "new": "repeat_sample(value, count - 1, sequence_append(output, value))",
+        "diagnosis": "Each recursion appends one sample but subtracts two from the remaining count. Subtracting one makes decoding append exactly count samples, preserving empty-input termination and exact RLE round trips."
+      }
+    }
+  ]
+}

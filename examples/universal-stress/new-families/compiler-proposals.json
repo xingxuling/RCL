@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-new-family-proposals.v1",
+  "contractRoot": "ffa5d85ea1cb1959facdbc7cfd4359dfc7734868e1e45dc9b31de72a6818e404",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/new-families/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_new_family_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "  reckon term_tail(tokens : Sequence, left : Sequence) -> Sequence =\n    choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,\n      finish_term(tokens, parse_factor(tokens, position(left) + 1, code(left))), left)",
+        "new": "  reckon term_tail(tokens : Sequence, left : Sequence) -> Sequence =\n    choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,\n      finish_term(tokens, parse_factor(tokens, position(left) + 1, code(left))), left)",
+        "diagnosis": "The term parser consumes addition token 1 while emitting multiplication. Consuming multiplication token 2 restores precedence, with addition and subtraction handled by the expression parser. Parenthesis handling and complete-input validation remain intact."
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_new_family_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "pair(choose(operator == 1, 2, 1), 0)",
+        "new": "pair(choose(operator == 1, 1, 2), 0)",
+        "diagnosis": "Addition and subtraction opcodes are reversed. Emit opcode one for the plus token and opcode two for the minus token, preserving the existing postfix operand order."
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_new_family_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 1, left + right, choose(operator == 2, right - left, left * right))",
+        "new": "choose(operator == 1, left + right, choose(operator == 2, left - right, left * right))",
+        "diagnosis": "Subtraction reverses the supplied stack operands. Using left minus right retains the existing addition and multiplication behavior."
+      }
+    }
+  ]
+}

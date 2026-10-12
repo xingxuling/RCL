@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**RESEARCH_PREVIEW · K400 142/400 (35.5%) · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 202/400 (50.5%) · INCOMPLETE · U3**
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
@@ -19,7 +19,9 @@ RCL (Reality Compiler Language) is an open-source language for writing programs 
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-**RCL is a research preview. K400 currently records 142/400 PASS and 258 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
+**RCL is a research preview. K400 currently records 202/400 PASS and 198 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
+
+The latest [RCL-owned kernels](docs/K400_NEW_FAMILIES_2026-10-13.md) implement token-expression compilation, RGB transforms and run-length round trips, and fixed-step platform-game rules. All three pass twelve actual execution contexts with frozen inputs and unchanged independent repairs. Their bounded scopes keep the remaining 198 K400 cells open.
 
 ## Why RCL?
 
@@ -60,7 +62,7 @@ The native VM and `rcl run` default to `rcl.semantic-state-root.v2`, using exact
 
 ## Portable native execution
 
-The [native-core genome campaign](docs/K400_GENOME_CAMPAIGN_2026-10-13.md) now also verifies bounded learning, agent deliberation, workflow, logical events, governance/reactive and mixed-paradigm programs on all four targets. Each has ten pre-sealed cases and three independently repaired-source replays. The new `createPortableHttpTarget` API provides actual authenticated loopback compilation/execution, with server-cell admission still pending its separate campaign.
+The [native-core genome campaign](docs/K400_GENOME_CAMPAIGN_2026-10-13.md) also verifies bounded learning, agent deliberation, workflow, logical events, governance/reactive and mixed-paradigm programs on all four targets. Each has ten pre-sealed cases and three independently repaired-source replays. The `createPortableHttpTarget` API provides authenticated loopback compilation/execution; its [completed execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) also verifies persistent embedded instances and two-worker recovery.
 
 The same native C VM now runs as a Windows executable, wasm32-WASI module, Linux executable and x86_64 Android emulator native process. Linux/Android compile source on their actual target with the RCL-authored compiler RBC; WASI uses that compiler on the Windows host. The current profiles cover algorithms/CLI, in-memory relational transactions and discrete simulation/scientific calculations. They have identical RBC bytes and semantic roots across credited targets.
 
@@ -402,7 +404,7 @@ Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
 A missing required gate blocks the cell. A failed required gate fails the cell. No weighted score can hide a missing hard requirement.
 
-Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `142 PASS / 0 BLOCKED / 258 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator execution. The [execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) verifies authenticated HTTP, persistent embedded instances and two-worker recovery, adding 35 distinct cells. The [native job campaign](docs/K400_JOB_CONTEXTS_2026-10-13.md) adds another 36 cells through cold handlers, SQLite transactions and worker-thread dataflow. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `202 PASS / 0 BLOCKED / 198 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator execution. The [execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) verifies authenticated HTTP, persistent embedded instances and two-worker recovery, adding 35 distinct cells. The [native job campaign](docs/K400_JOB_CONTEXTS_2026-10-13.md) adds another 36 cells through cold handlers, SQLite transactions and worker-thread dataflow. The [native RCL phase campaign](docs/K400_NATIVE_PHASES_2026-10-13.md) adds 24 cells through source-bound clock and job controllers. The [expression/media/game campaign](docs/K400_NEW_FAMILIES_2026-10-13.md) adds 36 cells with three new RCL programs across twelve actual execution contexts, reaching 202; the >=200 development milestone is met. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 ### Current killer-task frontier
 

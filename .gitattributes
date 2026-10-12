@@ -8,6 +8,9 @@
 *.wasm binary
 native/linux/rclvm binary
 native/linux/rclc binary
+# Runtime receipts bind these manifests byte for byte, including captured CRLF.
+native/wasi/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+native/linux/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 *.png binary
 *.jpg binary
 *.jpeg binary
