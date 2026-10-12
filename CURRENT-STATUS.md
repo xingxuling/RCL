@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 44/400 PASS (11%) · 356 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 71/400 PASS (17.75%) · 329 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -21,6 +21,17 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
 ## 2026-10-13 portable native execution
+
+The subsequent native-core genome campaign adds 27 distinct coordinates for
+learning, agent deliberation, logical events, workflows, governance/reactive
+and mixed paradigms across the same four actual targets. K098 receives another
+complete bounded profile without duplicate cell credit. All six contracts pin
+ten cases before independent generation; transaction evidence includes exact
+authority/witness matching and independently reconstructed root continuity.
+The current aggregate is 71 PASS / 329 UNTESTED, still INCOMPLETE. The new
+authenticated HTTP native compiler/VM organ has targeted runtime evidence;
+it receives no new server cell before its separate nine-gate admission.
+See `docs/K400_GENOME_CAMPAIGN_2026-10-13.md`.
 
 The same C VM now executes on Windows, wasm32-WASI, Linux WSL2 and the connected
 x86_64 Android emulator. Linux/Android also execute the RCL compiler RBC on their

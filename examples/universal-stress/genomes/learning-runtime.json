@@ -1,0 +1,2793 @@
+{
+  "format": "rcl.k400-genome-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_TARGETS",
+  "id": "learning",
+  "generatedAt": "2026-10-12T20:44:38.748Z",
+  "contractRoot": "d1520c6af8860402ebf47e6f90c9ac7bae2c08adef3dce352a32522aea5371c0",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/genomes/learning-proposals.json",
+  "proposalsHash": "eaad55f312179c9664aaaed765f6cbb1b418af4930a4c14c2565666b1c902663",
+  "eligibleCells": [
+    "K053",
+    "K013",
+    "K033",
+    "K093"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-genome-engine.mjs",
+      "sha256": "4c2b762cec2676b38377225e3dab5145c9417dcf799e61c217786166099d9cf7"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "scripts/run-native-wasi.mjs",
+      "sha256": "a8c88d54f7df1db0c1fe0b334d85b7f691f7e29792d4a13f6d2b2d8f93dcf910"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/k400-genomes/learning.mjs",
+      "sha256": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802"
+    }
+  ],
+  "backends": {
+    "windows": {
+      "binding": {
+        "execution": "Windows native C VM",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 217.738400000002,
+          "executeMs": 110.16800000000512,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 165.38409999999567,
+          "executeMs": 131.68549999999232,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 179.25440000000526,
+          "executeMs": 122.41280000002007,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 171.86960000000545,
+          "executeMs": 137.23009999998612,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 168.94500000000698,
+          "executeMs": 144.0814000000246,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 163.29339999999502,
+          "executeMs": 149.54079999998794,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 182.42280000000028,
+          "executeMs": 129.39019999999437,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 211.25230000002193,
+          "executeMs": 202.5211999999883,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 199.12610000002314,
+          "executeMs": 245.25930000000517,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 241.08139999999548,
+          "executeMs": 134.9659999999858,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 216.51949999999488,
+          "executeMs": 133.61819999999716,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 191.97179999999935,
+          "executeMs": 161.94610000000102,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 203.48680000001332,
+          "executeMs": 152.46210000000428,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 228.58780000000843,
+          "executeMs": 157.79839999999967,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 229.17869999998948,
+          "executeMs": 138.86059999998542,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 207.63440000000992,
+          "executeMs": 106.89600000000792,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 162.3686999999918,
+          "executeMs": 121.16920000000391,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 169.19819999998435,
+          "executeMs": 136.8630000000121,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 153.4363000000012,
+          "executeMs": 93.12760000000708,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 134.38989999998012,
+          "executeMs": 100.14489999998477,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 179.98869999998715,
+          "executeMs": 132.61290000000736,
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 248.56470000001718,
+          "executeMs": 158.7779000000155,
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 182.68290000001434,
+          "executeMs": 187.22039999999106,
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 220.58559999999125,
+          "executeMs": 169.53159999998752,
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 274.4483000000182,
+          "executeMs": 292.10800000000745,
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 241.88379999998142,
+          "executeMs": 166.20939999999246,
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 191.68889999997918,
+          "executeMs": 170.06770000001416,
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 228.39810000002035,
+          "executeMs": 156.08749999999418,
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 254.46689999999944,
+          "executeMs": 165.86540000000969,
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 216.93550000002142,
+          "executeMs": 133.79309999998077,
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+            "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 245.98279999999795,
+          "executeMs": 2403.995200000005,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared scoring function subtracts the learned bias. Adding it makes training and prediction use the intended dot product plus bias."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 215.87690000000293,
+          "executeMs": 2017.1499000000185,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-feature update has reversed signs. Misclassified positive samples must add their node feature; misclassified negative samples must subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 197.17620000001625,
+          "executeMs": 139.61650000000373,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 229.17869999998948,
+        "executeP95Ms": 202.5211999999883
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "wasm-vm": {
+      "binding": {
+        "execution": "Node WASI Preview 1, wasm32 native C VM",
+        "os": "WASI",
+        "arch": "wasm32",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 345.4567999999854,
+          "executeMs": 3115.895499999984,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 267.01149999999325,
+          "executeMs": 633.7284999999974,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 230.25680000000284,
+          "executeMs": 397.6675999999861,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 228.62679999999818,
+          "executeMs": 440.84109999999055,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 228.1880999999994,
+          "executeMs": 522.5468999999866,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 282.30770000000484,
+          "executeMs": 471.00889999998617,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 199.19500000000698,
+          "executeMs": 554.9384000000136,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 275.8214000000153,
+          "executeMs": 437.7864000000118,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 290.5149000000092,
+          "executeMs": 837.7861999999732,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 333.9967999999935,
+          "executeMs": 789.5372999999963,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 197.2906999999832,
+          "executeMs": 440.97649999998976,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 206.13969999999972,
+          "executeMs": 346.16319999998086,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 203.85499999998137,
+          "executeMs": 323.75050000002375,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 175.44670000000042,
+          "executeMs": 374.0842999999877,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 222.7447000000102,
+          "executeMs": 419.70040000000154,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 205.62060000002384,
+          "executeMs": 448.40119999999297,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 233.7557000000088,
+          "executeMs": 381.70370000001276,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 247.08720000000903,
+          "executeMs": 339.99299999998766,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 175.70590000000084,
+          "executeMs": 355.2760000000126,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 210.03250000000116,
+          "executeMs": 500.22749999997905,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 242.01980000000913,
+          "executeMs": 419.73709999999846,
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 209.73359999997774,
+          "executeMs": 895.0511999999871,
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 864.4772999999986,
+          "executeMs": 1370.7570000000123,
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 608.429300000018,
+          "executeMs": 1880.8706000000238,
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 658.4303999999829,
+          "executeMs": 1399.4001999999746,
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 298.41989999997895,
+          "executeMs": 429.5054999999993,
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 246.0289000000048,
+          "executeMs": 409.82380000001285,
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 220.28960000001825,
+          "executeMs": 439.8888000000152,
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 250.02569999999832,
+          "executeMs": 553.1516999999876,
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 378.58480000001146,
+          "executeMs": 483.7265999999945,
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+            "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 185.06280000001425,
+          "executeMs": 418.65179999999236,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared scoring function subtracts the learned bias. Adding it makes training and prediction use the intended dot product plus bias."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 187.5297000000137,
+          "executeMs": 329.67909999997937,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-feature update has reversed signs. Misclassified positive samples must add their node feature; misclassified negative samples must subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 158.6808000000019,
+          "executeMs": 302.83190000001923,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 333.9967999999935,
+        "executeP95Ms": 837.7861999999732
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:(node:54572) ExperimentalWarning: WASI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "linux": {
+      "binding": {
+        "execution": "Linux WSL2 native C process",
+        "os": "Linux",
+        "arch": "x86_64",
+        "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+        "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+        "compilerLocation": "Linux target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 3208.6468999999925,
+          "executeMs": 829.7574000000022,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1002.0905999999959,
+          "executeMs": 813.0385999999999,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1470.8044999999984,
+          "executeMs": 1302.4660999999905,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1196.824799999973,
+          "executeMs": 1064.988399999973,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1064.5720999999903,
+          "executeMs": 869.7961999999825,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 823.869000000006,
+          "executeMs": 922.7250000000349,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 651.8564999999944,
+          "executeMs": 741.6692999999505,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 737.7639999999665,
+          "executeMs": 496.33149999997113,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 560.9347999999882,
+          "executeMs": 496.52639999997336,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 471.6652999999933,
+          "executeMs": 438.764199999976,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 496.27980000001844,
+          "executeMs": 427.3237000000081,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 498.15340000001015,
+          "executeMs": 491.6635000000242,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 531.2299999999814,
+          "executeMs": 501.75559999997495,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 498.0763000000152,
+          "executeMs": 2453.2519999999786,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 579.9537000000128,
+          "executeMs": 473.87839999998687,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 500.55280000000494,
+          "executeMs": 477.96080000000075,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 606.8391000000411,
+          "executeMs": 573.0484999999753,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 620.8475999999791,
+          "executeMs": 474.69209999998566,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 488.890699999989,
+          "executeMs": 481.1835999999894,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 676.3454999999958,
+          "executeMs": 472.8436999999685,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 627.5577000000048,
+          "executeMs": 477.2252000000444,
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 537.7382000000216,
+          "executeMs": 503.15159999998286,
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 498.5023999999976,
+          "executeMs": 485.4002999999793,
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 535.7237000000314,
+          "executeMs": 735.36599999998,
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 672.4187999999849,
+          "executeMs": 539.881400000013,
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 587.4206000000122,
+          "executeMs": 495.5068999999785,
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 686.3876999999629,
+          "executeMs": 425.9702999999863,
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 520.3504000000539,
+          "executeMs": 429.226399999985,
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 496.0618999999715,
+          "executeMs": 480.1512000000221,
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 557.7921999999671,
+          "executeMs": 537.2826999999816,
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+            "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 773.084600000002,
+          "executeMs": 683.3414999999804,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared scoring function subtracts the learned bias. Adding it makes training and prediction use the intended dot product plus bias."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 488.49460000003455,
+          "executeMs": 390.5199000000139,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-feature update has reversed signs. Misclassified positive samples must add their node feature; misclassified negative samples must subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 445.56729999999516,
+          "executeMs": 364.09289999998873,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1470.8044999999984,
+        "executeP95Ms": 1302.4660999999905
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "android": {
+      "binding": {
+        "execution": "Android native Linux ABI C process via ADB",
+        "os": "Android",
+        "arch": "x86_64",
+        "abi": "x86_64",
+        "apiLevel": "35",
+        "emulator": true,
+        "deviceSerial": "emulator-5554",
+        "physicalDeviceClaimed": false,
+        "mobileUiClaimed": false,
+        "compilerLocation": "Android target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1942.8243999999831,
+          "executeMs": 832.7309000000241,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1222.6731000000145,
+          "executeMs": 460.68450000003213,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 912.6506999999983,
+          "executeMs": 582.3532000000123,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 939.3963999999687,
+          "executeMs": 1065.5361999999732,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 3825.699800000002,
+          "executeMs": 695.9279000000097,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1036.108499999973,
+          "executeMs": 619.3925999999628,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1361.5471999999718,
+          "executeMs": 579.5826999999699,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 830.1060999999754,
+          "executeMs": 429.86329999996815,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 937.5211000000127,
+          "executeMs": 706.6184999999823,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 668.0365000000456,
+          "executeMs": 302.74319999996806,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 607.2137000000221,
+          "executeMs": 313.84189999999944,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 713.1222000000416,
+          "executeMs": 358.1831999999704,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 1084.1447000000044,
+          "executeMs": 396.9283999999752,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 685.4078999999911,
+          "executeMs": 339.29690000001574,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 596.1678999999422,
+          "executeMs": 304.8520000000135,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 592.6223999999929,
+          "executeMs": 328.0522999999812,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 595.132500000007,
+          "executeMs": 329.7006999999867,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 605.493599999987,
+          "executeMs": 304.0764999999665,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 639.2835000000196,
+          "executeMs": 345.87329999997746,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 795.5616000000155,
+          "executeMs": 367.65240000002086,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 1085.5164999999688,
+          "executeMs": 355.45329999999376,
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 850.9106000000029,
+          "executeMs": 1523.8117000000202,
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 1726.6061000000336,
+          "executeMs": 375.99440000002505,
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 691.7813000000315,
+          "executeMs": 373.71469999995315,
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 683.2764000000316,
+          "executeMs": 374.5921999999555,
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 758.6622000000207,
+          "executeMs": 322.7397999999812,
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 870.7863000000361,
+          "executeMs": 341.31319999997504,
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 726.3983000000007,
+          "executeMs": 425.875400000019,
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 682.5629999999655,
+          "executeMs": 387.31969999999274,
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 1071.9096999999601,
+          "executeMs": 355.90830000001006,
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+            "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+            "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "valueRef": "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 650.7612000000081,
+          "executeMs": 366.62060000002384,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+            "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+            "diagnosis": "The shared scoring function subtracts the learned bias. Adding it makes training and prediction use the intended dot product plus bias."
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 650.8276000000187,
+          "executeMs": 361.9988000000012,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+            "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+            "diagnosis": "The node-feature update has reversed signs. Misclassified positive samples must add their node feature; misclassified negative samples must subtract it."
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "valueRef": "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 615.2452000000048,
+          "executeMs": 287.8782999999821,
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1942.8243999999831,
+        "executeP95Ms": 832.7309000000241
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\r\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "392232eab371aa60195093465e7cfd08641d5ec4daa0e00bf4d9d7f40a432cd2": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 9,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+      "history": [],
+      "projections": []
+    },
+    "11f3a97e13040c5f7606f3b832609d0cc84b428792fdb5625de0740cec43e674": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 0,
+        "inference.nodes": 0,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 0,
+        "input.epochs": 0,
+        "input.hotness": 0,
+        "input.nodes": 0,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 0,
+        "training.final_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+      "history": [],
+      "projections": []
+    },
+    "e3b059dd13cbdcdeb61378ce951e58be657ccbfac806e7b9066f4e1356912145": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 1,
+        "inference.nodes": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 2,
+        "input.epochs": 1,
+        "input.hotness": 1,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 1,
+        "training.final_parameters": [
+          2,
+          0,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+      "history": [],
+      "projections": []
+    },
+    "1a60775181ec9e06b9e87c60ea13c541b4af1a28b9b15cba73a1fad431fbe246": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 1,
+        "inference.nodes": 3,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 8,
+        "input.epochs": 2,
+        "input.hotness": 1,
+        "input.nodes": 3,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 2,
+        "training.final_parameters": [
+          2,
+          2,
+          0
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+      "history": [],
+      "projections": []
+    },
+    "9095702dfbe7a255145ea06e1fd5e93c248d77cffc4dc7f9761c4abbf5273ec8": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 3,
+        "inference.nodes": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 3,
+        "input.epochs": 3,
+        "input.hotness": 3,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 3,
+        "training.final_parameters": [
+          1,
+          1,
+          -1
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+      "history": [],
+      "projections": []
+    },
+    "dcf363c0a1f577d678a1c74b19f4a81a0c007be41e3e84f8b9ce63296a47083a": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 3,
+        "inference.nodes": 3,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 11,
+        "input.epochs": 4,
+        "input.hotness": 3,
+        "input.nodes": 3,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 4,
+        "training.final_parameters": [
+          3,
+          1,
+          -1
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+      "history": [],
+      "projections": []
+    },
+    "37cc6e08c0511aecadcf94551d5173c4548a8a39bbfe401eaefa88c5af99ffe9": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 0,
+        "inference.hotness": 5,
+        "inference.nodes": -2,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -4,
+        "input.epochs": 8,
+        "input.hotness": 5,
+        "input.nodes": -2,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 8,
+        "training.final_parameters": [
+          3,
+          1,
+          -3
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+      "history": [],
+      "projections": []
+    },
+    "1c88edbc3f845ec225a98bf4f81ee26dc631d8cef298d62ec096ed860dd5c0d3": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 0,
+        "inference.hotness": 1,
+        "inference.nodes": 1,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -1,
+        "input.epochs": 16,
+        "input.hotness": 1,
+        "input.nodes": 1,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+      "history": [],
+      "projections": []
+    },
+    "0b3bcd6c5c0bb86680885794b963875dba1f5129ec59676d99919640a329af0c": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 0,
+        "inference.hotness": 0,
+        "inference.nodes": 0,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "inference.score": -5,
+        "input.epochs": 20,
+        "input.hotness": 0,
+        "input.nodes": 0,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 20,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+      "history": [],
+      "projections": []
+    },
+    "5e458a0340b1046101cb5c070c2adb9734e800cbc9c4092d972d3ef65afe577a": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": -3,
+        "inference.nodes": 6,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 10,
+        "input.epochs": 24,
+        "input.hotness": -3,
+        "input.nodes": 6,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 24,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+      "history": [],
+      "projections": []
+    },
+    "72b8d7b6367b856349d1935a8aefe23e782c4324059a36edb678a5425be36e85": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 0,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 1,
+        "evaluation.correct": 4,
+        "inference.classification": 1,
+        "inference.hotness": 0.5,
+        "inference.nodes": 1.5,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 0,
+        "input.epochs": 12,
+        "input.hotness": 0.5,
+        "input.nodes": 1.5,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 12,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+      "history": [],
+      "projections": []
+    },
+    "82af0432857ad489f5c3d0b13eaa0a702590ba3c0ba423a116b7dd2ffdd6cdf0": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 15,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          9
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "4387241b21ca3d84ca8acfac861077a1c19a6fd0c6585d867f72a67c028ec104",
+      "history": [],
+      "projections": []
+    },
+    "a0d188b47008bf72833c3584416b5a7151e264a47bf6502ab9ba2e14d4364e48": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 15,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          -9
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "3709e4e8dc28ffcb92700a03b4570b0cd897d6c44a0c71f0610c3b5ca4af00ff",
+      "history": [],
+      "projections": []
+    },
+    "95f6df1963da20c02cf8e1e957cbc8f616f33d1367ef688f7471a4f1ccc143d2": {
+      "state": {
+        "authority.model_commit_granted": false,
+        "boundary.small_cold_classification": 1,
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-learning-v1",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "contract.owner": "RCL",
+        "evaluation.accuracy": 0.75,
+        "evaluation.correct": 3,
+        "inference.classification": 1,
+        "inference.hotness": 2,
+        "inference.nodes": 4,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "inference.score": 34,
+        "input.epochs": 16,
+        "input.hotness": 2,
+        "input.nodes": 4,
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          10,
+          2,
+          -10
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stateRoot": "534c184f47e29cef81c25cfd3f72d2983bdc373ba737ce9fb9fc8752f5197863",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "071aae4efcfe516e5a4b2421ced7dbdfcee9161d0f9d7989cbac5820a858c3b3"
+}

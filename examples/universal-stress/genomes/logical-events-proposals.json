@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-genome-proposals.v1",
+  "contractRoot": "b68a4cdebba7196473441947d530dc5d96b7e281c1df6eafc0f80abf69fc8506",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/genomes/independent-batch.json",
+  "trials": [
+    {
+      "id": "tie-order",
+      "context": "/root/k400_genome_a",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "event_priority(left) > event_priority(right)",
+        "new": "event_priority(left) < event_priority(right)",
+        "diagnosis": "The priority comparison sorts equal-time events in descending priority order. Reverse it to obtain increasing time, priority, and identifier."
+      }
+    },
+    {
+      "id": "budget",
+      "context": "/root/k400_genome_b",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+        "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+        "diagnosis": "The event budget rejection comparison is reversed. Reject only when due active events exceed the budget, allowing equality."
+      }
+    },
+    {
+      "id": "time-authority",
+      "context": "/root/k400_genome_c",
+      "proposal": {
+        "id": "logical-events",
+        "file": "candidate.rcl",
+        "old": "choose(temporal_commit_capability == 1,",
+        "new": "choose(temporal_commit_capability != 1,",
+        "diagnosis": "The capability gate rejects the authorized value. Rejecting values unequal to one restores authorization while retaining the existing backward-time rejection."
+      }
+    }
+  ]
+}

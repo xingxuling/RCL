@@ -2,6 +2,7 @@ export * from './index-pre-v095-v096.mjs';
 export { createRealitySession } from './runtime.mjs';
 export { createNativeRealitySession } from './native-session.mjs';
 export { createPortableNativeTarget } from './portable-native-vm.mjs';
+export { createPortableHttpTarget } from './portable-http-target.mjs';
 export { compileRealitySessionNative } from './session-compiler.mjs';
 export { openDurableRealitySession, verifyDurableRealitySession, RCL_DURABLE_SESSION_VERSION, RCL_SESSION_JOURNAL_FORMAT } from './durable-session.mjs';
 export { compileRealitySessionBytecode, RCL_BYTECODE_SESSION_FEATURE_VERSION } from './bytecode.mjs';

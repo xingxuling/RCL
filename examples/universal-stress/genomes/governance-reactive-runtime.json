@@ -1,0 +1,3761 @@
+{
+  "format": "rcl.k400-genome-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_TARGETS",
+  "id": "governance-reactive",
+  "generatedAt": "2026-10-12T20:40:19.741Z",
+  "contractRoot": "da6f08cde1ece402405e0bb5ee68471a1e25f55d2e567bbcef34b5095e7aef24",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/genomes/governance-reactive-proposals.json",
+  "proposalsHash": "ecec2ee22a7b375d08af751fd1f4f4f145d1f2c10d852784b8019868e539d89c",
+  "eligibleCells": [
+    "K057",
+    "K058",
+    "K017",
+    "K018",
+    "K037",
+    "K038",
+    "K097",
+    "K098"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-genome-engine.mjs",
+      "sha256": "4c2b762cec2676b38377225e3dab5145c9417dcf799e61c217786166099d9cf7"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "scripts/run-native-wasi.mjs",
+      "sha256": "a8c88d54f7df1db0c1fe0b334d85b7f691f7e29792d4a13f6d2b2d8f93dcf910"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/k400-genomes/governance.mjs",
+      "sha256": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec"
+    }
+  ],
+  "backends": {
+    "windows": {
+      "binding": {
+        "execution": "Windows native C VM",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 79.66619999999966,
+          "executeMs": 83.54019999999946,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 70.05709999999999,
+          "executeMs": 82.9429999999993,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.6867000000002,
+          "executeMs": 81.92919999999867,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 77.14309999999932,
+          "executeMs": 81.17050000000017,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 65.17129999999997,
+          "executeMs": 85.1812000000009,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 69.55279999999948,
+          "executeMs": 85.15060000000085,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.03620000000046,
+          "executeMs": 85.80789999999979,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 72.78069999999934,
+          "executeMs": 98.40099999999984,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.90339999999924,
+          "executeMs": 89.7479000000003,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 77.34389999999985,
+          "executeMs": 87.71479999999974,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 86.92410000000018,
+          "executeMs": 94.20629999999983,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 75.52170000000115,
+          "executeMs": 97.04520000000048,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.1257999999998,
+          "executeMs": 107.24040000000059,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.17720000000008,
+          "executeMs": 99.95790000000125,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 81.4349000000002,
+          "executeMs": 107.69710000000123,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.37630000000172,
+          "executeMs": 98.43029999999999,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 79.65840000000026,
+          "executeMs": 91.21059999999852,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 86.08410000000003,
+          "executeMs": 119.34100000000035,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 80.1292999999987,
+          "executeMs": 83.71409999999923,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.63960000000043,
+          "executeMs": 86.09259999999995,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 77.91220000000067,
+          "executeMs": 89.1797000000006,
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 65.77610000000095,
+          "executeMs": 73.95269999999982,
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 69.61809999999969,
+          "executeMs": 124.16799999999967,
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 87.89630000000034,
+          "executeMs": 107.22270000000026,
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 78.60000000000036,
+          "executeMs": 96.08379999999852,
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 75.79440000000068,
+          "executeMs": 90.02540000000045,
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 75.16579999999885,
+          "executeMs": 103.6201000000001,
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 78.14980000000105,
+          "executeMs": 103.41109999999935,
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 73.84249999999884,
+          "executeMs": 92.43840000000091,
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 71.67399999999907,
+          "executeMs": 83.17729999999938,
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the authorization rule's exact compiler.inspect requirement on source."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.54349999999977,
+          "executeMs": 89.75909999999931,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization leaves the accepted candidate in phase one. Emission must trigger there; its transition to phase two prevents another trigger."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.3083000000006,
+          "executeMs": 148.6160000000018,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit counter twice, violating its projected-state invariant. A single increment satisfies that invariant and preserves the subsequent emission increment."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 107.50049999999828,
+          "executeMs": 129.94870000000083,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 86.08410000000003,
+        "executeP95Ms": 107.69710000000123
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "wasm-vm": {
+      "binding": {
+        "execution": "Node WASI Preview 1, wasm32 native C VM",
+        "os": "WASI",
+        "arch": "wasm32",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.26540000000023,
+          "executeMs": 251.46069999999963,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 102.09289999999964,
+          "executeMs": 305.64789999999994,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.25249999999869,
+          "executeMs": 245.27560000000085,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 83.3737000000001,
+          "executeMs": 251.26859999999942,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.29449999999997,
+          "executeMs": 229.69220000000132,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.35339999999997,
+          "executeMs": 239.58740000000034,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 78.07670000000144,
+          "executeMs": 236.41579999999885,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.49910000000091,
+          "executeMs": 245.02070000000094,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 79.76740000000063,
+          "executeMs": 268.549500000001,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 80.82030000000304,
+          "executeMs": 287.8581000000013,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 89.29720000000088,
+          "executeMs": 321.02850000000035,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 90.34140000000116,
+          "executeMs": 277.4431999999979,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 76.89479999999821,
+          "executeMs": 232.14229999999952,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 69.97550000000047,
+          "executeMs": 266.39260000000286,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 105.3630000000012,
+          "executeMs": 281.1422999999995,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 77.76510000000053,
+          "executeMs": 315.64730000000054,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 237.0802999999978,
+          "executeMs": 507.6303999999982,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 95.92859999999928,
+          "executeMs": 314.4451000000008,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 88.64600000000064,
+          "executeMs": 288.10310000000027,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 86.80719999999928,
+          "executeMs": 244.07619999999952,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 68.56970000000001,
+          "executeMs": 220.47650000000067,
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 92.17499999999927,
+          "executeMs": 220.9341999999997,
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 68.47220000000016,
+          "executeMs": 276.09609999999884,
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 78.01650000000154,
+          "executeMs": 209.83079999999973,
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 66.70120000000315,
+          "executeMs": 205.21140000000014,
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 82.16739999999845,
+          "executeMs": 267.72619999999733,
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 93.65930000000299,
+          "executeMs": 207.84349999999904,
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 176.29859999999826,
+          "executeMs": 383.4991999999984,
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 121.14249999999811,
+          "executeMs": 252.05459999999948,
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 100.45699999999852,
+          "executeMs": 228.21180000000095,
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the authorization rule's exact compiler.inspect requirement on source."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 73.58569999999963,
+          "executeMs": 246.90090000000055,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization leaves the accepted candidate in phase one. Emission must trigger there; its transition to phase two prevents another trigger."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 74.70020000000295,
+          "executeMs": 261.1749999999993,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit counter twice, violating its projected-state invariant. A single increment satisfies that invariant and preserves the subsequent emission increment."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:(node:80776) ExperimentalWarning: WASI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 71.58300000000236,
+          "executeMs": 265.1320000000014,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 105.3630000000012,
+        "executeP95Ms": 321.02850000000035
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:(node:78704) ExperimentalWarning: WASI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "linux": {
+      "binding": {
+        "execution": "Linux WSL2 native C process",
+        "os": "Linux",
+        "arch": "x86_64",
+        "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+        "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+        "compilerLocation": "Linux target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 833.3243000000002,
+          "executeMs": 505.1326999999983,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 731.6768000000011,
+          "executeMs": 833.740600000001,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 388.74519999999757,
+          "executeMs": 320.3683000000019,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 362.4459999999963,
+          "executeMs": 363.80549999999494,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 398.95320000000356,
+          "executeMs": 394.29499999999825,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 427.51870000000054,
+          "executeMs": 523.8271000000022,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 427.66369999999733,
+          "executeMs": 382.4323000000004,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 368.5144,
+          "executeMs": 377.24149999999645,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 345.209299999995,
+          "executeMs": 385.938900000001,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 375.5414000000019,
+          "executeMs": 342.35699999999633,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 355.4019999999946,
+          "executeMs": 361.00560000000405,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 304.21229999999923,
+          "executeMs": 327.37659999999596,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 305.19149999999354,
+          "executeMs": 586.3730999999971,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 392.16509999999835,
+          "executeMs": 347.8972999999969,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 322.373599999999,
+          "executeMs": 303.6415999999954,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 359.18620000000374,
+          "executeMs": 334.19660000000295,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 281.1458000000057,
+          "executeMs": 306.6846000000005,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 341.14600000000064,
+          "executeMs": 337.3058999999994,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 347.7894000000015,
+          "executeMs": 296.5220999999947,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 329.57150000000547,
+          "executeMs": 342.9640999999974,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 284.2627999999968,
+          "executeMs": 295.40209999999934,
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 296.88140000000567,
+          "executeMs": 323.23139999999694,
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 309.08870000000024,
+          "executeMs": 283.38300000000163,
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 319.04069999999774,
+          "executeMs": 321.7829999999958,
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 574.8238999999958,
+          "executeMs": 428.2809000000052,
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 364.9288000000015,
+          "executeMs": 340.1036000000022,
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 347.88470000000234,
+          "executeMs": 372.4418000000005,
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 328.974000000002,
+          "executeMs": 328.2949000000008,
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 381.41879999999946,
+          "executeMs": 337.2975000000006,
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 399.76430000000255,
+          "executeMs": 360.940300000002,
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the authorization rule's exact compiler.inspect requirement on source."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1\"}\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 367.85370000000694,
+          "executeMs": 317.1762000000017,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization leaves the accepted candidate in phase one. Emission must trigger there; its transition to phase two prevents another trigger."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 393.70640000000276,
+          "executeMs": 324.6501999999964,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit counter twice, violating its projected-state invariant. A single increment satisfies that invariant and preserves the subsequent emission increment."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 337.2811999999976,
+          "executeMs": 305.495600000002,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 731.6768000000011,
+        "executeP95Ms": 586.3730999999971
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "android": {
+      "binding": {
+        "execution": "Android native Linux ABI C process via ADB",
+        "os": "Android",
+        "arch": "x86_64",
+        "abi": "x86_64",
+        "apiLevel": "35",
+        "emulator": true,
+        "deviceSerial": "emulator-5554",
+        "physicalDeviceClaimed": false,
+        "mobileUiClaimed": false,
+        "compilerLocation": "Android target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 755.3872000000047,
+          "executeMs": 1097.3600000000006,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 1,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 526.8103999999948,
+          "executeMs": 330.1428999999989,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 2,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 542.8536999999997,
+          "executeMs": 308.3027000000002,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 3,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 605.6512999999977,
+          "executeMs": 471.14510000000155,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 4,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 897.9450999999972,
+          "executeMs": 485.46050000000105,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 5,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 764.2498999999953,
+          "executeMs": 395.3570000000036,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 6,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 516.6578999999911,
+          "executeMs": 322.6655000000028,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 7,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 565.4297999999981,
+          "executeMs": 458.3768999999884,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 8,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 678.6361000000034,
+          "executeMs": 548.3549000000057,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 9,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 706.9615999999951,
+          "executeMs": 365.91449999999895,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 10,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 552.385500000004,
+          "executeMs": 455.29730000000563,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 11,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 736.1570000000065,
+          "executeMs": 685.5659000000014,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 12,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 812.4792000000016,
+          "executeMs": 450.3127999999997,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 13,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 629.8171000000002,
+          "executeMs": 376.97799999998824,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 14,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 616.934699999998,
+          "executeMs": 413.1962000000058,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 15,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 696.6171000000031,
+          "executeMs": 341.50620000000345,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 16,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 507.50949999998556,
+          "executeMs": 302.6838999999891,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 17,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 522.0819999999949,
+          "executeMs": 297.81909999999334,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 18,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 549.2889999999898,
+          "executeMs": 319.9470999999903,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "index": 19,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 491.9695000000065,
+          "executeMs": 322.53480000000854,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 0
+          },
+          "artifactHash": "04df3cdebb0e6c0138a747db4cff6a94dce5c919ffbb280f81ba58c9e9f617e1",
+          "sourceHash": "1861ea16290cf3c00fbc2cf2bd37366835f5ca3e785abf788beb99bf0e6b516c",
+          "sourceRoot": "f9b140b01a68274a7948c9da28b96d043a2d7c16395403e4143b11116b020335",
+          "compileMs": 560.8292999999976,
+          "executeMs": 355.0648999999976,
+          "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+          "valueRef": "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1
+          },
+          "artifactHash": "00751080582658bf1c1551299f59ab03dc5d3b4ab9f7603cb4cbc41fd4998064",
+          "sourceHash": "e5df9a15950ce7b48904cfc91b2e25418e3c901b450376d30c49ebf888f30738",
+          "sourceRoot": "29212e80dd0c6bfc527cbc7e3e68cefe1b8fbbb7e6ab9efa83442035d828d27d",
+          "compileMs": 632.6627000000008,
+          "executeMs": 325.3695000000007,
+          "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "valueRef": "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "62c29183dd79041fc86149c27f314bd3008cd8461a2fda4956e5cc340114cc2c",
+          "sourceHash": "63f9f43f3afaa0d66655838aa48afc0227189ff82748f2e1abf6b11dae1b9774",
+          "sourceRoot": "c5fa34e54d5a479b60b187c4a52ffbb0bfd5811439e7b08962f67a39d7025097",
+          "compileMs": 533.0743000000075,
+          "executeMs": 361.2838000000047,
+          "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "valueRef": "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "valid": false,
+            "phase": 0,
+            "audit": 10
+          },
+          "artifactHash": "be88301d773070aa0821f3fdac740bc99696ea6150772b4d92cf684480b45a03",
+          "sourceHash": "6639eb594d9a7a6af1d711a3dd73247cb5c9fff8f1db4ef2c4cd1cde93188683",
+          "sourceRoot": "ba215f9420da33981159b9d0f4d8e4d763180268e28a159c159bec130e2a1711",
+          "compileMs": 524.2790999999997,
+          "executeMs": 330.053899999999,
+          "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+          "valueRef": "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "valid": true,
+            "phase": 1,
+            "audit": 0
+          },
+          "artifactHash": "bb9eba210e565caf6c4c22e20bd95ebf89b149aa4a1ef2481d8ca4426f8f8ff1",
+          "sourceHash": "b39434711e58bd0d35171e31c128faf68e3de64c49e6ff00e2f1f8d07ae168ea",
+          "sourceRoot": "17614da7b7fd22ad78247c23e2ad68a60a313a6ac10233fbaefaa0457f2ce9ab",
+          "compileMs": 521.5399999999936,
+          "executeMs": 331.23159999999916,
+          "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+          "valueRef": "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "valid": true,
+            "phase": 2,
+            "audit": 0
+          },
+          "artifactHash": "31e5f619b938ce6c50d00cfdfecc5519743af916f09b3e6cd225ded13a874620",
+          "sourceHash": "011e2719c2d28528c73cbd29ccad4aea4258b6994823ada5e974882e4e55c66f",
+          "sourceRoot": "1f966042775fddec666bbe85d364274fc8f512fda8f82a9dc0f384c8723377c8",
+          "compileMs": 578.2400000000052,
+          "executeMs": 357.7908999999927,
+          "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+          "valueRef": "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "valid": false,
+            "phase": 2,
+            "audit": 20
+          },
+          "artifactHash": "f32c9dbd9cc582835b845e33eb490a1a35d63041199ece01b7706af47c8b1acd",
+          "sourceHash": "99673f39c45cc7521eb723667ca529da1eeb464478f933ec565ddcc9fefadef0",
+          "sourceRoot": "9dd8ab00f499ad0bce95cb1766947d853587b5c30fc82725c6e54e6011390567",
+          "compileMs": 633.7494000000006,
+          "executeMs": 435.1198000000004,
+          "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+          "valueRef": "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 100
+          },
+          "artifactHash": "456e901d476afabce45bfe417e4f3663f2c33ace516b492dab0e63bd94fdfbcc",
+          "sourceHash": "375d4594e645a4a3ffb2746d18c832d737e5b9af855b3c67dc9dbd7db4f52c09",
+          "sourceRoot": "42b46bea02740dd6f59ef0747a493ed1e4e27d000ba67d1a24f419e4b6829fe1",
+          "compileMs": 682.1716000000015,
+          "executeMs": 432.1229000000021,
+          "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "valueRef": "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "valid": true,
+            "phase": 3,
+            "audit": 7
+          },
+          "artifactHash": "154eeef38d9e7e9219e3c14dc50579d898619e872f91093d3cad3ca4a38d78d8",
+          "sourceHash": "66576150b478076c5efe7b4fc3cae962b2847e6d9ba6a3a87172a91aa35dae9c",
+          "sourceRoot": "9e469a73d1c68ace0fe2d198b588e976b9542acf53dbb4ee38e90eb4c7ea767d",
+          "compileMs": 826.7453000000096,
+          "executeMs": 574.5420000000013,
+          "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+          "valueRef": "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "valid": true,
+            "phase": 0,
+            "audit": 1000
+          },
+          "artifactHash": "ca5d71baeea583c76c43a94ed7bb91ff0009ceffbdf83d2df457253abe653be6",
+          "sourceHash": "ecd8e9b0630c487bca268264ad672cba663829c75a297e3b4e13b21e43003657",
+          "sourceRoot": "49a4f1ae1995ac5a3b0951723ae7858127a794f83ba5cf0d1e2ae4df91740183",
+          "compileMs": 752.2596000000049,
+          "executeMs": 361.7592000000004,
+          "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "valueRef": "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df"
+        }
+      ],
+      "trials": [
+        {
+          "id": "inspect-warrant",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "warrant compiler.no_inspect on source",
+            "new": "warrant compiler.inspect on source",
+            "diagnosis": "The maintainer's warrant does not match the authorization rule's exact compiler.inspect requirement on source."
+          },
+          "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b",
+          "broken": {
+            "kind": "compile-rejected",
+            "semanticCode": "RCL_WARRANT_MISSING",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler.inspect:source at 1:1\"}\r\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 552.2774999999965,
+          "executeMs": 356.5993000000017,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "emit-trigger",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "when compiler.accepted == true and compiler.phase == 2",
+            "new": "when compiler.accepted == true and compiler.phase == 1",
+            "diagnosis": "Authorization leaves the accepted candidate in phase one. Emission must trigger there; its transition to phase two prevents another trigger."
+          },
+          "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 791.4159000000072,
+          "executeMs": 307.27780000001076,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        },
+        {
+          "id": "audit-increment",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "governance-reactive",
+            "file": "candidate.rcl",
+            "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+            "new": "alter compiler.audit_count <- compiler.audit_count + 1",
+            "diagnosis": "Authorization increments the audit counter twice, violating its projected-state invariant. A single increment satisfies that invariant and preserves the subsequent emission increment."
+          },
+          "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36",
+          "broken": {
+            "kind": "rejected",
+            "code": "RCL_REALITY_BOUND_BROKEN",
+            "diagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_REALITY_BOUND_BROKEN\",\"message\":\"A preserve clause rejected the projected reality\"}\r\n"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "c8417f6fe8458f782de869919dfdeab46c090b1d64a9d2247edec6d9fcf95829",
+          "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+          "sourceRoot": "ea075fdc8c5ff0999bd60d2362f6adca802de2f598b26708fd4eda42899a6e0b",
+          "compileMs": 811.2945999999938,
+          "executeMs": 362.4381999999896,
+          "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "valueRef": "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 812.4792000000016,
+        "executeP95Ms": 685.5659000000014
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\r\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "fe6a9f41daa8966a8ecc7746650cce3d3b0aab5b164bb54f41cacc8407e7de6c": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 2,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "afterRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "afterRoot": "dcbda74c4fd5abfa317d25520384d31738e0bb7f22c23afefa7254d7bf593c07",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 2,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "de7d7492545c955dd53a3b1ead3d55d2ab2b6dcbd725e5445168b057d4497da9": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "949bd24879fb761f3ce9f5ea197857f0bc5e948a3e76c8fd85b7456e3800016c",
+      "history": [],
+      "projections": []
+    },
+    "0aca8e05457fd2fff88471c0ae411f01abe7abaa84320ba1b877d8d67f5752ef": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 3,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 1,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "456c8e3b00c517fde7fe16b2944337314c0034dd8ffb7f37b4a0d2211bd0b516",
+          "afterRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "afterRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 2,
+              "after": 3,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "456c8e3b00c517fde7fe16b2944337314c0034dd8ffb7f37b4a0d2211bd0b516",
+          "afterRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 2,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 1,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "193afc1a97b9b89cbc866b75a7d09569d36ebdaced1521e49df7735c196cba7e",
+          "afterRoot": "56a47d45d9737feac64b794e25f0defa21baf6063803d3e97005f6b32ef34fb6",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 2,
+              "after": 3,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 3,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 1,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "f3f1e6dd0744157fdc7b472ea5616383de3e5c62078d482193831dc2a9f9ca74": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 12,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 10,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "465ffef6d8996d9e3bba851b474a71ae13888d0c77413e6f46d3605318759504",
+          "afterRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 10,
+              "after": 11,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "afterRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 11,
+              "after": 12,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "465ffef6d8996d9e3bba851b474a71ae13888d0c77413e6f46d3605318759504",
+          "afterRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 10,
+              "after": 11,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 11,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 10,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "48d7f51b75eda6d58d52c5776006da7bc399ebfa14dc91c7647348638b348daa",
+          "afterRoot": "fdce59e2aaf7aa87853eaf043d1913bb6e9a949d45ddf50d32aef8345b3a82c4",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 11,
+              "after": 12,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 12,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 10,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "1d867fa4be0afe639f71d684b2597f15683a796293bc6eacc1dddb84bdad3150": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 10,
+        "compiler.emitted": false,
+        "compiler.phase": 0,
+        "input.audit": 10,
+        "input.phase": 0,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "47831746b597ab1c044ca5378f824d323a53175717795a189126f9eed359591b",
+      "history": [],
+      "projections": []
+    },
+    "72f98382d3d798f860d50cfd44e2041de2e91dffd5e49b5654287d0fca5d94b0": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 1,
+        "input.audit": 0,
+        "input.phase": 1,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "7eb301589870def54c09c0e122322a702c8919cf80f0f5f4ff46d9ef5cbaa75b",
+      "history": [],
+      "projections": []
+    },
+    "f68375afacc46d793cf4a6a24f7e6221a5f523b1a5fc17008a9ed6ad7ead3dd6": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 0,
+        "compiler.emitted": false,
+        "compiler.phase": 2,
+        "input.audit": 0,
+        "input.phase": 2,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "e2cca64aaa946a477fa3cab16e9e791ba80d9f2f884031a026b337656ec6f89d",
+      "history": [],
+      "projections": []
+    },
+    "a3d2420b59731d18060859237713be37d114508059d844fe19d97f56a8c94533": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 20,
+        "compiler.emitted": false,
+        "compiler.phase": 2,
+        "input.audit": 20,
+        "input.phase": 2,
+        "input.valid": false,
+        "request.valid": false
+      },
+      "stateRoot": "b3994e502fa0395fe88099db640a31496fd25c2611a235d05785e6e21ccd461c",
+      "history": [],
+      "projections": []
+    },
+    "6c230a7da9263e4816ddee54aa6b25b3fc6d48d8a5b3b7ab31fc802eff29ceb1": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 102,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 100,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "efe226a1ed2f5a0a851d2de8fb98c173d74165eb434722ad99b97573ef725ba1",
+          "afterRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 100,
+              "after": 101,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "afterRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 101,
+              "after": 102,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "efe226a1ed2f5a0a851d2de8fb98c173d74165eb434722ad99b97573ef725ba1",
+          "afterRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 100,
+              "after": 101,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 101,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 100,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "b17cb510f7bb611a8b48a05896758a56e2f44fc0918d03d2036d4896695de3d3",
+          "afterRoot": "0af321d10a8751582035214207ef038c20f4af914af762f9ae746dffe5cd67da",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 101,
+              "after": 102,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 102,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 100,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "e4e6d482d28e76223195959cbb1e8608073c525216b0945411c51f4ce94f6a6c": {
+      "state": {
+        "compiler.accepted": false,
+        "compiler.audit_count": 7,
+        "compiler.emitted": false,
+        "compiler.phase": 3,
+        "input.audit": 7,
+        "input.phase": 3,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "04121db3e48df602084945a40b3153793ba2e13e14a9938d3e31d0f20482fd97",
+      "history": [],
+      "projections": []
+    },
+    "198665f69aad2b5a26b6e632e48ef139a03a7bbc66fef78db15a9b516d9657df": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 1002,
+        "compiler.emitted": true,
+        "compiler.phase": 2,
+        "input.audit": 1000,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "ee9a21515074e323850afc810e72c3087cdd9fe608370609cf6736f406aa2df6",
+          "afterRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1000,
+              "after": 1001,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        },
+        {
+          "kind": "Transition",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "afterRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1001,
+              "after": 1002,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "ee9a21515074e323850afc810e72c3087cdd9fe608370609cf6736f406aa2df6",
+          "afterRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1000,
+              "after": 1001,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1001,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 1000,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        },
+        {
+          "kind": "Projection",
+          "rule": "emit_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "0813efd5fb962fd0d378433d5befe75fea75904ed6985141db61cbfc9c3a34c2",
+          "afterRoot": "428b0b84fb92d0f30d537533e43ced490ec8b97e9c09de9049f21e9f770e436d",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.emitted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 1,
+              "after": 2,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 1001,
+              "after": 1002,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k338:reactive:emitted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1002,
+            "compiler.emitted": true,
+            "compiler.phase": 2,
+            "input.audit": 1000,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    },
+    "3551c24bb56271a424489265ad8cabd29b8f93470dabd2b915f15fbc32b5a9ab": {
+      "state": {
+        "compiler.accepted": true,
+        "compiler.audit_count": 1,
+        "compiler.emitted": false,
+        "compiler.phase": 1,
+        "input.audit": 0,
+        "input.phase": 0,
+        "input.valid": true,
+        "request.valid": true
+      },
+      "stateRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+      "history": [
+        {
+          "kind": "Transition",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "realize",
+          "status": "realized",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": []
+        }
+      ],
+      "projections": [
+        {
+          "kind": "Projection",
+          "rule": "authorize_candidate",
+          "ruleKind": "Emergence",
+          "mode": "foresee",
+          "status": "projected",
+          "actor": "maintainer",
+          "from": null,
+          "into": null,
+          "beforeRoot": "40c8c157c97781c23c28c34ee52b243610189175b49bf669fa79ff788f69911d",
+          "afterRoot": "758c25b0686982c60166dbee73c9c985cb370805e2d4f3bce16fdb76810f0996",
+          "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+          "changes": [
+            {
+              "target": "compiler.accepted",
+              "before": false,
+              "after": true,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.phase",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            },
+            {
+              "target": "compiler.audit_count",
+              "before": 0,
+              "after": 1,
+              "source": "alter"
+            }
+          ],
+          "authority": {
+            "needs": [
+              {
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "capability": "compiler.stage",
+                "target": "artifact"
+              }
+            ],
+            "activeWarrants": [
+              {
+                "subject": "maintainer",
+                "capability": "compiler.inspect",
+                "target": "source"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.stage",
+                "target": "artifact"
+              },
+              {
+                "subject": "maintainer",
+                "capability": "compiler.emit",
+                "target": "artifact"
+              }
+            ]
+          },
+          "witnesses": [
+            "k337:authority:accepted"
+          ],
+          "hostCalls": [],
+          "projectedState": {
+            "compiler.accepted": true,
+            "compiler.audit_count": 1,
+            "compiler.emitted": false,
+            "compiler.phase": 1,
+            "input.audit": 0,
+            "input.phase": 0,
+            "input.valid": true,
+            "request.valid": true
+          }
+        }
+      ]
+    }
+  },
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "8aea014356f5903391ad8ab41d77e42714ed1cf18a106012e2885a04512f5970"
+}

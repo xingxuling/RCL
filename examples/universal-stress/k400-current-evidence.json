@@ -511,45 +511,73 @@
         "EXPRESS": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/counter.rcl"
+            "examples/native-ui/counter.rcl",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ]
         },
         "COMPILE": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/canonical-ui-ir.json"
+            "examples/native-ui/evidence/canonical-ui-ir.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ]
         },
         "LOWER": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/android-lowering-report.json"
+            "examples/native-ui/evidence/android-lowering-report.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ]
         },
         "EXECUTE": {
           "status": "PASS",
           "evidence": [
-            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ],
           "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "CORRECT": {
           "status": "PASS",
           "evidence": [
-            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ],
           "note": "Installed and exercised the frozen K03 transaction UI on Rcl_Aether_API35_ATD; receipt 9c61a52e883636f28d1a4bfa7c12df710720e7998416e9f8684b81ec38e47ebf."
         },
         "ROBUST": {
           "status": "PASS",
           "evidence": [
-            "tests/native-ui-runtime-style-layout.test.mjs"
+            "tests/native-ui-runtime-style-layout.test.mjs",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ]
         },
         "PERFORMANCE": {
           "status": "PASS",
           "evidence": [
-            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ],
           "note": "API 35 emulator ADB/UIAutomator end-to-end p95 2981.554 ms <= 5000 ms."
         },
@@ -559,14 +587,22 @@
             "examples/universal-stress/k03-ai-generation-contract.v0.1.json",
             "examples/universal-stress/evidence/k03-ai-generate/receipt.json",
             "examples/universal-stress/evidence/k03-ai-generate/github-replay.json",
-            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json"
+            "examples/universal-stress/evidence/k03-android-emulator-v0.1.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ],
           "note": "Three independent Android repairs restored canonical bytes and replayed with emulator receipt; GitHub run 32871776578."
         },
         "EVIDENCE": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/android-build-result.json"
+            "examples/native-ui/evidence/android-build-result.json",
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
           ]
         }
       },
@@ -581,6 +617,21 @@
             "windows"
           ],
           "generalPrimitive": true
+        }
+      ],
+      "additionalProfiles": [
+        {
+          "id": "governance-reactive",
+          "reportRoot": "8aea014356f5903391ad8ab41d77e42714ed1cf18a106012e2885a04512f5970",
+          "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+          "lastVerifiedDate": "2026-10-13",
+          "coverageMode": "native-semantic",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ]
         }
       ]
     },
@@ -5163,6 +5214,3030 @@
           "note": "Actual bound target execution, exact RBC parity, independent numerical/relational oracles, negative controls and source/binary-bound proposal replay."
         }
       }
+    },
+    {
+      "id": "windows::machine-learning",
+      "environment": "windows",
+      "programFamily": "machine-learning",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::machine-learning",
+      "environment": "wasm-vm",
+      "programFamily": "machine-learning",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::machine-learning",
+      "environment": "linux",
+      "programFamily": "machine-learning",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::machine-learning",
+      "environment": "android",
+      "programFamily": "machine-learning",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/learning-contract.json",
+            "examples/universal-stress/genomes/learning-runtime.json",
+            "examples/universal-stress/genomes/learning-cases.json",
+            "examples/universal-stress/genomes/learning-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::agent",
+      "environment": "windows",
+      "programFamily": "agent",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::agent",
+      "environment": "wasm-vm",
+      "programFamily": "agent",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::agent",
+      "environment": "linux",
+      "programFamily": "agent",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::agent",
+      "environment": "android",
+      "programFamily": "agent",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/agent-contract.json",
+            "examples/universal-stress/genomes/agent-runtime.json",
+            "examples/universal-stress/genomes/agent-cases.json",
+            "examples/universal-stress/genomes/agent-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::automation",
+      "environment": "windows",
+      "programFamily": "automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::automation",
+      "environment": "wasm-vm",
+      "programFamily": "automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::automation",
+      "environment": "linux",
+      "programFamily": "automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::automation",
+      "environment": "android",
+      "programFamily": "automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/automation-contract.json",
+            "examples/universal-stress/genomes/automation-runtime.json",
+            "examples/universal-stress/genomes/automation-cases.json",
+            "examples/universal-stress/genomes/automation-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::realtime",
+      "environment": "windows",
+      "programFamily": "realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::realtime",
+      "environment": "wasm-vm",
+      "programFamily": "realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::realtime",
+      "environment": "linux",
+      "programFamily": "realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::realtime",
+      "environment": "android",
+      "programFamily": "realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/logical-events-contract.json",
+            "examples/universal-stress/genomes/logical-events-runtime.json",
+            "examples/universal-stress/genomes/logical-events-cases.json",
+            "examples/universal-stress/genomes/logical-events-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::security-sensitive",
+      "environment": "windows",
+      "programFamily": "security-sensitive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::reactive",
+      "environment": "windows",
+      "programFamily": "reactive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::security-sensitive",
+      "environment": "wasm-vm",
+      "programFamily": "security-sensitive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::reactive",
+      "environment": "wasm-vm",
+      "programFamily": "reactive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::security-sensitive",
+      "environment": "linux",
+      "programFamily": "security-sensitive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::reactive",
+      "environment": "linux",
+      "programFamily": "reactive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::security-sensitive",
+      "environment": "android",
+      "programFamily": "security-sensitive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/governance-reactive-contract.json",
+            "examples/universal-stress/genomes/governance-reactive-runtime.json",
+            "examples/universal-stress/genomes/governance-reactive-cases.json",
+            "examples/universal-stress/genomes/governance-reactive-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "windows::mixed-paradigm",
+      "environment": "windows",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "wasm-vm::mixed-paradigm",
+      "environment": "wasm-vm",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "linux::mixed-paradigm",
+      "environment": "linux",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
+    },
+    {
+      "id": "android::mixed-paradigm",
+      "environment": "android",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim",
+        "20 actual target rounds, ten pre-sealed parametric cases, three fresh candidate-only exact repairs; local replay with no hosted CI/OS sandbox authority.",
+        "Linux runs in WSL2; Android uses an x86_64 emulator. No mobile UI/physical-device or whole-family claim."
+      ],
+      "requiredGenes": [
+        "portable-native-rbc",
+        "root-v2",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/genomes/mixed-paradigm-contract.json",
+            "examples/universal-stress/genomes/mixed-paradigm-runtime.json",
+            "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+            "examples/universal-stress/genomes/mixed-paradigm-proposals.json"
+          ],
+          "note": "Bound native execution, independent oracles, exact RBC parity, measured budgets, effective mutations and source-declared transaction evidence."
+        }
+      }
     }
   ],
   "competitiveComparisons": [],
@@ -5274,7 +8349,13 @@
     "examples/universal-stress/expansion-wave1/algorithm-runtime.json",
     "examples/universal-stress/portable-profiles/relations-runtime.json",
     "examples/universal-stress/portable-profiles/simulation-scientific-runtime.json",
-    "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json"
+    "examples/universal-stress/portable-profiles/algorithm-posix-runtime.json",
+    "examples/universal-stress/genomes/learning-runtime.json",
+    "examples/universal-stress/genomes/agent-runtime.json",
+    "examples/universal-stress/genomes/automation-runtime.json",
+    "examples/universal-stress/genomes/logical-events-runtime.json",
+    "examples/universal-stress/genomes/governance-reactive-runtime.json",
+    "examples/universal-stress/genomes/mixed-paradigm-runtime.json"
   ],
   "notes": [
     "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",

@@ -28,6 +28,9 @@ import { verifyK321K322CompilerAlgorithmCliReceipt } from './verify-k321-k322-co
 import { verifyPortableAlgorithmReceipt } from './verify-k400-expansion-receipts.mjs';
 import { verifyPortableProfileReceipt } from './verify-k400-portable-profiles.mjs';
 import { PORTABLE_PROFILES, PROFILE_DIRECTORY } from './k400-portable-profile-definitions.mjs';
+import { GENOMES } from './k400-genomes/index.mjs';
+import { DIRECTORY as GENOME_DIRECTORY } from './k400-genomes/shared.mjs';
+import { verifyGenome } from './k400-genome-engine.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -900,6 +903,29 @@ for (const profile of PORTABLE_PROFILES) {
     evidence.claims.push(claim); existingIds.add(claim.id);
   }
   evidence.sourceReceipts.push(PROFILE_DIRECTORY + '/' + profile.id + '-runtime.json');
+}
+for (const definition of GENOMES) {
+  const admission = verifyGenome(definition);
+  if (!admission.admitted) continue;
+  for (const claim of admission.claims) {
+    const existing = evidence.claims.find(item => item.id === claim.id);
+    if (!existing) { evidence.claims.push(claim); continue; }
+    // A second complete bounded profile supplements the existing coordinate;
+    // it never creates another cell or relabels the original authority/scope.
+    if ((existing.environment !== undefined && existing.environment !== claim.environment)
+      || (existing.programFamily !== undefined && existing.programFamily !== claim.programFamily)
+      || !UNIVERSAL_STRESS_GATES.every(gate => existing.gates[gate]?.status === 'PASS' && claim.gates[gate]?.status === 'PASS')) {
+      throw new Error('RCL_K400_PROFILE_COLLISION_REQUIRES_REVIEW:' + claim.id);
+    }
+    existing.additionalProfiles ??= [];
+    existing.additionalProfiles.push({ id: definition.id, reportRoot: admission.reportRoot, scope: definition.scope,
+      lastVerifiedDate: claim.lastVerifiedDate, coverageMode: claim.coverageMode,
+      evidence: claim.gates.EVIDENCE.evidence });
+    for (const gate of UNIVERSAL_STRESS_GATES) existing.gates[gate].evidence = [...new Set([
+      ...existing.gates[gate].evidence, ...claim.gates[gate].evidence,
+    ])];
+  }
+  evidence.sourceReceipts.push(GENOME_DIRECTORY + '/' + definition.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

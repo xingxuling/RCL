@@ -1,0 +1,4021 @@
+{
+  "format": "rcl.k400-genome-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_TARGETS",
+  "id": "automation",
+  "generatedAt": "2026-10-12T20:48:28.159Z",
+  "contractRoot": "51204a5018c077910949b542a136abfeb108b53295744ae0df54c60964fa5a31",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/genomes/automation-proposals.json",
+  "proposalsHash": "1f72c572a5dde36ff5072546c0f895157c6122af76c7da4a4cbfac7f3583ef38",
+  "eligibleCells": [
+    "K056",
+    "K016",
+    "K036",
+    "K096"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-genome-engine.mjs",
+      "sha256": "4c2b762cec2676b38377225e3dab5145c9417dcf799e61c217786166099d9cf7"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "scripts/run-native-wasi.mjs",
+      "sha256": "a8c88d54f7df1db0c1fe0b334d85b7f691f7e29792d4a13f6d2b2d8f93dcf910"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/k400-genomes/automation.mjs",
+      "sha256": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a"
+    }
+  ],
+  "backends": {
+    "windows": {
+      "binding": {
+        "execution": "Windows native C VM",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 163.38709999999264,
+          "executeMs": 97.18379999999888,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 1,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 163.23499999998603,
+          "executeMs": 85.76499999995576,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 2,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 154.53529999998864,
+          "executeMs": 86.40059999999357,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 3,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 188.9831000000122,
+          "executeMs": 142.18700000003446,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 4,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 210.507099999988,
+          "executeMs": 96.70279999997001,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 5,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 159.62650000001304,
+          "executeMs": 83.53109999996377,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 6,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 164.96019999997225,
+          "executeMs": 86.0847000000067,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 7,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 147.4849000000395,
+          "executeMs": 76.81580000004033,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 8,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 150.41560000000754,
+          "executeMs": 78.44060000003083,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 9,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 144.26539999997476,
+          "executeMs": 85.34490000002552,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 10,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 141.77939999999944,
+          "executeMs": 82.85269999998854,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 11,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 139.73480000003474,
+          "executeMs": 79.85379999998258,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 12,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 157.99930000002496,
+          "executeMs": 86.90140000003157,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 13,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 152.37549999996554,
+          "executeMs": 76.32009999995353,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 14,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 135.95900000003166,
+          "executeMs": 70.04889999999432,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 15,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 145.3108999999822,
+          "executeMs": 83.67540000000736,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 16,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 142.7619999999879,
+          "executeMs": 76.66259999998147,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 17,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 134.92360000003828,
+          "executeMs": 84.34289999998873,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 18,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 132.73399999999674,
+          "executeMs": 74.52189999999246,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 19,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 131.09230000001844,
+          "executeMs": 84.45740000001388,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "failures": 0,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "8d4e4ae622e4ae5fc8506412e723b14033cc4da4a21a9b4246344effdd651839",
+          "sourceHash": "384a86b38d940b027e8da354c1fc279ecfc07315c3a2f5f3fc78b4ce4a7495e9",
+          "sourceRoot": "8ec120feaa28e3e0939d7e01e6a69c16d786a5c592c5537f69f1dd92a817c6ca",
+          "compileMs": 139.88139999995474,
+          "executeMs": 75.83209999999963,
+          "stateRoot": "5886c2d7c7285cb5dc30e95b0a75979d2e305edf729f9975a486698c159650f8",
+          "valueRef": "bba5e9c695db9d3533362f72332841df935c8901a3ed631633173a8e7e785545"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "failures": 1,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "d2c16778922e352b78d96f937e179e6b94ad4f4b5bc0d34bbac7e4796e0b2dff",
+          "sourceHash": "dfa2ceadd54033c1b9174857f8830526f8bb8b3fa4ef2f6dff0e44891c9fe10a",
+          "sourceRoot": "0732738f8a28b80bda60ec1237d681a95fa87631831cc5e949b31267bcc57b4b",
+          "compileMs": 136.99170000001322,
+          "executeMs": 79.5859000000055,
+          "stateRoot": "ae957ff1354c5b7f398cb5c5b09e197fecebdf619ce1834f4f022c7349f1d9b0",
+          "valueRef": "4e54f4cc79999ebe4d09ec6a1c4749df766d4d9f0cce7a4e8a43757d1bed0169"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "failures": 2,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "4f26f0a69875d994020bd8712e5e2287e2bef9b3ad076aa7804c53628a93c7ce",
+          "sourceHash": "153d4d00c508d9f06f1fe2c89dc3fc59f7f445848b04353f5139dbd40a3fa68f",
+          "sourceRoot": "fc1e645f1b45f37b36d885d8a660eb40f7ab6eb4283e5599cc6a850ca7360a7e",
+          "compileMs": 140.8813000000082,
+          "executeMs": 78.60970000002999,
+          "stateRoot": "96895bf8a22ca7fdc9006a2b3560d77895d28f121d04478d9aaae70c2b3d07a7",
+          "valueRef": "0f3bc2632597ccc80c9f40a007571c75406d32f4559f0e39a995f1850ab2efb9"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "failures": 2,
+            "attempts": 3,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "c05d5a5841177aa2a3efd87308b62f3bfd58247dbf6c733de0553424d9e993e1",
+          "sourceHash": "4633fd3d8d1b4353a2cef25bcab44e2690a92ed240f266906033bc8df45b0333",
+          "sourceRoot": "eb05cc992c58b6e8dbf9ad085deae36c077664d2fdbaeb0b0ccad0e5a9597c8c",
+          "compileMs": 138.44980000000214,
+          "executeMs": 77.18959999998333,
+          "stateRoot": "a7e463e594a4c0bd144414a2008dae91f50e160973a8b4558e22a0c2372b4f64",
+          "valueRef": "4d04c47267d37db7f6034c82090f928bdb75f84bda084c3f4e7cf5387915797f"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "failures": 3,
+            "attempts": 4,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "dcbb9a19ca8a8bcae1b90a083ca4db956abf35fb3f2c83accd7c073be32d020b",
+          "sourceHash": "60c9efd0b04b3df204893e23ef15c3f138d6210c335ad6f00aa2a629b8b26bc4",
+          "sourceRoot": "bd919f773b1c14085e01b889cc4428c941a1d76c9274b0313b05ba54299fcc96",
+          "compileMs": 137.79489999997895,
+          "executeMs": 82.76230000000214,
+          "stateRoot": "6829d1caa0f5996034c2880f41f9923a76548ccab47a2d2808e3a90e9bad93ac",
+          "valueRef": "b80017bebaecb6022b0afedc2c0da5576d515c9867ab9637f8da7bdaae3af3c5"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "939d14ecaed59bb82b4f396fe8673cab9cb86fc44b4c138370f91fe05d146bce",
+          "sourceHash": "90f9887209a3215fc026e70c00183971647443f22786fae8b2a9bf8f95c79433",
+          "sourceRoot": "4c4124b1033d0af4e2c64ef009e15ec456480d5bfa592a43df326399286d6272",
+          "compileMs": 132.41090000001714,
+          "executeMs": 73.95579999999609,
+          "stateRoot": "44d81d955fb61c4e13801ab322e048e157ce32c5223218d66b15c6e8647ebc07",
+          "valueRef": "6f4928dfecb2d77dade5b7c3e990dfc01bddc47563021a6887b2b5e34d791903"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 1
+          },
+          "artifactHash": "6ef195c1653190ee194d7bd1643cc24557319d1e8b4c85fb8faa3f0b714aa06c",
+          "sourceHash": "6af4236da5ae77ff6c3142f424cebbd745db6e272656d79ceb2b055dc8a7f11c",
+          "sourceRoot": "1347f6d7a4c08d62dec373b2679b844c40628f6963bceb63926c7b094a3d213c",
+          "compileMs": 133.35149999998976,
+          "executeMs": 86.09090000001015,
+          "stateRoot": "40b0cf361c39629d60e291142d49ed622afe0c2f419080149cd2273e784bc9c6",
+          "valueRef": "c13a47df9a3532e8075c45f1bd2a21bd64577f41c4541bbebe9324839080b7ed"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "failures": 0,
+            "attempts": 0,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "044da31094d8deb5ced48ea33346fe4fe69886d40c406707dd0f3d2e4b0edc5d",
+          "sourceHash": "8f13e784e9eb810742a3708e16467574ef9ebfdfed5e58b2105c139ef8278083",
+          "sourceRoot": "9f77d49a18520316645bf8b603efba10b41d6ac113d373d4604cd18b2c7a6b4d",
+          "compileMs": 140.015699999989,
+          "executeMs": 83.90889999998035,
+          "stateRoot": "0f805bf2113a459ae1e3b0c9be0026b47136d99e9cb3a5174ba509d09fb37c84",
+          "valueRef": "b349f70819786482408e94733f97f4aac4aed68da052b4a934d58f0dc2f1a1fe"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "ead3dbf9aa44aca81fe2719b795e27fdd11d0d901aa54c536569297df70ab19f",
+          "sourceHash": "6dc2635abbc2950524be7ad635cdcbcc14ac68a05786f1ae9e3ce4148e7df878",
+          "sourceRoot": "4c0c96eb4d4dd84a0e67f80a8a2313069f121d8401034230bee554c384b1a7d9",
+          "compileMs": 130.21230000001378,
+          "executeMs": 78.92889999999898,
+          "stateRoot": "4cbc93f9a7bc4761769fb3fa0ab9692f056eb65e0e927141aa18cafe5e6f30a9",
+          "valueRef": "0397a1f48578e04c90fe31a7f41d23923384216bdb3ae351ab439018dc6c9543"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "33a0a9005f604b7b84f522df4b82e60885042270e527078b673b3755f70ae6be",
+          "sourceHash": "3539896198bd380e948834a4139c611c20467bf5457586c726ae3c6ac4b7a11a",
+          "sourceRoot": "ee423173a93fa5f14700a24a13453e10ad6e9fcf81fe53d15e5d94fa706177ab",
+          "compileMs": 150.7666999999783,
+          "executeMs": 87.08240000001388,
+          "stateRoot": "250a95b4f9761186427e6b8db941a328e80b8ee7373d2d143c9f83ecdf6c23a9",
+          "valueRef": "ae97dc93cd3dc15728dda7ff8780999ee1754996f5561faa19f85e263655bf0e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "dependency",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_dependency(task) > completed",
+            "new": "task_dependency(task) >= completed",
+            "diagnosis": "The boundary admits an index equal to the completed-task count, which does not name a previously completed task."
+          },
+          "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b66201a6de61fc7903ee4aa5d7594b34997fcefc566d585ce2ed715207bbe6a8"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 137.86720000003697,
+          "executeMs": 74.64139999996405,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "retry",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+            "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+            "diagnosis": "Success consumes one attempt after the planned failures. Equality leaves no attempt for success and must enter the failure branch."
+          },
+          "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a47266f2a8cad22a09f88fa4e825a689c9e868897dc8448735c557b178c348c3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 132.77039999997942,
+          "executeMs": 70.10210000001825,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "approval",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+            "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+            "diagnosis": "The workflow approval gate is inverted. It must stop before an approval-required task when approval is absent."
+          },
+          "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8",
+          "broken": {
+            "kind": "success",
+            "valueRef": "61025a1b6cef9e6d2a5a92e0dbc43bec5323e662cee90a5b3768d91155a5c8ad"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 127.53190000000177,
+          "executeMs": 76.94020000001183,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 188.9831000000122,
+        "executeP95Ms": 97.18379999999888
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "wasm-vm": {
+      "binding": {
+        "execution": "Node WASI Preview 1, wasm32 native C VM",
+        "os": "WASI",
+        "arch": "wasm32",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 150.79080000001704,
+          "executeMs": 206.7960000000312,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 1,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 136.33350000000792,
+          "executeMs": 232.6238000000012,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 2,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 155.18900000001304,
+          "executeMs": 226.601800000004,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 3,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 143.2949999999837,
+          "executeMs": 331.3307999999961,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 4,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 167.2886999999755,
+          "executeMs": 214.91619999997783,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 5,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 143.1191000000108,
+          "executeMs": 216.27049999998417,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 6,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 183.61580000002868,
+          "executeMs": 194.34409999998752,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 7,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 130.6315000000177,
+          "executeMs": 206.18189999996684,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 8,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 138.4712999999756,
+          "executeMs": 209.82740000000922,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 9,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 134.00370000000112,
+          "executeMs": 193.69050000002608,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 10,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 142.11589999997523,
+          "executeMs": 227.05309999996098,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 11,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 146.76920000003884,
+          "executeMs": 205.98889999999665,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 12,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 145.07129999995232,
+          "executeMs": 202.50329999998212,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 13,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 137.12469999998575,
+          "executeMs": 195.81540000002133,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 14,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 128.961100000015,
+          "executeMs": 284.48279999999795,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 15,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 149.766500000027,
+          "executeMs": 201.1066999999457,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 16,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 147.95819999999367,
+          "executeMs": 223.45659999997588,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 17,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 166.33370000001742,
+          "executeMs": 201.43570000003092,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 18,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 138.65360000001965,
+          "executeMs": 201.3761999999988,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 19,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 148.58500000002095,
+          "executeMs": 193.8681000000215,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "failures": 0,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "8d4e4ae622e4ae5fc8506412e723b14033cc4da4a21a9b4246344effdd651839",
+          "sourceHash": "384a86b38d940b027e8da354c1fc279ecfc07315c3a2f5f3fc78b4ce4a7495e9",
+          "sourceRoot": "8ec120feaa28e3e0939d7e01e6a69c16d786a5c592c5537f69f1dd92a817c6ca",
+          "compileMs": 125.88530000002356,
+          "executeMs": 215.34349999995902,
+          "stateRoot": "5886c2d7c7285cb5dc30e95b0a75979d2e305edf729f9975a486698c159650f8",
+          "valueRef": "bba5e9c695db9d3533362f72332841df935c8901a3ed631633173a8e7e785545"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "failures": 1,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "d2c16778922e352b78d96f937e179e6b94ad4f4b5bc0d34bbac7e4796e0b2dff",
+          "sourceHash": "dfa2ceadd54033c1b9174857f8830526f8bb8b3fa4ef2f6dff0e44891c9fe10a",
+          "sourceRoot": "0732738f8a28b80bda60ec1237d681a95fa87631831cc5e949b31267bcc57b4b",
+          "compileMs": 128.3082000000286,
+          "executeMs": 187.18190000002505,
+          "stateRoot": "ae957ff1354c5b7f398cb5c5b09e197fecebdf619ce1834f4f022c7349f1d9b0",
+          "valueRef": "4e54f4cc79999ebe4d09ec6a1c4749df766d4d9f0cce7a4e8a43757d1bed0169"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "failures": 2,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "4f26f0a69875d994020bd8712e5e2287e2bef9b3ad076aa7804c53628a93c7ce",
+          "sourceHash": "153d4d00c508d9f06f1fe2c89dc3fc59f7f445848b04353f5139dbd40a3fa68f",
+          "sourceRoot": "fc1e645f1b45f37b36d885d8a660eb40f7ab6eb4283e5599cc6a850ca7360a7e",
+          "compileMs": 127.01130000001285,
+          "executeMs": 187.07829999999376,
+          "stateRoot": "96895bf8a22ca7fdc9006a2b3560d77895d28f121d04478d9aaae70c2b3d07a7",
+          "valueRef": "0f3bc2632597ccc80c9f40a007571c75406d32f4559f0e39a995f1850ab2efb9"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "failures": 2,
+            "attempts": 3,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "c05d5a5841177aa2a3efd87308b62f3bfd58247dbf6c733de0553424d9e993e1",
+          "sourceHash": "4633fd3d8d1b4353a2cef25bcab44e2690a92ed240f266906033bc8df45b0333",
+          "sourceRoot": "eb05cc992c58b6e8dbf9ad085deae36c077664d2fdbaeb0b0ccad0e5a9597c8c",
+          "compileMs": 130.98969999997644,
+          "executeMs": 218.60420000000158,
+          "stateRoot": "a7e463e594a4c0bd144414a2008dae91f50e160973a8b4558e22a0c2372b4f64",
+          "valueRef": "4d04c47267d37db7f6034c82090f928bdb75f84bda084c3f4e7cf5387915797f"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "failures": 3,
+            "attempts": 4,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "dcbb9a19ca8a8bcae1b90a083ca4db956abf35fb3f2c83accd7c073be32d020b",
+          "sourceHash": "60c9efd0b04b3df204893e23ef15c3f138d6210c335ad6f00aa2a629b8b26bc4",
+          "sourceRoot": "bd919f773b1c14085e01b889cc4428c941a1d76c9274b0313b05ba54299fcc96",
+          "compileMs": 174.90050000004703,
+          "executeMs": 187.21789999998873,
+          "stateRoot": "6829d1caa0f5996034c2880f41f9923a76548ccab47a2d2808e3a90e9bad93ac",
+          "valueRef": "b80017bebaecb6022b0afedc2c0da5576d515c9867ab9637f8da7bdaae3af3c5"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "939d14ecaed59bb82b4f396fe8673cab9cb86fc44b4c138370f91fe05d146bce",
+          "sourceHash": "90f9887209a3215fc026e70c00183971647443f22786fae8b2a9bf8f95c79433",
+          "sourceRoot": "4c4124b1033d0af4e2c64ef009e15ec456480d5bfa592a43df326399286d6272",
+          "compileMs": 126.81520000001183,
+          "executeMs": 203.03570000000764,
+          "stateRoot": "44d81d955fb61c4e13801ab322e048e157ce32c5223218d66b15c6e8647ebc07",
+          "valueRef": "6f4928dfecb2d77dade5b7c3e990dfc01bddc47563021a6887b2b5e34d791903"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 1
+          },
+          "artifactHash": "6ef195c1653190ee194d7bd1643cc24557319d1e8b4c85fb8faa3f0b714aa06c",
+          "sourceHash": "6af4236da5ae77ff6c3142f424cebbd745db6e272656d79ceb2b055dc8a7f11c",
+          "sourceRoot": "1347f6d7a4c08d62dec373b2679b844c40628f6963bceb63926c7b094a3d213c",
+          "compileMs": 127.98849999997765,
+          "executeMs": 185.41070000000764,
+          "stateRoot": "40b0cf361c39629d60e291142d49ed622afe0c2f419080149cd2273e784bc9c6",
+          "valueRef": "c13a47df9a3532e8075c45f1bd2a21bd64577f41c4541bbebe9324839080b7ed"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "failures": 0,
+            "attempts": 0,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "044da31094d8deb5ced48ea33346fe4fe69886d40c406707dd0f3d2e4b0edc5d",
+          "sourceHash": "8f13e784e9eb810742a3708e16467574ef9ebfdfed5e58b2105c139ef8278083",
+          "sourceRoot": "9f77d49a18520316645bf8b603efba10b41d6ac113d373d4604cd18b2c7a6b4d",
+          "compileMs": 129.59470000001602,
+          "executeMs": 196.19010000000708,
+          "stateRoot": "0f805bf2113a459ae1e3b0c9be0026b47136d99e9cb3a5174ba509d09fb37c84",
+          "valueRef": "b349f70819786482408e94733f97f4aac4aed68da052b4a934d58f0dc2f1a1fe"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "ead3dbf9aa44aca81fe2719b795e27fdd11d0d901aa54c536569297df70ab19f",
+          "sourceHash": "6dc2635abbc2950524be7ad635cdcbcc14ac68a05786f1ae9e3ce4148e7df878",
+          "sourceRoot": "4c0c96eb4d4dd84a0e67f80a8a2313069f121d8401034230bee554c384b1a7d9",
+          "compileMs": 129.7849999999744,
+          "executeMs": 196.4368999999715,
+          "stateRoot": "4cbc93f9a7bc4761769fb3fa0ab9692f056eb65e0e927141aa18cafe5e6f30a9",
+          "valueRef": "0397a1f48578e04c90fe31a7f41d23923384216bdb3ae351ab439018dc6c9543"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "33a0a9005f604b7b84f522df4b82e60885042270e527078b673b3755f70ae6be",
+          "sourceHash": "3539896198bd380e948834a4139c611c20467bf5457586c726ae3c6ac4b7a11a",
+          "sourceRoot": "ee423173a93fa5f14700a24a13453e10ad6e9fcf81fe53d15e5d94fa706177ab",
+          "compileMs": 134.046800000011,
+          "executeMs": 209.86149999999907,
+          "stateRoot": "250a95b4f9761186427e6b8db941a328e80b8ee7373d2d143c9f83ecdf6c23a9",
+          "valueRef": "ae97dc93cd3dc15728dda7ff8780999ee1754996f5561faa19f85e263655bf0e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "dependency",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_dependency(task) > completed",
+            "new": "task_dependency(task) >= completed",
+            "diagnosis": "The boundary admits an index equal to the completed-task count, which does not name a previously completed task."
+          },
+          "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b66201a6de61fc7903ee4aa5d7594b34997fcefc566d585ce2ed715207bbe6a8"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 134.10250000003725,
+          "executeMs": 195.4941000000108,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "retry",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+            "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+            "diagnosis": "Success consumes one attempt after the planned failures. Equality leaves no attempt for success and must enter the failure branch."
+          },
+          "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a47266f2a8cad22a09f88fa4e825a689c9e868897dc8448735c557b178c348c3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 133.72200000000885,
+          "executeMs": 198.56219999998575,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "approval",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+            "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+            "diagnosis": "The workflow approval gate is inverted. It must stop before an approval-required task when approval is absent."
+          },
+          "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8",
+          "broken": {
+            "kind": "success",
+            "valueRef": "61025a1b6cef9e6d2a5a92e0dbc43bec5323e662cee90a5b3768d91155a5c8ad"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 146.89360000001034,
+          "executeMs": 195.71870000002673,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 167.2886999999755,
+        "executeP95Ms": 284.48279999999795
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:(node:82700) ExperimentalWarning: WASI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "linux": {
+      "binding": {
+        "execution": "Linux WSL2 native C process",
+        "os": "Linux",
+        "arch": "x86_64",
+        "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+        "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+        "compilerLocation": "Linux target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 574.5607999999775,
+          "executeMs": 339.4800999999861,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 1,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 416.320800000045,
+          "executeMs": 278.304199999955,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 2,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 353.04610000003595,
+          "executeMs": 292.2361000000383,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 3,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 364.2509999999893,
+          "executeMs": 269.27250000002095,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 4,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 362.048700000043,
+          "executeMs": 289.86490000004414,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 5,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 339.7439000000013,
+          "executeMs": 258.796399999992,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 6,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 376.0187000000151,
+          "executeMs": 268.7326999999932,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 7,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 358.90119999996386,
+          "executeMs": 265.2994999999646,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 8,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 325.4220000000205,
+          "executeMs": 259.2605999999796,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 9,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 339.3959999999497,
+          "executeMs": 277.3027000000002,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 10,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 331.3567000000039,
+          "executeMs": 278.1006000000052,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 11,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 316.84619999997085,
+          "executeMs": 256.3877999999677,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 12,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 328.8118999999715,
+          "executeMs": 288.6734999999753,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 13,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 361.7099000000162,
+          "executeMs": 287.82219999999506,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 14,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 333.241800000018,
+          "executeMs": 258.16340000001946,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 15,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 335.8249000000069,
+          "executeMs": 257.9849000000395,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 16,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 463.5449999999837,
+          "executeMs": 332.20079999999143,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 17,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 430.50620000000345,
+          "executeMs": 301.5113999999594,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 18,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 400.00639999995474,
+          "executeMs": 301.9881999999634,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 19,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 411.8998000000138,
+          "executeMs": 288.5456000000122,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "failures": 0,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "8d4e4ae622e4ae5fc8506412e723b14033cc4da4a21a9b4246344effdd651839",
+          "sourceHash": "384a86b38d940b027e8da354c1fc279ecfc07315c3a2f5f3fc78b4ce4a7495e9",
+          "sourceRoot": "8ec120feaa28e3e0939d7e01e6a69c16d786a5c592c5537f69f1dd92a817c6ca",
+          "compileMs": 390.45980000001146,
+          "executeMs": 306.5510999999824,
+          "stateRoot": "5886c2d7c7285cb5dc30e95b0a75979d2e305edf729f9975a486698c159650f8",
+          "valueRef": "bba5e9c695db9d3533362f72332841df935c8901a3ed631633173a8e7e785545"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "failures": 1,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "d2c16778922e352b78d96f937e179e6b94ad4f4b5bc0d34bbac7e4796e0b2dff",
+          "sourceHash": "dfa2ceadd54033c1b9174857f8830526f8bb8b3fa4ef2f6dff0e44891c9fe10a",
+          "sourceRoot": "0732738f8a28b80bda60ec1237d681a95fa87631831cc5e949b31267bcc57b4b",
+          "compileMs": 507.133199999982,
+          "executeMs": 290.34110000001965,
+          "stateRoot": "ae957ff1354c5b7f398cb5c5b09e197fecebdf619ce1834f4f022c7349f1d9b0",
+          "valueRef": "4e54f4cc79999ebe4d09ec6a1c4749df766d4d9f0cce7a4e8a43757d1bed0169"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "failures": 2,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "4f26f0a69875d994020bd8712e5e2287e2bef9b3ad076aa7804c53628a93c7ce",
+          "sourceHash": "153d4d00c508d9f06f1fe2c89dc3fc59f7f445848b04353f5139dbd40a3fa68f",
+          "sourceRoot": "fc1e645f1b45f37b36d885d8a660eb40f7ab6eb4283e5599cc6a850ca7360a7e",
+          "compileMs": 406.64930000004824,
+          "executeMs": 287.5003999999608,
+          "stateRoot": "96895bf8a22ca7fdc9006a2b3560d77895d28f121d04478d9aaae70c2b3d07a7",
+          "valueRef": "0f3bc2632597ccc80c9f40a007571c75406d32f4559f0e39a995f1850ab2efb9"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "failures": 2,
+            "attempts": 3,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "c05d5a5841177aa2a3efd87308b62f3bfd58247dbf6c733de0553424d9e993e1",
+          "sourceHash": "4633fd3d8d1b4353a2cef25bcab44e2690a92ed240f266906033bc8df45b0333",
+          "sourceRoot": "eb05cc992c58b6e8dbf9ad085deae36c077664d2fdbaeb0b0ccad0e5a9597c8c",
+          "compileMs": 393.7746999999508,
+          "executeMs": 315.8896999999997,
+          "stateRoot": "a7e463e594a4c0bd144414a2008dae91f50e160973a8b4558e22a0c2372b4f64",
+          "valueRef": "4d04c47267d37db7f6034c82090f928bdb75f84bda084c3f4e7cf5387915797f"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "failures": 3,
+            "attempts": 4,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "dcbb9a19ca8a8bcae1b90a083ca4db956abf35fb3f2c83accd7c073be32d020b",
+          "sourceHash": "60c9efd0b04b3df204893e23ef15c3f138d6210c335ad6f00aa2a629b8b26bc4",
+          "sourceRoot": "bd919f773b1c14085e01b889cc4428c941a1d76c9274b0313b05ba54299fcc96",
+          "compileMs": 457.31440000003204,
+          "executeMs": 388.01860000001034,
+          "stateRoot": "6829d1caa0f5996034c2880f41f9923a76548ccab47a2d2808e3a90e9bad93ac",
+          "valueRef": "b80017bebaecb6022b0afedc2c0da5576d515c9867ab9637f8da7bdaae3af3c5"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "939d14ecaed59bb82b4f396fe8673cab9cb86fc44b4c138370f91fe05d146bce",
+          "sourceHash": "90f9887209a3215fc026e70c00183971647443f22786fae8b2a9bf8f95c79433",
+          "sourceRoot": "4c4124b1033d0af4e2c64ef009e15ec456480d5bfa592a43df326399286d6272",
+          "compileMs": 509.18640000000596,
+          "executeMs": 336.7695999999996,
+          "stateRoot": "44d81d955fb61c4e13801ab322e048e157ce32c5223218d66b15c6e8647ebc07",
+          "valueRef": "6f4928dfecb2d77dade5b7c3e990dfc01bddc47563021a6887b2b5e34d791903"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 1
+          },
+          "artifactHash": "6ef195c1653190ee194d7bd1643cc24557319d1e8b4c85fb8faa3f0b714aa06c",
+          "sourceHash": "6af4236da5ae77ff6c3142f424cebbd745db6e272656d79ceb2b055dc8a7f11c",
+          "sourceRoot": "1347f6d7a4c08d62dec373b2679b844c40628f6963bceb63926c7b094a3d213c",
+          "compileMs": 480.3314000000246,
+          "executeMs": 432.0431999999564,
+          "stateRoot": "40b0cf361c39629d60e291142d49ed622afe0c2f419080149cd2273e784bc9c6",
+          "valueRef": "c13a47df9a3532e8075c45f1bd2a21bd64577f41c4541bbebe9324839080b7ed"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "failures": 0,
+            "attempts": 0,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "044da31094d8deb5ced48ea33346fe4fe69886d40c406707dd0f3d2e4b0edc5d",
+          "sourceHash": "8f13e784e9eb810742a3708e16467574ef9ebfdfed5e58b2105c139ef8278083",
+          "sourceRoot": "9f77d49a18520316645bf8b603efba10b41d6ac113d373d4604cd18b2c7a6b4d",
+          "compileMs": 550.6078999999445,
+          "executeMs": 321.8054000000702,
+          "stateRoot": "0f805bf2113a459ae1e3b0c9be0026b47136d99e9cb3a5174ba509d09fb37c84",
+          "valueRef": "b349f70819786482408e94733f97f4aac4aed68da052b4a934d58f0dc2f1a1fe"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "ead3dbf9aa44aca81fe2719b795e27fdd11d0d901aa54c536569297df70ab19f",
+          "sourceHash": "6dc2635abbc2950524be7ad635cdcbcc14ac68a05786f1ae9e3ce4148e7df878",
+          "sourceRoot": "4c0c96eb4d4dd84a0e67f80a8a2313069f121d8401034230bee554c384b1a7d9",
+          "compileMs": 380.77599999995437,
+          "executeMs": 328.1292000000831,
+          "stateRoot": "4cbc93f9a7bc4761769fb3fa0ab9692f056eb65e0e927141aa18cafe5e6f30a9",
+          "valueRef": "0397a1f48578e04c90fe31a7f41d23923384216bdb3ae351ab439018dc6c9543"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "33a0a9005f604b7b84f522df4b82e60885042270e527078b673b3755f70ae6be",
+          "sourceHash": "3539896198bd380e948834a4139c611c20467bf5457586c726ae3c6ac4b7a11a",
+          "sourceRoot": "ee423173a93fa5f14700a24a13453e10ad6e9fcf81fe53d15e5d94fa706177ab",
+          "compileMs": 438.0936999999685,
+          "executeMs": 363.561699999962,
+          "stateRoot": "250a95b4f9761186427e6b8db941a328e80b8ee7373d2d143c9f83ecdf6c23a9",
+          "valueRef": "ae97dc93cd3dc15728dda7ff8780999ee1754996f5561faa19f85e263655bf0e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "dependency",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_dependency(task) > completed",
+            "new": "task_dependency(task) >= completed",
+            "diagnosis": "The boundary admits an index equal to the completed-task count, which does not name a previously completed task."
+          },
+          "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b66201a6de61fc7903ee4aa5d7594b34997fcefc566d585ce2ed715207bbe6a8"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 542.265999999945,
+          "executeMs": 498.1637000000337,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "retry",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+            "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+            "diagnosis": "Success consumes one attempt after the planned failures. Equality leaves no attempt for success and must enter the failure branch."
+          },
+          "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a47266f2a8cad22a09f88fa4e825a689c9e868897dc8448735c557b178c348c3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 614.8392000000458,
+          "executeMs": 426.4333999999799,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "approval",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+            "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+            "diagnosis": "The workflow approval gate is inverted. It must stop before an approval-required task when approval is absent."
+          },
+          "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8",
+          "broken": {
+            "kind": "success",
+            "valueRef": "61025a1b6cef9e6d2a5a92e0dbc43bec5323e662cee90a5b3768d91155a5c8ad"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 456.52170000004116,
+          "executeMs": 450.2175999999745,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 463.5449999999837,
+        "executeP95Ms": 332.20079999999143
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "android": {
+      "binding": {
+        "execution": "Android native Linux ABI C process via ADB",
+        "os": "Android",
+        "arch": "x86_64",
+        "abi": "x86_64",
+        "apiLevel": "35",
+        "emulator": true,
+        "deviceSerial": "emulator-5554",
+        "physicalDeviceClaimed": false,
+        "mobileUiClaimed": false,
+        "compilerLocation": "Android target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 874.1160000000382,
+          "executeMs": 489.62180000008084,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 1,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1056.643800000078,
+          "executeMs": 486.858499999973,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 2,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1833.0755000000354,
+          "executeMs": 502.8293999999296,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 3,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 967.4097000000766,
+          "executeMs": 666.078199999989,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 4,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1031.624700000044,
+          "executeMs": 500.2679000000935,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 5,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1169.3995000000577,
+          "executeMs": 582.3061999999918,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 6,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1060.4986999999965,
+          "executeMs": 420.4144999999553,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 7,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1097.0579999999609,
+          "executeMs": 403.5842999999877,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 8,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 805.1524999999674,
+          "executeMs": 356.4755000000587,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 9,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1061.3511000000872,
+          "executeMs": 445.9083999999566,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 10,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 823.0949000000255,
+          "executeMs": 410.8330999999307,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 11,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 819.4442000000272,
+          "executeMs": 384.17559999995865,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 12,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 853.2198999999091,
+          "executeMs": 341.0058999999892,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 13,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 776.0661000000546,
+          "executeMs": 305.3712999999989,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 14,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 816.8516999999993,
+          "executeMs": 398.1034000000218,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 15,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1452.8149999999441,
+          "executeMs": 451.8554000000004,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 16,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 945.6527999999234,
+          "executeMs": 443.1293000000296,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 17,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1068.7453000000678,
+          "executeMs": 384.5263000000268,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 18,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 1166.2404999999562,
+          "executeMs": 543.047499999986,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "index": 19,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 969.563199999975,
+          "executeMs": 436.5648999999976,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "failures": 0,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "8d4e4ae622e4ae5fc8506412e723b14033cc4da4a21a9b4246344effdd651839",
+          "sourceHash": "384a86b38d940b027e8da354c1fc279ecfc07315c3a2f5f3fc78b4ce4a7495e9",
+          "sourceRoot": "8ec120feaa28e3e0939d7e01e6a69c16d786a5c592c5537f69f1dd92a817c6ca",
+          "compileMs": 1216.983600000036,
+          "executeMs": 378.8212000000058,
+          "stateRoot": "5886c2d7c7285cb5dc30e95b0a75979d2e305edf729f9975a486698c159650f8",
+          "valueRef": "bba5e9c695db9d3533362f72332841df935c8901a3ed631633173a8e7e785545"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "failures": 1,
+            "attempts": 1,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "d2c16778922e352b78d96f937e179e6b94ad4f4b5bc0d34bbac7e4796e0b2dff",
+          "sourceHash": "dfa2ceadd54033c1b9174857f8830526f8bb8b3fa4ef2f6dff0e44891c9fe10a",
+          "sourceRoot": "0732738f8a28b80bda60ec1237d681a95fa87631831cc5e949b31267bcc57b4b",
+          "compileMs": 897.7671000000555,
+          "executeMs": 353.36530000006314,
+          "stateRoot": "ae957ff1354c5b7f398cb5c5b09e197fecebdf619ce1834f4f022c7349f1d9b0",
+          "valueRef": "4e54f4cc79999ebe4d09ec6a1c4749df766d4d9f0cce7a4e8a43757d1bed0169"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "failures": 2,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "4f26f0a69875d994020bd8712e5e2287e2bef9b3ad076aa7804c53628a93c7ce",
+          "sourceHash": "153d4d00c508d9f06f1fe2c89dc3fc59f7f445848b04353f5139dbd40a3fa68f",
+          "sourceRoot": "fc1e645f1b45f37b36d885d8a660eb40f7ab6eb4283e5599cc6a850ca7360a7e",
+          "compileMs": 1055.5206999999937,
+          "executeMs": 354.17029999999795,
+          "stateRoot": "96895bf8a22ca7fdc9006a2b3560d77895d28f121d04478d9aaae70c2b3d07a7",
+          "valueRef": "0f3bc2632597ccc80c9f40a007571c75406d32f4559f0e39a995f1850ab2efb9"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "failures": 2,
+            "attempts": 3,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "c05d5a5841177aa2a3efd87308b62f3bfd58247dbf6c733de0553424d9e993e1",
+          "sourceHash": "4633fd3d8d1b4353a2cef25bcab44e2690a92ed240f266906033bc8df45b0333",
+          "sourceRoot": "eb05cc992c58b6e8dbf9ad085deae36c077664d2fdbaeb0b0ccad0e5a9597c8c",
+          "compileMs": 760.0701000000117,
+          "executeMs": 327.1215000000084,
+          "stateRoot": "a7e463e594a4c0bd144414a2008dae91f50e160973a8b4558e22a0c2372b4f64",
+          "valueRef": "4d04c47267d37db7f6034c82090f928bdb75f84bda084c3f4e7cf5387915797f"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "failures": 3,
+            "attempts": 4,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "dcbb9a19ca8a8bcae1b90a083ca4db956abf35fb3f2c83accd7c073be32d020b",
+          "sourceHash": "60c9efd0b04b3df204893e23ef15c3f138d6210c335ad6f00aa2a629b8b26bc4",
+          "sourceRoot": "bd919f773b1c14085e01b889cc4428c941a1d76c9274b0313b05ba54299fcc96",
+          "compileMs": 818.8652999999467,
+          "executeMs": 375.93130000005476,
+          "stateRoot": "6829d1caa0f5996034c2880f41f9923a76548ccab47a2d2808e3a90e9bad93ac",
+          "valueRef": "b80017bebaecb6022b0afedc2c0da5576d515c9867ab9637f8da7bdaae3af3c5"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "939d14ecaed59bb82b4f396fe8673cab9cb86fc44b4c138370f91fe05d146bce",
+          "sourceHash": "90f9887209a3215fc026e70c00183971647443f22786fae8b2a9bf8f95c79433",
+          "sourceRoot": "4c4124b1033d0af4e2c64ef009e15ec456480d5bfa592a43df326399286d6272",
+          "compileMs": 985.7594999999274,
+          "executeMs": 378.1854000000749,
+          "stateRoot": "44d81d955fb61c4e13801ab322e048e157ce32c5223218d66b15c6e8647ebc07",
+          "valueRef": "6f4928dfecb2d77dade5b7c3e990dfc01bddc47563021a6887b2b5e34d791903"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "failures": 1,
+            "attempts": 2,
+            "approval": 1,
+            "kill": 1
+          },
+          "artifactHash": "6ef195c1653190ee194d7bd1643cc24557319d1e8b4c85fb8faa3f0b714aa06c",
+          "sourceHash": "6af4236da5ae77ff6c3142f424cebbd745db6e272656d79ceb2b055dc8a7f11c",
+          "sourceRoot": "1347f6d7a4c08d62dec373b2679b844c40628f6963bceb63926c7b094a3d213c",
+          "compileMs": 795.4072999999626,
+          "executeMs": 369.0170999999391,
+          "stateRoot": "40b0cf361c39629d60e291142d49ed622afe0c2f419080149cd2273e784bc9c6",
+          "valueRef": "c13a47df9a3532e8075c45f1bd2a21bd64577f41c4541bbebe9324839080b7ed"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "failures": 0,
+            "attempts": 0,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "044da31094d8deb5ced48ea33346fe4fe69886d40c406707dd0f3d2e4b0edc5d",
+          "sourceHash": "8f13e784e9eb810742a3708e16467574ef9ebfdfed5e58b2105c139ef8278083",
+          "sourceRoot": "9f77d49a18520316645bf8b603efba10b41d6ac113d373d4604cd18b2c7a6b4d",
+          "compileMs": 899.2621999999974,
+          "executeMs": 432.70840000000317,
+          "stateRoot": "0f805bf2113a459ae1e3b0c9be0026b47136d99e9cb3a5174ba509d09fb37c84",
+          "valueRef": "b349f70819786482408e94733f97f4aac4aed68da052b4a934d58f0dc2f1a1fe"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 0,
+            "kill": 0
+          },
+          "artifactHash": "ead3dbf9aa44aca81fe2719b795e27fdd11d0d901aa54c536569297df70ab19f",
+          "sourceHash": "6dc2635abbc2950524be7ad635cdcbcc14ac68a05786f1ae9e3ce4148e7df878",
+          "sourceRoot": "4c0c96eb4d4dd84a0e67f80a8a2313069f121d8401034230bee554c384b1a7d9",
+          "compileMs": 1115.4435999999987,
+          "executeMs": 327.4316000000108,
+          "stateRoot": "4cbc93f9a7bc4761769fb3fa0ab9692f056eb65e0e927141aa18cafe5e6f30a9",
+          "valueRef": "0397a1f48578e04c90fe31a7f41d23923384216bdb3ae351ab439018dc6c9543"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "failures": 4,
+            "attempts": 5,
+            "approval": 1,
+            "kill": 0
+          },
+          "artifactHash": "33a0a9005f604b7b84f522df4b82e60885042270e527078b673b3755f70ae6be",
+          "sourceHash": "3539896198bd380e948834a4139c611c20467bf5457586c726ae3c6ac4b7a11a",
+          "sourceRoot": "ee423173a93fa5f14700a24a13453e10ad6e9fcf81fe53d15e5d94fa706177ab",
+          "compileMs": 918.2572999999393,
+          "executeMs": 405.7722000000067,
+          "stateRoot": "250a95b4f9761186427e6b8db941a328e80b8ee7373d2d143c9f83ecdf6c23a9",
+          "valueRef": "ae97dc93cd3dc15728dda7ff8780999ee1754996f5561faa19f85e263655bf0e"
+        }
+      ],
+      "trials": [
+        {
+          "id": "dependency",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_dependency(task) > completed",
+            "new": "task_dependency(task) >= completed",
+            "diagnosis": "The boundary admits an index equal to the completed-task count, which does not name a previously completed task."
+          },
+          "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b66201a6de61fc7903ee4aa5d7594b34997fcefc566d585ce2ed715207bbe6a8"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 794.356599999941,
+          "executeMs": 327.01659999997355,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "retry",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+            "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+            "diagnosis": "Success consumes one attempt after the planned failures. Equality leaves no attempt for success and must enter the failure branch."
+          },
+          "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5",
+          "broken": {
+            "kind": "success",
+            "valueRef": "a47266f2a8cad22a09f88fa4e825a689c9e868897dc8448735c557b178c348c3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 975.9843999999575,
+          "executeMs": 378.79649999993853,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        },
+        {
+          "id": "approval",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "automation",
+            "file": "candidate.rcl",
+            "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+            "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+            "diagnosis": "The workflow approval gate is inverted. It must stop before an approval-required task when approval is absent."
+          },
+          "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8",
+          "broken": {
+            "kind": "success",
+            "valueRef": "61025a1b6cef9e6d2a5a92e0dbc43bec5323e662cee90a5b3768d91155a5c8ad"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "3c66966e2041065ddbcab8ac517ba680f39fb8d97f3c3dd3475e4a208be0823b",
+          "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+          "sourceRoot": "7f56f1a1e9fecc6f0f7b7bb57c751825e5dcdb7e2553ad95888ff5b3d2bd7d7b",
+          "compileMs": 736.375100000063,
+          "executeMs": 328.76370000001043,
+          "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+          "valueRef": "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 1452.8149999999441,
+        "executeP95Ms": 582.3061999999918
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\r\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "fa50c38b05e467b26297ce985e3bc2410a1508c5681fdc9085d86addee3d5e3e": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          5,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "29fc5be5c70d50b912ff7a8d99f2b5772bfd3c5d5c0ce43c182bdbc2ad922490",
+      "history": [],
+      "projections": []
+    },
+    "bba5e9c695db9d3533362f72332841df935c8901a3ed631633173a8e7e785545": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 1,
+        "input.failures": 0,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          4,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            0,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "5886c2d7c7285cb5dc30e95b0a75979d2e305edf729f9975a486698c159650f8",
+      "history": [],
+      "projections": []
+    },
+    "4e54f4cc79999ebe4d09ec6a1c4749df766d4d9f0cce7a4e8a43757d1bed0169": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 1,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -1,
+          4,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "ae957ff1354c5b7f398cb5c5b09e197fecebdf619ce1834f4f022c7349f1d9b0",
+      "history": [],
+      "projections": []
+    },
+    "0f3bc2632597ccc80c9f40a007571c75406d32f4559f0e39a995f1850ab2efb9": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 2,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "96895bf8a22ca7fdc9006a2b3560d77895d28f121d04478d9aaae70c2b3d07a7",
+      "history": [],
+      "projections": []
+    },
+    "4d04c47267d37db7f6034c82090f928bdb75f84bda084c3f4e7cf5387915797f": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 3,
+        "input.failures": 2,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          6,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            3,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "a7e463e594a4c0bd144414a2008dae91f50e160973a8b4558e22a0c2372b4f64",
+      "history": [],
+      "projections": []
+    },
+    "b80017bebaecb6022b0afedc2c0da5576d515c9867ab9637f8da7bdaae3af3c5": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 4,
+        "input.failures": 3,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          7,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            3,
+            4,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "6829d1caa0f5996034c2880f41f9923a76548ccab47a2d2808e3a90e9bad93ac",
+      "history": [],
+      "projections": []
+    },
+    "6f4928dfecb2d77dade5b7c3e990dfc01bddc47563021a6887b2b5e34d791903": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 0,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "44d81d955fb61c4e13801ab322e048e157ce32c5223218d66b15c6e8647ebc07",
+      "history": [],
+      "projections": []
+    },
+    "c13a47df9a3532e8075c45f1bd2a21bd64577f41c4541bbebe9324839080b7ed": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 1,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "40b0cf361c39629d60e291142d49ed622afe0c2f419080149cd2273e784bc9c6",
+      "history": [],
+      "projections": []
+    },
+    "b349f70819786482408e94733f97f4aac4aed68da052b4a934d58f0dc2f1a1fe": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 0,
+        "input.failures": 0,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -1,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "0f805bf2113a459ae1e3b0c9be0026b47136d99e9cb3a5174ba509d09fb37c84",
+      "history": [],
+      "projections": []
+    },
+    "0397a1f48578e04c90fe31a7f41d23923384216bdb3ae351ab439018dc6c9543": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 0,
+        "input.attempts": 5,
+        "input.failures": 4,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            4,
+            5,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "4cbc93f9a7bc4761769fb3fa0ab9692f056eb65e0e927141aa18cafe5e6f30a9",
+      "history": [],
+      "projections": []
+    },
+    "ae97dc93cd3dc15728dda7ff8780999ee1754996f5561faa19f85e263655bf0e": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 5,
+        "input.failures": 4,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          8,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            4,
+            5,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "250a95b4f9761186427e6b8db941a328e80b8ee7373d2d143c9f83ecdf6c23a9",
+      "history": [],
+      "projections": []
+    },
+    "b66201a6de61fc7903ee4aa5d7594b34997fcefc566d585ce2ed715207bbe6a8": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          1,
+          1,
+          1,
+          0,
+          [
+            10
+          ],
+          1
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -1,
+          5,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          1,
+          5,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "5d3a7eb61eab43f1bc10e3bacd01b0801516f73bc9d5f193068f619361ccd35f",
+      "history": [],
+      "projections": []
+    },
+    "a47266f2a8cad22a09f88fa4e825a689c9e868897dc8448735c557b178c348c3": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          1,
+          6,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.success": [
+          1,
+          5,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "result.unapproved": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "5158c7229542de3dde789734946e929608ba2154fbd94f4eaf1c02603dcae4f3",
+      "history": [],
+      "projections": []
+    },
+    "61025a1b6cef9e6d2a5a92e0dbc43bec5323e662cee90a5b3768d91155a5c8ad": {
+      "state": {
+        "boundary.profile": "BOUNDED_DETERMINISTIC_WORKFLOW_NOT_EXTERNAL_ACTION_RUNNER",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-workflow-v1",
+        "contract.owner": "RCL",
+        "donor.automation": "DEPENDENCY_RETRY_APPROVAL_KILL_SWITCH_COMPENSATION",
+        "input.approval": 1,
+        "input.attempts": 2,
+        "input.failures": 1,
+        "input.kill": 0,
+        "result.dry_run": [
+          2,
+          0,
+          3,
+          0,
+          [],
+          0
+        ],
+        "result.invalid_dependency": [
+          -3,
+          0,
+          0,
+          0,
+          [
+            -10
+          ],
+          0
+        ],
+        "result.kill_switch": [
+          -4,
+          0,
+          0,
+          0,
+          [
+            -4
+          ],
+          0
+        ],
+        "result.retry_failure": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.success": [
+          -2,
+          3,
+          2,
+          2,
+          [
+            10,
+            20,
+            -30
+          ],
+          0
+        ],
+        "result.unapproved": [
+          1,
+          5,
+          3,
+          0,
+          [
+            10,
+            20,
+            30
+          ],
+          1
+        ],
+        "workflow.failure_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        ],
+        "workflow.invalid_dependency_tasks": [
+          [
+            10,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "workflow.success_tasks": [
+          [
+            10,
+            -1,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            1,
+            1,
+            2,
+            1,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "97e4bb334950dd62317acac89cff80110788db584c943a325d9e67b27d89c129",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "ccd774a3974ca0f7c0080b4f862cd15f179430d87ac7c453a96ca193102a6ee5"
+}

@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-genome-proposals.v1",
+  "contractRoot": "51204a5018c077910949b542a136abfeb108b53295744ae0df54c60964fa5a31",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/genomes/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_genome_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed",
+        "diagnosis": "The boundary admits an index equal to the completed-task count, which does not name a previously completed task."
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_genome_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "choose(task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor)),",
+        "new": "choose(task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor)),",
+        "diagnosis": "Success consumes one attempt after the planned failures. Equality leaves no attempt for success and must enter the failure branch."
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_genome_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+        "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 0",
+        "diagnosis": "The workflow approval gate is inverted. It must stop before an approval-required task when approval is absent."
+      }
+    }
+  ]
+}

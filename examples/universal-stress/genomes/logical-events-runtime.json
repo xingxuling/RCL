@@ -1,0 +1,3600 @@
+{
+  "format": "rcl.k400-genome-runtime.v1",
+  "status": "PASS_LOCAL_BOUND_TARGETS",
+  "id": "logical-events",
+  "generatedAt": "2026-10-12T20:50:09.787Z",
+  "contractRoot": "b68a4cdebba7196473441947d530dc5d96b7e281c1df6eafc0f80abf69fc8506",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/genomes/logical-events-proposals.json",
+  "proposalsHash": "ec2e71172dd7e72f4806155923a5d85f529511fc9bd34a499f206804b2b8c49e",
+  "eligibleCells": [
+    "K051",
+    "K011",
+    "K031",
+    "K091"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-genome-engine.mjs",
+      "sha256": "4c2b762cec2676b38377225e3dab5145c9417dcf799e61c217786166099d9cf7"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "scripts/run-native-wasi.mjs",
+      "sha256": "a8c88d54f7df1db0c1fe0b334d85b7f691f7e29792d4a13f6d2b2d8f93dcf910"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/k400-genomes/realtime.mjs",
+      "sha256": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b"
+    }
+  ],
+  "backends": {
+    "windows": {
+      "binding": {
+        "execution": "Windows native C VM",
+        "os": "win32",
+        "arch": "x64",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/rclvm.exe",
+          "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 211.46389999997336,
+          "executeMs": 93.52229999995325,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 1,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 202.70290000003297,
+          "executeMs": 90.56420000002254,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 2,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 192.16680000000633,
+          "executeMs": 98.96210000000428,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 3,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 215.6711999999825,
+          "executeMs": 84.86199999996461,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 206.41780000005383,
+          "executeMs": 87.29209999996237,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 5,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 203.53049999999348,
+          "executeMs": 85.31579999998212,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 6,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 210.3005000000121,
+          "executeMs": 104.02920000010636,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 7,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 214.9259000000311,
+          "executeMs": 91.3760000000475,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 8,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 233.77170000004116,
+          "executeMs": 145.62639999995008,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 9,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 253.7946000000229,
+          "executeMs": 101.86219999997411,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 10,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 284.3823000000557,
+          "executeMs": 125.13269999995828,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 11,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 246.25950000004377,
+          "executeMs": 99.92040000006091,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 12,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 221.85470000002533,
+          "executeMs": 114.79079999995884,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 13,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 236.47580000001471,
+          "executeMs": 98.95879999990575,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 14,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 216.21080000000075,
+          "executeMs": 108.89439999999013,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 15,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 227.3928999999771,
+          "executeMs": 133.39749999996275,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 16,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 216.77570000011474,
+          "executeMs": 112.00500000000466,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 17,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 230.84760000009555,
+          "executeMs": 97.57149999996182,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 18,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 202.10560000000987,
+          "executeMs": 95.51080000004731,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 19,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 203.74420000007376,
+          "executeMs": 85.29540000006091,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "current": 0,
+            "target": 0,
+            "budget": 0
+          },
+          "artifactHash": "294a1647e18a28d248fc7f89ff27d1d008a74bc712e9785d2a12a48f69019901",
+          "sourceHash": "018faf2d03aa4f4b1b6366bd77bfe694cc0890e6381201b50f44c641574ed047",
+          "sourceRoot": "f873a34a8116c64a664ccf0607857fd182afbed90f99fbd7d47308f25b3994db",
+          "compileMs": 187.50910000002477,
+          "executeMs": 95.02569999999832,
+          "stateRoot": "54a51d072bfb4ca29f5a075b1f98fca1182a0c1fe36b2134ef8d4b98cfdbbdc6",
+          "valueRef": "0e02ab503b6ca919b9b6039663b6a82561295cd34b10fb2285de802eebd36bae"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "081ccffb58763d6e37faa4b6daea96be7005a55b4e32490468953e3d4182f5d6",
+          "sourceHash": "b693da78afdb7cab3dcd164e85f288d26f553f23ea11bf23aa8e3653ebc7a776",
+          "sourceRoot": "a731c373f6f61e4f83e81afa1d4d9ba6d6de695fa31274e8df54f4138cb4f102",
+          "compileMs": 185.55219999991823,
+          "executeMs": 87.35679999995045,
+          "stateRoot": "8945d232b99cfdbea62980cbb44cbf402e0d6529ffc773967cf2783311a22542",
+          "valueRef": "0b41cadb7814bb6b772d6008830d68c9cac07de4afc8ed051812f9c030f16446"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 2
+          },
+          "artifactHash": "6328530715bf8d0bb8bf72703c2789b34559f70b05ea17e04acb69bc539242c0",
+          "sourceHash": "9db5862039f6256c5cd0a0bc4c169d5968ee9d140be8e3df22bdf9a941a81e1b",
+          "sourceRoot": "e2a4b6571aba826a3ab8ded67dbc1c3b796c433097ac2269e9c8ce56e95ab555",
+          "compileMs": 183.97010000003502,
+          "executeMs": 84.09539999999106,
+          "stateRoot": "8c0885f59c2263e033b833d7470a691e526c81dce3cfc2cc49ff30b65736d811",
+          "valueRef": "e608c5c195cc8304852cb18424eb771110d719dd4180a6307de28c3721727efe"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "current": 0,
+            "target": 4,
+            "budget": 4
+          },
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 191.17379999998957,
+          "executeMs": 92.91339999996126,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "current": 0,
+            "target": 6,
+            "budget": 5
+          },
+          "artifactHash": "f77af4982e10a9652b709d3adc7426d4d5e5f0a7df6a05c39e80c77fccadceba",
+          "sourceHash": "21ec927ac76b33591f636d126a186b5bac15a46204d888da7ccded37911bd7b9",
+          "sourceRoot": "d8d384de6f47034c62d70a5854d75c670a9ca5e035a269276dbe9a01f1cb0e98",
+          "compileMs": 189.75049999996554,
+          "executeMs": 91.8061999999918,
+          "stateRoot": "1fe31cad045897d04f43af394807f3207360aed1043dfe14982a39e6969cf939",
+          "valueRef": "4e3035f5f046186a7b0373301fe78663f2eb1d8f6b43f1b23980c8dbb93834ab"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "current": 4,
+            "target": 3,
+            "budget": 5
+          },
+          "artifactHash": "b94d11dfacc2a914878da430a9d18539ba48b2fbe2e83204505116097d246b44",
+          "sourceHash": "f61f100b569f7fd6cd34a3aaa374080c0286377e49457010c8dc4f3679482c8e",
+          "sourceRoot": "4f197d4800d2ace1f2c5e241ef3a3434212c0c430cceb8c8669500d97a38c3f5",
+          "compileMs": 196.29629999992903,
+          "executeMs": 93.30229999998119,
+          "stateRoot": "8fbda87a15e5300197329fa5d97274b0f2a3abb76802e65eec2efbf29394ffcc",
+          "valueRef": "b0171289fbbafd1d9c2255146b3c41926d2aa8ef803e5a799380e9a6746c065c"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "current": 0,
+            "target": 8,
+            "budget": 5
+          },
+          "artifactHash": "1b6eac2aeba3dd4eda7f3ffbdfce96ed89d3768fc387eb3fa0395c8ce8be1707",
+          "sourceHash": "63823b8331d139399ad13511c30a51a44f050a214b2283a9ae0984db45be3093",
+          "sourceRoot": "79019ef1297c21353a543b1d035e5f17dacf98c91e3e2e887aa6efdc0c547c13",
+          "compileMs": 213.70409999997355,
+          "executeMs": 109.19519999995828,
+          "stateRoot": "1690ec9cafbc21a0769d5f6b25413fbe2572aa160e7d7fa8d6a494e29f48649b",
+          "valueRef": "d9d14969964e3b084b03dbd0fb80cf910bd16aa9e316d065c769dbcf1586b495"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "current": 2,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "167e60bcc9db909a21f094e5235c6f923d23b5b6686a9c9fbf6e03cf0de12e69",
+          "sourceHash": "af19e21d537c9f986a91daa0751dd8df32ba8b60882d6da67ed34e0f5a45ebac",
+          "sourceRoot": "53093abc1de27cc5f40b586aa6066091969d25349ff4689f4af463eed6e91b14",
+          "compileMs": 211.33909999998286,
+          "executeMs": 93.59499999997206,
+          "stateRoot": "d642f417555ff96e22431ae90cb00f903dfd87b751b91c75c796ccb451faa2fe",
+          "valueRef": "46700462da9701b075524582f2c19a4a7bce74440a23b1886f8d9dec08c647ef"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "current": 0,
+            "target": 1,
+            "budget": 0
+          },
+          "artifactHash": "87d7a30e84e30da4ab41e437cc7ef55839c3fb5ff7dd44e394be3e4b2004cfb9",
+          "sourceHash": "46df69a150158db5c5640adda2e8d3a3dac912e8d8625d062f34bf36a5a1338c",
+          "sourceRoot": "6ee97e360974d58d69a8d1a465f0b1fc522d6a7050d72cb3cc4f5ce78e7dff6a",
+          "compileMs": 206.54389999993145,
+          "executeMs": 85.96959999995306,
+          "stateRoot": "84d485afd5bddd663c9515303cee9235e67b5f8a2a9ebbd815a9fe11182e967e",
+          "valueRef": "88e007d9cef3cb040a34511d5f4f521fc98a5f99605e83f280a55d3075b042ec"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "current": 4,
+            "target": 6,
+            "budget": 4
+          },
+          "artifactHash": "b03e98e93cf56cad3399850cc01be3ec8b18e120835333ffa8b23962f74620c3",
+          "sourceHash": "2e0ad024bc435a9e972984114dabfe1538e01c5097a14cf363d0440954ea544a",
+          "sourceRoot": "9baf61c85bcdd585aefdf50965b5e9b3693f26bb547068710da43825c25277fc",
+          "compileMs": 187.62410000001546,
+          "executeMs": 85.61609999998473,
+          "stateRoot": "38422769a19a6090bf4ec1065b965cabd6a786b381fd76cd7dd9e0ccf192960d",
+          "valueRef": "0f9b50cd69911ccab7a559090577dce9cbc16c09b50de0acc4b048f3f9019f2a"
+        }
+      ],
+      "trials": [
+        {
+          "id": "tie-order",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "event_priority(left) > event_priority(right)",
+            "new": "event_priority(left) < event_priority(right)",
+            "diagnosis": "The priority comparison sorts equal-time events in descending priority order. Reverse it to obtain increasing time, priority, and identifier."
+          },
+          "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b74ad190faf2aecd7f493b4577a60af3cae442865c8c6c2452d19b5804bb5aba"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 189.49840000004042,
+          "executeMs": 92.05869999993593,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "budget",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+            "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+            "diagnosis": "The event budget rejection comparison is reversed. Reject only when due active events exceed the budget, allowing equality."
+          },
+          "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2",
+          "broken": {
+            "kind": "success",
+            "valueRef": "e69d776a87e91bf5ab42669308fd78c117a7ed2f92c9780362bf0d032d6c7cd3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 160.2954000000609,
+          "executeMs": 81.97899999993388,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "time-authority",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(temporal_commit_capability == 1,",
+            "new": "choose(temporal_commit_capability != 1,",
+            "diagnosis": "The capability gate rejects the authorized value. Rejecting values unequal to one restores authorization while retaining the existing backward-time rejection."
+          },
+          "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "27a4d0eb4f49df0e4d15be18ceaeb6caed913e678f3537957d1bcb9d01be6f54"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 154.84990000003017,
+          "executeMs": 73.44030000001658,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 253.7946000000229,
+        "executeP95Ms": 133.39749999996275
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "wasm-vm": {
+      "binding": {
+        "execution": "Node WASI Preview 1, wasm32 native C VM",
+        "os": "WASI",
+        "arch": "wasm32",
+        "compilerLocation": "Windows native host executing RCL compiler RBC",
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "nodeVersion": "v24.15.0",
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 160.9788000000408,
+          "executeMs": 205.36719999997877,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 1,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 159.02799999993294,
+          "executeMs": 204.55330000002868,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 2,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 159.6803999999538,
+          "executeMs": 200.9600999999093,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 3,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 167.05099999997765,
+          "executeMs": 227.84600000001956,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 163.92399999999907,
+          "executeMs": 228.74580000003334,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 5,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 157.37659999995958,
+          "executeMs": 193.7497999999905,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 6,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 158.12779999990016,
+          "executeMs": 207.32790000003297,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 7,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 159.8332999999402,
+          "executeMs": 193.46529999992345,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 8,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 184.1478000000352,
+          "executeMs": 220.1424999999581,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 9,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 178.890699999989,
+          "executeMs": 233.35030000004917,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 10,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 182.14240000001155,
+          "executeMs": 221.65010000008624,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 11,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 179.79119999997783,
+          "executeMs": 218.03529999998864,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 12,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 185.983899999992,
+          "executeMs": 243.858899999992,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 13,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 204.0437999999849,
+          "executeMs": 278.5154999999795,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 14,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 174.24050000007264,
+          "executeMs": 204.96970000001602,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 15,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 170.0048999999417,
+          "executeMs": 238.96200000005774,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 16,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 179.08399999991525,
+          "executeMs": 232.3625999999931,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 17,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 181.45679999992717,
+          "executeMs": 243.69680000003427,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 18,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 190.53509999997914,
+          "executeMs": 278.20920000004116,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 19,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 173.97580000001471,
+          "executeMs": 239.81849999993574,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "current": 0,
+            "target": 0,
+            "budget": 0
+          },
+          "artifactHash": "294a1647e18a28d248fc7f89ff27d1d008a74bc712e9785d2a12a48f69019901",
+          "sourceHash": "018faf2d03aa4f4b1b6366bd77bfe694cc0890e6381201b50f44c641574ed047",
+          "sourceRoot": "f873a34a8116c64a664ccf0607857fd182afbed90f99fbd7d47308f25b3994db",
+          "compileMs": 192.0067000000272,
+          "executeMs": 243.65659999998752,
+          "stateRoot": "54a51d072bfb4ca29f5a075b1f98fca1182a0c1fe36b2134ef8d4b98cfdbbdc6",
+          "valueRef": "0e02ab503b6ca919b9b6039663b6a82561295cd34b10fb2285de802eebd36bae"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "081ccffb58763d6e37faa4b6daea96be7005a55b4e32490468953e3d4182f5d6",
+          "sourceHash": "b693da78afdb7cab3dcd164e85f288d26f553f23ea11bf23aa8e3653ebc7a776",
+          "sourceRoot": "a731c373f6f61e4f83e81afa1d4d9ba6d6de695fa31274e8df54f4138cb4f102",
+          "compileMs": 169.35350000008475,
+          "executeMs": 233.85680000006687,
+          "stateRoot": "8945d232b99cfdbea62980cbb44cbf402e0d6529ffc773967cf2783311a22542",
+          "valueRef": "0b41cadb7814bb6b772d6008830d68c9cac07de4afc8ed051812f9c030f16446"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 2
+          },
+          "artifactHash": "6328530715bf8d0bb8bf72703c2789b34559f70b05ea17e04acb69bc539242c0",
+          "sourceHash": "9db5862039f6256c5cd0a0bc4c169d5968ee9d140be8e3df22bdf9a941a81e1b",
+          "sourceRoot": "e2a4b6571aba826a3ab8ded67dbc1c3b796c433097ac2269e9c8ce56e95ab555",
+          "compileMs": 173.298000000068,
+          "executeMs": 238.5337999999756,
+          "stateRoot": "8c0885f59c2263e033b833d7470a691e526c81dce3cfc2cc49ff30b65736d811",
+          "valueRef": "e608c5c195cc8304852cb18424eb771110d719dd4180a6307de28c3721727efe"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "current": 0,
+            "target": 4,
+            "budget": 4
+          },
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 185.03430000005756,
+          "executeMs": 202.3292000000365,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "current": 0,
+            "target": 6,
+            "budget": 5
+          },
+          "artifactHash": "f77af4982e10a9652b709d3adc7426d4d5e5f0a7df6a05c39e80c77fccadceba",
+          "sourceHash": "21ec927ac76b33591f636d126a186b5bac15a46204d888da7ccded37911bd7b9",
+          "sourceRoot": "d8d384de6f47034c62d70a5854d75c670a9ca5e035a269276dbe9a01f1cb0e98",
+          "compileMs": 173.35039999999572,
+          "executeMs": 210.2402000000002,
+          "stateRoot": "1fe31cad045897d04f43af394807f3207360aed1043dfe14982a39e6969cf939",
+          "valueRef": "4e3035f5f046186a7b0373301fe78663f2eb1d8f6b43f1b23980c8dbb93834ab"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "current": 4,
+            "target": 3,
+            "budget": 5
+          },
+          "artifactHash": "b94d11dfacc2a914878da430a9d18539ba48b2fbe2e83204505116097d246b44",
+          "sourceHash": "f61f100b569f7fd6cd34a3aaa374080c0286377e49457010c8dc4f3679482c8e",
+          "sourceRoot": "4f197d4800d2ace1f2c5e241ef3a3434212c0c430cceb8c8669500d97a38c3f5",
+          "compileMs": 165.71199999994133,
+          "executeMs": 252.95160000002943,
+          "stateRoot": "8fbda87a15e5300197329fa5d97274b0f2a3abb76802e65eec2efbf29394ffcc",
+          "valueRef": "b0171289fbbafd1d9c2255146b3c41926d2aa8ef803e5a799380e9a6746c065c"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "current": 0,
+            "target": 8,
+            "budget": 5
+          },
+          "artifactHash": "1b6eac2aeba3dd4eda7f3ffbdfce96ed89d3768fc387eb3fa0395c8ce8be1707",
+          "sourceHash": "63823b8331d139399ad13511c30a51a44f050a214b2283a9ae0984db45be3093",
+          "sourceRoot": "79019ef1297c21353a543b1d035e5f17dacf98c91e3e2e887aa6efdc0c547c13",
+          "compileMs": 183.5390999999363,
+          "executeMs": 222.2284000000218,
+          "stateRoot": "1690ec9cafbc21a0769d5f6b25413fbe2572aa160e7d7fa8d6a494e29f48649b",
+          "valueRef": "d9d14969964e3b084b03dbd0fb80cf910bd16aa9e316d065c769dbcf1586b495"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "current": 2,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "167e60bcc9db909a21f094e5235c6f923d23b5b6686a9c9fbf6e03cf0de12e69",
+          "sourceHash": "af19e21d537c9f986a91daa0751dd8df32ba8b60882d6da67ed34e0f5a45ebac",
+          "sourceRoot": "53093abc1de27cc5f40b586aa6066091969d25349ff4689f4af463eed6e91b14",
+          "compileMs": 179.56170000007842,
+          "executeMs": 251.51190000004135,
+          "stateRoot": "d642f417555ff96e22431ae90cb00f903dfd87b751b91c75c796ccb451faa2fe",
+          "valueRef": "46700462da9701b075524582f2c19a4a7bce74440a23b1886f8d9dec08c647ef"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "current": 0,
+            "target": 1,
+            "budget": 0
+          },
+          "artifactHash": "87d7a30e84e30da4ab41e437cc7ef55839c3fb5ff7dd44e394be3e4b2004cfb9",
+          "sourceHash": "46df69a150158db5c5640adda2e8d3a3dac912e8d8625d062f34bf36a5a1338c",
+          "sourceRoot": "6ee97e360974d58d69a8d1a465f0b1fc522d6a7050d72cb3cc4f5ce78e7dff6a",
+          "compileMs": 187.1706000000704,
+          "executeMs": 216.16729999997187,
+          "stateRoot": "84d485afd5bddd663c9515303cee9235e67b5f8a2a9ebbd815a9fe11182e967e",
+          "valueRef": "88e007d9cef3cb040a34511d5f4f521fc98a5f99605e83f280a55d3075b042ec"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "current": 4,
+            "target": 6,
+            "budget": 4
+          },
+          "artifactHash": "b03e98e93cf56cad3399850cc01be3ec8b18e120835333ffa8b23962f74620c3",
+          "sourceHash": "2e0ad024bc435a9e972984114dabfe1538e01c5097a14cf363d0440954ea544a",
+          "sourceRoot": "9baf61c85bcdd585aefdf50965b5e9b3693f26bb547068710da43825c25277fc",
+          "compileMs": 173.0291000000434,
+          "executeMs": 211.40489999996498,
+          "stateRoot": "38422769a19a6090bf4ec1065b965cabd6a786b381fd76cd7dd9e0ccf192960d",
+          "valueRef": "0f9b50cd69911ccab7a559090577dce9cbc16c09b50de0acc4b048f3f9019f2a"
+        }
+      ],
+      "trials": [
+        {
+          "id": "tie-order",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "event_priority(left) > event_priority(right)",
+            "new": "event_priority(left) < event_priority(right)",
+            "diagnosis": "The priority comparison sorts equal-time events in descending priority order. Reverse it to obtain increasing time, priority, and identifier."
+          },
+          "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b74ad190faf2aecd7f493b4577a60af3cae442865c8c6c2452d19b5804bb5aba"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 163.8469000000041,
+          "executeMs": 215.25639999995474,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "budget",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+            "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+            "diagnosis": "The event budget rejection comparison is reversed. Reject only when due active events exceed the budget, allowing equality."
+          },
+          "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2",
+          "broken": {
+            "kind": "success",
+            "valueRef": "e69d776a87e91bf5ab42669308fd78c117a7ed2f92c9780362bf0d032d6c7cd3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 176.27949999994598,
+          "executeMs": 204.33990000002086,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "time-authority",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(temporal_commit_capability == 1,",
+            "new": "choose(temporal_commit_capability != 1,",
+            "diagnosis": "The capability gate rejects the authorized value. Rejecting values unequal to one restores authorization while retaining the existing backward-time rejection."
+          },
+          "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "27a4d0eb4f49df0e4d15be18ceaeb6caed913e678f3537957d1bcb9d01be6f54"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 178.5295000000624,
+          "executeMs": 224.71369999996386,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 190.53509999997914,
+        "executeP95Ms": 278.20920000004116
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:(node:79220) ExperimentalWarning: WASI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "linux": {
+      "binding": {
+        "execution": "Linux WSL2 native C process",
+        "os": "Linux",
+        "arch": "x86_64",
+        "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+        "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+        "compilerLocation": "Linux target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 941.3316000000341,
+          "executeMs": 348.579800000065,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 1,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 466.7898999999743,
+          "executeMs": 286.1681000000099,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 2,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 406.9978000000119,
+          "executeMs": 308.3735000001034,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 3,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 437.6489999999758,
+          "executeMs": 284.4272999999812,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 423.40480000001844,
+          "executeMs": 289.4904000000097,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 5,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 435.2597999999998,
+          "executeMs": 305.1380000000354,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 6,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 425.2528000000166,
+          "executeMs": 302.1909000000451,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 7,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 406.031799999997,
+          "executeMs": 292.6630000000587,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 8,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 405.40949999995064,
+          "executeMs": 278.90319999994244,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 9,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 375.6647000000812,
+          "executeMs": 265.84030000003986,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 10,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 371.21979999996256,
+          "executeMs": 260.9134000000777,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 11,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 369.1525000000838,
+          "executeMs": 266.7121999999508,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 12,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 386.7395999999717,
+          "executeMs": 266.78839999996126,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 13,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 390.52130000002217,
+          "executeMs": 259.0093999999808,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 14,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 383.64220000000205,
+          "executeMs": 280.3118999999715,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 15,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 396.40480000001844,
+          "executeMs": 269.8837000000058,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 16,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 396.72140000003856,
+          "executeMs": 272.9429999999702,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 17,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 382.67149999993853,
+          "executeMs": 268.95629999996163,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 18,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 389.656799999997,
+          "executeMs": 284.80669999995735,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 19,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 379.77110000001267,
+          "executeMs": 367.44270000001416,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "current": 0,
+            "target": 0,
+            "budget": 0
+          },
+          "artifactHash": "294a1647e18a28d248fc7f89ff27d1d008a74bc712e9785d2a12a48f69019901",
+          "sourceHash": "018faf2d03aa4f4b1b6366bd77bfe694cc0890e6381201b50f44c641574ed047",
+          "sourceRoot": "f873a34a8116c64a664ccf0607857fd182afbed90f99fbd7d47308f25b3994db",
+          "compileMs": 1357.7923000000883,
+          "executeMs": 462.4289000000572,
+          "stateRoot": "54a51d072bfb4ca29f5a075b1f98fca1182a0c1fe36b2134ef8d4b98cfdbbdc6",
+          "valueRef": "0e02ab503b6ca919b9b6039663b6a82561295cd34b10fb2285de802eebd36bae"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "081ccffb58763d6e37faa4b6daea96be7005a55b4e32490468953e3d4182f5d6",
+          "sourceHash": "b693da78afdb7cab3dcd164e85f288d26f553f23ea11bf23aa8e3653ebc7a776",
+          "sourceRoot": "a731c373f6f61e4f83e81afa1d4d9ba6d6de695fa31274e8df54f4138cb4f102",
+          "compileMs": 474.78570000000764,
+          "executeMs": 380.5357999999542,
+          "stateRoot": "8945d232b99cfdbea62980cbb44cbf402e0d6529ffc773967cf2783311a22542",
+          "valueRef": "0b41cadb7814bb6b772d6008830d68c9cac07de4afc8ed051812f9c030f16446"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 2
+          },
+          "artifactHash": "6328530715bf8d0bb8bf72703c2789b34559f70b05ea17e04acb69bc539242c0",
+          "sourceHash": "9db5862039f6256c5cd0a0bc4c169d5968ee9d140be8e3df22bdf9a941a81e1b",
+          "sourceRoot": "e2a4b6571aba826a3ab8ded67dbc1c3b796c433097ac2269e9c8ce56e95ab555",
+          "compileMs": 565.8793999999762,
+          "executeMs": 332.1350000000093,
+          "stateRoot": "8c0885f59c2263e033b833d7470a691e526c81dce3cfc2cc49ff30b65736d811",
+          "valueRef": "e608c5c195cc8304852cb18424eb771110d719dd4180a6307de28c3721727efe"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "current": 0,
+            "target": 4,
+            "budget": 4
+          },
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 455.29669999994803,
+          "executeMs": 329.4216000000015,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "current": 0,
+            "target": 6,
+            "budget": 5
+          },
+          "artifactHash": "f77af4982e10a9652b709d3adc7426d4d5e5f0a7df6a05c39e80c77fccadceba",
+          "sourceHash": "21ec927ac76b33591f636d126a186b5bac15a46204d888da7ccded37911bd7b9",
+          "sourceRoot": "d8d384de6f47034c62d70a5854d75c670a9ca5e035a269276dbe9a01f1cb0e98",
+          "compileMs": 439.4747999999672,
+          "executeMs": 323.51350000000093,
+          "stateRoot": "1fe31cad045897d04f43af394807f3207360aed1043dfe14982a39e6969cf939",
+          "valueRef": "4e3035f5f046186a7b0373301fe78663f2eb1d8f6b43f1b23980c8dbb93834ab"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "current": 4,
+            "target": 3,
+            "budget": 5
+          },
+          "artifactHash": "b94d11dfacc2a914878da430a9d18539ba48b2fbe2e83204505116097d246b44",
+          "sourceHash": "f61f100b569f7fd6cd34a3aaa374080c0286377e49457010c8dc4f3679482c8e",
+          "sourceRoot": "4f197d4800d2ace1f2c5e241ef3a3434212c0c430cceb8c8669500d97a38c3f5",
+          "compileMs": 443.4794000000693,
+          "executeMs": 323.8051999999443,
+          "stateRoot": "8fbda87a15e5300197329fa5d97274b0f2a3abb76802e65eec2efbf29394ffcc",
+          "valueRef": "b0171289fbbafd1d9c2255146b3c41926d2aa8ef803e5a799380e9a6746c065c"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "current": 0,
+            "target": 8,
+            "budget": 5
+          },
+          "artifactHash": "1b6eac2aeba3dd4eda7f3ffbdfce96ed89d3768fc387eb3fa0395c8ce8be1707",
+          "sourceHash": "63823b8331d139399ad13511c30a51a44f050a214b2283a9ae0984db45be3093",
+          "sourceRoot": "79019ef1297c21353a543b1d035e5f17dacf98c91e3e2e887aa6efdc0c547c13",
+          "compileMs": 403.5049000000581,
+          "executeMs": 297.53819999995176,
+          "stateRoot": "1690ec9cafbc21a0769d5f6b25413fbe2572aa160e7d7fa8d6a494e29f48649b",
+          "valueRef": "d9d14969964e3b084b03dbd0fb80cf910bd16aa9e316d065c769dbcf1586b495"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "current": 2,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "167e60bcc9db909a21f094e5235c6f923d23b5b6686a9c9fbf6e03cf0de12e69",
+          "sourceHash": "af19e21d537c9f986a91daa0751dd8df32ba8b60882d6da67ed34e0f5a45ebac",
+          "sourceRoot": "53093abc1de27cc5f40b586aa6066091969d25349ff4689f4af463eed6e91b14",
+          "compileMs": 513.4442999999737,
+          "executeMs": 283.27369999990333,
+          "stateRoot": "d642f417555ff96e22431ae90cb00f903dfd87b751b91c75c796ccb451faa2fe",
+          "valueRef": "46700462da9701b075524582f2c19a4a7bce74440a23b1886f8d9dec08c647ef"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "current": 0,
+            "target": 1,
+            "budget": 0
+          },
+          "artifactHash": "87d7a30e84e30da4ab41e437cc7ef55839c3fb5ff7dd44e394be3e4b2004cfb9",
+          "sourceHash": "46df69a150158db5c5640adda2e8d3a3dac912e8d8625d062f34bf36a5a1338c",
+          "sourceRoot": "6ee97e360974d58d69a8d1a465f0b1fc522d6a7050d72cb3cc4f5ce78e7dff6a",
+          "compileMs": 586.3349999999627,
+          "executeMs": 316.3548999999184,
+          "stateRoot": "84d485afd5bddd663c9515303cee9235e67b5f8a2a9ebbd815a9fe11182e967e",
+          "valueRef": "88e007d9cef3cb040a34511d5f4f521fc98a5f99605e83f280a55d3075b042ec"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "current": 4,
+            "target": 6,
+            "budget": 4
+          },
+          "artifactHash": "b03e98e93cf56cad3399850cc01be3ec8b18e120835333ffa8b23962f74620c3",
+          "sourceHash": "2e0ad024bc435a9e972984114dabfe1538e01c5097a14cf363d0440954ea544a",
+          "sourceRoot": "9baf61c85bcdd585aefdf50965b5e9b3693f26bb547068710da43825c25277fc",
+          "compileMs": 620.6371000000509,
+          "executeMs": 457.7210999999661,
+          "stateRoot": "38422769a19a6090bf4ec1065b965cabd6a786b381fd76cd7dd9e0ccf192960d",
+          "valueRef": "0f9b50cd69911ccab7a559090577dce9cbc16c09b50de0acc4b048f3f9019f2a"
+        }
+      ],
+      "trials": [
+        {
+          "id": "tie-order",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "event_priority(left) > event_priority(right)",
+            "new": "event_priority(left) < event_priority(right)",
+            "diagnosis": "The priority comparison sorts equal-time events in descending priority order. Reverse it to obtain increasing time, priority, and identifier."
+          },
+          "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b74ad190faf2aecd7f493b4577a60af3cae442865c8c6c2452d19b5804bb5aba"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 560.279899999965,
+          "executeMs": 401.2929000000004,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "budget",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+            "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+            "diagnosis": "The event budget rejection comparison is reversed. Reject only when due active events exceed the budget, allowing equality."
+          },
+          "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2",
+          "broken": {
+            "kind": "success",
+            "valueRef": "e69d776a87e91bf5ab42669308fd78c117a7ed2f92c9780362bf0d032d6c7cd3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 440.1872999999905,
+          "executeMs": 277.468899999978,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "time-authority",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(temporal_commit_capability == 1,",
+            "new": "choose(temporal_commit_capability != 1,",
+            "diagnosis": "The capability gate rejects the authorized value. Rejecting values unequal to one restores authorization while retaining the existing backward-time rejection."
+          },
+          "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "27a4d0eb4f49df0e4d15be18ceaeb6caed913e678f3537957d1bcb9d01be6f54"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 446.70470000000205,
+          "executeMs": 279.9977000000654,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 466.7898999999743,
+        "executeP95Ms": 348.579800000065
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    },
+    "android": {
+      "binding": {
+        "execution": "Android native Linux ABI C process via ADB",
+        "os": "Android",
+        "arch": "x86_64",
+        "abi": "x86_64",
+        "apiLevel": "35",
+        "emulator": true,
+        "deviceSerial": "emulator-5554",
+        "physicalDeviceClaimed": false,
+        "mobileUiClaimed": false,
+        "compilerLocation": "Android target executing RCL compiler RBC",
+        "binary": {
+          "path": "native/linux/rclvm",
+          "sha256": "302200c66a2ffcf7e6cf2153ad1c38a0178f6e7587a1b1e3c07d894411fde15a"
+        },
+        "compilerBinary": {
+          "path": "native/linux/rclc",
+          "sha256": "3738f3bdaded6dbc30cf82e3068e320363a4cbc4d06a2590f160cdc82bb9e43a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        }
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 1115.3214000000153,
+          "executeMs": 315.55139999999665,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 1,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 744.2012000000104,
+          "executeMs": 288.48729999992065,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 2,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 714.4510999999475,
+          "executeMs": 307.5865000000922,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 3,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 806.9097999999067,
+          "executeMs": 351.4664000000339,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 843.5594999999739,
+          "executeMs": 302.4948999999324,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 5,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 781.0384000000777,
+          "executeMs": 384.1770999999717,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 6,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 927.7868999999482,
+          "executeMs": 338.90950000006706,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 7,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 838.2084000000032,
+          "executeMs": 306.81099999998696,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 8,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 694.2366999998922,
+          "executeMs": 283.1347999999998,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 9,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 661.1510000000708,
+          "executeMs": 291.19029999990016,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 10,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 691.2815999999875,
+          "executeMs": 293.67560000007506,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 11,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 687.6517000000458,
+          "executeMs": 275.1886999999406,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 12,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 660.7321000000229,
+          "executeMs": 291.4570999999996,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 13,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 682.7432000000263,
+          "executeMs": 294.4413999998942,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 14,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 682.3466999999946,
+          "executeMs": 290.0091999999713,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 15,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 708.4853000000585,
+          "executeMs": 306.2787000000244,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 16,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 679.469000000041,
+          "executeMs": 283.15119999996386,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 17,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 770.8915999999736,
+          "executeMs": 281.8445000000065,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 18,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 694.0818000000436,
+          "executeMs": 288.3155000000261,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 19,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 714.3355999999912,
+          "executeMs": 301.17579999996815,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "current": 0,
+            "target": 0,
+            "budget": 0
+          },
+          "artifactHash": "294a1647e18a28d248fc7f89ff27d1d008a74bc712e9785d2a12a48f69019901",
+          "sourceHash": "018faf2d03aa4f4b1b6366bd77bfe694cc0890e6381201b50f44c641574ed047",
+          "sourceRoot": "f873a34a8116c64a664ccf0607857fd182afbed90f99fbd7d47308f25b3994db",
+          "compileMs": 708.7550999999512,
+          "executeMs": 320.8043000000762,
+          "stateRoot": "54a51d072bfb4ca29f5a075b1f98fca1182a0c1fe36b2134ef8d4b98cfdbbdc6",
+          "valueRef": "0e02ab503b6ca919b9b6039663b6a82561295cd34b10fb2285de802eebd36bae"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "081ccffb58763d6e37faa4b6daea96be7005a55b4e32490468953e3d4182f5d6",
+          "sourceHash": "b693da78afdb7cab3dcd164e85f288d26f553f23ea11bf23aa8e3653ebc7a776",
+          "sourceRoot": "a731c373f6f61e4f83e81afa1d4d9ba6d6de695fa31274e8df54f4138cb4f102",
+          "compileMs": 680.1541000000434,
+          "executeMs": 280.61250000004657,
+          "stateRoot": "8945d232b99cfdbea62980cbb44cbf402e0d6529ffc773967cf2783311a22542",
+          "valueRef": "0b41cadb7814bb6b772d6008830d68c9cac07de4afc8ed051812f9c030f16446"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "current": 0,
+            "target": 2,
+            "budget": 2
+          },
+          "artifactHash": "6328530715bf8d0bb8bf72703c2789b34559f70b05ea17e04acb69bc539242c0",
+          "sourceHash": "9db5862039f6256c5cd0a0bc4c169d5968ee9d140be8e3df22bdf9a941a81e1b",
+          "sourceRoot": "e2a4b6571aba826a3ab8ded67dbc1c3b796c433097ac2269e9c8ce56e95ab555",
+          "compileMs": 701.9434999999357,
+          "executeMs": 284.1426999999676,
+          "stateRoot": "8c0885f59c2263e033b833d7470a691e526c81dce3cfc2cc49ff30b65736d811",
+          "valueRef": "e608c5c195cc8304852cb18424eb771110d719dd4180a6307de28c3721727efe"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "current": 0,
+            "target": 4,
+            "budget": 4
+          },
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 715.3282999999356,
+          "executeMs": 290.8876000000164,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "current": 0,
+            "target": 6,
+            "budget": 5
+          },
+          "artifactHash": "f77af4982e10a9652b709d3adc7426d4d5e5f0a7df6a05c39e80c77fccadceba",
+          "sourceHash": "21ec927ac76b33591f636d126a186b5bac15a46204d888da7ccded37911bd7b9",
+          "sourceRoot": "d8d384de6f47034c62d70a5854d75c670a9ca5e035a269276dbe9a01f1cb0e98",
+          "compileMs": 677.1647999999113,
+          "executeMs": 304.4967999999644,
+          "stateRoot": "1fe31cad045897d04f43af394807f3207360aed1043dfe14982a39e6969cf939",
+          "valueRef": "4e3035f5f046186a7b0373301fe78663f2eb1d8f6b43f1b23980c8dbb93834ab"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "current": 4,
+            "target": 3,
+            "budget": 5
+          },
+          "artifactHash": "b94d11dfacc2a914878da430a9d18539ba48b2fbe2e83204505116097d246b44",
+          "sourceHash": "f61f100b569f7fd6cd34a3aaa374080c0286377e49457010c8dc4f3679482c8e",
+          "sourceRoot": "4f197d4800d2ace1f2c5e241ef3a3434212c0c430cceb8c8669500d97a38c3f5",
+          "compileMs": 699.3418999999994,
+          "executeMs": 322.4099999999162,
+          "stateRoot": "8fbda87a15e5300197329fa5d97274b0f2a3abb76802e65eec2efbf29394ffcc",
+          "valueRef": "b0171289fbbafd1d9c2255146b3c41926d2aa8ef803e5a799380e9a6746c065c"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "current": 0,
+            "target": 8,
+            "budget": 5
+          },
+          "artifactHash": "1b6eac2aeba3dd4eda7f3ffbdfce96ed89d3768fc387eb3fa0395c8ce8be1707",
+          "sourceHash": "63823b8331d139399ad13511c30a51a44f050a214b2283a9ae0984db45be3093",
+          "sourceRoot": "79019ef1297c21353a543b1d035e5f17dacf98c91e3e2e887aa6efdc0c547c13",
+          "compileMs": 804.0672000000486,
+          "executeMs": 304.1215000000084,
+          "stateRoot": "1690ec9cafbc21a0769d5f6b25413fbe2572aa160e7d7fa8d6a494e29f48649b",
+          "valueRef": "d9d14969964e3b084b03dbd0fb80cf910bd16aa9e316d065c769dbcf1586b495"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "current": 2,
+            "target": 2,
+            "budget": 3
+          },
+          "artifactHash": "167e60bcc9db909a21f094e5235c6f923d23b5b6686a9c9fbf6e03cf0de12e69",
+          "sourceHash": "af19e21d537c9f986a91daa0751dd8df32ba8b60882d6da67ed34e0f5a45ebac",
+          "sourceRoot": "53093abc1de27cc5f40b586aa6066091969d25349ff4689f4af463eed6e91b14",
+          "compileMs": 791.7092000000412,
+          "executeMs": 300.50520000001416,
+          "stateRoot": "d642f417555ff96e22431ae90cb00f903dfd87b751b91c75c796ccb451faa2fe",
+          "valueRef": "46700462da9701b075524582f2c19a4a7bce74440a23b1886f8d9dec08c647ef"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "current": 0,
+            "target": 1,
+            "budget": 0
+          },
+          "artifactHash": "87d7a30e84e30da4ab41e437cc7ef55839c3fb5ff7dd44e394be3e4b2004cfb9",
+          "sourceHash": "46df69a150158db5c5640adda2e8d3a3dac912e8d8625d062f34bf36a5a1338c",
+          "sourceRoot": "6ee97e360974d58d69a8d1a465f0b1fc522d6a7050d72cb3cc4f5ce78e7dff6a",
+          "compileMs": 791.4253000000026,
+          "executeMs": 298.1636000000872,
+          "stateRoot": "84d485afd5bddd663c9515303cee9235e67b5f8a2a9ebbd815a9fe11182e967e",
+          "valueRef": "88e007d9cef3cb040a34511d5f4f521fc98a5f99605e83f280a55d3075b042ec"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "current": 4,
+            "target": 6,
+            "budget": 4
+          },
+          "artifactHash": "b03e98e93cf56cad3399850cc01be3ec8b18e120835333ffa8b23962f74620c3",
+          "sourceHash": "2e0ad024bc435a9e972984114dabfe1538e01c5097a14cf363d0440954ea544a",
+          "sourceRoot": "9baf61c85bcdd585aefdf50965b5e9b3693f26bb547068710da43825c25277fc",
+          "compileMs": 799.6302000000142,
+          "executeMs": 307.0081000000937,
+          "stateRoot": "38422769a19a6090bf4ec1065b965cabd6a786b381fd76cd7dd9e0ccf192960d",
+          "valueRef": "0f9b50cd69911ccab7a559090577dce9cbc16c09b50de0acc4b048f3f9019f2a"
+        }
+      ],
+      "trials": [
+        {
+          "id": "tie-order",
+          "context": "/root/k400_genome_a",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "event_priority(left) > event_priority(right)",
+            "new": "event_priority(left) < event_priority(right)",
+            "diagnosis": "The priority comparison sorts equal-time events in descending priority order. Reverse it to obtain increasing time, priority, and identifier."
+          },
+          "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98",
+          "broken": {
+            "kind": "success",
+            "valueRef": "b74ad190faf2aecd7f493b4577a60af3cae442865c8c6c2452d19b5804bb5aba"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 811.8442000000505,
+          "executeMs": 408.8538000000408,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "budget",
+          "context": "/root/k400_genome_b",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events,",
+            "new": "choose(due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events,",
+            "diagnosis": "The event budget rejection comparison is reversed. Reject only when due active events exceed the budget, allowing equality."
+          },
+          "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2",
+          "broken": {
+            "kind": "success",
+            "valueRef": "e69d776a87e91bf5ab42669308fd78c117a7ed2f92c9780362bf0d032d6c7cd3"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 876.8673000000417,
+          "executeMs": 424.45470000000205,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        },
+        {
+          "id": "time-authority",
+          "context": "/root/k400_genome_c",
+          "proposal": {
+            "id": "logical-events",
+            "file": "candidate.rcl",
+            "old": "choose(temporal_commit_capability == 1,",
+            "new": "choose(temporal_commit_capability != 1,",
+            "diagnosis": "The capability gate rejects the authorized value. Rejecting values unequal to one restores authorization while retaining the existing backward-time rejection."
+          },
+          "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c",
+          "broken": {
+            "kind": "success",
+            "valueRef": "27a4d0eb4f49df0e4d15be18ceaeb6caed913e678f3537957d1bcb9d01be6f54"
+          },
+          "exactCanonicalRestoration": true,
+          "artifactHash": "602b0b2f08a567477926cbe98eb5b2af0f499dc81f142bcef29524cce2ae37cd",
+          "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+          "sourceRoot": "ff0d6897a9880a900acbc51e02cd50e5984790f6b9c36c128ebe5e7704888278",
+          "compileMs": 723.4303000000073,
+          "executeMs": 316.32600000000093,
+          "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+          "valueRef": "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 927.7868999999482,
+        "executeP95Ms": 351.4664000000339
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\r\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "RCL_PORTABLE_TARGET_COMMAND_FAILED:{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\r\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "7ce153ae19aa50043be64c0d54c7d2e171d7dc24874f1158dd2f295b7efb77ca": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 4,
+        "input.current": 0,
+        "input.target": 4,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          4,
+          [
+            10,
+            15,
+            20,
+            30
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "9ea29e4158f53189798bfa426f905142c2569c0567223a43d8abf131aa8ea96f",
+      "history": [],
+      "projections": []
+    },
+    "0e02ab503b6ca919b9b6039663b6a82561295cd34b10fb2285de802eebd36bae": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 0,
+        "input.current": 0,
+        "input.target": 0,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          0,
+          []
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "54a51d072bfb4ca29f5a075b1f98fca1182a0c1fe36b2134ef8d4b98cfdbbdc6",
+      "history": [],
+      "projections": []
+    },
+    "0b41cadb7814bb6b772d6008830d68c9cac07de4afc8ed051812f9c030f16446": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 3,
+        "input.current": 0,
+        "input.target": 2,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          2,
+          [
+            10,
+            15,
+            20
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "8945d232b99cfdbea62980cbb44cbf402e0d6529ffc773967cf2783311a22542",
+      "history": [],
+      "projections": []
+    },
+    "e608c5c195cc8304852cb18424eb771110d719dd4180a6307de28c3721727efe": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 2,
+        "input.current": 0,
+        "input.target": 2,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          -2,
+          0,
+          []
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "8c0885f59c2263e033b833d7470a691e526c81dce3cfc2cc49ff30b65736d811",
+      "history": [],
+      "projections": []
+    },
+    "4e3035f5f046186a7b0373301fe78663f2eb1d8f6b43f1b23980c8dbb93834ab": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 5,
+        "input.current": 0,
+        "input.target": 6,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          6,
+          [
+            10,
+            15,
+            20,
+            30,
+            40
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "1fe31cad045897d04f43af394807f3207360aed1043dfe14982a39e6969cf939",
+      "history": [],
+      "projections": []
+    },
+    "b0171289fbbafd1d9c2255146b3c41926d2aa8ef803e5a799380e9a6746c065c": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 5,
+        "input.current": 4,
+        "input.target": 3,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          -1,
+          4,
+          []
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "8fbda87a15e5300197329fa5d97274b0f2a3abb76802e65eec2efbf29394ffcc",
+      "history": [],
+      "projections": []
+    },
+    "d9d14969964e3b084b03dbd0fb80cf910bd16aa9e316d065c769dbcf1586b495": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 5,
+        "input.current": 0,
+        "input.target": 8,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          8,
+          [
+            10,
+            15,
+            20,
+            30,
+            40
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "1690ec9cafbc21a0769d5f6b25413fbe2572aa160e7d7fa8d6a494e29f48649b",
+      "history": [],
+      "projections": []
+    },
+    "46700462da9701b075524582f2c19a4a7bce74440a23b1886f8d9dec08c647ef": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 3,
+        "input.current": 2,
+        "input.target": 2,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          2,
+          [
+            10,
+            15,
+            20
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "d642f417555ff96e22431ae90cb00f903dfd87b751b91c75c796ccb451faa2fe",
+      "history": [],
+      "projections": []
+    },
+    "88e007d9cef3cb040a34511d5f4f521fc98a5f99605e83f280a55d3075b042ec": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 0,
+        "input.current": 0,
+        "input.target": 1,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          1,
+          []
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "84d485afd5bddd663c9515303cee9235e67b5f8a2a9ebbd815a9fe11182e967e",
+      "history": [],
+      "projections": []
+    },
+    "0f9b50cd69911ccab7a559090577dce9cbc16c09b50de0acc4b048f3f9019f2a": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 4,
+        "input.current": 4,
+        "input.target": 6,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          -2,
+          4,
+          []
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "38422769a19a6090bf4ec1065b965cabd6a786b381fd76cd7dd9e0ccf192960d",
+      "history": [],
+      "projections": []
+    },
+    "b74ad190faf2aecd7f493b4577a60af3cae442865c8c6c2452d19b5804bb5aba": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 4,
+        "input.current": 0,
+        "input.target": 4,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          4,
+          [
+            20,
+            10,
+            15,
+            30
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "f7670d24d44277e1c854ca9930f487a62d8a06fd7ccf883db85258da4a1e65bf",
+      "history": [],
+      "projections": []
+    },
+    "e69d776a87e91bf5ab42669308fd78c117a7ed2f92c9780362bf0d032d6c7cd3": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 4,
+        "input.current": 0,
+        "input.target": 4,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          1,
+          4,
+          [
+            10,
+            15,
+            20,
+            30
+          ]
+        ],
+        "result.external_approved": [
+          1,
+          8,
+          []
+        ],
+        "result.external_unapproved": [
+          -3,
+          4,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          4,
+          [
+            10,
+            15,
+            20,
+            30
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "1c5c041dbe626466d3d8f7dbdbb14d207382ed1c69804365136b4d32e045a6c9",
+      "history": [],
+      "projections": []
+    },
+    "27a4d0eb4f49df0e4d15be18ceaeb6caed913e678f3537957d1bcb9d01be6f54": {
+      "state": {
+        "boundary.profile": "DETERMINISTIC_LOGICAL_TIME_NOT_WALL_CLOCK_OR_HARD_REALTIME",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-logical-events-v1",
+        "contract.owner": "RCL",
+        "donor.logical_scheduler": "AUXILIARY_RUNTIME_DIFFERENTIAL_ORACLE",
+        "input.budget": 4,
+        "input.current": 0,
+        "input.target": 4,
+        "projection.accelerated": 2,
+        "projection.invalid": -1,
+        "projection.normal": 8,
+        "result.backward_rejected": [
+          -1,
+          4,
+          []
+        ],
+        "result.budget_rejected": [
+          -2,
+          0,
+          []
+        ],
+        "result.external_approved": [
+          -3,
+          4,
+          []
+        ],
+        "result.external_unapproved": [
+          1,
+          8,
+          []
+        ],
+        "result.invalid_rejected": [
+          -5,
+          0,
+          []
+        ],
+        "result.success": [
+          1,
+          4,
+          [
+            10,
+            15,
+            20,
+            30
+          ]
+        ],
+        "schedule.events": [
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ],
+        "schedule.invalid": [
+          [
+            50,
+            -1,
+            0,
+            1
+          ]
+        ],
+        "schedule.sorted": [
+          [
+            10,
+            2,
+            0,
+            1
+          ],
+          [
+            15,
+            2,
+            0,
+            1
+          ],
+          [
+            20,
+            2,
+            1,
+            1
+          ],
+          [
+            30,
+            4,
+            0,
+            1
+          ],
+          [
+            40,
+            6,
+            0,
+            1
+          ]
+        ]
+      },
+      "stateRoot": "5eead26b4e1501537cb5aa19e9c93b1fad0a6c08f5c9385465b58ed9727af5d4",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "80fa60f80ecbc5e80d97a195b6479a673f551a1891ba5039342d8293f4468e86"
+}

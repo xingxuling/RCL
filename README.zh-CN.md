@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**研究预览 · K400 44/400（11%）· INCOMPLETE · U3**
+**研究预览 · K400 71/400（17.75%）· INCOMPLETE · U3**
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
@@ -19,7 +19,7 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**RCL 当前是研究预览：K400 登记 44/400 PASS、356 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
+**RCL 当前是研究预览：K400 登记 71/400 PASS、329 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
 
 ## 为什么使用 RCL？
 
@@ -59,6 +59,8 @@ RCL 适合探索带权限约束的应用状态、可审计自动化与语言 / �
 原生 VM 与 `rcl run` 默认使用 `rcl.semantic-state-root.v2`，以精确有限 binary64 编码绑定最终状态与转移前后根。历史原生 v1 凭据仍可显式选择算法验证。`runReality` Reference API 保留其独立的 `rcl.reference-state-root.v0.6` 默认；使用 `stateRootAlgorithm` 可选择跨运行时 v2。参见[稳定契约](docs/v1.0/language-contract.md)、[状态根协议](docs/v1.0/semantic-state-root-v2.md)与[发布验收](docs/v1.0/acceptance.md)。
 
 ## 可移植原生执行
+
+[原生核心程序族批次](docs/K400_GENOME_CAMPAIGN_2026-10-13.md)还验证了四个目标中的有界学习、代理推演、工作流、逻辑事件、治理/响应式和混合范式程序，各自包含十组预先封存的输入和三组独立修复重放。新 API `createPortableHttpTarget` 提供真实的本地 HTTP 编译/执行与访问令牌校验；其独立通关批次尚未完成，暂不新增服务端格子。
 
 同一套 C 虚拟机现在能作为 Windows 程序、wasm32-WASI 模块、Linux 程序和 x86_64 Android 模拟器中的原生程序运行。Linux/Android 在目标环境中执行 RCL 编写的编译器；WASI 使用 Windows 主机中的 RCL 编译器。目前已验证算法/命令行、内存关系查询与事务、离散模拟/科学计算，目标之间的字节码和语义状态根一致。
 
@@ -399,7 +401,7 @@ RCL 当前长期验证主线是一张固定的：
 
 缺一个必要 Gate 就是 BLOCKED；必要 Gate 失败就是 FAIL，不能靠其它高分抵消。
 
-当前记录为 `44 PASS / 0 BLOCKED / 356 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器中的算法、命令行、关系查询和模拟/科学计算证据。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+当前记录为 `71 PASS / 0 BLOCKED / 329 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器中的算法、命令行、关系查询和模拟/科学计算证据。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 ### 当前 Killer Tasks
 

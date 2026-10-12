@@ -1,0 +1,74 @@
+{
+  "format": "rcl.k400-genome-contract.v1",
+  "id": "learning",
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/learning.rcl",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesPath": "examples/universal-stress/genomes/learning-cases.json",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "definitionFile": "scripts/k400-genomes/learning.mjs",
+  "definitionHash": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802",
+  "donor": {
+    "path": "examples/universal-stress/k333-compiler-machine-learning.rcl",
+    "sha256": "44933d704a3365bbb2b73a1e0b1bd4cb57cc4ee2f3a302e2b4521e85db39e917",
+    "decision": "ADAPT"
+  },
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android"
+  ],
+  "families": [
+    "machine-learning"
+  ],
+  "eligibleCells": [
+    "K053",
+    "K013",
+    "K033",
+    "K093"
+  ],
+  "baseline": {
+    "epochs": 16,
+    "nodes": 4,
+    "hotness": 2
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "authorityProfile": "local source/binary-bound actual execution and exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "index": 0,
+      "intent": "Train a binary perceptron: for a misclassified sample add its features and one to the bias for a positive label; subtract them for a negative label.",
+      "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057"
+    },
+    {
+      "id": "score-bias",
+      "index": 1,
+      "intent": "Inference uses the dot product of feature weights with features plus the learned bias, consistently during training and prediction.",
+      "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299"
+    },
+    {
+      "id": "weight-direction",
+      "index": 2,
+      "intent": "The node-feature perceptron weight moves toward a misclassified positive sample and away from a misclassified negative sample.",
+      "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67"
+    }
+  ],
+  "contractRoot": "d1520c6af8860402ebf47e6f90c9ac7bae2c08adef3dce352a32522aea5371c0"
+}

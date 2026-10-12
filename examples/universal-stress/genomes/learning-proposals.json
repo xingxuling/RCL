@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-genome-proposals.v1",
+  "contractRoot": "d1520c6af8860402ebf47e6f90c9ac7bae2c08adef3dce352a32522aea5371c0",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/genomes/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_genome_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+        "diagnosis": "The bias update has reversed signs. A misclassified positive sample must add one; a negative sample must subtract one."
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_genome_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+        "diagnosis": "The shared scoring function subtracts the learned bias. Adding it makes training and prediction use the intended dot product plus bias."
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_genome_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+        "diagnosis": "The node-feature update has reversed signs. Misclassified positive samples must add their node feature; misclassified negative samples must subtract it."
+      }
+    }
+  ]
+}

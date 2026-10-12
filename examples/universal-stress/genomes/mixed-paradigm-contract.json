@@ -1,0 +1,72 @@
+{
+  "format": "rcl.k400-genome-contract.v1",
+  "id": "mixed-paradigm",
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/mixed-paradigm.rcl",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesPath": "examples/universal-stress/genomes/mixed-paradigm-cases.json",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "definitionFile": "scripts/k400-genomes/mixed.mjs",
+  "definitionHash": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb",
+  "donor": {
+    "path": "examples/universal-stress/k340-compiler-mixed-paradigm.rcl",
+    "sha256": "5bcbc4cc51fba8b6a2e9201c1c3f074fb8f5e68fb08197ef1e98d902c3d6e042",
+    "decision": "ADAPT"
+  },
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android"
+  ],
+  "families": [
+    "mixed-paradigm"
+  ],
+  "eligibleCells": [
+    "K060",
+    "K020",
+    "K040",
+    "K100"
+  ],
+  "baseline": {
+    "batch_size": 8
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "authorityProfile": "local source/binary-bound actual execution and exact independent proposals; no new hosted CI",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "index": 0,
+      "intent": "Compute the sum of squares for the functional stage, agreeing with the closed-form invariant before transactional commit.",
+      "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d"
+    },
+    {
+      "id": "analyze-warrant",
+      "index": 1,
+      "intent": "The builder needs the exact compiler.analyze warrant on source before analyzing a positive batch; do not change the declared requirements.",
+      "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4"
+    },
+    {
+      "id": "phase-trigger",
+      "index": 2,
+      "intent": "Emission follows successful analysis at phase one, then advances to phase two; preserve the digest and all authority requirements.",
+      "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167"
+    }
+  ],
+  "contractRoot": "f88bd34c1d79bfd8b3a7c1f66f9126c4a79b9d7396e63123ba692e8c8000f875"
+}

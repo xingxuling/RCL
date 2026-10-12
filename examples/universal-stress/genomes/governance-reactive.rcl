@@ -1,0 +1,48 @@
+reality PortableGovernance {
+  facet input.valid : Truth = true
+  facet input.phase : Number = 0
+  facet input.audit : Number = 0
+
+  facet request.valid : Truth = input.valid
+  facet compiler.phase : Number = input.phase
+  facet compiler.accepted : Truth = false
+  facet compiler.emitted : Truth = false
+  facet compiler.audit_count : Number = input.audit
+
+  subject maintainer {
+    warrant compiler.inspect on source
+    warrant compiler.stage on artifact
+    warrant compiler.emit on artifact
+  }
+
+  emergence authorize_candidate {
+    cause maintainer
+    when request.valid == true and compiler.phase == 0
+    needs compiler.inspect on source
+    needs compiler.stage on artifact
+    alter compiler.accepted <- true
+    alter compiler.phase <- 1
+    alter compiler.audit_count <- compiler.audit_count + 1
+    preserve compiler.accepted == true
+    preserve compiler.audit_count == input.audit + 1
+    witness "k337:authority:accepted"
+  }
+
+  emergence emit_candidate {
+    cause maintainer
+    when compiler.accepted == true and compiler.phase == 1
+    needs compiler.stage on artifact
+    needs compiler.emit on artifact
+    alter compiler.emitted <- true
+    alter compiler.phase <- 2
+    alter compiler.audit_count <- compiler.audit_count + 1
+    preserve compiler.emitted == true
+    preserve compiler.audit_count == input.audit + 2
+    witness "k338:reactive:emitted"
+  }
+
+  foresee authorize_candidate
+  realize authorize_candidate
+  foresee emit_candidate
+  realize emit_candidate
+}
