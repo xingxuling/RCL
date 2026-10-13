@@ -1,0 +1,51 @@
+{
+  "format": "rcl.k400-independent-ai-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "batches": [
+    {
+      "index": 0,
+      "context": "/root/k400_gpu_ui_fresh_a",
+      "input": "output/gpu-ui-independent/batch-0.json",
+      "rawResponse": "[{\"id\":\"gpu-text-counter-0\",\"file\":\"candidate.rcl\",\"old\":\"count - step\",\"new\":\"count + step\"}]",
+      "returnedProposals": [
+        {
+          "id": "gpu-text-counter-0",
+          "file": "candidate.rcl",
+          "old": "count - step",
+          "new": "count + step"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "context": "/root/k400_gpu_ui_fresh_b",
+      "input": "output/gpu-ui-independent/batch-1.json",
+      "rawResponse": "[{\"id\":\"gpu-text-counter-1\",\"file\":\"candidate.rcl\",\"old\":\"derived count_label : Text = \\\"计数：\\\" + step\",\"new\":\"derived count_label : Text = \\\"计数：\\\" + count\"}]",
+      "returnedProposals": [
+        {
+          "id": "gpu-text-counter-1",
+          "file": "candidate.rcl",
+          "old": "derived count_label : Text = \"计数：\" + step",
+          "new": "derived count_label : Text = \"计数：\" + count"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "context": "/root/k400_gpu_ui_fresh_c",
+      "input": "output/gpu-ui-independent/batch-2.json",
+      "rawResponse": "[{\"id\":\"gpu-text-counter-2\",\"file\":\"candidate.rcl\",\"old\":\"on activate { set count <- step }\",\"new\":\"on activate { set count <- initial }\"}]",
+      "returnedProposals": [
+        {
+          "id": "gpu-text-counter-2",
+          "file": "candidate.rcl",
+          "old": "on activate { set count <- step }",
+          "new": "on activate { set count <- initial }"
+        }
+      ]
+    }
+  ]
+}

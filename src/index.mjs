@@ -67,6 +67,7 @@ export {
 
 export { createPortableBrowserTarget } from './portable-browser-target.mjs';
 export { createPortableGpuTarget } from './portable-gpu-target.mjs';
+export { createPortableGpuTextTarget } from './portable-gpu-text-target.mjs';
 export { createPortableRncsTarget } from './portable-rncs-target.mjs';
 export { runReplicatedCounterNetwork, bindCounterInputs } from './replicated-counter-network.mjs';
 export { createPortableRealtimeTarget } from './portable-realtime-target.mjs';

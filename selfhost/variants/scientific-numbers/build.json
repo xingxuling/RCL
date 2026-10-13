@@ -1,0 +1,19 @@
+{
+  "format": "rcl.selfhost-scientific-number-compiler.v1",
+  "status": "PASS_NATIVE_FIXED_POINT_CANDIDATE",
+  "donorSourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceHash": "c33e73811b66bffe6baab6289cc45595b58fa6a17e5e88ad445c483827f593a6",
+  "artifactHash": "ef95a33ca6e704bc744fb1b0a73122b0cb4c89788b0492263582fbb4be13c111",
+  "bytes": 299295,
+  "patch": {
+    "old": "  reckon scan_number_end(source : Text, index : Number, seen_dot : Truth) -> Number =\n    choose(index >= length(source), index,\n      choose(is_digit(char_at(source, index)), scan_number_end(source, index + 1, seen_dot),\n        choose(both(char_at(source, index) == char_at(\".\", 0), not seen_dot),\n          scan_number_end(source, index + 1, true), index)))",
+    "replacement": "  reckon scan_exponent_digits(source : Text, index : Number) -> Number =\n    choose(index >= length(source), index,\n      choose(is_digit(char_at(source, index)), scan_exponent_digits(source, index + 1), index))\n\n  reckon scan_exponent_after_sign(source : Text, marker : Number, index : Number) -> Number =\n    choose(index >= length(source), marker,\n      choose(is_digit(char_at(source, index)), scan_exponent_digits(source, index + 1), marker))\n\n  reckon scan_exponent_end(source : Text, marker : Number) -> Number =\n    scan_exponent_after_sign(source, marker,\n      choose(either(char_at(source, marker + 1) == \"+\", char_at(source, marker + 1) == minus_operator()), marker + 2, marker + 1))\n\n  reckon scan_number_end(source : Text, index : Number, seen_dot : Truth) -> Number =\n    choose(index >= length(source), index,\n      choose(is_digit(char_at(source, index)), scan_number_end(source, index + 1, seen_dot),\n        choose(both(char_at(source, index) == char_at(\".\", 0), not seen_dot),\n          scan_number_end(source, index + 1, true),\n          choose(either(char_at(source, index) == \"e\", char_at(source, index) == \"E\"), scan_exponent_end(source, index), index))))"
+  },
+  "executedInstructions": 102629503,
+  "generations": [
+    "ef95a33ca6e704bc744fb1b0a73122b0cb4c89788b0492263582fbb4be13c111",
+    "ef95a33ca6e704bc744fb1b0a73122b0cb4c89788b0492263582fbb4be13c111",
+    "ef95a33ca6e704bc744fb1b0a73122b0cb4c89788b0492263582fbb4be13c111"
+  ],
+  "scope": "Separate RCL-authored general lexer extension for decimal exponent suffixes with optional sign and mandatory digits; retains UTF-16 column accounting. Original and previously frozen compiler variants remain unchanged."
+}

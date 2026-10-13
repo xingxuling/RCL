@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 364/400 PASS (91%) · 36 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 367/400 PASS (91.75%) · 33 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,18 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-14 GPU Text and UI continuation
+
+K163/K164/K165 add three distinct coordinates, reaching **367 PASS /
+33 UNTESTED**, U3, INCOMPLETE. The separate AMD OpenCL Text interpreter owns
+Text and event state in actual Chromium and native Android touch flows. Forty
+baseline flows, twenty sealed inputs and six unchanged replays of three fresh
+independent proposals pass all nine gates. Twenty-three GUI/mobile admission
+checks, a GPU/native C parity and bounded-failure check, and fourteen
+scientific-number compiler checks pass. Android ATD captures remain black;
+visual pixel acceptance and physical-device smoke are pending. Version promotion
+remains frozen. See `docs/K400_GPU_TEXT_2026-10-14.md`.
 
 ## 2026-10-14 native-core self-hosting continuation
 

@@ -1,0 +1,155 @@
+{
+  "format": "rcl.gpu-text-source-replay.v1",
+  "status": "PASS_RELOCATED_SOURCE_REPLAY",
+  "resumedAfterDoctorFieldRepair": true,
+  "snapshot": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\k4-gt-229fc7ea",
+  "generatedFiles": [
+    {
+      "file": "native/gpu-text-runtime/ryu-opencl.cl",
+      "sha256": "205c6d1ff0547dfc1e5ecb1e1ba92204cf77fed3c9d255946f2e435d56016fd3"
+    },
+    {
+      "file": "native/gpu-text-runtime/ryu-build.json",
+      "sha256": "dfebaadc100d1edd9fdb0982bfce9d232d621f289d68afd53a2ec1ce65a467e5"
+    },
+    {
+      "file": "native/gpu-text-runtime/rcl-text-stack-vm.cl",
+      "sha256": "94af363e46b002bcbeff8d6ff6d995b369aad3d87a03fcc8a7861ac0e9f98493"
+    },
+    {
+      "file": "native/gpu-text-runtime/provider.py",
+      "sha256": "2edbff37fe384afb2ea5383d8139a1b4847f4244570308631fa37af3505d9572"
+    },
+    {
+      "file": "native/gpu-text-runtime/build.json",
+      "sha256": "3f90e3f62785675e803e80b4512e5129078009be6cc3b9dc48e2d2b271f8d7c4"
+    },
+    {
+      "file": "src/portable-gpu-text-target.mjs",
+      "sha256": "38e5b745f1858bb0894c893fdea625a2a96233857930f2bacc270866d13c3086"
+    },
+    {
+      "file": "src/scientific-lexer.mjs",
+      "sha256": "4192b1a1e3bc9017358eaff3f8d66ae219dfcb72c123af380713d2f189187e15"
+    },
+    {
+      "file": "src/scientific-parser.mjs",
+      "sha256": "cf6e7f14728e73201e8cdfc9117f1f2cb50340dac538ec11106cf0acd88ddf06"
+    },
+    {
+      "file": "src/scientific-compiler.mjs",
+      "sha256": "729c3a6431ef60afa55cb1457c78318a86e7070a7190cfa97d9f0fd0fa2442c8"
+    },
+    {
+      "file": "selfhost/variants/scientific-numbers/reference-build.json",
+      "sha256": "e1248614185f38b1b76302a739754a5e5bdefffffc43c6ab8f5e1dfb83d34ab4"
+    },
+    {
+      "file": "selfhost/variants/scientific-numbers/compiler.rcl",
+      "sha256": "c33e73811b66bffe6baab6289cc45595b58fa6a17e5e88ad445c483827f593a6"
+    },
+    {
+      "file": "selfhost/variants/scientific-numbers/compiler.rbc",
+      "sha256": "ef95a33ca6e704bc744fb1b0a73122b0cb4c89788b0492263582fbb4be13c111"
+    },
+    {
+      "file": "selfhost/variants/scientific-numbers/build.json",
+      "sha256": "aafb70d7fe7b47d095556f1bf6816057cd3b753711b673cfe1c6ac814c8ac06f"
+    }
+  ],
+  "focusedTests": 38,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "doctorOk": true,
+  "k400Passed": 367,
+  "k400Untested": 33,
+  "k400Verdict": "INCOMPLETE",
+  "reportRoot": "dd589d2e0911b7c47ebdf959b55083c651efbba1c3bc09a2602bd402f024cf4f",
+  "commands": [
+    {
+      "name": "build-gpu-ryu-opencl",
+      "args": [
+        "scripts/build-gpu-ryu-opencl.mjs"
+      ],
+      "execution": "CAPTURED_PREVIOUS_PHASE_NOT_RERUN",
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/build-gpu-ryu-opencl.log",
+      "sha256": "07092772e0a5f79a7f51f72bc8f550bdb36eab56ea4b7a29c16d30011ad40c05"
+    },
+    {
+      "name": "build-gpu-text-runtime",
+      "args": [
+        "scripts/build-gpu-text-runtime.mjs"
+      ],
+      "execution": "CAPTURED_PREVIOUS_PHASE_NOT_RERUN",
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/build-gpu-text-runtime.log",
+      "sha256": "12f402405811e807852ebb049f5c12b62afed77f5d17cde46bc1d652e34d2cb3"
+    },
+    {
+      "name": "build-scientific-reference",
+      "args": [
+        "scripts/build-scientific-reference.mjs"
+      ],
+      "execution": "CAPTURED_PREVIOUS_PHASE_NOT_RERUN",
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/build-scientific-reference.log",
+      "sha256": "6e29414e23e7de39a2bb77a3765f0819c2820e70d9337a31f6c9cd1454b3c2c4"
+    },
+    {
+      "name": "build-selfhost-number-compiler",
+      "args": [
+        "scripts/build-selfhost-number-compiler.mjs"
+      ],
+      "execution": "CAPTURED_PREVIOUS_PHASE_NOT_RERUN",
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/build-selfhost-number-compiler.log",
+      "sha256": "7073e523c71199cd834b1e352ea49efedcf6140cb9dd5a4b0800cad8bb66151b"
+    },
+    {
+      "name": "focused-tests",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "tests/portable-gpu-text-target.test.mjs",
+        "tests/selfhost-scientific-numbers.test.mjs",
+        "tests/k400-gpu-ui-admission.test.mjs",
+        "tests/k400-gpu-mobile-admission.test.mjs"
+      ],
+      "execution": "CAPTURED_PREVIOUS_PHASE_NOT_RERUN",
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/focused-tests.log",
+      "sha256": "b5bf8535ee6750ccb396a572fd490fbf27c9f03b74c7dd79394d273650b49aed"
+    },
+    {
+      "name": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "started": "2026-10-13T22:39:29.767Z",
+      "status": 0,
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/doctor.log",
+      "sha256": "53f3aa0b1f057161595ffa70603c3fbbc40c488b380fe07b19ae771248ea19e4"
+    },
+    {
+      "name": "k400-evidence",
+      "args": [
+        "scripts/build-k400-evidence.mjs"
+      ],
+      "started": "2026-10-13T22:39:30.167Z",
+      "status": 0,
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/k400-evidence.log",
+      "sha256": "a365e3f1cce7a363fea703fee296e5b4f9e27035e8e430d7d8e07d3b1b53aff2"
+    },
+    {
+      "name": "k400-report",
+      "args": [
+        "scripts/universal-program-stress-report.mjs",
+        "examples/universal-stress/k400-current-evidence.json",
+        "output/universal-stress-gpu-text-source"
+      ],
+      "started": "2026-10-13T22:42:48.092Z",
+      "status": 0,
+      "log": "docs/evidence/gpu-text-runtime/source-delivery/k400-report.log",
+      "sha256": "f10c649965f40e5c05d8a4ab6b508e5d570e101b795f440786186ab25b442c95"
+    }
+  ],
+  "scope": "Four generators reproduce the frozen outputs byte for byte in the materialized Git source tree; actual GPU/native C and native compiler tests rerun locally. If resumedAfterDoctorFieldRepair is true, successful prior generator/test logs are retained explicitly and those phases are not rerun. Existing captured UI/mobile receipts and the full matrix independently reverify in the relocated checkout. External pinned Python, OpenCL, native binaries and browser paths remain prerequisites; fresh Android acquisition and Android visual pixels are not claimed."
+}

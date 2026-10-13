@@ -1,6 +1,6 @@
 # RCL research maturity correction — 2026-10-13
 
-RCL is **RESEARCH_PREVIEW**. The current registered K400 evidence reports
+RCL is **RESEARCH_PREVIEW**. At the 2026-10-13 correction, registered K400 evidence reported
 **24/400 PASS (6%), 376 UNTESTED, INCOMPLETE, maturity U3**.
 
 The earlier promotion to a 2.0 release used bounded session/compiler improvements

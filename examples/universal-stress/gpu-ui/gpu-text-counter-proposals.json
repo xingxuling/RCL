@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "451d53615fa545277eb223ba425dd36d35412a91f63d2ea94ce437f7d8f568ed",
+  "acquisitionBatch": "examples/universal-stress/gpu-ui/independent-batch.json",
+  "trials": [
+    {
+      "id": "increment-step",
+      "context": "/root/k400_gpu_ui_fresh_a",
+      "proposal": {
+        "id": "gpu-text-counter-0",
+        "file": "candidate.rcl",
+        "old": "count - step",
+        "new": "count + step"
+      }
+    },
+    {
+      "id": "derived-label",
+      "context": "/root/k400_gpu_ui_fresh_b",
+      "proposal": {
+        "id": "gpu-text-counter-1",
+        "file": "candidate.rcl",
+        "old": "derived count_label : Text = \"计数：\" + step",
+        "new": "derived count_label : Text = \"计数：\" + count"
+      }
+    },
+    {
+      "id": "reset-initial",
+      "context": "/root/k400_gpu_ui_fresh_c",
+      "proposal": {
+        "id": "gpu-text-counter-2",
+        "file": "candidate.rcl",
+        "old": "on activate { set count <- step }",
+        "new": "on activate { set count <- initial }"
+      }
+    }
+  ]
+}

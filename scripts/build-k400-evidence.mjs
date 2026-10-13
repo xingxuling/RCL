@@ -63,6 +63,8 @@ import { verifyFamilyProfile as verifyCompilerProfile } from './k400-compiler-en
 import { MOBILE_PROFILE, MOBILE_DIRECTORY } from './k400-mobile-definitions.mjs';
 import { verifyUiProfile as verifyMobileProfile } from './k400-mobile-engine.mjs';
 import { verifySelfhostProfile } from './k400-selfhost-column-admission.mjs';
+import { verifyUiProfile as verifyGpuUiProfile } from './k400-gpu-ui-engine.mjs';
+import { verifyUiProfile as verifyGpuMobileProfile } from './k400-gpu-mobile-engine.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -1254,6 +1256,14 @@ if (selfhostAdmission.admitted) {
     evidence.claims.push(claim);
   }
   evidence.sourceReceipts.push('examples/universal-stress/selfhost-columns/general-compiler-columns-runtime.json');
+}
+for(const [directory,verifyProfile] of [['gpu-ui',verifyGpuUiProfile],['gpu-mobile',verifyGpuMobileProfile]]){
+  const admission=await verifyProfile();if(!admission.admitted)continue;
+  for(const claim of admission.claims){
+    if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_GPU_TEXT_COORDINATE_DUPLICATED:'+claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/'+directory+'/gpu-text-counter-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

@@ -1,0 +1,3 @@
+import {MOBILE_PROFILE as BASE} from './k400-mobile-definitions.mjs';
+export const MOBILE_DIRECTORY='examples/universal-stress/gpu-mobile';
+export const MOBILE_PROFILE={...BASE,id:'gpu-text-counter',file:'scripts/k400-gpu-mobile-definitions.mjs',environments:['gpu'],scope:'Actual Android API35 x86_64 emulator native Views and real touch on dedicated serial emulator-5556, with the separate AMD FP64 OpenCL RBC Text interpreter owning event state, predicates, warrants, transactions, dynamic text and derived render values. Connected native client and cooperative authenticated loopback transport; no CPU semantic fallback, WebView, physical-device/offline/durable-backend/full-mobile-platform/public-hosting claim.'};
