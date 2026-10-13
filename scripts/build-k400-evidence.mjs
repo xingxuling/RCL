@@ -58,6 +58,8 @@ import { AI_PROFILES, AI_DIRECTORY } from './k400-ai-definitions.mjs';
 import { verifyAiProfile } from './k400-ai-engine.mjs';
 import { UI_PROFILE, UI_DIRECTORY } from './k400-ui-definitions.mjs';
 import { verifyUiAdmission } from './k400-ui-admission.mjs';
+import { COMPILER_PROFILES, COMPILER_DIRECTORY } from './k400-compiler-definitions.mjs';
+import { verifyFamilyProfile as verifyCompilerProfile } from './k400-compiler-engine.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -1212,6 +1214,15 @@ if (uiAdmission.admitted) {
     ])];
   }
   evidence.sourceReceipts.push(UI_DIRECTORY + '/' + UI_PROFILE.id + '-runtime.json');
+}
+for (const definition of COMPILER_PROFILES) {
+  const admission = await verifyCompilerProfile(definition);
+  if (!admission.admitted) continue;
+  for (const claim of admission.claims) {
+    if (evidence.claims.some(item => item.id === claim.id)) throw new Error('RCL_K400_COMPILER_COORDINATE_DUPLICATED:' + claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push(COMPILER_DIRECTORY + '/' + definition.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

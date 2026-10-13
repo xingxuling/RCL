@@ -1,0 +1,73 @@
+{
+  "format": "rcl.k400-compiler-pipeline-contract.v1",
+  "id": "replicated-counter",
+  "scope": "RCL-owned bounded three-replica grow-counter join with safe-integer components, stale/reordered/duplicate delivery, partitions/healing, invalid sender rejection and source-owned monotone commit; actual HTTP packet replay with isolated target instances; no cryptographic member identity, cross-host deployment or arbitrary distributed-system claim; actual source-to-RBC-to-native-VM compiler workflow with observed process exits, compiler instruction metrics and source/artifact/result binding; local Windows pipeline, no external deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/distributed/replicated-counter.rcl",
+  "sourceHash": "207bfa984d459a5f3ee88ab02559b5fdf02f1f9b29e7c5644932643830b3b1d6",
+  "casesPath": "examples/universal-stress/compiler-pipeline/replicated-counter-cases.json",
+  "casesHash": "a90f98fe0b39f9a889449b285d2b4e1055c873d0ef188721f8833650021bc423",
+  "definitionFile": "scripts/k400-compiler-definitions.mjs",
+  "definitionHash": "f344752b9f3c5f38a0f36feac8b1825fc6ab00e1c389bfc71d87630095084a48",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "compiler-runtime"
+  ],
+  "families": [
+    "distributed"
+  ],
+  "baseline": {
+    "a": 3,
+    "a_later": 5,
+    "b": 4,
+    "c": 7,
+    "repeats": 2,
+    "partition": 2,
+    "reverse": false,
+    "heal": true,
+    "allowed": true,
+    "poison": true
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K330"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read only named frozen candidate batch; no other filesystem, memory, network, execution, writes or delegation"
+  },
+  "runtimeControls": [
+    "actual compiler/VM process exits, compiler instruction and byte metrics",
+    "typed roots and source-owned transitions, wrong-root rejection; distributed profile additionally requires three real HTTP nodes"
+  ],
+  "trials": [
+    {
+      "id": "join-maximum",
+      "index": 0,
+      "intent": "Join grow-counter snapshots by the maximum of each component, so duplicates and stale delivery never decrease a component and do not count increments twice.",
+      "mutatedSourceHash": "29fa4cc4af2259038f1d5446639196a2f9c4fa2e68d0ddbc578e0197be160131"
+    },
+    {
+      "id": "replica-membership",
+      "index": 1,
+      "intent": "Only replica identifiers zero, one and two belong to this group; reject every other sender before merging its counter components.",
+      "mutatedSourceHash": "5c39d7f7aed3af26d7ffcd3453a3c4b89d91e47304746e66d402bfa3312291d8"
+    },
+    {
+      "id": "conditional-merge-authority",
+      "index": 2,
+      "intent": "The replicator may commit valid merges when the explicit allowed input is true, and must refuse them when it is false. Preserve the replica.merge capability and current-input conditional authority.",
+      "mutatedSourceHash": "a5e4495fa87c3465c1ceff2ba3f2c24b49e5644a4adfa3b8a238f051ee31b86c"
+    }
+  ],
+  "contractRoot": "07fcf9c02980abea72c37d6d36fc5b6153ebe967447fbadfff2ab5b6abb5ef83"
+}

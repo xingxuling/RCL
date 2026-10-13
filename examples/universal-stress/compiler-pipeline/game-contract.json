@@ -1,0 +1,71 @@
+{
+  "format": "rcl.k400-compiler-pipeline-contract.v1",
+  "id": "game",
+  "scope": "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; actual source-to-RBC-to-native-VM compiler workflow with observed process exits, compiler instruction metrics and source/artifact/result binding; local Windows pipeline, no external deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/game.rcl",
+  "sourceHash": "96a520f1c85d3e3fd4b6e5c6cd24fad40f01ebbf91a88a5ae50bb11e04a4d26d",
+  "casesPath": "examples/universal-stress/compiler-pipeline/game-cases.json",
+  "casesHash": "de92ebae3801abdc44b538fcb52831bfde24fbbc61159f16c529fdc60e351471",
+  "definitionFile": "scripts/k400-compiler-definitions.mjs",
+  "definitionHash": "f344752b9f3c5f38a0f36feac8b1825fc6ab00e1c389bfc71d87630095084a48",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environments": [
+    "compiler-runtime"
+  ],
+  "families": [
+    "game"
+  ],
+  "baseline": {
+    "frames": 12,
+    "move": 1,
+    "speed": 2,
+    "jump_frame": 2,
+    "gravity": 1,
+    "star": 8,
+    "enemy": 18,
+    "width": 20
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K328"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read only named frozen candidate batch; no other filesystem, memory, network, execution, writes or delegation"
+  },
+  "runtimeControls": [
+    "actual compiler/VM process exits, compiler instruction and byte metrics",
+    "typed roots and source-owned transitions, wrong-root rejection; distributed profile additionally requires three real HTTP nodes"
+  ],
+  "trials": [
+    {
+      "id": "movement",
+      "index": 0,
+      "intent": "Advance horizontal position by direction multiplied by speed and clamp to the world bounds; preserve zero and negative directions.",
+      "mutatedSourceHash": "80f98298483630869a115356f8d0049b3b1b00ecf17c2ca6bfcdf1ec0ec3449b"
+    },
+    {
+      "id": "landing",
+      "index": 1,
+      "intent": "With downward-positive coordinates, landing occurs when proposed y reaches or crosses ground zero; then reset vertical position and velocity. Preserve airborne motion.",
+      "mutatedSourceHash": "36bec945f0530e4931c73c6bc8a7f06e5939db4eabffecc9e95dd7e22da61dee"
+    },
+    {
+      "id": "pickup-once",
+      "index": 2,
+      "intent": "Collect the star at most once after reaching its threshold, retaining a score between zero and one and terminal enemy-stop behavior.",
+      "mutatedSourceHash": "e63241c6388e3234c8c9476c4359110e87cf973ca0bce73374afc58a02a05844"
+    }
+  ],
+  "contractRoot": "56ac6e9486af3ad4baa3ec41840d69d0c81ff778335cc535e2b8806a86ee4d8a"
+}

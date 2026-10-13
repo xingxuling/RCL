@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-compiler-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "bd3b0a0d7a8e570f26986ecac200b61326a7405b859ce2fb18c7558158f10ff1",
+  "acquisitionBatch": "examples/universal-stress/compiler-pipeline/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_compiler_independent_a",
+      "proposal": {
+        "id": "media-0",
+        "file": "candidate.rcl",
+        "old": "choose(value < 255, 255, value)",
+        "new": "choose(value > 255, 255, value)"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_compiler_independent_b",
+      "proposal": {
+        "id": "media-1",
+        "file": "candidate.rcl",
+        "old": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_compiler_independent_c",
+      "proposal": {
+        "id": "media-2",
+        "file": "candidate.rcl",
+        "old": "count - 2",
+        "new": "count - 1"
+      }
+    }
+  ]
+}

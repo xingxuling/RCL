@@ -73,6 +73,7 @@ export { createPortableRealtimeTarget } from './portable-realtime-target.mjs';
 export { createPortableGameTarget } from './portable-game-target.mjs';
 export { createPortableScientificTarget } from './portable-scientific-target.mjs';
 export { createPortableAiTarget } from './portable-ai-target.mjs';
+export { createPortableCompilerTarget } from './portable-compiler-target.mjs';
 export { compileNativeUiForExecution, lowerNativeUiEvent, projectNativeUiResult } from './ui/native-event-lowering.mjs';
 export { createNativeUiEventRuntime } from './ui/native-event-runtime.mjs';
 export { createNativeUiWebBridge, emitNativeUiBridgeHtml } from './ui/native-web-bridge.mjs';

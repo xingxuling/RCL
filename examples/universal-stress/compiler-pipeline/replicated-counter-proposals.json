@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-compiler-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "07fcf9c02980abea72c37d6d36fc5b6153ebe967447fbadfff2ab5b6abb5ef83",
+  "acquisitionBatch": "examples/universal-stress/compiler-pipeline/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_compiler_independent_a",
+      "proposal": {
+        "id": "replicated-counter-0",
+        "file": "candidate.rcl",
+        "old": "choose(left < right, left, right)",
+        "new": "choose(left > right, left, right)"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_compiler_independent_b",
+      "proposal": {
+        "id": "replicated-counter-1",
+        "file": "candidate.rcl",
+        "old": "reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 99 and sender % 1 == 0",
+        "new": "reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 2 and sender % 1 == 0"
+      }
+    },
+    {
+      "id": "conditional-merge-authority",
+      "context": "/root/k400_compiler_independent_c",
+      "proposal": {
+        "id": "replicated-counter-2",
+        "file": "candidate.rcl",
+        "old": "warrant replica.merge on replicas while not input.allowed",
+        "new": "warrant replica.merge on replicas while input.allowed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+import {NEW_FAMILIES} from './k400-new-family-definitions.mjs';
+import {CRDT_PROFILE} from './k400-crdt-definitions.mjs';
+export const COMPILER_DIRECTORY='examples/universal-stress/compiler-pipeline';
+export const COMPILER_PROFILES=[...NEW_FAMILIES.filter(p=>['game','media'].includes(p.id)),{...CRDT_PROFILE,mutations:[...CRDT_PROFILE.mutations.slice(0,2),{id:'conditional-merge-authority',good:'warrant replica.merge on replicas while input.allowed',bad:'warrant replica.merge on replicas while not input.allowed',intent:'The replicator may commit valid merges when the explicit allowed input is true, and must refuse them when it is false. Preserve the replica.merge capability and current-input conditional authority.'}]}]
+  .map(p=>({...p,file:'scripts/k400-compiler-definitions.mjs',environments:['compiler-runtime'],scope:p.scope+'; actual source-to-RBC-to-native-VM compiler workflow with observed process exits, compiler instruction metrics and source/artifact/result binding; local Windows pipeline, no external deployment or whole-family claim'}));

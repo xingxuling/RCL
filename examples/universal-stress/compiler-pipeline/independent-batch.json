@@ -1,0 +1,87 @@
+{
+  "format": "rcl.k400-independent-compiler-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "batches": [
+    {
+      "index": 0,
+      "context": "/root/k400_compiler_independent_a",
+      "input": "output/k400-compiler-independent/batch-0.json",
+      "rawResponse": "[\n  {\n    \"id\": \"media-0\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(value < 255, 255, value)\",\n    \"new\": \"choose(value > 255, 255, value)\"\n  },\n  {\n    \"id\": \"game-0\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"x(state) + input.move + input.speed\",\n    \"new\": \"x(state) + input.move * input.speed\"\n  },\n  {\n    \"id\": \"replicated-counter-0\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(left < right, left, right)\",\n    \"new\": \"choose(left > right, left, right)\"\n  }\n]",
+      "returnedProposals": [
+        {
+          "id": "media-0",
+          "file": "candidate.rcl",
+          "old": "choose(value < 255, 255, value)",
+          "new": "choose(value > 255, 255, value)"
+        },
+        {
+          "id": "game-0",
+          "file": "candidate.rcl",
+          "old": "x(state) + input.move + input.speed",
+          "new": "x(state) + input.move * input.speed"
+        },
+        {
+          "id": "replicated-counter-0",
+          "file": "candidate.rcl",
+          "old": "choose(left < right, left, right)",
+          "new": "choose(left > right, left, right)"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "context": "/root/k400_compiler_independent_b",
+      "input": "output/k400-compiler-independent/batch-1.json",
+      "rawResponse": "[\n  {\n    \"id\": \"media-1\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)\",\n    \"new\": \"cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)\"\n  },\n  {\n    \"id\": \"game-1\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0\",\n    \"new\": \"reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0\"\n  },\n  {\n    \"id\": \"replicated-counter-1\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 99 and sender % 1 == 0\",\n    \"new\": \"reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 2 and sender % 1 == 0\"\n  }\n]",
+      "returnedProposals": [
+        {
+          "id": "media-1",
+          "file": "candidate.rcl",
+          "old": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+          "new": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+        },
+        {
+          "id": "game-1",
+          "file": "candidate.rcl",
+          "old": "reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0",
+          "new": "reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0"
+        },
+        {
+          "id": "replicated-counter-1",
+          "file": "candidate.rcl",
+          "old": "reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 99 and sender % 1 == 0",
+          "new": "reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender <= 2 and sender % 1 == 0"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "context": "/root/k400_compiler_independent_c",
+      "input": "output/k400-compiler-independent/batch-2.json",
+      "rawResponse": "[\n  {\n    \"id\": \"media-2\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"count - 2\",\n    \"new\": \"count - 1\"\n  },\n  {\n    \"id\": \"game-2\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"collected(state) >= 0\",\n    \"new\": \"collected(state) == 0\"\n  },\n  {\n    \"id\": \"replicated-counter-2\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"warrant replica.merge on replicas while not input.allowed\",\n    \"new\": \"warrant replica.merge on replicas while input.allowed\"\n  }\n]",
+      "returnedProposals": [
+        {
+          "id": "media-2",
+          "file": "candidate.rcl",
+          "old": "count - 2",
+          "new": "count - 1"
+        },
+        {
+          "id": "game-2",
+          "file": "candidate.rcl",
+          "old": "collected(state) >= 0",
+          "new": "collected(state) == 0"
+        },
+        {
+          "id": "replicated-counter-2",
+          "file": "candidate.rcl",
+          "old": "warrant replica.merge on replicas while not input.allowed",
+          "new": "warrant replica.merge on replicas while input.allowed"
+        }
+      ]
+    }
+  ]
+}

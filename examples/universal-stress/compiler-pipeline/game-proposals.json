@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-compiler-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "56ac6e9486af3ad4baa3ec41840d69d0c81ff778335cc535e2b8806a86ee4d8a",
+  "acquisitionBatch": "examples/universal-stress/compiler-pipeline/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_compiler_independent_a",
+      "proposal": {
+        "id": "game-0",
+        "file": "candidate.rcl",
+        "old": "x(state) + input.move + input.speed",
+        "new": "x(state) + input.move * input.speed"
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_compiler_independent_b",
+      "proposal": {
+        "id": "game-1",
+        "file": "candidate.rcl",
+        "old": "reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0",
+        "new": "reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0"
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_compiler_independent_c",
+      "proposal": {
+        "id": "game-2",
+        "file": "candidate.rcl",
+        "old": "collected(state) >= 0",
+        "new": "collected(state) == 0"
+      }
+    }
+  ]
+}

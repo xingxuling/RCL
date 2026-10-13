@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 357/400 PASS (89.25%) · 43 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 360/400 PASS (90%) · 40 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,16 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 compiler workflow continuation
+
+K328/K330/K335 close with actual compiler-RBC and native-VM process ledgers,
+reaching **360 PASS / 40 UNTESTED**, U3, INCOMPLETE. Sixty rounds, thirty sealed
+inputs, nine fresh unchanged proposals and ten additional noncanonical member
+cases pass. Three real HTTP nodes bind packet/state results to observed native
+compilation and execution. Thirty-nine focused checks pass; Actions are not
+requested. The full K400 goal remains active and version promotion is frozen.
+See `docs/K400_COMPILER_PIPELINE_2026-10-13.md`.
 
 ## 2026-10-13 target-backed Native UI continuation
 
