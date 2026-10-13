@@ -6,9 +6,9 @@ import {validateUiInputs,verifyUiEnvironment,verifyUiProfile} from '../scripts/k
 import {verifyMobileFlow} from '../scripts/k400-mobile-traces.mjs';
 
 const inputs=validateUiInputs();
-const receipt=()=>JSON.parse(fs.readFileSync('examples/universal-stress/mobile-native/native-counter-windows-runtime.json','utf8'));
+const receipt=()=>JSON.parse(fs.readFileSync('examples/universal-stress/mobile-native/native-counter-server-runtime.json','utf8'));
 
-for(const environment of ['windows','wasm-vm'])test('twenty real Android native-touch flows preserve '+environment+' RCL semantics and independent repairs',async()=>{
+for(const environment of ['server'])test('twenty real Android native-touch flows preserve '+environment+' RCL semantics and independent repairs',async()=>{
   const report=JSON.parse(fs.readFileSync('examples/universal-stress/mobile-native/native-counter-'+environment+'-runtime.json','utf8'));
   await verifyUiEnvironment(report,inputs);
 });

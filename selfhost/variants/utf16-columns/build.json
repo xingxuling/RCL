@@ -1,0 +1,19 @@
+{
+  "format": "rcl.selfhost-column-compiler.v1",
+  "status": "PASS_NATIVE_FIXED_POINT_CANDIDATE",
+  "donorSourceHash": "07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "artifactHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "bytes": 297957,
+  "patch": {
+    "old": "position_after(source, index + 1, end, line, column + 1)))",
+    "replacement": "position_after(source, index + 1, end, line, column + choose(length(utf8_bytes(char_at(source, index))) == 4, 2, 1))))"
+  },
+  "executedInstructions": 101897504,
+  "generations": [
+    "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+    "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+    "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48"
+  ],
+  "scope": "Separate RCL compiler variant with UTF-16 source-column accounting for non-BMP string content; existing default compiler and evidence anchors unchanged"
+}

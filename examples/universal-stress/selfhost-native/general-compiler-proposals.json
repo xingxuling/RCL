@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-selfhost-proposals.v1",
+  "contractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "acquisitionBatch": "examples/universal-stress/selfhost-native/independent-batch.json",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "trials": [
+    {
+      "id": "addition-opcode",
+      "context": "/root/k400_selfhost_independent_a",
+      "proposal": {
+        "id": "general-compiler-0",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"+\", 7,",
+        "new": "choose(operator == \"+\", 6,"
+      }
+    },
+    {
+      "id": "less-equal-opcode",
+      "context": "/root/k400_selfhost_independent_b",
+      "proposal": {
+        "id": "general-compiler-1",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"<=\", 12,",
+        "new": "choose(operator == \"<=\", 13,"
+      }
+    },
+    {
+      "id": "greater-equal-opcode",
+      "context": "/root/k400_selfhost_independent_c",
+      "proposal": {
+        "id": "general-compiler-2",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \">=\", 14, 44)",
+        "new": "choose(operator == \">=\", 15, 44)"
+      }
+    }
+  ]
+}

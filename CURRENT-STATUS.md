@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 360/400 PASS (90%) · 40 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 364/400 PASS (91%) · 36 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -20,14 +20,27 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
+## 2026-10-14 native-core self-hosting continuation
+
+K059/K039/K019/K079 add four distinct coordinates, reaching **364 PASS /
+36 UNTESTED**, U3, INCOMPLETE. Four actual environments preserve eighty
+byte-identical complete compiler generations, forty sealed programs and twelve
+unchanged independent repair replays. A separate RCL source-column repair fixes
+non-BMP source-map identity; the original failed contract remains unadmitted.
+Seventeen targeted regression/admission checks pass. The original compiler and
+native anchors are preserved, Actions are not requested, and version advancement
+remains frozen. See `docs/K400_SELFHOST_COLUMNS_2026-10-14.md`.
+
 ## 2026-10-14 native mobile and Sequence runtime candidates
 
-K400 remains **360 PASS / 40 UNTESTED**, U3, INCOMPLETE. The Android native
-counter now has actual Views, touch and activity/process recovery. Its Windows
-and WASI backends each pass 20 complete flows, ten frozen inputs and three independent
-repairs; the other seventeen backend contexts are still being acquired. Twenty-one
-targeted bridge/admission checks pass. The full frozen mobile index remains
-unadmitted until every selected environment passes.
+The Android native counter has actual Views, touch and activity/process
+recovery. The current server backend passes 20 complete flows, ten frozen
+inputs and three independent repairs; eighteen backend contexts remain.
+An actual HTTP startup race is fixed by atomic readiness publication in
+separate adapters. Previous mobile receipts remain archived with zero current
+credit, and all nineteen backends are reacquired. Twenty focused
+bridge/admission checks pass against the current server receipt. The frozen
+mobile index grants no K400 credit until every selected environment passes.
 
 A separate persistent Sequence concatenation runtime preserves twenty
 byte-identical full general-compiler self-compilation generations. Median/P95

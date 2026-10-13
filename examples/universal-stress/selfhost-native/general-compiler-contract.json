@@ -1,0 +1,104 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/selfhost-native/general-compiler.rcl",
+  "sourceHash": "07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452",
+  "sourceRoot": "ab909e1977b2acf4906a08f33e74ac7776fe6e648a72f6fe2ecfcb61193b8ce7",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "definitionFile": "scripts/k400-selfhost-definitions.mjs",
+  "definitionHash": "b5fb070222150959ab2a71027bad0c686bfa77b3a539fdedfb63de5d1c5a6705",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "windows",
+      "vm": {
+        "path": "native/sequence-runtime/portable/windows/rclvm.exe",
+        "sha256": "511c48eed305925af81217a65f1518f9dded06be83c2f7e18d1bdb3bd7fade47",
+        "bytes": 333312
+      },
+      "compiler": {
+        "path": "native/sequence-runtime/portable/windows/rclc.exe",
+        "sha256": "6db115ba1aede21e2643aeadb645f78c216b1f6a0b40b8fc16cda8027e8c7690",
+        "bytes": 337408
+      }
+    },
+    {
+      "environment": "linux",
+      "vm": {
+        "path": "native/sequence-runtime/portable/linux/rclvm",
+        "sha256": "38a5591e0574b4987caa791136194ebea4bcb3451427ad970eeec1fb913d6a07",
+        "bytes": 1817632
+      },
+      "compiler": {
+        "path": "native/sequence-runtime/portable/linux/rclc",
+        "sha256": "b24fd9928477ab6a3ed579bd9cfca2db353d746476060bff7cd76d8a165f7033",
+        "bytes": 1841776
+      }
+    },
+    {
+      "environment": "wasm-vm",
+      "vm": {
+        "path": "native/sequence-runtime/portable/wasm-vm/rclvm.wasm",
+        "sha256": "fd3ac568b2353e0e63c1551191bf8b57ac02fa0ca865696aee424ce090d80edd",
+        "bytes": 1428311
+      },
+      "compiler": {
+        "path": "native/sequence-runtime/portable/wasm-vm/rclc.wasm",
+        "sha256": "f254b8d395b913350e62baac5c10deaeec98ff079e892de5da31ad71fa3e1aa8",
+        "bytes": 1446277
+      }
+    }
+  ],
+  "environments": [
+    "windows",
+    "linux",
+    "wasm-vm",
+    "browser"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K059",
+    "K039",
+    "K019",
+    "K079"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "5f7a27052daaaa37970e4df03f7b1258a2f37ee4de5082ec716a87962048c45e",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "edb64f066dc3a0f745b807554e9b00bc6ddfa26ef4ea46f7dfc105283214c105",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "5bb1c3afc5c3afb86fa061c843e35a944097ccebfa0783ec16417a92fb25765d",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Unchanged complete RCL native-core general compiler, twenty actual C0-to-C20 byte-identical self-compilation generations in each selected environment, ten sealed source programs and fresh independent compiler repairs; separate generic persistent Sequence runtime, no whole-runtime self-hosting or whole-language release claim",
+  "contractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4"
+}

@@ -1,0 +1,54 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {createHash,randomUUID} from 'node:crypto';
+import {performance} from 'node:perf_hooks';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {wslPath} from '../src/portable-native-vm.mjs';
+import {createArtifactBrowserTarget} from '../src/portable-artifact-browser-target.mjs';
+import {verifyNativeSemanticStateRoot} from '../src/semantic-state-root.mjs';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+export async function createSelfhostTarget(environment,contract,directory){
+  assert.ok(contract.environments.includes(environment));
+  const runtime=contract.runtimeArtifacts.find(a=>a.environment===(environment==='browser'?'wasm-vm':environment));assert.ok(runtime);
+  for(const a of [runtime.vm,runtime.compiler])assert.equal(sha(fs.readFileSync(path.join(ROOT,a.path))),a.sha256);
+  const session=randomUUID(),ledger=[],browsers=new Map();
+  const binding={environment,session,runtime,acquisitionRoot:path.resolve(ROOT),referenceCompilationUsed:false,referenceExecutionUsed:false,compilerSemanticsOwner:'RCL_GENERAL_COMPILER_SOURCE',hostEffects:'Owned temporary compiler input/output files only',securitySandboxClaimed:false};
+  if(environment==='linux'){
+    const run=spawnSync('wsl.exe',['-d','RCL-K400-Alpine','--','uname','-s','-r','-m'],{encoding:'utf8',windowsHide:true});assert.equal(run.status,0);assert.match(run.stdout.trim(),/^Linux .* x86_64$/u);binding.identity=run.stdout.trim();binding.distribution='RCL-K400-Alpine';
+    for(const a of [runtime.vm,runtime.compiler]){const verified=spawnSync('wsl.exe',['-d',binding.distribution,'--','sha256sum',wslPath(path.join(ROOT,a.path))],{encoding:'utf8',windowsHide:true});assert.equal(verified.status,0);assert.equal(verified.stdout.slice(0,64),a.sha256);}
+  }
+  if(environment==='wasm-vm')binding.wasi={owner:'Node WASI Preview 1',nodeVersion:process.version,nodePath:process.execPath,nodeHash:sha(fs.readFileSync(process.execPath)),emulatedPidNotPhysical:true};
+  async function browser(compilerBytes){
+    const hash=sha(compilerBytes);let target=browsers.get(hash);
+    if(!target){const slot=path.join(directory,'browser-compiler-'+hash+'.rbc');fs.writeFileSync(slot,compilerBytes);target=await createArtifactBrowserTarget({vmPath:path.join(ROOT,runtime.vm.path),compilerWasmPath:path.join(ROOT,runtime.compiler.path),compilerArtifactPath:slot});browsers.set(hash,target);}
+    return target;
+  }
+  async function call(kind,{compilerFile,sourceFile,outputFile,artifactFile,sourceRoot}){
+    const started=performance.now(),index=ledger.length,nonce=randomUUID(),inputCompiler=kind==='compile'?fs.readFileSync(compilerFile):null;
+    const trace={index,session,nonce,kind,environment,inputCompilerHash:inputCompiler?sha(inputCompiler):null,source:sourceFile?fs.readFileSync(sourceFile,'utf8'):null,sourceHash:sourceFile?sha(fs.readFileSync(sourceFile)):null,artifactHash:artifactFile?sha(fs.readFileSync(artifactFile)):null,sourceRoot:sourceRoot??null};
+    if(kind==='compile'&&fs.existsSync(outputFile)){assert.ok(path.resolve(outputFile).startsWith(path.resolve(directory)+path.sep));fs.unlinkSync(outputFile);}
+    try{
+      if(environment==='browser'){
+        const target=await browser(inputCompiler??fs.readFileSync(path.join(ROOT,contract.compilerPath)));trace.browserBinding=structuredClone(target.binding);
+        if(kind==='compile'){const r=await target.compile(sourceFile,outputFile);trace.browserTrace=r.browserCompileTrace;trace.metrics=r.browserCompileTrace.compilerMetrics;trace.outputHash=sha(r.bytecode);trace.outputBytes=r.bytecode.length;}
+        else{const r=await target.execute(artifactFile,sourceRoot);trace.browserTrace=r.browserTrace;trace.result=r.result;}
+        trace.status=0;trace.exitObserved=true;
+      }else{
+        let command,args;
+        if(environment==='windows'){command=path.join(ROOT,kind==='compile'?runtime.compiler.path:runtime.vm.path);args=kind==='compile'?[compilerFile,sourceFile,outputFile]:[artifactFile];}
+        else if(environment==='linux'){command='wsl.exe';args=['-d',binding.distribution,'--','env','RCL_SEMANTIC_STATE_ROOT_ALGORITHM=rcl.semantic-state-root.v2','RCLC_OUTPUT_STATE=compiler.output',wslPath(path.join(ROOT,kind==='compile'?runtime.compiler.path:runtime.vm.path)),...(kind==='compile'?[compilerFile,sourceFile,outputFile]:[artifactFile]).map(wslPath)];}
+        else{command=process.execPath;args=kind==='compile'?[path.join(ROOT,'scripts/run-sequence-wasi-compiler.mjs'),path.join(ROOT,runtime.compiler.path),compilerFile,sourceFile,outputFile]:[path.join(ROOT,'scripts/run-native-wasi.mjs'),path.join(ROOT,runtime.vm.path),artifactFile];}
+        const run=spawnSync(command,args,{encoding:'utf8',windowsHide:true,timeout:300000,maxBuffer:64*1024*1024,env:{...process.env,RCL_SEMANTIC_STATE_ROOT_ALGORITHM:'rcl.semantic-state-root.v2',RCLC_OUTPUT_STATE:'compiler.output'}});
+        Object.assign(trace,{command,args,pid:run.pid,status:run.status,signal:run.signal,exitObserved:run.status!==null,stdout:run.stdout??'',stderr:run.stderr??''});trace.stdoutHash=sha(trace.stdout);trace.stderrHash=sha(trace.stderr);
+        if(run.error)throw run.error;if(run.status!==0)throw new Error(trace.stdout+'\n'+trace.stderr);
+        if(kind==='compile'){trace.metrics=JSON.parse(trace.stdout);trace.outputHash=sha(fs.readFileSync(outputFile));trace.outputBytes=fs.statSync(outputFile).size;}
+        else trace.result=verifyNativeSemanticStateRoot(JSON.parse(trace.stdout),{requireNativeRoot:true,expectedAlgorithm:'rcl.semantic-state-root.v2'});
+      }
+      if(kind==='execute')assert.equal(trace.result.sourceRoot,sourceRoot);
+      trace.ms=performance.now()-started;ledger.push(trace);return trace;
+    }catch(error){trace.ms=performance.now()-started;trace.error={code:error.code??null,message:error.message};ledger.push(trace);throw Object.assign(error,{traceIndex:index});}
+  }
+  return{binding,ledger:()=>structuredClone(ledger),compile:(compilerFile,sourceFile,outputFile)=>call('compile',{compilerFile,sourceFile,outputFile}),execute:(artifactFile,sourceRoot)=>call('execute',{artifactFile,sourceRoot}),async dispose(){for(const t of browsers.values())await t.dispose();}};
+}

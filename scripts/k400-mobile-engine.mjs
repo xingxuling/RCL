@@ -32,6 +32,7 @@ export function uiBindingFiles(){
   return [...new Set([...old,...reused,'scripts/k400-ui-engine.mjs','scripts/k400-ui-traces.mjs','scripts/k400-ui-definitions.mjs','scripts/k400-ui-flow.mjs','scripts/k400-ui-targets.mjs',
     'src/ui/native-event-lowering.mjs','src/ui/native-event-runtime.mjs','src/ui/native-web-bridge.mjs','src/ui/native-browser-driver.mjs',
     'src/ui/ui-event.mjs','src/ui/ui-compiler.mjs','src/ui/ui-reactive.mjs','src/ui/ui-ir.mjs','src/ui/ui-validator.mjs','src/ui/ui-schema.mjs','src/ui/ui-style.mjs','src/ui/ui-layout.mjs','src/ui/ui-lifecycle.mjs','src/ui/ui-resource-accessibility.mjs','src/ui/ui-device-adaptation.mjs','src/ui/web-ui-backend.mjs','src/parser.mjs','src/lexer.mjs','src/ui/android-ui-backend.mjs','src/android-application-compiler.mjs',...mobilePolicyFiles,'scripts/k400-mobile-definitions.mjs',
+    'src/ready-http-target.mjs','src/ready-http-worker.mjs','src/ready-replica-target.mjs',
     'scripts/k400-family-targets.mjs','scripts/k400-crdt-targets.mjs','scripts/k400-browser-traces.mjs','scripts/k400-rncs-traces.mjs','scripts/k400-phase-ledger.mjs',
     'src/execution-context-targets.mjs','src/job-context-targets.mjs','src/phase-context-targets.mjs','src/portable-browser-target.mjs','src/portable-rncs-target.mjs',
     'scripts/k400-realtime-traces.mjs','scripts/k400-game-traces.mjs','scripts/k400-scientific-traces.mjs','scripts/k400-ai-traces.mjs',UI_PROFILE.sourcePath])];

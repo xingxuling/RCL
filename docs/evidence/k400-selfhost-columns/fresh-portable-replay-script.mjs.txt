@@ -1,0 +1,51 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {performance} from 'node:perf_hooks';
+import {wslPath} from '../src/portable-native-vm.mjs';
+import {verifyNativeSemanticStateRoot} from '../src/semantic-state-root.mjs';
+import {evidenceRoot} from '../src/universal-program-stress.mjs';
+const root=path.resolve('.'),sha=b=>createHash('sha256').update(b).digest('hex');
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const contract=read('examples/universal-stress/selfhost-columns/general-compiler-columns-contract.json');
+const build=read('output/sequence-portable/build.json');
+const admitted=read('examples/universal-stress/selfhost-columns/general-compiler-columns-windows-runtime.json');
+const cases=read(contract.casesPath),source=path.join(root,contract.sourcePath),seed=path.join(root,contract.compilerPath);
+assert.equal(sha(fs.readFileSync(source)),contract.sourceHash);assert.equal(sha(fs.readFileSync(seed)),contract.compilerHash);
+const reports=[];
+for(const artifact of build.artifacts){
+ const environment=artifact.environment==='wasi'?'wasm-vm':'linux',directory=path.join(root,'output/rebuilt-selfhost-'+environment);
+ fs.mkdirSync(directory,{recursive:true});
+ const compiler=path.join(root,artifact.compiler.path),vm=path.join(root,artifact.vm.path),ledger=[],generations=[],inputResults=[];
+ const compilerSource=path.join(directory,'compiler.rcl');fs.copyFileSync(source,compilerSource);
+ for(const a of [artifact.vm,artifact.compiler])assert.equal(sha(fs.readFileSync(a.path)),a.sha256);
+ function invoke(kind,args){
+  const started=performance.now(),command=environment==='linux'?'wsl.exe':process.execPath;
+  const argv=environment==='linux'?['-d','RCL-K400-Alpine','--','env','RCL_SEMANTIC_STATE_ROOT_ALGORITHM=rcl.semantic-state-root.v2','RCLC_OUTPUT_STATE=compiler.output',wslPath(kind==='compile'?compiler:vm),...args.map(wslPath)]:[path.join(root,kind==='compile'?'scripts/run-sequence-wasi-compiler.mjs':'scripts/run-native-wasi.mjs'),kind==='compile'?compiler:vm,...args];
+  const run=spawnSync(command,argv,{encoding:'utf8',windowsHide:true,timeout:300000,maxBuffer:64*1024*1024,env:{...process.env,RCL_SEMANTIC_STATE_ROOT_ALGORITHM:'rcl.semantic-state-root.v2',RCLC_OUTPUT_STATE:'compiler.output'}});
+  assert.equal(run.error,undefined);assert.equal(run.status,0,run.stderr);assert.equal(run.signal,null);
+  const t={kind,command,args:argv,pid:run.pid,status:run.status,stdoutHash:sha(run.stdout),stderrHash:sha(run.stderr),ms:performance.now()-started,metrics:JSON.parse(run.stdout)};
+  ledger.push(t);return t;
+ }
+ let current=seed;
+ for(let generation=1;generation<=20;generation++){
+  const output=path.join(directory,'c'+generation+'.rbc'),trace=invoke('compile',[current,compilerSource,output]);
+  assert.equal(sha(fs.readFileSync(output)),contract.compilerHash);assert.equal(trace.metrics.executedInstructions,contract.expectedFixedpointInstructions);
+  generations.push({generation,outputHash:sha(fs.readFileSync(output)),trace:ledger.length-1});current=output;
+  if(generation%5===0)console.log(JSON.stringify({environment,generation}));
+ }
+ for(const c of cases){
+  const input=path.join(directory,'input-'+c.index+'.rcl'),output=input+'.rbc';fs.writeFileSync(input,c.source);
+  invoke('compile',[current,input,output]);assert.equal(sha(fs.readFileSync(output)),c.artifactHash);
+  const t=invoke('execute',[output]),result=verifyNativeSemanticStateRoot(t.metrics,{requireNativeRoot:true,expectedAlgorithm:'rcl.semantic-state-root.v2'});
+  const expected=admitted.ledger[admitted.inputResults[c.index].executeTrace].result;
+  for(const key of ['state','stateRoot','history','projections'])assert.deepEqual(result[key],expected[key]);assert.equal(result.sourceRoot,c.sourceRoot);
+  inputResults.push({id:c.id,artifactHash:c.artifactHash,stateRoot:result.stateRoot,trace:ledger.length-1});
+ }
+ const report={environment,artifacts:artifact,generations,inputResults,ledger};reports.push(report);
+ fs.writeFileSync(path.join(directory,'replay.json'),JSON.stringify(report,null,2)+'\n');
+}
+const receipt={format:'rcl.selfhost-fresh-source-replay.v1',status:'PASS_SOURCE_REBUILD_AND_FULL_SELFHOST',scope:'Forty complete compiler self-generations and twenty sealed compile/execute programs from Linux/WASI binaries freshly rebuilt in a relocated source-only snapshot; no additional K400 coordinates or replacement of frozen runtime artifacts',contractRoot:contract.contractRoot,buildHash:sha(fs.readFileSync('output/sequence-portable/build.json')),sourceBindings:build.sourceBindings,reports};
+receipt.reportRoot=evidenceRoot(receipt);fs.writeFileSync('output/rebuilt-selfhost-receipt.json',JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify({status:receipt.status,reportRoot:receipt.reportRoot}));

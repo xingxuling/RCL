@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {compileRealityToBytecode} from '../src/bytecode.mjs';
+import {readSelfHostedCompilerSource} from '../src/selfhost-compiler.mjs';
+import {runNativeCompiler} from '../src/native-vm.mjs';
+import {ROOT,edit} from './k400-genomes/shared.mjs';
+const sha=b=>createHash('sha256').update(b).digest('hex'),directory=path.join(ROOT,'selfhost/variants/utf16-columns');fs.mkdirSync(directory,{recursive:true});
+const donor=readSelfHostedCompilerSource();assert.equal(sha(donor),'07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452');
+const old='position_after(source, index + 1, end, line, column + 1)))';
+const replacement='position_after(source, index + 1, end, line, column + choose(length(utf8_bytes(char_at(source, index))) == 4, 2, 1))))';
+const source=edit(donor,old,replacement),sourcePath=path.join(directory,'compiler.rcl'),artifactPath=path.join(directory,'compiler.rbc'),c0=Buffer.from(compileRealityToBytecode(source));fs.writeFileSync(sourcePath,source);fs.writeFileSync(artifactPath,c0);
+const out=path.join(ROOT,'output/column-compiler');fs.mkdirSync(out,{recursive:true});
+const compilerPath=path.join(ROOT,'native/sequence-runtime/portable/windows/rclc.exe'),first=runNativeCompiler(artifactPath,sourcePath,path.join(out,'c1.rbc'),{compilerPath,timeout:300000}),second=runNativeCompiler(path.join(out,'c1.rbc'),sourcePath,path.join(out,'c2.rbc'),{compilerPath,timeout:300000});
+assert.deepEqual(first.bytecode,c0);assert.deepEqual(second.bytecode,c0);
+const report={format:'rcl.selfhost-column-compiler.v1',status:'PASS_NATIVE_FIXED_POINT_CANDIDATE',donorSourceHash:sha(donor),sourceHash:sha(source),artifactHash:sha(c0),bytes:c0.length,patch:{old,replacement},executedInstructions:first.executedInstructions,generations:[sha(c0),sha(first.bytecode),sha(second.bytecode)],scope:'Separate RCL compiler variant with UTF-16 source-column accounting for non-BMP string content; existing default compiler and evidence anchors unchanged'};
+fs.writeFileSync(path.join(directory,'build.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

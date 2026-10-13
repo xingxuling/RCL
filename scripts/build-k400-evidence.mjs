@@ -62,6 +62,7 @@ import { COMPILER_PROFILES, COMPILER_DIRECTORY } from './k400-compiler-definitio
 import { verifyFamilyProfile as verifyCompilerProfile } from './k400-compiler-engine.mjs';
 import { MOBILE_PROFILE, MOBILE_DIRECTORY } from './k400-mobile-definitions.mjs';
 import { verifyUiProfile as verifyMobileProfile } from './k400-mobile-engine.mjs';
+import { verifySelfhostProfile } from './k400-selfhost-column-admission.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -1245,6 +1246,14 @@ if (mobileAdmission.admitted) {
     ])];
   }
   evidence.sourceReceipts.push(MOBILE_DIRECTORY + '/' + MOBILE_PROFILE.id + '-runtime.json');
+}
+const selfhostAdmission = await verifySelfhostProfile();
+if (selfhostAdmission.admitted) {
+  for (const claim of selfhostAdmission.claims) {
+    if (evidence.claims.some(item => item.id === claim.id)) throw new Error('RCL_K400_SELFHOST_COORDINATE_DUPLICATED:' + claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/selfhost-columns/general-compiler-columns-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

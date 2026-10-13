@@ -1,0 +1,34 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {validateSelfhostInputs,verifySelfhostEnvironment} from './k400-selfhost-column-engine.mjs';
+import {evidenceRoot,UNIVERSAL_STRESS_GATES} from '../src/universal-program-stress.mjs';
+import {wslPath} from '../src/portable-native-vm.mjs';
+const prefix='examples/universal-stress/selfhost-columns/general-compiler-columns',indexPath=prefix+'-runtime.json',sha=b=>createHash('sha256').update(b).digest('hex'),read=f=>JSON.parse(fs.readFileSync(path.join(ROOT,f),'utf8'));
+const policyFiles=['scripts/k400-selfhost-column-admission.mjs','scripts/k400-selfhost-column-engine.mjs','scripts/k400-selfhost-targets.mjs','scripts/k400-selfhost-mutant-oracle.mjs'];
+const bindings=()=>policyFiles.map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))}));
+function verifyRuntimeCommands(report){
+  const acquisitionRoot=report.binding.acquisitionRoot;
+  for(const t of report.ledger){
+    if(report.environment==='browser'){if(!t.error){assert.equal(t.browserTrace.executionOwner,t.kind==='compile'?'RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY':'RCL_C_VM_BROWSER_WEBASSEMBLY');assert.equal(t.kind==='compile'?t.browserTrace.compilerHash:t.browserTrace.wasmHash,t.kind==='compile'?report.binding.runtime.compiler.sha256:report.binding.runtime.vm.sha256);}continue;}
+    if(report.environment==='windows')assert.equal(t.args.length,t.kind==='compile'?3:1);
+    if(report.environment==='linux')assert.ok(t.args.includes(wslPath(path.join(acquisitionRoot,t.kind==='compile'?report.binding.runtime.compiler.path:report.binding.runtime.vm.path))));
+    if(report.environment==='wasm-vm'){assert.equal(t.args[0],path.join(acquisitionRoot,t.kind==='compile'?'scripts/run-sequence-wasi-compiler.mjs':'scripts/run-native-wasi.mjs'));assert.equal(t.args[1],path.join(acquisitionRoot,t.kind==='compile'?report.binding.runtime.compiler.path:report.binding.runtime.vm.path));assert.equal(t.args.length,t.kind==='compile'?5:3);}
+  }
+}
+export async function verifySelfhostProfile(supplied){
+  const inputs=validateSelfhostInputs(),{contract}=inputs;if(!supplied&&!fs.existsSync(path.join(ROOT,indexPath)))return{admitted:false,claims:[]};const index=supplied??read(indexPath);
+  assert.equal(index.format,'rcl.k400-selfhost-index.v1');assert.equal(index.contractRoot,contract.contractRoot);assert.equal(index.reportRoot,evidenceRoot({...index,reportRoot:undefined}));assert.deepEqual(index.admissionBindings,bindings());assert.deepEqual(index.eligibleCells,contract.eligibleCells);assert.deepEqual(index.receipts.map(r=>r.environment),contract.environments);
+  for(const r of index.receipts){assert.equal(r.path,prefix+'-'+r.environment+'-runtime.json');assert.equal(r.sha256,sha(fs.readFileSync(path.join(ROOT,r.path))));const report=read(r.path);assert.equal(r.reportRoot,report.reportRoot);await verifySelfhostEnvironment(report,inputs);verifyRuntimeCommands(report);}
+  const refs=[indexPath,prefix+'-contract.json',contract.sourcePath,contract.compilerPath,contract.casesPath,contract.buildPath,prefix+'-proposals.json',inputs.proposals.acquisitionBatch,...index.receipts.map(r=>r.path),...policyFiles];
+  return{admitted:true,reportRoot:index.reportRoot,eligibleCells:contract.eligibleCells,claims:contract.environments.map(environment=>({id:environment+'::self-hosting',environment,programFamily:'self-hosting',coverageMode:'native-semantic',lastVerifiedDate:'2026-10-14',changes:[],knownLimits:[contract.scope],requiredGenes:['rcl-general-compiler','generic-persistent-sequence','utf16-source-column-identity','actual-c0-c20-self-compilation','sealed-program-byte-and-state-oracles','fresh-independent-compiler-repair'],gates:Object.fromEntries(UNIVERSAL_STRESS_GATES.map(g=>[g,{status:'PASS',evidence:refs,note:'Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets.'}]))}))};
+}
+export async function buildSelfhostIndex(){
+  const inputs=validateSelfhostInputs(),{contract}=inputs;assert.ok(contract.environments.every(e=>fs.existsSync(path.join(ROOT,prefix+'-'+e+'-runtime.json'))),'Every frozen environment must finish before admission');
+  const receipts=[];for(const environment of contract.environments){const file=prefix+'-'+environment+'-runtime.json',report=read(file);await verifySelfhostEnvironment(report,inputs);receipts.push({environment,path:file,sha256:sha(fs.readFileSync(path.join(ROOT,file))),reportRoot:report.reportRoot});}
+  const index={format:'rcl.k400-selfhost-index.v1',contractRoot:contract.contractRoot,eligibleCells:contract.eligibleCells,receipts,admissionBindings:bindings()};index.reportRoot=evidenceRoot(index);const result=await verifySelfhostProfile(index);fs.writeFileSync(path.join(ROOT,indexPath),JSON.stringify(index,null,2)+'\n');return result;
+}
+if(process.argv[1]&&pathToFileURL(path.resolve(process.argv[1])).href===import.meta.url){const result=process.argv[2]==='build'?await buildSelfhostIndex():await verifySelfhostProfile();console.log(JSON.stringify({admitted:result.admitted,reportRoot:result.reportRoot,cells:result.claims.length}));}

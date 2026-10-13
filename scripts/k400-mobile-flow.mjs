@@ -3,10 +3,13 @@ import {createHash,randomUUID} from 'node:crypto';
 import assert from 'node:assert/strict';
 import {createNativeUiWebBridge} from '../src/ui/native-web-bridge.mjs';
 import {createUiExecutionTarget} from './k400-ui-targets.mjs';
+import {createReadyHttpTarget} from '../src/ready-http-target.mjs';
+import {createReadyReplicaTarget} from '../src/ready-replica-target.mjs';
 import {UI_EVENTS} from './k400-ui-definitions.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
 export async function runMobileFlow(environment,source,driver,build,{controls=false,screenshotPath=null}={}){
-  const bridge=await createNativeUiWebBridge(source,{factory:()=>createUiExecutionTarget(environment)}),session=randomUUID(),port=new URL(bridge.url).port,commandStart=driver.commands().length,steps=[];
+  const factory=()=>environment==='server'?createReadyHttpTarget():environment==='distributed-runtime'?createReadyReplicaTarget():createUiExecutionTarget(environment);
+  const bridge=await createNativeUiWebBridge(source,{factory}),session=randomUUID(),port=new URL(bridge.url).port,commandStart=driver.commands().length,steps=[];
   const launch=()=>driver.launch({url:bridge.url,token:bridge.token,uiRoot:bridge.runtime.ui.semanticRoot,session});
   try{
     driver.stop();driver.adb(['reverse','tcp:'+port,'tcp:'+port]);launch();const initial=await driver.waitFrame(session,f=>f.kind==='ready'&&f.snapshot?.revision===0),initialHierarchy=driver.hierarchy();

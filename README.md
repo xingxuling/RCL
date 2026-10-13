@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**RESEARCH_PREVIEW · K400 360/400 (90%) · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 364/400 (91%) · INCOMPLETE · U3**
 
 **A programming language that makes permissions, state changes, and evidence part of the program.**
 
@@ -19,9 +19,9 @@ RCL (Reality Compiler Language) is an open-source language for writing programs 
 
 This repository contains the language implementation, an RCL-authored native-core compiler, a native bytecode VM, Web/Android backends, and a verification toolchain. Canonical source: `xingxuling/RCL@main`.
 
-**RCL is a research preview. K400 currently records 360/400 PASS and 40 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
+**RCL is a research preview. K400 currently records 364/400 PASS and 36 UNTESTED; its verdict is INCOMPLETE.** The previous promotion to a 2.0 release overstated whole-language maturity. Build identity: `2.0.0` is retained for existing package/native artifacts and historical receipts; further version advancement is frozen. The verified session/compiler profiles remain useful bounded implementation evidence. See the [maturity policy](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md) and [K400 campaign](docs/K400_COMPLETION_CAMPAIGN_v0.1.md).
 
-The [RCL-owned kernels](docs/K400_NEW_FAMILIES_2026-10-13.md) implement token-expression compilation, RGB transforms and run-length round trips, and fixed-step platform-game rules. All three pass twelve actual execution contexts with frozen inputs and unchanged independent repairs. Their bounded scopes keep the remaining 40 K400 cells open.
+The [RCL-owned kernels](docs/K400_NEW_FAMILIES_2026-10-13.md) implement token-expression compilation, RGB transforms and run-length round trips, and fixed-step platform-game rules. All three pass twelve actual execution contexts with frozen inputs and unchanged independent repairs. Their bounded scopes keep the remaining 36 K400 cells open.
 
 The [browser-native campaign](docs/K400_BROWSER_NATIVE_2026-10-13.md) now compiles and executes RCL inside an actual Chromium window, including exact compiler-byte parity, native rejection diagnostics and page reset. It adds fourteen unique coordinates, reaching 216. The active goal is the complete 400-cell campaign.
 
@@ -43,9 +43,11 @@ The [target-backed Native UI campaign](docs/K400_NATIVE_UI_2026-10-13.md) adds t
 
 The [compiler workflow continuation](docs/K400_COMPILER_PIPELINE_2026-10-13.md) closes K328/K330/K335, reaching 360. Actual RCL-authored compilation and native execution expose separate process traces and instruction/byte metrics. Existing game/media/CRDT kernels pass 60 rounds, 30 sealed inputs, nine fresh repairs and ten extra alternative-repair cases; the distributed workflow binds actual three-node HTTP packets to compiler/VM ledgers.
 
-The [native Android continuation](docs/K400_NATIVE_MOBILE_2026-10-14.md) now provides actual native Views, touch and lifecycle recovery with RCL-owned backend state. Its Windows and WASI backends pass the frozen runs, inputs and independent repairs; acquisition across the other backends is ongoing and adds no K400 credit yet. The frozen APK and an interactive demo command are available.
+The [native Android continuation](docs/K400_NATIVE_MOBILE_2026-10-14.md) provides actual native Views, touch and lifecycle recovery with RCL-owned backend state. Its server backend passes the current frozen runs, inputs and independent repairs. A readiness publication race is fixed in separate HTTP/replica adapters; previous mobile receipts are archived and all nineteen backends are reacquired. The incomplete mobile index adds no K400 credit yet. The frozen APK and an interactive demo command are available.
 
 The [persistent Sequence runtime candidate](docs/NATIVE_SEQUENCE_RUNTIME_2026-10-14.md) preserves twenty byte-identical full-compiler self-compilation generations, with a 3.9-second median on this Windows host. One same-source comparison measured 159.1 seconds in the original runtime and 6.4 seconds in the candidate, about 24.7× faster. This separate optional runtime does not advance the version or K400 count.
+
+The [native-core self-hosting continuation](docs/K400_SELFHOST_COLUMNS_2026-10-14.md) closes K059/K039/K019/K079, reaching 364. A separate RCL compiler fixes non-BMP source-column identity and reproduces its complete artifact for eighty generations across Windows/Linux/WASI/Chromium. Forty sealed programs and twelve unchanged fresh-repair replays pass; the original failed Unicode contract retains zero credit.
 
 ## Why RCL?
 
@@ -428,7 +430,7 @@ Each evidence-bearing cell is checked through nine **non-compensatory** gates:
 
 A missing required gate blocks the cell. A failed required gate fails the cell. No weighted score can hide a missing hard requirement.
 
-Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `360 PASS / 0 BLOCKED / 40 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator execution. The [execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) verifies authenticated HTTP, persistent embedded instances and two-worker recovery, adding 35 distinct cells. The [native job campaign](docs/K400_JOB_CONTEXTS_2026-10-13.md) adds another 36 cells through cold handlers, SQLite transactions and worker-thread dataflow. The [native RCL phase campaign](docs/K400_NATIVE_PHASES_2026-10-13.md) adds 24 cells through source-bound clock and job controllers. The [expression/media/game campaign](docs/K400_NEW_FAMILIES_2026-10-13.md) adds 36 cells with three new RCL programs across twelve actual execution contexts, reaching 202; the >=200 development milestone is met. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
+Every permanent cell also has a stable campaign identity from `K001` through `K400`. Run `npm run evidence:k400` to rebuild the consolidated fail-closed report. The current recorded coverage is `364 PASS / 0 BLOCKED / 36 UNTESTED` (maturity `U3`), so K400 remains `INCOMPLETE`. These are bounded evidence profiles, not a claim that whole program or environment families are solved. The [portable campaign](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds real Windows/WASI/Linux/Android emulator execution. The [execution-context campaign](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md) verifies authenticated HTTP, persistent embedded instances and two-worker recovery, adding 35 distinct cells. The [native job campaign](docs/K400_JOB_CONTEXTS_2026-10-13.md) adds another 36 cells through cold handlers, SQLite transactions and worker-thread dataflow. The [native RCL phase campaign](docs/K400_NATIVE_PHASES_2026-10-13.md) adds 24 cells through source-bound clock and job controllers. The [expression/media/game campaign](docs/K400_NEW_FAMILIES_2026-10-13.md) adds 36 cells with three new RCL programs across twelve actual execution contexts, reaching 202; the >=200 development milestone is met. K233 closes a bounded configurable two-Dense-layer General MLP profile; later Tensor/Autodiff candidates retain their separate evidence boundaries in [`CURRENT-STATUS.md`](CURRENT-STATUS.md).
 
 ### Current killer-task frontier
 

@@ -1,0 +1,82 @@
+[
+  {
+    "index": 0,
+    "id": "addition",
+    "source": "reality Add { facet result : Number = 9 + 2 }",
+    "sourceHash": "9adad81fff661d509859f4dd83a44121b68a8aba14d24b97cfef98bd7897a512",
+    "sourceRoot": "9d6ee9beefff521a88db666a20aecb4090f88c512ecae6f60f2b49bf84d9d9e6",
+    "artifactHash": "92ed2cc3cdf78385cebd2a1332bfa9f9777047c3e2d18a76806ccb82dcccaeb6"
+  },
+  {
+    "index": 1,
+    "id": "subtract-multiply",
+    "source": "reality Arithmetic { facet result : Number = (9 - 2) * 3 }",
+    "sourceHash": "2b7581901b80addf2e6bdb8e0420906547895ca08a29c9ed74b5c9a9a4b9d9a9",
+    "sourceRoot": "7098ebaab3c0c90976e4ae181bdd0f95a4fec30875ab00c62579dd10ed4aa2bc",
+    "artifactHash": "997dd9e30eee3b83d56c947c9fa1937c3b8fe9f2d66ef41ea4892f752ba7a3d5"
+  },
+  {
+    "index": 2,
+    "id": "division-modulo",
+    "source": "reality Division { facet quotient : Number = 24 / 3 facet rest : Number = 29 % 6 }",
+    "sourceHash": "558552a31bc23efd292669ac3a03c72d957cdd30e2f125109d755da5205c6975",
+    "sourceRoot": "942c472ce8ab38198fdb6b61bd85dd67c44a2441aa520ef32b17ab355f001d49",
+    "artifactHash": "3dabaee10d39c6851024317cc7365f0b8b1b682ac6d8ce3df0bc172cc69493a2"
+  },
+  {
+    "index": 3,
+    "id": "comparison-boundary",
+    "source": "reality Comparison { facet le : Truth = 1 <= 1 facet ge : Truth = 1 >= 1 facet lt : Truth = 1 < 1 facet gt : Truth = 1 > 1 }",
+    "sourceHash": "bcde948d49a5e723fe8a9315782ea23b8b5f25b2c81a01e4331f45b749f4f7dc",
+    "sourceRoot": "2dfb5ef6130c9063ad34327679830b69210cd750a3ba29b238ac02fd18f3d98b",
+    "artifactHash": "a74110ee9f26af1fe5d540f54e4108b703e7d5b7c9ad94c58b558d52cbd6f1cf"
+  },
+  {
+    "index": 4,
+    "id": "boolean-short-circuit",
+    "source": "reality ShortCircuit { facet accepted : Truth = true or (1 / 0 == 0) facet rejected : Truth = false and (1 / 0 == 0) }",
+    "sourceHash": "0012e7d56e82d1bfef255b0e5490cbcd5e002e361300e6d92b3365e81d7e506f",
+    "sourceRoot": "d3e8c39803d2a1ff359ab0f2271066031cd3b93a0dd6a6d1e079b6893825b5a0",
+    "artifactHash": "ff69ae164d8eb18caa27f3c0b95b25ab954bfd231c40ef03ed349fb745865bb5"
+  },
+  {
+    "index": 5,
+    "id": "recursive-gcd",
+    "source": "reality Euclid { reckon gcd(a : Number, b : Number) -> Number = choose(b == 0, a, gcd(b, a % b)) facet result : Number = gcd(84, 30) }",
+    "sourceHash": "93ef96663dbd0a1362b1d2601d12a71b5245fe36a93beb21441ae7a543a715c6",
+    "sourceRoot": "4ca0c2b4756bdadd0e740663d8656eed08982c09449f1450e53cf3697e62a7ee",
+    "artifactHash": "0957558da02d9bad84f8bbe88cef4895f39a893a1c3ff24a1cce794691d9428e"
+  },
+  {
+    "index": 6,
+    "id": "unicode-text",
+    "source": "reality Unicode { facet source : Text = \"中😀文\" facet count : Number = length(source) facet first : Text = char_at(source, 0) facet label : Text = \"计数：\" + text(17) }",
+    "sourceHash": "0dd1ce8655db09aeaa7e7787321633a1193feae32b75d4e59f5f06617d3c2056",
+    "sourceRoot": "f2298e70d29c4fbc867edb333831a2f244b68e0ad71ade69ad859e4d92bb0c32",
+    "artifactHash": "fc9449aedc95ffd415b6d9ff1836255946aa1b9265b98811d44d5dc3dee29417"
+  },
+  {
+    "index": 7,
+    "id": "persistent-sequence",
+    "source": "reality SequenceCase { facet left : Sequence = sequence_append(empty_sequence(), 7) facet both : Sequence = sequence_concat(left, left) facet value : Number = sequence_get(both, 1) }",
+    "sourceHash": "13502b6c1b70f3ec7006faed9ed1cd0da9a922f9312924a3211a0bd89f7d6dce",
+    "sourceRoot": "3e313a221529e9d83006618057593852755b6b65bc056cc97d79119c6b8e86c1",
+    "artifactHash": "30873b131259a7f5e6fbc7183078428bb7bfd384ec965986fa005c58ea39a2c2"
+  },
+  {
+    "index": 8,
+    "id": "conditional-warrant",
+    "source": "reality Conditional { facet enabled : Truth = true facet count : Number = 0 subject actor { warrant counter.write on count while enabled } emergence add { cause actor when count == 0 needs counter.write on count alter count <- count + 2 preserve count == 2 witness \"conditional:committed\" } realize add }",
+    "sourceHash": "5d263d9e26982a2e047433c600bc2a8017fa4d7814485ae93adfa43268cbf002",
+    "sourceRoot": "d972ab26838bcae911276143177450144344cfd0f8e2d910737c1cd878c4b02f",
+    "artifactHash": "1ac4db8b40024a8b3ac3e5efce63ff17abc8b02ca25ce7873a3e8df5452c5be6"
+  },
+  {
+    "index": 9,
+    "id": "projection-commit",
+    "source": "reality SequenceTransaction {\n  facet original : Sequence = sequence_append(empty_sequence(), false)\n  facet current : Sequence = original\n  subject builder { warrant sequence.write on current }\n  emergence extend {\n    cause builder\n    when length(current) == 1\n    needs sequence.write on current\n    alter current <- sequence_concat(current, sequence_append(empty_sequence(), \"追加\"))\n    preserve length(current) == 2\n    witness \"sequence:concatenated\"\n  }\n  foresee extend\n  realize extend\n}\n",
+    "sourceHash": "1cfcb30d990010061be4a30825a0ea695b21a84caefa0d2f38db7b07c1df4b48",
+    "sourceRoot": "6bcde6cdfbbb17b36fb93e619c1c7ca21539b5f18ccc4b56948c0f3021e4580a",
+    "artifactHash": "f5158de35efb38217819be591be03391bb836cb2a9d811655bf2556d0e129921"
+  }
+]
