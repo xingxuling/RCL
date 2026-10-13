@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "e46a13a010a606ce811b4d3ef9ce7fcb95dc06de0028d6d9a77477f80046e351",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(value < 255, 255, value)",
+        "new": "choose(value > 255, 255, value)"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+        "new": "repeat_sample(value, count - 1, sequence_append(output, value))"
+      }
+    }
+  ]
+}

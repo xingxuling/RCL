@@ -1,0 +1,94 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/realtime-native/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K266"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "4d13c25e0bcae7054abe8860ba943340d558afbb0da4848caae5057dc9070a20"
+}

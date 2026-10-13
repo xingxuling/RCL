@@ -1,0 +1,93 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "logical-events",
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/logical-events.rcl",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesPath": "examples/universal-stress/realtime-native/logical-events-cases.json",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "definitionFile": "scripts/k400-genomes/realtime.mjs",
+  "definitionHash": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "realtime"
+  ],
+  "baseline": {
+    "current": 0,
+    "target": 4,
+    "budget": 4
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K271"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "tie-order",
+      "index": 0,
+      "intent": "Sort events by increasing time, then increasing priority value, then increasing identifier, using a total deterministic order.",
+      "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject an advance when the count of due active events exceeds the event budget; equality is allowed.",
+      "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2"
+    },
+    {
+      "id": "time-authority",
+      "index": 2,
+      "intent": "An external time proposal requires temporal commit capability equal to one and cannot move logical time backwards.",
+      "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c"
+    }
+  ],
+  "contractRoot": "64a75cb89dae040bb2eaf46ab9b220bd2e2778fdfda65e4a092f4911c97bf7dd"
+}

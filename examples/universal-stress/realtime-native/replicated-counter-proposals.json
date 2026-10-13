@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "f46090e20ad4e9845c8ca4fbb22ce622cd1f3b64e4be9ecc20c90844302c1b3b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "choose(left < right, left, right)",
+        "new": "choose(left > right, left, right)"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "sender <= 99",
+        "new": "sender <= 2"
+      }
+    },
+    {
+      "id": "merge-warrant",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "warrant replica.inspect on replicas while input.allowed",
+        "new": "warrant replica.merge on replicas while input.allowed"
+      }
+    }
+  ]
+}

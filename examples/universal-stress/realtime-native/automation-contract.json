@@ -1,0 +1,94 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "automation",
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/automation.rcl",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesPath": "examples/universal-stress/realtime-native/automation-cases.json",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "definitionFile": "scripts/k400-genomes/automation.mjs",
+  "definitionHash": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "automation"
+  ],
+  "baseline": {
+    "failures": 1,
+    "attempts": 2,
+    "approval": 1,
+    "kill": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K276"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "dependency",
+      "index": 0,
+      "intent": "A task dependency names a previously completed task index; reject a dependency at or beyond the number of completed tasks.",
+      "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286"
+    },
+    {
+      "id": "retry",
+      "index": 1,
+      "intent": "Success requires one additional attempt after all planned failures; reject when failures consume the entire attempt budget.",
+      "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "Stop a workflow before an approval-required task if human approval is absent; approved tasks may proceed if dependencies and retries permit.",
+      "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8"
+    }
+  ],
+  "contractRoot": "2ca05ad2890f10b42e8fafaff6d7573dda9f2a2288ff8d29c12a66df6178f48d"
+}

@@ -1,0 +1,80 @@
+reality NativeRealtimeGate {
+  input event.root : Text = ""
+  input event.now : Number = 0
+  input event.release : Number = 0
+  input event.deadline : Number = 0
+  input event.success : Truth = true
+  input event.cancelled : Truth = false
+  facet clock.last : Number = 0
+  facet scheduler.enabled : Truth = true
+  facet job.active : Truth = false
+  facet job.root : Text = ""
+  facet job.release : Number = 0
+  facet job.deadline : Number = 0
+  facet job.admitted : Number = 0
+  facet job.completed : Number = 0
+  facet job.failed : Number = 0
+  facet job.expired : Number = 0
+  facet job.cancelled : Number = 0
+  subject dispatcher {
+    warrant job.dispatch on job while scheduler.enabled and not job.active
+  }
+  subject publisher {
+    warrant job.publish on job while scheduler.enabled and job.active and event.now <= job.deadline and not event.cancelled
+    warrant job.cleanup on job while job.active
+  }
+  subject coordinator {
+    warrant scheduler.control on scheduler
+  }
+  emergence admit {
+    cause dispatcher
+    when event.root != "" and event.now >= clock.last and event.now >= event.release and event.now <= event.deadline and not event.cancelled
+    needs job.dispatch on job
+    alter job.active <- true
+    alter job.root <- event.root
+    alter job.release <- event.release
+    alter job.deadline <- event.deadline
+    alter job.admitted <- job.admitted + 1
+    alter clock.last <- event.now
+    preserve job.admitted == job.completed + job.failed + 1
+    preserve job.deadline >= job.release
+    witness "realtime:source-owned-monotonic-admission"
+  }
+  emergence publish {
+    cause publisher
+    when job.active and event.success and event.now >= clock.last
+    needs job.publish on job
+    alter job.active <- false
+    alter job.completed <- job.completed + 1
+    alter clock.last <- event.now
+    preserve job.admitted == job.completed + job.failed
+    preserve clock.last <= job.deadline
+    witness "realtime:source-owned-on-time-publication"
+  }
+  emergence fail {
+    cause publisher
+    when job.active and event.now >= clock.last
+    needs job.cleanup on job
+    alter job.active <- false
+    alter job.failed <- job.failed + 1
+    alter job.expired <- job.expired + choose(event.now > job.deadline, 1, 0)
+    alter job.cancelled <- job.cancelled + choose(event.cancelled, 1, 0)
+    alter clock.last <- event.now
+    preserve job.admitted == job.completed + job.failed
+    witness "realtime:source-owned-failure-settlement"
+  }
+  emergence pause {
+    cause coordinator
+    when scheduler.enabled and not job.active
+    needs scheduler.control on scheduler
+    alter scheduler.enabled <- false
+    witness "realtime:paused"
+  }
+  emergence resume {
+    cause coordinator
+    when not scheduler.enabled and not job.active
+    needs scheduler.control on scheduler
+    alter scheduler.enabled <- true
+    witness "realtime:resumed"
+  }
+}

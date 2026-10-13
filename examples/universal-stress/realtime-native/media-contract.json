@@ -1,0 +1,97 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "media",
+  "scope": "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/media.rcl",
+  "sourceHash": "54982263685a07f45279fb5cbc738c4afc121412f75cafec63c6b19b8c0a523e",
+  "casesPath": "examples/universal-stress/realtime-native/media-cases.json",
+  "casesHash": "f98a504b1110201a86774414f00425a5065eb1a23c50834e6222f4e8faff1ba9",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "media"
+  ],
+  "baseline": {
+    "red": 20,
+    "green": 20,
+    "blue": 20,
+    "gain": 2,
+    "offset": -5,
+    "invert": false,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K275"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "index": 0,
+      "intent": "Clamp each transformed RGB channel to the inclusive range zero through 255 before optional inversion.",
+      "mutatedSourceHash": "34472644dde98bb037dd67d1f087f1517181fdd8406efdd71e14dc8bd45fc137"
+    },
+    {
+      "id": "row-flip",
+      "index": 1,
+      "intent": "Horizontal flipping swaps the two RGB pixels within each row, preserving row order and each pixel channel order.",
+      "mutatedSourceHash": "c5713977190a50660435da69918f2c4806c018d37d2ed91e1b61f6b9a8e7f9fc"
+    },
+    {
+      "id": "run-decode",
+      "index": 2,
+      "intent": "Decode every run by appending its sample exactly count times; retain empty inputs and exact run-length round trips.",
+      "mutatedSourceHash": "e3c39257ac678034fee5c12ea2662db2f5f2455c76f60b5d8b1c7e6e11ed4e31"
+    }
+  ],
+  "contractRoot": "e46a13a010a606ce811b4d3ef9ce7fcb95dc06de0028d6d9a77477f80046e351"
+}

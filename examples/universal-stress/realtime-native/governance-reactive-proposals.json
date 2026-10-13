@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "f58658ce76770b9cafb5a376380ea0e0e1d5e704457c6e5bb75733814b888028",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_inspect on source",
+        "new": "warrant compiler.inspect on source"
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "when compiler.accepted == true and compiler.phase == 2",
+        "new": "when compiler.accepted == true and compiler.phase == 1"
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+        "new": "alter compiler.audit_count <- compiler.audit_count + 1"
+      }
+    }
+  ]
+}

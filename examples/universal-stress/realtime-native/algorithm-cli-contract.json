@@ -1,0 +1,96 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "algorithm-cli",
+  "scope": "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/algorithm-posix.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "casesPath": "examples/universal-stress/realtime-native/algorithm-cli-cases.json",
+  "casesHash": "f23064a66ea16d27bab2c42729ed525b0eaa8503f25d746796613e4cce73a841",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "algorithm",
+    "cli"
+  ],
+  "baseline": {
+    "gcd_a": 1071,
+    "gcd_b": 462,
+    "fibonacci_n": 12,
+    "sum_squares_n": 24
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K261",
+    "K262"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "gcd",
+      "index": 0,
+      "intent": "Compute the nonnegative greatest common divisor with Euclidean reduction, including negative values and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "index": 1,
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "index": 2,
+      "intent": "Compute the sum of integer squares from 1 through n, returning zero for nonpositive n.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "9e9d139884307a60d1ae2562e3bcb414d48dc9dc0ab7e7bb1a4d18457a07917a"
+}

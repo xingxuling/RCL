@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "4d13c25e0bcae7054abe8860ba943340d558afbb0da4848caae5057dc9070a20",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "not has_customer(customers, 0, order_customer(row)) or"
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "customer_region(sequence_get(customers, cursor)) != region",
+        "new": "customer_region(sequence_get(customers, cursor)) == region"
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+      }
+    }
+  ]
+}

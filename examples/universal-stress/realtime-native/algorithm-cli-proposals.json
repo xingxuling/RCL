@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "9e9d139884307a60d1ae2562e3bcb414d48dc9dc0ab7e7bb1a4d18457a07917a",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "gcd(b, b % a)",
+        "new": "gcd(b, a % b)"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 3)",
+        "new": "fibonacci(n - 2)"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)"
+      }
+    }
+  ]
+}

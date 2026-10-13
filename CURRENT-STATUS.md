@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 261/400 PASS (65.25%) · 139 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 277/400 PASS (69.25%) · 123 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,20 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 soft realtime continuation
+
+Thirteen frozen programs add sixteen distinct realtime-runtime coordinates,
+reaching **277 PASS / 123 UNTESTED**, U3, INCOMPLETE. Actual monotonic timers
+wait for release and asynchronous native VM processes execute source-bound RBC.
+RCL owns sampled-deadline publication, active-job exclusion, conditional authority
+and failure settlement. Real spinning native programs are terminated by deadlines
+and cancellation; receipts require observed terminal processes and successful
+recovery. All 260 rounds, 130 sealed inputs, 39 unchanged independent repairs,
+ten additional noncanonical repair cases and 35 focused checks pass locally.
+These are soft realtime observations, without hard OS timing guarantees.
+The full 400-cell goal stays active; version promotion remains frozen.
+See `docs/K400_SOFT_REALTIME_2026-10-13.md`.
 
 ## 2026-10-13 replicated-counter continuation
 

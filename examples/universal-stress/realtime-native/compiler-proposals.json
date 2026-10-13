@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "3c6a4dbcd565002854e0c847c34e4a7786d17619c4dfcdbb09cd69c2003a02b6",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,",
+        "new": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,"
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 1, 2, 1)",
+        "new": "choose(operator == 1, 1, 2)"
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "right - left",
+        "new": "left - right"
+      }
+    }
+  ]
+}

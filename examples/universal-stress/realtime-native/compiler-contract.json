@@ -1,0 +1,96 @@
+{
+  "format": "rcl.k400-realtime-contract.v1",
+  "id": "compiler",
+  "scope": "RCL-owned token-sequence expression compiler with parenthesis/precedence validation, postfix stack-code emission and execution for addition/subtraction/multiplication; no lexer/full-RCL compiler or whole-language self-hosting claim; actual monotonic timer release and asynchronous native RCL process with source-owned sampled-deadline publication, cancellation/exit observation and failure settlement; local soft realtime, no hard OS interrupt/timing guarantee or external effects",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/compiler.rcl",
+  "sourceHash": "00ab562d4001758c6c57078d6d12c890e35714cdf362c2f84e712b6ccbc0f494",
+  "casesPath": "examples/universal-stress/realtime-native/compiler-cases.json",
+  "casesHash": "13712d6d433dc2072f18600e90c4dab11c06f5bd4b673b21df6edfe779fde1fa",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "realtimeDefinitionFile": "scripts/k400-realtime-definitions.mjs",
+  "realtimeDefinitionHash": "04857dbef7a3751890e1f4617596205fab8ab9e1bb9919a87dca3b18fcd4d449",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/realtime-gate.rcl",
+    "sha256": "9da4b5ba475ec3a673d58e94b073241d36084b5411c3788eb56361cbb7894db1"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "environments": [
+    "realtime-runtime"
+  ],
+  "families": [
+    "compiler"
+  ],
+  "baseline": {
+    "a": 2,
+    "b": 3,
+    "c": 4,
+    "d": 5,
+    "parenthesized": true,
+    "invalid": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "deadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "expiredDeadlineMs": -1,
+    "spinDeadlineMs": 150,
+    "cancelAfterMs": 20,
+    "heartbeatIntervalMs": 5
+  },
+  "eligibleCells": [
+    "K267"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual monotonic timers and asynchronous native process exit",
+    "RCL-owned admission/publication and full independent controller replay",
+    "release wait, bounded backpressure, past-deadline/time-reversal/source-authority rejection, native timeout/cancel and healthy recovery"
+  ],
+  "authorityProfile": "RCL conditional warrants own local sampled-deadline publication; Node transports clock observations, stops owned processes and waits for real exit; no hard realtime/OS interruption guarantee",
+  "trials": [
+    {
+      "id": "precedence",
+      "index": 0,
+      "intent": "The term parser consumes multiplication; addition and subtraction belong to the lower-precedence expression parser. Preserve parentheses and complete-input validation.",
+      "mutatedSourceHash": "ee29e430497af832b265163612258ce9377ab82d3027a5f348737d574cb1d3ab"
+    },
+    {
+      "id": "opcode-emission",
+      "index": 1,
+      "intent": "Emit addition opcode one for a plus token and subtraction opcode two for a minus token; retain postfix operand order.",
+      "mutatedSourceHash": "036fee18785afde4e1a84944a30cd737ecc248f06afbbf6fef8477184111adfa"
+    },
+    {
+      "id": "operand-order",
+      "index": 2,
+      "intent": "Stack execution subtracts the right operand from the left operand, preserving addition and multiplication behavior.",
+      "mutatedSourceHash": "465d70ed11b85f2f25149f6c47e2fe0e1b70ff0a23d1d5c54a25919362024d35"
+    }
+  ],
+  "contractRoot": "3c6a4dbcd565002854e0c847c34e4a7786d17619c4dfcdbb09cd69c2003a02b6"
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-realtime-proposals.v1",
+  "contractRoot": "10a906018f5e9991e33326b0ccb044ac57f6069b6dc835244ff5079b6d8f746e",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/realtime-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_realtime_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_realtime_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "hotness_weight(parameters) * hotness + bias(parameters)"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_realtime_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))"
+      }
+    }
+  ]
+}
