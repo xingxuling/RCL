@@ -1,12 +1,12 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `246 PASS / 0 BLOCKED / 154 UNTESTED`
+**Current evidence:** `261 PASS / 0 BLOCKED / 139 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `3259fb047ec8d6c3b39be281a7f2c42b5b792dda646c48a070b2d226bfa8e7d6`
+**Report root:** `a052d35eb6ff7ed923670a756f8307b3bfaa7b4b21b8b5a7e7dc8f88f525d6e3`
 **Date:** 2026-10-13
 
-The active development goal is completion of all 400 cells. The at-least-200 milestone was met at 202 verified cells. This does not complete K400 or authorize a language release. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106. The [native job campaign](K400_JOB_CONTEXTS_2026-10-13.md) adds 36 more, reaching 142. The [native phase campaign](K400_NATIVE_PHASES_2026-10-13.md) adds 24 distinct cells, reaching 166. The [RCL expression/media/game campaign](K400_NEW_FAMILIES_2026-10-13.md) adds 36 distinct cells, reaching 202. All 60 new coordinates have complete, independently checked local evidence. The [browser-native campaign](K400_BROWSER_NATIVE_2026-10-13.md) adds fourteen further unique cells, reaching 216. The [actual GPU campaign](K400_GPU_NATIVE_2026-10-13.md) adds fifteen further unique cells, reaching 231. The [RNCS candidate-runtime campaign](K400_RNCS_CANDIDATE_2026-10-13.md) adds fifteen more unique cells, reaching 246; 154 remain UNTESTED. No new hosted CI was run.
+The active development goal is completion of all 400 cells. The at-least-200 milestone was met at 202 verified cells. This does not complete K400 or authorize a language release. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106. The [native job campaign](K400_JOB_CONTEXTS_2026-10-13.md) adds 36 more, reaching 142. The [native phase campaign](K400_NATIVE_PHASES_2026-10-13.md) adds 24 distinct cells, reaching 166. The [RCL expression/media/game campaign](K400_NEW_FAMILIES_2026-10-13.md) adds 36 distinct cells, reaching 202. All 60 new coordinates have complete, independently checked local evidence. The [browser-native campaign](K400_BROWSER_NATIVE_2026-10-13.md) adds fourteen further unique cells, reaching 216. The [actual GPU campaign](K400_GPU_NATIVE_2026-10-13.md) adds fifteen further unique cells, reaching 231. The [RNCS candidate-runtime campaign](K400_RNCS_CANDIDATE_2026-10-13.md) adds fifteen more unique cells, reaching 246. The [replicated-counter campaign](K400_REPLICATED_COUNTER_2026-10-13.md) adds fifteen distributed-program coordinates, reaching 261; 139 remain UNTESTED. No new hosted CI was run.
 
 ## 1. Completion contract
 

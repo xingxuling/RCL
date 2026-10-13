@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 246/400 PASS (61.5%) · 154 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 261/400 PASS (65.25%) · 139 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,18 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 replicated-counter continuation
+
+The new RCL grow-counter program owns component-wise join, bounded member
+admission, and monotone packet/replica commits. Fifteen actual execution
+contexts add fifteen distinct distributed-program coordinates, reaching
+**261 PASS / 139 UNTESTED**, U3, INCOMPLETE. Forty-five real loopback HTTP
+nodes run source-owned packet merge, partition/recovery, stale/duplicate
+delivery, membership/source-authority rejection and transport denial. Every
+context retains frozen inputs, effective mutants and unchanged independent
+repairs. The full 400-cell goal remains active; version promotion is frozen.
+See `docs/K400_REPLICATED_COUNTER_2026-10-13.md`.
 
 ## 2026-10-13 RNCS candidate-runtime continuation
 

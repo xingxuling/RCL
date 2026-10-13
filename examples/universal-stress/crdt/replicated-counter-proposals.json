@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-crdt-proposals.v1",
+  "contractRoot": "4ea7b023d97ac979cbc205df3d1d23f7b35d4410e6b6ce35eae4eeb28c7060f0",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidate; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/crdt/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_crdt_final_a",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "choose(left < right, left, right)",
+        "new": "choose(left > right, left, right)"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_crdt_final_b",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "sender <= 99",
+        "new": "sender <= 2"
+      }
+    },
+    {
+      "id": "merge-warrant",
+      "context": "/root/k400_crdt_final_c",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "warrant replica.inspect on replicas while input.allowed",
+        "new": "warrant replica.merge on replicas while input.allowed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+reality ReplicatedCounter {
+  facet input.a : Number = 3
+  facet input.a_later : Number = 5
+  facet input.b : Number = 4
+  facet input.c : Number = 7
+  facet input.repeats : Number = 2
+  facet input.partition : Number = 2
+  facet input.reverse : Truth = false
+  facet input.heal : Truth = true
+  facet input.allowed : Truth = true
+  facet input.poison : Truth = true
+  facet input.packet_mode : Truth = false
+  facet input.receiver : Number = 0
+  facet input.sender : Number = 1
+  facet input.current_a : Number = 0
+  facet input.current_b : Number = 0
+  facet input.current_c : Number = 0
+  facet input.incoming_a : Number = 0
+  facet input.incoming_b : Number = 0
+  facet input.incoming_c : Number = 0
+
+  reckon vector(a : Number, b : Number, c : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), a), b), c)
+  reckon component(value : Sequence, index : Number) -> Number = sequence_get(value, index)
+  reckon maximum(left : Number, right : Number) -> Number = choose(left > right, left, right)
+  reckon merge(left : Sequence, right : Sequence) -> Sequence =
+    vector(maximum(component(left, 0), component(right, 0)),
+      maximum(component(left, 1), component(right, 1)), maximum(component(left, 2), component(right, 2)))
+  reckon total(value : Sequence) -> Number = component(value, 0) + component(value, 1) + component(value, 2)
+  reckon dominates(left : Sequence, right : Sequence) -> Truth =
+    component(left, 0) >= component(right, 0) and component(left, 1) >= component(right, 1) and component(left, 2) >= component(right, 2)
+  reckon valid_amount(value : Number) -> Truth = value >= 0 and value <= 9007199254740991 and value % 1 == 0
+  reckon safe_amount(value : Number) -> Number = choose(valid_amount(value), value, 0)
+  reckon bounded_repeats(value : Number) -> Number = choose(valid_amount(value) and value <= 4, value, 0)
+  reckon valid_vector(value : Sequence) -> Truth =
+    valid_amount(component(value, 0)) and valid_amount(component(value, 1)) and valid_amount(component(value, 2))
+  reckon known_replica(sender : Number) -> Truth = sender >= 0 and sender < 3 and sender % 1 == 0
+  reckon message(sender : Number, value : Sequence) -> Sequence = sequence_append(sequence_append(empty_sequence(), sender), value)
+  reckon sender(value : Sequence) -> Number = sequence_get(value, 0)
+  reckon payload(value : Sequence) -> Sequence = sequence_get(value, 1)
+  reckon connected(left : Number, right : Number, partition : Number) -> Truth = partition == 3 or left == right or left < partition and right < partition
+  reckon traffic(a : Sequence, stale_a : Sequence, b : Sequence, c : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(),
+      message(choose(input.reverse, 2, 0), choose(input.reverse, c, a))), message(1, b)),
+      message(choose(input.reverse, 0, 2), choose(input.reverse, a, c))), message(0, stale_a))
+  reckon with_poison(messages : Sequence) -> Sequence = choose(input.poison,
+    sequence_append(messages, message(99, vector(1000, 1000, 1000))), messages)
+  reckon deliver(value : Sequence, receiver : Number, partition : Number, messages : Sequence, index : Number) -> Sequence =
+    choose(index >= length(messages), value,
+      deliver(choose(known_replica(sender(sequence_get(messages, index))) and connected(receiver, sender(sequence_get(messages, index)), partition),
+        merge(value, payload(sequence_get(messages, index))), value), receiver, partition, messages, index + 1))
+  reckon repeat_delivery(value : Sequence, receiver : Number, partition : Number, messages : Sequence, remaining : Number) -> Sequence =
+    choose(remaining <= 0, value, repeat_delivery(deliver(value, receiver, partition, messages, 0), receiver, partition, messages, remaining - 1))
+  reckon converge(value : Sequence, receiver : Number, messages : Sequence) -> Sequence =
+    choose(input.heal, repeat_delivery(value, receiver, 3, messages, bounded_repeats(input.repeats)), value)
+
+  facet local.a : Sequence = vector(safe_amount(safe_amount(input.a) + safe_amount(input.a_later)), 0, 0)
+  facet local.stale_a : Sequence = vector(safe_amount(input.a), 0, 0)
+  facet local.b : Sequence = vector(0, safe_amount(input.b), 0)
+  facet local.c : Sequence = vector(0, 0, safe_amount(input.c))
+  facet network.messages : Sequence = with_poison(traffic(local.a, local.stale_a, local.b, local.c))
+  facet partition.a : Sequence = repeat_delivery(local.a, 0, input.partition, network.messages, bounded_repeats(input.repeats))
+  facet partition.b : Sequence = repeat_delivery(local.b, 1, input.partition, network.messages, bounded_repeats(input.repeats))
+  facet partition.c : Sequence = repeat_delivery(local.c, 2, input.partition, network.messages, bounded_repeats(input.repeats))
+  facet planned.a : Sequence = converge(partition.a, 0, network.messages)
+  facet planned.b : Sequence = converge(partition.b, 1, network.messages)
+  facet planned.c : Sequence = converge(partition.c, 2, network.messages)
+  facet law.idempotent : Truth = merge(local.a, local.a) == local.a
+  facet law.commutative : Truth = merge(local.a, local.b) == merge(local.b, local.a)
+  facet law.associative : Truth = merge(merge(local.a, local.b), local.c) == merge(local.a, merge(local.b, local.c))
+  facet replicas.snapshot : Sequence = sequence_append(sequence_append(sequence_append(empty_sequence(), local.a), local.b), local.c)
+  facet replicas.committed : Truth = false
+  facet request.valid : Truth = valid_amount(input.a) and valid_amount(input.a_later) and valid_amount(input.b) and valid_amount(input.c)
+    and valid_amount(input.a + input.a_later) and valid_amount(input.repeats) and input.repeats <= 4 and known_replica(input.partition - 1)
+  facet packet.current : Sequence = vector(input.current_a, input.current_b, input.current_c)
+  facet packet.incoming : Sequence = vector(input.incoming_a, input.incoming_b, input.incoming_c)
+  facet packet.valid : Truth = known_replica(input.receiver) and known_replica(input.sender) and valid_vector(packet.current) and valid_vector(packet.incoming)
+  facet packet.result : Sequence = packet.current
+  facet packet.accepted : Truth = false
+
+  subject replicator {
+    warrant replica.merge on replicas while input.allowed
+    warrant packet.merge on packet while input.allowed
+  }
+  emergence commit_replicas {
+    cause replicator
+    when request.valid and input.allowed and not input.packet_mode
+    needs replica.merge on replicas
+    alter replicas.snapshot <- sequence_append(sequence_append(sequence_append(empty_sequence(), planned.a), planned.b), planned.c)
+    alter replicas.committed <- true
+    preserve dominates(sequence_get(replicas.snapshot, 0), local.a)
+    preserve dominates(sequence_get(replicas.snapshot, 1), local.b)
+    preserve dominates(sequence_get(replicas.snapshot, 2), local.c)
+    witness "distributed:component-wise-monotone-merge"
+  }
+  emergence receive_packet {
+    cause replicator
+    when input.packet_mode and packet.valid and input.allowed
+    needs packet.merge on packet
+    alter packet.result <- merge(packet.current, packet.incoming)
+    alter packet.accepted <- true
+    preserve dominates(packet.result, packet.current)
+    preserve dominates(packet.result, packet.incoming)
+    witness "distributed:source-owned-packet-admission"
+  }
+  foresee commit_replicas
+  realize commit_replicas
+  foresee receive_packet
+  realize receive_packet
+}

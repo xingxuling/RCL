@@ -1,0 +1,43 @@
+{
+  "format": "rcl.k400-independent-crdt-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidate; no other filesystem, memory, network, tools or writes",
+  "batches": [
+    {
+      "context": "/root/k400_crdt_final_a",
+      "returnedProposals": [
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "choose(left < right, left, right)",
+          "new": "choose(left > right, left, right)"
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_crdt_final_b",
+      "returnedProposals": [
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "sender <= 99",
+          "new": "sender <= 2"
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_crdt_final_c",
+      "returnedProposals": [
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "warrant replica.inspect on replicas while input.allowed",
+          "new": "warrant replica.merge on replicas while input.allowed"
+        }
+      ]
+    }
+  ]
+}

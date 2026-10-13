@@ -1,0 +1,151 @@
+{
+  "format": "rcl.k400-crdt-contract.v1",
+  "id": "replicated-counter",
+  "scope": "RCL-owned bounded three-replica grow-counter join with safe-integer components, stale/reordered/duplicate delivery, partitions/healing, invalid sender rejection and source-owned monotone commit; actual HTTP packet replay with isolated target instances; no cryptographic member identity, cross-host deployment or arbitrary distributed-system claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/distributed/replicated-counter.rcl",
+  "sourceHash": "207bfa984d459a5f3ee88ab02559b5fdf02f1f9b29e7c5644932643830b3b1d6",
+  "casesPath": "examples/universal-stress/crdt/replicated-counter-cases.json",
+  "casesHash": "a90f98fe0b39f9a889449b285d2b4e1055c873d0ef188721f8833650021bc423",
+  "definitionFile": "scripts/k400-crdt-definitions.mjs",
+  "definitionHash": "7892e2da35ad62b5acc68e5adcdd0df763043d27f8608fb8beb6ee3288a7d956",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "environmentContracts": {
+    "browser": {
+      "compilerBinary": {
+        "path": "native/wasi-compiler/rclc.wasm",
+        "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+      }
+    },
+    "gpu": {
+      "compilerBinary": {
+        "path": "native/rclc.exe",
+        "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+      },
+      "kernel": {
+        "path": "native/gpu-runtime/rcl-stack-vm.cl",
+        "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+      }
+    },
+    "rncs-runtime": {
+      "compilerBinary": {
+        "path": "native/rclc.exe",
+        "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+      },
+      "vendorProvenance": {
+        "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+        "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd"
+      }
+    }
+  },
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android",
+    "server",
+    "embedded-runtime",
+    "distributed-runtime",
+    "serverless",
+    "database",
+    "dataflow-runtime",
+    "simulation-runtime",
+    "automation-runtime",
+    "browser",
+    "gpu",
+    "rncs-runtime"
+  ],
+  "families": [
+    "distributed"
+  ],
+  "baseline": {
+    "a": 3,
+    "a_later": 5,
+    "b": 4,
+    "c": 7,
+    "repeats": 2,
+    "partition": 2,
+    "reverse": false,
+    "heal": true,
+    "allowed": true,
+    "poison": true
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K050",
+    "K010",
+    "K030",
+    "K090",
+    "K110",
+    "K290",
+    "K250",
+    "K130",
+    "K150",
+    "K310",
+    "K370",
+    "K350",
+    "K070",
+    "K170",
+    "K390"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidate; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "on-target native/bytecode execution with context-specific controls",
+    "typed roots and source-declared transaction continuity",
+    "three real HTTP nodes per target environment; actual RCL packet merge, partition/heal, stale/duplicate delivery, membership/source-authority/transport rejection"
+  ],
+  "networkPlan": {
+    "nodes": 3,
+    "packetStatuses": [
+      200,
+      200,
+      503,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      400,
+      400,
+      403
+    ],
+    "partitionWidth": 2,
+    "authority": "RCL source owns packet membership, monotone merge and conditional warrant; HTTP host owns transport and fault injection",
+    "multiHostClaimed": false,
+    "cryptographicMemberIdentityClaimed": false
+  },
+  "trials": [
+    {
+      "id": "join-maximum",
+      "index": 0,
+      "intent": "Join grow-counter snapshots by the maximum of each component, so duplicates and stale delivery never decrease a component and do not count increments twice.",
+      "mutatedSourceHash": "29fa4cc4af2259038f1d5446639196a2f9c4fa2e68d0ddbc578e0197be160131"
+    },
+    {
+      "id": "replica-membership",
+      "index": 1,
+      "intent": "Only replica identifiers zero, one and two belong to this group; reject every other sender before merging its counter components.",
+      "mutatedSourceHash": "5c39d7f7aed3af26d7ffcd3453a3c4b89d91e47304746e66d402bfa3312291d8"
+    },
+    {
+      "id": "merge-warrant",
+      "index": 2,
+      "intent": "The commit_replicas transition requires the replicator subject to hold replica.merge on replicas; retain the conditional current-input admission boundary.",
+      "mutatedSourceHash": "bc4e639ae0b550fd9a2b17df0dab383f4cb2fa93c7ee41f51dc22cc8feb1f380"
+    }
+  ],
+  "contractRoot": "4ea7b023d97ac979cbc205df3d1d23f7b35d4410e6b6ce35eae4eeb28c7060f0"
+}
