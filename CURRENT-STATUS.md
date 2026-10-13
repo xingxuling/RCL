@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 292/400 PASS (73%) · 108 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 308/400 PASS (77%) · 92 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,19 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 native scientific continuation
+
+Fourteen frozen scientific workbench profiles add sixteen unique coordinates,
+reaching **308 PASS / 92 UNTESTED**, U3, INCOMPLETE. Native RCL owns shifted
+population moments, extrema, regression, binary64 sample transport and governed
+numeric-error publication. Actual NumPy 2.4.2 / SciPy 1.17.0 supplies independent
+observations. All 280 rounds, 140 sealed cases, 42 unchanged repairs and twenty
+extra noncanonical cases pass; 600 actual independent observations include
+negative numeric controls. All seventeen observer processes exit, including
+three real HTTP counter nodes. Thirty-six focused checks pass. The full K400
+goal stays active; version promotion is frozen.
+See `docs/K400_SCIENTIFIC_2026-10-13.md`.
 
 ## 2026-10-13 native game-frame continuation
 

@@ -1,0 +1,140 @@
+{
+  "format": "rcl.k400-scientific-contract.v1",
+  "id": "automation",
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; actual native program outputs enter a native RCL numerical workbench with exact binary64 data binding, independent local NumPy/SciPy observation, source-owned error admission/failure settlement and real worker exit; at most 256 measured scalars, no arbitrary HPC or external-effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/automation.rcl",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesPath": "examples/universal-stress/scientific-native/automation-cases.json",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "definitionFile": "scripts/k400-genomes/automation.mjs",
+  "definitionHash": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a",
+  "scientificDefinitionFile": "scripts/k400-scientific-definitions.mjs",
+  "scientificDefinitionHash": "e665c8b6e1ae76353e7771a48fa1652d7d29026ac9f5b08aa544e2ee3e50c24e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/scientific-gate.rcl",
+    "sha256": "c86117c3ba7a4266b73cc403b34fae72726a458ddf03c2efc51a0eef56f1a30e"
+  },
+  "kernelSource": {
+    "path": "examples/scientific/statistics.rcl",
+    "sha256": "ab0305ac38ff6afa70010e9ad51726d69259da8bdd4e5a19131ef496cba04108"
+  },
+  "oracleSource": {
+    "path": "native/scientific-runtime/oracle.py",
+    "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+  },
+  "observerBinding": {
+    "kind": "ACTUAL_NUMPY_SCIPY_FLOAT64",
+    "processPid": 93464,
+    "python": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+    "executable": {
+      "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423"
+    },
+    "numpyVersion": "2.4.2",
+    "scipyVersion": "1.17.0",
+    "modules": [
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\__init__.py",
+        "sha256": "b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd",
+        "sha256": "e9e712de545963cce130f9ba7581c3a493b101d57f21112e062d9e15428379bf"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\__init__.py",
+        "sha256": "679531778dbacdfc88b3467e91c7a6df64492aac81257593057485120229d9b1"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_axis_nan_policy.py",
+        "sha256": "e612420bd10359b75d93429de102a6848df1c54fadafd8c95f8e965c4fca013c"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_stats_py.py",
+        "sha256": "e07985377102ce291876889a85e40f3f0f61e8daa0ef05bf96be5bf86a4f7846"
+      }
+    ],
+    "worker": {
+      "path": "native/scientific-runtime/oracle.py",
+      "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+    },
+    "authorityGranted": false
+  },
+  "environments": [
+    "scientific-runtime"
+  ],
+  "families": [
+    "automation"
+  ],
+  "baseline": {
+    "failures": 1,
+    "attempts": 2,
+    "approval": 1,
+    "kill": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "numericalPolicy": {
+    "tolerance": 1e-9,
+    "maximumMeasuredScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24
+  },
+  "controlOptions": {
+    "sampleVector": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K216"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program and native numerical kernel with independent NumPy/SciPy observation",
+    "source-owned numeric-error publication and entire independent controller replay",
+    "pause/source/empty/oversized/nonfinite rejection, actual numeric mutant failure settlement, real controller reset and observer exit"
+  ],
+  "authorityProfile": "RCL owns numeric kernels and publication; NumPy/SciPy only supplies independent observations; Node binds exact binary64 measurements and transports evidence",
+  "trials": [
+    {
+      "id": "dependency",
+      "index": 0,
+      "intent": "A task dependency names a previously completed task index; reject a dependency at or beyond the number of completed tasks.",
+      "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286"
+    },
+    {
+      "id": "retry",
+      "index": 1,
+      "intent": "Success requires one additional attempt after all planned failures; reject when failures consume the entire attempt budget.",
+      "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "Stop a workflow before an approval-required task if human approval is absent; approved tasks may proceed if dependencies and retries permit.",
+      "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8"
+    }
+  ],
+  "contractRoot": "31e0fb8128e7970a8cd5cf0b82539c0e2e2129d542cc2c2ce35ce8240a4c6072"
+}

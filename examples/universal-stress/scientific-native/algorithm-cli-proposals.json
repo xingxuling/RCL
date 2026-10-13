@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "fde226d2964640fe48ae7352b768fab4457716c983ffb5c547178dad1a512519",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "b % a",
+        "new": "a % b"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 3)",
+        "new": "fibonacci(n - 2)"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)"
+      }
+    }
+  ]
+}

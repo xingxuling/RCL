@@ -1,0 +1,141 @@
+{
+  "format": "rcl.k400-scientific-contract.v1",
+  "id": "governance-reactive",
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; actual native program outputs enter a native RCL numerical workbench with exact binary64 data binding, independent local NumPy/SciPy observation, source-owned error admission/failure settlement and real worker exit; at most 256 measured scalars, no arbitrary HPC or external-effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/governance-reactive.rcl",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesPath": "examples/universal-stress/scientific-native/governance-reactive-cases.json",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "definitionFile": "scripts/k400-genomes/governance.mjs",
+  "definitionHash": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec",
+  "scientificDefinitionFile": "scripts/k400-scientific-definitions.mjs",
+  "scientificDefinitionHash": "e665c8b6e1ae76353e7771a48fa1652d7d29026ac9f5b08aa544e2ee3e50c24e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/scientific-gate.rcl",
+    "sha256": "c86117c3ba7a4266b73cc403b34fae72726a458ddf03c2efc51a0eef56f1a30e"
+  },
+  "kernelSource": {
+    "path": "examples/scientific/statistics.rcl",
+    "sha256": "ab0305ac38ff6afa70010e9ad51726d69259da8bdd4e5a19131ef496cba04108"
+  },
+  "oracleSource": {
+    "path": "native/scientific-runtime/oracle.py",
+    "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+  },
+  "observerBinding": {
+    "kind": "ACTUAL_NUMPY_SCIPY_FLOAT64",
+    "processPid": 93464,
+    "python": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+    "executable": {
+      "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423"
+    },
+    "numpyVersion": "2.4.2",
+    "scipyVersion": "1.17.0",
+    "modules": [
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\__init__.py",
+        "sha256": "b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd",
+        "sha256": "e9e712de545963cce130f9ba7581c3a493b101d57f21112e062d9e15428379bf"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\__init__.py",
+        "sha256": "679531778dbacdfc88b3467e91c7a6df64492aac81257593057485120229d9b1"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_axis_nan_policy.py",
+        "sha256": "e612420bd10359b75d93429de102a6848df1c54fadafd8c95f8e965c4fca013c"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_stats_py.py",
+        "sha256": "e07985377102ce291876889a85e40f3f0f61e8daa0ef05bf96be5bf86a4f7846"
+      }
+    ],
+    "worker": {
+      "path": "native/scientific-runtime/oracle.py",
+      "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+    },
+    "authorityGranted": false
+  },
+  "environments": [
+    "scientific-runtime"
+  ],
+  "families": [
+    "security-sensitive",
+    "reactive"
+  ],
+  "baseline": {
+    "valid": true,
+    "phase": 0,
+    "audit": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "numericalPolicy": {
+    "tolerance": 1e-9,
+    "maximumMeasuredScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24
+  },
+  "controlOptions": {
+    "sampleVector": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K217",
+    "K218"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program and native numerical kernel with independent NumPy/SciPy observation",
+    "source-owned numeric-error publication and entire independent controller replay",
+    "pause/source/empty/oversized/nonfinite rejection, actual numeric mutant failure settlement, real controller reset and observer exit"
+  ],
+  "authorityProfile": "RCL owns numeric kernels and publication; NumPy/SciPy only supplies independent observations; Node binds exact binary64 measurements and transports evidence",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "index": 0,
+      "intent": "The maintainer needs the exact compiler.inspect warrant on source to authorize the candidate; do not change rule requirements or grant unrelated permissions.",
+      "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b"
+    },
+    {
+      "id": "emit-trigger",
+      "index": 1,
+      "intent": "After candidate authorization sets phase one and accepted true, emission must trigger once and advance the phase to two.",
+      "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c"
+    },
+    {
+      "id": "audit-increment",
+      "index": 2,
+      "intent": "Each successful transaction increments the audit counter by exactly one, while its projected-state invariant must remain satisfied.",
+      "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36"
+    }
+  ],
+  "contractRoot": "c2e2bae6ba5ea3d7c4f975b96658c352036013788cd356d32751608d890de858"
+}

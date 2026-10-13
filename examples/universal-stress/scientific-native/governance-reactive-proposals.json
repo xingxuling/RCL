@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "c2e2bae6ba5ea3d7c4f975b96658c352036013788cd356d32751608d890de858",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.no_inspect",
+        "new": "compiler.inspect"
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "alter compiler.audit_count <- compiler.audit_count + 2",
+        "new": "alter compiler.audit_count <- compiler.audit_count + 1"
+      }
+    }
+  ]
+}

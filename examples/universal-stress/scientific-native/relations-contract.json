@@ -1,0 +1,140 @@
+{
+  "format": "rcl.k400-scientific-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; actual native program outputs enter a native RCL numerical workbench with exact binary64 data binding, independent local NumPy/SciPy observation, source-owned error admission/failure settlement and real worker exit; at most 256 measured scalars, no arbitrary HPC or external-effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/scientific-native/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "scientificDefinitionFile": "scripts/k400-scientific-definitions.mjs",
+  "scientificDefinitionHash": "e665c8b6e1ae76353e7771a48fa1652d7d29026ac9f5b08aa544e2ee3e50c24e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/scientific-gate.rcl",
+    "sha256": "c86117c3ba7a4266b73cc403b34fae72726a458ddf03c2efc51a0eef56f1a30e"
+  },
+  "kernelSource": {
+    "path": "examples/scientific/statistics.rcl",
+    "sha256": "ab0305ac38ff6afa70010e9ad51726d69259da8bdd4e5a19131ef496cba04108"
+  },
+  "oracleSource": {
+    "path": "native/scientific-runtime/oracle.py",
+    "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+  },
+  "observerBinding": {
+    "kind": "ACTUAL_NUMPY_SCIPY_FLOAT64",
+    "processPid": 93464,
+    "python": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+    "executable": {
+      "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423"
+    },
+    "numpyVersion": "2.4.2",
+    "scipyVersion": "1.17.0",
+    "modules": [
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\__init__.py",
+        "sha256": "b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd",
+        "sha256": "e9e712de545963cce130f9ba7581c3a493b101d57f21112e062d9e15428379bf"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\__init__.py",
+        "sha256": "679531778dbacdfc88b3467e91c7a6df64492aac81257593057485120229d9b1"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_axis_nan_policy.py",
+        "sha256": "e612420bd10359b75d93429de102a6848df1c54fadafd8c95f8e965c4fca013c"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_stats_py.py",
+        "sha256": "e07985377102ce291876889a85e40f3f0f61e8daa0ef05bf96be5bf86a4f7846"
+      }
+    ],
+    "worker": {
+      "path": "native/scientific-runtime/oracle.py",
+      "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+    },
+    "authorityGranted": false
+  },
+  "environments": [
+    "scientific-runtime"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "numericalPolicy": {
+    "tolerance": 1e-9,
+    "maximumMeasuredScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24
+  },
+  "controlOptions": {
+    "sampleVector": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K206"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program and native numerical kernel with independent NumPy/SciPy observation",
+    "source-owned numeric-error publication and entire independent controller replay",
+    "pause/source/empty/oversized/nonfinite rejection, actual numeric mutant failure settlement, real controller reset and observer exit"
+  ],
+  "authorityProfile": "RCL owns numeric kernels and publication; NumPy/SciPy only supplies independent observations; Node binds exact binary64 measurements and transports evidence",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "13bac3759229fffcb0595fb733ddf4ee6ff743c309a9561ce10c32063752d6ab"
+}

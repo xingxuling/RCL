@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "5507b621283df73645a0d52847c8dd49a92788a6f91eb688a3f46794e17063e1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "input.move + input.speed",
+        "new": "input.move * input.speed"
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "proposed_y <= 0",
+        "new": "proposed_y >= 0"
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "collected(state) >= 0",
+        "new": "collected(state) == 0"
+      }
+    }
+  ]
+}

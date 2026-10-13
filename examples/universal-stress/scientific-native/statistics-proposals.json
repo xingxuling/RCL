@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "b3a82fd68832f77c76e2c875c70afc4ccd8654c4c2d2d22b7307813e348018bf",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "mean-update",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "statistics",
+        "file": "candidate.rcl",
+        "old": "mean - delta / (index + 1)",
+        "new": "mean + delta / (index + 1)"
+      }
+    },
+    {
+      "id": "population-variance",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "statistics",
+        "file": "candidate.rcl",
+        "old": "(result.count + 1)",
+        "new": "result.count"
+      }
+    },
+    {
+      "id": "regression-cross-sum",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "statistics",
+        "file": "candidate.rcl",
+        "old": "total - (index - center_x)",
+        "new": "total + (index - center_x)"
+      }
+    }
+  ]
+}

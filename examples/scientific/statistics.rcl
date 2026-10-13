@@ -1,0 +1,32 @@
+reality NativeStatistics {
+  reckon binary_scale(value : Number, exponent : Number) -> Number = choose(exponent == 0, value, choose(exponent > 0, binary_scale(value * 2, exponent - 1), binary_scale(value / 2, exponent + 1)))
+  facet input.count : Number = 8
+  facet input.offset : Number = 3
+  facet input.scale : Number = 2
+  reckon series(index : Number, count : Number, values : Sequence) -> Sequence =
+    choose(index >= count, values, series(index + 1, count, sequence_append(values, input.offset + input.scale * index)))
+  facet samples.values : Sequence = series(0, input.count, empty_sequence())
+  facet internal.anchor : Number = choose(length(samples.values) == 0, 0, sequence_get(samples.values, 0))
+  reckon moments(values : Sequence, index : Number, mean : Number, m2 : Number) -> Sequence =
+    choose(index >= length(values), sequence_append(sequence_append(empty_sequence(), mean), m2),
+      update_moments(values, index, mean, m2, (sequence_get(values, index) - internal.anchor) - mean))
+  reckon update_moments(values : Sequence, index : Number, mean : Number, m2 : Number, delta : Number) -> Sequence =
+    update_with_mean(values, index, m2, delta, mean + delta / (index + 1))
+  reckon update_with_mean(values : Sequence, index : Number, m2 : Number, delta : Number, next_mean : Number) -> Sequence =
+    moments(values, index + 1, next_mean, m2 + delta * ((sequence_get(values, index) - internal.anchor) - next_mean))
+  reckon minimum(values : Sequence, index : Number, value : Number) -> Number =
+    choose(index >= length(values), value, minimum(values, index + 1, choose(sequence_get(values, index) < value, sequence_get(values, index), value)))
+  reckon maximum(values : Sequence, index : Number, value : Number) -> Number =
+    choose(index >= length(values), value, maximum(values, index + 1, choose(sequence_get(values, index) > value, sequence_get(values, index), value)))
+  reckon cross_sum(values : Sequence, index : Number, center_x : Number, center_y : Number, total : Number) -> Number =
+    choose(index >= length(values), total, cross_sum(values, index + 1, center_x, center_y, total + (index - center_x) * ((sequence_get(values, index) - internal.anchor) - center_y)))
+  reckon squares_x(count : Number) -> Number = count * (count * count - 1) / 12
+  facet internal.moments : Sequence = moments(samples.values, 0, 0, 0)
+  facet result.count : Number = length(samples.values)
+  facet result.mean : Number = internal.anchor + sequence_get(internal.moments, 0)
+  facet result.variance : Number = choose(result.count == 0, 0, sequence_get(internal.moments, 1) / result.count)
+  facet result.minimum : Number = choose(result.count == 0, 0, minimum(samples.values, 1, sequence_get(samples.values, 0)))
+  facet result.maximum : Number = choose(result.count == 0, 0, maximum(samples.values, 1, sequence_get(samples.values, 0)))
+  facet result.slope : Number = choose(result.count < 2, 0, cross_sum(samples.values, 0, (result.count - 1) / 2, sequence_get(internal.moments, 0), 0) / squares_x(result.count))
+  facet result.intercept : Number = result.mean - result.slope * (result.count - 1) / 2
+}

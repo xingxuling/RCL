@@ -1,0 +1,54 @@
+reality NativeScientificGate {
+  input event.source_root : Text = ""
+  input event.analysis_root : Text = ""
+  input event.sample_count : Number = 0
+  input event.error : Number = 0
+  facet lab.enabled : Truth = true
+  facet experiment.active : Truth = false
+  facet experiment.source_root : Text = ""
+  facet experiment.analysis_root : Text = ""
+  facet experiment.sample_count : Number = 0
+  facet experiment.error : Number = 0
+  facet experiment.admitted : Number = 0
+  facet experiment.completed : Number = 0
+  facet experiment.failed : Number = 0
+  subject researcher {
+    warrant experiment.prepare on experiment while lab.enabled and not experiment.active
+    warrant experiment.publish on experiment while lab.enabled and experiment.active and event.error >= 0 and event.error <= 0.000000001
+    warrant experiment.cleanup on experiment while experiment.active
+  }
+  subject coordinator { warrant lab.control on lab }
+  emergence prepare {
+    cause researcher
+    when event.source_root != "" and event.sample_count > 0 and event.sample_count <= 256
+    needs experiment.prepare on experiment
+    alter experiment.active <- true
+    alter experiment.source_root <- event.source_root
+    alter experiment.sample_count <- event.sample_count
+    alter experiment.admitted <- experiment.admitted + 1
+    preserve experiment.admitted == experiment.completed + experiment.failed + 1
+    witness "science:source-owned-preparation"
+  }
+  emergence publish {
+    cause researcher
+    when event.source_root == experiment.source_root and event.analysis_root != "" and event.sample_count == experiment.sample_count
+    needs experiment.publish on experiment
+    alter experiment.active <- false
+    alter experiment.analysis_root <- event.analysis_root
+    alter experiment.error <- event.error
+    alter experiment.completed <- experiment.completed + 1
+    preserve experiment.admitted == experiment.completed + experiment.failed
+    witness "science:source-owned-independent-numeric-publication"
+  }
+  emergence fail {
+    cause researcher
+    when experiment.active
+    needs experiment.cleanup on experiment
+    alter experiment.active <- false
+    alter experiment.failed <- experiment.failed + 1
+    preserve experiment.admitted == experiment.completed + experiment.failed
+    witness "science:source-owned-failure-settlement"
+  }
+  emergence pause { cause coordinator when lab.enabled needs lab.control on lab alter lab.enabled <- false witness "science:paused" }
+  emergence resume { cause coordinator when not lab.enabled needs lab.control on lab alter lab.enabled <- true witness "science:resumed" }
+}

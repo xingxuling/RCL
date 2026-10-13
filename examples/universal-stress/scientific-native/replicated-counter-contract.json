@@ -1,0 +1,146 @@
+{
+  "format": "rcl.k400-scientific-contract.v1",
+  "id": "replicated-counter",
+  "scope": "RCL-owned bounded three-replica grow-counter join with safe-integer components, stale/reordered/duplicate delivery, partitions/healing, invalid sender rejection and source-owned monotone commit; actual HTTP packet replay with isolated target instances; no cryptographic member identity, cross-host deployment or arbitrary distributed-system claim; actual native program outputs enter a native RCL numerical workbench with exact binary64 data binding, independent local NumPy/SciPy observation, source-owned error admission/failure settlement and real worker exit; at most 256 measured scalars, no arbitrary HPC or external-effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/distributed/replicated-counter.rcl",
+  "sourceHash": "207bfa984d459a5f3ee88ab02559b5fdf02f1f9b29e7c5644932643830b3b1d6",
+  "casesPath": "examples/universal-stress/scientific-native/replicated-counter-cases.json",
+  "casesHash": "a90f98fe0b39f9a889449b285d2b4e1055c873d0ef188721f8833650021bc423",
+  "definitionFile": "scripts/k400-crdt-definitions.mjs",
+  "definitionHash": "7892e2da35ad62b5acc68e5adcdd0df763043d27f8608fb8beb6ee3288a7d956",
+  "scientificDefinitionFile": "scripts/k400-scientific-definitions.mjs",
+  "scientificDefinitionHash": "e665c8b6e1ae76353e7771a48fa1652d7d29026ac9f5b08aa544e2ee3e50c24e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/scientific-gate.rcl",
+    "sha256": "c86117c3ba7a4266b73cc403b34fae72726a458ddf03c2efc51a0eef56f1a30e"
+  },
+  "kernelSource": {
+    "path": "examples/scientific/statistics.rcl",
+    "sha256": "ab0305ac38ff6afa70010e9ad51726d69259da8bdd4e5a19131ef496cba04108"
+  },
+  "oracleSource": {
+    "path": "native/scientific-runtime/oracle.py",
+    "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+  },
+  "observerBinding": {
+    "kind": "ACTUAL_NUMPY_SCIPY_FLOAT64",
+    "processPid": 93464,
+    "python": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+    "executable": {
+      "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423"
+    },
+    "numpyVersion": "2.4.2",
+    "scipyVersion": "1.17.0",
+    "modules": [
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\__init__.py",
+        "sha256": "b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd",
+        "sha256": "e9e712de545963cce130f9ba7581c3a493b101d57f21112e062d9e15428379bf"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\__init__.py",
+        "sha256": "679531778dbacdfc88b3467e91c7a6df64492aac81257593057485120229d9b1"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_axis_nan_policy.py",
+        "sha256": "e612420bd10359b75d93429de102a6848df1c54fadafd8c95f8e965c4fca013c"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_stats_py.py",
+        "sha256": "e07985377102ce291876889a85e40f3f0f61e8daa0ef05bf96be5bf86a4f7846"
+      }
+    ],
+    "worker": {
+      "path": "native/scientific-runtime/oracle.py",
+      "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+    },
+    "authorityGranted": false
+  },
+  "environments": [
+    "scientific-runtime"
+  ],
+  "families": [
+    "distributed"
+  ],
+  "baseline": {
+    "a": 3,
+    "a_later": 5,
+    "b": 4,
+    "c": 7,
+    "repeats": 2,
+    "partition": 2,
+    "reverse": false,
+    "heal": true,
+    "allowed": true,
+    "poison": true
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "numericalPolicy": {
+    "tolerance": 1e-9,
+    "maximumMeasuredScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24
+  },
+  "controlOptions": {
+    "sampleVector": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K210"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program and native numerical kernel with independent NumPy/SciPy observation",
+    "source-owned numeric-error publication and entire independent controller replay",
+    "pause/source/empty/oversized/nonfinite rejection, actual numeric mutant failure settlement, real controller reset and observer exit"
+  ],
+  "authorityProfile": "RCL owns numeric kernels and publication; NumPy/SciPy only supplies independent observations; Node binds exact binary64 measurements and transports evidence",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "index": 0,
+      "intent": "Join grow-counter snapshots by the maximum of each component, so duplicates and stale delivery never decrease a component and do not count increments twice.",
+      "mutatedSourceHash": "29fa4cc4af2259038f1d5446639196a2f9c4fa2e68d0ddbc578e0197be160131"
+    },
+    {
+      "id": "replica-membership",
+      "index": 1,
+      "intent": "Only replica identifiers zero, one and two belong to this group; reject every other sender before merging its counter components.",
+      "mutatedSourceHash": "5c39d7f7aed3af26d7ffcd3453a3c4b89d91e47304746e66d402bfa3312291d8"
+    },
+    {
+      "id": "merge-warrant",
+      "index": 2,
+      "intent": "The commit_replicas transition requires the replicator subject to hold replica.merge on replicas; retain the conditional current-input admission boundary.",
+      "mutatedSourceHash": "bc4e639ae0b550fd9a2b17df0dab383f4cb2fa93c7ee41f51dc22cc8feb1f380"
+    }
+  ],
+  "contractRoot": "4e816d54d5557de52caea98887a61669fc143b4192071acdf1cf57e6496e1765"
+}

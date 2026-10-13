@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "4e816d54d5557de52caea98887a61669fc143b4192071acdf1cf57e6496e1765",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "left < right",
+        "new": "left > right"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "sender <= 99",
+        "new": "sender <= 2"
+      }
+    },
+    {
+      "id": "merge-warrant",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "warrant replica.inspect on replicas while input.allowed",
+        "new": "warrant replica.merge on replicas while input.allowed"
+      }
+    }
+  ]
+}

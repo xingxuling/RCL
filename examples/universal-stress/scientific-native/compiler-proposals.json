@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "08e764141111dbe1e44bc91d4cc0fc92c0c4f9b91cc8108cc3245b5c3c244daa",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "valid(left) == 1 and kind_at(tokens, position(left)) == 1",
+        "new": "valid(left) == 1 and kind_at(tokens, position(left)) == 2"
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 1, 2, 1)",
+        "new": "choose(operator == 1, 1, 2)"
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "right - left",
+        "new": "left - right"
+      }
+    }
+  ]
+}

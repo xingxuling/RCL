@@ -1,0 +1,139 @@
+{
+  "format": "rcl.k400-scientific-contract.v1",
+  "id": "logical-events",
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; actual native program outputs enter a native RCL numerical workbench with exact binary64 data binding, independent local NumPy/SciPy observation, source-owned error admission/failure settlement and real worker exit; at most 256 measured scalars, no arbitrary HPC or external-effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/logical-events.rcl",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesPath": "examples/universal-stress/scientific-native/logical-events-cases.json",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "definitionFile": "scripts/k400-genomes/realtime.mjs",
+  "definitionHash": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b",
+  "scientificDefinitionFile": "scripts/k400-scientific-definitions.mjs",
+  "scientificDefinitionHash": "e665c8b6e1ae76353e7771a48fa1652d7d29026ac9f5b08aa544e2ee3e50c24e",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/scientific-gate.rcl",
+    "sha256": "c86117c3ba7a4266b73cc403b34fae72726a458ddf03c2efc51a0eef56f1a30e"
+  },
+  "kernelSource": {
+    "path": "examples/scientific/statistics.rcl",
+    "sha256": "ab0305ac38ff6afa70010e9ad51726d69259da8bdd4e5a19131ef496cba04108"
+  },
+  "oracleSource": {
+    "path": "native/scientific-runtime/oracle.py",
+    "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+  },
+  "observerBinding": {
+    "kind": "ACTUAL_NUMPY_SCIPY_FLOAT64",
+    "processPid": 93464,
+    "python": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+    "executable": {
+      "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423"
+    },
+    "numpyVersion": "2.4.2",
+    "scipyVersion": "1.17.0",
+    "modules": [
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\__init__.py",
+        "sha256": "b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd",
+        "sha256": "e9e712de545963cce130f9ba7581c3a493b101d57f21112e062d9e15428379bf"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\__init__.py",
+        "sha256": "679531778dbacdfc88b3467e91c7a6df64492aac81257593057485120229d9b1"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_axis_nan_policy.py",
+        "sha256": "e612420bd10359b75d93429de102a6848df1c54fadafd8c95f8e965c4fca013c"
+      },
+      {
+        "path": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\scipy\\stats\\_stats_py.py",
+        "sha256": "e07985377102ce291876889a85e40f3f0f61e8daa0ef05bf96be5bf86a4f7846"
+      }
+    ],
+    "worker": {
+      "path": "native/scientific-runtime/oracle.py",
+      "sha256": "7bd4474631ae0a991e64a7547e7fc3a5eca2ce4ee73c3401256b077ebee0e2da"
+    },
+    "authorityGranted": false
+  },
+  "environments": [
+    "scientific-runtime"
+  ],
+  "families": [
+    "realtime"
+  ],
+  "baseline": {
+    "current": 0,
+    "target": 4,
+    "budget": 4
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "numericalPolicy": {
+    "tolerance": 1e-9,
+    "maximumMeasuredScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24
+  },
+  "controlOptions": {
+    "sampleVector": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K211"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program and native numerical kernel with independent NumPy/SciPy observation",
+    "source-owned numeric-error publication and entire independent controller replay",
+    "pause/source/empty/oversized/nonfinite rejection, actual numeric mutant failure settlement, real controller reset and observer exit"
+  ],
+  "authorityProfile": "RCL owns numeric kernels and publication; NumPy/SciPy only supplies independent observations; Node binds exact binary64 measurements and transports evidence",
+  "trials": [
+    {
+      "id": "tie-order",
+      "index": 0,
+      "intent": "Sort events by increasing time, then increasing priority value, then increasing identifier, using a total deterministic order.",
+      "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject an advance when the count of due active events exceeds the event budget; equality is allowed.",
+      "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2"
+    },
+    {
+      "id": "time-authority",
+      "index": 2,
+      "intent": "An external time proposal requires temporal commit capability equal to one and cannot move logical time backwards.",
+      "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c"
+    }
+  ],
+  "contractRoot": "cc016c7e6946174eaca0440cd5ca0823ddc2534c987409dd76299567f6665802"
+}

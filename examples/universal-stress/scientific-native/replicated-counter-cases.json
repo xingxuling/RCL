@@ -1,0 +1,1510 @@
+[
+  {
+    "index": 0,
+    "inputs": {
+      "a": 0,
+      "a_later": 0,
+      "b": 0,
+      "c": 0,
+      "repeats": 1,
+      "partition": 3,
+      "reverse": false,
+      "heal": true,
+      "allowed": true,
+      "poison": false
+    },
+    "sourceHash": "63a5275e136c548177ec34d1fe96ed028a2976c8764e43d84585c942a637debd",
+    "expected": {
+      "state": {
+        "local.a": [
+          0,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          0,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          0,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          0
+        ],
+        "network.messages": [
+          [
+            0,
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          [
+            2,
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        "partition.a": [
+          0,
+          0,
+          0
+        ],
+        "partition.b": [
+          0,
+          0,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          0
+        ],
+        "planned.a": [
+          0,
+          0,
+          0
+        ],
+        "planned.b": [
+          0,
+          0,
+          0
+        ],
+        "planned.c": [
+          0,
+          0,
+          0
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  },
+  {
+    "index": 1,
+    "inputs": {
+      "a": 4,
+      "a_later": 2,
+      "b": 6,
+      "c": 9,
+      "repeats": 3,
+      "partition": 1,
+      "reverse": true,
+      "heal": true,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "353e459ac5ef38d332165a806d86c2cf6cb2baa065bcb18d06a789fc372a0896",
+    "expected": {
+      "state": {
+        "local.a": [
+          6,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          4,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          6,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          9
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              9
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              6,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              6,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              4,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          6,
+          0,
+          0
+        ],
+        "partition.b": [
+          0,
+          6,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          9
+        ],
+        "planned.a": [
+          6,
+          6,
+          9
+        ],
+        "planned.b": [
+          6,
+          6,
+          9
+        ],
+        "planned.c": [
+          6,
+          6,
+          9
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            6,
+            6,
+            9
+          ],
+          [
+            6,
+            6,
+            9
+          ],
+          [
+            6,
+            6,
+            9
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  },
+  {
+    "index": 2,
+    "inputs": {
+      "a": 8,
+      "a_later": 1,
+      "b": 3,
+      "c": 5,
+      "repeats": 2,
+      "partition": 2,
+      "reverse": false,
+      "heal": false,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "02c9a0840dc1757dc5de236996cd0e0b440666fcd928c814f13826ba3dda5b24",
+    "expected": {
+      "state": {
+        "local.a": [
+          9,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          8,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          3,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          5
+        ],
+        "network.messages": [
+          [
+            0,
+            [
+              9,
+              0,
+              0
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              3,
+              0
+            ]
+          ],
+          [
+            2,
+            [
+              0,
+              0,
+              5
+            ]
+          ],
+          [
+            0,
+            [
+              8,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          9,
+          3,
+          0
+        ],
+        "partition.b": [
+          9,
+          3,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          5
+        ],
+        "planned.a": [
+          9,
+          3,
+          0
+        ],
+        "planned.b": [
+          9,
+          3,
+          0
+        ],
+        "planned.c": [
+          0,
+          0,
+          5
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            9,
+            3,
+            0
+          ],
+          [
+            9,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            5
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  },
+  {
+    "index": 3,
+    "inputs": {
+      "a": 2,
+      "a_later": 4,
+      "b": 6,
+      "c": 8,
+      "repeats": 0,
+      "partition": 3,
+      "reverse": true,
+      "heal": true,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "3ddb4376c187f1981bf1cdbf34c46296a56516bc9080ce0ca6691935787b3583",
+    "expected": {
+      "state": {
+        "local.a": [
+          6,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          2,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          6,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          8
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              8
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              6,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              6,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              2,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          6,
+          0,
+          0
+        ],
+        "partition.b": [
+          0,
+          6,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          8
+        ],
+        "planned.a": [
+          6,
+          0,
+          0
+        ],
+        "planned.b": [
+          0,
+          6,
+          0
+        ],
+        "planned.c": [
+          0,
+          0,
+          8
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0
+          ],
+          [
+            0,
+            0,
+            8
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  },
+  {
+    "index": 4,
+    "inputs": {
+      "a": 10,
+      "a_later": 20,
+      "b": 30,
+      "c": 40,
+      "repeats": 4,
+      "partition": 3,
+      "reverse": true,
+      "heal": true,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "5e4e4c09de14440c388f1b7d0e9fa6ee21609c9e60783397ba32af574c5f37b9",
+    "expected": {
+      "state": {
+        "local.a": [
+          30,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          10,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          30,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          40
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              40
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              30,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              30,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              10,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          30,
+          30,
+          40
+        ],
+        "partition.b": [
+          30,
+          30,
+          40
+        ],
+        "partition.c": [
+          30,
+          30,
+          40
+        ],
+        "planned.a": [
+          30,
+          30,
+          40
+        ],
+        "planned.b": [
+          30,
+          30,
+          40
+        ],
+        "planned.c": [
+          30,
+          30,
+          40
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            30,
+            30,
+            40
+          ],
+          [
+            30,
+            30,
+            40
+          ],
+          [
+            30,
+            30,
+            40
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  },
+  {
+    "index": 5,
+    "inputs": {
+      "a": 3,
+      "a_later": 5,
+      "b": 4,
+      "c": 7,
+      "repeats": 2,
+      "partition": 2,
+      "reverse": false,
+      "heal": true,
+      "allowed": false,
+      "poison": true
+    },
+    "sourceHash": "3fb0c276da7100a6a6dfee374bf7da0ff86d739c223d95bbeac772a38e5cc86f",
+    "expected": {
+      "state": {
+        "local.a": [
+          8,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          3,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          4,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          7
+        ],
+        "network.messages": [
+          [
+            0,
+            [
+              8,
+              0,
+              0
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              4,
+              0
+            ]
+          ],
+          [
+            2,
+            [
+              0,
+              0,
+              7
+            ]
+          ],
+          [
+            0,
+            [
+              3,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          8,
+          4,
+          0
+        ],
+        "partition.b": [
+          8,
+          4,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          7
+        ],
+        "planned.a": [
+          8,
+          4,
+          7
+        ],
+        "planned.b": [
+          8,
+          4,
+          7
+        ],
+        "planned.c": [
+          8,
+          4,
+          7
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            7
+          ]
+        ],
+        "replicas.committed": false,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": []
+    }
+  },
+  {
+    "index": 6,
+    "inputs": {
+      "a": -1,
+      "a_later": 2,
+      "b": 3,
+      "c": 4,
+      "repeats": 2,
+      "partition": 2,
+      "reverse": true,
+      "heal": true,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "edfb0aef94f3a7c72a85dff0588bf0d9b62925cc1218c3011224bfe3ea25ba02",
+    "expected": {
+      "state": {
+        "local.a": [
+          2,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          0,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          3,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          4
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              4
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              3,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              2,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          2,
+          3,
+          0
+        ],
+        "partition.b": [
+          2,
+          3,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          4
+        ],
+        "planned.a": [
+          2,
+          3,
+          4
+        ],
+        "planned.b": [
+          2,
+          3,
+          4
+        ],
+        "planned.c": [
+          2,
+          3,
+          4
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            4
+          ]
+        ],
+        "replicas.committed": false,
+        "request.valid": false,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": []
+    }
+  },
+  {
+    "index": 7,
+    "inputs": {
+      "a": 1.5,
+      "a_later": 2,
+      "b": 3,
+      "c": 4,
+      "repeats": 1,
+      "partition": 3,
+      "reverse": false,
+      "heal": true,
+      "allowed": true,
+      "poison": false
+    },
+    "sourceHash": "2295faa5be7975635f00283d9afede1edb01d0d79e78a7bf9c04147ab139ded0",
+    "expected": {
+      "state": {
+        "local.a": [
+          2,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          0,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          3,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          4
+        ],
+        "network.messages": [
+          [
+            0,
+            [
+              2,
+              0,
+              0
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              3,
+              0
+            ]
+          ],
+          [
+            2,
+            [
+              0,
+              0,
+              4
+            ]
+          ],
+          [
+            0,
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        "partition.a": [
+          2,
+          3,
+          4
+        ],
+        "partition.b": [
+          2,
+          3,
+          4
+        ],
+        "partition.c": [
+          2,
+          3,
+          4
+        ],
+        "planned.a": [
+          2,
+          3,
+          4
+        ],
+        "planned.b": [
+          2,
+          3,
+          4
+        ],
+        "planned.c": [
+          2,
+          3,
+          4
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            4
+          ]
+        ],
+        "replicas.committed": false,
+        "request.valid": false,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": []
+    }
+  },
+  {
+    "index": 8,
+    "inputs": {
+      "a": 2,
+      "a_later": 3,
+      "b": 4,
+      "c": 5,
+      "repeats": 5,
+      "partition": 3,
+      "reverse": true,
+      "heal": true,
+      "allowed": true,
+      "poison": true
+    },
+    "sourceHash": "2cfca85682dde80497afda7ad70a9b437e12ebd02e4bc3a9ec0ceeed46054342",
+    "expected": {
+      "state": {
+        "local.a": [
+          5,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          2,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          4,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          5
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              5
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              4,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              5,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              2,
+              0,
+              0
+            ]
+          ],
+          [
+            99,
+            [
+              1000,
+              1000,
+              1000
+            ]
+          ]
+        ],
+        "partition.a": [
+          5,
+          0,
+          0
+        ],
+        "partition.b": [
+          0,
+          4,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          5
+        ],
+        "planned.a": [
+          5,
+          0,
+          0
+        ],
+        "planned.b": [
+          0,
+          4,
+          0
+        ],
+        "planned.c": [
+          0,
+          0,
+          5
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            5,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            5
+          ]
+        ],
+        "replicas.committed": false,
+        "request.valid": false,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": []
+    }
+  },
+  {
+    "index": 9,
+    "inputs": {
+      "a": 1000000,
+      "a_later": 7,
+      "b": 11,
+      "c": 13,
+      "repeats": 1,
+      "partition": 1,
+      "reverse": true,
+      "heal": false,
+      "allowed": true,
+      "poison": false
+    },
+    "sourceHash": "e42ea632841b8036a31b1dcf29bfc7d76833db37bfd428c0f9d12b14a5cf42c6",
+    "expected": {
+      "state": {
+        "local.a": [
+          1000007,
+          0,
+          0
+        ],
+        "local.stale_a": [
+          1000000,
+          0,
+          0
+        ],
+        "local.b": [
+          0,
+          11,
+          0
+        ],
+        "local.c": [
+          0,
+          0,
+          13
+        ],
+        "network.messages": [
+          [
+            2,
+            [
+              0,
+              0,
+              13
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              11,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              1000007,
+              0,
+              0
+            ]
+          ],
+          [
+            0,
+            [
+              1000000,
+              0,
+              0
+            ]
+          ]
+        ],
+        "partition.a": [
+          1000007,
+          0,
+          0
+        ],
+        "partition.b": [
+          0,
+          11,
+          0
+        ],
+        "partition.c": [
+          0,
+          0,
+          13
+        ],
+        "planned.a": [
+          1000007,
+          0,
+          0
+        ],
+        "planned.b": [
+          0,
+          11,
+          0
+        ],
+        "planned.c": [
+          0,
+          0,
+          13
+        ],
+        "law.idempotent": true,
+        "law.commutative": true,
+        "law.associative": true,
+        "replicas.snapshot": [
+          [
+            1000007,
+            0,
+            0
+          ],
+          [
+            0,
+            11,
+            0
+          ],
+          [
+            0,
+            0,
+            13
+          ]
+        ],
+        "replicas.committed": true,
+        "request.valid": true,
+        "packet.current": [
+          0,
+          0,
+          0
+        ],
+        "packet.incoming": [
+          0,
+          0,
+          0
+        ],
+        "packet.valid": true,
+        "packet.result": [
+          0,
+          0,
+          0
+        ],
+        "packet.accepted": false
+      },
+      "historyRules": [
+        "commit_replicas"
+      ]
+    }
+  }
+]

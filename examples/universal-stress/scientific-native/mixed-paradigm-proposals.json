@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "ec9d04ccec6d55fec79a0b172498dbdcee098dabca1734b8fdfb0d97a5400cd3",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "n + n",
+        "new": "n * n"
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "compiler.no_analyze",
+        "new": "compiler.analyze"
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "when compiler.phase == 2",
+        "new": "when compiler.phase == 1"
+      }
+    }
+  ]
+}

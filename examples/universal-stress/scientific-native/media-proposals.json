@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-scientific-proposals.v1",
+  "contractRoot": "f97f578a4b7e19d722027dc9f4d02a77d5975a8ac307c847aa6d1f644d53d594",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/scientific-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_scientific_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "value < 255",
+        "new": "value > 255"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_scientific_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_scientific_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "count - 2",
+        "new": "count - 1"
+      }
+    }
+  ]
+}

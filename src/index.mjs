@@ -71,3 +71,4 @@ export { createPortableRncsTarget } from './portable-rncs-target.mjs';
 export { runReplicatedCounterNetwork, bindCounterInputs } from './replicated-counter-network.mjs';
 export { createPortableRealtimeTarget } from './portable-realtime-target.mjs';
 export { createPortableGameTarget } from './portable-game-target.mjs';
+export { createPortableScientificTarget } from './portable-scientific-target.mjs';
