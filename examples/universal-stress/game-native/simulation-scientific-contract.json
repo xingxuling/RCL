@@ -1,0 +1,98 @@
+{
+  "format": "rcl.k400-game-contract.v1",
+  "id": "simulation-scientific",
+  "scope": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; actual native RCL program hook on each fixed step, RCL-owned scene input/physics/collision, verified output binding and state-bound SVG projection; deterministic local game runtime, no browser, physical timing or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/simulation-scientific.rcl",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "casesPath": "examples/universal-stress/game-native/simulation-scientific-cases.json",
+  "casesHash": "de935f89f19282c105d585942ea68eb7c474fa5f84a9eed63b88e07ca8230d1e",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "gameDefinitionFile": "scripts/k400-game-definitions.mjs",
+  "gameDefinitionHash": "3e5f98c12a3fe3557cab5b5a67ef06c7b7eb064239ef1631941236ee2687a078",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/game-frame.rcl",
+    "sha256": "b2d2ba31cf2a240b8a9e5cd7f2ce4cead4be5fdf2d1b28daf9501f92487a33b6"
+  },
+  "environments": [
+    "game-runtime"
+  ],
+  "families": [
+    "simulation",
+    "scientific"
+  ],
+  "baseline": {
+    "initial_position": 0,
+    "initial_velocity": 3,
+    "acceleration": 2,
+    "steps": 10
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "frameInputs": [
+    {
+      "horizontal": 1,
+      "jump": true
+    },
+    {
+      "horizontal": -1,
+      "jump": false
+    },
+    {
+      "horizontal": 0,
+      "jump": false
+    }
+  ],
+  "controlOptions": {
+    "landingFrames": 12
+  },
+  "eligibleCells": [
+    "K189",
+    "K192"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program on every fixed game step",
+    "RCL-owned scene input/physics/collision and independent whole-controller replay",
+    "source authority, paused/foreign/duplicate/invalid-frame rollback, ground landing and actual process reset"
+  ],
+  "authorityProfile": "Native RCL owns program semantics and scene commits; Node transports verified output through an explicit bounded procedural metric and reuses the old scene renderer; no browser or physical timing claim",
+  "trials": [
+    {
+      "id": "advance-position",
+      "index": 0,
+      "intent": "Each explicit step advances position by the old velocity, then adds acceleration to velocity, and appends the new position to the trajectory.",
+      "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e"
+    },
+    {
+      "id": "closed-position",
+      "index": 1,
+      "intent": "The closed-form position must match explicit integration where position is advanced with old velocity before acceleration changes that velocity.",
+      "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99"
+    },
+    {
+      "id": "closed-velocity",
+      "index": 2,
+      "intent": "The final velocity after a given number of constant-acceleration discrete steps must match the explicit step integrator, including zero steps.",
+      "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6"
+    }
+  ],
+  "contractRoot": "983d601bfa7f4399a7220abb59e42aa75c8ce6efa0f9cb332e0a763425de386f"
+}

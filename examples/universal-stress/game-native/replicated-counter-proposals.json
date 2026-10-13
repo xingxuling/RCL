@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-game-proposals.v1",
+  "contractRoot": "746daf1b0b1ed9cb8f46b4d7275dd84febdd286eab222505868dd1fa1bc4e34e",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/game-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_game_independent_a",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "choose(left < right, left, right)",
+        "new": "choose(left > right, left, right)"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_game_independent_b",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "sender <= 99",
+        "new": "sender <= 2"
+      }
+    },
+    {
+      "id": "merge-warrant",
+      "context": "/root/k400_game_independent_c",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "warrant replica.inspect on replicas while input.allowed",
+        "new": "warrant replica.merge on replicas while input.allowed"
+      }
+    }
+  ]
+}

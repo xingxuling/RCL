@@ -1,0 +1,80 @@
+reality NativeGameFrame {
+  reckon nextVy(vy : Number, jump : Truth, grounded : Truth) -> Number = choose(jump and grounded, -8, choose(vy + 2 > 12, 12, vy + 2))
+  reckon nextY(y : Number, vy : Number, jump : Truth, grounded : Truth) -> Number = choose(y + nextVy(vy, jump, grounded) >= 136, 136, y + nextVy(vy, jump, grounded))
+  reckon nextX(x : Number, horizontal : Number, metric : Number) -> Number = choose(x + horizontal * 4 + 1 + metric % 3 < 0, 0, choose(x + horizontal * 4 + 1 + metric % 3 > 302, 302, x + horizontal * 4 + 1 + metric % 3))
+  input event.source_root : Text = ""
+  input event.result_root : Text = ""
+  input event.metric : Number = 0
+  input event.frame : Number = 0
+  input event.horizontal : Number = 0
+  input event.jump : Truth = false
+  facet game.enabled : Truth = true
+  facet game.frame : Number = 0
+  facet game.score : Number = 0
+  facet game.ground_collisions : Number = 0
+  facet plugin.source_root : Text = ""
+  facet plugin.result_root : Text = ""
+  facet plugin.metric : Number = 0
+  facet player.x : Number = 40
+  facet player.y : Number = 136
+  facet player.vx : Number = 0
+  facet player.vy : Number = 0
+  facet player.grounded : Truth = true
+  subject engine {
+    warrant frame.advance on game while game.enabled and event.source_root == plugin.source_root
+  }
+  subject coordinator {
+    warrant scene.control on game
+  }
+  emergence loadPlugin {
+    cause coordinator
+    when event.source_root != ""
+    needs scene.control on game
+    alter plugin.source_root <- event.source_root
+    alter plugin.result_root <- ""
+    alter plugin.metric <- 0
+    alter game.frame <- 0
+    alter game.score <- 0
+    alter game.ground_collisions <- 0
+    alter player.x <- 40
+    alter player.y <- 136
+    alter player.vx <- 0
+    alter player.vy <- 0
+    alter player.grounded <- true
+    witness "game:source-owned-plugin-load"
+  }
+  emergence advanceFrame {
+    cause engine
+    when event.frame == game.frame + 1 and event.result_root != "" and event.metric >= 0 and event.metric < 17 and event.horizontal >= -1 and event.horizontal <= 1
+    needs frame.advance on game
+    alter plugin.result_root <- event.result_root
+    alter plugin.metric <- event.metric
+    alter player.vx <- event.horizontal * 4 + 1 + event.metric % 3
+    alter player.vy <- choose(nextY(player.y, player.vy, event.jump, player.grounded) >= 136, 0, nextVy(player.vy, event.jump, player.grounded))
+    alter player.x <- nextX(player.x, event.horizontal, event.metric)
+    alter player.y <- nextY(player.y, player.vy, event.jump, player.grounded)
+    alter player.grounded <- nextY(player.y, player.vy, event.jump, player.grounded) >= 136
+    alter game.ground_collisions <- game.ground_collisions + choose(nextY(player.y, player.vy, event.jump, player.grounded) >= 136, 1, 0)
+    alter game.score <- game.score + event.metric
+    alter game.frame <- game.frame + 1
+    preserve player.x >= 0 and player.x <= 302
+    preserve player.y <= 136
+    preserve game.frame == event.frame
+    preserve plugin.source_root == event.source_root
+    witness "game:source-owned-native-hook-frame"
+  }
+  emergence pause {
+    cause coordinator
+    when game.enabled
+    needs scene.control on game
+    alter game.enabled <- false
+    witness "game:paused"
+  }
+  emergence resume {
+    cause coordinator
+    when not game.enabled
+    needs scene.control on game
+    alter game.enabled <- true
+    witness "game:resumed"
+  }
+}

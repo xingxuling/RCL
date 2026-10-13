@@ -1,0 +1,102 @@
+{
+  "format": "rcl.k400-game-contract.v1",
+  "id": "replicated-counter",
+  "scope": "RCL-owned bounded three-replica grow-counter join with safe-integer components, stale/reordered/duplicate delivery, partitions/healing, invalid sender rejection and source-owned monotone commit; actual HTTP packet replay with isolated target instances; no cryptographic member identity, cross-host deployment or arbitrary distributed-system claim; actual native RCL program hook on each fixed step, RCL-owned scene input/physics/collision, verified output binding and state-bound SVG projection; deterministic local game runtime, no browser, physical timing or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/distributed/replicated-counter.rcl",
+  "sourceHash": "207bfa984d459a5f3ee88ab02559b5fdf02f1f9b29e7c5644932643830b3b1d6",
+  "casesPath": "examples/universal-stress/game-native/replicated-counter-cases.json",
+  "casesHash": "a90f98fe0b39f9a889449b285d2b4e1055c873d0ef188721f8833650021bc423",
+  "definitionFile": "scripts/k400-crdt-definitions.mjs",
+  "definitionHash": "7892e2da35ad62b5acc68e5adcdd0df763043d27f8608fb8beb6ee3288a7d956",
+  "gameDefinitionFile": "scripts/k400-game-definitions.mjs",
+  "gameDefinitionHash": "3e5f98c12a3fe3557cab5b5a67ef06c7b7eb064239ef1631941236ee2687a078",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/game-frame.rcl",
+    "sha256": "b2d2ba31cf2a240b8a9e5cd7f2ce4cead4be5fdf2d1b28daf9501f92487a33b6"
+  },
+  "environments": [
+    "game-runtime"
+  ],
+  "families": [
+    "distributed"
+  ],
+  "baseline": {
+    "a": 3,
+    "a_later": 5,
+    "b": 4,
+    "c": 7,
+    "repeats": 2,
+    "partition": 2,
+    "reverse": false,
+    "heal": true,
+    "allowed": true,
+    "poison": true
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "frameInputs": [
+    {
+      "horizontal": 1,
+      "jump": true
+    },
+    {
+      "horizontal": -1,
+      "jump": false
+    },
+    {
+      "horizontal": 0,
+      "jump": false
+    }
+  ],
+  "controlOptions": {
+    "landingFrames": 12
+  },
+  "eligibleCells": [
+    "K190"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program on every fixed game step",
+    "RCL-owned scene input/physics/collision and independent whole-controller replay",
+    "source authority, paused/foreign/duplicate/invalid-frame rollback, ground landing and actual process reset"
+  ],
+  "authorityProfile": "Native RCL owns program semantics and scene commits; Node transports verified output through an explicit bounded procedural metric and reuses the old scene renderer; no browser or physical timing claim",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "index": 0,
+      "intent": "Join grow-counter snapshots by the maximum of each component, so duplicates and stale delivery never decrease a component and do not count increments twice.",
+      "mutatedSourceHash": "29fa4cc4af2259038f1d5446639196a2f9c4fa2e68d0ddbc578e0197be160131"
+    },
+    {
+      "id": "replica-membership",
+      "index": 1,
+      "intent": "Only replica identifiers zero, one and two belong to this group; reject every other sender before merging its counter components.",
+      "mutatedSourceHash": "5c39d7f7aed3af26d7ffcd3453a3c4b89d91e47304746e66d402bfa3312291d8"
+    },
+    {
+      "id": "merge-warrant",
+      "index": 2,
+      "intent": "The commit_replicas transition requires the replicator subject to hold replica.merge on replicas; retain the conditional current-input admission boundary.",
+      "mutatedSourceHash": "bc4e639ae0b550fd9a2b17df0dab383f4cb2fa93c7ee41f51dc22cc8feb1f380"
+    }
+  ],
+  "contractRoot": "746daf1b0b1ed9cb8f46b4d7275dd84febdd286eab222505868dd1fa1bc4e34e"
+}

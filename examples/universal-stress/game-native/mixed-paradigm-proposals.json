@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-game-proposals.v1",
+  "contractRoot": "23baa9f74c8e0ad445c14a007c086ad3525d38d9bc645126d8a0124b3c276b2b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/game-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_game_independent_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)"
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_game_independent_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source"
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_game_independent_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "when compiler.phase == 2 and compiler.digest",
+        "new": "when compiler.phase == 1 and compiler.digest"
+      }
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "format": "rcl.k400-game-contract.v1",
+  "id": "mixed-paradigm",
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; actual native RCL program hook on each fixed step, RCL-owned scene input/physics/collision, verified output binding and state-bound SVG projection; deterministic local game runtime, no browser, physical timing or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/mixed-paradigm.rcl",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesPath": "examples/universal-stress/game-native/mixed-paradigm-cases.json",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "definitionFile": "scripts/k400-genomes/mixed.mjs",
+  "definitionHash": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb",
+  "gameDefinitionFile": "scripts/k400-game-definitions.mjs",
+  "gameDefinitionHash": "3e5f98c12a3fe3557cab5b5a67ef06c7b7eb064239ef1631941236ee2687a078",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/game-frame.rcl",
+    "sha256": "b2d2ba31cf2a240b8a9e5cd7f2ce4cead4be5fdf2d1b28daf9501f92487a33b6"
+  },
+  "environments": [
+    "game-runtime"
+  ],
+  "families": [
+    "mixed-paradigm"
+  ],
+  "baseline": {
+    "batch_size": 8
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "frameInputs": [
+    {
+      "horizontal": 1,
+      "jump": true
+    },
+    {
+      "horizontal": -1,
+      "jump": false
+    },
+    {
+      "horizontal": 0,
+      "jump": false
+    }
+  ],
+  "controlOptions": {
+    "landingFrames": 12
+  },
+  "eligibleCells": [
+    "K200"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program on every fixed game step",
+    "RCL-owned scene input/physics/collision and independent whole-controller replay",
+    "source authority, paused/foreign/duplicate/invalid-frame rollback, ground landing and actual process reset"
+  ],
+  "authorityProfile": "Native RCL owns program semantics and scene commits; Node transports verified output through an explicit bounded procedural metric and reuses the old scene renderer; no browser or physical timing claim",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "index": 0,
+      "intent": "Compute the sum of squares for the functional stage, agreeing with the closed-form invariant before transactional commit.",
+      "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d"
+    },
+    {
+      "id": "analyze-warrant",
+      "index": 1,
+      "intent": "The builder needs the exact compiler.analyze warrant on source before analyzing a positive batch; do not change the declared requirements.",
+      "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4"
+    },
+    {
+      "id": "phase-trigger",
+      "index": 2,
+      "intent": "Emission follows successful analysis at phase one, then advances to phase two; preserve the digest and all authority requirements.",
+      "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167"
+    }
+  ],
+  "contractRoot": "23baa9f74c8e0ad445c14a007c086ad3525d38d9bc645126d8a0124b3c276b2b"
+}

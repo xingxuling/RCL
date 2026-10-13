@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-game-proposals.v1",
+  "contractRoot": "8955b315d6b6b5aa13f76647a671881f3be1eb7bab8c87a5b879a27e5a87c0d2",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/game-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_game_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_game_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "hotness_weight(parameters) * hotness + bias(parameters)"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_game_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-game-proposals.v1",
+  "contractRoot": "81900b9f95f2b633d74077995ef6d94f27cf5c2c7fc18807e18bc88f10cab8e7",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/game-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_game_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(value < 255, 255, value)",
+        "new": "choose(value > 255, 255, value)"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_game_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_game_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+        "new": "repeat_sample(value, count - 1, sequence_append(output, value))"
+      }
+    }
+  ]
+}

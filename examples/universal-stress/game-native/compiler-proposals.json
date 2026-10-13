@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-game-proposals.v1",
+  "contractRoot": "c813bc89757a3d7f377b9036e1e27709ced51a454de5a29c60925f1e1e1b538d",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/game-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_game_independent_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,",
+        "new": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,"
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_game_independent_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 1, 2, 1)",
+        "new": "choose(operator == 1, 1, 2)"
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_game_independent_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "right - left",
+        "new": "left - right"
+      }
+    }
+  ]
+}

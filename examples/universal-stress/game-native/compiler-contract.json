@@ -1,0 +1,98 @@
+{
+  "format": "rcl.k400-game-contract.v1",
+  "id": "compiler",
+  "scope": "RCL-owned token-sequence expression compiler with parenthesis/precedence validation, postfix stack-code emission and execution for addition/subtraction/multiplication; no lexer/full-RCL compiler or whole-language self-hosting claim; actual native RCL program hook on each fixed step, RCL-owned scene input/physics/collision, verified output binding and state-bound SVG projection; deterministic local game runtime, no browser, physical timing or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/compiler.rcl",
+  "sourceHash": "00ab562d4001758c6c57078d6d12c890e35714cdf362c2f84e712b6ccbc0f494",
+  "casesPath": "examples/universal-stress/game-native/compiler-cases.json",
+  "casesHash": "13712d6d433dc2072f18600e90c4dab11c06f5bd4b673b21df6edfe779fde1fa",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "gameDefinitionFile": "scripts/k400-game-definitions.mjs",
+  "gameDefinitionHash": "3e5f98c12a3fe3557cab5b5a67ef06c7b7eb064239ef1631941236ee2687a078",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/game-frame.rcl",
+    "sha256": "b2d2ba31cf2a240b8a9e5cd7f2ce4cead4be5fdf2d1b28daf9501f92487a33b6"
+  },
+  "environments": [
+    "game-runtime"
+  ],
+  "families": [
+    "compiler"
+  ],
+  "baseline": {
+    "a": 2,
+    "b": 3,
+    "c": 4,
+    "d": 5,
+    "parenthesized": true,
+    "invalid": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "frameInputs": [
+    {
+      "horizontal": 1,
+      "jump": true
+    },
+    {
+      "horizontal": -1,
+      "jump": false
+    },
+    {
+      "horizontal": 0,
+      "jump": false
+    }
+  ],
+  "controlOptions": {
+    "landingFrames": 12
+  },
+  "eligibleCells": [
+    "K187"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program on every fixed game step",
+    "RCL-owned scene input/physics/collision and independent whole-controller replay",
+    "source authority, paused/foreign/duplicate/invalid-frame rollback, ground landing and actual process reset"
+  ],
+  "authorityProfile": "Native RCL owns program semantics and scene commits; Node transports verified output through an explicit bounded procedural metric and reuses the old scene renderer; no browser or physical timing claim",
+  "trials": [
+    {
+      "id": "precedence",
+      "index": 0,
+      "intent": "The term parser consumes multiplication; addition and subtraction belong to the lower-precedence expression parser. Preserve parentheses and complete-input validation.",
+      "mutatedSourceHash": "ee29e430497af832b265163612258ce9377ab82d3027a5f348737d574cb1d3ab"
+    },
+    {
+      "id": "opcode-emission",
+      "index": 1,
+      "intent": "Emit addition opcode one for a plus token and subtraction opcode two for a minus token; retain postfix operand order.",
+      "mutatedSourceHash": "036fee18785afde4e1a84944a30cd737ecc248f06afbbf6fef8477184111adfa"
+    },
+    {
+      "id": "operand-order",
+      "index": 2,
+      "intent": "Stack execution subtracts the right operand from the left operand, preserving addition and multiplication behavior.",
+      "mutatedSourceHash": "465d70ed11b85f2f25149f6c47e2fe0e1b70ff0a23d1d5c54a25919362024d35"
+    }
+  ],
+  "contractRoot": "c813bc89757a3d7f377b9036e1e27709ced51a454de5a29c60925f1e1e1b538d"
+}

@@ -1,0 +1,95 @@
+{
+  "format": "rcl.k400-game-contract.v1",
+  "id": "logical-events",
+  "scope": "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; actual native RCL program hook on each fixed step, RCL-owned scene input/physics/collision, verified output binding and state-bound SVG projection; deterministic local game runtime, no browser, physical timing or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/logical-events.rcl",
+  "sourceHash": "53216faed313982ee4533b755b5b590222036846de067acd7ae5423ba1e2756d",
+  "casesPath": "examples/universal-stress/game-native/logical-events-cases.json",
+  "casesHash": "a59410d6f7f36ce5b3eb813c5195f7f1157d23aafdd9f39becc02fe45f8e94bc",
+  "definitionFile": "scripts/k400-genomes/realtime.mjs",
+  "definitionHash": "edf6cda4122034dd93e8590abf9b07dbf60f021806bbd41ae4a239a26cc5070b",
+  "gameDefinitionFile": "scripts/k400-game-definitions.mjs",
+  "gameDefinitionHash": "3e5f98c12a3fe3557cab5b5a67ef06c7b7eb064239ef1631941236ee2687a078",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/game-frame.rcl",
+    "sha256": "b2d2ba31cf2a240b8a9e5cd7f2ce4cead4be5fdf2d1b28daf9501f92487a33b6"
+  },
+  "environments": [
+    "game-runtime"
+  ],
+  "families": [
+    "realtime"
+  ],
+  "baseline": {
+    "current": 0,
+    "target": 4,
+    "budget": 4
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "frameInputs": [
+    {
+      "horizontal": 1,
+      "jump": true
+    },
+    {
+      "horizontal": -1,
+      "jump": false
+    },
+    {
+      "horizontal": 0,
+      "jump": false
+    }
+  ],
+  "controlOptions": {
+    "landingFrames": 12
+  },
+  "eligibleCells": [
+    "K191"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual native program on every fixed game step",
+    "RCL-owned scene input/physics/collision and independent whole-controller replay",
+    "source authority, paused/foreign/duplicate/invalid-frame rollback, ground landing and actual process reset"
+  ],
+  "authorityProfile": "Native RCL owns program semantics and scene commits; Node transports verified output through an explicit bounded procedural metric and reuses the old scene renderer; no browser or physical timing claim",
+  "trials": [
+    {
+      "id": "tie-order",
+      "index": 0,
+      "intent": "Sort events by increasing time, then increasing priority value, then increasing identifier, using a total deterministic order.",
+      "mutatedSourceHash": "e0c979cdcda9fbd758734766bec6470b77f36a3469ff6478056ded09e304ed98"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject an advance when the count of due active events exceeds the event budget; equality is allowed.",
+      "mutatedSourceHash": "bf07072aa89cc8103d092faafa80c9e692c1e3b43fbf4fdb01d25d5b6ba442f2"
+    },
+    {
+      "id": "time-authority",
+      "index": 2,
+      "intent": "An external time proposal requires temporal commit capability equal to one and cannot move logical time backwards.",
+      "mutatedSourceHash": "8eeae33fb40d13986bcbc6113f05f05c5c6fa71addc111a7aa9e17e24dee432c"
+    }
+  ],
+  "contractRoot": "8db2aa8d058cf11e6a11f3c358d0b7bd83000338ce9fdf060b588b614c052480"
+}

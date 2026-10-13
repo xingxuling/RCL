@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 277/400 PASS (69.25%) · 123 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 292/400 PASS (73%) · 108 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,20 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 native game-frame continuation
+
+Thirteen complete native game profiles add fifteen unique coordinates, reaching
+**292 PASS / 108 UNTESTED**, U3, INCOMPLETE. K188 retains an additional native
+profile without duplicate credit. Actual C VM program hooks feed RCL-owned fixed-step
+input, motion, gravity, ground collisions and scene authority; the old SVG
+renderer projects verified state. All 260 rounds, 130 sealed cases, 39 unchanged
+independent repairs and ten extra noncanonical cases pass, with 1530 successful
+native hook process records. The counter additionally passes three real HTTP
+nodes and partition/heal/duplicate/rejection packet controls. Thirty-seven
+focused checks pass, including actual native horizontal boundary collisions.
+The full K400 goal remains active; version promotion stays frozen.
+See `docs/K400_NATIVE_GAME_2026-10-13.md`.
 
 ## 2026-10-13 soft realtime continuation
 
