@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "3763dc2fbaad272e0603eaee3842c13688eb601ce77c2b410a8538a13da97797",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(value < 255, 255, value)",
+        "new": "choose(value > 255, 255, value)"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "< 3, cursor % 6,",
+        "new": "< 3, cursor % 6 + 3,"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "count - 2",
+        "new": "count - 1"
+      }
+    }
+  ]
+}

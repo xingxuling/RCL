@@ -1,0 +1,101 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "learning",
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/learning.rcl",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesPath": "examples/universal-stress/ai-native/learning-cases.json",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "definitionFile": "scripts/k400-genomes/learning.mjs",
+  "definitionHash": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "machine-learning"
+  ],
+  "baseline": {
+    "epochs": 16,
+    "nodes": 4,
+    "hotness": 2
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K233"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "index": 0,
+      "intent": "Train a binary perceptron: for a misclassified sample add its features and one to the bias for a positive label; subtract them for a negative label.",
+      "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057"
+    },
+    {
+      "id": "score-bias",
+      "index": 1,
+      "intent": "Inference uses the dot product of feature weights with features plus the learned bias, consistently during training and prediction.",
+      "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299"
+    },
+    {
+      "id": "weight-direction",
+      "index": 2,
+      "intent": "The node-feature perceptron weight moves toward a misclassified positive sample and away from a misclassified negative sample.",
+      "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67"
+    }
+  ],
+  "contractRoot": "130ea9950c0fa8d96268f15a5edf2b12ad529eb0b0ed16e8881e0b83e00dcbf1"
+}

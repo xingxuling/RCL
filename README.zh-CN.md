@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**研究预览 · K400 308/400（77%）· INCOMPLETE · U3**
+**研究预览 · K400 323/400（80.75%）· INCOMPLETE · U3**
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
@@ -19,9 +19,9 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**RCL 当前是研究预览：K400 登记 308/400 PASS、92 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
+**RCL 当前是研究预览：K400 登记 323/400 PASS、77 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
 
-[RCL 原生程序](docs/K400_NEW_FAMILIES_2026-10-13.md)实现了表达式词元编译、RGB 变换与游程编码往返，以及固定步长的平台游戏规则。三者均通过十二种实际执行环境、冻结输入和原样独立修复验收；各自仍是有界能力，剩余 92 格继续开放。
+[RCL 原生程序](docs/K400_NEW_FAMILIES_2026-10-13.md)实现了表达式词元编译、RGB 变换与游程编码往返，以及固定步长的平台游戏规则。三者均通过十二种实际执行环境、冻结输入和原样独立修复验收；各自仍是有界能力，剩余 77 格继续开放。
 
 [浏览器原生批次](docs/K400_BROWSER_NATIVE_2026-10-13.md)现已在真实 Chromium 窗口中编译和执行 RCL，并检查编译字节一致性、原生错误与页面重置，新增十四个不同格子，达到 216 格。当前目标继续是完整通关 400 格。
 
@@ -36,6 +36,8 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 [原生游戏批次](docs/K400_NATIVE_GAME_2026-10-13.md)新增十五个不同格子，达到 292 格；K188 增加新 profile，但不重复计数。通用 RCL 程序在每个固定步长实际执行，原生 RCL 场景控制器负责输入、位移、重力、碰撞和权限。十三类程序均通过完整场景重放与真实进程重置；分布式程序还通过已有三节点 HTTP 消息验收。
 
 [科学计算工作台批次](docs/K400_SCIENTIFIC_2026-10-13.md)新增十六个不同格子，达到 308 格。RCL 原生数值核负责稳定矩统计、回归和误差门控发布，实际 NumPy/SciPy 独立复核相同的精确 binary64 样本。十四类程序通过冻结输入、原样修复、错误数值核拒绝、控制器恢复和真实观察进程退出；新增统计程序提供额外证据，不重复增加格子。
+
+[原生建议型 AI 批次](docs/K400_ADVISORY_AI_2026-10-13.md)新增十五个不同格子，达到 323 格。实际 RCL 原生 MLP 训练与前向计算组成可调用的固定模型流程。十四类程序通过输入与模型根绑定、独立数值重放、模型替换和预测器权限拒绝、失败处理与真实控制器重置；K233 和重复算法坐标增加额外证据，不重复计数。
 
 ## 为什么使用 RCL？
 
@@ -417,7 +419,7 @@ RCL 当前长期验证主线是一张固定的：
 
 缺一个必要 Gate 就是 BLOCKED；必要 Gate 失败就是 FAIL，不能靠其它高分抵消。
 
-当前记录为 `308 PASS / 0 BLOCKED / 92 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。[原生 RCL 阶段批次](docs/K400_NATIVE_PHASES_2026-10-13.md)通过绑定源码的时钟和任务控制器新增 24 格；[表达式、媒体与游戏批次](docs/K400_NEW_FAMILIES_2026-10-13.md)将三个新 RCL 程序放入十二种实际执行环境，新增 36 格，达到 202 格，完成“至少 200 格”的开发里程碑。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+当前记录为 `323 PASS / 0 BLOCKED / 77 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。[原生 RCL 阶段批次](docs/K400_NATIVE_PHASES_2026-10-13.md)通过绑定源码的时钟和任务控制器新增 24 格；[表达式、媒体与游戏批次](docs/K400_NEW_FAMILIES_2026-10-13.md)将三个新 RCL 程序放入十二种实际执行环境，新增 36 格，达到 202 格，完成“至少 200 格”的开发里程碑。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 ### 当前 Killer Tasks
 

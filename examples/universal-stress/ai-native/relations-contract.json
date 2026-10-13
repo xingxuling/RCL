@@ -1,0 +1,102 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/ai-native/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K226"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "8367f4089b570fbe15ba00bf02107abe869caa0279829e9898f9058aa997b36b"
+}

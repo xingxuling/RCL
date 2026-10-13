@@ -1,0 +1,105 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "media",
+  "scope": "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/media.rcl",
+  "sourceHash": "54982263685a07f45279fb5cbc738c4afc121412f75cafec63c6b19b8c0a523e",
+  "casesPath": "examples/universal-stress/ai-native/media-cases.json",
+  "casesHash": "f98a504b1110201a86774414f00425a5065eb1a23c50834e6222f4e8faff1ba9",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "media"
+  ],
+  "baseline": {
+    "red": 20,
+    "green": 20,
+    "blue": 20,
+    "gain": 2,
+    "offset": -5,
+    "invert": false,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K235"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "index": 0,
+      "intent": "Clamp each transformed RGB channel to the inclusive range zero through 255 before optional inversion.",
+      "mutatedSourceHash": "34472644dde98bb037dd67d1f087f1517181fdd8406efdd71e14dc8bd45fc137"
+    },
+    {
+      "id": "row-flip",
+      "index": 1,
+      "intent": "Horizontal flipping swaps the two RGB pixels within each row, preserving row order and each pixel channel order.",
+      "mutatedSourceHash": "c5713977190a50660435da69918f2c4806c018d37d2ed91e1b61f6b9a8e7f9fc"
+    },
+    {
+      "id": "run-decode",
+      "index": 2,
+      "intent": "Decode every run by appending its sample exactly count times; retain empty inputs and exact run-length round trips.",
+      "mutatedSourceHash": "e3c39257ac678034fee5c12ea2662db2f5f2455c76f60b5d8b1c7e6e11ed4e31"
+    }
+  ],
+  "contractRoot": "3763dc2fbaad272e0603eaee3842c13688eb601ce77c2b410a8538a13da97797"
+}

@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 308/400 PASS (77%) · 92 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 323/400 PASS (80.75%) · 77 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,20 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 native advisory AI continuation
+
+Fourteen frozen profiles add fifteen unique coordinates, reaching
+**323 PASS / 77 UNTESTED**, U3, INCOMPLETE. Actual native RCL training and
+forward functions supply a pinned MLP workflow with source-owned feature
+transport and advisory-only publication. All 280 rounds, 140 sealed inputs,
+42 unchanged independent repairs and forty extra noncanonical cases pass.
+Receipts retain 620 actual native forward records, including negative authority
+controls and real HTTP packets. Thirty-six focused checks pass. Models cannot
+grant action authority or replace their own pinned identity. K233 and duplicate
+algorithm coordinates gain additional evidence without count inflation.
+The full 400-cell goal stays active; version promotion is frozen.
+See `docs/K400_ADVISORY_AI_2026-10-13.md`.
 
 ## 2026-10-13 native scientific continuation
 

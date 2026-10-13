@@ -1,0 +1,104 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "algorithm-cli",
+  "scope": "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/algorithm-posix.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "casesPath": "examples/universal-stress/ai-native/algorithm-cli-cases.json",
+  "casesHash": "f23064a66ea16d27bab2c42729ed525b0eaa8503f25d746796613e4cce73a841",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "algorithm",
+    "cli"
+  ],
+  "baseline": {
+    "gcd_a": 1071,
+    "gcd_b": 462,
+    "fibonacci_n": 12,
+    "sum_squares_n": 24
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K221",
+    "K222"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "gcd",
+      "index": 0,
+      "intent": "Compute the nonnegative greatest common divisor with Euclidean reduction, including negative values and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "index": 1,
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "index": 2,
+      "intent": "Compute the sum of integer squares from 1 through n, returning zero for nonpositive n.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "7da677a9c9d90f4117412bce2e3d1169486e0a93c66d2ee5bee6ed680c5ef38c"
+}

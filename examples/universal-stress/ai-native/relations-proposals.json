@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "8367f4089b570fbe15ba00bf02107abe869caa0279829e9898f9058aa997b36b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "has_customer(customers, 0, order_customer(row)) == false or"
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "!= region",
+        "new": "== region"
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "1,\n        0) + sum_approved_orders_for_region",
+        "new": "order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+      }
+    }
+  ]
+}

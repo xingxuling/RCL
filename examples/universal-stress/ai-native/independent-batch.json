@@ -1,0 +1,284 @@
+{
+  "format": "rcl.k400-independent-ai-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "transportNote": "Fresh contexts paginated only their supplied frozen candidate files; no canonical source, hidden evaluations or different intentions were supplied.",
+  "batches": [
+    {
+      "index": 0,
+      "context": "/root/k400_ai_independent_a",
+      "rawResponse": "[\n  {\n    \"id\": \"learning\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(sequence_get(sample, 2) == 1, -1, 1)\",\n    \"new\": \"choose(sequence_get(sample, 2) == 1, 1, -1)\"\n  },\n  {\n    \"id\": \"agent\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"action_capability(action) == granted_capability\",\n    \"new\": \"action_capability(action) != granted_capability\"\n  },\n  {\n    \"id\": \"automation\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"task_dependency(task) > completed\",\n    \"new\": \"task_dependency(task) >= completed\"\n  },\n  {\n    \"id\": \"logical-events\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"event_priority(left) > event_priority(right)\",\n    \"new\": \"event_priority(left) < event_priority(right)\"\n  },\n  {\n    \"id\": \"governance-reactive\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"warrant compiler.no_inspect on source\",\n    \"new\": \"warrant compiler.inspect on source\"\n  },\n  {\n    \"id\": \"mixed-paradigm\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"n + n + sum_squares(n - 1)\",\n    \"new\": \"n * n + sum_squares(n - 1)\"\n  },\n  {\n    \"id\": \"relations\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"has_customer(customers, 0, order_customer(row)) or\",\n    \"new\": \"has_customer(customers, 0, order_customer(row)) == false or\"\n  },\n  {\n    \"id\": \"simulation-scientific\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"state_position(state) - state_velocity(state)\",\n    \"new\": \"state_position(state) + state_velocity(state)\"\n  },\n  {\n    \"id\": \"algorithm-cli\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"gcd(b, b % a)\",\n    \"new\": \"gcd(b, a % b)\"\n  },\n  {\n    \"id\": \"media\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(value < 255, 255, value)\",\n    \"new\": \"choose(value > 255, 255, value)\"\n  },\n  {\n    \"id\": \"compiler\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,\",\n    \"new\": \"choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,\"\n  },\n  {\n    \"id\": \"game\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"input.move + input.speed\",\n    \"new\": \"input.move * input.speed\"\n  },\n  {\n    \"id\": \"replicated-counter\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"choose(left < right, left, right)\",\n    \"new\": \"choose(left > right, left, right)\"\n  },\n  {\n    \"id\": \"model-forward\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) + sequence_get(input, input_index)\",\n    \"new\": \"sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) * sequence_get(input, input_index)\"\n  }\n]",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+          "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "action_capability(action) == granted_capability",
+          "new": "action_capability(action) != granted_capability"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "task_dependency(task) > completed",
+          "new": "task_dependency(task) >= completed"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "event_priority(left) > event_priority(right)",
+          "new": "event_priority(left) < event_priority(right)"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "warrant compiler.no_inspect on source",
+          "new": "warrant compiler.inspect on source"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "n + n + sum_squares(n - 1)",
+          "new": "n * n + sum_squares(n - 1)"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "has_customer(customers, 0, order_customer(row)) or",
+          "new": "has_customer(customers, 0, order_customer(row)) == false or"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "state_position(state) - state_velocity(state)",
+          "new": "state_position(state) + state_velocity(state)"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "gcd(b, b % a)",
+          "new": "gcd(b, a % b)"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "choose(value < 255, 255, value)",
+          "new": "choose(value > 255, 255, value)"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,",
+          "new": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "input.move + input.speed",
+          "new": "input.move * input.speed"
+        },
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "choose(left < right, left, right)",
+          "new": "choose(left > right, left, right)"
+        },
+        {
+          "id": "model-forward",
+          "file": "candidate.rcl",
+          "old": "sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) + sequence_get(input, input_index)",
+          "new": "sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) * sequence_get(input, input_index)"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "context": "/root/k400_ai_independent_b",
+      "rawResponse": "[\n  {\"id\":\"learning\",\"file\":\"candidate.rcl\",\"old\":\"- bias(parameters)\",\"new\":\"+ bias(parameters)\"},\n  {\"id\":\"agent\",\"file\":\"candidate.rcl\",\"old\":\"action_cost(action) < budget\",\"new\":\"action_cost(action) > budget\"},\n  {\"id\":\"automation\",\"file\":\"candidate.rcl\",\"old\":\"<= task_max_attempts\",\"new\":\"< task_max_attempts\"},\n  {\"id\":\"logical-events\",\"file\":\"candidate.rcl\",\"old\":\"< max_events\",\"new\":\"> max_events\"},\n  {\"id\":\"governance-reactive\",\"file\":\"candidate.rcl\",\"old\":\"compiler.phase == 2\",\"new\":\"compiler.phase == 1\"},\n  {\"id\":\"mixed-paradigm\",\"file\":\"candidate.rcl\",\"old\":\"compiler.no_analyze\",\"new\":\"compiler.analyze\"},\n  {\"id\":\"relations\",\"file\":\"candidate.rcl\",\"old\":\"!= region\",\"new\":\"== region\"},\n  {\"id\":\"simulation-scientific\",\"file\":\"candidate.rcl\",\"old\":\"(steps + 1)\",\"new\":\"(steps - 1)\"},\n  {\"id\":\"algorithm-cli\",\"file\":\"candidate.rcl\",\"old\":\"fibonacci(n - 3)\",\"new\":\"fibonacci(n - 2)\"},\n  {\"id\":\"media\",\"file\":\"candidate.rcl\",\"old\":\"< 3, cursor % 6,\",\"new\":\"< 3, cursor % 6 + 3,\"},\n  {\"id\":\"compiler\",\"file\":\"candidate.rcl\",\"old\":\"choose(operator == 1, 2, 1)\",\"new\":\"choose(operator == 1, 1, 2)\"},\n  {\"id\":\"game\",\"file\":\"candidate.rcl\",\"old\":\"proposed_y <= 0\",\"new\":\"proposed_y >= 0\"},\n  {\"id\":\"replicated-counter\",\"file\":\"candidate.rcl\",\"old\":\"sender <= 99\",\"new\":\"sender <= 2\"},\n  {\"id\":\"model-forward\",\"file\":\"candidate.rcl\",\"old\":\"0.5 - 0.5\",\"new\":\"0.5 + 0.5\"}\n]",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "- bias(parameters)",
+          "new": "+ bias(parameters)"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "action_cost(action) < budget",
+          "new": "action_cost(action) > budget"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "<= task_max_attempts",
+          "new": "< task_max_attempts"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "< max_events",
+          "new": "> max_events"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "compiler.phase == 2",
+          "new": "compiler.phase == 1"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "compiler.no_analyze",
+          "new": "compiler.analyze"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "!= region",
+          "new": "== region"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "(steps + 1)",
+          "new": "(steps - 1)"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "fibonacci(n - 3)",
+          "new": "fibonacci(n - 2)"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "< 3, cursor % 6,",
+          "new": "< 3, cursor % 6 + 3,"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "choose(operator == 1, 2, 1)",
+          "new": "choose(operator == 1, 1, 2)"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "proposed_y <= 0",
+          "new": "proposed_y >= 0"
+        },
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "sender <= 99",
+          "new": "sender <= 2"
+        },
+        {
+          "id": "model-forward",
+          "file": "candidate.rcl",
+          "old": "0.5 - 0.5",
+          "new": "0.5 + 0.5"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "context": "/root/k400_ai_independent_c",
+      "rawResponse": "[\n  {\n    \"id\": \"learning\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"-sequence_get(sample, 0), sequence_get(sample, 0)\",\n    \"new\": \"sequence_get(sample, 0), -sequence_get(sample, 0)\"\n  },\n  {\n    \"id\": \"agent\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"human_approval == 1\",\n    \"new\": \"human_approval != 1\"\n  },\n  {\n    \"id\": \"automation\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"human_approval == 1\",\n    \"new\": \"human_approval != 1\"\n  },\n  {\n    \"id\": \"logical-events\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"temporal_commit_capability == 1\",\n    \"new\": \"temporal_commit_capability != 1\"\n  },\n  {\n    \"id\": \"governance-reactive\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"compiler.audit_count + 2\",\n    \"new\": \"compiler.audit_count + 1\"\n  },\n  {\n    \"id\": \"mixed-paradigm\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"compiler.phase == 2\",\n    \"new\": \"compiler.phase == 1\"\n  },\n  {\n    \"id\": \"relations\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"1,\\n        0) + sum_approved_orders_for_region\",\n    \"new\": \"order_amount(sequence_get(orders, cursor)),\\n        0) + sum_approved_orders_for_region\"\n  },\n  {\n    \"id\": \"simulation-scientific\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"acceleration + steps\",\n    \"new\": \"acceleration * steps\"\n  },\n  {\n    \"id\": \"algorithm-cli\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"n + n\",\n    \"new\": \"n * n\"\n  },\n  {\n    \"id\": \"media\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"count - 2\",\n    \"new\": \"count - 1\"\n  },\n  {\n    \"id\": \"compiler\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"right - left\",\n    \"new\": \"left - right\"\n  },\n  {\n    \"id\": \"game\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"collected(state) >= 0\",\n    \"new\": \"collected(state) == 0\"\n  },\n  {\n    \"id\": \"replicated-counter\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"replica.inspect\",\n    \"new\": \"replica.merge\"\n  },\n  {\n    \"id\": \"model-forward\",\n    \"file\": \"candidate.rcl\",\n    \"old\": \"layer_forward(model_first_layer(model), model_hidden(model, input))\",\n    \"new\": \"layer_forward(model_second_layer(model), model_hidden(model, input))\"\n  }\n]",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "-sequence_get(sample, 0), sequence_get(sample, 0)",
+          "new": "sequence_get(sample, 0), -sequence_get(sample, 0)"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "human_approval == 1",
+          "new": "human_approval != 1"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "human_approval == 1",
+          "new": "human_approval != 1"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "temporal_commit_capability == 1",
+          "new": "temporal_commit_capability != 1"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "compiler.audit_count + 2",
+          "new": "compiler.audit_count + 1"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "compiler.phase == 2",
+          "new": "compiler.phase == 1"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "1,\n        0) + sum_approved_orders_for_region",
+          "new": "order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "acceleration + steps",
+          "new": "acceleration * steps"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "n + n",
+          "new": "n * n"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "count - 2",
+          "new": "count - 1"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "right - left",
+          "new": "left - right"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "collected(state) >= 0",
+          "new": "collected(state) == 0"
+        },
+        {
+          "id": "replicated-counter",
+          "file": "candidate.rcl",
+          "old": "replica.inspect",
+          "new": "replica.merge"
+        },
+        {
+          "id": "model-forward",
+          "file": "candidate.rcl",
+          "old": "layer_forward(model_first_layer(model), model_hidden(model, input))",
+          "new": "layer_forward(model_second_layer(model), model_hidden(model, input))"
+        }
+      ]
+    }
+  ]
+}

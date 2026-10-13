@@ -1,0 +1,104 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "agent",
+  "scope": "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/agent.rcl",
+  "sourceHash": "dbc1e9646ebd63380f571510738225a40e572192c983a2a606f969154680328e",
+  "casesPath": "examples/universal-stress/ai-native/agent-cases.json",
+  "casesHash": "1ea4af53538abf6b5c16e5f27111ca7f8d163f201e38534e293937d943ebf40c",
+  "definitionFile": "scripts/k400-genomes/agent.mjs",
+  "definitionHash": "d267577fd88eacbb1f57b3ba717b8ce21fa98dba099254135cf391e9f24f3f6f",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "agent"
+  ],
+  "baseline": {
+    "capability": 1,
+    "budget": 5,
+    "max_risk": 3,
+    "approval": 1,
+    "kill": 0,
+    "observe": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K234"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "capability",
+      "index": 0,
+      "intent": "Reject an action whose required capability does not equal the granted capability; all other eligibility checks still apply.",
+      "mutatedSourceHash": "2114c52234a65a098adda5c4db9fc91638286afa1992aae3e589b623a8c761eb"
+    },
+    {
+      "id": "budget",
+      "index": 1,
+      "intent": "Reject actions whose cost exceeds the available budget; equal cost is permitted if all other checks pass.",
+      "mutatedSourceHash": "6f4e59abb12a6156438da3a96e8de323f0198d636bbd65e69a7758ee332ba9d9"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "An action requiring human approval must be rejected while approval is absent and may be considered when approval is present.",
+      "mutatedSourceHash": "ad8079068c79259d12f4a19518bd86f41a77790a51ab22b4580d7c2d6329430a"
+    }
+  ],
+  "contractRoot": "f2b4eeb4ed585e2529e9cd89ba5a064ab82bfa1ab43bdedacacee45eff3f0d06"
+}

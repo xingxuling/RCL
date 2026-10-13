@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "c02a490e0c2ba8350d743a755a5c2c59a4b5b6c00a18508b3e8c867061f1a4c7",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed"
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "<= task_max_attempts",
+        "new": "< task_max_attempts"
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "human_approval == 1",
+        "new": "human_approval != 1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "d4f2cc7e065b353be96f69dca83d098ddb5ec4f3d054d0e179f6869a4f5ebd91",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "join-maximum",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "choose(left < right, left, right)",
+        "new": "choose(left > right, left, right)"
+      }
+    },
+    {
+      "id": "replica-membership",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "sender <= 99",
+        "new": "sender <= 2"
+      }
+    },
+    {
+      "id": "merge-warrant",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "replicated-counter",
+        "file": "candidate.rcl",
+        "old": "replica.inspect",
+        "new": "replica.merge"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "130ea9950c0fa8d96268f15a5edf2b12ad529eb0b0ed16e8881e0b83e00dcbf1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "- bias(parameters)",
+        "new": "+ bias(parameters)"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "-sequence_get(sample, 0), sequence_get(sample, 0)",
+        "new": "sequence_get(sample, 0), -sequence_get(sample, 0)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "cacfc7d183f1d2d64724f95aa1aa71821f7aab818c16dbb95650df77de47a1e2",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)"
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "compiler.no_analyze",
+        "new": "compiler.analyze"
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    }
+  ]
+}

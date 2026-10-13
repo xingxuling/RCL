@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "de92ae03fcc247609120ab689b5abea5bee7ece1251a72e3d3d18b1ceaf84c70",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_inspect on source",
+        "new": "warrant compiler.inspect on source"
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.audit_count + 2",
+        "new": "compiler.audit_count + 1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+reality NativeAdvisoryModelGate {
+  input event.source_root : Text = ""
+  input event.model_root : Text = ""
+  input event.inference_root : Text = ""
+  input event.requests_authority : Truth = false
+  input event.advisory : Truth = true
+  facet runtime.enabled : Truth = true
+  facet model.pinned_root : Text = ""
+  facet request.active : Truth = false
+  facet request.source_root : Text = ""
+  facet request.inference_root : Text = ""
+  facet request.admitted : Number = 0
+  facet request.completed : Number = 0
+  facet request.failed : Number = 0
+  facet result.authority_granted : Truth = false
+  subject coordinator {
+    warrant model.install on model while model.pinned_root == ""
+    warrant runtime.control on runtime
+  }
+  subject observer {
+    warrant inference.prepare on request while runtime.enabled and not request.active and event.model_root == model.pinned_root
+    warrant inference.publish on request while runtime.enabled and request.active and event.advisory and not event.requests_authority and event.model_root == model.pinned_root
+    warrant inference.cleanup on request while request.active
+  }
+  emergence installModel {
+    cause coordinator
+    when event.model_root != ""
+    needs model.install on model
+    alter model.pinned_root <- event.model_root
+    witness "ai:source-owned-one-time-model-pin"
+  }
+  emergence prepare {
+    cause observer
+    when event.source_root != "" and model.pinned_root != ""
+    needs inference.prepare on request
+    alter request.active <- true
+    alter request.source_root <- event.source_root
+    alter request.admitted <- request.admitted + 1
+    preserve request.admitted == request.completed + request.failed + 1
+    preserve result.authority_granted == false
+    witness "ai:source-owned-preparation"
+  }
+  emergence publish {
+    cause observer
+    when event.source_root == request.source_root and event.inference_root != ""
+    needs inference.publish on request
+    alter request.active <- false
+    alter request.inference_root <- event.inference_root
+    alter request.completed <- request.completed + 1
+    preserve request.admitted == request.completed + request.failed
+    preserve result.authority_granted == false
+    witness "ai:advisory-only-publication"
+  }
+  emergence fail {
+    cause observer
+    when request.active
+    needs inference.cleanup on request
+    alter request.active <- false
+    alter request.failed <- request.failed + 1
+    preserve request.admitted == request.completed + request.failed
+    preserve result.authority_granted == false
+    witness "ai:source-owned-failure-settlement"
+  }
+  emergence pause { cause coordinator when runtime.enabled needs runtime.control on runtime alter runtime.enabled <- false witness "ai:paused" }
+  emergence resume { cause coordinator when not runtime.enabled needs runtime.control on runtime alter runtime.enabled <- true witness "ai:resumed" }
+}

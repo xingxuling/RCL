@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "5a1535e8c1edcc6e4d40f4696317d105448c06303b26454d7368d419cbb60ae0",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state)",
+        "new": "state_position(state) + state_velocity(state)"
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "(steps + 1)",
+        "new": "(steps - 1)"
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "acceleration + steps",
+        "new": "acceleration * steps"
+      }
+    }
+  ]
+}

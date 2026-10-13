@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "cca9fc52ac3f5140acafe37a07f20a8932b60ff546b95bd5239e69b009d32ae8",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "dense-weighted-product",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "model-forward",
+        "file": "candidate.rcl",
+        "old": "sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) + sequence_get(input, input_index)",
+        "new": "sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) * sequence_get(input, input_index)"
+      }
+    },
+    {
+      "id": "softsign-orientation",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "model-forward",
+        "file": "candidate.rcl",
+        "old": "0.5 - 0.5",
+        "new": "0.5 + 0.5"
+      }
+    },
+    {
+      "id": "second-layer-composition",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "model-forward",
+        "file": "candidate.rcl",
+        "old": "layer_forward(model_first_layer(model), model_hidden(model, input))",
+        "new": "layer_forward(model_second_layer(model), model_hidden(model, input))"
+      }
+    }
+  ]
+}

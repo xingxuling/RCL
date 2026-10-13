@@ -1,0 +1,104 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "compiler",
+  "scope": "RCL-owned token-sequence expression compiler with parenthesis/precedence validation, postfix stack-code emission and execution for addition/subtraction/multiplication; no lexer/full-RCL compiler or whole-language self-hosting claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/compiler.rcl",
+  "sourceHash": "00ab562d4001758c6c57078d6d12c890e35714cdf362c2f84e712b6ccbc0f494",
+  "casesPath": "examples/universal-stress/ai-native/compiler-cases.json",
+  "casesHash": "13712d6d433dc2072f18600e90c4dab11c06f5bd4b673b21df6edfe779fde1fa",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "compiler"
+  ],
+  "baseline": {
+    "a": 2,
+    "b": 3,
+    "c": 4,
+    "d": 5,
+    "parenthesized": true,
+    "invalid": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K227"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "precedence",
+      "index": 0,
+      "intent": "The term parser consumes multiplication; addition and subtraction belong to the lower-precedence expression parser. Preserve parentheses and complete-input validation.",
+      "mutatedSourceHash": "ee29e430497af832b265163612258ce9377ab82d3027a5f348737d574cb1d3ab"
+    },
+    {
+      "id": "opcode-emission",
+      "index": 1,
+      "intent": "Emit addition opcode one for a plus token and subtraction opcode two for a minus token; retain postfix operand order.",
+      "mutatedSourceHash": "036fee18785afde4e1a84944a30cd737ecc248f06afbbf6fef8477184111adfa"
+    },
+    {
+      "id": "operand-order",
+      "index": 2,
+      "intent": "Stack execution subtracts the right operand from the left operand, preserving addition and multiplication behavior.",
+      "mutatedSourceHash": "465d70ed11b85f2f25149f6c47e2fe0e1b70ff0a23d1d5c54a25919362024d35"
+    }
+  ],
+  "contractRoot": "3cdd3e460091b2fa53e106b7ed7c3b27b0a413e7ed7a728cab193585b2b34637"
+}

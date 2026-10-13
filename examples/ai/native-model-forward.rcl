@@ -1,0 +1,179 @@
+reality NativeModelForwardFixture {
+  reckon one(value : Number) -> Sequence =
+    sequence_append(empty_sequence(), value)
+
+  reckon two(first : Number, second : Number) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), first), second)
+
+  reckon three(first : Number, second : Number, third : Number) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), first), second), third)
+
+  reckon make_parameter(weights : Sequence, biases : Sequence) -> Sequence =
+    sequence_append(sequence_append(sequence_append(empty_sequence(), "Parameter"), weights), biases)
+
+  reckon parameter_weights(parameter : Sequence) -> Sequence = sequence_get(parameter, 1)
+  reckon parameter_biases(parameter : Sequence) -> Sequence = sequence_get(parameter, 2)
+
+  reckon make_layer(input_size : Number, output_size : Number, activation : Text, parameter : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(
+            sequence_append(empty_sequence(), "Layer"),
+            input_size),
+          output_size),
+        activation),
+      parameter)
+
+  reckon layer_input_size(layer : Sequence) -> Number = sequence_get(layer, 1)
+  reckon layer_output_size(layer : Sequence) -> Number = sequence_get(layer, 2)
+  reckon layer_activation(layer : Sequence) -> Text = sequence_get(layer, 3)
+  reckon layer_parameter(layer : Sequence) -> Sequence = sequence_get(layer, 4)
+  reckon layer_weights(layer : Sequence) -> Sequence = parameter_weights(layer_parameter(layer))
+  reckon layer_biases(layer : Sequence) -> Sequence = parameter_biases(layer_parameter(layer))
+
+  reckon make_model(first_layer : Sequence, second_layer : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Model"),
+        first_layer),
+      second_layer)
+
+  reckon model_first_layer(model : Sequence) -> Sequence = sequence_get(model, 1)
+  reckon model_second_layer(model : Sequence) -> Sequence = sequence_get(model, 2)
+
+  reckon make_loss(kind : Text) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "Loss"), kind)
+
+  reckon make_optimizer(kind : Text, learning_rate : Number) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Optimizer"),
+        kind),
+      learning_rate)
+
+  reckon optimizer_kind(optimizer : Sequence) -> Text = sequence_get(optimizer, 1)
+  reckon optimizer_learning_rate(optimizer : Sequence) -> Number = sequence_get(optimizer, 2)
+
+  reckon make_sample(features : Sequence, targets : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(empty_sequence(), "Sample"),
+        features),
+      targets)
+
+  reckon sample_features(sample : Sequence) -> Sequence = sequence_get(sample, 1)
+  reckon sample_targets(sample : Sequence) -> Sequence = sequence_get(sample, 2)
+
+  reckon make_dataset(samples : Sequence) -> Sequence =
+    sequence_append(sequence_append(empty_sequence(), "Dataset"), samples)
+
+  reckon dataset_samples(dataset : Sequence) -> Sequence = sequence_get(dataset, 1)
+  reckon dataset_length(dataset : Sequence) -> Number = length(dataset_samples(dataset))
+  reckon dataset_sample(dataset : Sequence, index : Number) -> Sequence = sequence_get(dataset_samples(dataset), index)
+
+  reckon make_checkpoint(epoch : Number, model : Sequence, optimizer : Sequence) -> Sequence =
+    sequence_append(
+      sequence_append(
+        sequence_append(
+          sequence_append(empty_sequence(), "Checkpoint"),
+          epoch),
+        model),
+      optimizer)
+
+  reckon checkpoint_epoch(checkpoint : Sequence) -> Number = sequence_get(checkpoint, 1)
+  reckon checkpoint_model(checkpoint : Sequence) -> Sequence = sequence_get(checkpoint, 2)
+  reckon checkpoint_optimizer(checkpoint : Sequence) -> Sequence = sequence_get(checkpoint, 3)
+
+  reckon absolute(value : Number) -> Number = choose(value >= 0, value, -value)
+
+  reckon activate(kind : Text, value : Number) -> Number =
+    choose(kind == "linear", value, 0.5 + 0.5 * value / (1 + absolute(value)))
+
+  reckon activation_derivative(kind : Text, value : Number) -> Number =
+    choose(kind == "linear", 1, 0.5 / ((1 + absolute(value)) * (1 + absolute(value))))
+
+  reckon activation_valid(kind : Text) -> Truth = kind == "softsign01" or kind == "linear"
+
+  reckon layer_valid(layer : Sequence) -> Truth =
+    length(layer) == 5 and
+    sequence_get(layer, 0) == "Layer" and
+    layer_input_size(layer) >= 1 and
+    layer_output_size(layer) >= 1 and
+    activation_valid(layer_activation(layer)) and
+    length(layer_parameter(layer)) == 3 and
+    sequence_get(layer_parameter(layer), 0) == "Parameter" and
+    length(layer_weights(layer)) == layer_input_size(layer) * layer_output_size(layer) and
+    length(layer_biases(layer)) == layer_output_size(layer)
+
+  reckon model_valid(model : Sequence) -> Truth =
+    length(model) == 3 and
+    sequence_get(model, 0) == "Model" and
+    layer_valid(model_first_layer(model)) and
+    layer_valid(model_second_layer(model)) and
+    layer_output_size(model_first_layer(model)) == layer_input_size(model_second_layer(model))
+
+  reckon sample_valid(sample : Sequence, input_size : Number, output_size : Number) -> Truth =
+    length(sample) == 3 and
+    sequence_get(sample, 0) == "Sample" and
+    length(sample_features(sample)) == input_size and
+    length(sample_targets(sample)) == output_size
+
+  reckon dataset_rows_valid(dataset : Sequence, input_size : Number, output_size : Number, row_index : Number) -> Truth =
+    choose(row_index >= dataset_length(dataset),
+      true,
+      sample_valid(dataset_sample(dataset, row_index), input_size, output_size) and
+        dataset_rows_valid(dataset, input_size, output_size, row_index + 1))
+
+  reckon dataset_valid_for_model(dataset : Sequence, model : Sequence) -> Truth =
+    length(dataset) == 2 and
+    sequence_get(dataset, 0) == "Dataset" and
+    dataset_length(dataset) >= 1 and
+    dataset_rows_valid(
+      dataset,
+      layer_input_size(model_first_layer(model)),
+      layer_output_size(model_second_layer(model)),
+      0)
+
+  reckon weighted_input_sum(layer : Sequence, input : Sequence, output_index : Number, input_index : Number, accumulated : Number) -> Number =
+    choose(input_index >= layer_input_size(layer),
+      accumulated + sequence_get(layer_biases(layer), output_index),
+      weighted_input_sum(
+        layer,
+        input,
+        output_index,
+        input_index + 1,
+        accumulated + sequence_get(layer_weights(layer), output_index * layer_input_size(layer) + input_index) * sequence_get(input, input_index)))
+
+  reckon unit_pre_activation(layer : Sequence, input : Sequence, output_index : Number) -> Number =
+    weighted_input_sum(layer, input, output_index, 0, 0)
+
+  reckon unit_output(layer : Sequence, input : Sequence, output_index : Number) -> Number =
+    activate(layer_activation(layer), unit_pre_activation(layer, input, output_index))
+
+  reckon layer_forward_units(layer : Sequence, input : Sequence, output_index : Number, output : Sequence) -> Sequence =
+    choose(output_index >= layer_output_size(layer),
+      output,
+      layer_forward_units(
+        layer,
+        input,
+        output_index + 1,
+        sequence_append(output, unit_output(layer, input, output_index))))
+
+  reckon layer_forward(layer : Sequence, input : Sequence) -> Sequence =
+    layer_forward_units(layer, input, 0, empty_sequence())
+
+  reckon model_hidden(model : Sequence, input : Sequence) -> Sequence =
+    layer_forward(model_first_layer(model), input)
+
+  reckon model_forward(model : Sequence, input : Sequence) -> Sequence =
+    layer_forward(model_second_layer(model), model_hidden(model, input))
+
+  facet input.feature_a : Number = 0.5
+  facet input.feature_b : Number = 0.25
+  facet fixture.model : Sequence = make_model(make_layer(2, 2, "linear", make_parameter(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), 1), 0), 0), 1), two(0, 0))), make_layer(2, 1, "softsign01", make_parameter(two(2, -1), one(0.25))))
+  facet fixture.features : Sequence = two(input.feature_a, input.feature_b)
+  facet result.model_valid : Truth = model_valid(fixture.model)
+  facet result.hidden : Sequence = model_hidden(fixture.model, fixture.features)
+  facet result.output : Sequence = model_forward(fixture.model, fixture.features)
+}

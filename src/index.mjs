@@ -72,3 +72,4 @@ export { runReplicatedCounterNetwork, bindCounterInputs } from './replicated-cou
 export { createPortableRealtimeTarget } from './portable-realtime-target.mjs';
 export { createPortableGameTarget } from './portable-game-target.mjs';
 export { createPortableScientificTarget } from './portable-scientific-target.mjs';
+export { createPortableAiTarget } from './portable-ai-target.mjs';

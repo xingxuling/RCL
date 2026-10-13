@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "contractRoot": "7da677a9c9d90f4117412bce2e3d1169486e0a93c66d2ee5bee6ed680c5ef38c",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/ai-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_ai_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "gcd(b, b % a)",
+        "new": "gcd(b, a % b)"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_ai_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 3)",
+        "new": "fibonacci(n - 2)"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_ai_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "n + n",
+        "new": "n * n"
+      }
+    }
+  ]
+}

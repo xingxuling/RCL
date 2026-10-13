@@ -1,0 +1,106 @@
+{
+  "format": "rcl.k400-ai-contract.v1",
+  "id": "game",
+  "scope": "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; actual native RCL program in a pinned RCL-trained MLP workflow, source-owned clamp/mean feature channels and advisory-only inference publication, model/source binding, authority rejection and actual controller reset; local bounded model organ, no general AI or external effects claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/game.rcl",
+  "sourceHash": "96a520f1c85d3e3fd4b6e5c6cd24fad40f01ebbf91a88a5ae50bb11e04a4d26d",
+  "casesPath": "examples/universal-stress/ai-native/game-cases.json",
+  "casesHash": "de92ebae3801abdc44b538fcb52831bfde24fbbc61159f16c529fdc60e351471",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "aiDefinitionFile": "scripts/k400-ai-definitions.mjs",
+  "aiDefinitionHash": "30a119e3ab6f16fa059d15c3cb144a8dd843077f05f59ab21c181296f9a40e5d",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "controllerSource": {
+    "path": "examples/runtime-hosts/ai-gate.rcl",
+    "sha256": "c52c8c6a3770c060e9aa0754bd5da40c0824e8d70d09cbfeaabb470f32e1fe8b"
+  },
+  "donorSource": {
+    "path": "examples/native-ai/general-mlp.rcl",
+    "sha256": "0063f381d8636f00f7a30a6a54aef37e14f500e9015c2d07d10e38bb72c4d9c0"
+  },
+  "modelRoot": "62d8f039b2b3abca29735f3ab466fb1c3b4d952b0c9fdce2ad99b9390c375d17",
+  "environments": [
+    "ai-runtime"
+  ],
+  "families": [
+    "game"
+  ],
+  "baseline": {
+    "frames": 12,
+    "move": 1,
+    "speed": 2,
+    "jump_frame": 2,
+    "gravity": 1,
+    "star": 8,
+    "enemy": 18,
+    "width": 20
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "featurePolicy": {
+    "maximumScalars": 256,
+    "minimumNonzeroMagnitude": 1e-12,
+    "maximumMagnitude": 1e+24,
+    "channels": 2,
+    "normalization": "clamp [0,1], alternating channel mean"
+  },
+  "controlOptions": {
+    "positive": [
+      0,
+      1
+    ],
+    "negative": [
+      0,
+      0
+    ],
+    "oversizedCount": 257
+  },
+  "eligibleCells": [
+    "K228"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RCL-owned training and native program/model forward execution",
+    "pinned model and input roots, source-owned advisory-only publication, complete independent controller replay",
+    "pause/source/model-replacement/authority-escalation/oversized/nonfinite rejection, failure settlement and real controller reset"
+  ],
+  "authorityProfile": "RCL owns semantics and result publication; native MLP predictions remain advisory, never action authorization; two bounded toy training tasks prove no general AI competence",
+  "trials": [
+    {
+      "id": "movement",
+      "index": 0,
+      "intent": "Advance horizontal position by direction multiplied by speed and clamp to the world bounds; preserve zero and negative directions.",
+      "mutatedSourceHash": "80f98298483630869a115356f8d0049b3b1b00ecf17c2ca6bfcdf1ec0ec3449b"
+    },
+    {
+      "id": "landing",
+      "index": 1,
+      "intent": "With downward-positive coordinates, landing occurs when proposed y reaches or crosses ground zero; then reset vertical position and velocity. Preserve airborne motion.",
+      "mutatedSourceHash": "36bec945f0530e4931c73c6bc8a7f06e5939db4eabffecc9e95dd7e22da61dee"
+    },
+    {
+      "id": "pickup-once",
+      "index": 2,
+      "intent": "Collect the star at most once after reaching its threshold, retaining a score between zero and one and terminal enemy-stop behavior.",
+      "mutatedSourceHash": "e63241c6388e3234c8c9476c4359110e87cf973ca0bce73374afc58a02a05844"
+    }
+  ],
+  "contractRoot": "bbae759efa6cccf93a5d57c620b7257a995826d2555b4ce326176866d271e187"
+}
