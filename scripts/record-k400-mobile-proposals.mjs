@@ -1,0 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {MOBILE_DIRECTORY,MOBILE_PROFILE as p} from './k400-mobile-definitions.mjs';
+const items=[{id:'native-counter-0',file:'candidate.rcl',old:'set count <- count - step',new:'set count <- count + step'},{id:'native-counter-1',file:'candidate.rcl',old:'derived count_label : Text = "计数：" + step',new:'derived count_label : Text = "计数：" + count'},{id:'native-counter-2',file:'candidate.rcl',old:'set count <- step',new:'set count <- initial'}],flags={canonicalSourceProvided:false,oracleEditsProvided:false,holdoutTestsProvided:false,osIsolationClaimed:false};
+const prefix=MOBILE_DIRECTORY+'/'+p.id,contract=JSON.parse(fs.readFileSync(path.join(ROOT,prefix+'-contract.json'),'utf8')),batchPath=MOBILE_DIRECTORY+'/independent-batch.json';if(fs.existsSync(path.join(ROOT,batchPath)))throw new Error('MOBILE_PROPOSALS_ALREADY_RECORDED');
+const batches=items.map((proposal,index)=>({index,context:'/root/k400_mobile_independent_'+['a','b','c'][index],input:'output/k400-mobile-independent/batch-'+index+'.json',rawResponse:JSON.stringify([proposal],null,2),returnedProposals:[proposal]}));fs.writeFileSync(path.join(ROOT,batchPath),JSON.stringify({format:'rcl.k400-independent-mobile-batch.v1',...flags,batches},null,2)+'\n');
+fs.writeFileSync(path.join(ROOT,prefix+'-proposals.json'),JSON.stringify({format:'rcl.k400-independent-mobile-proposals.v1',...flags,contractRoot:contract.contractRoot,acquisitionBatch:batchPath,trials:contract.trials.map((t,i)=>({id:t.id,context:batches[i].context,proposal:items[i]}))},null,2)+'\n');console.log(JSON.stringify({contexts:batches.map(b=>b.context),contractRoot:contract.contractRoot}));

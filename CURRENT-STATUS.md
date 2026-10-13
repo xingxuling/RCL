@@ -20,6 +20,25 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
+## 2026-10-14 native mobile and Sequence runtime candidates
+
+K400 remains **360 PASS / 40 UNTESTED**, U3, INCOMPLETE. The Android native
+counter now has actual Views, touch and activity/process recovery. Its Windows
+and WASI backends each pass 20 complete flows, ten frozen inputs and three independent
+repairs; the other seventeen backend contexts are still being acquired. Twenty-one
+targeted bridge/admission checks pass. The full frozen mobile index remains
+unadmitted until every selected environment passes.
+
+A separate persistent Sequence concatenation runtime preserves twenty
+byte-identical full general-compiler self-compilation generations. Median/P95
+compilation is 3.902/5.285 seconds on this Windows host. A single same-source
+pair observed 159.059 seconds in the original runtime and 6.442 seconds in the
+candidate, approximately 24.7x. This improvement preserves the old native
+anchors and grants no new K400 coordinate. See
+`docs/K400_NATIVE_MOBILE_2026-10-14.md` and
+`docs/NATIVE_SEQUENCE_RUNTIME_2026-10-14.md`. Actions are not requested;
+version advancement is frozen and the full 400-cell goal remains active.
+
 ## 2026-10-13 compiler workflow continuation
 
 K328/K330/K335 close with actual compiler-RBC and native-VM process ledgers,

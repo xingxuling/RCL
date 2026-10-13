@@ -1,0 +1,97 @@
+{
+  "format": "rcl.native-sequence-runtime-build.v1",
+  "status": "BUILT_CANDIDATE",
+  "scope": "Windows candidate generic persistent Sequence concatenation overlay; original compiler/runtime and all K400 anchors preserved",
+  "sourceBindings": [
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/sequence-runtime/concat-case.c",
+      "sha256": "4ba235c9d16606ef023345af2e878afc5f32f4cfc2357863743378c460ffdf4c"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "scripts/build-native-sequence-runtime.mjs",
+      "sha256": "ea7fa7e25b972622e50c10cb77da30f7b29b2bb713b6b0189e258e2366bf90c0"
+    }
+  ],
+  "generatedSourceHash": "594831e31a2e637d8033133f5e27a37f69f7cd23f0f912ea38f19591ebb67282",
+  "toolchain": {
+    "path": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\_tools\\zig-x86_64-windows-0.16.0\\zig.exe",
+    "version": "0.16.0",
+    "sha256": "086ce9d47ba42f33a514e1a6e04eb1d4a8fa1d75e0868e0213caad447c91e864"
+  },
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-target",
+        "x86_64-windows-gnu",
+        "-O3",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\native-sequence-runtime\\rclvm.c",
+        "-o",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\native-sequence-runtime\\rclvm.exe",
+        "-lbcrypt",
+        "-lm"
+      ],
+      "status": 0,
+      "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrHash": "6c76df81651f9bd1504ea3757c8af04993032c6eab76281ea90861c064be7259"
+    },
+    {
+      "argv": [
+        "cc",
+        "-target",
+        "x86_64-windows-gnu",
+        "-O3",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-I",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native",
+        "-DRCLVM_EMBEDDED_ONLY",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native\\rclc.c",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\native-sequence-runtime\\rclvm.c",
+        "-o",
+        "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\native-sequence-runtime\\rclc.exe",
+        "-lbcrypt",
+        "-lm"
+      ],
+      "status": 0,
+      "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrHash": "6c76df81651f9bd1504ea3757c8af04993032c6eab76281ea90861c064be7259"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "output/native-sequence-runtime/rclvm.exe",
+      "bytes": 333312,
+      "sha256": "6d96b9223384bf8e23b4bd0439063a8a8faf4fe2c0ab085eb18aedc764ef7f6a"
+    },
+    {
+      "path": "output/native-sequence-runtime/rclc.exe",
+      "bytes": 337408,
+      "sha256": "d81c5f908869474b47be00dea4cbd10799e721688b8fa8cde8abb14fb221f3c7"
+    }
+  ]
+}

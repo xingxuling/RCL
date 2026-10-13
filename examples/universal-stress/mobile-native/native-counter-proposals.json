@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-mobile-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "4cc02f1bc5e314ce3848ae7e085da52ef82ac1c212dd7aca268cf05c4a4b86dd",
+  "acquisitionBatch": "examples/universal-stress/mobile-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "increment-step",
+      "context": "/root/k400_mobile_independent_a",
+      "proposal": {
+        "id": "native-counter-0",
+        "file": "candidate.rcl",
+        "old": "set count <- count - step",
+        "new": "set count <- count + step"
+      }
+    },
+    {
+      "id": "derived-label",
+      "context": "/root/k400_mobile_independent_b",
+      "proposal": {
+        "id": "native-counter-1",
+        "file": "candidate.rcl",
+        "old": "derived count_label : Text = \"计数：\" + step",
+        "new": "derived count_label : Text = \"计数：\" + count"
+      }
+    },
+    {
+      "id": "reset-initial",
+      "context": "/root/k400_mobile_independent_c",
+      "proposal": {
+        "id": "native-counter-2",
+        "file": "candidate.rcl",
+        "old": "set count <- step",
+        "new": "set count <- initial"
+      }
+    }
+  ]
+}

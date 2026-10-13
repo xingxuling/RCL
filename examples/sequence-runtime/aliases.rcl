@@ -1,0 +1,8 @@
+reality SequenceAliases {
+  facet base : Sequence = sequence_append(sequence_append(empty_sequence(), 7), "中😀")
+  facet self_join : Sequence = sequence_concat(base, base)
+  facet left_empty : Sequence = sequence_concat(empty_sequence(), base)
+  facet right_empty : Sequence = sequence_concat(base, empty_sequence())
+  facet nested : Sequence = sequence_concat(sequence_append(empty_sequence(), base), sequence_append(empty_sequence(), self_join))
+  facet from_prefix : Number = sequence_get(self_join, 2)
+}

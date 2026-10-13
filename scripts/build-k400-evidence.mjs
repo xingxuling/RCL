@@ -60,6 +60,8 @@ import { UI_PROFILE, UI_DIRECTORY } from './k400-ui-definitions.mjs';
 import { verifyUiAdmission } from './k400-ui-admission.mjs';
 import { COMPILER_PROFILES, COMPILER_DIRECTORY } from './k400-compiler-definitions.mjs';
 import { verifyFamilyProfile as verifyCompilerProfile } from './k400-compiler-engine.mjs';
+import { MOBILE_PROFILE, MOBILE_DIRECTORY } from './k400-mobile-definitions.mjs';
+import { verifyUiProfile as verifyMobileProfile } from './k400-mobile-engine.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -1223,6 +1225,26 @@ for (const definition of COMPILER_PROFILES) {
     evidence.claims.push(claim);
   }
   evidence.sourceReceipts.push(COMPILER_DIRECTORY + '/' + definition.id + '-runtime.json');
+}
+const mobileAdmission = await verifyMobileProfile();
+if (mobileAdmission.admitted) {
+  for (const claim of mobileAdmission.claims) {
+    const existing = evidence.claims.find(item => item.id === claim.id);
+    if (!existing) { evidence.claims.push(claim); continue; }
+    if ((existing.environment !== undefined && existing.environment !== claim.environment)
+      || (existing.programFamily !== undefined && existing.programFamily !== claim.programFamily)
+      || !UNIVERSAL_STRESS_GATES.every(gate => existing.gates[gate]?.status === 'PASS' && claim.gates[gate]?.status === 'PASS')) {
+      throw new Error('RCL_K400_PROFILE_COLLISION_REQUIRES_REVIEW:' + claim.id);
+    }
+    existing.additionalProfiles ??= [];
+    existing.additionalProfiles.push({ id: 'mobile:' + MOBILE_PROFILE.id, reportRoot: mobileAdmission.reportRoot, scope: MOBILE_PROFILE.scope,
+      lastVerifiedDate: claim.lastVerifiedDate, coverageMode: claim.coverageMode, evidence: claim.gates.EVIDENCE.evidence });
+    existing.knownLimits = [...new Set([...(existing.knownLimits ?? []), ...claim.knownLimits])];
+    for (const gate of UNIVERSAL_STRESS_GATES) existing.gates[gate].evidence = [...new Set([
+      ...existing.gates[gate].evidence, ...claim.gates[gate].evidence,
+    ])];
+  }
+  evidence.sourceReceipts.push(MOBILE_DIRECTORY + '/' + MOBILE_PROFILE.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

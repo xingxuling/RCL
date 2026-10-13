@@ -1,0 +1,9 @@
+reality SequenceAccumulation {
+  reckon build(index : Number, output : Sequence) -> Sequence = choose(index == 600, output,
+    build(index + 1, sequence_concat(output, sequence_append(sequence_append(empty_sequence(), index), index + 1))))
+  facet values : Sequence = build(0, empty_sequence())
+  facet count : Number = length(values)
+  facet start : Number = sequence_get(values, 0)
+  facet middle : Number = sequence_get(values, 601)
+  facet end : Number = sequence_get(values, 1199)
+}

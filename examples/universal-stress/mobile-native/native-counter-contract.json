@@ -1,0 +1,140 @@
+{
+  "format": "rcl.k400-mobile-contract.v1",
+  "id": "native-counter",
+  "scope": "Actual Android API35 x86_64 emulator native Views and real touch, activity recreation/process restart with target-owned RCL state/derived/render semantics through cooperative authenticated loopback transport; Android frontend with explicitly selected actual semantic backend; frozen integer counter scope, no WebView, physical-device/offline/durable-backend/full-mobile-platform/public-hosting claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/native-ui/governed-counter.rcl",
+  "sourceHash": "353167d40ac2b9b756ac57307f33dd7cb799ec0c8fc6d72341e494971aa800b1",
+  "definitionFile": "scripts/k400-mobile-definitions.mjs",
+  "definitionHash": "ef2e2712ee12dd90d6c087b1987e285d6b00d48ad96a601cfe5cb86ddf09c8ac",
+  "casesPath": "examples/universal-stress/mobile-native/native-counter-cases.json",
+  "casesHash": "56cea95708f1588ed7d11324e83289d466fcc10e3f41e0b6f2e35b83e9e4d54a",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "uiRoot": "478bed8936e79fcacdcbf648e3469d5c1ba2438c54e7332db8e9694e466effac",
+  "clientBuildPath": "examples/universal-stress/mobile-native/native-counter-build.json",
+  "clientBuildHash": "fc0e2abde7c682e246e3c34103a2aaa72e669e0eed6f1ebc781e2ac4bc000ef3",
+  "apk": {
+    "path": "examples/universal-stress/mobile-native/native-counter-client.apk",
+    "sha256": "b1b315afdb70e518de73d7597cc70fcb3b58687dffb9d5dbed4273131939135c",
+    "bytes": 25448
+  },
+  "layoutRoot": "1493ee53883e9bfd4f31dd56e8c0186b3729a9f8df6aac06aa7006f241b113b4",
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android",
+    "server",
+    "embedded-runtime",
+    "distributed-runtime",
+    "serverless",
+    "database",
+    "dataflow-runtime",
+    "simulation-runtime",
+    "automation-runtime",
+    "browser",
+    "rncs-runtime",
+    "realtime-runtime",
+    "game-runtime",
+    "scientific-runtime",
+    "ai-runtime",
+    "compiler-runtime"
+  ],
+  "families": [
+    "mobile"
+  ],
+  "baseline": {
+    "initial": 0,
+    "step": 1
+  },
+  "events": [
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "ResetButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    }
+  ],
+  "rounds": 20,
+  "eligibleCells": [
+    "K045",
+    "K005",
+    "K025",
+    "K085",
+    "K105",
+    "K285",
+    "K245",
+    "K125",
+    "K145",
+    "K305",
+    "K365",
+    "K345",
+    "K065",
+    "K385",
+    "K265",
+    "K185",
+    "K205",
+    "K225",
+    "K325"
+  ],
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "measurementUnit": "per-target native initial-render/event compile and execute p95 over full four-touch flows; Android input/hierarchy/startup/lifecycle overhead is retained separately",
+  "mobilePolicy": {
+    "kind": "ACTUAL_ANDROID_NATIVE_VIEWS",
+    "api": 35,
+    "abi": "x86_64",
+    "emulator": true,
+    "minimumActionHeightDp": 48,
+    "webViewUsed": false,
+    "clientComputesRclState": false,
+    "eachRound": "cold launch and four actual native touch actions",
+    "controls": "authenticated/stale/unknown/native-authority rejection; actual activity recreation and process restart with unchanged committed state and native hierarchy/screenshot"
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read only named frozen candidate; no other filesystem, memory, network, execution, writes or delegation"
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "increment-step",
+      "intent": "The increment action adds the configured step to the current count, including negative and zero steps.",
+      "mutatedSourceHash": "2d6b0ad2c1277d9f3a988c5680d0c7a4fbeddfa25468140e5d75cc5bc6f9b3a2"
+    },
+    {
+      "index": 1,
+      "id": "derived-label",
+      "intent": "The count label displays the current committed count after actions, rather than the configured step.",
+      "mutatedSourceHash": "2756ee9f8e3fbf36ad67da4a3516c1d67e150b84206100eb405efe8cddf861bf"
+    },
+    {
+      "index": 2,
+      "id": "reset-initial",
+      "intent": "Reset restores the configured initial count; it must not replace the count with the increment step.",
+      "mutatedSourceHash": "1908b64d7e8e7a4ab81f4db42344a71831ba9693ddc55896bf1e203a6300da31"
+    }
+  ],
+  "contractRoot": "4cc02f1bc5e314ce3848ae7e085da52ef82ac1c212dd7aca268cf05c4a4b86dd"
+}

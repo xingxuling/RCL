@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {UI_PROFILE} from './k400-ui-definitions.mjs';
+import {buildRclAndroidApplication} from '../src/android-application-compiler.mjs';
+import {emitNativeUiAndroidBridge} from '../src/ui/native-android-bridge.mjs';
+const sha=b=>createHash('sha256').update(b).digest('hex'),output=path.join(ROOT,'output/native-mobile-bridge'),source=UI_PROFILE.source(),emitted=emitNativeUiAndroidBridge(source);
+fs.mkdirSync(output,{recursive:true});const spec=path.join(output,'android-target.json');fs.writeFileSync(spec,JSON.stringify({schema:'rcl.native-ui.android-target.v0.1',applicationId:emitted.manifest.application.applicationId,activity:'MainActivity',title:'RCL 计数器',minSdk:26,compileSdk:35,targetSdk:35})+'\n');
+const built=buildRclAndroidApplication({rclPath:path.join(ROOT,UI_PROFILE.sourcePath),specPath:spec,outputPath:output});fs.writeFileSync(built.activitySource,emitted.java);
+const androidManifest=path.join(output,'app/src/main/AndroidManifest.xml');fs.writeFileSync(androidManifest,fs.readFileSync(androidManifest,'utf8').replace('<application ','<uses-permission android:name="android.permission.INTERNET"/>\n  <application android:usesCleartextTraffic="true" ').replace('android:allowBackup="true"','android:allowBackup="false"'));
+const gradle='C:/Users/User/.gradle/wrapper/dists/gradle-8.10.2-bin/a04bxjujx95o3nb99gddekhwo/gradle-8.10.2/bin/gradle.bat',javaHome='C:/Program Files/Android/Android Studio/jbr',sdk='C:/Users/User/AppData/Local/Android/Sdk';for(const f of [gradle,path.join(javaHome,'bin/java.exe'),path.join(sdk,'platform-tools/adb.exe')])if(!fs.existsSync(f))throw new Error('RCL_MOBILE_BUILD_TOOL_MISSING:'+f);
+const result=spawnSync(process.env.ComSpec??'cmd.exe',['/d','/s','/c',gradle,'--offline','--no-daemon','assembleDebug'],{cwd:output,env:{...process.env,ANDROID_HOME:sdk,ANDROID_SDK_ROOT:sdk,JAVA_HOME:javaHome},encoding:'utf8',windowsHide:true,timeout:180000,maxBuffer:16*1024*1024});fs.writeFileSync(path.join(output,'build.log'),(result.stdout??'')+'\n'+(result.stderr??''));if(result.error||result.status!==0)throw new Error('RCL_MOBILE_BUILD_FAILED:'+result.status+':'+result.stderr);
+const apk=path.join(output,'app/build/outputs/apk/debug/app-debug.apk'),report={format:'rcl.native-mobile.build.v1',status:'PASS_BUILD',applicationId:emitted.manifest.application.applicationId,activity:'MainActivity',layoutRoot:emitted.layoutRoot,uiRoot:emitted.ui.semanticRoot,javaHash:emitted.javaHash,canonicalEmitterHash:emitted.canonicalEmitterHash,clientComputesRclState:false,webViewUsed:false,nativeViews:true,apk:{path:path.relative(ROOT,apk).replaceAll('\\','/'),sha256:sha(fs.readFileSync(apk)),bytes:fs.statSync(apk).size},toolchain:{offline:true,gradle:{path:gradle,sha256:sha(fs.readFileSync(gradle))},java:{path:path.join(javaHome,'bin/java.exe'),sha256:sha(fs.readFileSync(path.join(javaHome,'bin/java.exe')))},sdk:35},buildLogHash:sha(fs.readFileSync(path.join(output,'build.log')))};
+fs.writeFileSync(path.join(output,'build-receipt.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

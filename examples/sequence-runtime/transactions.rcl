@@ -1,0 +1,15 @@
+reality SequenceTransaction {
+  facet original : Sequence = sequence_append(empty_sequence(), false)
+  facet current : Sequence = original
+  subject builder { warrant sequence.write on current }
+  emergence extend {
+    cause builder
+    when length(current) == 1
+    needs sequence.write on current
+    alter current <- sequence_concat(current, sequence_append(empty_sequence(), "追加"))
+    preserve length(current) == 2
+    witness "sequence:concatenated"
+  }
+  foresee extend
+  realize extend
+}

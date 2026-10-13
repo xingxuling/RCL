@@ -43,6 +43,10 @@ The [target-backed Native UI campaign](docs/K400_NATIVE_UI_2026-10-13.md) adds t
 
 The [compiler workflow continuation](docs/K400_COMPILER_PIPELINE_2026-10-13.md) closes K328/K330/K335, reaching 360. Actual RCL-authored compilation and native execution expose separate process traces and instruction/byte metrics. Existing game/media/CRDT kernels pass 60 rounds, 30 sealed inputs, nine fresh repairs and ten extra alternative-repair cases; the distributed workflow binds actual three-node HTTP packets to compiler/VM ledgers.
 
+The [native Android continuation](docs/K400_NATIVE_MOBILE_2026-10-14.md) now provides actual native Views, touch and lifecycle recovery with RCL-owned backend state. Its Windows and WASI backends pass the frozen runs, inputs and independent repairs; acquisition across the other backends is ongoing and adds no K400 credit yet. The frozen APK and an interactive demo command are available.
+
+The [persistent Sequence runtime candidate](docs/NATIVE_SEQUENCE_RUNTIME_2026-10-14.md) preserves twenty byte-identical full-compiler self-compilation generations, with a 3.9-second median on this Windows host. One same-source comparison measured 159.1 seconds in the original runtime and 6.4 seconds in the candidate, about 24.7× faster. This separate optional runtime does not advance the version or K400 count.
+
 ## Why RCL?
 
 - **Put authority next to behavior.** Subjects, warrants, guards, mutations, and invariants are language constructs. A state transition declares its permission and validation requirements instead of leaving that contract implicit in surrounding application code.

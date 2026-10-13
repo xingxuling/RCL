@@ -77,3 +77,5 @@ export { createPortableCompilerTarget } from './portable-compiler-target.mjs';
 export { compileNativeUiForExecution, lowerNativeUiEvent, projectNativeUiResult } from './ui/native-event-lowering.mjs';
 export { createNativeUiEventRuntime } from './ui/native-event-runtime.mjs';
 export { createNativeUiWebBridge, emitNativeUiBridgeHtml } from './ui/native-web-bridge.mjs';
+export { emitNativeUiAndroidBridge } from './ui/native-android-bridge.mjs';
+export { createNativeAndroidDriver, parseAndroidHierarchy } from './ui/native-android-driver.mjs';
