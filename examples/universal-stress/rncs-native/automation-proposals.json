@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "f56246b04174de5b2c13efb6e6c5634aa8496770b1bb5d86a31118e8ba576c91",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed"
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor))",
+        "new": "task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor))"
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "human_approval == 1",
+        "new": "human_approval == 0"
+      }
+    }
+  ]
+}

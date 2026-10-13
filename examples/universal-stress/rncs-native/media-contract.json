@@ -1,0 +1,82 @@
+{
+  "format": "rcl.k400-rncs-contract.v1",
+  "id": "media",
+  "scope": "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/media.rcl",
+  "sourceHash": "54982263685a07f45279fb5cbc738c4afc121412f75cafec63c6b19b8c0a523e",
+  "casesPath": "examples/universal-stress/rncs-native/media-cases.json",
+  "casesHash": "f98a504b1110201a86774414f00425a5065eb1a23c50834e6222f4e8faff1ba9",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "rncsDefinitionFile": "scripts/k400-rncs-definitions.mjs",
+  "rncsDefinitionHash": "0835bc0a1ac4581c56107ad56c67e50f1218bb94bbecd0bbc203951494783caf",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "vendorProvenance": {
+    "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+    "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd"
+  },
+  "environments": [
+    "rncs-runtime"
+  ],
+  "families": [
+    "media"
+  ],
+  "baseline": {
+    "red": 20,
+    "green": 20,
+    "blue": 20,
+    "gain": 2,
+    "offset": -5,
+    "invert": false,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K395"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RNCS branch/provider/authority/merge execution",
+    "source-owned admission, stale-base rejection and rollback",
+    "integer-safe typed native-state materialization and context restart"
+  ],
+  "authorityProfile": "Frozen canonical RNCS RBF candidate runtime invokes native RCL provider; source-owned local admission and sealed candidate merge; no production RFE writes or human authority claim",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "index": 0,
+      "intent": "Clamp each transformed RGB channel to the inclusive range zero through 255 before optional inversion.",
+      "mutatedSourceHash": "34472644dde98bb037dd67d1f087f1517181fdd8406efdd71e14dc8bd45fc137"
+    },
+    {
+      "id": "row-flip",
+      "index": 1,
+      "intent": "Horizontal flipping swaps the two RGB pixels within each row, preserving row order and each pixel channel order.",
+      "mutatedSourceHash": "c5713977190a50660435da69918f2c4806c018d37d2ed91e1b61f6b9a8e7f9fc"
+    },
+    {
+      "id": "run-decode",
+      "index": 2,
+      "intent": "Decode every run by appending its sample exactly count times; retain empty inputs and exact run-length round trips.",
+      "mutatedSourceHash": "e3c39257ac678034fee5c12ea2662db2f5f2455c76f60b5d8b1c7e6e11ed4e31"
+    }
+  ],
+  "contractRoot": "8161c19c2eacc727c1d5bb10b48eee5cdb70b53febb08de56fabaed001ede03e"
+}

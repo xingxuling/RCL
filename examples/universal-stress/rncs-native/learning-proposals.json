@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "d3e80dcf871f7c32a747371cd188d0c627178cd91391b8aaf3dd448ae7859ea7",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "- bias(parameters)",
+        "new": "+ bias(parameters)"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "bec13b028ab0e11e0539acd0ce1d6bd21d428eb7ee3cdb43bfdc23eab84dd497",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state)",
+        "new": "state_position(state) + state_velocity(state)"
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "(steps + 1)",
+        "new": "(steps - 1)"
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_velocity + acceleration + steps",
+        "new": "initial_velocity + acceleration * steps"
+      }
+    }
+  ]
+}

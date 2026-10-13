@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "16cb24fde7df8ce16b729a95fe44290cea2fb0b6d9263bbf00138b9a3cdfd44d",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row))",
+        "new": "has_customer(customers, 0, order_customer(row)) == false"
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "customer_region(sequence_get(customers, cursor)) != region",
+        "new": "customer_region(sequence_get(customers, cursor)) == region"
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "2a57c37d1d91afd1f477f2726e96c2bd3d70167020509576d2bbe0634d3df751",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "b % a",
+        "new": "a % b"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 3)",
+        "new": "fibonacci(n - 2)"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "n + n + sum_squares(n - 1)",
+        "new": "n * n + sum_squares(n - 1)"
+      }
+    }
+  ]
+}

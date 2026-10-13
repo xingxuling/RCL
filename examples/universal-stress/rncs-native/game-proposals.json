@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "6e4574f11452c25aa8c53e47512d38cb034579adfeaf091781b0e468bfe9bafb",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "input.move + input.speed",
+        "new": "input.move * input.speed"
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "proposed_y <= 0",
+        "new": "proposed_y >= 0"
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "collected(state) >= 0",
+        "new": "collected(state) == 0"
+      }
+    }
+  ]
+}

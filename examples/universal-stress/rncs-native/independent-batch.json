@@ -1,0 +1,241 @@
+{
+  "format": "rcl.k400-independent-rncs-batch.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "batches": [
+    {
+      "context": "/root/k400_rncs_final_independent_a",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+          "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "action_capability(action) == granted_capability",
+          "new": "action_capability(action) != granted_capability"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "task_dependency(task) > completed",
+          "new": "task_dependency(task) >= completed"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "event_priority(left) > event_priority(right)",
+          "new": "event_priority(left) < event_priority(right)"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "compiler.no_inspect",
+          "new": "compiler.inspect"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "n + n",
+          "new": "n * n"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "has_customer(customers, 0, order_customer(row))",
+          "new": "has_customer(customers, 0, order_customer(row)) == false"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "state_position(state) - state_velocity(state)",
+          "new": "state_position(state) + state_velocity(state)"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "b % a",
+          "new": "a % b"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "value < 255",
+          "new": "value > 255"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "valid(left) == 1 and kind_at(tokens, position(left)) == 1",
+          "new": "valid(left) == 1 and kind_at(tokens, position(left)) == 2"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "input.move + input.speed",
+          "new": "input.move * input.speed"
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_rncs_final_independent_b",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "- bias(parameters)",
+          "new": "+ bias(parameters)"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "action_cost(action) < budget",
+          "new": "action_cost(action) > budget"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor))",
+          "new": "task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor))"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "due_count(sort_events(events, 0, empty_sequence()), target, 0) < max_events",
+          "new": "due_count(sort_events(events, 0, empty_sequence()), target, 0) > max_events"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "compiler.phase == 2",
+          "new": "compiler.phase == 1"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "warrant compiler.no_analyze on source",
+          "new": "warrant compiler.analyze on source"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "customer_region(sequence_get(customers, cursor)) != region",
+          "new": "customer_region(sequence_get(customers, cursor)) == region"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "(steps + 1)",
+          "new": "(steps - 1)"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "fibonacci(n - 3)",
+          "new": "fibonacci(n - 2)"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+          "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "choose(operator == 1, 2, 1)",
+          "new": "choose(operator == 1, 1, 2)"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "proposed_y <= 0",
+          "new": "proposed_y >= 0"
+        }
+      ]
+    },
+    {
+      "context": "/root/k400_rncs_final_independent_c",
+      "returnedProposals": [
+        {
+          "id": "learning",
+          "file": "candidate.rcl",
+          "old": "choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+          "new": "choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))"
+        },
+        {
+          "id": "agent",
+          "file": "candidate.rcl",
+          "old": "human_approval == 1",
+          "new": "human_approval == 0"
+        },
+        {
+          "id": "automation",
+          "file": "candidate.rcl",
+          "old": "human_approval == 1",
+          "new": "human_approval == 0"
+        },
+        {
+          "id": "logical-events",
+          "file": "candidate.rcl",
+          "old": "temporal_commit_capability == 1",
+          "new": "temporal_commit_capability != 1"
+        },
+        {
+          "id": "governance-reactive",
+          "file": "candidate.rcl",
+          "old": "compiler.audit_count + 2",
+          "new": "compiler.audit_count + 1"
+        },
+        {
+          "id": "mixed-paradigm",
+          "file": "candidate.rcl",
+          "old": "compiler.phase == 2",
+          "new": "compiler.phase == 1"
+        },
+        {
+          "id": "relations",
+          "file": "candidate.rcl",
+          "old": "        1,\n        0) + sum_approved_orders_for_region",
+          "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+        },
+        {
+          "id": "simulation-scientific",
+          "file": "candidate.rcl",
+          "old": "initial_velocity + acceleration + steps",
+          "new": "initial_velocity + acceleration * steps"
+        },
+        {
+          "id": "algorithm-cli",
+          "file": "candidate.rcl",
+          "old": "n + n + sum_squares(n - 1)",
+          "new": "n * n + sum_squares(n - 1)"
+        },
+        {
+          "id": "media",
+          "file": "candidate.rcl",
+          "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+          "new": "repeat_sample(value, count - 1, sequence_append(output, value))"
+        },
+        {
+          "id": "compiler",
+          "file": "candidate.rcl",
+          "old": "right - left",
+          "new": "left - right"
+        },
+        {
+          "id": "game",
+          "file": "candidate.rcl",
+          "old": "collected(state) >= 0",
+          "new": "collected(state) == 0"
+        }
+      ]
+    }
+  ]
+}

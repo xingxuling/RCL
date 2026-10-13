@@ -1,0 +1,78 @@
+{
+  "format": "rcl.k400-rncs-contract.v1",
+  "id": "learning",
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/learning.rcl",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesPath": "examples/universal-stress/rncs-native/learning-cases.json",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "definitionFile": "scripts/k400-genomes/learning.mjs",
+  "definitionHash": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802",
+  "rncsDefinitionFile": "scripts/k400-rncs-definitions.mjs",
+  "rncsDefinitionHash": "0835bc0a1ac4581c56107ad56c67e50f1218bb94bbecd0bbc203951494783caf",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "vendorProvenance": {
+    "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+    "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd"
+  },
+  "environments": [
+    "rncs-runtime"
+  ],
+  "families": [
+    "machine-learning"
+  ],
+  "baseline": {
+    "epochs": 16,
+    "nodes": 4,
+    "hotness": 2
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K393"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RNCS branch/provider/authority/merge execution",
+    "source-owned admission, stale-base rejection and rollback",
+    "integer-safe typed native-state materialization and context restart"
+  ],
+  "authorityProfile": "Frozen canonical RNCS RBF candidate runtime invokes native RCL provider; source-owned local admission and sealed candidate merge; no production RFE writes or human authority claim",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "index": 0,
+      "intent": "Train a binary perceptron: for a misclassified sample add its features and one to the bias for a positive label; subtract them for a negative label.",
+      "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057"
+    },
+    {
+      "id": "score-bias",
+      "index": 1,
+      "intent": "Inference uses the dot product of feature weights with features plus the learned bias, consistently during training and prediction.",
+      "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299"
+    },
+    {
+      "id": "weight-direction",
+      "index": 2,
+      "intent": "The node-feature perceptron weight moves toward a misclassified positive sample and away from a misclassified negative sample.",
+      "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67"
+    }
+  ],
+  "contractRoot": "d3e80dcf871f7c32a747371cd188d0c627178cd91391b8aaf3dd448ae7859ea7"
+}

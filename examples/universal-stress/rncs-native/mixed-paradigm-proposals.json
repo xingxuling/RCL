@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "2c2fafef5d5ed8875024c042736b155704af4926117637690d7273f99110c8d9",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "n + n",
+        "new": "n * n"
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source"
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "8161c19c2eacc727c1d5bb10b48eee5cdb70b53febb08de56fabaed001ede03e",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "value < 255",
+        "new": "value > 255"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+        "new": "repeat_sample(value, count - 1, sequence_append(output, value))"
+      }
+    }
+  ]
+}

@@ -67,3 +67,4 @@ export {
 
 export { createPortableBrowserTarget } from './portable-browser-target.mjs';
 export { createPortableGpuTarget } from './portable-gpu-target.mjs';
+export { createPortableRncsTarget } from './portable-rncs-target.mjs';

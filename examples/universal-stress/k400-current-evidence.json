@@ -27880,6 +27880,1836 @@
           "note": "Host compile traces, actual GPU instruction/kernel traces and process-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
         }
       }
+    },
+    {
+      "id": "rncs-runtime::machine-learning",
+      "environment": "rncs-runtime",
+      "programFamily": "machine-learning",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/learning-contract.json",
+            "examples/universal-stress/rncs-native/learning-runtime.json",
+            "examples/universal-stress/rncs-native/learning-cases.json",
+            "examples/universal-stress/rncs-native/learning-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::agent",
+      "environment": "rncs-runtime",
+      "programFamily": "agent",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/agent-contract.json",
+            "examples/universal-stress/rncs-native/agent-runtime.json",
+            "examples/universal-stress/rncs-native/agent-cases.json",
+            "examples/universal-stress/rncs-native/agent-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::automation",
+      "environment": "rncs-runtime",
+      "programFamily": "automation",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/automation-contract.json",
+            "examples/universal-stress/rncs-native/automation-runtime.json",
+            "examples/universal-stress/rncs-native/automation-cases.json",
+            "examples/universal-stress/rncs-native/automation-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::realtime",
+      "environment": "rncs-runtime",
+      "programFamily": "realtime",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/logical-events-contract.json",
+            "examples/universal-stress/rncs-native/logical-events-runtime.json",
+            "examples/universal-stress/rncs-native/logical-events-cases.json",
+            "examples/universal-stress/rncs-native/logical-events-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::security-sensitive",
+      "environment": "rncs-runtime",
+      "programFamily": "security-sensitive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::reactive",
+      "environment": "rncs-runtime",
+      "programFamily": "reactive",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/governance-reactive-contract.json",
+            "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+            "examples/universal-stress/rncs-native/governance-reactive-cases.json",
+            "examples/universal-stress/rncs-native/governance-reactive-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::mixed-paradigm",
+      "environment": "rncs-runtime",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/rncs-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::database",
+      "environment": "rncs-runtime",
+      "programFamily": "database",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/relations-contract.json",
+            "examples/universal-stress/rncs-native/relations-runtime.json",
+            "examples/universal-stress/rncs-native/relations-cases.json",
+            "examples/universal-stress/rncs-native/relations-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::simulation",
+      "environment": "rncs-runtime",
+      "programFamily": "simulation",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::scientific",
+      "environment": "rncs-runtime",
+      "programFamily": "scientific",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/simulation-scientific-contract.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-cases.json",
+            "examples/universal-stress/rncs-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::algorithm",
+      "environment": "rncs-runtime",
+      "programFamily": "algorithm",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::cli",
+      "environment": "rncs-runtime",
+      "programFamily": "cli",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/algorithm-cli-contract.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-cases.json",
+            "examples/universal-stress/rncs-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::media",
+      "environment": "rncs-runtime",
+      "programFamily": "media",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/media-contract.json",
+            "examples/universal-stress/rncs-native/media-runtime.json",
+            "examples/universal-stress/rncs-native/media-cases.json",
+            "examples/universal-stress/rncs-native/media-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::compiler",
+      "environment": "rncs-runtime",
+      "programFamily": "compiler",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned token-sequence expression compiler with parenthesis/precedence validation, postfix stack-code emission and execution for addition/subtraction/multiplication; no lexer/full-RCL compiler or whole-language self-hosting claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/compiler-contract.json",
+            "examples/universal-stress/rncs-native/compiler-runtime.json",
+            "examples/universal-stress/rncs-native/compiler-cases.json",
+            "examples/universal-stress/rncs-native/compiler-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "rncs-runtime::game",
+      "environment": "rncs-runtime",
+      "programFamily": "game",
+      "coverageMode": "lowered-execution",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Frozen canonical RNCS RBF invokes the native RCL provider and binds source-owned admission before local candidate merge; no production RFE write, human key custody or OS sandbox claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/rncs-native/game-contract.json",
+            "examples/universal-stress/rncs-native/game-runtime.json",
+            "examples/universal-stress/rncs-native/game-cases.json",
+            "examples/universal-stress/rncs-native/game-proposals.json",
+            "examples/universal-stress/rncs-native/independent-batch.json"
+          ],
+          "note": "Native RCL compilation, actual RNCS execution/authority/merge receipts, source-owned admission replay, rollback and context-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
     }
   ],
   "competitiveComparisons": [],
@@ -28051,7 +29881,19 @@
     "examples/universal-stress/gpu-native/algorithm-cli-runtime.json",
     "examples/universal-stress/gpu-native/media-runtime.json",
     "examples/universal-stress/gpu-native/compiler-runtime.json",
-    "examples/universal-stress/gpu-native/game-runtime.json"
+    "examples/universal-stress/gpu-native/game-runtime.json",
+    "examples/universal-stress/rncs-native/learning-runtime.json",
+    "examples/universal-stress/rncs-native/agent-runtime.json",
+    "examples/universal-stress/rncs-native/automation-runtime.json",
+    "examples/universal-stress/rncs-native/logical-events-runtime.json",
+    "examples/universal-stress/rncs-native/governance-reactive-runtime.json",
+    "examples/universal-stress/rncs-native/mixed-paradigm-runtime.json",
+    "examples/universal-stress/rncs-native/relations-runtime.json",
+    "examples/universal-stress/rncs-native/simulation-scientific-runtime.json",
+    "examples/universal-stress/rncs-native/algorithm-cli-runtime.json",
+    "examples/universal-stress/rncs-native/media-runtime.json",
+    "examples/universal-stress/rncs-native/compiler-runtime.json",
+    "examples/universal-stress/rncs-native/game-runtime.json"
   ],
   "notes": [
     "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",

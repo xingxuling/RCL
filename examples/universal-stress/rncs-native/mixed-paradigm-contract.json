@@ -1,0 +1,76 @@
+{
+  "format": "rcl.k400-rncs-contract.v1",
+  "id": "mixed-paradigm",
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; RCL-owned native computation inside the frozen canonical RNCS RBF candidate runtime, source-owned conditional admission, integer-safe typed f64 transport and evidence-bound local candidate merge; no production RFE commit, human key custody, external effects or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/mixed-paradigm.rcl",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesPath": "examples/universal-stress/rncs-native/mixed-paradigm-cases.json",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "definitionFile": "scripts/k400-genomes/mixed.mjs",
+  "definitionHash": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb",
+  "rncsDefinitionFile": "scripts/k400-rncs-definitions.mjs",
+  "rncsDefinitionHash": "0835bc0a1ac4581c56107ad56c67e50f1218bb94bbecd0bbc203951494783caf",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "vendorProvenance": {
+    "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+    "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd"
+  },
+  "environments": [
+    "rncs-runtime"
+  ],
+  "families": [
+    "mixed-paradigm"
+  ],
+  "baseline": {
+    "batch_size": 8
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K400"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual RNCS branch/provider/authority/merge execution",
+    "source-owned admission, stale-base rejection and rollback",
+    "integer-safe typed native-state materialization and context restart"
+  ],
+  "authorityProfile": "Frozen canonical RNCS RBF candidate runtime invokes native RCL provider; source-owned local admission and sealed candidate merge; no production RFE writes or human authority claim",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "index": 0,
+      "intent": "Compute the sum of squares for the functional stage, agreeing with the closed-form invariant before transactional commit.",
+      "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d"
+    },
+    {
+      "id": "analyze-warrant",
+      "index": 1,
+      "intent": "The builder needs the exact compiler.analyze warrant on source before analyzing a positive batch; do not change the declared requirements.",
+      "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4"
+    },
+    {
+      "id": "phase-trigger",
+      "index": 2,
+      "intent": "Emission follows successful analysis at phase one, then advances to phase two; preserve the digest and all authority requirements.",
+      "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167"
+    }
+  ],
+  "contractRoot": "2c2fafef5d5ed8875024c042736b155704af4926117637690d7273f99110c8d9"
+}

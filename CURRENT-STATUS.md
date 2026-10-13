@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 231/400 PASS (57.75%) · 169 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 246/400 PASS (61.5%) · 154 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,19 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 RNCS candidate-runtime continuation
+
+The frozen canonical RNCS Reality Branch Fabric actually dispatches the native
+RCL provider, verifies source-owned conditional admission, and merges a local
+candidate with generation lineage. Twelve frozen profiles add fifteen distinct
+coordinates, reaching **246 PASS / 154 UNTESTED**, U3, INCOMPLETE. Missing
+approval, stale bases and provider failures reject or roll back. Exact typed f64
+transport preserves state/history/projections through RNCS integer-only hashing.
+These cells receive deliberate host execution credit. Production RFE writes,
+human key custody and broader RNCS-world claims remain open. The full 400-cell
+goal stays active; no package promotion or new Actions run is requested.
+See `docs/K400_RNCS_CANDIDATE_2026-10-13.md`.
 
 ## 2026-10-13 actual GPU continuation
 

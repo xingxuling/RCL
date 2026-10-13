@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-rncs-proposals.v1",
+  "contractRoot": "f412d94d83edfa59643a415850f69dfd6e7a20231f8998125708a490b0cecc50",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/rncs-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_rncs_final_independent_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.no_inspect",
+        "new": "compiler.inspect"
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_rncs_final_independent_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_rncs_final_independent_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.audit_count + 2",
+        "new": "compiler.audit_count + 1"
+      }
+    }
+  ]
+}

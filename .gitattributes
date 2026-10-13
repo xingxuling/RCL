@@ -13,6 +13,8 @@ native/wasi/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space
 native/linux/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the exact licensed upstream bytes recorded by PROVENANCE.json.
 src/vendor/browser-wasi-shim/* -text
+# Freeze upstream RNCS bytes exactly as identified in PROVENANCE.json.
+src/vendor/rncs-reality-branch/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 *.png binary
 *.jpg binary
 *.jpeg binary
