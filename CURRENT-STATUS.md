@@ -34,12 +34,14 @@ remains frozen. See `docs/K400_SELFHOST_COLUMNS_2026-10-14.md`.
 ## 2026-10-14 native mobile and Sequence runtime candidates
 
 The Android native counter has actual Views, touch and activity/process
-recovery. The current server backend passes 20 complete flows, ten frozen
-inputs and three independent repairs; eighteen backend contexts remain.
-An actual HTTP startup race is fixed by atomic readiness publication in
-separate adapters. Previous mobile receipts remain archived with zero current
-credit, and all nineteen backends are reacquired. Twenty focused
-bridge/admission checks pass against the current server receipt. The frozen
+recovery. A complete embedded acquisition failed the unchanged native execution
+P95 gate. A paired actual touch diagnostic preserves all five state roots while
+asynchronous ADB avoids stalling RCL callbacks: four event times are 39–50 ms
+versus 1.14–1.61 s in that single synchronous flow. This is a diagnostic pair,
+not a general timing or admission claim. Atomic readiness publication now also
+covers cold handlers. Previous mobile receipts remain archived with zero
+current credit, and all nineteen backends are reacquired. Eight focused bridge,
+transport and event checks plus one real cold-handler check pass. The frozen
 mobile index grants no K400 credit until every selected environment passes.
 
 A separate persistent Sequence concatenation runtime preserves twenty

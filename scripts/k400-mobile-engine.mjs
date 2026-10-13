@@ -12,7 +12,7 @@ import {UI_TARGET_CONTRACTS,verifyUiFlow,uiFlowSemanticKey,verifyUiControllerLed
 import {compileNativeUiForExecution,lowerNativeUiEvent} from '../src/ui/native-event-lowering.mjs';
 import {compileReality} from '../src/compiler.mjs';
 import {compileRealityToBytecode} from '../src/bytecode.mjs';
-import {createNativeAndroidDriver} from '../src/ui/native-android-driver.mjs';
+import {createAsyncNativeAndroidDriver} from '../src/ui/async-native-android-driver.mjs';
 import {createUiExecutionTarget} from './k400-ui-targets.mjs';
 import {runMobileFlow} from './k400-mobile-flow.mjs';
 import {verifyMobileFlow,mobileSemanticKey} from './k400-mobile-traces.mjs';
@@ -20,7 +20,7 @@ import {emitNativeUiAndroidBridge} from '../src/ui/native-android-bridge.mjs';
 import {evidenceRoot,campaignCellIdFor,UNIVERSAL_STRESS_GATES} from '../src/universal-program-stress.mjs';
 import {verifyUiSourceBinding,uiAdmissionBindings} from './k400-ui-source-bindings.mjs';
 const runUiFlow=(environment,source,driver,options)=>runMobileFlow(environment,source,driver,read(UI_DIRECTORY+'/native-counter-build.json'),options);
-const mobilePolicyFiles=['scripts/k400-mobile-engine.mjs','scripts/k400-mobile-traces.mjs','scripts/k400-mobile-flow.mjs','src/ui/native-android-bridge.mjs','src/ui/native-android-driver.mjs','scripts/build-native-mobile-bridge.mjs'];
+const mobilePolicyFiles=['scripts/k400-mobile-engine.mjs','scripts/k400-mobile-traces.mjs','scripts/k400-mobile-flow.mjs','src/ui/native-android-bridge.mjs','src/ui/native-android-driver.mjs','src/ui/async-native-android-driver.mjs','scripts/build-native-mobile-bridge.mjs'];
 const mobilePolicyBindings=()=>mobilePolicyFiles.map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))}));
 const prefix=UI_DIRECTORY+'/'+UI_PROFILE.id,sha=b=>createHash('sha256').update(b).digest('hex');
 const read=f=>JSON.parse(fs.readFileSync(path.join(ROOT,f),'utf8'));
@@ -32,7 +32,7 @@ export function uiBindingFiles(){
   return [...new Set([...old,...reused,'scripts/k400-ui-engine.mjs','scripts/k400-ui-traces.mjs','scripts/k400-ui-definitions.mjs','scripts/k400-ui-flow.mjs','scripts/k400-ui-targets.mjs',
     'src/ui/native-event-lowering.mjs','src/ui/native-event-runtime.mjs','src/ui/native-web-bridge.mjs','src/ui/native-browser-driver.mjs',
     'src/ui/ui-event.mjs','src/ui/ui-compiler.mjs','src/ui/ui-reactive.mjs','src/ui/ui-ir.mjs','src/ui/ui-validator.mjs','src/ui/ui-schema.mjs','src/ui/ui-style.mjs','src/ui/ui-layout.mjs','src/ui/ui-lifecycle.mjs','src/ui/ui-resource-accessibility.mjs','src/ui/ui-device-adaptation.mjs','src/ui/web-ui-backend.mjs','src/parser.mjs','src/lexer.mjs','src/ui/android-ui-backend.mjs','src/android-application-compiler.mjs',...mobilePolicyFiles,'scripts/k400-mobile-definitions.mjs',
-    'src/ready-http-target.mjs','src/ready-http-worker.mjs','src/ready-replica-target.mjs',
+    'src/ready-http-target.mjs','src/ready-http-worker.mjs','src/ready-replica-target.mjs','src/ready-serverless-target.mjs',
     'scripts/k400-family-targets.mjs','scripts/k400-crdt-targets.mjs','scripts/k400-browser-traces.mjs','scripts/k400-rncs-traces.mjs','scripts/k400-phase-ledger.mjs',
     'src/execution-context-targets.mjs','src/job-context-targets.mjs','src/phase-context-targets.mjs','src/portable-browser-target.mjs','src/portable-rncs-target.mjs',
     'scripts/k400-realtime-traces.mjs','scripts/k400-game-traces.mjs','scripts/k400-scientific-traces.mjs','scripts/k400-ai-traces.mjs',UI_PROFILE.sourcePath])];
@@ -65,7 +65,7 @@ async function acquireErrors(env,source){
   }finally{await target.dispose();assert.equal(path.dirname(path.resolve(directory)),path.resolve(os.tmpdir()));assert.ok(path.basename(directory).startsWith('rcl-ui-errors-'));fs.rmSync(directory,{recursive:true,force:true});}
 }
 export async function runUiProfile({environments=UI_PROFILE.environments,screenshotDirectory=null}={}){
-  const inputs=validateUiInputs(),{contract,source,cases,proposals}=inputs,bindings=uiBindingFiles().map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))})),driver=createNativeAndroidDriver();driver.install(contract.apk.path);
+  const inputs=validateUiInputs(),{contract,source,cases,proposals}=inputs,bindings=uiBindingFiles().map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))})),driver=await createAsyncNativeAndroidDriver();await driver.install(contract.apk.path);
   try{
     for(const env of environments){
       assert.ok(contract.environments.includes(env));const rounds=[],inputResults=[],trials=[];
@@ -81,7 +81,7 @@ export async function runUiProfile({environments=UI_PROFILE.environments,screens
       report.reportRoot=evidenceRoot({...report,generatedAt:undefined});await verifyUiEnvironment(report,inputs);for(const b of bindings)assert.equal(sha(fs.readFileSync(path.join(ROOT,b.path))),b.sha256,'Source changed during acquisition');
       fs.writeFileSync(path.join(ROOT,receiptPath(env)),JSON.stringify(report)+'\n');console.log(JSON.stringify({status:'UI_TARGET_PASS',environment:env,performance,reportRoot:report.reportRoot}));
     }
-  }finally{driver.stop();}
+  }finally{await driver.stop();}
   if(contract.environments.every(env=>fs.existsSync(path.join(ROOT,receiptPath(env))))){const receipts=contract.environments.map(env=>({environment:env,path:receiptPath(env),sha256:sha(fs.readFileSync(path.join(ROOT,receiptPath(env)))),reportRoot:read(receiptPath(env)).reportRoot})),index={format:'rcl.k400-mobile-index.v1',contractRoot:contract.contractRoot,eligibleCells:contract.eligibleCells,receipts,admissionBindings:mobilePolicyBindings()};index.reportRoot=evidenceRoot(index);fs.writeFileSync(path.join(ROOT,prefix+'-runtime.json'),JSON.stringify(index,null,2)+'\n');return verifyUiProfile();}
   return{admitted:false,status:'PARTIAL_ACQUISITION'};
 }

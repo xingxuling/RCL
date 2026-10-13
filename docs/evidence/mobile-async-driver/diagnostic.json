@@ -1,0 +1,57 @@
+{
+  "format": "rcl.mobile-async-driver-diagnostic.v1",
+  "status": "PASS_ONE_PAIRED_FLOW_NOT_K400_ADMISSION",
+  "scope": "One actual native-touch flow per driver on the same embedded RCL backend; diagnostic only, not K400 admission or a general timing claim",
+  "grantedCells": 0,
+  "sourceBindings": [
+    {
+      "path": "src/ui/native-android-driver.mjs",
+      "sha256": "57ff09b11f38de6d867bced63ba1497f9198d47d7676c8f81317ed4ab0cc47f3"
+    },
+    {
+      "path": "src/ui/async-native-android-driver.mjs",
+      "sha256": "b18bc965e201f24495cdef831781caa96070768b99f1b97c5bb1efb49f4a3460"
+    },
+    {
+      "path": "scripts/k400-mobile-flow.mjs",
+      "sha256": "bce1cd85692b7dea77986db066192e79ecf741f65a70be6ee1162c3c1c3ab71a"
+    },
+    {
+      "path": "scripts/k400-mobile-engine.mjs",
+      "sha256": "d13d24e034a19b52dfc34fda5f2b7d5cf230f2f6a78a344afed0a133c2497810"
+    },
+    {
+      "path": "src/ready-serverless-target.mjs",
+      "sha256": "9bfa201a6dac970a16de425a525e915eb1cca2900a5b97797999b5bf66960de5"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/evidence/mobile-async-driver/asynchronous-flow.json",
+      "sha256": "de8fc86cba41976127998d9650158f4933e1e3977ad9c719f613f70e91d78688"
+    },
+    {
+      "path": "docs/evidence/mobile-async-driver/comparison.json",
+      "sha256": "9b347bc9b8bb9b8572a867d9886815de309a69179842f0ca87c5f15f03054d76"
+    },
+    {
+      "path": "docs/evidence/mobile-async-driver/failed-synchronous-acquisition.log",
+      "sha256": "3cb721a6daf39bb263990c1a82b39ad9d67c420b75e13860912fc547da3bea78"
+    },
+    {
+      "path": "docs/evidence/mobile-async-driver/synchronous-flow.json",
+      "sha256": "5487373933f58d55d6644728b517afd4331db70d5e988658c6b94f78b767bbe0"
+    }
+  ],
+  "controls": {
+    "sameApk": true,
+    "sameRclSource": true,
+    "sameEmbeddedBackend": true,
+    "sameFiveStateRoots": true,
+    "frozenPerformanceBudgetsChanged": false
+  },
+  "claims": {
+    "generalSpeedup": false,
+    "fullMobileProfile": false
+  }
+}

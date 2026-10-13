@@ -4,13 +4,21 @@ import assert from 'node:assert/strict';
 import {evidenceRoot} from '../src/universal-program-stress.mjs';
 import {validateUiInputs,verifyUiEnvironment,verifyUiProfile} from '../scripts/k400-mobile-engine.mjs';
 import {verifyMobileFlow} from '../scripts/k400-mobile-traces.mjs';
+import {MOBILE_PROFILE,MOBILE_DIRECTORY} from '../scripts/k400-mobile-definitions.mjs';
 
 const inputs=validateUiInputs();
-const receipt=()=>JSON.parse(fs.readFileSync('examples/universal-stress/mobile-native/native-counter-server-runtime.json','utf8'));
+const historicalPath=MOBILE_DIRECTORY+'/acquisition-before-async-driver/native-counter-server-runtime.json';
+const receipt=()=>JSON.parse(fs.readFileSync(historicalPath,'utf8'));
+const currentEnvironments=MOBILE_PROFILE.environments.filter(environment=>fs.existsSync(MOBILE_DIRECTORY+'/native-counter-'+environment+'-runtime.json'));
 
-for(const environment of ['server'])test('twenty real Android native-touch flows preserve '+environment+' RCL semantics and independent repairs',async()=>{
+for(const environment of currentEnvironments)test('twenty real Android native-touch flows preserve '+environment+' RCL semantics and independent repairs',async()=>{
   const report=JSON.parse(fs.readFileSync('examples/universal-stress/mobile-native/native-counter-'+environment+'-runtime.json','utf8'));
   await verifyUiEnvironment(report,inputs);
+});
+
+test('historical native flow semantics remain verifiable while stale acquisition policies receive no current admission',async()=>{
+  const report=receipt();await verifyMobileFlow(report.rounds[0].flow,inputs.source,inputs.contract,{controls:true});
+  await assert.rejects(()=>verifyUiEnvironment(report,inputs));
 });
 
 for(const[name,mutate]of [
@@ -30,8 +38,8 @@ for(const[name,mutate]of [
   await assert.rejects(()=>verifyMobileFlow(flow,inputs.source,inputs.contract,{controls:true}));
 });
 
-test('rehashing does not compensate for a missing K400 gate',async()=>{
-  const report=receipt();report.gates.EXECUTE='UNTESTED';
+test('rehashing does not compensate for a missing K400 gate',{skip:currentEnvironments.length===0?'Fresh acquisition is still running; a current receipt is required to isolate gate rejection':false},async()=>{
+  const report=JSON.parse(fs.readFileSync(MOBILE_DIRECTORY+'/native-counter-'+currentEnvironments[0]+'-runtime.json','utf8'));report.gates.EXECUTE='UNTESTED';
   report.reportRoot=evidenceRoot({...report,generatedAt:undefined,reportRoot:undefined});
   await assert.rejects(()=>verifyUiEnvironment(report,inputs));
 });

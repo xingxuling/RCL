@@ -1,0 +1,116 @@
+// ADAPT of k400-ui-engine.mjs; actual native Android flow replaces browser DOM.
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {ROOT,edit} from './k400-genomes/shared.mjs';
+import {MOBILE_PROFILE as UI_PROFILE,MOBILE_DIRECTORY as UI_DIRECTORY} from './k400-mobile-definitions.mjs';
+import {uiVariant,UI_EVENTS} from './k400-ui-definitions.mjs';
+import {UI_TARGET_CONTRACTS,verifyUiFlow,uiFlowSemanticKey,verifyUiControllerLedger,verifyUiTargetBinding} from './k400-ui-traces.mjs';
+import {compileNativeUiForExecution,lowerNativeUiEvent} from '../src/ui/native-event-lowering.mjs';
+import {compileReality} from '../src/compiler.mjs';
+import {compileRealityToBytecode} from '../src/bytecode.mjs';
+import {createNativeAndroidDriver} from '../src/ui/native-android-driver.mjs';
+import {createUiExecutionTarget} from './k400-ui-targets.mjs';
+import {runMobileFlow} from './k400-mobile-flow.mjs';
+import {verifyMobileFlow,mobileSemanticKey} from './k400-mobile-traces.mjs';
+import {emitNativeUiAndroidBridge} from '../src/ui/native-android-bridge.mjs';
+import {evidenceRoot,campaignCellIdFor,UNIVERSAL_STRESS_GATES} from '../src/universal-program-stress.mjs';
+import {verifyUiSourceBinding,uiAdmissionBindings} from './k400-ui-source-bindings.mjs';
+const runUiFlow=(environment,source,driver,options)=>runMobileFlow(environment,source,driver,read(UI_DIRECTORY+'/native-counter-build.json'),options);
+const mobilePolicyFiles=['scripts/k400-mobile-engine.mjs','scripts/k400-mobile-traces.mjs','scripts/k400-mobile-flow.mjs','src/ui/native-android-bridge.mjs','src/ui/native-android-driver.mjs','scripts/build-native-mobile-bridge.mjs'];
+const mobilePolicyBindings=()=>mobilePolicyFiles.map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))}));
+const prefix=UI_DIRECTORY+'/'+UI_PROFILE.id,sha=b=>createHash('sha256').update(b).digest('hex');
+const read=f=>JSON.parse(fs.readFileSync(path.join(ROOT,f),'utf8'));
+const p95=values=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*.95)-1];
+const receiptPath=env=>prefix+'-'+env+'-runtime.json';
+export function uiBindingFiles(){
+  const old=[UI_TARGET_CONTRACTS.base,...Object.values(UI_TARGET_CONTRACTS).filter(f=>f!==UI_TARGET_CONTRACTS.base)];
+  const reused=old.flatMap(f=>read(f.replace('-contract.json','-runtime.json')).sourceBindings.map(b=>b.path));
+  return [...new Set([...old,...reused,'scripts/k400-ui-engine.mjs','scripts/k400-ui-traces.mjs','scripts/k400-ui-definitions.mjs','scripts/k400-ui-flow.mjs','scripts/k400-ui-targets.mjs',
+    'src/ui/native-event-lowering.mjs','src/ui/native-event-runtime.mjs','src/ui/native-web-bridge.mjs','src/ui/native-browser-driver.mjs',
+    'src/ui/ui-event.mjs','src/ui/ui-compiler.mjs','src/ui/ui-reactive.mjs','src/ui/ui-ir.mjs','src/ui/ui-validator.mjs','src/ui/ui-schema.mjs','src/ui/ui-style.mjs','src/ui/ui-layout.mjs','src/ui/ui-lifecycle.mjs','src/ui/ui-resource-accessibility.mjs','src/ui/ui-device-adaptation.mjs','src/ui/web-ui-backend.mjs','src/parser.mjs','src/lexer.mjs','src/ui/android-ui-backend.mjs','src/android-application-compiler.mjs',...mobilePolicyFiles,'scripts/k400-mobile-definitions.mjs',
+    'src/ready-http-target.mjs','src/ready-http-worker.mjs','src/ready-replica-target.mjs',
+    'scripts/k400-family-targets.mjs','scripts/k400-crdt-targets.mjs','scripts/k400-browser-traces.mjs','scripts/k400-rncs-traces.mjs','scripts/k400-phase-ledger.mjs',
+    'src/execution-context-targets.mjs','src/job-context-targets.mjs','src/phase-context-targets.mjs','src/portable-browser-target.mjs','src/portable-rncs-target.mjs',
+    'scripts/k400-realtime-traces.mjs','scripts/k400-game-traces.mjs','scripts/k400-scientific-traces.mjs','scripts/k400-ai-traces.mjs',UI_PROFILE.sourcePath])];
+}
+export function validateUiInputs(){
+  const contract=read(prefix+'-contract.json'),source=UI_PROFILE.source(),cases=read(contract.casesPath),proposalsPath=prefix+'-proposals.json',proposals=read(proposalsPath),batch=read(proposals.acquisitionBatch);
+  assert.equal(contract.format,'rcl.k400-mobile-contract.v1');assert.equal(evidenceRoot({...contract,contractRoot:undefined}),contract.contractRoot);assert.equal(contract.frozenBeforeIndependentTrials,true);
+  for(const[file,hash]of [[contract.sourcePath,contract.sourceHash],[contract.definitionFile,contract.definitionHash],[contract.casesPath,contract.casesHash],[contract.compilerPath,contract.compilerHash]])assert.equal(sha(fs.readFileSync(path.join(ROOT,file))),hash);
+  assert.equal(contract.id,UI_PROFILE.id);assert.equal(contract.sourcePath,UI_PROFILE.sourcePath);assert.equal(contract.uiRoot,compileNativeUiForExecution(source).semanticRoot);
+  assert.deepEqual(contract.environments,UI_PROFILE.environments);assert.deepEqual(contract.families,UI_PROFILE.families);assert.deepEqual(contract.events,UI_EVENTS);assert.deepEqual(contract.baseline,UI_PROFILE.baseline);assert.equal(contract.scope,UI_PROFILE.scope);
+  assert.equal(contract.rounds,20);assert.equal(cases.length,10);assert.equal(contract.clientBuildHash,sha(fs.readFileSync(path.join(ROOT,contract.clientBuildPath))));assert.equal(contract.apk.sha256,sha(fs.readFileSync(path.join(ROOT,contract.apk.path))));const built=read(contract.clientBuildPath);assert.equal(built.apk.sha256,contract.apk.sha256);assert.equal(built.javaHash,emitNativeUiAndroidBridge(source).javaHash);assert.equal(built.layoutRoot,contract.layoutRoot);assert.deepEqual(contract.performanceBudget,{compileP95Ms:5000,executeP95Ms:2000});assert.equal(contract.independentGeneration.requiredFreshContexts,3);
+  assert.deepEqual(contract.eligibleCells,UI_PROFILE.environments.flatMap(env=>UI_PROFILE.families.map(f=>campaignCellIdFor(env,f))));
+  for(const[c,i]of cases.map((c,i)=>[c,i])){const variant=uiVariant(source,c.inputs);assert.equal(c.index,i);assert.deepEqual(c.inputs,UI_PROFILE.cases[i]);assert.equal(c.sourceHash,sha(variant));assert.equal(c.uiRoot,compileNativeUiForExecution(variant).semanticRoot);}
+  assert.equal(proposals.format,'rcl.k400-independent-mobile-proposals.v1');assert.equal(batch.format,'rcl.k400-independent-mobile-batch.v1');assert.equal(proposals.contractRoot,contract.contractRoot);assert.equal(proposals.acquisitionBatch,UI_DIRECTORY+'/independent-batch.json');
+  for(const o of [contract.independentGeneration,proposals,batch])for(const f of ['canonicalSourceProvided','oracleEditsProvided','holdoutTestsProvided','osIsolationClaimed'])assert.equal(o[f],false);
+  assert.equal(batch.batches.length,3);assert.equal(proposals.trials.length,3);assert.equal(new Set(batch.batches.map(b=>b.context)).size,3);
+  for(const[t,i]of contract.trials.map((t,i)=>[t,i])){assert.equal(t.index,i);assert.equal(t.id,UI_PROFILE.mutations[i].id);assert.equal(t.mutatedSourceHash,sha(edit(source,UI_PROFILE.mutations[i].good,UI_PROFILE.mutations[i].bad)));const b=batch.batches[i],p=proposals.trials[i];assert.equal(b.index,i);assert.deepEqual(JSON.parse(b.rawResponse),b.returnedProposals);assert.equal(p.id,t.id);assert.equal(p.context,b.context);assert.equal(b.returnedProposals.length,1);assert.deepEqual(p.proposal,b.returnedProposals[0]);assert.equal(p.proposal.id,contract.id+'-'+i);assert.equal(p.proposal.file,'candidate.rcl');}
+  return{contract,source,cases,proposalsPath,proposals,batchHash:sha(fs.readFileSync(path.join(ROOT,proposals.acquisitionBatch)))};
+}
+async function acquireErrors(env,source){
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'rcl-ui-errors-')),target=await createUiExecutionTarget(env);
+  try{
+    const text=lowerNativeUiEvent(source).source,valid=path.join(directory,'valid.rcl'),out=valid+'.rbc';fs.writeFileSync(valid,text);const compiled=await target.compile(valid,out);
+    assert.equal(sha(compiled.bytecode),sha(compileRealityToBytecode(text)));
+    const malformed=path.join(directory,'malformed.rcl');fs.writeFileSync(malformed,text.replace(/^reality /u,'realty '));let malformedDiagnostic;
+    try{await target.compile(malformed,malformed+'.rbc');}catch(e){malformedDiagnostic=e.message;}assert.match(malformedDiagnostic??'',/RCL_SEMANTIC_ASSERT: reality at/u);
+    const corrupt=path.join(directory,'corrupt.rbc');fs.writeFileSync(corrupt,Buffer.from('RCLB'));let corruptDiagnostic;
+    try{await target.execute(corrupt,compileReality(text).programRoot);}catch(e){corruptDiagnostic=e.message;}assert.match(corruptDiagnostic??'',/RCL_NATIVE_TRUNCATED/u);
+    return{malformedRejected:true,malformedDiagnostic,corruptRejected:true,corruptDiagnostic,corruptArtifactHash:sha(Buffer.from('RCLB')),sourceRoot:compileReality(text).programRoot,binding:structuredClone(target.binding),controllerLedger:target.controllerLedger?.()??null};
+  }finally{await target.dispose();assert.equal(path.dirname(path.resolve(directory)),path.resolve(os.tmpdir()));assert.ok(path.basename(directory).startsWith('rcl-ui-errors-'));fs.rmSync(directory,{recursive:true,force:true});}
+}
+export async function runUiProfile({environments=UI_PROFILE.environments,screenshotDirectory=null}={}){
+  const inputs=validateUiInputs(),{contract,source,cases,proposals}=inputs,bindings=uiBindingFiles().map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))})),driver=createNativeAndroidDriver();driver.install(contract.apk.path);
+  try{
+    for(const env of environments){
+      assert.ok(contract.environments.includes(env));const rounds=[],inputResults=[],trials=[];
+      for(let i=0;i<20;i++){const screenshotPath=i===0&&env==='windows'&&screenshotDirectory?path.join(screenshotDirectory,'governed-native-ui-mobile.png'):null;rounds.push({index:i,flow:await runUiFlow(env,source,driver,{controls:i===0,screenshotPath})});if((i+1)%5===0)console.log(JSON.stringify({environment:env,phase:'rounds',completed:i+1,total:20}));}
+      for(const c of cases)inputResults.push({index:c.index,inputs:c.inputs,flow:await runUiFlow(env,uiVariant(source,c.inputs),driver)});
+      for(const[frozen,i]of contract.trials.map((f,i)=>[f,i])){const mutation=UI_PROFILE.mutations[i],p=proposals.trials[i],mutated=edit(source,mutation.good,mutation.bad),broken=await runUiFlow(env,mutated,driver);assert.notEqual(mobileSemanticKey(broken),mobileSemanticKey(rounds[0].flow),'Effective semantic mutation');const repaired=edit(mutated,p.proposal.old,p.proposal.new),semanticRepairCases=[];
+        if(repaired!==source)for(const c of cases)semanticRepairCases.push({index:c.index,inputs:c.inputs,flow:await runUiFlow(env,uiVariant(repaired,c.inputs),driver)});
+        trials.push({id:frozen.id,context:p.context,proposal:p.proposal,mutatedSourceHash:sha(mutated),broken,exactCanonicalRestoration:repaired===source,semanticRepairCases,flow:await runUiFlow(env,repaired,driver)});}
+      const metrics=rounds.flatMap(r=>r.flow.records),performance={compileP95Ms:p95(metrics.map(r=>r.compileMs)),executeP95Ms:p95(metrics.map(r=>r.executeMs))};
+      const report={format:'rcl.k400-mobile-runtime.v1',status:'PASS_NATIVE_MOBILE',id:contract.id,environment:env,generatedAt:new Date().toISOString(),contractRoot:contract.contractRoot,sourceHash:contract.sourceHash,casesHash:contract.casesHash,compilerHash:contract.compilerHash,
+        proposalsPath:inputs.proposalsPath,proposalsHash:sha(fs.readFileSync(path.join(ROOT,inputs.proposalsPath))),batchHash:inputs.batchHash,scope:contract.scope,hostedCi:'NOT_RUN_USER_INSTRUCTION',osIsolationClaimed:false,sourceBindings:bindings,
+        rounds,inputResults,trials,performance,negativeControls:await acquireErrors(env,source),gates:Object.fromEntries(UNIVERSAL_STRESS_GATES.map(g=>[g,'PASS']))};
+      report.reportRoot=evidenceRoot({...report,generatedAt:undefined});await verifyUiEnvironment(report,inputs);for(const b of bindings)assert.equal(sha(fs.readFileSync(path.join(ROOT,b.path))),b.sha256,'Source changed during acquisition');
+      fs.writeFileSync(path.join(ROOT,receiptPath(env)),JSON.stringify(report)+'\n');console.log(JSON.stringify({status:'UI_TARGET_PASS',environment:env,performance,reportRoot:report.reportRoot}));
+    }
+  }finally{driver.stop();}
+  if(contract.environments.every(env=>fs.existsSync(path.join(ROOT,receiptPath(env))))){const receipts=contract.environments.map(env=>({environment:env,path:receiptPath(env),sha256:sha(fs.readFileSync(path.join(ROOT,receiptPath(env)))),reportRoot:read(receiptPath(env)).reportRoot})),index={format:'rcl.k400-mobile-index.v1',contractRoot:contract.contractRoot,eligibleCells:contract.eligibleCells,receipts,admissionBindings:mobilePolicyBindings()};index.reportRoot=evidenceRoot(index);fs.writeFileSync(path.join(ROOT,prefix+'-runtime.json'),JSON.stringify(index,null,2)+'\n');return verifyUiProfile();}
+  return{admitted:false,status:'PARTIAL_ACQUISITION'};
+}
+export async function verifyUiEnvironment(report,inputs=validateUiInputs()){
+  const{contract,source,cases,proposals}=inputs;
+  assert.equal(report.format,'rcl.k400-mobile-runtime.v1');assert.equal(report.status,'PASS_NATIVE_MOBILE');assert.equal(report.id,contract.id);assert.ok(contract.environments.includes(report.environment));assert.equal(report.contractRoot,contract.contractRoot);assert.equal(evidenceRoot({...report,generatedAt:undefined,reportRoot:undefined}),report.reportRoot);
+  for(const f of ['sourceHash','casesHash','compilerHash','scope'])assert.equal(report[f],contract[f]);assert.equal(report.osIsolationClaimed,false);assert.equal(report.hostedCi,'NOT_RUN_USER_INSTRUCTION');assert.equal(report.proposalsPath,inputs.proposalsPath);assert.equal(report.proposalsHash,sha(fs.readFileSync(path.join(ROOT,inputs.proposalsPath))));assert.equal(report.batchHash,inputs.batchHash);
+  assert.deepEqual(report.sourceBindings.map(b=>b.path),uiBindingFiles());for(const b of report.sourceBindings)verifyUiSourceBinding(b);
+  const driver=report.rounds[0].flow.appBinding;const instances=new Set();
+  async function flow(f,s,options={}){assert.equal(f.environment,report.environment);const instance=f.session;assert.ok(instance&&!instances.has(instance),'Fresh UI flow instance');instances.add(instance);assert.deepEqual(f.appBinding,driver);await verifyMobileFlow(f,s,contract,options);}
+  // Validate the actual browser executable/driver once; every flow must use that binding.
+  await verifyMobileFlow(report.rounds[0].flow,source,contract,{controls:true});
+  assert.equal(report.rounds.length,20);for(const[r,i]of report.rounds.map((r,i)=>[r,i])){assert.equal(r.index,i);await flow(r.flow,source,{controls:i===0});}
+  assert.equal(new Set(report.rounds.map(r=>mobileSemanticKey(r.flow))).size,1);assert.equal(report.inputResults.length,10);
+  for(const c of cases){const r=report.inputResults[c.index];assert.equal(r.index,c.index);assert.deepEqual(r.inputs,c.inputs);await flow(r.flow,uiVariant(source,c.inputs));}
+  assert.equal(report.trials.length,3);assert.equal(new Set(report.trials.map(t=>t.context)).size,3);
+  for(const[frozen,i]of contract.trials.map((f,i)=>[f,i])){const r=report.trials[i],p=proposals.trials[i],m=UI_PROFILE.mutations[i],mutated=edit(source,m.good,m.bad),repaired=edit(mutated,p.proposal.old,p.proposal.new);assert.equal(r.id,frozen.id);assert.equal(r.context,p.context);assert.deepEqual(r.proposal,p.proposal);assert.equal(r.mutatedSourceHash,frozen.mutatedSourceHash);await flow(r.broken,mutated);assert.notEqual(mobileSemanticKey(r.broken),mobileSemanticKey(report.rounds[0].flow));assert.equal(r.exactCanonicalRestoration,repaired===source);assert.equal(r.semanticRepairCases.length,repaired===source?0:10);
+    for(const c of repaired===source?[]:cases){const v=r.semanticRepairCases[c.index];assert.equal(v.index,c.index);assert.deepEqual(v.inputs,c.inputs);await flow(v.flow,uiVariant(repaired,c.inputs),{expectedSource:uiVariant(source,c.inputs)});}await flow(r.flow,repaired,{expectedSource:source});}
+  const metrics=report.rounds.flatMap(r=>r.flow.records);for(const[f,m]of [['compileP95Ms','compileMs'],['executeP95Ms','executeMs']]){assert.equal(report.performance[f],p95(metrics.map(r=>r[m])));assert.ok(report.performance[f]<=contract.performanceBudget[f]);}
+  const n=report.negativeControls;assert.equal(n.malformedRejected,true);assert.equal(n.corruptRejected,true);assert.match(n.malformedDiagnostic,/RCL_SEMANTIC_ASSERT: reality at/u);assert.match(n.corruptDiagnostic,/RCL_NATIVE_TRUNCATED/u);assert.equal(n.corruptArtifactHash,sha(Buffer.from('RCLB')));assert.equal(n.sourceRoot,compileReality(lowerNativeUiEvent(source).source).programRoot);verifyUiTargetBinding(report.environment,n.binding,contract);await verifyUiControllerLedger(report.environment,n.binding,n.controllerLedger);
+  for(const gate of UNIVERSAL_STRESS_GATES)assert.equal(report.gates[gate],'PASS');return true;
+}
+export async function verifyUiProfile(supplied){
+  const inputs=validateUiInputs(),{contract}=inputs,indexPath=prefix+'-runtime.json';if(!supplied&&!fs.existsSync(path.join(ROOT,indexPath)))return{admitted:false,claims:[],id:contract.id};const index=supplied??read(indexPath);
+  assert.equal(index.format,'rcl.k400-mobile-index.v1');assert.equal(index.contractRoot,contract.contractRoot);assert.equal(index.reportRoot,evidenceRoot({...index,reportRoot:undefined}));assert.deepEqual(index.eligibleCells,contract.eligibleCells);assert.deepEqual(index.receipts.map(r=>r.environment),contract.environments);assert.deepEqual(index.admissionBindings,mobilePolicyBindings());
+  const reports=[];for(const receipt of index.receipts){assert.equal(receipt.path,receiptPath(receipt.environment));assert.equal(receipt.sha256,sha(fs.readFileSync(path.join(ROOT,receipt.path))));const report=read(receipt.path);assert.equal(receipt.reportRoot,report.reportRoot);await verifyUiEnvironment(report,inputs);reports.push(report);}
+  for(let i=0;i<10;i++)assert.equal(new Set(reports.map(r=>mobileSemanticKey(r.inputResults[i].flow))).size,1);
+  const refs=[prefix+'-contract.json',indexPath,contract.casesPath,inputs.proposalsPath,inputs.proposals.acquisitionBatch,...index.receipts.map(r=>r.path),...index.admissionBindings.map(b=>b.path)];
+  return{admitted:true,id:contract.id,reportRoot:index.reportRoot,eligibleCells:contract.eligibleCells,claims:contract.environments.flatMap(environment=>contract.families.map(programFamily=>({id:environment+'::'+programFamily,environment,programFamily,coverageMode:'native-semantic',lastVerifiedDate:'2026-10-13',changes:[],knownLimits:[contract.scope,'Frozen integer mobile counter vertical slice: 20 complete real native-touch flows, ten sealed inputs and three unchanged independent repairs per context; actual Android activity recreation/process restart and target-owned RCL state, no whole-mobile-platform claim.'],requiredGenes:['native-ui-event-lowering','source-owned-state-and-render','actual-android-native-views','authenticated-stale-root-transport','sealed-input-oracles','independent-repair'],
+    gates:Object.fromEntries(UNIVERSAL_STRESS_GATES.map(g=>[g,{status:'PASS',evidence:refs,note:'Actual Android native Views and touch; selected native RCL target owns state/render with exact RBC parity, reference event/history roots and full controller replay, measured budgets, lifecycle recreation/process restart, denied authority/transport and frozen unchanged repairs.'}]))})))};
+}
+if(process.argv[1]&&pathToFileURL(path.resolve(process.argv[1])).href===import.meta.url){const mode=process.argv[2]??'verify';if(mode==='run')console.log(JSON.stringify(await runUiProfile({environments:process.argv[3]?[process.argv[3]]:UI_PROFILE.environments,screenshotDirectory:process.env.RCL_UI_SCREENSHOT_DIRECTORY})));else if(mode==='verify')console.log(JSON.stringify(await verifyUiProfile()));else throw new Error('UI_ENGINE_MODE');}
