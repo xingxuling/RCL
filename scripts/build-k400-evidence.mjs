@@ -56,6 +56,8 @@ import { SCIENTIFIC_PROFILES, SCIENTIFIC_DIRECTORY } from './k400-scientific-def
 import { verifyScientificProfile } from './k400-scientific-engine.mjs';
 import { AI_PROFILES, AI_DIRECTORY } from './k400-ai-definitions.mjs';
 import { verifyAiProfile } from './k400-ai-engine.mjs';
+import { UI_PROFILE, UI_DIRECTORY } from './k400-ui-definitions.mjs';
+import { verifyUiAdmission } from './k400-ui-admission.mjs';
 
 const root = process.cwd();
 const nativeUiPath = 'examples/universal-stress/native-ui-genome-v0.1-evidence.json';
@@ -1190,6 +1192,26 @@ for (const definition of AI_PROFILES) {
     ])];
   }
   evidence.sourceReceipts.push(AI_DIRECTORY + '/' + definition.id + '-runtime.json');
+}
+const uiAdmission = await verifyUiAdmission();
+if (uiAdmission.admitted) {
+  for (const claim of uiAdmission.claims) {
+    const existing = evidence.claims.find(item => item.id === claim.id);
+    if (!existing) { evidence.claims.push(claim); continue; }
+    if ((existing.environment !== undefined && existing.environment !== claim.environment)
+      || (existing.programFamily !== undefined && existing.programFamily !== claim.programFamily)
+      || !UNIVERSAL_STRESS_GATES.every(gate => existing.gates[gate]?.status === 'PASS' && claim.gates[gate]?.status === 'PASS')) {
+      throw new Error('RCL_K400_PROFILE_COLLISION_REQUIRES_REVIEW:' + claim.id);
+    }
+    existing.additionalProfiles ??= [];
+    existing.additionalProfiles.push({ id: 'ui:' + UI_PROFILE.id, reportRoot: uiAdmission.reportRoot, scope: UI_PROFILE.scope,
+      lastVerifiedDate: claim.lastVerifiedDate, coverageMode: claim.coverageMode, evidence: claim.gates.EVIDENCE.evidence });
+    existing.knownLimits = [...new Set([...(existing.knownLimits ?? []), ...claim.knownLimits])];
+    for (const gate of UNIVERSAL_STRESS_GATES) existing.gates[gate].evidence = [...new Set([
+      ...existing.gates[gate].evidence, ...claim.gates[gate].evidence,
+    ])];
+  }
+  evidence.sourceReceipts.push(UI_DIRECTORY + '/' + UI_PROFILE.id + '-runtime.json');
 }
 const validation = validateUniversalStressEvidence(evidence);
 if (!validation.ok) throw new Error(`RCL_K400_EVIDENCE_INVALID:${validation.errors.join('|')}`);

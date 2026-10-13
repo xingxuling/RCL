@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-ai-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "31ba6c6253e55b865efc2f32f18d46dda29ed92addb65a80ee4b91bef9e1ff7e",
+  "acquisitionBatch": "examples/universal-stress/ui-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "increment-step",
+      "context": "/root/k400_ui_independent_a",
+      "proposal": {
+        "id": "governed-counter-0",
+        "file": "candidate.rcl",
+        "old": "count - step",
+        "new": "count + step"
+      }
+    },
+    {
+      "id": "derived-label",
+      "context": "/root/k400_ui_independent_b",
+      "proposal": {
+        "id": "governed-counter-1",
+        "file": "candidate.rcl",
+        "old": "\"计数：\" + step",
+        "new": "\"计数：\" + count"
+      }
+    },
+    {
+      "id": "reset-initial",
+      "context": "/root/k400_ui_independent_c",
+      "proposal": {
+        "id": "governed-counter-2",
+        "file": "candidate.rcl",
+        "old": "set count <- step",
+        "new": "set count <- initial"
+      }
+    }
+  ]
+}

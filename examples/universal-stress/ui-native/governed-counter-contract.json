@@ -1,0 +1,159 @@
+{
+  "format": "rcl.k400-ui-contract.v1",
+  "id": "governed-counter",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/native-ui/governed-counter.rcl",
+  "sourceHash": "353167d40ac2b9b756ac57307f33dd7cb799ec0c8fc6d72341e494971aa800b1",
+  "definitionFile": "scripts/k400-ui-definitions.mjs",
+  "definitionHash": "49a345973e544cf6b603039c7946b3692bafb44835bc4b0a2d8777b4d3d7b0cb",
+  "casesPath": "examples/universal-stress/ui-native/governed-counter-cases.json",
+  "casesHash": "56cea95708f1588ed7d11324e83289d466fcc10e3f41e0b6f2e35b83e9e4d54a",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "uiRoot": "478bed8936e79fcacdcbf648e3469d5c1ba2438c54e7332db8e9694e466effac",
+  "environments": [
+    "windows",
+    "wasm-vm",
+    "linux",
+    "android",
+    "server",
+    "embedded-runtime",
+    "distributed-runtime",
+    "serverless",
+    "database",
+    "dataflow-runtime",
+    "simulation-runtime",
+    "automation-runtime",
+    "browser",
+    "rncs-runtime",
+    "realtime-runtime",
+    "game-runtime",
+    "scientific-runtime",
+    "ai-runtime",
+    "compiler-runtime"
+  ],
+  "families": [
+    "gui",
+    "web"
+  ],
+  "events": [
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "ResetButton",
+      "type": "activate",
+      "payload": {}
+    },
+    {
+      "nodeId": "IncrementButton",
+      "type": "activate",
+      "payload": {}
+    }
+  ],
+  "baseline": {
+    "initial": 0,
+    "step": 1
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "measurementUnit": "native event compile/execute p95 across full four-event UI flows; browser/transport overhead retained separately",
+  "browserPolicy": {
+    "realm": "ACTUAL_CHROMIUM_DOM",
+    "desktop": {
+      "width": 1100,
+      "height": 800
+    },
+    "mobileViewport": {
+      "width": 414,
+      "height": 896
+    },
+    "minimumActionHeight": 44,
+    "consoleErrorsAllowed": 0
+  },
+  "runtimeControls": [
+    "actual browser clicks and target-owned RCL state/render projection",
+    "authenticated HTTP, stale-root and unknown-event rejection, native authority rejection",
+    "page reload with preserved committed state, mobile viewport layout and screenshot, exact reference/native event history"
+  ],
+  "eligibleCells": [
+    "K043",
+    "K044",
+    "K003",
+    "K004",
+    "K023",
+    "K024",
+    "K083",
+    "K084",
+    "K103",
+    "K104",
+    "K283",
+    "K284",
+    "K243",
+    "K244",
+    "K123",
+    "K124",
+    "K143",
+    "K144",
+    "K303",
+    "K304",
+    "K363",
+    "K364",
+    "K343",
+    "K344",
+    "K063",
+    "K064",
+    "K383",
+    "K384",
+    "K263",
+    "K264",
+    "K183",
+    "K184",
+    "K203",
+    "K204",
+    "K223",
+    "K224",
+    "K323",
+    "K324"
+  ],
+  "scope": "Actual target-backed browser GUI and loopback Web vertical slice; existing UI IR lowered into native RCL event/derived/render semantics, cooperative in-memory state and authenticated/stale-root transport; desktop/mobile-sized browser rendering, no native OS widget, mobile-family, public hosting or whole-UI-language claim",
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidate; no other filesystem, memory, network, execution, writes or delegation"
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "increment-step",
+      "intent": "The increment action adds the configured step to the current count, including negative and zero steps.",
+      "mutatedSourceHash": "2d6b0ad2c1277d9f3a988c5680d0c7a4fbeddfa25468140e5d75cc5bc6f9b3a2"
+    },
+    {
+      "index": 1,
+      "id": "derived-label",
+      "intent": "The count label displays the current committed count after actions, rather than the configured step.",
+      "mutatedSourceHash": "2756ee9f8e3fbf36ad67da4a3516c1d67e150b84206100eb405efe8cddf861bf"
+    },
+    {
+      "index": 2,
+      "id": "reset-initial",
+      "intent": "Reset restores the configured initial count; it must not replace the count with the increment step.",
+      "mutatedSourceHash": "1908b64d7e8e7a4ab81f4db42344a71831ba9693ddc55896bf1e203a6300da31"
+    }
+  ],
+  "contractRoot": "31ba6c6253e55b865efc2f32f18d46dda29ed92addb65a80ee4b91bef9e1ff7e"
+}

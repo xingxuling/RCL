@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 323/400 PASS (80.75%) · 77 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 357/400 PASS (89.25%) · 43 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,25 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 target-backed Native UI continuation
+
+Nineteen actual RCL backends pass GUI/Web counter interaction, adding thirty-four
+unique coordinates and reaching **357 PASS / 43 UNTESTED**, U3, INCOMPLETE.
+All 380 baseline four-click flows, 190 sealed input flows, 57 effective mutants
+and 57 unchanged independent repairs pass, retaining 3420 successful native
+event/render records. RCL owns mutations, derived text and render projections;
+the Windows browser and loopback transport render those backend results.
+Invalid credentials, stale roots, unknown events and denied native authority
+leave committed state unchanged. Reload, 414x896 layout, accessible controls,
+zero console errors and actual hashed screenshots pass. Four prior coordinates
+retain additional profiles without duplicate credit. Runtime source hashes
+remain exact; archived acquisition-verifier bytes preserve original provenance
+across two explicitly documented verifier corrections. Current independent
+admission also pins every controller role. No native OS-widget/mobile-family,
+public hosting, whole-UI-language or hosted CI claim is made. The full 400-cell
+goal stays active and version advancement remains frozen.
+See `docs/K400_NATIVE_UI_2026-10-13.md`.
 
 ## 2026-10-13 native advisory AI continuation
 

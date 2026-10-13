@@ -1,0 +1,35 @@
+reality GovernedCounterUi {
+  ui CounterApp {
+    state initial : Number = 0
+    state step : Number = 1
+    state count : Number = 0
+    derived count_label : Text = "计数：" + count
+    lifecycle { create activate suspend resume destroy restore initial restore step restore count }
+    theme CounterTheme {
+      property foreground = "#172033" inherit
+      property font_family = "system" inherit
+      property font_size = 18 inherit
+    }
+    view Root {
+      accessibility_label "RCL 计数器"
+      layout vertical { width fill height intrinsic gap 18 padding 24 align stretch distribute start overflow visible }
+      text Title { value "RCL 计数器" accessibility_label "计数器标题" }
+      text CounterText { bind value <- count_label accessibility_label "当前计数" }
+      view ActionsRow {
+        layout horizontal { width fill height intrinsic gap 12 padding 0 align stretch distribute start overflow visible }
+        action IncrementButton {
+          label "增加"
+          accessibility_label "增加计数"
+          layout vertical { width fill height fixed 48 gap 0 padding 12 align center distribute center overflow visible }
+          on activate { set count <- count + step }
+        }
+        action ResetButton {
+          label "重置"
+          accessibility_label "重置计数"
+          layout vertical { width fill height fixed 48 gap 0 padding 12 align center distribute center overflow visible }
+          on activate { set count <- initial }
+        }
+      }
+    }
+  }
+}
