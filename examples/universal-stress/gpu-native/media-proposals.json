@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "1be257085755e2775a306da47baf9afb84a1be6071884aa2f06c99723ce50b64",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "value < 255",
+        "new": "value > 255"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "count - 2",
+        "new": "count - 1"
+      }
+    }
+  ]
+}

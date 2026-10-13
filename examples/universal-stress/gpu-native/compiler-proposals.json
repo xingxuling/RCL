@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "c9ee44d37f17a821a565a81a1433a3822f485de017b5546b7027b0d5abfd5be3",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "and kind_at(tokens, position(left)) == 1,",
+        "new": "and kind_at(tokens, position(left)) == 2,"
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 1, 2, 1)",
+        "new": "choose(operator == 1, 1, 2)"
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "right - left",
+        "new": "left - right"
+      }
+    }
+  ]
+}

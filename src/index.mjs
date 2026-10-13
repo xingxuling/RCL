@@ -66,3 +66,4 @@ export {
 } from './same-source-artifact-exchange-v093-v094-adapter.mjs';
 
 export { createPortableBrowserTarget } from './portable-browser-target.mjs';
+export { createPortableGpuTarget } from './portable-gpu-target.mjs';

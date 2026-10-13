@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "2be4d33ba1c7068430ecf9206691daea4fe0cc39365bfcc3c94eced6ad79434b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "gcd(b, b % a)",
+        "new": "gcd(b, a % b)"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 3)",
+        "new": "fibonacci(n - 2)"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "n + n",
+        "new": "n * n"
+      }
+    }
+  ]
+}

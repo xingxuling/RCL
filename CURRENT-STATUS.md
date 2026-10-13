@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 216/400 PASS (54.0%) · 184 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 231/400 PASS (57.75%) · 169 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,17 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 actual GPU continuation
+
+The generic RBC interpreter now executes on actual AMD gfx1152 FP64 OpenCL.
+Twelve complete frozen profiles add fifteen distinct coordinates, reaching
+**231 PASS / 169 UNTESTED**, U3, INCOMPLETE. RCL owns device instruction,
+authority and transaction semantics; compilation and snapshot hashing remain
+host-owned. All 240 rounds, 120 sealed inputs and 36 independent repairs pass,
+with actual process restart and no CPU VM fallback. The full 400-cell goal
+remains active; no version promotion or new Actions run is requested.
+See `docs/K400_GPU_NATIVE_2026-10-13.md`.
 
 ## 2026-10-13 browser-native continuation
 

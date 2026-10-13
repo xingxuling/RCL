@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "fbd71639b2d6910163f5e18559a6353a0007c2acd5c2e3da51014864b718c2f8",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.no_inspect",
+        "new": "compiler.inspect"
+      }
+    },
+    {
+      "id": "emit-trigger",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "when compiler.accepted == true and compiler.phase == 2",
+        "new": "when compiler.accepted == true and compiler.phase == 1"
+      }
+    },
+    {
+      "id": "audit-increment",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "governance-reactive",
+        "file": "candidate.rcl",
+        "old": "compiler.audit_count + 2",
+        "new": "compiler.audit_count + 1"
+      }
+    }
+  ]
+}

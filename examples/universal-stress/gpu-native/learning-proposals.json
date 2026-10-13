@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "a37d3933d7633e159f8eaaf5dfcbd9c3d2605825add0a13355ecae8f7a397b80",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "- bias(parameters)",
+        "new": "+ bias(parameters)"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "-sequence_get(sample, 0), sequence_get(sample, 0)",
+        "new": "sequence_get(sample, 0), -sequence_get(sample, 0)"
+      }
+    }
+  ]
+}

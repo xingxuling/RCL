@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "219aee0da83478832ff4821e7a98ec02278946d06c8248fd107b7549fe49fb80",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state)",
+        "new": "state_position(state) + state_velocity(state)"
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "acceleration * steps * (steps + 1) / 2",
+        "new": "acceleration * steps * (steps - 1) / 2"
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "acceleration + steps",
+        "new": "acceleration * steps"
+      }
+    }
+  ]
+}

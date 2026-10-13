@@ -1,0 +1,79 @@
+{
+  "format": "rcl.k400-gpu-contract.v1",
+  "id": "automation",
+  "scope": "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/automation.rcl",
+  "sourceHash": "764e69a096d54201e136c211fa2c2e42c0dc502af63ce5fb5bd63e5f73eb0a75",
+  "casesPath": "examples/universal-stress/gpu-native/automation-cases.json",
+  "casesHash": "7533bdeb948cfed7e2505f75300ce5ec231d14e9a539e65669ae3871d044ddac",
+  "definitionFile": "scripts/k400-genomes/automation.mjs",
+  "definitionHash": "0771be7f49c4c65b874437105eafe3f74c1bb76647e5a2896527ed669d843e3a",
+  "gpuDefinitionFile": "scripts/k400-gpu-definitions.mjs",
+  "gpuDefinitionHash": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "kernel": {
+    "path": "native/gpu-runtime/rcl-stack-vm.cl",
+    "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+  },
+  "environments": [
+    "gpu"
+  ],
+  "families": [
+    "automation"
+  ],
+  "baseline": {
+    "failures": 1,
+    "attempts": 2,
+    "approval": 1,
+    "kill": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K176"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual GPU instruction/authority/transaction execution",
+    "process restart and fresh device buffers",
+    "host hashes typed device-produced snapshots and transaction continuity"
+  ],
+  "authorityProfile": "actual AMD FP64 OpenCL GPU executes generic RBC; host compilation and snapshot hashing explicitly owned by host; no CPU VM fallback or parallel-throughput claim",
+  "trials": [
+    {
+      "id": "dependency",
+      "index": 0,
+      "intent": "A task dependency names a previously completed task index; reject a dependency at or beyond the number of completed tasks.",
+      "mutatedSourceHash": "8f23930b31717d2a48bc39c4c5e0fb0e84122c96d06c44afdf1ee340857a0286"
+    },
+    {
+      "id": "retry",
+      "index": 1,
+      "intent": "Success requires one additional attempt after all planned failures; reject when failures consume the entire attempt budget.",
+      "mutatedSourceHash": "4028f9f31de2e60e87e096bfbd9e1a6657b48d246891bc8f017472d20e964ca5"
+    },
+    {
+      "id": "approval",
+      "index": 2,
+      "intent": "Stop a workflow before an approval-required task if human approval is absent; approved tasks may proceed if dependencies and retries permit.",
+      "mutatedSourceHash": "6026340e19ca7446f304b9ac7a4fb1ea68398cbc20a49a8692fa3ccf725be5e8"
+    }
+  ],
+  "contractRoot": "d2243d0cd3d581f93f481d18a4d8c98e43d345fc525c496e73f170e6fa702274"
+}

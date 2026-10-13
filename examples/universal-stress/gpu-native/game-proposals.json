@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "b9f3f7fb9f75036699b46956fc358c04d90063814efde3728e53153c75b08448",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "input.move + input.speed",
+        "new": "input.move * input.speed"
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "proposed_y <= 0",
+        "new": "proposed_y >= 0"
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "collected(state) >= 0",
+        "new": "collected(state) == 0"
+      }
+    }
+  ]
+}

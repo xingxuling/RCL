@@ -1,0 +1,81 @@
+{
+  "format": "rcl.k400-gpu-contract.v1",
+  "id": "algorithm-cli",
+  "scope": "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/algorithm-posix.rcl",
+  "sourceHash": "6792f2dbe46be7a2403986dc78ddd2ca9e721fcce6fcf02cbdcbdd211462857e",
+  "casesPath": "examples/universal-stress/gpu-native/algorithm-cli-cases.json",
+  "casesHash": "f23064a66ea16d27bab2c42729ed525b0eaa8503f25d746796613e4cce73a841",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "gpuDefinitionFile": "scripts/k400-gpu-definitions.mjs",
+  "gpuDefinitionHash": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "kernel": {
+    "path": "native/gpu-runtime/rcl-stack-vm.cl",
+    "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+  },
+  "environments": [
+    "gpu"
+  ],
+  "families": [
+    "algorithm",
+    "cli"
+  ],
+  "baseline": {
+    "gcd_a": 1071,
+    "gcd_b": 462,
+    "fibonacci_n": 12,
+    "sum_squares_n": 24
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K161",
+    "K162"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual GPU instruction/authority/transaction execution",
+    "process restart and fresh device buffers",
+    "host hashes typed device-produced snapshots and transaction continuity"
+  ],
+  "authorityProfile": "actual AMD FP64 OpenCL GPU executes generic RBC; host compilation and snapshot hashing explicitly owned by host; no CPU VM fallback or parallel-throughput claim",
+  "trials": [
+    {
+      "id": "gcd",
+      "index": 0,
+      "intent": "Compute the nonnegative greatest common divisor with Euclidean reduction, including negative values and zero boundaries.",
+      "mutatedSourceHash": "1872478d03a38da989267c31a22f25cfcf6d45f1a66da1c043c8bbd6484e8aa2"
+    },
+    {
+      "id": "fibonacci",
+      "index": 1,
+      "intent": "Compute F(0)=0, F(1)=1 and each subsequent Fibonacci value as the sum of the previous two.",
+      "mutatedSourceHash": "f9b716e82366506d5cca3b9c810a9721cc626aa0049edb1bde3544bb16aaea97"
+    },
+    {
+      "id": "sum-squares",
+      "index": 2,
+      "intent": "Compute the sum of integer squares from 1 through n, returning zero for nonpositive n.",
+      "mutatedSourceHash": "5acf346f808bc745269baeeac66c064a9ae4ed55afa9d3cabd198d749b902581"
+    }
+  ],
+  "contractRoot": "2be4d33ba1c7068430ecf9206691daea4fe0cc39365bfcc3c94eced6ad79434b"
+}

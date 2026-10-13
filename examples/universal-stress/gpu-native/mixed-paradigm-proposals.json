@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "e5dbec891bae390a2c0bfd5d9651bf0e368bcdbc0a4fec07ea0f191cca00b01b",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "n + n",
+        "new": "n * n"
+      }
+    },
+    {
+      "id": "analyze-warrant",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "warrant compiler.no_analyze on source",
+        "new": "warrant compiler.analyze on source"
+      }
+    },
+    {
+      "id": "phase-trigger",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "mixed-paradigm",
+        "file": "candidate.rcl",
+        "old": "compiler.phase == 2",
+        "new": "compiler.phase == 1"
+      }
+    }
+  ]
+}

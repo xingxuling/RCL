@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "d2243d0cd3d581f93f481d18a4d8c98e43d345fc525c496e73f170e6fa702274",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed"
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor))",
+        "new": "task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor))"
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "human_approval == 1",
+        "new": "human_approval != 1"
+      }
+    }
+  ]
+}

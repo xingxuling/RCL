@@ -1,0 +1,42 @@
+{
+  "format": "rcl.k400-independent-gpu-proposals.v1",
+  "contractRoot": "633fe58eb940af8c22df4794f0c97ca0cdfb4471be72c496c8313194e0e3a97a",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/gpu-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "context": "/root/k400_gpu_independent_a",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "has_customer(customers, 0, order_customer(row)) or",
+        "new": "has_customer(customers, 0, order_customer(row)) == false or"
+      }
+    },
+    {
+      "id": "selection",
+      "context": "/root/k400_gpu_independent_b",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "customer_region(sequence_get(customers, cursor)) != region",
+        "new": "customer_region(sequence_get(customers, cursor)) == region"
+      }
+    },
+    {
+      "id": "aggregation",
+      "context": "/root/k400_gpu_independent_c",
+      "proposal": {
+        "id": "relations",
+        "file": "candidate.rcl",
+        "old": "        1,\n        0) + sum_approved_orders_for_region",
+        "new": "        order_amount(sequence_get(orders, cursor)),\n        0) + sum_approved_orders_for_region"
+      }
+    }
+  ]
+}

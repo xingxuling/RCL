@@ -1,0 +1,2976 @@
+{
+  "format": "rcl.k400-gpu-runtime.v1",
+  "status": "PASS_LOCAL_GPU_OPENCL",
+  "id": "learning",
+  "generatedAt": "2026-10-13T04:53:04.465Z",
+  "contractRoot": "a37d3933d7633e159f8eaaf5dfcbd9c3d2605825add0a13355ecae8f7a397b80",
+  "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+  "casesHash": "bec5fcb3018bdf8e3cd6503c5b8196985bce93998534e70a1c27cc6e0156378f",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/gpu-native/learning-proposals.json",
+  "proposalsHash": "f84adaf0a43f101a465a030e375c186c3372e34e5c59517cfb06e2661db8bf59",
+  "batchHash": "ac30524ccf0ef97ea6fc686d883e5dc4fd10bf6887860a2cb2c141706cff0b83",
+  "eligibleCells": [
+    "K173"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-gpu-engine.mjs",
+      "sha256": "658138950053b16cba8f455397972d682b53cc9abcd4671595bef0d63c262c08"
+    },
+    {
+      "path": "scripts/k400-gpu-traces.mjs",
+      "sha256": "bff7df51ae79d683609ccc2e14cfad4a34e146d33d5acf73e9b39de72bdb82e2"
+    },
+    {
+      "path": "scripts/k400-gpu-definitions.mjs",
+      "sha256": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-gpu-target.mjs",
+      "sha256": "a71a6ebb4e38184bc11f7e647f7e87d35f00ea5628bb27aa6c5c59476a13a7e7"
+    },
+    {
+      "path": "native/gpu-runtime/provider.py",
+      "sha256": "144b27b0fbb302a5bdf1199e2fc2ea003c64c30c452416a7f7d8525cafcab77f"
+    },
+    {
+      "path": "native/gpu-runtime/rcl-stack-vm.cl",
+      "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+    },
+    {
+      "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+      "sha256": "41b8a9c35a678daedfa714f683455b8652b757f50ac987c6054cd013911a0885"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "src/selfhost-compiler.mjs",
+      "sha256": "0e6c1968a6f292aa37efa4f99234a3bc603d0cb00c26423e9d135ff325e413bd"
+    },
+    {
+      "path": "src/native-vm.mjs",
+      "sha256": "a1fdc40a560b2b108928253468e04b8dd441adc2c89fb9830bf0cea23d4e7cc2"
+    },
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/compiler-main.rcl",
+      "sha256": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "scripts/k400-genomes/learning.mjs",
+      "sha256": "bf9799ca221b24b102ed476ba214a24e0402e79900f98c9f339db1ee25143802"
+    }
+  ],
+  "backends": {
+    "gpu": {
+      "binding": {
+        "context": "gpu",
+        "execution": "Generic RBC stack interpreter executing on one actual AMD FP64 OpenCL GPU work item",
+        "hostPlatform": "win32",
+        "os": "OpenCL",
+        "arch": "gpu-fp64",
+        "deviceType": "GPU",
+        "device": {
+          "platformName": "AMD Accelerated Parallel Processing",
+          "platformVendor": "Advanced Micro Devices, Inc.",
+          "deviceName": "gfx1152",
+          "deviceVendor": "Advanced Micro Devices, Inc.",
+          "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+          "driverVersion": "3661.0 (PAL,LC)",
+          "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+        },
+        "runtimeOwner": "RCL_OPENCL_RBC_STACK_VM",
+        "cpuExecutionFallback": false,
+        "sourceBindings": [
+          {
+            "path": "native/gpu-runtime/provider.py",
+            "sha256": "144b27b0fbb302a5bdf1199e2fc2ea003c64c30c452416a7f7d8525cafcab77f"
+          },
+          {
+            "path": "native/gpu-runtime/rcl-stack-vm.cl",
+            "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+          },
+          {
+            "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+            "sha256": "41b8a9c35a678daedfa714f683455b8652b757f50ac987c6054cd013911a0885"
+          }
+        ],
+        "compilerLocation": "Windows native host executing RCL-authored compiler RBC; program instructions execute on GPU",
+        "compilerBinary": {
+          "path": "native/rclc.exe",
+          "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "kernel": {
+          "path": "native/gpu-runtime/rcl-stack-vm.cl",
+          "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+        },
+        "provider": {
+          "path": "native/gpu-runtime/provider.py",
+          "sha256": "144b27b0fbb302a5bdf1199e2fc2ea003c64c30c452416a7f7d8525cafcab77f"
+        },
+        "transport": {
+          "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+          "sha256": "41b8a9c35a678daedfa714f683455b8652b757f50ac987c6054cd013911a0885"
+        },
+        "python": {
+          "binaryPath": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+          "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423",
+          "version": "3.11.6"
+        },
+        "openclLoader": {
+          "binaryPath": "C:\\Windows\\System32\\OpenCL.dll",
+          "sha256": "161480d6a14f3d2b8180ef7205550a150d617dea2a3b5ec87c3dfe701625f927"
+        },
+        "initialProcessPid": 80988,
+        "initialContextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+        "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+        "parallelThroughputClaimed": false,
+        "securitySandboxClaimed": false,
+        "hostedDeploymentClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 102.23710000000005,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 146.0241000000001,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 138.976400019601,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "8df3cb8b-7452-4f30-ad2d-c201221fc1a2",
+            "instance": 1,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 1,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 101.52329999999995,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 11.625800000000027,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 5.680200003553182,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "17c54eac-6bdd-4b69-84e9-87648d790671",
+            "instance": 2,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 2,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 97.88280000000009,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.465400000000045,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.613999953027815,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "463e184c-ef25-4eb2-ba99-53d220295298",
+            "instance": 3,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 3,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 99.19860000000017,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 23.08199999999988,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.694399972446263,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "4e478502-4460-432f-bce6-3cfe2074e212",
+            "instance": 4,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 4,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 112.10849999999982,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 22.514899999999898,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 19.39279999351129,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "0124b7c6-d5cb-4de3-be86-2c129d94adcd",
+            "instance": 5,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 5,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 98.1259,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 21.075800000000072,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.432200013194233,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "bf88df88-cb63-4dfc-913e-76f1e4fd29d7",
+            "instance": 6,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 6,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 95.5014000000001,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 21.772899999999936,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.828399945050478,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "83c291d5-ec2c-4222-acff-baf63146df56",
+            "instance": 7,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 7,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 98.1522,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 21.558500000000095,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.344299984164536,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "cae0bbe2-0d10-4705-a760-fea87c7ff1df",
+            "instance": 8,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 8,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 102.06740000000013,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.95609999999988,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.140400003176183,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "022c1320-7c8c-414d-a962-ab66ab58d9d6",
+            "instance": 9,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 9,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 91.9541999999999,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 22.10629999999992,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.75119999749586,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "40d58ccc-94eb-4f82-bbb3-a9a967970199",
+            "instance": 10,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 10,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 108.23700000000008,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.55179999999973,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.43379997787997,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "81269569-3efb-45a5-b873-e7f6411e7df1",
+            "instance": 11,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 11,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 97.24119999999994,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 24.48180000000002,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.095200008247048,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "5a8ac119-9a0f-4acf-a8fc-e4b62ab7d424",
+            "instance": 12,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 12,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 106.84529999999995,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.367099999999937,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.915200034622103,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "32bba52f-5460-4405-8efc-a7960c4130d4",
+            "instance": 13,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 13,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 99.00390000000016,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.568700000000263,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.60580000700429,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "9bea6633-cbd1-4f8f-8e34-168cafba9e62",
+            "instance": 14,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 14,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 100.96539999999959,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 19.985499999999774,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.4682000069879,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "3b585763-506b-4fe8-a507-712c74365795",
+            "instance": 15,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 15,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 113.69650000000001,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 23.99559999999974,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.332500010728836,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "3bc13ce4-a27c-460d-b597-29ce817405f9",
+            "instance": 16,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 16,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 102.30470000000014,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 20.498599999999897,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 17.52459997078404,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "799d3cb8-ab3b-495b-93bd-a7815936a006",
+            "instance": 17,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 17,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 97.21489999999994,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 15.697099999999864,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 12.935200007632375,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "264c5926-ff9d-4459-9107-a9bb8b57d388",
+            "instance": 18,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 18,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 100.21879999999965,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 10.0933,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 6.575499952305108,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "4d7a3e52-3b90-4663-aa54-2374bcdd37d6",
+            "instance": 19,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "index": 19,
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 96.5336000000002,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 23.021600000000035,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 18.70080002117902,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "284006de-cd51-449c-b995-dc6950c6e4ca",
+            "instance": 20,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "epochs": 0,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+          "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+          "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+          "compileMs": 99.33570000000009,
+          "compileTrace": {
+            "sourceHash": "db9d3345d5b64fd85b137abdc2054c2e6047e0a4742ad1918636f14362b365d5",
+            "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 3.836500000000342,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 485,
+            "kernelMs": 0.9130999678745866,
+            "sourceRoot": "a024026e577d930d6ab40cd93c7fab10130e40d53b991a7e5d3562bdb47acc82",
+            "artifactHash": "2ca679c6112f9d95e22d191fbefc21ad45be3a385e75ec189f847f9e7aabb387",
+            "nonce": "ad861d65-f988-4871-96a0-fb0e44c470ad",
+            "instance": 21,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+          "valueRef": "2b1d34441d487262b14b73211ee1c3e5ff688dc28b4be924696a6f1926d30a97"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "epochs": 1,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+          "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+          "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+          "compileMs": 97.9656,
+          "compileTrace": {
+            "sourceHash": "e0082e675cb5dc5bda3fa7a4bfce7655e149387ceffe6459e3fd28e9e1780a3c",
+            "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 7.33600000000024,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 879,
+            "kernelMs": 1.5727999852970243,
+            "sourceRoot": "afb2c6ecfd57f5fd3060b2d433c1a9b6bedc1a9da30933a88ab1ec52ebe5e28f",
+            "artifactHash": "8f09d9fea5a1d479a2ae60ed388393dd7b2626961d7af766131754bec36f68b9",
+            "nonce": "04875b81-c2b1-40d5-b427-68302cbb49d7",
+            "instance": 22,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+          "valueRef": "f77976967b97e89083197d424809539a1e7dfef6876aaac53aec6e5d0e1570fa"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "epochs": 2,
+            "nodes": 3,
+            "hotness": 1
+          },
+          "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+          "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+          "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+          "compileMs": 104.66310000000021,
+          "compileTrace": {
+            "sourceHash": "1b7af06d49b06f386271c7953e21e52511a160d87cdf7af672c0b12e4507da39",
+            "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 5.557000000000244,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 1273,
+            "kernelMs": 2.26239999756217,
+            "sourceRoot": "4da9b3f799ffb006163d0a69e0f9ddf0901bf2fcce5f8ddfc1606e04adaac9e0",
+            "artifactHash": "2b2f94fbfb27f0b09e34f36ab5d852f6d852db5e95f1242950234bead7e615b5",
+            "nonce": "89addbc0-183e-4cc7-be6d-368985bcb2f8",
+            "instance": 23,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+          "valueRef": "e3447b1eb49284060d665532d93b47a230d1e4f23bdf1d46ea3e3eceb8b0516a"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "epochs": 3,
+            "nodes": 1,
+            "hotness": 3
+          },
+          "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+          "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+          "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+          "compileMs": 97.13470000000007,
+          "compileTrace": {
+            "sourceHash": "9159bf87b4ee3a3f1779751a0ee9de2cb23dfb84ecc128d0271408f580fffb83",
+            "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 8.860900000000129,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 1612,
+            "kernelMs": 4.906499991193414,
+            "sourceRoot": "2bc360edf30945d1b968a0688dc9ae58c806cd15044dafa60bad3890e4f88e18",
+            "artifactHash": "cc5804c8eae746d5ab9644c3a3a3d473f5691004fa1716884b5bf03e8fe85f60",
+            "nonce": "e2cd2d1b-e5f2-49b2-a882-85efc2a65473",
+            "instance": 24,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+          "valueRef": "1a18d306ca27e6c085f49746e1e2d619a7835944be7cb3d2d5e92aef621f5e4b"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "epochs": 4,
+            "nodes": 3,
+            "hotness": 3
+          },
+          "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+          "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+          "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+          "compileMs": 102.07829999999967,
+          "compileTrace": {
+            "sourceHash": "7e62f579cbcd26e31ea797d67464c153b34d5869eb61468ca056c87d2f7ed4a2",
+            "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 6.322599999999966,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 2006,
+            "kernelMs": 3.349200007505715,
+            "sourceRoot": "78163627752610596a59eda1de24f9921c4c4cd0d03d055316a2d2042047933d",
+            "artifactHash": "a6b552bb0cc71387e9b7d01e535847fdf257ee50fb235b4d3abe215e243ad8d4",
+            "nonce": "7097321a-92d9-4143-8396-9be48e0d988f",
+            "instance": 25,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+          "valueRef": "4b4bbb1577f77266cc9b342a20f583c632a5e51f65c0a95d71e78eb8fff8af4a"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "epochs": 8,
+            "nodes": -2,
+            "hotness": 5
+          },
+          "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+          "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+          "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+          "compileMs": 102.4074999999998,
+          "compileTrace": {
+            "sourceHash": "80dc1a3a979eb0c974f124a35aea28c315e17d8ce889ee732f77ea8a137038b9",
+            "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 7.251999999999953,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 3471,
+            "kernelMs": 2.8901000041514635,
+            "sourceRoot": "eeabc789aa4e14ec6553da257bba9b33069338a8112202c7d2be02bde31b0c4a",
+            "artifactHash": "4551cbc079df1bafde9e5118540dbd29dab9047a968801b4d2670a420c3a0102",
+            "nonce": "ff4dfaf0-ac94-4830-af0b-3be5acca13e1",
+            "instance": 26,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+          "valueRef": "71248044db08e1ac3771d04a12df2bdb806609d0e3811a01acfe09a3cd94654e"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "epochs": 16,
+            "nodes": 1,
+            "hotness": 1
+          },
+          "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+          "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+          "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+          "compileMs": 102.11600000000044,
+          "compileTrace": {
+            "sourceHash": "8c4566962c0a9fb5a18be842e11e46351d4136e3626a0f2ad0d88fd1b6c65e07",
+            "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 8.70890000000054,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6063,
+            "kernelMs": 4.764599958434701,
+            "sourceRoot": "bd8c5cc7af40001d93b6df78399849facbed9717ed172e5288f0526a8e784e19",
+            "artifactHash": "31c1c4ca74dee418146f302b1e60e96ffc618a4016f87f116ea8d46f1b4ed62e",
+            "nonce": "a9d6c0b4-df70-4a4f-93ae-5b1e400b8f38",
+            "instance": 27,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+          "valueRef": "e2ce05995388d53d5beabf7fe19761971e46248fbe80815f78ce8b616d6fef1d"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "epochs": 20,
+            "nodes": 0,
+            "hotness": 0
+          },
+          "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+          "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+          "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+          "compileMs": 97.65170000000035,
+          "compileTrace": {
+            "sourceHash": "7401c929be31354823c77911345399245584e6d7a1bd8c9cec617d68fbec09a6",
+            "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 8.090400000000045,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 7191,
+            "kernelMs": 5.411599995568395,
+            "sourceRoot": "b8b64d560e86f70fb8cf0e21ca67af956e4f717dc56346b896326273b72fac2e",
+            "artifactHash": "7060c3223b3efdc468f0de751fffad4678c54541c2a0d99deeddacfa6d69626d",
+            "nonce": "0de0eced-eead-4574-955e-6d60548e4a8f",
+            "instance": 28,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+          "valueRef": "407ed6e6967f57deafe2e53e26f54ca37b2fa564f9401ad06c3e8a554e5a444a"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "epochs": 24,
+            "nodes": 6,
+            "hotness": -3
+          },
+          "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+          "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+          "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+          "compileMs": 100.08150000000023,
+          "compileTrace": {
+            "sourceHash": "9d7a477e904f5e0a0d71d0621a73289ff1bae1f228cec1f72fbb95f1ce44eff2",
+            "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 9.780399999999645,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 8322,
+            "kernelMs": 6.697100005112588,
+            "sourceRoot": "a05cb003344b87d67e3fa7a91d351dfa04d25c334b3a1d0ee5a88f58415fbbdd",
+            "artifactHash": "ab29dd10cb181fb15f36518cc07f555006f5cddfc50edc99410fe06744e13a1b",
+            "nonce": "5ba8e332-f285-42ca-84ad-bf572fe9268e",
+            "instance": 29,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+          "valueRef": "2626a0c4dfd892d9d31b49c6a1dc7868cd38e4195e1b32f648c74437e0ee3d9a"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "epochs": 12,
+            "nodes": 1.5,
+            "hotness": 0.5
+          },
+          "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+          "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+          "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+          "compileMs": 104.92759999999998,
+          "compileTrace": {
+            "sourceHash": "9b7be415e80f460ad21bda3052bd9e6d6d4455a9573d7c907b8d5d4228247d1c",
+            "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 10.928100000000086,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 4937,
+            "kernelMs": 5.849600012879819,
+            "sourceRoot": "e245c102430d8c8952e74008af63e6dd0d3e7fb6e15b0188dd2d62154a835952",
+            "artifactHash": "7d078c0876ceab33563c3e59fcfa061e8c939c080b64cdc89cc947318701f23f",
+            "nonce": "0a147339-41ad-4107-9ce5-8edc073c710a",
+            "instance": 30,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+          "valueRef": "2159d9aca6234d14655dacb78f9cfc4cfb172611ec7d48fb647822a90fe95d10"
+        }
+      ],
+      "trials": [
+        {
+          "id": "bias-direction",
+          "context": "/root/k400_gpu_independent_a",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "choose(sequence_get(sample, 2) == 1, -1, 1)",
+            "new": "choose(sequence_get(sample, 2) == 1, 1, -1)"
+          },
+          "mutatedSourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+          "broken": {
+            "kind": "success",
+            "executeMs": 9.027599999999438,
+            "runtimeTrace": {
+              "ok": true,
+              "executedInstructions": 6285,
+              "kernelMs": 5.34119998337701,
+              "sourceRoot": "4008a34897b45cf0ea846534b087bc0f2bd00a7f7e027643c01969d5a94be888",
+              "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+              "nonce": "98da3dec-58df-40dc-8773-914e47529d51",
+              "instance": 31,
+              "warrantCount": 0,
+              "openclCalls": {
+                "clEnqueueNDRangeKernel": 1,
+                "clFinish": 1,
+                "clEnqueueReadBuffer": 4
+              },
+              "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+              "device": {
+                "platformName": "AMD Accelerated Parallel Processing",
+                "platformVendor": "Advanced Micro Devices, Inc.",
+                "deviceName": "gfx1152",
+                "deviceVendor": "Advanced Micro Devices, Inc.",
+                "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+                "driverVersion": "3661.0 (PAL,LC)",
+                "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+              },
+              "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+              "processPid": 80988,
+              "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+              "cpuExecutionFallback": false,
+              "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+              "stateRoot": "4387241b21ca3d84ca8acfac861077a1c19a6fd0c6585d867f72a67c028ec104",
+              "transactionCount": 0,
+              "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+            "sourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+            "sourceRoot": "4008a34897b45cf0ea846534b087bc0f2bd00a7f7e027643c01969d5a94be888",
+            "compileMs": 102.4988999999996,
+            "compileTrace": {
+              "sourceHash": "ec832d8ae1a1b2630507f4eef6d92b9e2d7715e5181af3a0007ef3a055967057",
+              "artifactHash": "28f803a60cb43d57f2da5a3805043d1e1652bc9a390606c5d5d290bc2bb1cc61",
+              "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+              "gpuCompilationClaimed": false
+            },
+            "valueRef": "176eeb33cabb4ca3262caedd4f9be476856faf56490420ba975ae8d4ea0467b4"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 97.97769999999946,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 7.953899999999521,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 4.758099967148155,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "2f31c492-ddff-4e6c-84e9-fc183138e27c",
+            "instance": 32,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "id": "score-bias",
+          "context": "/root/k400_gpu_independent_b",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "- bias(parameters)",
+            "new": "+ bias(parameters)"
+          },
+          "mutatedSourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+          "broken": {
+            "kind": "success",
+            "executeMs": 13.516099999999824,
+            "runtimeTrace": {
+              "ok": true,
+              "executedInstructions": 6294,
+              "kernelMs": 9.743400034494698,
+              "sourceRoot": "9b614c65e53062521f8d807c23b7931e13ef15b0dc2463999e4f4e22086f0b0c",
+              "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+              "nonce": "11eb2f0b-d7ed-448c-9c6a-2d327e051145",
+              "instance": 33,
+              "warrantCount": 0,
+              "openclCalls": {
+                "clEnqueueNDRangeKernel": 1,
+                "clFinish": 1,
+                "clEnqueueReadBuffer": 4
+              },
+              "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+              "device": {
+                "platformName": "AMD Accelerated Parallel Processing",
+                "platformVendor": "Advanced Micro Devices, Inc.",
+                "deviceName": "gfx1152",
+                "deviceVendor": "Advanced Micro Devices, Inc.",
+                "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+                "driverVersion": "3661.0 (PAL,LC)",
+                "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+              },
+              "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+              "processPid": 80988,
+              "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+              "cpuExecutionFallback": false,
+              "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+              "stateRoot": "3709e4e8dc28ffcb92700a03b4570b0cd897d6c44a0c71f0610c3b5ca4af00ff",
+              "transactionCount": 0,
+              "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+            "sourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+            "sourceRoot": "9b614c65e53062521f8d807c23b7931e13ef15b0dc2463999e4f4e22086f0b0c",
+            "compileMs": 99.01640000000043,
+            "compileTrace": {
+              "sourceHash": "bbc3b411a0873a2515609733043046674fe4cc08799b71c23de15ab6bf37e299",
+              "artifactHash": "4e71ff94e8983f0f59d1f36f645b16140bda274afa71afd18a7c3dd4b5de64f9",
+              "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+              "gpuCompilationClaimed": false
+            },
+            "valueRef": "feb4cfc2c4ca1f0b52e7a771990ba2fd5b023fdc830d9059cfa9659b2df3279c"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 102.23199999999997,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 8.179199999999582,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 4.72480000462383,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "82904544-7f95-4452-8a4b-5b3bbfd01899",
+            "instance": 34,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        },
+        {
+          "id": "weight-direction",
+          "context": "/root/k400_gpu_independent_c",
+          "proposal": {
+            "id": "learning",
+            "file": "candidate.rcl",
+            "old": "-sequence_get(sample, 0), sequence_get(sample, 0)",
+            "new": "sequence_get(sample, 0), -sequence_get(sample, 0)"
+          },
+          "mutatedSourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+          "broken": {
+            "kind": "success",
+            "executeMs": 10.063699999999699,
+            "runtimeTrace": {
+              "ok": true,
+              "executedInstructions": 6229,
+              "kernelMs": 6.310199969448149,
+              "sourceRoot": "d2e53d94a3022a4085b89c02fd6ca54144d2873e63d09985c6db329f54ec3dc3",
+              "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+              "nonce": "4579c8df-a9c0-40cc-85a4-9e7341e3d11a",
+              "instance": 35,
+              "warrantCount": 0,
+              "openclCalls": {
+                "clEnqueueNDRangeKernel": 1,
+                "clFinish": 1,
+                "clEnqueueReadBuffer": 4
+              },
+              "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+              "device": {
+                "platformName": "AMD Accelerated Parallel Processing",
+                "platformVendor": "Advanced Micro Devices, Inc.",
+                "deviceName": "gfx1152",
+                "deviceVendor": "Advanced Micro Devices, Inc.",
+                "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+                "driverVersion": "3661.0 (PAL,LC)",
+                "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+              },
+              "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+              "processPid": 80988,
+              "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+              "cpuExecutionFallback": false,
+              "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+              "stateRoot": "534c184f47e29cef81c25cfd3f72d2983bdc373ba737ce9fb9fc8752f5197863",
+              "transactionCount": 0,
+              "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+            "sourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+            "sourceRoot": "d2e53d94a3022a4085b89c02fd6ca54144d2873e63d09985c6db329f54ec3dc3",
+            "compileMs": 99.67529999999988,
+            "compileTrace": {
+              "sourceHash": "d44ed62a7032201f684d50ad12631afe653ad8dea4e9ca6a82faead820abfe67",
+              "artifactHash": "fa9e6517cc5d7c416137293951c0b080d3ba3d0c867c0b29cdc3436705db9e46",
+              "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+              "gpuCompilationClaimed": false
+            },
+            "valueRef": "61b490541b5d4b29cfefef8423b184ce67c98c6b1bcc97ad91d42a608d4de9cd"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+          "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+          "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+          "compileMs": 102.9364000000005,
+          "compileTrace": {
+            "sourceHash": "5f5b91d029ca41229c9936ccb014632337a7bd4437c620d1e8d7cd2677c68c5c",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "compilerHash": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "compilationOwner": "RCL_COMPILER_RBC_WINDOWS_NATIVE",
+            "gpuCompilationClaimed": false
+          },
+          "executeMs": 8.609300000000076,
+          "runtimeTrace": {
+            "ok": true,
+            "executedInstructions": 6065,
+            "kernelMs": 5.701699992641807,
+            "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+            "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+            "nonce": "e2e5f9fd-f108-436e-ac8f-94a381860bdd",
+            "instance": 36,
+            "warrantCount": 0,
+            "openclCalls": {
+              "clEnqueueNDRangeKernel": 1,
+              "clFinish": 1,
+              "clEnqueueReadBuffer": 4
+            },
+            "stateRootOwner": "HOST_HASHES_DEVICE_PRODUCED_VALUES",
+            "device": {
+              "platformName": "AMD Accelerated Parallel Processing",
+              "platformVendor": "Advanced Micro Devices, Inc.",
+              "deviceName": "gfx1152",
+              "deviceVendor": "Advanced Micro Devices, Inc.",
+              "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+              "driverVersion": "3661.0 (PAL,LC)",
+              "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+            },
+            "kernelHash": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb",
+            "processPid": 80988,
+            "contextToken": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+            "cpuExecutionFallback": false,
+            "executionOwner": "RCL_OPENCL_RBC_STACK_VM",
+            "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+            "transactionCount": 0,
+            "transactionSnapshotsRoot": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+          "valueRef": "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 112.10849999999982,
+        "executeP95Ms": 24.48180000000002
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "processResetObserved": true,
+        "stateResetObserved": true,
+        "processExit": {
+          "code": 0,
+          "signal": null,
+          "pid": 80988
+        },
+        "processPidBefore": 80988,
+        "processPidAfter": 91476,
+        "contextTokenBefore": "22bc6152-d2ef-458f-9d38-cdad69d549c1",
+        "contextTokenAfter": "206cc833-20c0-42b0-a5c7-8d7adedaadec",
+        "firstInstance": 37,
+        "nextInstance": 38,
+        "resetInstance": 1,
+        "artifactHash": "bfaf91245410901204b0b654b1c038c4a122bfc2ac9025aeb4e0615ce4d6007a",
+        "sourceRoot": "509b0f6d03828bdfb81842b460342324e51ba51f6b33f626b8cd9d4a8eae36e3",
+        "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "RCL_SEMANTIC_ASSERT: reality at 1:1",
+        "corruptRejected": true,
+        "corruptDiagnostic": "{\"status\":\"error\",\"code\":\"RCL_GPU_BYTECODE_TRUNCATED\",\"message\":\"RCL_GPU_BYTECODE_TRUNCATED\"}",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "4e35bb0d56c3c6550615c7f231819c79f28178630c96a787c5b8c9f3f1401292": {
+      "state": {
+        "input.epochs": 16,
+        "input.nodes": 4,
+        "input.hotness": 2,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "evaluation.correct": 4,
+        "evaluation.accuracy": 1,
+        "inference.nodes": 4,
+        "inference.hotness": 2,
+        "inference.score": 9,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 0,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "e7f371463ea5244d3562c293072dda02c77ea77005d0fa62ea884ea09b8c2f9f",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "2b1d34441d487262b14b73211ee1c3e5ff688dc28b4be924696a6f1926d30a97": {
+      "state": {
+        "input.epochs": 0,
+        "input.nodes": 0,
+        "input.hotness": 0,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 0,
+        "training.final_parameters": [
+          0,
+          0,
+          0
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 0,
+        "inference.hotness": 0,
+        "inference.score": 0,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "4781617653b2ce69d2b0c54514e675ca057afc32cd21c8306da999c8feeb1239",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "f77976967b97e89083197d424809539a1e7dfef6876aaac53aec6e5d0e1570fa": {
+      "state": {
+        "input.epochs": 1,
+        "input.nodes": 1,
+        "input.hotness": 1,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 1,
+        "training.final_parameters": [
+          2,
+          0,
+          0
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 1,
+        "inference.hotness": 1,
+        "inference.score": 2,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "e2ff66c10ad9ecbba0ae762b19cf5d041be6118a9210012b7ea1b31b970dc5b8",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "e3447b1eb49284060d665532d93b47a230d1e4f23bdf1d46ea3e3eceb8b0516a": {
+      "state": {
+        "input.epochs": 2,
+        "input.nodes": 3,
+        "input.hotness": 1,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 2,
+        "training.final_parameters": [
+          2,
+          2,
+          0
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 3,
+        "inference.hotness": 1,
+        "inference.score": 8,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "2475fbc7f4199f84ce4156e26d8a41ba1f2f204fc49ae3f3cd952a8025871493",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "1a18d306ca27e6c085f49746e1e2d619a7835944be7cb3d2d5e92aef621f5e4b": {
+      "state": {
+        "input.epochs": 3,
+        "input.nodes": 1,
+        "input.hotness": 3,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 3,
+        "training.final_parameters": [
+          1,
+          1,
+          -1
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 1,
+        "inference.hotness": 3,
+        "inference.score": 3,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "5d0302419a250c641ed4cf4797d4113ae1c53e6a62e3b28eae5ce23a42287432",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "4b4bbb1577f77266cc9b342a20f583c632a5e51f65c0a95d71e78eb8fff8af4a": {
+      "state": {
+        "input.epochs": 4,
+        "input.nodes": 3,
+        "input.hotness": 3,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 4,
+        "training.final_parameters": [
+          3,
+          1,
+          -1
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 3,
+        "inference.hotness": 3,
+        "inference.score": 11,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "af32f41595fdad56afaddb78b9363967e9ba1314007d0eb3cc376baf310f2fc9",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "71248044db08e1ac3771d04a12df2bdb806609d0e3811a01acfe09a3cd94654e": {
+      "state": {
+        "input.epochs": 8,
+        "input.nodes": -2,
+        "input.hotness": 5,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 8,
+        "training.final_parameters": [
+          3,
+          1,
+          -3
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": -2,
+        "inference.hotness": 5,
+        "inference.score": -4,
+        "inference.classification": 0,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "f6a1fcf7625865219875bfe4270a3d1b323a7c8d9b2ecbe505286939e7ec3c70",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "e2ce05995388d53d5beabf7fe19761971e46248fbe80815f78ce8b616d6fef1d": {
+      "state": {
+        "input.epochs": 16,
+        "input.nodes": 1,
+        "input.hotness": 1,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "evaluation.correct": 4,
+        "evaluation.accuracy": 1,
+        "inference.nodes": 1,
+        "inference.hotness": 1,
+        "inference.score": -1,
+        "inference.classification": 0,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 0,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "c81571824de2cc3bb2c11dba1379007ee217b05555b54b8fa7380897f86323eb",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "407ed6e6967f57deafe2e53e26f54ca37b2fa564f9401ad06c3e8a554e5a444a": {
+      "state": {
+        "input.epochs": 20,
+        "input.nodes": 0,
+        "input.hotness": 0,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 20,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "evaluation.correct": 4,
+        "evaluation.accuracy": 1,
+        "inference.nodes": 0,
+        "inference.hotness": 0,
+        "inference.score": -5,
+        "inference.classification": 0,
+        "inference.recommendation": "STANDARD_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 0,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "ddcf5a8c59ad884fa014f103a3013c515e07a8fa0b21e3e29728a92777cb9dcc",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "2626a0c4dfd892d9d31b49c6a1dc7868cd38e4195e1b32f648c74437e0ee3d9a": {
+      "state": {
+        "input.epochs": 24,
+        "input.nodes": 6,
+        "input.hotness": -3,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 24,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "evaluation.correct": 4,
+        "evaluation.accuracy": 1,
+        "inference.nodes": 6,
+        "inference.hotness": -3,
+        "inference.score": 10,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 0,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "04a9c88a09d79c2517bed753917adb5986864ee841622e1e6fd06781ccf8bbb5",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "2159d9aca6234d14655dacb78f9cfc4cfb172611ec7d48fb647822a90fe95d10": {
+      "state": {
+        "input.epochs": 12,
+        "input.nodes": 1.5,
+        "input.hotness": 0.5,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 12,
+        "training.final_parameters": [
+          3,
+          1,
+          -5
+        ],
+        "evaluation.correct": 4,
+        "evaluation.accuracy": 1,
+        "inference.nodes": 1.5,
+        "inference.hotness": 0.5,
+        "inference.score": 0,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 0,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "37bfaeefde5a6a39b446314a4a30042593906824e71163e99bf65f51683fa131",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "176eeb33cabb4ca3262caedd4f9be476856faf56490420ba975ae8d4ea0467b4": {
+      "state": {
+        "input.epochs": 16,
+        "input.nodes": 4,
+        "input.hotness": 2,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          9
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 4,
+        "inference.hotness": 2,
+        "inference.score": 15,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "4387241b21ca3d84ca8acfac861077a1c19a6fd0c6585d867f72a67c028ec104",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "feb4cfc2c4ca1f0b52e7a771990ba2fd5b023fdc830d9059cfa9659b2df3279c": {
+      "state": {
+        "input.epochs": 16,
+        "input.nodes": 4,
+        "input.hotness": 2,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          1,
+          1,
+          -9
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 4,
+        "inference.hotness": 2,
+        "inference.score": 15,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "3709e4e8dc28ffcb92700a03b4570b0cd897d6c44a0c71f0610c3b5ca4af00ff",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    },
+    "61b490541b5d4b29cfefef8423b184ce67c98c6b1bcc97ad91d42a608d4de9cd": {
+      "state": {
+        "input.epochs": 16,
+        "input.nodes": 4,
+        "input.hotness": 2,
+        "contract.id": "k400-learning-v1",
+        "contract.owner": "RCL",
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.model": "INTEGER_PERCEPTRON",
+        "contract.model_authority": "ADVISORY_ONLY_DETERMINISTIC_COMPILER_POLICY_RETAINS_COMMIT",
+        "training.dataset": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            3,
+            3,
+            1
+          ]
+        ],
+        "training.initial_parameters": [
+          0,
+          0,
+          0
+        ],
+        "training.epochs": 16,
+        "training.final_parameters": [
+          10,
+          2,
+          -10
+        ],
+        "evaluation.correct": 3,
+        "evaluation.accuracy": 0.75,
+        "inference.nodes": 4,
+        "inference.hotness": 2,
+        "inference.score": 34,
+        "inference.classification": 1,
+        "inference.recommendation": "EXPENSIVE_OPTIMIZATION_CANDIDATE",
+        "boundary.small_cold_classification": 1,
+        "authority.model_commit_granted": false
+      },
+      "stateRoot": "534c184f47e29cef81c25cfd3f72d2983bdc373ba737ce9fb9fc8752f5197863",
+      "history": [],
+      "projections": [],
+      "gpuRecords": [],
+      "gpuWarrants": []
+    }
+  },
+  "scope": "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "4db60b17fe3c0580b347791af727c90140cc16996d91038ef15584f4c5274e16"
+}

@@ -1,0 +1,79 @@
+{
+  "format": "rcl.k400-gpu-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/gpu-native/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "gpuDefinitionFile": "scripts/k400-gpu-definitions.mjs",
+  "gpuDefinitionHash": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "kernel": {
+    "path": "native/gpu-runtime/rcl-stack-vm.cl",
+    "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+  },
+  "environments": [
+    "gpu"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K166"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual GPU instruction/authority/transaction execution",
+    "process restart and fresh device buffers",
+    "host hashes typed device-produced snapshots and transaction continuity"
+  ],
+  "authorityProfile": "actual AMD FP64 OpenCL GPU executes generic RBC; host compilation and snapshot hashing explicitly owned by host; no CPU VM fallback or parallel-throughput claim",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "633fe58eb940af8c22df4794f0c97ca0cdfb4471be72c496c8313194e0e3a97a"
+}

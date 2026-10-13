@@ -1,0 +1,83 @@
+{
+  "format": "rcl.k400-gpu-contract.v1",
+  "id": "game",
+  "scope": "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/game.rcl",
+  "sourceHash": "96a520f1c85d3e3fd4b6e5c6cd24fad40f01ebbf91a88a5ae50bb11e04a4d26d",
+  "casesPath": "examples/universal-stress/gpu-native/game-cases.json",
+  "casesHash": "de92ebae3801abdc44b538fcb52831bfde24fbbc61159f16c529fdc60e351471",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "gpuDefinitionFile": "scripts/k400-gpu-definitions.mjs",
+  "gpuDefinitionHash": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "kernel": {
+    "path": "native/gpu-runtime/rcl-stack-vm.cl",
+    "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+  },
+  "environments": [
+    "gpu"
+  ],
+  "families": [
+    "game"
+  ],
+  "baseline": {
+    "frames": 12,
+    "move": 1,
+    "speed": 2,
+    "jump_frame": 2,
+    "gravity": 1,
+    "star": 8,
+    "enemy": 18,
+    "width": 20
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K168"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual GPU instruction/authority/transaction execution",
+    "process restart and fresh device buffers",
+    "host hashes typed device-produced snapshots and transaction continuity"
+  ],
+  "authorityProfile": "actual AMD FP64 OpenCL GPU executes generic RBC; host compilation and snapshot hashing explicitly owned by host; no CPU VM fallback or parallel-throughput claim",
+  "trials": [
+    {
+      "id": "movement",
+      "index": 0,
+      "intent": "Advance horizontal position by direction multiplied by speed and clamp to the world bounds; preserve zero and negative directions.",
+      "mutatedSourceHash": "80f98298483630869a115356f8d0049b3b1b00ecf17c2ca6bfcdf1ec0ec3449b"
+    },
+    {
+      "id": "landing",
+      "index": 1,
+      "intent": "With downward-positive coordinates, landing occurs when proposed y reaches or crosses ground zero; then reset vertical position and velocity. Preserve airborne motion.",
+      "mutatedSourceHash": "36bec945f0530e4931c73c6bc8a7f06e5939db4eabffecc9e95dd7e22da61dee"
+    },
+    {
+      "id": "pickup-once",
+      "index": 2,
+      "intent": "Collect the star at most once after reaching its threshold, retaining a score between zero and one and terminal enemy-stop behavior.",
+      "mutatedSourceHash": "e63241c6388e3234c8c9476c4359110e87cf973ca0bce73374afc58a02a05844"
+    }
+  ],
+  "contractRoot": "b9f3f7fb9f75036699b46956fc358c04d90063814efde3728e53153c75b08448"
+}

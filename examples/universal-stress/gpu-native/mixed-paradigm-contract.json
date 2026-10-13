@@ -1,0 +1,76 @@
+{
+  "format": "rcl.k400-gpu-contract.v1",
+  "id": "mixed-paradigm",
+  "scope": "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; host RCL-owned compilation, generic RBC instructions/authority/transaction decisions on actual AMD FP64 OpenCL GPU, host hashes device-produced snapshots; one serial work item, no parallel throughput, CPU VM fallback, provider calls, typed records, sessions or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/mixed-paradigm.rcl",
+  "sourceHash": "ee02cee24e598291acec87f241cd70d41b62e04407debf86391078bf20a8af6d",
+  "casesPath": "examples/universal-stress/gpu-native/mixed-paradigm-cases.json",
+  "casesHash": "881eb4c8a3047e6b248835b800ece93e04dffe50e8824b8f7963141c9a2f8f93",
+  "definitionFile": "scripts/k400-genomes/mixed.mjs",
+  "definitionHash": "7f147d03232599ee470fe9d825bc5bc6b9671d8357a54e531a5df636200556cb",
+  "gpuDefinitionFile": "scripts/k400-gpu-definitions.mjs",
+  "gpuDefinitionHash": "16cda48f57131f4668a79bc56d0113458d312c3ca616069ac7a9bc3665d30c12",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/rclc.exe",
+    "sha256": "bfd5d0cbd7cbd15e2892b29ee100d5ac20b53abe119bd57b3b932272087c0ce8"
+  },
+  "kernel": {
+    "path": "native/gpu-runtime/rcl-stack-vm.cl",
+    "sha256": "dc2c1a3728ce74f99cbca9d0a041332a505392c0aca852ee975e18eabc4accfb"
+  },
+  "environments": [
+    "gpu"
+  ],
+  "families": [
+    "mixed-paradigm"
+  ],
+  "baseline": {
+    "batch_size": 8
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K180"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual GPU instruction/authority/transaction execution",
+    "process restart and fresh device buffers",
+    "host hashes typed device-produced snapshots and transaction continuity"
+  ],
+  "authorityProfile": "actual AMD FP64 OpenCL GPU executes generic RBC; host compilation and snapshot hashing explicitly owned by host; no CPU VM fallback or parallel-throughput claim",
+  "trials": [
+    {
+      "id": "recursive-square",
+      "index": 0,
+      "intent": "Compute the sum of squares for the functional stage, agreeing with the closed-form invariant before transactional commit.",
+      "mutatedSourceHash": "7e4242fea7e4955b81a4bff550607644a328361a310cf7591355c3d38aa8313d"
+    },
+    {
+      "id": "analyze-warrant",
+      "index": 1,
+      "intent": "The builder needs the exact compiler.analyze warrant on source before analyzing a positive batch; do not change the declared requirements.",
+      "mutatedSourceHash": "32595db0e29b83a2350069b5e60acd3035c2e80caede9aa237188ed660f9c9c4"
+    },
+    {
+      "id": "phase-trigger",
+      "index": 2,
+      "intent": "Emission follows successful analysis at phase one, then advances to phase two; preserve the digest and all authority requirements.",
+      "mutatedSourceHash": "28a7ea7fd70d5f4ad9e390b08325492efe52ac23175b105f96f21edfd7c18167"
+    }
+  ],
+  "contractRoot": "e5dbec891bae390a2c0bfd5d9651bf0e368bcdbc0a4fec07ea0f191cca00b01b"
+}
