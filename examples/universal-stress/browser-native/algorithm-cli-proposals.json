@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "587915c06e09abe129284b48dc8c51b25cf450779061033610bcba9ec7871d58",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "gcd",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "gcd(b, b % a)",
+        "new": "gcd(absolute(b), absolute(a) % absolute(b))",
+        "diagnosis": "欧几里得递推的取余操作数颠倒；修正并归一化符号，使非零除数下余数递减，零边界继续由已有基例处理。"
+      }
+    },
+    {
+      "id": "fibonacci",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "fibonacci(n - 1) + fibonacci(n - 3)",
+        "new": "fibonacci(n - 1) + fibonacci(n - 2)",
+        "diagnosis": "递推误用了前三项；改为前两项相加，保留零和一的基例。"
+      }
+    },
+    {
+      "id": "sum-squares",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "algorithm-cli",
+        "file": "candidate.rcl",
+        "old": "choose(n <= 0, 0, n + n + sum_squares(n - 1))",
+        "new": "choose(n <= 0, 0, n * n + sum_squares(n - 1))",
+        "diagnosis": "递归项错误地计算二倍 n；改为 n 的平方，并保留非正输入返回零的边界。"
+      }
+    }
+  ]
+}

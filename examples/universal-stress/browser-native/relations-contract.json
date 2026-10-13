@@ -1,0 +1,75 @@
+{
+  "format": "rcl.k400-browser-contract.v1",
+  "id": "relations",
+  "scope": "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/relations.rcl",
+  "sourceHash": "8a7f3ba1cd01632d042f59df7e9743b56601314037f9585ee7997aea5b13d5b4",
+  "casesPath": "examples/universal-stress/browser-native/relations-cases.json",
+  "casesHash": "d43d0851c8532577c3bfae40e02d413a44adb736b65d6a8ab7d5ac2cc6ec7efa",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "browserDefinitionFile": "scripts/k400-browser-definitions.mjs",
+  "browserDefinitionHash": "cb85cc3096491e00ff0ad9d4eebbbc881249152c237561f6bf4d014a2cba1724",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/wasi-compiler/rclc.wasm",
+    "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+  },
+  "environments": [
+    "browser"
+  ],
+  "families": [
+    "database"
+  ],
+  "baseline": {
+    "region": 10,
+    "valid_amount": 25,
+    "approved": 1,
+    "empty": false
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K066"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual browser compilation and VM execution",
+    "page reload and fresh WASI instances",
+    "typed roots and source-declared transaction continuity"
+  ],
+  "authorityProfile": "actual local Chromium WebAssembly compilation/execution; no Node-WASI fallback, hosted deployment or whole-family claim",
+  "trials": [
+    {
+      "id": "foreign-key",
+      "index": 0,
+      "intent": "Atomic insert rejects duplicate order keys, missing customer foreign keys or negative amounts; valid inserts append exactly one row.",
+      "mutatedSourceHash": "732ee135c8e2d248128ef05deffb15f32a1d0112c9da2f8bc869c2a7e29194a9"
+    },
+    {
+      "id": "selection",
+      "index": 1,
+      "intent": "Count only customers in the requested region, including empty relations and absent regions.",
+      "mutatedSourceHash": "5229c30d370593f0c2d940bf7bc03c8e3f3ae91220710ad89e2ce0ad67a96292"
+    },
+    {
+      "id": "aggregation",
+      "index": 2,
+      "intent": "Sum amounts of approved orders after joining customers in the requested region; do not replace a sum with a count.",
+      "mutatedSourceHash": "6960c2d555ab606b88822c1f41c8dfe864139e69bd8e681803c2eb205db86d8d"
+    }
+  ],
+  "contractRoot": "0cd8a055ddfd524efc184a454992298118cd464700d85107076802ceb19edea7"
+}

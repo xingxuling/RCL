@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "ace3ede9ed879370c925d45c3dc8de225d50706d5ed1185722e478cb3a90ca00",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "clamp-upper",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "choose(value < 255, 255, value)",
+        "new": "choose(value > 255, 255, value)",
+        "diagnosis": "通道上界条件反了；仅超过 255 时截到 255，使反相前的通道值夹紧至包含两端的 0..255。"
+      }
+    },
+    {
+      "id": "row-flip",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6, cursor % 6 - 3)",
+        "new": "cursor - cursor % 6 + choose(cursor % 6 < 3, cursor % 6 + 3, cursor % 6 - 3)",
+        "diagnosis": "每行前一个 RGB 像素没有映射到后一个像素；前半段索引加三，实现交换并保持行序及通道顺序。"
+      }
+    },
+    {
+      "id": "run-decode",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "media",
+        "file": "candidate.rcl",
+        "old": "repeat_sample(value, count - 2, sequence_append(output, value))",
+        "new": "repeat_sample(value, count - 1, sequence_append(output, value))",
+        "diagnosis": "每追加一个样本却减少两个计数，导致解码缺样；每次减少一即可精确展开 run，并保留空输入行为。"
+      }
+    }
+  ]
+}

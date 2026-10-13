@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "81ce0706f972e8f3c812099fb67668463eb10a63fbeeb156b89694348eb64b15",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "capability",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "agent",
+        "file": "candidate.rcl",
+        "old": "choose(action_capability(action) == granted_capability,",
+        "new": "choose(action_capability(action) != granted_capability,",
+        "diagnosis": "能力拒绝条件反了；需要能力与已授能力不等时才返回拒绝码，其余资格判断保持原样。"
+      }
+    },
+    {
+      "id": "budget",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "agent",
+        "file": "candidate.rcl",
+        "old": "action_cost(action) < budget",
+        "new": "action_cost(action) > budget",
+        "diagnosis": "预算拒绝条件方向相反；仅成本超过预算时拒绝，成本等于预算时继续检查其他条件。"
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "agent",
+        "file": "candidate.rcl",
+        "old": "action_requires_approval(action) == 1 and human_approval == 1",
+        "new": "action_requires_approval(action) == 1 and human_approval != 1",
+        "diagnosis": "批准检查反了；需要批准的行动在批准值不等于一时拒绝，批准后继续接受其他资格检查。"
+      }
+    }
+  ]
+}

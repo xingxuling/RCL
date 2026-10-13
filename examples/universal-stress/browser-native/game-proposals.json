@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "2de9c4649c04fe3f5cd8a12e2a86df090b8037daface703ab6afee8f01f57552",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "movement",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "clamp_x(x(state) + input.move + input.speed)",
+        "new": "clamp_x(x(state) + input.move * input.speed)",
+        "diagnosis": "水平位移错误地将方向与速度相加；改为相乘，支持零及负方向，并继续通过现有夹紧函数限制世界边界。"
+      }
+    },
+    {
+      "id": "landing",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "reckon lands(proposed_y : Number) -> Truth = proposed_y <= 0",
+        "new": "reckon lands(proposed_y : Number) -> Truth = proposed_y >= 0",
+        "diagnosis": "向下为正时负 y 表示空中；候选 y 达到或越过零才落地，沿用现有位置和速度清零逻辑。"
+      }
+    },
+    {
+      "id": "pickup-once",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "game",
+        "file": "candidate.rcl",
+        "old": "choose(collected(state) >= 0 and next_x >= input.star, 1, 0)",
+        "new": "choose(collected(state) == 0 and next_x >= input.star, 1, 0)",
+        "diagnosis": "非负 collected 条件允许重复拾取；仅在尚未拾取时加一，使初始状态可达分数保持零或一，保留碰敌终止行为。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "54a89a06cb3ccc9a2a0434c9f358807e906c27c5d9d9a7ba1536a2730558ea7d",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "bias-direction",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "bias(parameters) + choose(sequence_get(sample, 2) == 1, -1, 1)",
+        "new": "bias(parameters) + choose(sequence_get(sample, 2) == 1, 1, -1)",
+        "diagnosis": "误分类时偏置更新方向反了；正样本应加一，负样本应减一。特征权重更新保持原样。"
+      }
+    },
+    {
+      "id": "score-bias",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness - bias(parameters)",
+        "new": "node_weight(parameters) * nodes + hotness_weight(parameters) * hotness + bias(parameters)",
+        "diagnosis": "共享评分函数错误地减去偏置；改为加偏置，使训练和预测均采用点积加偏置。"
+      }
+    },
+    {
+      "id": "weight-direction",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "learning",
+        "file": "candidate.rcl",
+        "old": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, -sequence_get(sample, 0), sequence_get(sample, 0))",
+        "new": "node_weight(parameters) + choose(sequence_get(sample, 2) == 1, sequence_get(sample, 0), -sequence_get(sample, 0))",
+        "diagnosis": "node-feature 更新方向反了；误分类正样本应增加其特征对应权重，误分类负样本应减少。"
+      }
+    }
+  ]
+}

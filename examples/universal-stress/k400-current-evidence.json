@@ -301,44 +301,79 @@
         "EXPRESS": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/counter.rcl"
+            "examples/native-ui/counter.rcl",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "COMPILE": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/canonical-ui-ir.json"
+            "examples/native-ui/evidence/canonical-ui-ir.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "LOWER": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/web-lowering-report.json"
+            "examples/native-ui/evidence/web-lowering-report.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "EXECUTE": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/browser-runtime-result.json"
+            "examples/native-ui/evidence/browser-runtime-result.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "CORRECT": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/semantic-trace-web.json"
+            "examples/native-ui/evidence/semantic-trace-web.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "ROBUST": {
           "status": "PASS",
           "evidence": [
-            "tests/native-ui-runtime-style-layout.test.mjs"
+            "tests/native-ui-runtime-style-layout.test.mjs",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         },
         "PERFORMANCE": {
           "status": "PASS",
           "evidence": [
             "examples/native-ui/browser-performance-contract.v0.1.json",
-            "examples/native-ui/evidence/browser-runtime-result.json"
+            "examples/native-ui/evidence/browser-runtime-result.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ],
           "note": "real Chrome completed the frozen Counter workload at 0.884 ms per three-event sequence against a 1.5 ms absolute budget"
         },
@@ -347,14 +382,24 @@
           "evidence": [
             "examples/universal-stress/k02-ai-generation-contract.v0.1.json",
             "examples/universal-stress/evidence/k02-ai-generate/receipt.json",
-            "examples/universal-stress/evidence/k02-ai-generate/github-replay.json"
+            "examples/universal-stress/evidence/k02-ai-generate/github-replay.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ],
           "note": "Three independent repairs passed deterministic RCL Web/Server replay and GitHub run 32865270251."
         },
         "EVIDENCE": {
           "status": "PASS",
           "evidence": [
-            "examples/native-ui/evidence/evidence-summary.json"
+            "examples/native-ui/evidence/evidence-summary.json",
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
           ]
         }
       },
@@ -369,6 +414,22 @@
             "windows"
           ],
           "generalPrimitive": true
+        }
+      ],
+      "additionalProfiles": [
+        {
+          "id": "browser:governance-reactive",
+          "reportRoot": "5f5a6ab38e727b591c88abe3c1691a27044e8fdd71b130ed6c2a1b56f5525884",
+          "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+          "lastVerifiedDate": "2026-10-13",
+          "coverageMode": "native-semantic",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ]
         }
       ]
     },
@@ -24281,6 +24342,1714 @@
           "note": "Actual environment-specific controls, exact RCL-compiler RBC parity, independently rooted results and controller ledgers, frozen oracles, measured budgets, three effective mutations and unchanged independent repairs."
         }
       }
+    },
+    {
+      "id": "browser::machine-learning",
+      "environment": "browser",
+      "programFamily": "machine-learning",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded RCL-owned integer perceptron training and numerical inference; model output remains advisory, with no Tensor/Transformer/general ML claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/learning-contract.json",
+            "examples/universal-stress/browser-native/learning-runtime.json",
+            "examples/universal-stress/browser-native/learning-cases.json",
+            "examples/universal-stress/browser-native/learning-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::agent",
+      "environment": "browser",
+      "programFamily": "agent",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic action deliberation with capability, budget, risk, approval, kill-switch and memory; no LLM/tool I/O or external effects claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/agent-contract.json",
+            "examples/universal-stress/browser-native/agent-runtime.json",
+            "examples/universal-stress/browser-native/agent-cases.json",
+            "examples/universal-stress/browser-native/agent-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::automation",
+      "environment": "browser",
+      "programFamily": "automation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic dependency/retry/approval/kill-switch/compensation workflow; no external action runner or actual tool-side rollback claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/automation-contract.json",
+            "examples/universal-stress/browser-native/automation-runtime.json",
+            "examples/universal-stress/browser-native/automation-cases.json",
+            "examples/universal-stress/browser-native/automation-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::realtime",
+      "environment": "browser",
+      "programFamily": "realtime",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded deterministic logical event scheduling, total tie order and event-budget rejection; no physical clock, interrupt or hard real-time claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/logical-events-contract.json",
+            "examples/universal-stress/browser-native/logical-events-runtime.json",
+            "examples/universal-stress/browser-native/logical-events-cases.json",
+            "examples/universal-stress/browser-native/logical-events-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::security-sensitive",
+      "environment": "browser",
+      "programFamily": "security-sensitive",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/governance-reactive-contract.json",
+            "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+            "examples/universal-stress/browser-native/governance-reactive-cases.json",
+            "examples/universal-stress/browser-native/governance-reactive-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::mixed-paradigm",
+      "environment": "browser",
+      "programFamily": "mixed-paradigm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive arithmetic, declarative authority, transactional invariants and state-triggered rule composition; no arbitrary multi-language interoperation claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/mixed-paradigm-contract.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-cases.json",
+            "examples/universal-stress/browser-native/mixed-paradigm-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::database",
+      "environment": "browser",
+      "programFamily": "database",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded in-memory integer relations, selection/join/aggregation, primary and foreign keys, atomic insertion and rejection; no SQL engine/persistence claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/relations-contract.json",
+            "examples/universal-stress/browser-native/relations-runtime.json",
+            "examples/universal-stress/browser-native/relations-cases.json",
+            "examples/universal-stress/browser-native/relations-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::simulation",
+      "environment": "browser",
+      "programFamily": "simulation",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::scientific",
+      "environment": "browser",
+      "programFamily": "scientific",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/simulation-scientific-contract.json",
+            "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+            "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+            "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::algorithm",
+      "environment": "browser",
+      "programFamily": "algorithm",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::cli",
+      "environment": "browser",
+      "programFamily": "cli",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "bounded recursive GCD/Fibonacci/square summation and command-line outputs on Linux and Android emulator native processes; no mobile UI/hardware claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/algorithm-cli-contract.json",
+            "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+            "examples/universal-stress/browser-native/algorithm-cli-cases.json",
+            "examples/universal-stress/browser-native/algorithm-cli-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::media",
+      "environment": "browser",
+      "programFamily": "media",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned bounded 2x2 RGB sample transform/clamp, horizontal row flip and exact run-length encode/decode; procedural samples, no arbitrary image/video/audio codec or provider generation claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/media-contract.json",
+            "examples/universal-stress/browser-native/media-runtime.json",
+            "examples/universal-stress/browser-native/media-cases.json",
+            "examples/universal-stress/browser-native/media-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::compiler",
+      "environment": "browser",
+      "programFamily": "compiler",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned token-sequence expression compiler with parenthesis/precedence validation, postfix stack-code emission and execution for addition/subtraction/multiplication; no lexer/full-RCL compiler or whole-language self-hosting claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/compiler-contract.json",
+            "examples/universal-stress/browser-native/compiler-runtime.json",
+            "examples/universal-stress/browser-native/compiler-cases.json",
+            "examples/universal-stress/browser-native/compiler-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
+    },
+    {
+      "id": "browser::game",
+      "environment": "browser",
+      "programFamily": "game",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-13",
+      "changes": [],
+      "knownLimits": [
+        "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+        "20 actual context rounds, ten pre-sealed inputs, three fresh candidate-only repairs. Noncanonical repairs additionally replay all ten sealed inputs; input-domain agreement is not full-language semantic equivalence.",
+        "Actual headless Chromium compiles with the RCL-owned compiler RBC and executes the C VM in WebAssembly; no Node-WASI fallback, GUI/mobile interaction, hosted deployment or OS isolation claim."
+      ],
+      "requiredGenes": [
+        "native-rcl-owned-rbc",
+        "root-v2",
+        "actual-context-controls",
+        "sealed-input-oracles",
+        "independent-repair",
+        "transaction-root-continuity"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/browser-native/game-contract.json",
+            "examples/universal-stress/browser-native/game-runtime.json",
+            "examples/universal-stress/browser-native/game-cases.json",
+            "examples/universal-stress/browser-native/game-proposals.json",
+            "examples/universal-stress/browser-native/independent-batch.json"
+          ],
+          "note": "Actual browser compile/execute traces and syscall evidence, page-reset controls, exact RBC parity, frozen independent oracles, measured budgets, effective mutations and unchanged independent repairs."
+        }
+      }
     }
   ],
   "competitiveComparisons": [],
@@ -24428,7 +26197,19 @@
     "examples/universal-stress/phase-contexts/algorithm-cli-runtime.json",
     "examples/universal-stress/new-families/media-runtime.json",
     "examples/universal-stress/new-families/compiler-runtime.json",
-    "examples/universal-stress/new-families/game-runtime.json"
+    "examples/universal-stress/new-families/game-runtime.json",
+    "examples/universal-stress/browser-native/learning-runtime.json",
+    "examples/universal-stress/browser-native/agent-runtime.json",
+    "examples/universal-stress/browser-native/automation-runtime.json",
+    "examples/universal-stress/browser-native/logical-events-runtime.json",
+    "examples/universal-stress/browser-native/governance-reactive-runtime.json",
+    "examples/universal-stress/browser-native/mixed-paradigm-runtime.json",
+    "examples/universal-stress/browser-native/relations-runtime.json",
+    "examples/universal-stress/browser-native/simulation-scientific-runtime.json",
+    "examples/universal-stress/browser-native/algorithm-cli-runtime.json",
+    "examples/universal-stress/browser-native/media-runtime.json",
+    "examples/universal-stress/browser-native/compiler-runtime.json",
+    "examples/universal-stress/browser-native/game-runtime.json"
   ],
   "notes": [
     "This is the consolidated K400 campaign input; it preserves the status and evidence boundaries of each source receipt.",

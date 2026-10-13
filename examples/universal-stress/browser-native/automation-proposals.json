@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "4c16ccd3486889c1a4ab6d24541a13a5ea670220305537cd2b14e40618c551af",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "dependency",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_dependency(task) > completed",
+        "new": "task_dependency(task) >= completed",
+        "diagnosis": "已完成任务的有效下标小于已完成数量；等于该数量的依赖也必须拒绝。"
+      }
+    },
+    {
+      "id": "retry",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_failures_before_success(sequence_get(tasks, cursor)) <= task_max_attempts(sequence_get(tasks, cursor))",
+        "new": "task_failures_before_success(sequence_get(tasks, cursor)) < task_max_attempts(sequence_get(tasks, cursor))",
+        "diagnosis": "成功还需要失败之后的一次尝试；失败次数必须严格小于尝试预算。"
+      }
+    },
+    {
+      "id": "approval",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "automation",
+        "file": "candidate.rcl",
+        "old": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval == 1",
+        "new": "task_requires_approval(sequence_get(tasks, cursor)) == 1 and human_approval != 1",
+        "diagnosis": "工作流错误地拒绝已批准任务；改为在批准值不等于一时停止，保留依赖和重试检查。"
+      }
+    }
+  ]
+}

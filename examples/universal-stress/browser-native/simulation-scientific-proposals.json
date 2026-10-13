@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "99b41de80566e4639874af0a2de5f6d6b28b17db3627f954adc1d61e9497bd80",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "advance-position",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "state_position(state) - state_velocity(state),",
+        "new": "state_position(state) + state_velocity(state),",
+        "diagnosis": "位置更新错误地减去了旧速度；改为加上旧速度，与既有新速度及轨迹记录计算一致。"
+      }
+    },
+    {
+      "id": "closed-position",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+        "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+        "diagnosis": "位置先使用旧速度更新，加速度累计项应为 steps × (steps − 1) / 2。"
+      }
+    },
+    {
+      "id": "closed-velocity",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "simulation-scientific",
+        "file": "candidate.rcl",
+        "old": "initial_velocity + acceleration + steps",
+        "new": "initial_velocity + acceleration * steps",
+        "diagnosis": "速度闭式表达式把加速度和步数相加；逐步积分需要加速度乘步数，零步时保持初始速度。"
+      }
+    }
+  ]
+}

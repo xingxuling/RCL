@@ -1,0 +1,4108 @@
+{
+  "format": "rcl.k400-browser-runtime.v1",
+  "status": "PASS_LOCAL_BROWSER_WASM",
+  "id": "simulation-scientific",
+  "generatedAt": "2026-10-13T03:04:48.660Z",
+  "contractRoot": "99b41de80566e4639874af0a2de5f6d6b28b17db3627f954adc1d61e9497bd80",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "casesHash": "de935f89f19282c105d585942ea68eb7c474fa5f84a9eed63b88e07ca8230d1e",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "proposalsPath": "examples/universal-stress/browser-native/simulation-scientific-proposals.json",
+  "proposalsHash": "bd206a94f1b00b73f0e6a53a7db7996cf8c1a2c55200b373169cd1d2828c7031",
+  "batchHash": "2eb2cc0380ba36a2c362d594ca789b0fa9955d17c8a6a153954f4b82d3918208",
+  "eligibleCells": [
+    "K069",
+    "K072"
+  ],
+  "sourceBindings": [
+    {
+      "path": "scripts/k400-browser-engine.mjs",
+      "sha256": "f3fef5502478724961476b40500b36132af1bde29b3a99b41dcfdba1a1285664"
+    },
+    {
+      "path": "scripts/k400-browser-traces.mjs",
+      "sha256": "2ebf0441a1a5302a67aae840400f320188426c3fe9b729377efee1f1bcbddd8d"
+    },
+    {
+      "path": "scripts/k400-browser-definitions.mjs",
+      "sha256": "cb85cc3096491e00ff0ad9d4eebbbc881249152c237561f6bf4d014a2cba1724"
+    },
+    {
+      "path": "scripts/k400-genomes/shared.mjs",
+      "sha256": "0b2bb2a26e1925d362137f09c18af2cada6ffa88aa24febe6caf3f91ea981d24"
+    },
+    {
+      "path": "src/portable-browser-target.mjs",
+      "sha256": "486169bce02ef724c890c4421c319aa6106ba559a0002ec38eb55d2da65766bd"
+    },
+    {
+      "path": "src/browser-runtime-page.mjs",
+      "sha256": "70d7e7cc12b6feb7c6d8f9db085adbec84d8ad8b41897108cfe1bd60e2cf611c"
+    },
+    {
+      "path": "src/compiler.mjs",
+      "sha256": "4beeb668104e6901bbde8e256950293233cab74bbb4970cf3ba250c011a10a6d"
+    },
+    {
+      "path": "src/bytecode.mjs",
+      "sha256": "d681b46f983d66ea3e26e87721b40e889b84671da24c7b1260ef8f6d3913b7d1"
+    },
+    {
+      "path": "src/semantic-state-root.mjs",
+      "sha256": "2d6127483e5981692273948efd6dd6a847916db760d9fba3b150c63a50465be3"
+    },
+    {
+      "path": "src/semantic-state-root-v2.mjs",
+      "sha256": "d66855f74a8e6403c420b0771f0065da96cc3159919405818114216f937446dd"
+    },
+    {
+      "path": "src/canonical-f64.mjs",
+      "sha256": "0bf52d415a2c48f0a1f2483069c66bcdc1a122084aa717f6cf1eafe94de24b31"
+    },
+    {
+      "path": "selfhost/compiler-core.rcl",
+      "sha256": "8d8a348e0ebf3c06a2f888af164586774d311678c6d32b1a712ff1e066799ab8"
+    },
+    {
+      "path": "selfhost/compiler-main.rcl",
+      "sha256": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/wasi-sha256.zig",
+      "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+    },
+    {
+      "path": "native/wasi-compat/openssl/sha.h",
+      "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+    },
+    {
+      "path": "native/wasi-compat/stdio-capture.c",
+      "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+    },
+    {
+      "path": "scripts/build-native-wasi-compiler.mjs",
+      "sha256": "e781092f4ecc6196f028a06e93952f34cea6d6a3c7991c926dc1678b78aeb376"
+    },
+    {
+      "path": "native/wasi-compiler/build-manifest.json",
+      "sha256": "1374ff8613e4ee2e813d517d4f4bad1191c2711cb8b4b2bbd22fe01326d8a4ac"
+    },
+    {
+      "path": "src/universal-program-stress.mjs",
+      "sha256": "70f461a51a166eb80c9d012b1d7663786ba420de554b5c27eb082b99f6a9cf15"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/debug.js",
+      "sha256": "a91848ee180529e2a60c05dfb9584cad19cd4e1c6f391fdb76a938bcae4c0328"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/fd.js",
+      "sha256": "9e82e1fc1bfd3e3573f64349dc42b4b624ed61d24e5c553f2bb4d041444f166c"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/fs_mem.js",
+      "sha256": "85dbc9e0ee784d9ff8b55452644e00bf7058e32355aab974f8b71d7d85772324"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/fs_opfs.js",
+      "sha256": "4b96aaeb5ac5986cf802cbf22b975c656682d22a38248160c96fc2ded5644869"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/index.js",
+      "sha256": "7e2fd52ee3f728bb0b1d6e449724e0f13e3d586bb25bde6e02a66366175b5605"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/LICENSE-APACHE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/PROVENANCE.json",
+      "sha256": "da941998d70923ae80d57cf177d2e09f5c878916f3dcbe37554d1fefd68e7cc0"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/strace.js",
+      "sha256": "ece435d3784d928d02bff4d015b7cb686f8c06de8536ff9f8ebc38a8f403a3be"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/wasi.js",
+      "sha256": "168eb977a826f75ab0c39f9322f78cc58dbd5b233019ad1d6a7e940af8a7c4aa"
+    },
+    {
+      "path": "src/vendor/browser-wasi-shim/wasi_defs.js",
+      "sha256": "0db0f42ba330749a7b05095ea1fd0ff63fd2b30e84cead30fe4c28359d15f194"
+    },
+    {
+      "path": "scripts/k400-portable-profile-definitions.mjs",
+      "sha256": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830"
+    }
+  ],
+  "backends": {
+    "browser": {
+      "binding": {
+        "context": "browser",
+        "execution": "Actual headless Chromium browser compiling RCL source and executing the native C VM through WebAssembly and WASI Preview 1",
+        "os": "Browser",
+        "hostPlatform": "win32",
+        "arch": "wasm32",
+        "compilerLocation": "Browser window executing RCL-authored compiler RBC",
+        "compilerBinary": {
+          "path": "native/wasi-compiler/rclc.wasm",
+          "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+        },
+        "compilerArtifact": {
+          "path": "selfhost/compiler.rbc",
+          "sha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+        },
+        "binary": {
+          "path": "native/wasi/rclvm.wasm",
+          "sha256": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78"
+        },
+        "executionRealm": "browser-window",
+        "vmArchitecture": "wasm32",
+        "browser": {
+          "binaryPath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+          "sha256": "f76f0234efb271041dc84f9f38fb858e01859d5da6f775f5108668eb3ae80975",
+          "version": "155.0.8059.40",
+          "pid": 15992,
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36"
+        },
+        "driver": {
+          "binaryPath": "C:\\Users\\User\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules\\playwright-core\\index.js",
+          "sha256": "a58fb2cec4293e7dcf73c58a179898a4f3986666451a19da4e731fa3af63265b",
+          "version": "1.62.1"
+        },
+        "shim": {
+          "path": "src/vendor/browser-wasi-shim/PROVENANCE.json",
+          "sha256": "da941998d70923ae80d57cf177d2e09f5c878916f3dcbe37554d1fefd68e7cc0"
+        },
+        "runtimeOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+        "nodeWasiExecutionUsed": false,
+        "hostedDeploymentClaimed": false,
+        "securitySandboxClaimed": false
+      },
+      "rounds": [
+        {
+          "index": 0,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 3346.440500000026,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 440.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 1,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "70c83ad4-74da-4db8-bc97-03fd36b5cacc",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 175.80509999999776,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 127,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 2,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "bce3e835-1a49-4d2f-bf4f-4e68da1d9a3d",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 1,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2969.2619000000414,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 226.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 3,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "2fa1c5c1-ed1d-4311-8932-b199911a7139",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 78.42559999995865,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 25.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 4,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "78c323ca-15c7-42b5-b96c-416febdafe36",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 2,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 3005.5331000000006,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 162.39999997615814,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 5,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "2c8462be-8652-459a-a4d1-c26c8b98593a",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 63.73959999997169,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 27.900000035762787,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 6,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "b64e9cf6-b545-4f32-afad-ec3bb0278e8b",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 3,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2638.74589999998,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 177.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 7,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "c42d0908-9d74-4b43-8df4-8ba45c096df3",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 67.9777999999933,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 26.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 8,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "4125e987-df6f-44f3-85bd-64347d8ae4fc",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 4,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2647.3375000000233,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 117.09999996423721,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 9,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "2314e314-b462-48d7-a092-552f81f66ff0",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 59.479799999971874,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 21.900000035762787,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 10,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "e8cea0de-3353-46bc-b8d3-a7439743c882",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 5,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2298.1059000000823,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 142.39999997615814,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 11,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "252ffe80-4025-429f-b7fb-328ec7c91cb6",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 52.25709999992978,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 12,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0aac9e93-670c-4ab1-861a-71a650302d45",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 6,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2484.6049999999814,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 144.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 13,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "5dd1afba-4ef5-49ac-adc1-da71b6098c98",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 61.70779999997467,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 23.099999964237213,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 14,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0f63c6ee-7cda-4e31-9e39-da9842301857",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 7,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2367.0007999999216,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 134.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 15,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "699410d4-035a-4480-95a6-3157f2eae36b",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 64.23560000001453,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 22.600000023841858,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 16,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0a45e5f8-6cca-4428-b936-c7f9280c222d",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 8,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2258.1706000000704,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 143.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 17,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "71ccbd84-2bf4-4f0c-bc24-891fd72a1dc2",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 49.831600000034086,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 21.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 18,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "630ead62-4627-417e-a2fd-46dcd7616a6b",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 9,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2590.420700000017,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 181.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 19,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "804c830b-120d-44e3-aaf7-db43b0b87579",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 68.76799999992363,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 27.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 20,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "c44918fa-2af4-4016-b386-27537c4dcc5c",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 10,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 3451.1901999999536,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 167.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 21,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "80a13bd2-390d-47c2-9636-75ca8f53a3da",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 72.4773999999743,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 27.19999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 22,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "9ba1f19d-cbd3-4c78-bf12-b6b3364da94a",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 11,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 3125.505300000077,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 152.89999997615814,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 23,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "4dc58279-1e00-4852-aa29-8da5bcfcddae",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 61.47080000001006,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 25,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 24,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "39b95ac5-703c-426d-a854-032a3b8cc21e",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 12,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2369.9082000000635,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 142.0999999642372,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 25,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "598e9f4c-7eb6-4eaf-b805-89de8f7dd704",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 58.07310000003781,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 20.599999964237213,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 26,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "ca6b336d-92ac-4575-9d56-72292a4e48ee",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 13,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2651.5551999999443,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 115,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 27,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "316c0446-0ced-4dd1-93d1-9b286943f021",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 48.20190000010189,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 28,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "a7571043-90fc-4de4-8ece-f21e014605f8",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 14,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2347.67220000003,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 120.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 29,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "7bf4863f-3c9b-4a02-88f0-c6826ded8d6d",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 56.78749999997672,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.099999964237213,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 30,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "83186649-f83c-4518-a175-7ddb51e76694",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 15,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2177.028500000015,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 112.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 31,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "5d85e8c4-9b52-4cc5-bf6c-f1a9ea066ce8",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 51.774199999985285,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 32,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "7cc5174f-6c0c-4bd5-9170-29fa0731e0dc",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 16,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2389.4222999999765,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 126,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 33,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "fb706d80-7f7a-4f54-bf9e-90dcb41115e9",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 46.999199999962,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 34,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "89b78156-94b4-439d-bf47-38b230aaf59c",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 17,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2209.1598999999696,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 99.19999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 35,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "d5a21d48-21dd-424d-804a-6b1c05d7027b",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 56.34429999999702,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 36,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "064ddd1e-0d2e-4805-bd48-2e971c21ee28",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 18,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2199.93200000003,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 117.70000004768372,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 37,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "07bbdbd9-98d1-47c9-9df4-c7425dd3c3aa",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 58.371699999901466,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 38,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "ea5fb7b3-5f57-4b01-908c-13e5e80041c6",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "index": 19,
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2154.8791999999667,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 106.59999996423721,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 39,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "356982d8-f313-499a-8970-1ec8fa93cf13",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 50.80989999999292,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.200000047683716,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 40,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "a74b9058-ddae-40c3-a194-8a1e93ce305c",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        }
+      ],
+      "inputResults": [
+        {
+          "index": 0,
+          "inputs": {
+            "initial_position": 0,
+            "initial_velocity": 0,
+            "acceleration": 0,
+            "steps": 0
+          },
+          "artifactHash": "79890efad4e57ac4752a4900ef32b9d2bba24f5c3db263d3b88df42eaf021e67",
+          "sourceHash": "40715d69f59897376506d98e1e59f6bc5479b24c567ae9ced4186bd21a00e571",
+          "sourceRoot": "1d954018f40601d33c5ad332d227cdffbddf6add4db6af0effd0c48e9332b850",
+          "compileMs": 1971.4971000000369,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 119.60000002384186,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 41,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "79890efad4e57ac4752a4900ef32b9d2bba24f5c3db263d3b88df42eaf021e67",
+            "sourceHash": "40715d69f59897376506d98e1e59f6bc5479b24c567ae9ced4186bd21a00e571",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "fe799de6-bf7a-418a-89f0-de86236a96ba",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3196,
+              "executedInstructions": 1303872,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 50.56460000004154,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.600000023841858,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 42,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "79890efad4e57ac4752a4900ef32b9d2bba24f5c3db263d3b88df42eaf021e67",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "a52aba68-ba08-454c-8f86-64ff7383338e",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "1d954018f40601d33c5ad332d227cdffbddf6add4db6af0effd0c48e9332b850"
+          },
+          "stateRoot": "ab9ceda1b92d83b91db9d3d8d5a0a6b5323791a9866cd77583c8cf0c49b3d9d6",
+          "valueRef": "cd50141e88e2b4686da4ce0e9332b32e50a5ff18c0afae62ef5189a5fe9bc272"
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "initial_position": 5,
+            "initial_velocity": -3,
+            "acceleration": 2,
+            "steps": 1
+          },
+          "artifactHash": "56ddfda9d6fdb97d72395756d831c03885031b9b2c126e138c33748b0ab7c929",
+          "sourceHash": "04eef77765bda3510a9256af296e6ed45ec264cc97ee84b89a89dc1c776d0523",
+          "sourceRoot": "e59cfc391eb268033a4046deca477e14961836fd6445468daef0af4cd1790bf5",
+          "compileMs": 1968.1374999999534,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 102.19999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 43,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "56ddfda9d6fdb97d72395756d831c03885031b9b2c126e138c33748b0ab7c929",
+            "sourceHash": "04eef77765bda3510a9256af296e6ed45ec264cc97ee84b89a89dc1c776d0523",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "1bf42d5f-9082-477e-95d4-ec6d0acc486a",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3228,
+              "executedInstructions": 1306236,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 42.18739999993704,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 15.600000023841858,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 44,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "56ddfda9d6fdb97d72395756d831c03885031b9b2c126e138c33748b0ab7c929",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0531ae8d-09a1-4abc-8ea4-b35c9b3e79d0",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "e59cfc391eb268033a4046deca477e14961836fd6445468daef0af4cd1790bf5"
+          },
+          "stateRoot": "f0df6b8146e6cd082694c070b7bb86b2e99b6fb88b520b66adc848fbb5298905",
+          "valueRef": "13bd92e068f1e911bdca7069355e56fe5a232bd73e962a3a944d1cfa5b7139e0"
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "initial_position": -7,
+            "initial_velocity": 0,
+            "acceleration": -2,
+            "steps": 4
+          },
+          "artifactHash": "a502ab699e4a8dead8f5750d1f3f759936508d3d895da9c92e45805e1302236c",
+          "sourceHash": "b273ba67aba786e3e6a7c2f5bb9532482416e6cdfbd7de173192a75250793804",
+          "sourceRoot": "b334673c0bd85d71cef381d67572ee3f6fe6a194e69ba645418ed29df5649dbf",
+          "compileMs": 1953.171800000011,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 131.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 45,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "a502ab699e4a8dead8f5750d1f3f759936508d3d895da9c92e45805e1302236c",
+            "sourceHash": "b273ba67aba786e3e6a7c2f5bb9532482416e6cdfbd7de173192a75250793804",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "0ed61f8e-7180-4dc9-890f-68da464cdb44",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3244,
+              "executedInstructions": 1307046,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 47.306699999957345,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 18.799999952316284,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 46,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "a502ab699e4a8dead8f5750d1f3f759936508d3d895da9c92e45805e1302236c",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "05984a71-5bf7-4564-87ca-d94c6907f691",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "b334673c0bd85d71cef381d67572ee3f6fe6a194e69ba645418ed29df5649dbf"
+          },
+          "stateRoot": "baf24431ade94eb80c1538c97cb31d4e41b4e42e96b41e047155bd75f8947e14",
+          "valueRef": "25f1baf56c1248c3f94a956fe935a67d619108fa9ab522555ff8de812cac9866"
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "initial_position": 2,
+            "initial_velocity": 4,
+            "acceleration": 0,
+            "steps": 12
+          },
+          "artifactHash": "3a8f259fb59eeadf936b43ab27356ba9103fce78a30016a0fe9c4cbe69b6b32a",
+          "sourceHash": "f4a9aaa6451aa2cb6f5fda23c73bf80ebe65f50fbc1b4005be746b860230bf8f",
+          "sourceRoot": "987c39d5e6786c9fc67847fc350cc05dc0f51056cac65f11762d46cb18fb7d8c",
+          "compileMs": 2382.132500000065,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 111.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 47,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "3a8f259fb59eeadf936b43ab27356ba9103fce78a30016a0fe9c4cbe69b6b32a",
+            "sourceHash": "f4a9aaa6451aa2cb6f5fda23c73bf80ebe65f50fbc1b4005be746b860230bf8f",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "70693132-96ba-4d40-bd83-bd4e215e300e",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304692,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 50.92800000007264,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 48,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "3a8f259fb59eeadf936b43ab27356ba9103fce78a30016a0fe9c4cbe69b6b32a",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "d659034c-4297-43cf-89e7-85eadb55cb57",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "987c39d5e6786c9fc67847fc350cc05dc0f51056cac65f11762d46cb18fb7d8c"
+          },
+          "stateRoot": "486a08148534e4549d44d13871c3ec3e2ed913dcdd35eca112c7719a49a0442c",
+          "valueRef": "fcc9af1f6efb8f55575d92c21494c6e9fb4a4f54eded0fe56679bffb0940e23c"
+        },
+        {
+          "index": 4,
+          "inputs": {
+            "initial_position": -10,
+            "initial_velocity": -4,
+            "acceleration": 3,
+            "steps": 9
+          },
+          "artifactHash": "e2544d5ef37ab4dfc1450e31a59d1aa9e980b9c57ead7639baee28cf21d58889",
+          "sourceHash": "9d16b8b39b1b508daafb55862ff1a0dedb57d3ea3837b4c8088c64c68b85daed",
+          "sourceRoot": "9297e0987279aad0751d77f925e5e57533cf28f1657c393f2aa1c998eb42ebcb",
+          "compileMs": 1955.9195000000764,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 107.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 49,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "e2544d5ef37ab4dfc1450e31a59d1aa9e980b9c57ead7639baee28cf21d58889",
+            "sourceHash": "9d16b8b39b1b508daafb55862ff1a0dedb57d3ea3837b4c8088c64c68b85daed",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "30dcb757-bfa2-4510-9ec4-91d370d0cc37",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3260,
+              "executedInstructions": 1308172,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 54.57049999991432,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 17.400000035762787,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 50,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "e2544d5ef37ab4dfc1450e31a59d1aa9e980b9c57ead7639baee28cf21d58889",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "a732969d-d16a-42bc-a659-7ae1580ec8eb",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "9297e0987279aad0751d77f925e5e57533cf28f1657c393f2aa1c998eb42ebcb"
+          },
+          "stateRoot": "42a9aa14b1b666c6a2be93a542f6f60778a24d861634253a2e19d9721b34e6b0",
+          "valueRef": "58e5af2ae80fb2848f693be6839ddbebad419f264c26e79543cd0639326ca25c"
+        },
+        {
+          "index": 5,
+          "inputs": {
+            "initial_position": 100,
+            "initial_velocity": 1,
+            "acceleration": -1,
+            "steps": 20
+          },
+          "artifactHash": "78a7b7d39931e62220926436ae358c69cb21072bccf48f9569c37ad80fb7dcf0",
+          "sourceHash": "34e5f80e18e10c6452b83d0fc2806fd6996c2023e9151b8b503362664f0b789b",
+          "sourceRoot": "9ad34a44ccee2e5d6ab09143f801318b8d654e4a44d0d4319e54cef7537abe9a",
+          "compileMs": 1958.311699999962,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 111.69999998807907,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 51,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "78a7b7d39931e62220926436ae358c69cb21072bccf48f9569c37ad80fb7dcf0",
+            "sourceHash": "34e5f80e18e10c6452b83d0fc2806fd6996c2023e9151b8b503362664f0b789b",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "48b66234-d8ec-442b-a217-05fb8577542d",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3228,
+              "executedInstructions": 1306074,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 51.2196999998996,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 52,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "78a7b7d39931e62220926436ae358c69cb21072bccf48f9569c37ad80fb7dcf0",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "1ea7c04f-9fa4-4bfb-992a-064630851fd7",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "9ad34a44ccee2e5d6ab09143f801318b8d654e4a44d0d4319e54cef7537abe9a"
+          },
+          "stateRoot": "91aadacc739330549a869f837eed3969dc01e0c8252a5f57e3f534407900b212",
+          "valueRef": "b16306ac6690e2031cf36c8aea259dfaa1129e06feb1e8d9bd66f2db54aebec6"
+        },
+        {
+          "index": 6,
+          "inputs": {
+            "initial_position": 3,
+            "initial_velocity": 7,
+            "acceleration": 2,
+            "steps": 2
+          },
+          "artifactHash": "5c93aeda79ff585ed66467526d121fe7c49ab43a66db1955189db36075443ada",
+          "sourceHash": "69876dcf454a4643acd406f95e1822d208703b25afe3f95fe92dc643cdbf8baf",
+          "sourceRoot": "62da1c227e001aceee22a6442f3f07d1014d52ffe6f617d0f8755ce031f12f83",
+          "compileMs": 2027.4662000000244,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 118.60000002384186,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 53,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "5c93aeda79ff585ed66467526d121fe7c49ab43a66db1955189db36075443ada",
+            "sourceHash": "69876dcf454a4643acd406f95e1822d208703b25afe3f95fe92dc643cdbf8baf",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "a71a9c2b-0757-494b-95d8-1fde8c5b7adc",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304984,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 52.7212999999756,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 20,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 54,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "5c93aeda79ff585ed66467526d121fe7c49ab43a66db1955189db36075443ada",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0d6ce6f9-875f-4676-9eed-266c239de71a",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "62da1c227e001aceee22a6442f3f07d1014d52ffe6f617d0f8755ce031f12f83"
+          },
+          "stateRoot": "b8296fbff9451796f9ad0d0db2bf09b5c571ade199ffb14c23c4329e9e3a3683",
+          "valueRef": "852db10f5eeaeb8864d88eb67cd735c156df1f4b43d116a2b55b5ce54d8ccf65"
+        },
+        {
+          "index": 7,
+          "inputs": {
+            "initial_position": 0,
+            "initial_velocity": 0,
+            "acceleration": 1,
+            "steps": 30
+          },
+          "artifactHash": "bb3045d67c856dc4152194c437d9dba4a38d5ad6eaf649809e6c8e34550ff7d3",
+          "sourceHash": "d124fdfb9cf7e67b966f194a0005e795560f730557a497bee10f53be1873cc34",
+          "sourceRoot": "d7a1bf332a8d3b724d89971b667aa7925f296b145eab4846532fbdb465b615b2",
+          "compileMs": 1980.9285999999847,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 102.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 55,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "bb3045d67c856dc4152194c437d9dba4a38d5ad6eaf649809e6c8e34550ff7d3",
+            "sourceHash": "d124fdfb9cf7e67b966f194a0005e795560f730557a497bee10f53be1873cc34",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "12b0f1bd-ed24-437f-9d24-7be0b6a971c9",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3204,
+              "executedInstructions": 1304136,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 49.52139999996871,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 19.599999964237213,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 56,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "bb3045d67c856dc4152194c437d9dba4a38d5ad6eaf649809e6c8e34550ff7d3",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "0e39997a-4347-4328-8990-b264f568b903",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "d7a1bf332a8d3b724d89971b667aa7925f296b145eab4846532fbdb465b615b2"
+          },
+          "stateRoot": "0dc05611ad292672e38e8d04c4ebce33e9245c113eb09983b45fbc8cc9dbeb04",
+          "valueRef": "7fd760c10e4923e64cf7b8fecfe1fd0d7822918d0ed45c8bce0bbe9d2193bcc4"
+        },
+        {
+          "index": 8,
+          "inputs": {
+            "initial_position": 1.5,
+            "initial_velocity": 0.5,
+            "acceleration": -0.5,
+            "steps": 6
+          },
+          "artifactHash": "0e496f64da8e6006a85882f48ef0e286c71e8f630ff9b0014bb77197d5293e24",
+          "sourceHash": "79443025775ee8bb80567a8d041288049f631f2ace669246aedf9042fcc9b622",
+          "sourceRoot": "0cd0af90f661757eeab933599ab9aed9930e1c7c0e113c1743e5cdadf7d35a87",
+          "compileMs": 2105.7904000000563,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 114.30000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 57,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "0e496f64da8e6006a85882f48ef0e286c71e8f630ff9b0014bb77197d5293e24",
+            "sourceHash": "79443025775ee8bb80567a8d041288049f631f2ace669246aedf9042fcc9b622",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "59137b9d-a43f-4f59-9604-be5bdbd72794",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3236,
+              "executedInstructions": 1306884,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 61.66009999997914,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 23.400000035762787,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 58,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "0e496f64da8e6006a85882f48ef0e286c71e8f630ff9b0014bb77197d5293e24",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "a98f839b-c346-4b60-946a-3d3654ac0fc4",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "0cd0af90f661757eeab933599ab9aed9930e1c7c0e113c1743e5cdadf7d35a87"
+          },
+          "stateRoot": "5eebfa832c6185bb2a886880b8b70674c3876c47aae927937f8c6f7d328d0c35",
+          "valueRef": "1aa07cf17042a0ec45e467f530da1b991c92ea76f44e5d94849aad5a289d0b87"
+        },
+        {
+          "index": 9,
+          "inputs": {
+            "initial_position": -32,
+            "initial_velocity": 11,
+            "acceleration": -3,
+            "steps": 16
+          },
+          "artifactHash": "e14555c078cada8c8ade2ee3b6a244c67239a472b6c3069c907fddfd6c5b7da6",
+          "sourceHash": "1732423864007568d8fbc598f71882a543090f27cf9e5e383a04ae2a766badbf",
+          "sourceRoot": "f32d727e09a7a0838a03b264ad08994f8d5b1d68823275127daa44356a4557a0",
+          "compileMs": 2275.7112999999663,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 109,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 59,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "e14555c078cada8c8ade2ee3b6a244c67239a472b6c3069c907fddfd6c5b7da6",
+            "sourceHash": "1732423864007568d8fbc598f71882a543090f27cf9e5e383a04ae2a766badbf",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "58d9d96d-70a6-4fcb-9b77-2f4603c682ee",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3260,
+              "executedInstructions": 1308268,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 60.28489999996964,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 27,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 60,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "e14555c078cada8c8ade2ee3b6a244c67239a472b6c3069c907fddfd6c5b7da6",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "614cf8f0-db00-4f3c-90cb-1403f522d3b6",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "f32d727e09a7a0838a03b264ad08994f8d5b1d68823275127daa44356a4557a0"
+          },
+          "stateRoot": "cffb3a7079654ed6369e5cff1ec1f5e0cafa1ea9f0eb4c4809afb52307607f94",
+          "valueRef": "7a5a38538211f11fa0e39a9565a102821051ce7c9f9b116cd8e51f4258171e10"
+        }
+      ],
+      "trials": [
+        {
+          "id": "advance-position",
+          "context": "/root/k400_browser_independent_a",
+          "proposal": {
+            "id": "simulation-scientific",
+            "file": "candidate.rcl",
+            "old": "state_position(state) - state_velocity(state),",
+            "new": "state_position(state) + state_velocity(state),",
+            "diagnosis": "位置更新错误地减去了旧速度；改为加上旧速度，与既有新速度及轨迹记录计算一致。"
+          },
+          "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e",
+          "broken": {
+            "kind": "success",
+            "executeMs": 70.81959999992978,
+            "runtimeTrace": {
+              "exitCode": 0,
+              "executionMs": 30,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 62,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 4,
+                "path_open": 2,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 2,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 3
+              },
+              "artifactHash": "62e66188babc588298a40bcc0b92c348e5f544cb731316a26ff8601b8540c71a",
+              "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+              "nonce": "494d4b5e-40e6-4998-97a2-44442d00335f",
+              "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "sourceRoot": "1d83ece1d72bf71cc7cd09ab61e7a64b8685611392ff95529214fda1214de142"
+            },
+            "artifactHash": "62e66188babc588298a40bcc0b92c348e5f544cb731316a26ff8601b8540c71a",
+            "sourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e",
+            "sourceRoot": "1d83ece1d72bf71cc7cd09ab61e7a64b8685611392ff95529214fda1214de142",
+            "compileMs": 2232.768700000015,
+            "compileTrace": {
+              "exitCode": 0,
+              "executionMs": 115.59999996423721,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 61,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 5,
+                "path_open": 3,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 3,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 2,
+                "fd_sync": 1,
+                "path_rename": 1
+              },
+              "artifactHash": "62e66188babc588298a40bcc0b92c348e5f544cb731316a26ff8601b8540c71a",
+              "sourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e",
+              "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "nonce": "f95d918b-ef85-4567-9f5f-fe9cdead37ce",
+              "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "compilerMetrics": {
+                "status": "ok",
+                "outputState": "compiler.output",
+                "bytes": 3212,
+                "executedInstructions": 1304561,
+                "instructionBudget": 300000000,
+                "peakStackDepth": 116,
+                "peakCallFrames": 17,
+                "output": "/work/output.rbc"
+              }
+            },
+            "valueRef": "cd9782bc94587dc869a9937571aec7bd1f458ebe5e809c8ee8600235459584b6"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2323.7040999999736,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 142.39999997615814,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 63,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "5492ae9f-6c26-4d26-9243-807be4b59c98",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 57.98070000007283,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 21.80000001192093,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 64,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "e82962a4-7b8b-4891-8935-5eb1fe24e151",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "id": "closed-position",
+          "context": "/root/k400_browser_independent_b",
+          "proposal": {
+            "id": "simulation-scientific",
+            "file": "candidate.rcl",
+            "old": "initial_position + steps * initial_velocity + acceleration * steps * (steps + 1) / 2",
+            "new": "initial_position + steps * initial_velocity + acceleration * steps * (steps - 1) / 2",
+            "diagnosis": "位置先使用旧速度更新，加速度累计项应为 steps × (steps − 1) / 2。"
+          },
+          "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99",
+          "broken": {
+            "kind": "success",
+            "executeMs": 43.05499999993481,
+            "runtimeTrace": {
+              "exitCode": 0,
+              "executionMs": 17.80000001192093,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 66,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 4,
+                "path_open": 2,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 2,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 3
+              },
+              "artifactHash": "7bd9648de4a0a8695159cb1a7a654af000ebc7acb7831851954abc0499c8df70",
+              "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+              "nonce": "394fd7b7-5578-4d76-8c61-04eb52c07358",
+              "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "sourceRoot": "92c22a8c94769c3af8d31aea706a195cf95bce800aee8452ac2e2569fd4749a8"
+            },
+            "artifactHash": "7bd9648de4a0a8695159cb1a7a654af000ebc7acb7831851954abc0499c8df70",
+            "sourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99",
+            "sourceRoot": "92c22a8c94769c3af8d31aea706a195cf95bce800aee8452ac2e2569fd4749a8",
+            "compileMs": 2010.9502999999095,
+            "compileTrace": {
+              "exitCode": 0,
+              "executionMs": 102.20000004768372,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 65,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 5,
+                "path_open": 3,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 3,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 2,
+                "fd_sync": 1,
+                "path_rename": 1
+              },
+              "artifactHash": "7bd9648de4a0a8695159cb1a7a654af000ebc7acb7831851954abc0499c8df70",
+              "sourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99",
+              "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "nonce": "2b3960b3-fdf7-4e57-92cc-8818778fa9af",
+              "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "compilerMetrics": {
+                "status": "ok",
+                "outputState": "compiler.output",
+                "bytes": 3212,
+                "executedInstructions": 1304551,
+                "instructionBudget": 300000000,
+                "peakStackDepth": 116,
+                "peakCallFrames": 17,
+                "output": "/work/output.rbc"
+              }
+            },
+            "valueRef": "afc597b4862446cd787aee6f68ad08280dc0644bba702c7b162eec5cef595405"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2035.4352000000654,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 105,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 67,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "9f0791ac-dd1c-41c4-91ca-bc382da0de5a",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 63.58980000007432,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 22.5,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 68,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "6a8cfb70-b4bb-4901-be85-505afcdd64f3",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        },
+        {
+          "id": "closed-velocity",
+          "context": "/root/k400_browser_independent_c",
+          "proposal": {
+            "id": "simulation-scientific",
+            "file": "candidate.rcl",
+            "old": "initial_velocity + acceleration + steps",
+            "new": "initial_velocity + acceleration * steps",
+            "diagnosis": "速度闭式表达式把加速度和步数相加；逐步积分需要加速度乘步数，零步时保持初始速度。"
+          },
+          "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6",
+          "broken": {
+            "kind": "success",
+            "executeMs": 51.05079999996815,
+            "runtimeTrace": {
+              "exitCode": 0,
+              "executionMs": 19.200000047683716,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 70,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 4,
+                "path_open": 2,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 2,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 3
+              },
+              "artifactHash": "deb9dd8289f02c7dee8cda5186df2a38c94cc68be18fdd50031ffaca12156052",
+              "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+              "nonce": "56ead714-81f6-4cbd-ab50-818862fed69a",
+              "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "sourceRoot": "4798bc35101df662bb26b9327f186d772870adcee5dca8c2ff1a67b3fbc215ee"
+            },
+            "artifactHash": "deb9dd8289f02c7dee8cda5186df2a38c94cc68be18fdd50031ffaca12156052",
+            "sourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6",
+            "sourceRoot": "4798bc35101df662bb26b9327f186d772870adcee5dca8c2ff1a67b3fbc215ee",
+            "compileMs": 2220.330900000059,
+            "compileTrace": {
+              "exitCode": 0,
+              "executionMs": 103.39999997615814,
+              "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+              "instance": 69,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+              "wasiCalls": {
+                "fd_prestat_get": 3,
+                "fd_prestat_dir_name": 2,
+                "args_sizes_get": 1,
+                "args_get": 1,
+                "fd_fdstat_get": 5,
+                "path_open": 3,
+                "fd_seek": 6,
+                "fd_read": 2,
+                "fd_close": 3,
+                "environ_sizes_get": 1,
+                "environ_get": 1,
+                "fd_write": 2,
+                "fd_sync": 1,
+                "path_rename": 1
+              },
+              "artifactHash": "deb9dd8289f02c7dee8cda5186df2a38c94cc68be18fdd50031ffaca12156052",
+              "sourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6",
+              "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+              "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+              "nonce": "f91f95bb-4e3f-4890-a6d1-c0ff64969b94",
+              "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+              "browserPid": 15992,
+              "compilerMetrics": {
+                "status": "ok",
+                "outputState": "compiler.output",
+                "bytes": 3212,
+                "executedInstructions": 1304518,
+                "instructionBudget": 300000000,
+                "peakStackDepth": 116,
+                "peakCallFrames": 17,
+                "output": "/work/output.rbc"
+              }
+            },
+            "valueRef": "48f30a2ac3e5a5a0fbb01d5b3745b430ebb8a2cae847269b9131003a1d54c63b"
+          },
+          "exactCanonicalRestoration": true,
+          "semanticRepairCases": [],
+          "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+          "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+          "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+          "compileMs": 2150.353299999959,
+          "compileTrace": {
+            "exitCode": 0,
+            "executionMs": 138.70000004768372,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 71,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 5,
+              "path_open": 3,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 3,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 2,
+              "fd_sync": 1,
+              "path_rename": 1
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+            "compilerHash": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a",
+            "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+            "nonce": "7f427812-a41f-4d30-8553-6a90c0ff2e63",
+            "executionOwner": "RCL_COMPILER_RBC_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "compilerMetrics": {
+              "status": "ok",
+              "outputState": "compiler.output",
+              "bytes": 3212,
+              "executedInstructions": 1304556,
+              "instructionBudget": 300000000,
+              "peakStackDepth": 116,
+              "peakCallFrames": 17,
+              "output": "/work/output.rbc"
+            }
+          },
+          "executeMs": 57.49670000001788,
+          "runtimeTrace": {
+            "exitCode": 0,
+            "executionMs": 21,
+            "pageToken": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+            "instance": 72,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+            "wasiCalls": {
+              "fd_prestat_get": 3,
+              "fd_prestat_dir_name": 2,
+              "args_sizes_get": 1,
+              "args_get": 1,
+              "fd_fdstat_get": 4,
+              "path_open": 2,
+              "fd_seek": 6,
+              "fd_read": 2,
+              "fd_close": 2,
+              "environ_sizes_get": 1,
+              "environ_get": 1,
+              "fd_write": 3
+            },
+            "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc",
+            "wasmHash": "9c46098364a975de827c21bda9c581fc70979437bfdd51a2e11ff9e118fbcd78",
+            "nonce": "407ab79d-577b-4fb5-a873-35a2a3fec322",
+            "executionOwner": "RCL_C_VM_BROWSER_WEBASSEMBLY",
+            "browserPid": 15992,
+            "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da"
+          },
+          "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+          "valueRef": "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2"
+        }
+      ],
+      "performance": {
+        "compileP95Ms": 3346.440500000026,
+        "executeP95Ms": 78.42559999995865
+      },
+      "runtimeControl": {
+        "status": "PASS",
+        "pageResetObserved": true,
+        "browserPid": 15992,
+        "pageTokenBefore": "da2ae3e1-ca33-49b0-bf54-5cbfb53abec2",
+        "pageTokenAfter": "b2c4452b-8928-4ea4-bbd4-4373eec60d7e",
+        "firstInstance": 74,
+        "nextInstance": 75,
+        "resetInstance": 1,
+        "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+        "sourceRoot": "fac7e27cfbb9f00ca0d0936c36c7e3afdfcc021b7e4bc35e9e64c4c37eff83da",
+        "artifactHash": "4e59261b088398b021734e0001f613d8410064bdffe98a5c80654e0423813fcc"
+      },
+      "negativeControls": {
+        "malformedRejected": true,
+        "malformedDiagnostic": "\n{\"status\":\"error\",\"code\":\"RCLC_COMPILER_FAILURE\",\"message\":\"RCL_SEMANTIC_ASSERT: reality at 1:1\"}\n",
+        "corruptRejected": true,
+        "corruptDiagnostic": "\n{\"status\":\"error\",\"code\":\"RCL_NATIVE_LOAD\",\"message\":\"RCL_NATIVE_TRUNCATED: RBC is shorter than its 36-byte header\"}\n",
+        "semanticMutationsDetected": 3
+      },
+      "gates": {
+        "EXPRESS": "PASS",
+        "COMPILE": "PASS",
+        "LOWER": "PASS",
+        "EXECUTE": "PASS",
+        "CORRECT": "PASS",
+        "ROBUST": "PASS",
+        "PERFORMANCE": "PASS",
+        "AI_GENERATE": "PASS",
+        "EVIDENCE": "PASS"
+      }
+    }
+  },
+  "values": {
+    "cf7f82e814af2f96cec9dad4ec60e5454525eb0dfeab1df11230f30937ef3dc2": {
+      "state": {
+        "boundary.one_step_state": [
+          3,
+          5,
+          [
+            0,
+            3
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 0,
+        "input.initial_velocity": 3,
+        "input.steps": 10,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 120,
+        "oracle.velocity": 23,
+        "result.position": 120,
+        "result.trajectory": [
+          0,
+          3,
+          8,
+          15,
+          24,
+          35,
+          48,
+          63,
+          80,
+          99,
+          120
+        ],
+        "result.velocity": 23,
+        "simulation.final_state": [
+          120,
+          23,
+          [
+            0,
+            3,
+            8,
+            15,
+            24,
+            35,
+            48,
+            63,
+            80,
+            99,
+            120
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "98a90faa1d00d13174234e269f000ba10cae5b6c5b1a5679879d654159c251d5",
+      "history": [],
+      "projections": []
+    },
+    "cd50141e88e2b4686da4ce0e9332b32e50a5ff18c0afae62ef5189a5fe9bc272": {
+      "state": {
+        "boundary.one_step_state": [
+          0,
+          0,
+          [
+            0,
+            0
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          0,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 0,
+        "input.initial_position": 0,
+        "input.initial_velocity": 0,
+        "input.steps": 0,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 0,
+        "oracle.velocity": 0,
+        "result.position": 0,
+        "result.trajectory": [
+          0
+        ],
+        "result.velocity": 0,
+        "simulation.final_state": [
+          0,
+          0,
+          [
+            0
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          0,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "ab9ceda1b92d83b91db9d3d8d5a0a6b5323791a9866cd77583c8cf0c49b3d9d6",
+      "history": [],
+      "projections": []
+    },
+    "13bd92e068f1e911bdca7069355e56fe5a232bd73e962a3a944d1cfa5b7139e0": {
+      "state": {
+        "boundary.one_step_state": [
+          2,
+          -1,
+          [
+            5,
+            2
+          ]
+        ],
+        "boundary.zero_step_state": [
+          5,
+          -3,
+          [
+            5
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 5,
+        "input.initial_velocity": -3,
+        "input.steps": 1,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 2,
+        "oracle.velocity": -1,
+        "result.position": 2,
+        "result.trajectory": [
+          5,
+          2
+        ],
+        "result.velocity": -1,
+        "simulation.final_state": [
+          2,
+          -1,
+          [
+            5,
+            2
+          ]
+        ],
+        "simulation.initial_state": [
+          5,
+          -3,
+          [
+            5
+          ]
+        ]
+      },
+      "stateRoot": "f0df6b8146e6cd082694c070b7bb86b2e99b6fb88b520b66adc848fbb5298905",
+      "history": [],
+      "projections": []
+    },
+    "25f1baf56c1248c3f94a956fe935a67d619108fa9ab522555ff8de812cac9866": {
+      "state": {
+        "boundary.one_step_state": [
+          -7,
+          -2,
+          [
+            -7,
+            -7
+          ]
+        ],
+        "boundary.zero_step_state": [
+          -7,
+          0,
+          [
+            -7
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": -2,
+        "input.initial_position": -7,
+        "input.initial_velocity": 0,
+        "input.steps": 4,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": -19,
+        "oracle.velocity": -8,
+        "result.position": -19,
+        "result.trajectory": [
+          -7,
+          -7,
+          -9,
+          -13,
+          -19
+        ],
+        "result.velocity": -8,
+        "simulation.final_state": [
+          -19,
+          -8,
+          [
+            -7,
+            -7,
+            -9,
+            -13,
+            -19
+          ]
+        ],
+        "simulation.initial_state": [
+          -7,
+          0,
+          [
+            -7
+          ]
+        ]
+      },
+      "stateRoot": "baf24431ade94eb80c1538c97cb31d4e41b4e42e96b41e047155bd75f8947e14",
+      "history": [],
+      "projections": []
+    },
+    "fcc9af1f6efb8f55575d92c21494c6e9fb4a4f54eded0fe56679bffb0940e23c": {
+      "state": {
+        "boundary.one_step_state": [
+          6,
+          4,
+          [
+            2,
+            6
+          ]
+        ],
+        "boundary.zero_step_state": [
+          2,
+          4,
+          [
+            2
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 0,
+        "input.initial_position": 2,
+        "input.initial_velocity": 4,
+        "input.steps": 12,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 50,
+        "oracle.velocity": 4,
+        "result.position": 50,
+        "result.trajectory": [
+          2,
+          6,
+          10,
+          14,
+          18,
+          22,
+          26,
+          30,
+          34,
+          38,
+          42,
+          46,
+          50
+        ],
+        "result.velocity": 4,
+        "simulation.final_state": [
+          50,
+          4,
+          [
+            2,
+            6,
+            10,
+            14,
+            18,
+            22,
+            26,
+            30,
+            34,
+            38,
+            42,
+            46,
+            50
+          ]
+        ],
+        "simulation.initial_state": [
+          2,
+          4,
+          [
+            2
+          ]
+        ]
+      },
+      "stateRoot": "486a08148534e4549d44d13871c3ec3e2ed913dcdd35eca112c7719a49a0442c",
+      "history": [],
+      "projections": []
+    },
+    "58e5af2ae80fb2848f693be6839ddbebad419f264c26e79543cd0639326ca25c": {
+      "state": {
+        "boundary.one_step_state": [
+          -14,
+          -1,
+          [
+            -10,
+            -14
+          ]
+        ],
+        "boundary.zero_step_state": [
+          -10,
+          -4,
+          [
+            -10
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 3,
+        "input.initial_position": -10,
+        "input.initial_velocity": -4,
+        "input.steps": 9,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 62,
+        "oracle.velocity": 23,
+        "result.position": 62,
+        "result.trajectory": [
+          -10,
+          -14,
+          -15,
+          -13,
+          -8,
+          0,
+          11,
+          25,
+          42,
+          62
+        ],
+        "result.velocity": 23,
+        "simulation.final_state": [
+          62,
+          23,
+          [
+            -10,
+            -14,
+            -15,
+            -13,
+            -8,
+            0,
+            11,
+            25,
+            42,
+            62
+          ]
+        ],
+        "simulation.initial_state": [
+          -10,
+          -4,
+          [
+            -10
+          ]
+        ]
+      },
+      "stateRoot": "42a9aa14b1b666c6a2be93a542f6f60778a24d861634253a2e19d9721b34e6b0",
+      "history": [],
+      "projections": []
+    },
+    "b16306ac6690e2031cf36c8aea259dfaa1129e06feb1e8d9bd66f2db54aebec6": {
+      "state": {
+        "boundary.one_step_state": [
+          101,
+          0,
+          [
+            100,
+            101
+          ]
+        ],
+        "boundary.zero_step_state": [
+          100,
+          1,
+          [
+            100
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": -1,
+        "input.initial_position": 100,
+        "input.initial_velocity": 1,
+        "input.steps": 20,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": -70,
+        "oracle.velocity": -19,
+        "result.position": -70,
+        "result.trajectory": [
+          100,
+          101,
+          101,
+          100,
+          98,
+          95,
+          91,
+          86,
+          80,
+          73,
+          65,
+          56,
+          46,
+          35,
+          23,
+          10,
+          -4,
+          -19,
+          -35,
+          -52,
+          -70
+        ],
+        "result.velocity": -19,
+        "simulation.final_state": [
+          -70,
+          -19,
+          [
+            100,
+            101,
+            101,
+            100,
+            98,
+            95,
+            91,
+            86,
+            80,
+            73,
+            65,
+            56,
+            46,
+            35,
+            23,
+            10,
+            -4,
+            -19,
+            -35,
+            -52,
+            -70
+          ]
+        ],
+        "simulation.initial_state": [
+          100,
+          1,
+          [
+            100
+          ]
+        ]
+      },
+      "stateRoot": "91aadacc739330549a869f837eed3969dc01e0c8252a5f57e3f534407900b212",
+      "history": [],
+      "projections": []
+    },
+    "852db10f5eeaeb8864d88eb67cd735c156df1f4b43d116a2b55b5ce54d8ccf65": {
+      "state": {
+        "boundary.one_step_state": [
+          10,
+          9,
+          [
+            3,
+            10
+          ]
+        ],
+        "boundary.zero_step_state": [
+          3,
+          7,
+          [
+            3
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 3,
+        "input.initial_velocity": 7,
+        "input.steps": 2,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 19,
+        "oracle.velocity": 11,
+        "result.position": 19,
+        "result.trajectory": [
+          3,
+          10,
+          19
+        ],
+        "result.velocity": 11,
+        "simulation.final_state": [
+          19,
+          11,
+          [
+            3,
+            10,
+            19
+          ]
+        ],
+        "simulation.initial_state": [
+          3,
+          7,
+          [
+            3
+          ]
+        ]
+      },
+      "stateRoot": "b8296fbff9451796f9ad0d0db2bf09b5c571ade199ffb14c23c4329e9e3a3683",
+      "history": [],
+      "projections": []
+    },
+    "7fd760c10e4923e64cf7b8fecfe1fd0d7822918d0ed45c8bce0bbe9d2193bcc4": {
+      "state": {
+        "boundary.one_step_state": [
+          0,
+          1,
+          [
+            0,
+            0
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          0,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 1,
+        "input.initial_position": 0,
+        "input.initial_velocity": 0,
+        "input.steps": 30,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 435,
+        "oracle.velocity": 30,
+        "result.position": 435,
+        "result.trajectory": [
+          0,
+          0,
+          1,
+          3,
+          6,
+          10,
+          15,
+          21,
+          28,
+          36,
+          45,
+          55,
+          66,
+          78,
+          91,
+          105,
+          120,
+          136,
+          153,
+          171,
+          190,
+          210,
+          231,
+          253,
+          276,
+          300,
+          325,
+          351,
+          378,
+          406,
+          435
+        ],
+        "result.velocity": 30,
+        "simulation.final_state": [
+          435,
+          30,
+          [
+            0,
+            0,
+            1,
+            3,
+            6,
+            10,
+            15,
+            21,
+            28,
+            36,
+            45,
+            55,
+            66,
+            78,
+            91,
+            105,
+            120,
+            136,
+            153,
+            171,
+            190,
+            210,
+            231,
+            253,
+            276,
+            300,
+            325,
+            351,
+            378,
+            406,
+            435
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          0,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "0dc05611ad292672e38e8d04c4ebce33e9245c113eb09983b45fbc8cc9dbeb04",
+      "history": [],
+      "projections": []
+    },
+    "1aa07cf17042a0ec45e467f530da1b991c92ea76f44e5d94849aad5a289d0b87": {
+      "state": {
+        "boundary.one_step_state": [
+          2,
+          0,
+          [
+            1.5,
+            2
+          ]
+        ],
+        "boundary.zero_step_state": [
+          1.5,
+          0.5,
+          [
+            1.5
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": -0.5,
+        "input.initial_position": 1.5,
+        "input.initial_velocity": 0.5,
+        "input.steps": 6,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": -3,
+        "oracle.velocity": -2.5,
+        "result.position": -3,
+        "result.trajectory": [
+          1.5,
+          2,
+          2,
+          1.5,
+          0.5,
+          -1,
+          -3
+        ],
+        "result.velocity": -2.5,
+        "simulation.final_state": [
+          -3,
+          -2.5,
+          [
+            1.5,
+            2,
+            2,
+            1.5,
+            0.5,
+            -1,
+            -3
+          ]
+        ],
+        "simulation.initial_state": [
+          1.5,
+          0.5,
+          [
+            1.5
+          ]
+        ]
+      },
+      "stateRoot": "5eebfa832c6185bb2a886880b8b70674c3876c47aae927937f8c6f7d328d0c35",
+      "history": [],
+      "projections": []
+    },
+    "7a5a38538211f11fa0e39a9565a102821051ce7c9f9b116cd8e51f4258171e10": {
+      "state": {
+        "boundary.one_step_state": [
+          -21,
+          8,
+          [
+            -32,
+            -21
+          ]
+        ],
+        "boundary.zero_step_state": [
+          -32,
+          11,
+          [
+            -32
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": -3,
+        "input.initial_position": -32,
+        "input.initial_velocity": 11,
+        "input.steps": 16,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": -216,
+        "oracle.velocity": -37,
+        "result.position": -216,
+        "result.trajectory": [
+          -32,
+          -21,
+          -13,
+          -8,
+          -6,
+          -7,
+          -11,
+          -18,
+          -28,
+          -41,
+          -57,
+          -76,
+          -98,
+          -123,
+          -151,
+          -182,
+          -216
+        ],
+        "result.velocity": -37,
+        "simulation.final_state": [
+          -216,
+          -37,
+          [
+            -32,
+            -21,
+            -13,
+            -8,
+            -6,
+            -7,
+            -11,
+            -18,
+            -28,
+            -41,
+            -57,
+            -76,
+            -98,
+            -123,
+            -151,
+            -182,
+            -216
+          ]
+        ],
+        "simulation.initial_state": [
+          -32,
+          11,
+          [
+            -32
+          ]
+        ]
+      },
+      "stateRoot": "cffb3a7079654ed6369e5cff1ec1f5e0cafa1ea9f0eb4c4809afb52307607f94",
+      "history": [],
+      "projections": []
+    },
+    "cd9782bc94587dc869a9937571aec7bd1f458ebe5e809c8ee8600235459584b6": {
+      "state": {
+        "boundary.one_step_state": [
+          -3,
+          5,
+          [
+            0,
+            3
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 0,
+        "input.initial_velocity": 3,
+        "input.steps": 10,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 120,
+        "oracle.velocity": 23,
+        "result.position": -120,
+        "result.trajectory": [
+          0,
+          3,
+          2,
+          -1,
+          -6,
+          -13,
+          -22,
+          -33,
+          -46,
+          -61,
+          -78
+        ],
+        "result.velocity": 23,
+        "simulation.final_state": [
+          -120,
+          23,
+          [
+            0,
+            3,
+            2,
+            -1,
+            -6,
+            -13,
+            -22,
+            -33,
+            -46,
+            -61,
+            -78
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "a3c1aa5a25579cd17d8c24a90258a0f4f464f7c7670e4041d031e48cdcd7e924",
+      "history": [],
+      "projections": []
+    },
+    "afc597b4862446cd787aee6f68ad08280dc0644bba702c7b162eec5cef595405": {
+      "state": {
+        "boundary.one_step_state": [
+          3,
+          5,
+          [
+            0,
+            3
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 0,
+        "input.initial_velocity": 3,
+        "input.steps": 10,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 140,
+        "oracle.velocity": 23,
+        "result.position": 120,
+        "result.trajectory": [
+          0,
+          3,
+          8,
+          15,
+          24,
+          35,
+          48,
+          63,
+          80,
+          99,
+          120
+        ],
+        "result.velocity": 23,
+        "simulation.final_state": [
+          120,
+          23,
+          [
+            0,
+            3,
+            8,
+            15,
+            24,
+            35,
+            48,
+            63,
+            80,
+            99,
+            120
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "d6e6d76ae5f1c11c9ac149a4a98eba0abb719c7b9764c0f68702beb7ea88760d",
+      "history": [],
+      "projections": []
+    },
+    "48f30a2ac3e5a5a0fbb01d5b3745b430ebb8a2cae847269b9131003a1d54c63b": {
+      "state": {
+        "boundary.one_step_state": [
+          3,
+          5,
+          [
+            0,
+            3
+          ]
+        ],
+        "boundary.zero_step_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ],
+        "contract.execution": "RCL_OWNED_PORTABLE_RBC",
+        "contract.id": "k400-portable-simulation-scientific-v1",
+        "contract.owner": "RCL",
+        "input.acceleration": 2,
+        "input.initial_position": 0,
+        "input.initial_velocity": 3,
+        "input.steps": 10,
+        "model.kind": "DISCRETE_CONSTANT_ACCELERATION_INTEGER_INTEGRATOR",
+        "oracle.position": 120,
+        "oracle.velocity": 15,
+        "result.position": 120,
+        "result.trajectory": [
+          0,
+          3,
+          8,
+          15,
+          24,
+          35,
+          48,
+          63,
+          80,
+          99,
+          120
+        ],
+        "result.velocity": 23,
+        "simulation.final_state": [
+          120,
+          23,
+          [
+            0,
+            3,
+            8,
+            15,
+            24,
+            35,
+            48,
+            63,
+            80,
+            99,
+            120
+          ]
+        ],
+        "simulation.initial_state": [
+          0,
+          3,
+          [
+            0
+          ]
+        ]
+      },
+      "stateRoot": "e77db3c13d9259bfee9ed6f83198407eff5bc48022ef5f412485dbe17b0ea837",
+      "history": [],
+      "projections": []
+    }
+  },
+  "scope": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+  "osIsolationClaimed": false,
+  "hostedCi": "NOT_RUN_USER_INSTRUCTION",
+  "reportRoot": "779b022ddf0c22d7339296153f8a7d15883629743032b44870a45d14be73bbe4"
+}

@@ -1,0 +1,77 @@
+{
+  "format": "rcl.k400-browser-contract.v1",
+  "id": "simulation-scientific",
+  "scope": "bounded explicit discrete constant-acceleration trajectory and independent closed-form differential numerical checks; no arbitrary physics/HPC claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/portable-profiles/simulation-scientific.rcl",
+  "sourceHash": "766dcdace58b8f3201992cf77663f8a0738ae4a91669ea0485facc0c45b83dc4",
+  "casesPath": "examples/universal-stress/browser-native/simulation-scientific-cases.json",
+  "casesHash": "de935f89f19282c105d585942ea68eb7c474fa5f84a9eed63b88e07ca8230d1e",
+  "definitionFile": "scripts/k400-portable-profile-definitions.mjs",
+  "definitionHash": "bc68901782e6aa4274d9b9845c25d0bcee8358de748fec2ef33aead6981f0830",
+  "browserDefinitionFile": "scripts/k400-browser-definitions.mjs",
+  "browserDefinitionHash": "cb85cc3096491e00ff0ad9d4eebbbc881249152c237561f6bf4d014a2cba1724",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/wasi-compiler/rclc.wasm",
+    "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+  },
+  "environments": [
+    "browser"
+  ],
+  "families": [
+    "simulation",
+    "scientific"
+  ],
+  "baseline": {
+    "initial_position": 0,
+    "initial_velocity": 3,
+    "acceleration": 2,
+    "steps": 10
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K069",
+    "K072"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual browser compilation and VM execution",
+    "page reload and fresh WASI instances",
+    "typed roots and source-declared transaction continuity"
+  ],
+  "authorityProfile": "actual local Chromium WebAssembly compilation/execution; no Node-WASI fallback, hosted deployment or whole-family claim",
+  "trials": [
+    {
+      "id": "advance-position",
+      "index": 0,
+      "intent": "Each explicit step advances position by the old velocity, then adds acceleration to velocity, and appends the new position to the trajectory.",
+      "mutatedSourceHash": "b0cd1dbf10fa025675d5152b3bc7be384aac876ca79c9dde242ede309bbcc11e"
+    },
+    {
+      "id": "closed-position",
+      "index": 1,
+      "intent": "The closed-form position must match explicit integration where position is advanced with old velocity before acceleration changes that velocity.",
+      "mutatedSourceHash": "10297bc687a8283c4e8a129640bb09f459b61b669c4788ecc95677cfd8e6fc99"
+    },
+    {
+      "id": "closed-velocity",
+      "index": 2,
+      "intent": "The final velocity after a given number of constant-acceleration discrete steps must match the explicit step integrator, including zero steps.",
+      "mutatedSourceHash": "91a3b4ded00e608aef3a2adcdba0b4c5cb74c285f4bf05dbcd62f02330bafdd6"
+    }
+  ],
+  "contractRoot": "99b41de80566e4639874af0a2de5f6d6b28b17db3627f954adc1d61e9497bd80"
+}

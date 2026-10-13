@@ -1,0 +1,79 @@
+{
+  "format": "rcl.k400-browser-contract.v1",
+  "id": "game",
+  "scope": "RCL-owned bounded fixed-step 2D platform kernel: movement/wall clamp, grounded jump, gravity/landing, single collectible, ground enemy collision, terminal stop and governed trajectory commit; no graphics/input device/full game engine or arbitrary game generation claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/new-families/game.rcl",
+  "sourceHash": "96a520f1c85d3e3fd4b6e5c6cd24fad40f01ebbf91a88a5ae50bb11e04a4d26d",
+  "casesPath": "examples/universal-stress/browser-native/game-cases.json",
+  "casesHash": "de92ebae3801abdc44b538fcb52831bfde24fbbc61159f16c529fdc60e351471",
+  "definitionFile": "scripts/k400-new-family-definitions.mjs",
+  "definitionHash": "61227c8d6d98de30e1681fbd33da1fd4b03b36861a86065ef8d686d086c60655",
+  "browserDefinitionFile": "scripts/k400-browser-definitions.mjs",
+  "browserDefinitionHash": "cb85cc3096491e00ff0ad9d4eebbbc881249152c237561f6bf4d014a2cba1724",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/wasi-compiler/rclc.wasm",
+    "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+  },
+  "environments": [
+    "browser"
+  ],
+  "families": [
+    "game"
+  ],
+  "baseline": {
+    "frames": 12,
+    "move": 1,
+    "speed": 2,
+    "jump_frame": 2,
+    "gravity": 1,
+    "star": 8,
+    "enemy": 18,
+    "width": 20
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K068"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual browser compilation and VM execution",
+    "page reload and fresh WASI instances",
+    "typed roots and source-declared transaction continuity"
+  ],
+  "authorityProfile": "actual local Chromium WebAssembly compilation/execution; no Node-WASI fallback, hosted deployment or whole-family claim",
+  "trials": [
+    {
+      "id": "movement",
+      "index": 0,
+      "intent": "Advance horizontal position by direction multiplied by speed and clamp to the world bounds; preserve zero and negative directions.",
+      "mutatedSourceHash": "80f98298483630869a115356f8d0049b3b1b00ecf17c2ca6bfcdf1ec0ec3449b"
+    },
+    {
+      "id": "landing",
+      "index": 1,
+      "intent": "With downward-positive coordinates, landing occurs when proposed y reaches or crosses ground zero; then reset vertical position and velocity. Preserve airborne motion.",
+      "mutatedSourceHash": "36bec945f0530e4931c73c6bc8a7f06e5939db4eabffecc9e95dd7e22da61dee"
+    },
+    {
+      "id": "pickup-once",
+      "index": 2,
+      "intent": "Collect the star at most once after reaching its threshold, retaining a score between zero and one and terminal enemy-stop behavior.",
+      "mutatedSourceHash": "e63241c6388e3234c8c9476c4359110e87cf973ca0bce73374afc58a02a05844"
+    }
+  ],
+  "contractRoot": "2de9c4649c04fe3f5cd8a12e2a86df090b8037daface703ab6afee8f01f57552"
+}

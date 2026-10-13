@@ -1,0 +1,45 @@
+{
+  "format": "rcl.k400-independent-browser-proposals.v1",
+  "contractRoot": "501734284e305d5df17fc92369e1ba5188566dfc046924ad83033d63562cf50f",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes",
+  "acquisitionBatch": "examples/universal-stress/browser-native/independent-batch.json",
+  "trials": [
+    {
+      "id": "precedence",
+      "context": "/root/k400_browser_independent_a",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 1,",
+        "new": "choose(valid(left) == 1 and kind_at(tokens, position(left)) == 2,",
+        "diagnosis": "term 错将加法标记当作乘法；改为消费乘法标记，使 expression 保持加减的较低优先级，保留括号及完整输入验证。"
+      }
+    },
+    {
+      "id": "opcode-emission",
+      "context": "/root/k400_browser_independent_b",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "pair(choose(operator == 1, 2, 1), 0)",
+        "new": "pair(choose(operator == 1, 1, 2), 0)",
+        "diagnosis": "加减运算 opcode 映射颠倒；plus 生成一，minus 生成二，保留现有后缀操作数次序。"
+      }
+    },
+    {
+      "id": "operand-order",
+      "context": "/root/k400_browser_independent_c",
+      "proposal": {
+        "id": "compiler",
+        "file": "candidate.rcl",
+        "old": "choose(operator == 2, right - left, left * right)",
+        "new": "choose(operator == 2, left - right, left * right)",
+        "diagnosis": "减法操作数顺序反了；按栈中左操作数减右操作数计算，保留加法与乘法分支。"
+      }
+    }
+  ]
+}

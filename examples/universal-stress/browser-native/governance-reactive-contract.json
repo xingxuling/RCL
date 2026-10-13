@@ -1,0 +1,76 @@
+{
+  "format": "rcl.k400-browser-contract.v1",
+  "id": "governance-reactive",
+  "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "examples/universal-stress/genomes/governance-reactive.rcl",
+  "sourceHash": "f960d3bfc7167dd6690ff792d0b2f87c62ea45839d8623d40d28da210cfbfa91",
+  "casesPath": "examples/universal-stress/browser-native/governance-reactive-cases.json",
+  "casesHash": "b0988fe6fd03d6e3cb0390ac417494c43b7bb75af3a1fec859ca9a25a116785e",
+  "definitionFile": "scripts/k400-genomes/governance.mjs",
+  "definitionHash": "3f2c63fdf39f6c3fecd921629c8a8786b937bbabf26b8fd829a9cc041249d7ec",
+  "browserDefinitionFile": "scripts/k400-browser-definitions.mjs",
+  "browserDefinitionHash": "cb85cc3096491e00ff0ad9d4eebbbc881249152c237561f6bf4d014a2cba1724",
+  "compilerPath": "selfhost/compiler.rbc",
+  "compilerHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+  "compilerBinary": {
+    "path": "native/wasi-compiler/rclc.wasm",
+    "sha256": "2fd660dee867b57837af6bcd637d6524290003f8df426d2c6eaef9f511bb624a"
+  },
+  "environments": [
+    "browser"
+  ],
+  "families": [
+    "security-sensitive",
+    "reactive"
+  ],
+  "baseline": {
+    "valid": true,
+    "phase": 0,
+    "audit": 0
+  },
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 5000,
+    "executeP95Ms": 2000
+  },
+  "eligibleCells": [
+    "K077",
+    "K078"
+  ],
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "read only named frozen candidates; no other filesystem, memory, network, tools or writes"
+  },
+  "runtimeControls": [
+    "actual browser compilation and VM execution",
+    "page reload and fresh WASI instances",
+    "typed roots and source-declared transaction continuity"
+  ],
+  "authorityProfile": "actual local Chromium WebAssembly compilation/execution; no Node-WASI fallback, hosted deployment or whole-family claim",
+  "trials": [
+    {
+      "id": "inspect-warrant",
+      "index": 0,
+      "intent": "The maintainer needs the exact compiler.inspect warrant on source to authorize the candidate; do not change rule requirements or grant unrelated permissions.",
+      "mutatedSourceHash": "7684417939e37682401af985d6624d48ec89f31a03d158143c5996c9351c798b"
+    },
+    {
+      "id": "emit-trigger",
+      "index": 1,
+      "intent": "After candidate authorization sets phase one and accepted true, emission must trigger once and advance the phase to two.",
+      "mutatedSourceHash": "f3ea9607261f1bbed43bbe20d01a1db1b199728aea1b304e346a544a3a63d43c"
+    },
+    {
+      "id": "audit-increment",
+      "index": 2,
+      "intent": "Each successful transaction increments the audit counter by exactly one, while its projected-state invariant must remain satisfied.",
+      "mutatedSourceHash": "814e24afbf256310421420c2184462ea0b6b9065650e9d90b442e706384ade36"
+    }
+  ],
+  "contractRoot": "f0a7af7d639b50dda0ba6e2fd4fc10b31b20b7431123f7b453dd7277bf6e722c"
+}

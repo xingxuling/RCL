@@ -1,12 +1,12 @@
 # K400 Completion Campaign v0.1
 
 **Verdict:** `INCOMPLETE`
-**Current evidence:** `202 PASS / 0 BLOCKED / 198 UNTESTED`
+**Current evidence:** `216 PASS / 0 BLOCKED / 184 UNTESTED`
 **Maturity:** `U3`
-**Report root:** `8327206e8514f1f8d34ca70abc558253ed52145c0099131569a68bc5b01a88fe`
+**Report root:** `644b437444dd2d06a93ff74d851031529f4deade860d0b7696cf000d0ab9d72c`
 **Date:** 2026-10-13
 
-The at-least-200 development milestone is met with 202 verified cells. This does not complete K400 or authorize a language release. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106. The [native job campaign](K400_JOB_CONTEXTS_2026-10-13.md) adds 36 more, reaching 142. The [native phase campaign](K400_NATIVE_PHASES_2026-10-13.md) adds 24 distinct cells, reaching 166. The [RCL expression/media/game campaign](K400_NEW_FAMILIES_2026-10-13.md) adds 36 distinct cells, reaching 202. All 60 new coordinates have complete, independently checked local evidence; no new hosted CI was run.
+The active development goal is completion of all 400 cells. The at-least-200 milestone was met at 202 verified cells. This does not complete K400 or authorize a language release. The [portable expansion campaign](K400_EXPANSION_CAMPAIGN_2026-10-13.md) adds twenty cells over the 24-cell baseline. The [native-core genome campaign](K400_GENOME_CAMPAIGN_2026-10-13.md) adds 27 further distinct coordinates. The [actual execution-context campaign](K400_EXECUTION_CONTEXTS_2026-10-13.md) adds another 35, reaching 106. The [native job campaign](K400_JOB_CONTEXTS_2026-10-13.md) adds 36 more, reaching 142. The [native phase campaign](K400_NATIVE_PHASES_2026-10-13.md) adds 24 distinct cells, reaching 166. The [RCL expression/media/game campaign](K400_NEW_FAMILIES_2026-10-13.md) adds 36 distinct cells, reaching 202. All 60 new coordinates have complete, independently checked local evidence. The [browser-native campaign](K400_BROWSER_NATIVE_2026-10-13.md) adds fourteen further unique cells, reaching 216; 184 remain UNTESTED. No new hosted CI was run.
 
 ## 1. Completion contract
 

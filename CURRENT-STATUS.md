@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 202/400 PASS (50.5%) · 198 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 216/400 PASS (54.0%) · 184 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,15 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-13 browser-native continuation
+
+The full K400 goal remains active. The browser-native campaign adds fourteen
+unique coordinates, reaching **216 PASS / 184 UNTESTED**, U3, INCOMPLETE.
+Twelve frozen profiles use the RCL compiler and C VM inside actual Chromium
+WebAssembly, with twenty rounds, ten sealed inputs and three independent repairs
+per profile. K078 receives an additional native profile without duplicate credit.
+See `docs/K400_BROWSER_NATIVE_2026-10-13.md`.
 
 ## 2026-10-13 portable native execution
 

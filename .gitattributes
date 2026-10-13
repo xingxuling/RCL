@@ -11,6 +11,8 @@ native/linux/rclc binary
 # Runtime receipts bind these manifests byte for byte, including captured CRLF.
 native/wasi/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 native/linux/build-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact licensed upstream bytes recorded by PROVENANCE.json.
+src/vendor/browser-wasi-shim/* -text
 *.png binary
 *.jpg binary
 *.jpeg binary
