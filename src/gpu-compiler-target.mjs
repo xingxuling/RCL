@@ -70,6 +70,9 @@ export async function createGpuCompilerTarget(options={}){
       if(observed.artifactHash!==input.artifactHash||observed.sourceRoot!==input.sourceRoot||observed.compilerSourceHash!==(input.compilerSourceHash??null)
         ||!Number.isInteger(observed.executedInstructions)||observed.executedInstructions<1||observed.executedInstructions>300000000
         ||observed.openclCalls?.clEnqueueNDRangeKernel<observed.batchCount||observed.openclCalls?.clFinish!==observed.openclCalls?.clEnqueueNDRangeKernel)throw err('RCL_GPU_TRACE_BINDING');
+      if(!Array.isArray(observed.deviceOpcodeCounts)||observed.deviceOpcodeCounts.length!==48
+        ||observed.deviceOpcodeCounts.some(n=>!Number.isSafeInteger(n)||n<0)
+        ||observed.deviceOpcodeCounts.reduce((a,b)=>a+b,0)!==observed.executedInstructions)throw err('RCL_GPU_INSTRUCTION_COUNT_BINDING');
       return observed;
     }catch(caught){if(caught.gpuProcessExit){exits.push(caught.gpuProcessExit);connection=null;}throw caught;}
   }

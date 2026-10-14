@@ -16,7 +16,7 @@ the original 50,000 ms compile budget. It is not K179 acceptance evidence.
 The captured baseline identifies its actual kernel; later kernels require their
 own verification and do not inherit this result.
 
-The final candidate kernel
+The first delivered candidate kernel
 `29aa25c68c6d5dd051674c9b41a736cccfbc09704fc81c9b45a3a8cba2a86dc7`
 also completed the full fixed point with the same 101,897,504 instruction count,
 510 execution batches plus one device flatten dispatch, and identical compiler

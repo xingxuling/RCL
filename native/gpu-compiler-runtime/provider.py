@@ -133,6 +133,7 @@ def decode_bytecode(data):
 
 class Runtime:
     def __init__(self):
+        setup_started = time.perf_counter()
         self.context = self.queue = self.program = None
         self.cl = transport.OpenCL()
         self.platform, self.device = transport.select_amd_device(self.cl)
@@ -155,12 +156,14 @@ class Runtime:
             status = self.cl.build_program(self.program, 1, ctypes.byref(self.device), b'-cl-std=CL1.2', None, None)
             if status:
                 reject('RCL_GPU_KERNEL_BUILD:' + self.cl.build_log(self.program, self.device))
+            self.cold_setup_ms = (time.perf_counter()-setup_started)*1000
         except Exception:
             self.close()
             raise
 
     def identity(self):
         return {'device': self.receipt, 'kernelHash': self.kernel_hash, 'processPid': os.getpid(),
+                'coldSetupMs': self.cold_setup_ms,
                 'contextToken': self.token, 'cpuExecutionFallback': False,
                 'executionOwner': 'RCL_OPENCL_RESUMABLE_RBC_COMPILER_VM'}
 
@@ -272,7 +275,7 @@ class Runtime:
             bvalues = allocate(size=VALUE_CAPACITY*ctypes.sizeof(Value))
             bstate, bsvalue = allocate(bytes(len(strings)*4)),allocate(size=len(strings)*4)
             bnvalue, bmachine = allocate(size=max(4,len(numbers)*4)),allocate(bytes(ctypes.sizeof(Machine)))
-            bmeta, bindices, bscratch = allocate(bytes(128*4)),allocate(size=INDEX_CAPACITY*4),allocate(size=VALUE_CAPACITY*4)
+            bmeta, bindices, bscratch = allocate(bytes(128*4)),allocate(size=INDEX_CAPACITY*4),allocate(size=(VALUE_CAPACITY+4096)*4)
             brecords = allocate(size=RECORD_CAPACITY*stride*4)
             vm = kernel('rcl_execute',[bcode,transport.CLInt(len(instructions)),bnum,transport.CLInt(len(numbers)),bstrings,
                 transport.CLInt(len(strings)),btext,transport.CLInt(len(text)),transport.CLInt(source_offset),transport.CLInt(source_length),
@@ -332,6 +335,12 @@ class Runtime:
                 if v.type == 2:
                     return bool(v.number)
                 if v.type == 3:
+                    if v.first < 0:
+                        flat = kernel('rcl_flatten',[bvalues,btext,bindices,bmeta,bscratch,bmachine,transport.CLInt(identifier)])
+                        dispatch(flat)
+                        check_header(header())
+                        value_cache.pop(identifier,None)
+                        v = fields(identifier)
                     if v.first < 0 or v.length < 0 or v.first+v.length > TEXT_CAPACITY:
                         reject('RCL_GPU_RESULT_TEXT_RANGE')
                     return read(btext,v.length,v.first).decode('utf-8',errors='strict')
@@ -346,6 +355,7 @@ class Runtime:
 
             common = {'ok':True,'executedInstructions':h['steps'],'kernelMs':kernel_ms,'elapsedMs':(time.perf_counter()-started)*1000,
                 'batchCount':len(batches),'batches':batches,'sourceRoot':source_root,'artifactHash':artifact_hash,
+                'deviceOpcodeCounts':list(meta[80:128]),
                 'compilerSourceHash':input_hash,'providerCalls':meta[6],'nonce':request['nonce'],'instance':self.instance,
                 'valueArenaLive':meta[2],'valueArenaPeak':meta[3],'valueArenaBump':meta[0],
                 'textArenaUsed':meta[4],'indexArenaUsed':meta[5],'openclCalls':calls,

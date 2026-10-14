@@ -20,13 +20,25 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
+## 2026-10-15 GPU complete compiler optimization, K179 still open
+
+The final public API full generation measures 158,336.406 ms with byte-identical
+297,957-byte output and exactly 101,897,504 original device instructions. Retained
+long Text ropes, private controls, generic load dispatch and separate deep
+comparison scratch improve the runtime. Device count bindings, nine invalid or
+underflow decimal inputs, capacity bounds, long Unicode Text, nested Sequence
+equality and lifecycle checks pass. The original 50,000 ms budget is still failed;
+twenty generations, sealed cases and fresh repair acquisition remain unadmitted.
+K400 stays 399/400, INCOMPLETE, U3. See
+`docs/K400_GPU_SELFHOST_OPTIMIZATION_2026-10-15.md`.
+
 ## 2026-10-15 GPU complete compiler candidate, K179 still open
 
 `createGpuCompilerTarget` runs the actual supplied full compiler and programs on
 a separate resumable AMD FP64 OpenCL VM, with immutable input snapshots and no
 CPU execution fallback. One complete diagnostic generation emitted the original
 297,957-byte compiler exactly after 101,897,504 device instructions. The measured
-219-second final candidate exceeds the original 50-second budget. Focused API checks
+earlier 219-second candidate exceeds the original 50-second budget. Focused API checks
 cover device values/bytes/SHA256, Unicode, transactions, rejection and recovery;
 they do not replace twenty generations, sealed programs or fresh AI trials.
 K179 stays UNTESTED, K400 stays 399/400, and version promotion stays frozen.
