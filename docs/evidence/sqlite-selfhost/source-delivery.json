@@ -1,0 +1,100 @@
+{
+  "format": "rcl.sqlite-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_API_AND_ADMISSION",
+  "tree": "431d6a628bd721f9bca4eaa3beba7ad395873cde",
+  "commands": [
+    {
+      "id": "public-api",
+      "args": [
+        "--test",
+        "tests/sqlite-compiler.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\sqlite-source-public-api.log",
+      "sha256": "3a3ba9eadffa553932f042aee539ac63e89b1fd8eca3a6ef510b213a631f97c2"
+    },
+    {
+      "id": "admission",
+      "args": [
+        "scripts/k400-selfhost-sqlite-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\sqlite-source-admission.log",
+      "sha256": "ae00cf5cb67f601798e313e4688d644f7572cf470d421aad72df42926993fbc3"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\sqlite-source-doctor.log",
+      "sha256": "161212619b4ce177c6e5649c13d12ec7d87f44f28a1e940c768fe2e48a5a1837"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/sqlite-compiler-target.mjs",
+      "sha256": "03e65d9fcf803aaf4e04dd25aafd74fd6279f1af8d9ee864b4b6b7f9be504b8c"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "0847e38dcfdc55bbb82f4d63c0392804806f30ce9a4556627a5141b3f8bb476e"
+    },
+    {
+      "path": "package.json",
+      "sha256": "fd03b6248228b37117fd7b1b3de566b920dc1452d5c088c5cc54a76bd90695a8"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "69f64c469ad2515d834b1f049c1d915f25111482d144709c4a50f40dce539701"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-sqlite.mjs",
+      "sha256": "6d68b55d28d84addb99a3cb0b4b5b03fe9d53c2f86c2ea7c829a9a43a55932d6"
+    },
+    {
+      "path": "scripts/k400-selfhost-sqlite-admission.mjs",
+      "sha256": "01dc18d8f75756efabf777003229085f49b8d946acbb446d19bc4bf6c38dd103"
+    },
+    {
+      "path": "scripts/k400-selfhost-sqlite-definitions.mjs",
+      "sha256": "72b7a68d51a364439806f2080d6f66516818b7399742945ac691b010cba60799"
+    },
+    {
+      "path": "scripts/k400-selfhost-sqlite-engine.mjs",
+      "sha256": "3cae637f529a2c939f05a8255c6d2dc966366d83cb95f42e71d4fd7d56c61be8"
+    },
+    {
+      "path": "scripts/k400-selfhost-sqlite-target.mjs",
+      "sha256": "62d3b17f8728d719620810cc75e9c138a92e2093537175b30e3f9f8dc026a58e"
+    },
+    {
+      "path": "scripts/k400-selfhost-sqlite-transport.mjs",
+      "sha256": "4c2580292ba638b16609003a653976a2ae787ea64b2ef5419f389f7f7a1ab864"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-sqlite-proposals.mjs",
+      "sha256": "c8aa586bc6c624fb4ee70d11f94a2a5fa1833ee4d38de0668cead8fe24b2f9c5"
+    },
+    {
+      "path": "scripts/probe-sqlite-selfhost-compiler.mjs",
+      "sha256": "357b447ae8faa462ec240f466324556cbd39e991eb92b455ccbb0ebe9b4fa4c2"
+    },
+    {
+      "path": "tests/sqlite-compiler.test.mjs",
+      "sha256": "dddc38cfe8cd1e977299e93d8647740bc806cc0243916612ba69351b7a1bd2b8"
+    },
+    {
+      "path": "tests/k400-selfhost-sqlite-admission.test.mjs",
+      "sha256": "196bce4c2631c281c8bd81937868f01eb25e39429a13c4e89e3d027885e5db53"
+    }
+  ],
+  "k159IndexRoot": "4164c31067674056d196cc0098a8a12024ace1e5362f5cf487636625c5e7db92",
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Its public API actually self-compiles supplied generations, executes a native program and verifies successful/rejected process exits. The captured K159 admission verifies unchanged. Existing native code/binaries are unchanged and are not rebuilt or credited again. This is not a fresh entire K400 acquisition, independent OS isolation, cloud deployment or hosted CI."
+}

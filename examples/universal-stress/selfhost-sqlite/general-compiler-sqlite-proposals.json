@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-selfhost-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "189e95c22cc872a3e2dcc2b8354decbe11d0e0a0c2da2793ba8e19c2579af70c",
+  "acquisitionBatch": "examples/universal-stress/selfhost-sqlite/independent-batch.json",
+  "trials": [
+    {
+      "id": "addition-opcode",
+      "context": "/root/k400_sqlite_selfhost_fresh_a",
+      "proposal": {
+        "id": "general-compiler-sqlite-0",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"+\", 7,",
+        "new": "choose(operator == \"+\", 6,"
+      }
+    },
+    {
+      "id": "less-equal-opcode",
+      "context": "/root/k400_sqlite_selfhost_fresh_b",
+      "proposal": {
+        "id": "general-compiler-sqlite-1",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"<=\", 12,",
+        "new": "choose(operator == \"<=\", 13,"
+      }
+    },
+    {
+      "id": "greater-equal-opcode",
+      "context": "/root/k400_sqlite_selfhost_fresh_c",
+      "proposal": {
+        "id": "general-compiler-sqlite-2",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \">=\", 14, 44)",
+        "new": "choose(operator == \">=\", 15, 44)"
+      }
+    }
+  ]
+}

@@ -83,3 +83,4 @@ export { createNativeUiWebBridge, emitNativeUiBridgeHtml } from './ui/native-web
 export { emitNativeUiAndroidBridge } from './ui/native-android-bridge.mjs';
 export { createNativeAndroidDriver, parseAndroidHierarchy } from './ui/native-android-driver.mjs';
 export { createColdCompilerHttpTarget } from './cold-compiler-http-target.mjs';
+export { createSqliteCompilerTarget } from './sqlite-compiler-target.mjs';

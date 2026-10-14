@@ -23,6 +23,13 @@ instance reuse. DWAC's actual local four-mode router chose `DEEP_DEVELOPMENT`
 for this evidence-rich bottleneck. Its [receipt](evidence/cold-selfhost/dwac-mode.json)
 is advisory. Laya abstained on prioritization; it supplied no authorization.
 
+Provenance correction: adapter preparation renamed the donor path text in the
+first header of the frozen K139 engine/admission. Their hashes actually identify
+`scripts/k400-selfhost-http-engine.mjs` (`3fd8f2fcf75f60db52b02f0464697e29d7193d2d5f9ed15312a910dff58a44bf`)
+and `scripts/k400-selfhost-http-admission.mjs` (`c2e410049d0af660f3d9fba5ede906a709c8f5ecf329a8f9870d59668fedc1b1`).
+The frozen source bytes and acquisition bindings remain intact; this correction
+does not rewrite or reacquire their runtime evidence.
+
 ## Frozen acceptance
 
 The [contract](../examples/universal-stress/selfhost-serverless/general-compiler-serverless-contract.json)

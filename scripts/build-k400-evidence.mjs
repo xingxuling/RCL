@@ -67,6 +67,7 @@ import { verifySelfhostProfile as verifyAndroidSelfhostProfile } from './k400-se
 import { verifySelfhostProfile as verifyEmbeddedSelfhostProfile } from './k400-selfhost-embedded-admission.mjs';
 import { verifySelfhostProfile as verifyHttpSelfhostProfile } from './k400-selfhost-http-admission.mjs';
 import { verifySelfhostProfile as verifyServerlessSelfhostProfile } from './k400-selfhost-serverless-admission.mjs';
+import { verifySelfhostProfile as verifySqliteSelfhostProfile } from './k400-selfhost-sqlite-admission.mjs';
 import { verifyUiProfile as verifyGpuUiProfile } from './k400-gpu-ui-engine.mjs';
 import { verifyUiProfile as verifyGpuMobileProfile } from './k400-gpu-mobile-engine.mjs';
 
@@ -1292,6 +1293,14 @@ if(serverlessSelfhostAdmission.admitted){
     evidence.claims.push(claim);
   }
   evidence.sourceReceipts.push('examples/universal-stress/selfhost-serverless/general-compiler-serverless-runtime.json');
+}
+const sqliteSelfhostAdmission=await verifySqliteSelfhostProfile();
+if(sqliteSelfhostAdmission.admitted){
+  for(const claim of sqliteSelfhostAdmission.claims){
+    if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_SQLITE_SELFHOST_COORDINATE_DUPLICATED:'+claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/selfhost-sqlite/general-compiler-sqlite-runtime.json');
 }
 for(const [directory,verifyProfile] of [['gpu-ui',verifyGpuUiProfile],['gpu-mobile',verifyGpuMobileProfile]]){
   const admission=await verifyProfile();if(!admission.admitted)continue;
