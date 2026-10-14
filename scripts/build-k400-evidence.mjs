@@ -63,6 +63,9 @@ import { verifyFamilyProfile as verifyCompilerProfile } from './k400-compiler-en
 import { MOBILE_PROFILE, MOBILE_DIRECTORY } from './k400-mobile-definitions.mjs';
 import { verifyUiProfile as verifyMobileProfile } from './k400-mobile-engine.mjs';
 import { verifySelfhostProfile } from './k400-selfhost-column-admission.mjs';
+import { verifySelfhostProfile as verifyAndroidSelfhostProfile } from './k400-selfhost-android-admission.mjs';
+import { verifySelfhostProfile as verifyEmbeddedSelfhostProfile } from './k400-selfhost-embedded-admission.mjs';
+import { verifySelfhostProfile as verifyHttpSelfhostProfile } from './k400-selfhost-http-admission.mjs';
 import { verifyUiProfile as verifyGpuUiProfile } from './k400-gpu-ui-engine.mjs';
 import { verifyUiProfile as verifyGpuMobileProfile } from './k400-gpu-mobile-engine.mjs';
 
@@ -1256,6 +1259,30 @@ if (selfhostAdmission.admitted) {
     evidence.claims.push(claim);
   }
   evidence.sourceReceipts.push('examples/universal-stress/selfhost-columns/general-compiler-columns-runtime.json');
+}
+const androidSelfhostAdmission=await verifyAndroidSelfhostProfile();
+if(androidSelfhostAdmission.admitted){
+  for(const claim of androidSelfhostAdmission.claims){
+    if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_ANDROID_SELFHOST_COORDINATE_DUPLICATED:'+claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/selfhost-android/general-compiler-android-runtime.json');
+}
+const embeddedSelfhostAdmission=await verifyEmbeddedSelfhostProfile();
+if(embeddedSelfhostAdmission.admitted){
+  for(const claim of embeddedSelfhostAdmission.claims){
+    if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_EMBEDDED_SELFHOST_COORDINATE_DUPLICATED:'+claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json');
+}
+const httpSelfhostAdmission=await verifyHttpSelfhostProfile();
+if(httpSelfhostAdmission.admitted){
+  for(const claim of httpSelfhostAdmission.claims){
+    if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_HTTP_SELFHOST_COORDINATE_DUPLICATED:'+claim.id);
+    evidence.claims.push(claim);
+  }
+  evidence.sourceReceipts.push('examples/universal-stress/selfhost-http/general-compiler-http-runtime.json');
 }
 for(const [directory,verifyProfile] of [['gpu-ui',verifyGpuUiProfile],['gpu-mobile',verifyGpuMobileProfile]]){
   const admission=await verifyProfile();if(!admission.admitted)continue;

@@ -4,6 +4,8 @@ export { createNativeRealitySession } from './native-session.mjs';
 export { createPortableNativeTarget } from './portable-native-vm.mjs';
 export { createPortableHttpTarget } from './portable-http-target.mjs';
 export { createPortableEmbeddedTarget } from './portable-embedded-target.mjs';
+export { createResidentSequenceCompiler } from './resident-sequence-compiler.mjs';
+export { createResidentCompilerHttpTarget } from './resident-compiler-http-target.mjs';
 export { createPortableReplicaTarget } from './portable-replica-target.mjs';
 export { createExecutionContextTarget } from './execution-context-targets.mjs';
 export { createPortableServerlessTarget } from './portable-serverless-target.mjs';

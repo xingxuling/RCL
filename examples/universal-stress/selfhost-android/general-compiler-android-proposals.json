@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-selfhost-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "1456553e4b379f4a23f52c8917928b68604c48b940a8c3a7217fd8fcc6c878ac",
+  "acquisitionBatch": "examples/universal-stress/selfhost-android/independent-batch.json",
+  "trials": [
+    {
+      "id": "addition-opcode",
+      "context": "/root/k400_android_selfhost_fresh_a",
+      "proposal": {
+        "id": "general-compiler-android-0",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"+\", 7,",
+        "new": "choose(operator == \"+\", 6,"
+      }
+    },
+    {
+      "id": "less-equal-opcode",
+      "context": "/root/k400_android_selfhost_fresh_b",
+      "proposal": {
+        "id": "general-compiler-android-1",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"<=\", 12,",
+        "new": "choose(operator == \"<=\", 13,"
+      }
+    },
+    {
+      "id": "greater-equal-opcode",
+      "context": "/root/k400_android_selfhost_fresh_c",
+      "proposal": {
+        "id": "general-compiler-android-2",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \">=\", 14, 44)",
+        "new": "choose(operator == \">=\", 15, 44)"
+      }
+    }
+  ]
+}

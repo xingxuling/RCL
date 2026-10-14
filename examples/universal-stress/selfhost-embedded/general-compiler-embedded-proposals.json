@@ -1,0 +1,41 @@
+{
+  "format": "rcl.k400-independent-selfhost-proposals.v1",
+  "canonicalSourceProvided": false,
+  "oracleEditsProvided": false,
+  "holdoutTestsProvided": false,
+  "osIsolationClaimed": false,
+  "contractRoot": "cb29bfcae89f39f4bad9d47c39dbbe93718275839eeedd30ee45162bbb2927aa",
+  "acquisitionBatch": "examples/universal-stress/selfhost-embedded/independent-batch.json",
+  "trials": [
+    {
+      "id": "addition-opcode",
+      "context": "/root/k400_embedded_selfhost_fresh_a",
+      "proposal": {
+        "id": "general-compiler-embedded-0",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"+\", 7,",
+        "new": "choose(operator == \"+\", 6,"
+      }
+    },
+    {
+      "id": "less-equal-opcode",
+      "context": "/root/k400_embedded_selfhost_fresh_b",
+      "proposal": {
+        "id": "general-compiler-embedded-1",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \"<=\", 12,",
+        "new": "choose(operator == \"<=\", 13,"
+      }
+    },
+    {
+      "id": "greater-equal-opcode",
+      "context": "/root/k400_embedded_selfhost_fresh_c",
+      "proposal": {
+        "id": "general-compiler-embedded-2",
+        "file": "candidate.rcl",
+        "old": "choose(operator == \">=\", 14, 44)",
+        "new": "choose(operator == \">=\", 15, 44)"
+      }
+    }
+  ]
+}

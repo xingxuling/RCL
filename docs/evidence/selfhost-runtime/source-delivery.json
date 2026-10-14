@@ -1,0 +1,99 @@
+{
+  "format": "rcl.selfhost-runtime-source-delivery.v1",
+  "status": "PASS_SOURCE_ONLY_REPLAY",
+  "snapshot": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\k4-sr-98df5ddf",
+  "commands": [
+    {
+      "id": "resident-native-build",
+      "execution": "CAPTURED_PREVIOUS_SOURCE_PHASE_NOT_RERUN",
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\resident-native-build.log",
+      "sha256": "901eddbab784f790fbf0141eac6bc72ceee691f3b2b53bb6f5eb69f470c6ca18"
+    },
+    {
+      "id": "rebuilt-runtime-tests",
+      "execution": "CAPTURED_PREVIOUS_SOURCE_PHASE_NOT_RERUN",
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\rebuilt-runtime-tests.log",
+      "sha256": "460414c5a679caad490a035a9f69b7b8de9091ba9b482182a0bc1b5f5aed2e61"
+    },
+    {
+      "id": "focused-tests",
+      "execution": "CAPTURED_PREVIOUS_SOURCE_PHASE_NOT_RERUN",
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\focused-tests.log",
+      "sha256": "6285d30977a3ad08651af3ba497b2133ccda27f5e9db2d60fb997dd8e51e3a0b"
+    },
+    {
+      "id": "k400-evidence",
+      "args": [
+        "scripts/build-k400-evidence.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\k400-evidence.log",
+      "sha256": "39e9da402ee4aa35a867a7d881df0fd8f4ffb4009522f231ed3c1ebe69927f4c"
+    },
+    {
+      "id": "k400-report",
+      "args": [
+        "scripts/universal-program-stress-report.mjs",
+        "examples/universal-stress/k400-current-evidence.json",
+        "output/universal-stress-selfhost-source"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\k400-report.log",
+      "sha256": "d1ad9a3d232cbb3e0e6c232cbafef1c1110a77b1ffa393f69c37d8fb608e6e74"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\selfhost-runtime-source-verification\\doctor.log",
+      "sha256": "9f159217dca8de1dbdc53e3409281b985194cb58c475f99589cf901a38b803d2"
+    }
+  ],
+  "resumedAfterTests": true,
+  "capturedBinarySha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+  "rebuildIdentity": {
+    "capturedRawSha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+    "rebuiltRawSha256": "8a9c07f307aaf80d364f14097321c69e5486b09144469da5ffc22646a33f7a1e",
+    "rawByteIdentical": false,
+    "normalizedSha256": "8c674120ce7541caeb55c5a573c3af2b8463b482e4a52d3b11397bd419e4baca",
+    "excludedMetadataFields": [
+      {
+        "kind": "COFF_TimeDateStamp",
+        "offset": 128,
+        "length": 4
+      },
+      {
+        "kind": "DEBUG_TimeDateStamp",
+        "offset": 331268,
+        "length": 4
+      },
+      {
+        "kind": "CODEVIEW_PDB_GUID",
+        "offset": 331324,
+        "length": 16
+      },
+      {
+        "kind": "DEBUG_TimeDateStamp",
+        "offset": 331296,
+        "length": 4
+      }
+    ],
+    "scope": "Only parsed PE COFF/debug timestamps and CodeView PDB GUID differ. Every other byte is checked. Raw historical binary admission bindings remain unchanged; this is not raw-byte reproducibility."
+  },
+  "rebuiltRuntimeTests": 2,
+  "freshBuildReceiptSha256": "b584b1791bc364e57862db6c02d8a6935766105aa445848d38ce1c310c28d6ec",
+  "capturedBinaryAndBuildReceiptRestoredForHistoricalAdmission": true,
+  "focusedTests": 40,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "doctorOk": true,
+  "k400Passed": 370,
+  "k400Untested": 30,
+  "k400Verdict": "INCOMPLETE",
+  "reportRoot": "470bbee52a47a2583877bd57b89e62a3586cb8c07c0bbda7f3e872dea676954e",
+  "scope": "Materialized Git sources reproduce every native code/data and non-build-identity byte; parsed PE timestamp/PDB GUID differences are retained explicitly, so raw binary reproducibility is not claimed. The rebuilt artifact passes two actual C ABI/HTTP runtime tests, then the original captured binary/build metadata is restored for forty source-bound runtime/admission checks. Successful prior phases are retained on resume without rerunning or reattributing them. Existing matrix receipts independently reverify. External pinned Zig and frozen browser bundle remain local prerequisites. Android is not freshly reacquired; no additional device, visual-pixel, independent OS or hosted CI claim."
+}

@@ -561,7 +561,7 @@
       "additionalProfiles": [
         {
           "id": "ui:governed-counter",
-          "reportRoot": "81cc003d5a30ee30810da89bbc3c749f444f4470fbcae867b32286966af5a110",
+          "reportRoot": "8514487df533e1ecfbd7fba52588927b8e4dcd377022683213f70ddcc754cb65",
           "scope": "Actual target-backed browser GUI and loopback Web vertical slice; existing UI IR lowered into native RCL event/derived/render semantics, cooperative in-memory state and authenticated/stale-root transport; desktop/mobile-sized browser rendering, no native OS widget, mobile-family, public hosting or whole-UI-language claim",
           "lastVerifiedDate": "2026-10-13",
           "coverageMode": "native-semantic",
@@ -742,7 +742,7 @@
       "additionalProfiles": [
         {
           "id": "browser:governance-reactive",
-          "reportRoot": "5f5a6ab38e727b591c88abe3c1691a27044e8fdd71b130ed6c2a1b56f5525884",
+          "reportRoot": "05f1807475830f948cbdedd5a60f67892edb89d0cbb9ac9f393721731f0a0cde",
           "scope": "bounded source-declared warrants, two guarded transactions, invariants, witnesses and state-triggered rule order; no operating-system security or external key custody claim; RCL-owned compilation and C VM execution inside actual headless Chromium WebAssembly; no Node-WASI fallback, mobile UI, hosted deployment or whole-family claim",
           "lastVerifiedDate": "2026-10-13",
           "coverageMode": "native-semantic",
@@ -1155,7 +1155,7 @@
       "additionalProfiles": [
         {
           "id": "ui:governed-counter",
-          "reportRoot": "81cc003d5a30ee30810da89bbc3c749f444f4470fbcae867b32286966af5a110",
+          "reportRoot": "8514487df533e1ecfbd7fba52588927b8e4dcd377022683213f70ddcc754cb65",
           "scope": "Actual target-backed browser GUI and loopback Web vertical slice; existing UI IR lowered into native RCL event/derived/render semantics, cooperative in-memory state and authenticated/stale-root transport; desktop/mobile-sized browser rendering, no native OS widget, mobile-family, public hosting or whole-UI-language claim",
           "lastVerifiedDate": "2026-10-13",
           "coverageMode": "native-semantic",
@@ -3201,7 +3201,7 @@
       "additionalProfiles": [
         {
           "id": "ui:governed-counter",
-          "reportRoot": "81cc003d5a30ee30810da89bbc3c749f444f4470fbcae867b32286966af5a110",
+          "reportRoot": "8514487df533e1ecfbd7fba52588927b8e4dcd377022683213f70ddcc754cb65",
           "scope": "Actual target-backed browser GUI and loopback Web vertical slice; existing UI IR lowered into native RCL event/derived/render semantics, cooperative in-memory state and authenticated/stale-root transport; desktop/mobile-sized browser rendering, no native OS widget, mobile-family, public hosting or whole-UI-language claim",
           "lastVerifiedDate": "2026-10-13",
           "coverageMode": "native-semantic",
@@ -3959,7 +3959,7 @@
       "additionalProfiles": [
         {
           "id": "ui:governed-counter",
-          "reportRoot": "81cc003d5a30ee30810da89bbc3c749f444f4470fbcae867b32286966af5a110",
+          "reportRoot": "8514487df533e1ecfbd7fba52588927b8e4dcd377022683213f70ddcc754cb65",
           "scope": "Actual target-backed browser GUI and loopback Web vertical slice; existing UI IR lowered into native RCL event/derived/render semantics, cooperative in-memory state and authenticated/stale-root transport; desktop/mobile-sized browser rendering, no native OS widget, mobile-family, public hosting or whole-UI-language claim",
           "lastVerifiedDate": "2026-10-13",
           "coverageMode": "native-semantic",
@@ -54038,6 +54038,636 @@
       }
     },
     {
+      "id": "android::self-hosting",
+      "environment": "android",
+      "programFamily": "self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-14",
+      "changes": [],
+      "knownLimits": [
+        "Complete RCL-authored native-core general compiler executing on actual Android API35 x86_64 native Linux ABI processes in a dedicated read-only emulator; twenty C0-to-C20 byte-identical self-compilation generations, ten sealed native source programs and three unchanged fresh independent compiler repairs. Uses the pinned separate generic persistent Sequence runtime and UTF-16 source-column variant; no host compilation/execution fallback, physical-device or UI/pixel/whole-runtime self-hosting/whole-language release claim."
+      ],
+      "requiredGenes": [
+        "rcl-general-compiler",
+        "generic-persistent-sequence",
+        "utf16-source-column-identity",
+        "actual-c0-c20-self-compilation",
+        "sealed-program-byte-and-state-oracles",
+        "fresh-independent-compiler-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-proposals.json",
+            "examples/universal-stress/selfhost-android/independent-batch.json",
+            "examples/universal-stress/selfhost-android/general-compiler-android-android-runtime.json",
+            "scripts/k400-selfhost-android-admission.mjs",
+            "scripts/k400-selfhost-android-engine.mjs",
+            "scripts/k400-selfhost-android-target.mjs",
+            "scripts/k400-selfhost-android-transport.mjs",
+            "scripts/k400-selfhost-android-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        }
+      }
+    },
+    {
+      "id": "embedded-runtime::self-hosting",
+      "environment": "embedded-runtime",
+      "programFamily": "self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-14",
+      "changes": [],
+      "knownLimits": [
+        "Complete RCL-authored native-core compiler in a caller-owned resident native C ABI instance. Twenty byte-identical C0-to-C20 self-compilation generations reuse one live compiler instance; ten sealed programs run through actual caller-owned native C ABI VM instances, and three unchanged fresh independent repairs are replayed. Explicit rejection, reset, recovery and clean native exit checks; no JS compiler/execution fallback, microcontroller, hardware embedding or whole-language release claim."
+      ],
+      "requiredGenes": [
+        "rcl-general-compiler",
+        "generic-persistent-sequence",
+        "utf16-source-column-identity",
+        "actual-c0-c20-self-compilation",
+        "sealed-program-byte-and-state-oracles",
+        "fresh-independent-compiler-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-proposals.json",
+            "examples/universal-stress/selfhost-embedded/independent-batch.json",
+            "examples/universal-stress/selfhost-embedded/general-compiler-embedded-embedded-runtime-runtime.json",
+            "scripts/k400-selfhost-embedded-admission.mjs",
+            "scripts/k400-selfhost-embedded-engine.mjs",
+            "scripts/k400-selfhost-embedded-target.mjs",
+            "scripts/k400-selfhost-embedded-transport.mjs",
+            "scripts/k400-selfhost-embedded-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        }
+      }
+    },
+    {
+      "id": "server::self-hosting",
+      "environment": "server",
+      "programFamily": "self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-14",
+      "changes": [],
+      "knownLimits": [
+        "Complete native-core RCL compiler behind a separate authenticated loopback HTTP worker. Twenty byte-identical C0-to-C20 generations supply the preceding compiler artifact and reuse one actual resident native compiler C ABI instance; ten sealed programs execute in actual native VM processes. Three unchanged fresh independent compiler repairs, rejected unauthorized requests, malformed/corrupt recovery, fresh native program processes and clean worker/compiler exits; no JS compiler/execution fallback, public hosting, distributed runtime, security sandbox or whole-language release claim."
+      ],
+      "requiredGenes": [
+        "rcl-general-compiler",
+        "generic-persistent-sequence",
+        "utf16-source-column-identity",
+        "actual-c0-c20-self-compilation",
+        "sealed-program-byte-and-state-oracles",
+        "fresh-independent-compiler-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-contract.json",
+            "selfhost/variants/utf16-columns/compiler.rcl",
+            "selfhost/variants/utf16-columns/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "examples/universal-stress/selfhost-native/runtime-builds.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-proposals.json",
+            "examples/universal-stress/selfhost-http/independent-batch.json",
+            "examples/universal-stress/selfhost-http/general-compiler-http-server-runtime.json",
+            "scripts/k400-selfhost-http-admission.mjs",
+            "scripts/k400-selfhost-http-engine.mjs",
+            "scripts/k400-selfhost-http-target.mjs",
+            "scripts/k400-selfhost-http-transport.mjs",
+            "scripts/k400-selfhost-http-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        }
+      }
+    },
+    {
       "id": "gpu::gui",
       "environment": "gpu",
       "programFamily": "gui",
@@ -54877,6 +55507,9 @@
     "examples/universal-stress/compiler-pipeline/game-runtime.json",
     "examples/universal-stress/compiler-pipeline/replicated-counter-runtime.json",
     "examples/universal-stress/selfhost-columns/general-compiler-columns-runtime.json",
+    "examples/universal-stress/selfhost-android/general-compiler-android-runtime.json",
+    "examples/universal-stress/selfhost-embedded/general-compiler-embedded-runtime.json",
+    "examples/universal-stress/selfhost-http/general-compiler-http-runtime.json",
     "examples/universal-stress/gpu-ui/gpu-text-counter-runtime.json",
     "examples/universal-stress/gpu-mobile/gpu-text-counter-runtime.json"
   ],

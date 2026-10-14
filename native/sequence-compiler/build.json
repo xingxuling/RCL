@@ -1,0 +1,70 @@
+{
+  "format": "rcl.resident-sequence-compiler-build.v1",
+  "status": "BUILT_CANDIDATE_RUNTIME_REPLAY_PENDING",
+  "sourceBindings": [
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+    },
+    {
+      "path": "native/rclvm.h",
+      "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+    },
+    {
+      "path": "native/semantic_state_v2.h",
+      "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+    },
+    {
+      "path": "native/sequence-runtime/concat-case.c",
+      "sha256": "4ba235c9d16606ef023345af2e878afc5f32f4cfc2357863743378c460ffdf4c"
+    },
+    {
+      "path": "native/sequence-compiler/compiler-daemon.c",
+      "sha256": "8f8bdc76f6c1b440eb3a3357086c809ea6d314f2eb6db243f09bac566d00c013"
+    },
+    {
+      "path": "scripts/build-resident-sequence-compiler.mjs",
+      "sha256": "599a8f89b19a9a2ac544c954fa4bcc672a7e036072b53c898129ee4a4f62e0a4"
+    }
+  ],
+  "generatedVmSourceHash": "594831e31a2e637d8033133f5e27a37f69f7cd23f0f912ea38f19591ebb67282",
+  "toolchain": {
+    "path": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\_tools\\zig-x86_64-windows-0.16.0\\zig.exe",
+    "version": "0.16.0",
+    "sha256": "086ce9d47ba42f33a514e1a6e04eb1d4a8fa1d75e0868e0213caad447c91e864"
+  },
+  "command": {
+    "args": [
+      "cc",
+      "-target",
+      "x86_64-windows-gnu",
+      "-O3",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-DRCLVM_EMBEDDED_ONLY",
+      "-I",
+      "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native",
+      "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\resident-compiler-build\\rclvm.c",
+      "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native\\sequence-compiler\\compiler-daemon.c",
+      "-o",
+      "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\native\\sequence-compiler\\rclcd.exe",
+      "-lbcrypt",
+      "-lm"
+    ],
+    "status": 0,
+    "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrHash": "1a5660c0768291a54da79323a1d0d145f39f49e4097ffdee0024a412a8380317"
+  },
+  "artifact": {
+    "path": "native/sequence-compiler/rclcd.exe",
+    "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+    "bytes": 341504
+  },
+  "scope": "Separate generic resident compiler C ABI using the existing RCL general compiler input/output contract and persistent Sequence VM overlay; original native, compiler and K400 anchors preserved. No coordinate admission from a build alone."
+}

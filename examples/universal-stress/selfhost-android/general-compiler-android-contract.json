@@ -1,0 +1,85 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-android",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-android-definitions.mjs",
+  "definitionHash": "e3a0eac1464a5d52bfa7563c7cd011eb146833a1cd2e889d9d1120b2e6018583",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "android",
+      "vm": {
+        "path": "native/sequence-runtime/portable/linux/rclvm",
+        "sha256": "38a5591e0574b4987caa791136194ebea4bcb3451427ad970eeec1fb913d6a07",
+        "bytes": 1817632
+      },
+      "compiler": {
+        "path": "native/sequence-runtime/portable/linux/rclc",
+        "sha256": "b24fd9928477ab6a3ed579bd9cfca2db353d746476060bff7cd76d8a165f7033",
+        "bytes": 1841776
+      }
+    }
+  ],
+  "environments": [
+    "android"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K099"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete RCL-authored native-core general compiler executing on actual Android API35 x86_64 native Linux ABI processes in a dedicated read-only emulator; twenty C0-to-C20 byte-identical self-compilation generations, ten sealed native source programs and three unchanged fresh independent compiler repairs. Uses the pinned separate generic persistent Sequence runtime and UTF-16 source-column variant; no host compilation/execution fallback, physical-device or UI/pixel/whole-runtime self-hosting/whole-language release claim.",
+  "contractRoot": "1456553e4b379f4a23f52c8917928b68604c48b940a8c3a7217fd8fcc6c878ac",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "deviceSerial": "emulator-5556",
+  "devicePolicy": {
+    "serial": "emulator-5556",
+    "api": "35",
+    "abi": "x86_64",
+    "arch": "x86_64",
+    "fingerprint": "Android/sdk_slim_x86_64/emu64x:15/AE3A.240806.019/12368160:userdebug/test-keys",
+    "emulator": true
+  },
+  "frozenAt": "2026-10-13T23:02:16.075Z"
+}

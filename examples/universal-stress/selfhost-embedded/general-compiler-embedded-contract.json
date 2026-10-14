@@ -1,0 +1,81 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-embedded",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-embedded-definitions.mjs",
+  "definitionHash": "9c03a3f2655e62a5c25f20b5fd577c5679961e89944c073b2e0a87896ca1e2ee",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "embedded-runtime",
+      "vm": {
+        "path": "native/rclvmd.exe",
+        "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+        "bytes": 337408
+      },
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      }
+    }
+  ],
+  "environments": [
+    "embedded-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K299"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete RCL-authored native-core compiler in a caller-owned resident native C ABI instance. Twenty byte-identical C0-to-C20 self-compilation generations reuse one live compiler instance; ten sealed programs run through actual caller-owned native C ABI VM instances, and three unchanged fresh independent repairs are replayed. Explicit rejection, reset, recovery and clean native exit checks; no JS compiler/execution fallback, microcontroller, hardware embedding or whole-language release claim.",
+  "contractRoot": "cb29bfcae89f39f4bad9d47c39dbbe93718275839eeedd30ee45162bbb2927aa",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "frozenAt": "2026-10-14T09:24:46.331Z",
+  "runtimeControls": [
+    "twenty generations reuse one actual caller-owned resident compiler C ABI instance",
+    "ten actual native C ABI program executions",
+    "malformed source and corrupt compiler rejection, healthy full self-compilation recovery, same native program instance reset, and clean observed native exits"
+  ]
+}
