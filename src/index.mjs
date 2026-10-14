@@ -91,3 +91,4 @@ export { createApplicationCompilerTarget, COMPILER_METRIC_FEATURES } from './app
 export { createRncsCompilerTarget } from './rncs-compiler-target.mjs';
 export { createGameCompilerTarget, GAME_COMPILER_METRIC } from './game-compiler-target.mjs';
 export { createRealtimeCompilerTarget } from './realtime-compiler-target.mjs';
+export { createGpuCompilerTarget } from './gpu-compiler-target.mjs';

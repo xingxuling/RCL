@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\User\.codex\.chatgpt-projects\g-p-6a437af98cc08191af8185180f66b55e\work\RCL-v2-development\output\gpu-compiler-bench.py", line 18, in <module>
+    result=runtime.execute({'bytecode':base64.b64encode(compiler).decode('ascii'),'artifactHash':hashlib.sha256(compiler).hexdigest(),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\.codex\.chatgpt-projects\g-p-6a437af98cc08191af8185180f66b55e\work\RCL-v2-development\native\gpu-compiler-runtime\provider.py", line 283, in execute
+    dispatch(vm)
+  File "C:\Users\User\.codex\.chatgpt-projects\g-p-6a437af98cc08191af8185180f66b55e\work\RCL-v2-development\native\gpu-compiler-runtime\provider.py", line 246, in dispatch
+    transport.check(self.cl.enqueue_kernel(self.queue,handle,1,None,size,None,0,None,None),'clEnqueueNDRangeKernel')
+  File "C:\Users\User\.codex\.chatgpt-projects\g-p-6a437af98cc08191af8185180f66b55e\work\RCL-v2-development\native\tensor-engine\amd_opencl_bf16_provider.py", line 98, in check
+    raise fail(
+rcl_gpu_compiler_transport.ProviderError: clEnqueueNDRangeKernel returned OpenCL error -5

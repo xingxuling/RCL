@@ -1,0 +1,62 @@
+/* Generic retained device values and resumable RBC state. No host evaluator. */
+#define VALUE_CAPACITY 2097152
+#define TEXT_CAPACITY 67108864
+#define INDEX_CAPACITY 33554432
+#define STACK_CAPACITY 131072
+#define FRAME_CAPACITY 32768
+#define WARRANT_CAPACITY 256
+#define TX_CAPACITY 128
+#define RECORD_CAPACITY 64
+#define INSTRUCTION_BUDGET 300000000
+#define IMMORTAL_REFS 1073741824
+typedef struct { int op,flags,a,b,c; } Instruction;
+typedef struct { int type,refs,first,length,parent,tail,cache,aux; double number; } Value;
+typedef struct { int return_pc,base,argc; } Frame;
+typedef struct {
+  int pc,sp,fp,steps,error,halted,initialized,source_value;
+  int active,projected,mode,rule,actor,rule_kind,changes,needs,witnesses,records,warrants;
+  int diagnostic_code,diagnostic_detail,diagnostic_line,diagnostic_column;
+  int stack[STACK_CAPACITY];Frame frames[FRAME_CAPACITY];
+  int warrant[WARRANT_CAPACITY*3],change[TX_CAPACITY*3],need[TX_CAPACITY*2],witness[TX_CAPACITY];
+  int byte_value[256],empty_value,true_value,false_value;
+} Machine;
+typedef struct { __global Value* v;__global uchar* text;__global int* index;__local int* meta;__global int* scratch; } Heap;
+// meta: value bump/free/live/peak, text bump, index bump; bin heads start at 16/48.
+int value_new(Heap* h,int type,double number){int id=h->meta[1];if(id){h->meta[1]=h->v[id].first;}else{if(h->meta[0]>=VALUE_CAPACITY)return 0;id=h->meta[0]++;}h->v[id]=(Value){type,1,0,0,0,0,-1,-1,number};h->meta[2]++;h->meta[3]=max(h->meta[3],h->meta[2]);return id;}
+int keep(Heap* h,int id){if(id&&h->v[id].refs<IMMORTAL_REFS)h->v[id].refs++;return id;}
+int bin_class(int length){int k=4;while(k<26&&(1<<k)<length)k++;return k;}
+int block_new(Heap* h,int length,int indices){int k=bin_class(max(length,1)),head=(indices?48:16)+k,at=h->meta[head];if(at){h->meta[head]=indices?h->index[at]:((__global int*)h->text)[at/4];return at;}int bump=indices?5:4,capacity=indices?INDEX_CAPACITY:TEXT_CAPACITY;if(h->meta[bump]+(1<<k)>capacity)return -1;at=h->meta[bump];h->meta[bump]+=(1<<k);return at;}
+void block_free(Heap* h,int at,int length,int indices){if(at<0)return;int head=(indices?48:16)+bin_class(max(length,1));if(indices)h->index[at]=h->meta[head];else((__global int*)h->text)[at/4]=h->meta[head];h->meta[head]=at;}
+void drop(Heap* h,int id){int count=0;h->scratch[count++]=id;while(count){id=h->scratch[--count];if(!id||h->v[id].refs>=IMMORTAL_REFS)continue;if(--h->v[id].refs>0)continue;Value v=h->v[id];if(v.type==4){if(v.cache>=0)block_free(h,v.cache,v.length,1);if(v.aux==1){h->scratch[count++]=v.parent;h->scratch[count++]=v.tail;}else if(v.aux==2){h->scratch[count++]=v.parent;h->scratch[count++]=v.tail;}}
+    else if(v.type==3){if(v.number==1&&v.cache>=0)block_free(h,v.cache,v.length+1,1);if(v.parent)h->scratch[count++]=v.parent;else block_free(h,v.first,v.length,0);}
+    h->v[id].type=-1;h->v[id].first=h->meta[1];h->meta[1]=id;h->meta[2]--;}}
+int numeric(Heap* h,double number,__global Machine* m){int id=value_new(h,1,number);if(!id)m->error=1;return id;}
+int boolean(Heap* h,int value,__global Machine* m){return keep(h,value?m->true_value:m->false_value);}
+int text_new(Heap* h,int length,__global Machine* m){int at=block_new(h,length,0),id=value_new(h,3,0);if(at<0||!id){m->error=24;return 0;}h->v[id].first=at;h->v[id].length=length;return id;}
+int text_chars(Heap* h,int id,__global Machine* m){Value v=h->v[id];if(v.type!=3){m->error=9;return 0;}if(v.aux>=0)return v.aux;int count=0,ascii=1;for(int i=0;i<v.length;i++){uchar c=h->text[v.first+i];ascii&=c<128;if((c&192)!=128)count++;}h->v[id].aux=count;if(ascii){h->v[id].cache=-2;return count;}int at=block_new(h,v.length+1,1);if(at<0){m->error=24;return 0;}int n=0;for(int i=0;i<v.length;i++)if((h->text[v.first+i]&192)!=128)h->index[at+n++]=v.first+i;h->index[at+n]=v.first+v.length;h->v[id].cache=at;h->v[id].number=1;return count;}
+int text_offset(Heap* h,int id,int scalar){Value v=h->v[id];return v.cache==-2?v.first+scalar:h->index[v.cache+scalar];}
+int text_view(Heap* h,int id,int offset,int count,__global Machine* m){int total=text_chars(h,id,m);offset=min(offset,total);count=min(count,total-offset);if(m->error)return 0;Value v=h->v[id];int first=text_offset(h,id,offset),last=text_offset(h,id,offset+count),out=value_new(h,3,0);if(!out){m->error=1;return 0;}h->v[out].first=first;h->v[out].length=last-first;h->v[out].parent=keep(h,id);h->v[out].aux=count;h->v[out].cache=v.cache==-2?-2:v.cache+offset;return out;}
+int text_bytes_view(Heap* h,int id,int first,int length,__global Machine* m){Value v=h->v[id];int out=value_new(h,3,0);if(!out){m->error=1;return 0;}h->v[out].first=v.first+first;h->v[out].length=length;h->v[out].parent=keep(h,v.parent?v.parent:id);return out;}
+int text_private_new(Heap* h,const char* text,int length,__global Machine* m){int id=text_new(h,length,m);if(m->error)return 0;for(int i=0;i<length;i++)h->text[h->v[id].first+i]=(uchar)text[i];return id;}
+int number_text(double number,char* output){
+  if(number==0){output[0]='0';return 1;}
+  if(isfinite(number)&&trunc(number)==number&&fabs(number)<1e16){int at=0;if(number<0){output[at++]='-';number=-number;}ulong n=(ulong)number;char reverse[24];int count=0;do{reverse[count++]='0'+n%10;n/=10;}while(n);while(count)output[at++]=reverse[--count];return at;}
+  if(isnan(number)){output[0]='N';output[1]='a';output[2]='N';return 3;}if(isinf(number)){int at=0;if(signbit(number))output[at++]='-';__constant const char* s="Infinity";for(int i=0;i<8;i++)output[at++]=s[i];return at+8;}
+  char raw[160],digits[24];int length=fabs(number)<0x1p-1022?d2exp_buffered_n(number,16,raw):d2s_buffered_n(number,raw),cursor=0,negative=raw[0]=='-';if(negative)cursor++;int count=0;while(cursor<length&&raw[cursor]!='E'&&raw[cursor]!='e'){if(raw[cursor]!='.')digits[count++]=raw[cursor];cursor++;}while(count>1&&digits[count-1]=='0')count--;cursor++;int sign=1,exponent=0;if(cursor<length&&raw[cursor]=='-'){sign=-1;cursor++;}else if(cursor<length&&raw[cursor]=='+')cursor++;while(cursor<length)exponent=exponent*10+raw[cursor++]-'0';int k=exponent*sign+1,at=0;if(negative)output[at++]='-';if(k>0&&k<=21){for(int i=0;i<k;i++)output[at++]=i<count?digits[i]:'0';if(count>k){output[at++]='.';for(int i=k;i<count;i++)output[at++]=digits[i];}}else if(k<=0&&k>-6){output[at++]='0';output[at++]='.';for(int i=0;i<-k;i++)output[at++]='0';for(int i=0;i<count;i++)output[at++]=digits[i];}else{output[at++]=digits[0];if(count>1){output[at++]='.';for(int i=1;i<count;i++)output[at++]=digits[i];}int exp=k-1;output[at++]='e';output[at++]=exp<0?'-':'+';if(exp<0)exp=-exp;char reverse[5];int n=0;do{reverse[n++]=(char)('0'+exp%10);exp/=10;}while(exp);while(n)output[at++]=reverse[--n];}return at;
+}
+int scalar_text(Heap* h,int id,__global Machine* m){Value v=h->v[id];if(v.type==3)return keep(h,id);char buffer[160];int length;if(v.type==1)length=number_text(v.number,buffer);else if(v.type==2){__constant const char* s=v.number!=0?"true":"false";length=v.number!=0?4:5;for(int i=0;i<length;i++)buffer[i]=s[i];}else if(v.type==0){length=4;buffer[0]='n';buffer[1]='u';buffer[2]='l';buffer[3]='l';}else{m->error=9;return 0;}return text_private_new(h,buffer,length,m);}
+int text_join(Heap* h,int left,int right,__global Machine* m){left=scalar_text(h,left,m);right=scalar_text(h,right,m);if(m->error){drop(h,left);drop(h,right);return 0;}Value a=h->v[left],b=h->v[right];int out=text_new(h,a.length+b.length,m);if(!m->error){int at=h->v[out].first;for(int i=0;i<a.length;i++)h->text[at+i]=h->text[a.first+i];for(int i=0;i<b.length;i++)h->text[at+a.length+i]=h->text[b.first+i];}drop(h,left);drop(h,right);return out;}
+int seq_empty(Heap* h,__global Machine* m){return keep(h,m->empty_value);}
+int seq_append(Heap* h,int left,int tail,__global Machine* m){if(h->v[left].type!=4){m->error=9;return 0;}int id=value_new(h,4,0);if(!id){m->error=1;return 0;}h->v[id].aux=1;h->v[id].length=h->v[left].length+1;h->v[id].parent=keep(h,left);h->v[id].tail=keep(h,tail);return id;}
+int seq_concat(Heap* h,int left,int right,__global Machine* m){if(h->v[left].type!=4||h->v[right].type!=4){m->error=9;return 0;}if(!h->v[left].length)return keep(h,right);if(!h->v[right].length)return keep(h,left);int id=value_new(h,4,0);if(!id){m->error=1;return 0;}h->v[id].aux=2;h->v[id].length=h->v[left].length+h->v[right].length;h->v[id].parent=keep(h,left);h->v[id].tail=keep(h,right);return id;}
+int seq_flat(Heap* h,int id,__global Machine* m){Value v=h->v[id];if(v.type!=4){m->error=9;return -1;}if(v.cache>=0)return v.cache;int at=block_new(h,v.length,1);if(at<0){m->error=1;return -1;}int pending=0,written=0;h->scratch[pending++]=id;while(pending&&!m->error){int node=h->scratch[--pending];if(node<0){if(written>=v.length){m->error=2;break;}h->index[at+written++]=-node-1;continue;}Value child=h->v[node];if(child.type!=4){m->error=9;break;}if(child.cache>=0){if(written+child.length>v.length){m->error=2;break;}for(int i=0;i<child.length;i++)h->index[at+written++]=h->index[child.cache+i];}else if(child.aux==1||child.aux==2){if(pending>VALUE_CAPACITY-2){m->error=1;break;}h->scratch[pending++]=child.aux==1?-child.tail-1:child.tail;h->scratch[pending++]=child.parent;}}if(written!=v.length)m->error=2;h->v[id].cache=at;return at;}
+int seq_item(Heap* h,int id,int index,__global Machine* m){if(h->v[id].type!=4||index<0||index>=h->v[id].length){m->error=2;return 0;}if(h->v[id].length>=128){int at=seq_flat(h,id,m);return m->error?0:keep(h,h->index[at+index]);}while(1){Value v=h->v[id];if(v.cache>=0)return keep(h,h->index[v.cache+index]);if(v.aux==1){if(index==v.length-1)return keep(h,v.tail);id=v.parent;}else if(v.aux==2){int n=h->v[v.parent].length;if(index<n)id=v.parent;else{index-=n;id=v.tail;}}else{m->error=2;return 0;}}}
+int byte_sequence(Heap* h,__global Machine* m,__global const uchar* bytes,int length){int id=value_new(h,4,0),at=block_new(h,length,1);if(!id||at<0){m->error=1;return 0;}h->v[id].length=length;h->v[id].cache=at;h->v[id].aux=3;for(int i=0;i<length;i++)h->index[at+i]=m->byte_value[bytes[i]];return id;}
+int byte_private_sequence(Heap* h,__global Machine* m,const uchar* bytes,int length){int id=value_new(h,4,0),at=block_new(h,length,1);if(!id||at<0){m->error=1;return 0;}h->v[id].length=length;h->v[id].cache=at;h->v[id].aux=3;for(int i=0;i<length;i++)h->index[at+i]=m->byte_value[bytes[i]];return id;}
+int truth(Heap* h,int id){Value v=h->v[id];return v.type==1||v.type==2?v.number!=0&&!isnan(v.number):(v.type==3||v.type==4)&&v.length>0;}
+int text_equal(Heap* h,int left,int right){Value a=h->v[left],b=h->v[right];if(a.length!=b.length)return 0;for(int i=0;i<a.length;i++)if(h->text[a.first+i]!=h->text[b.first+i])return 0;return 1;}
+int equal_value(Heap* h,int left,int right,__global Machine* m){int pairs[4096],count=2; pairs[0]=left;pairs[1]=right;while(count&&!m->error){right=pairs[--count];left=pairs[--count];Value a=h->v[left],b=h->v[right];if(a.type!=b.type)return 0;if(a.type==0)continue;if(a.type==1||a.type==2){if(a.number!=b.number)return 0;continue;}if(a.type==3){if(!text_equal(h,left,right))return 0;continue;}if(a.type==5){if(a.first!=b.first||a.length!=b.length||a.parent!=b.parent||a.tail!=b.tail)return 0;continue;}if(a.type!=4||a.length!=b.length)return 0;int la=seq_flat(h,left,m),ra=seq_flat(h,right,m);for(int i=0;i<a.length;i++){int x=h->index[la+i],y=h->index[ra+i];if(h->v[x].type==4||h->v[y].type==4){if(count>4092){m->error=4;return 0;}pairs[count++]=x;pairs[count++]=y;}else if(h->v[x].type!=h->v[y].type)return 0;else if(h->v[x].type==3){if(!text_equal(h,x,y))return 0;}else if(h->v[x].number!=h->v[y].number)return 0;}}return !m->error;}
+int ascii_space(int value){return value==32||(value>=9&&value<=13);}
+int text_find(Heap* h,int left,int right){Value a=h->v[left],b=h->v[right];for(int i=0;i<=a.length-b.length;i++){int same=1;for(int j=0;j<b.length;j++)if(h->text[a.first+i+j]!=h->text[b.first+j]){same=0;break;}if(same)return i;}return -1;}
+@@BUILTINS@@
+@@EXECUTION@@

@@ -67,6 +67,8 @@ The [complete compiler native game workflow](docs/K400_GAME_SELFHOST_2026-10-15.
 
 The [complete compiler soft realtime workflow](docs/K400_REALTIME_SELFHOST_2026-10-15.md) closes K279. Actual supplied compiler generations and native programs enter the original monotonic RCL scheduler. Real compiler deadline/abort controls dispatch the complete compiler, terminate and await child exit, settle failure without publication, and recover with a healthy fresh full compile. Twenty generations, ten sealed programs, three unchanged fresh repairs and 38 focused checks pass. This is local soft realtime with sampled deadline publication; hard OS timing and interrupt guarantees remain unclaimed.
 
+The [GPU complete compiler candidate](docs/K400_GPU_SELFHOST_CANDIDATE_2026-10-15.md) adds `createGpuCompilerTarget`: the actual supplied compiler parses, validates, hashes and emits RBC on an AMD FP64 OpenCL device. Complete diagnostic generations produced the original 297,957-byte compiler exactly after 101,897,504 device instructions. The final candidate takes about 219 seconds, exceeding the original 50-second budget, so **K179 stays UNTESTED and K400 stays 399/400**. Public API checks cover Unicode, device bytes/SHA256, supported decimals, transactions, snapshots, rejection and fresh recovery. No CPU execution fallback or version promotion is used.
+
 ## Why RCL?
 
 - **Put authority next to behavior.** Subjects, warrants, guards, mutations, and invariants are language constructs. A state transition declares its permission and validation requirements instead of leaving that contract implicit in surrounding application code.

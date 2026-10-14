@@ -1,0 +1,235 @@
+{
+  "format": "rcl.gpu-selfhost-candidate-verification.v1",
+  "status": "FULL_GPU_FIXEDPOINT_MATCH_PERFORMANCE_FAILED_K179_NOT_ADMITTED",
+  "cleanSourceTree": "10986d247fac4ea0bc315b715baffc4774a294d2",
+  "cleanSourceScope": "Actual focused public API and doctor; not a fresh full K400 campaign",
+  "baseline": {
+    "kernelHash": "42d8580fcbf3bddb5cd04160dabfce4f8f97e24c96d9b5b9fb6144cda1f55d54",
+    "kernelMs": 226970.47250077594
+  },
+  "final": {
+    "kernelHash": "29aa25c68c6d5dd051674c9b41a736cccfbc09704fc81c9b45a3a8cba2a86dc7",
+    "kernelMs": 219381.51750096586,
+    "instructions": 101897504,
+    "outputHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+    "bytes": 297957
+  },
+  "originalCompileBudgetMs": 50000,
+  "performanceGate": "FAILED",
+  "fullGenerationsObserved": 2,
+  "twentyGenerationCampaign": "NOT_RUN",
+  "sealedTenProgramAcquisition": "NOT_RUN",
+  "freshIndependentRepairAcquisition": "NOT_RUN",
+  "api": {
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "semanticProbeCount": 6,
+    "cancellation": {
+      "code": "RCL_GPU_CANCELLED",
+      "exit": {
+        "processPid": 63156,
+        "code": null,
+        "signal": "SIGTERM",
+        "exitObserved": true
+      }
+    },
+    "shutdown": {
+      "closed": true,
+      "exits": [
+        {
+          "processPid": 43856,
+          "code": 0,
+          "signal": null,
+          "exitObserved": true
+        },
+        {
+          "processPid": 63156,
+          "code": null,
+          "signal": "SIGTERM",
+          "exitObserved": true
+        },
+        {
+          "processPid": 37444,
+          "code": 0,
+          "signal": null,
+          "exitObserved": true
+        }
+      ]
+    }
+  },
+  "k400": {
+    "PASS": 399,
+    "FAIL": 0,
+    "BLOCKED": 0,
+    "UNVERIFIED": 0,
+    "UNTESTED": 1,
+    "REGRESSED": 0
+  },
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "donorsByteIdentical": 5,
+  "sourceBindings": [
+    {
+      "path": "src/gpu-compiler-target.mjs",
+      "sha256": "0869a7ee7c324fc36793eb355dcb8a4fad5f233a49d42b0628de6675dc8636c2"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "2aa78aea7bf7e71f5e322008b43116da709da0e9ff197987780462736c91cacf"
+    },
+    {
+      "path": "tests/gpu-compiler.test.mjs",
+      "sha256": "8488dcf481a6e3e1ba5ca87b1d5a22453e67bde1ca68f42e8b6780efa28dc4f5"
+    },
+    {
+      "path": "scripts/build-gpu-compiler-runtime.mjs",
+      "sha256": "a3282056ccc8012c75ea002bc04bc9b656db755c250bf0d5e493ab761c4e9536"
+    },
+    {
+      "path": "scripts/probe-gpu-selfhost-compiler.mjs",
+      "sha256": "6b3965f04ef09a34701d6ff3486c75ebc860cd2f460fa12d59e13dadfa17a0a9"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/provider.py",
+      "sha256": "17087dc179fe39bf7888c08e86b9e5faf3fb023b99ceaa297d5c006d68f65bbb"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/rcl-compiler-stack-vm.cl",
+      "sha256": "29aa25c68c6d5dd051674c9b41a736cccfbc09704fc81c9b45a3a8cba2a86dc7"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-core.cl",
+      "sha256": "ccb785edbd26d664dafdcc63b842278c1bdcaf705ed2e22fb2494086299d96b0"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-builtins.cl",
+      "sha256": "8851f29631013bcfe1e70982fdd49c2c7abe07dd2d24a37069f62db895f971df"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-execution.cl",
+      "sha256": "957348a7ffe9127331f5be867860a81bb507f3046a8591113c740f65f0322bc8"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/decimal-parse.cl",
+      "sha256": "a9ae1b82b54cbaf1a57788f0eeaf2693c3f09bc0f547f3d334afbd5d7f7807b2"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/build.json",
+      "sha256": "46f16032652e9a9010c02b79b2ad452135265bc0af69b5ffc827590992e240d9"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/s2d.c",
+      "sha256": "9485e78f329ec1cf931b737333ef7bd85195864dfb9dd096413f0d336a7a46d3"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/ryu_parse.h",
+      "sha256": "da8ad9764b2701627cb75926b9d14b540fdfd7be693d671da9594eb16dabd27a"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/LICENSE-Apache2",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/PROVENANCE.json",
+      "sha256": "db50c59876ec1ac24578c4b24a149646e6a21d921adbf174851c0579adf0b768"
+    },
+    {
+      "path": "native/gpu-text-runtime/ryu-opencl.cl",
+      "sha256": "205c6d1ff0547dfc1e5ecb1e1ba92204cf77fed3c9d255946f2e435d56016fd3"
+    },
+    {
+      "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+      "sha256": "41b8a9c35a678daedfa714f683455b8652b757f50ac987c6054cd013911a0885"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/evidence/gpu-selfhost/api-verification.json",
+      "sha256": "1ad06ea2cda03a9325d4ae33fb5dbac789093b7280c3c4c6b35c0aadad345e85",
+      "bytes": 9128
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/baseline-fixedpoint.json",
+      "sha256": "967cfcdb9e195c74eaf013c055b70a0f0df0c71b20d9c361d4bd986891182aaa",
+      "bytes": 460382
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/clean-api-tests.log",
+      "sha256": "0ab4f98562ebf28c4e9608026123768e196bcdb3b7d25c43e05ca812278862e1",
+      "bytes": 239
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/clean-api-verification.json",
+      "sha256": "9911f8afa92ae070171c17337dea4c4f2da8885c2bda1c7ecf9e8dad6e5c605d",
+      "bytes": 9978
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/clean-doctor.json",
+      "sha256": "ea3a409688acf068e2a8bc59ef5a102cea3b66ea17be5e2009e029c88cd556e1",
+      "bytes": 4284
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/doctor.json",
+      "sha256": "ea3a409688acf068e2a8bc59ef5a102cea3b66ea17be5e2009e029c88cd556e1",
+      "bytes": 4284
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/dwac-mode.json",
+      "sha256": "f6629424c65bf7b8b23f3e11975a9fb6ec119d21d59bc7c0dd6c12ab238da396",
+      "bytes": 750
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/final-fixedpoint.json",
+      "sha256": "2bab2ba4c9039be4b7524679430aafaae245b0b47de128847fbed29777bbf983",
+      "bytes": 460439
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/laya-advisory.json",
+      "sha256": "555f7910321be673fbc7a6f76359ff954b926c9030ed2645b4778aa905a7811c",
+      "bytes": 2312
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/medium-immediates-rejected.json",
+      "sha256": "6d481f3c46cdc5631e78aefc3d7d193a54104369b431f3cec9f3cd6893b57fba",
+      "bytes": 15606
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/medium-meta.json",
+      "sha256": "60a40b82383760e4d0e2acecce3ae25ece31919fc4308456782f3f1ac0390b5a",
+      "bytes": 15605
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/medium-noinline-rejected.json",
+      "sha256": "fb7c0ed92fb7a1c59bd058ba516058fd23a3e390d9ed3396b5010a0c44d2410a",
+      "bytes": 15603
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/medium-stack.json",
+      "sha256": "e54edfa2d4442d4cfae01a2ce59105c5acc90c720c9e04149e657e12291df05d",
+      "bytes": 15601
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/noopt-rejected.log",
+      "sha256": "b91067ba32548afc59783aba13edc51d7c274ad36cbe177148009b0d4ccb53ff",
+      "bytes": 630
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/upstream-check.json",
+      "sha256": "67602a140c7b22357943ec83288de003dc56ce80b972c1745818b82b198d7184",
+      "bytes": 710
+    },
+    {
+      "path": "docs/evidence/gpu-selfhost/value-cache-rejected.log",
+      "sha256": "a8cd39274297b661080766337c122a51ae767e818bb31a0ebd837adc4979fb45",
+      "bytes": 1236
+    }
+  ],
+  "knownLimits": [
+    "single GPU work item; no parallel throughput claim",
+    "pinned decimal parser scope",
+    "bounded VM arenas and provider",
+    "host hashes reconstructed device values; no security sandbox"
+  ]
+}

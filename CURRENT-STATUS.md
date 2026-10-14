@@ -20,6 +20,19 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
 
+## 2026-10-15 GPU complete compiler candidate, K179 still open
+
+`createGpuCompilerTarget` runs the actual supplied full compiler and programs on
+a separate resumable AMD FP64 OpenCL VM, with immutable input snapshots and no
+CPU execution fallback. One complete diagnostic generation emitted the original
+297,957-byte compiler exactly after 101,897,504 device instructions. The measured
+219-second final candidate exceeds the original 50-second budget. Focused API checks
+cover device values/bytes/SHA256, Unicode, transactions, rejection and recovery;
+they do not replace twenty generations, sealed programs or fresh AI trials.
+K179 stays UNTESTED, K400 stays 399/400, and version promotion stays frozen.
+See `docs/K400_GPU_SELFHOST_CANDIDATE_2026-10-15.md` for actual hashes, scope,
+parser limits, router receipts and remaining work.
+
 ## 2026-10-15 complete compiler under native RCL soft deadlines
 
 K279 adds one unique self-hosting coordinate, reaching **399 PASS / 1 UNTESTED**,
