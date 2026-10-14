@@ -87,3 +87,4 @@ export { createSqliteCompilerTarget } from './sqlite-compiler-target.mjs';
 export { createCompilerDataflowTarget } from './compiler-dataflow-target.mjs';
 export { createReplicatedCompilerTarget } from './replicated-compiler-target.mjs';
 export { createPhaseCompilerTarget } from './phase-compiler-target.mjs';
+export { createApplicationCompilerTarget, COMPILER_METRIC_FEATURES } from './application-compiler-target.mjs';

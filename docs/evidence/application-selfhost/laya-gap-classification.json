@@ -1,0 +1,73 @@
+{
+  "request": {
+    "state": {
+      "environments": [
+        "ai-runtime",
+        "scientific-runtime"
+      ],
+      "observedSources": {
+        "compilerEntry": "Existing adapters use fixed bootstrap artifacts; native RCL controllers, actual native inference/statistics and independent Python observer already exist",
+        "newCapability": "Caller-supplied complete compiler admitted by original RCL controller; actual native compiler metrics processed by existing workflow before source-owned publication"
+      },
+      "existingDevice": "Windows native C ABI and native RCL VM remain unchanged"
+    },
+    "questions": {
+      "gap_kind": {
+        "type": "choice",
+        "instructions": "仅分类已审计缺口，不授权修改、执行或验收。依据实际责任边界给出一个标签。",
+        "criteria": {
+          "application_integration": "已有原生语言执行和真实应用工作流，需要补动态编译器接入和工件发布边界。",
+          "device_interpreter": "设备还不能执行完整编译器，需要新增指令、原语、内存或解释器生命周期。",
+          "version_metadata": "只涉及版本号和展示文字。"
+        }
+      }
+    },
+    "min_confidence": 0.65
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"authority\": \"ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION\",\n  \"model\": \"convaiinnovations/laya-multilingual\",\n  \"revision\": \"b4a904d1a2a54c822b829e24291d4b8f280fe43e\",\n  \"device\": \"cpu\",\n  \"cold_load_seconds\": 27.587,\n  \"inference_ms\": 2530.37,\n  \"gates\": {\n    \"gap_kind\": {\n      \"status\": \"ABSTAIN\",\n      \"confidence\": 0.0022,\n      \"threshold\": 0.65\n    }\n  },\n  \"result\": {\n    \"model\": \"laya-rl-agent\",\n    \"answers\": {\n      \"gap_kind\": {\n        \"type\": \"choice\",\n        \"choice\": \"version_metadata\",\n        \"probabilities\": {\n          \"application_integration\": 0.3009,\n          \"device_interpreter\": 0.3478,\n          \"version_metadata\": 0.3513\n        },\n        \"confidence\": 0.0022,\n        \"action\": {\n          \"act_probability\": 1.0\n        }\n      }\n    },\n    \"usage\": {\n      \"input_tokens\": 196,\n      \"output_tokens\": 0\n    }\n  }\n}"
+      }
+    ],
+    "structuredContent": {
+      "authority": "ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION",
+      "model": "convaiinnovations/laya-multilingual",
+      "revision": "b4a904d1a2a54c822b829e24291d4b8f280fe43e",
+      "device": "cpu",
+      "cold_load_seconds": 27.587,
+      "inference_ms": 2530.37,
+      "gates": {
+        "gap_kind": {
+          "status": "ABSTAIN",
+          "confidence": 0.0022,
+          "threshold": 0.65
+        }
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "gap_kind": {
+            "type": "choice",
+            "choice": "version_metadata",
+            "probabilities": {
+              "application_integration": 0.3009,
+              "device_interpreter": 0.3478,
+              "version_metadata": 0.3513
+            },
+            "confidence": 0.0022,
+            "action": {
+              "act_probability": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 196,
+          "output_tokens": 0
+        }
+      }
+    },
+    "isError": false
+  }
+}

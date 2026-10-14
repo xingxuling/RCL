@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 394/400 PASS (98.50%) · 6 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 396/400 PASS (99.00%) · 4 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,22 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-14 complete compiler in actual application workflows
+
+K239/K219 add two unique self-hosting coordinates, reaching **396 PASS /
+4 UNTESTED**, U3, INCOMPLETE. Each original native advisory-model/science workflow
+now admits the actual supplied complete compiler, observes two explicit native
+compiler metrics and owns artifact publication. Native MLP inference remains
+advisory; actual NumPy/SciPy checks native RCL statistics. Foreign model, predictor
+authority, an incorrect numerical kernel, paused native calls, malformed/corrupt
+input and bounded backpressure are rejected. Each environment preserves twenty
+complete generations, ten sealed programs and three unchanged fresh repairs;
+44 focused checks pass. Compiler/observer zero exits and controller termination
+are observed, with controller exit code unavailable from the reused session API.
+Remaining cells: K179 GPU, K199 game, K279 soft realtime and K399 RNCS complete
+compiler profiles. Version promotion stays frozen; no Actions are requested.
+See `docs/K400_APPLICATION_SELFHOST_2026-10-14.md`.
 
 ## 2026-10-14 complete mobile and native compiler controllers
 

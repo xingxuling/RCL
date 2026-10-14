@@ -1,0 +1,109 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-application",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-application-definitions.mjs",
+  "definitionHash": "6724673a2b6adb33ab63c56e51304e25acff2ccd9af3ba8b097a74a304944379",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "ai-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+      }
+    },
+    {
+      "environment": "scientific-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b"
+      }
+    }
+  ],
+  "environments": [
+    "ai-runtime",
+    "scientific-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K239",
+    "K219"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler supplied dynamically to a resident native C ABI inside the original native RCL advisory-model or scientific workbench workflow. Each context independently performs twenty byte-identical generations, ten sealed programs and three unchanged fresh repairs. Compile entry binds SHA256 source bytes, snapshots compiler/source inputs and precedes native invocation; two generic bounded native compiler metrics feed actual pinned native RCL MLP inference or native RCL statistics with independent NumPy/SciPy observation. Source-owned publication gates output; wrong model, requested predictor authority and an actual incorrect statistical kernel cannot publish. Native compiler failure settles the original workflow, pause rejects compile/execute before native calls, bounded backpressure and healthy recovery are observed. Program execution uses the original actual application workflow with an additional native RCL preflight and input snapshot. Compiler and scientific observer expose actual zero exits; controller termination is observed with no exposed exit code. Compiler metric projection is explicit transport, not understanding, quality prediction, general AI/HPC competence, external effects, a security sandbox or a whole-language release.",
+  "contractRoot": "c205d31e4f4398f9360e7a3b73b06b3279e74221642cc45816b8a42cd6195351",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "workflowContracts": [
+    {
+      "environment": "ai-runtime",
+      "path": "examples/universal-stress/ai-native/learning-contract.json",
+      "sha256": "fcffbc58f941dbe4584a84e759ee4c6038fe462ff466657425c97773aeb10d3e"
+    },
+    {
+      "environment": "scientific-runtime",
+      "path": "examples/universal-stress/scientific-native/learning-contract.json",
+      "sha256": "a10c693f2717b3ea5ab4da4094601bbb83384e5389344c32edd45909f62bebff"
+    }
+  ],
+  "frozenAt": "2026-10-14T13:45:48.117Z",
+  "runtimeControls": [
+    "twenty supplied complete compiler generations admitted and published by each actual application controller",
+    "native complete-compiler metric features enter pinned native RCL MLP or native RCL statistics with an actual independent NumPy/SciPy observer",
+    "ten sealed programs and three broken/repaired probes execute in the original actual application workflow",
+    "native failure settlement and pause rejection before compile/execute native calls",
+    "wrong model denies native compiler entry; predictor authority and incorrect numerical kernel reject publication after actual compilation",
+    "bounded backpressure, healthy full compiler/program recovery and actual compiler/observer exits with observed controller termination"
+  ]
+}
