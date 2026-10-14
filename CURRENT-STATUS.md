@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 367/400 PASS (91.75%) · 33 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 394/400 PASS (98.50%) · 6 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,24 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-14 complete mobile and native compiler controllers
+
+The full nineteen-environment Android native-touch index admits eighteen previously
+open coordinates, and source-bound automation/simulation complete-compiler profiles
+add K359/K379. The consolidated collector now records **394 PASS / 6 UNTESTED**,
+U3, INCOMPLETE. Mobile profiles preserve twenty real flows, ten sealed inputs and
+three unchanged repairs per environment; all 33 admission checks run without skips.
+Each complete-compiler controller preserves twenty supplied compiler generations,
+ten sealed programs and three unchanged fresh repairs. Its public API snapshots
+inputs, gates both compile/execute before worker calls, settles automation failures
+and commits the simulation clock after success. Thirty-one focused checks pass.
+Controller termination is observed; the reused session API exposes no exit code.
+The remaining self-hosting cells are K179/K199/K219/K239/K279/K399, for GPU/game/
+science/advisory-AI/soft-realtime/RNCS. Version promotion is frozen, Actions are
+not requested, and the goal remains the full 400 cells. See
+`docs/K400_PHASE_SELFHOST_2026-10-14.md` and
+`docs/K400_NATIVE_MOBILE_2026-10-14.md`.
 
 ## 2026-10-14 GPU Text and UI continuation
 

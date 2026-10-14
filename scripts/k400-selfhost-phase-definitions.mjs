@@ -1,0 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {SELFHOST_PROFILE as BASE,SELFHOST_CASES} from './k400-selfhost-definitions.mjs';
+export {SELFHOST_CASES};
+export const SELFHOST_DIRECTORY='examples/universal-stress/selfhost-phase';
+export const SELFHOST_PROFILE={...BASE,id:'general-compiler-phase',environments:['automation-runtime','simulation-runtime'],source:()=>fs.readFileSync(path.join(ROOT,'selfhost/variants/utf16-columns/compiler.rcl'),'utf8'),scope:'Complete native-core RCL compiler supplied dynamically to an actual compiler-stage native C ABI, with compilation and native VM execution admitted by the original source-bound native RCL automation or simulation controller. Each environment independently runs twenty byte-identical generations, ten sealed programs and three unchanged fresh repairs. Compile admission binds SHA256 source bytes; execution admission binds the RCL program root. Automation settles native failures; simulation commits its projected clock only after native success. Pause rejects both compilation and execution before worker invocation, denied compilation publishes no output, reversal is rejected, and bounded backpressure plus healthy recovery are observed. Compiler and stage exits expose actual zero codes; controller termination is observed but its reused session API does not expose an exit code. No JS execution/compiler fallback, physical clock/world, external automation effect, security sandbox or whole-language release claim.'};

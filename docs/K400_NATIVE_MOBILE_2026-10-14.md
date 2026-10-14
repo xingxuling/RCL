@@ -1,6 +1,6 @@
 # Native Android mobile continuation
 
-**Status: PARTIAL_ACQUISITION. The mobile profile grants no new K400 credit.**
+**Status: PASS_NATIVE_MOBILE. All nineteen frozen environments completed and the full index is admitted. Eighteen previously open mobile cells gain credit.**
 
 The Android frontend now uses actual native `TextView` and `Button` instances.
 RCL owns each event mutation, derived label and render projection through the
@@ -10,7 +10,7 @@ event lowering and target adapters are reused.
 
 The frozen integer counter has an initial value, a configurable step, increment
 and reset. The API35 x86_64 Android emulator receives real touch events. The
-nineteen-backend campaign is being reacquired with asynchronous ADB transport.
+nineteen-backend campaign was reacquired with asynchronous ADB transport.
 Previous acquisitions are archived with zero current credit.
 Rotation recreates the activity in the same process; force-stop/relaunch creates
 a new process. Both recover the same state from the still-running RCL backend.
@@ -20,13 +20,12 @@ labels, button bounds, process IDs and screenshot bytes are bound to the receipt
 
 ![Actual native Android counter](assets/native-mobile-counter.png)
 
-The frozen campaign requires all nineteen selected backends;
-acquisition is
-still in progress, so its profile index is not admitted and no mobile coordinate
-is added yet. When every frozen environment passes, eighteen currently open
-coordinates may gain credit; the existing Android coordinate receives an
-additional profile. GPU remains outside this contract because its current RBC
-interpreter lacks the required Text operations.
+The frozen campaign requires all nineteen selected backends, and every one now
+passes twenty real native-touch flows, ten sealed input flows, three effective
+broken mutants and three unchanged independent repairs, plus real lifecycle,
+authority, transport and native failure controls. This adds eighteen previously
+open coordinates; K085 already had an admitted Android mobile profile. GPU has
+its separate Text/mobile contract and does not receive credit from this index.
 
 The independent contexts received only frozen mutated candidates and task
 requirements. Canonical source, oracle edits and sealed inputs were withheld.
@@ -69,6 +68,7 @@ is operating the same package and emulator.
 - [Historical Windows receipt](../examples/universal-stress/mobile-native/acquisition-before-ready-fix/native-counter-windows-runtime.json)
 - [Historical WASI receipt](../examples/universal-stress/mobile-native/acquisition-before-ready-fix/native-counter-wasm-vm-runtime.json)
 - [Independent proposals](../examples/universal-stress/mobile-native/native-counter-proposals.json)
+- [Complete current index](../examples/universal-stress/mobile-native/native-counter-runtime.json)
 - [Admission checks](../tests/k400-mobile-admission.test.mjs)
 
 Contract root: `4cc02f1bc5e314ce3848ae7e085da52ef82ac1c212dd7aca268cf05c4a4b86dd`.
@@ -78,8 +78,8 @@ APK SHA256: `b1b315afdb70e518de73d7597cc70fcb3b58687dffb9d5dbed4273131939135c`.
 The targeted bridge/admission checks reject forged APK, display,
 touch, authority, hierarchy, screenshot and lifecycle evidence. Historical
 flows remain independently checkable, while their stale acquisition policies
-cannot obtain current admission. The missing-gate regression requires a fresh
-receipt and is explicitly skipped until one exists. Android startup, hierarchy
+cannot obtain current admission. The missing-gate regression now uses a fresh
+current receipt. Android startup, hierarchy
 and touch overhead remains separate from native backend measurements.
 
 An actual server acquisition exposed a ready-file publication race: the parent
@@ -106,7 +106,7 @@ command regression proves the in-process bridge responds before the child
 exits. Binary transport and actual command errors are checked. Cold handlers
 now reuse the atomic-ready adapter and verify distinct process identities and
 real exit. Eight focused bridge/transport/event checks and one actual cold-
-handler check pass. All nineteen formal environments are reacquired under the
+handler check pass. All nineteen formal environments were reacquired under the
 same frozen source, client, independent proposals and 5000/2000 ms budgets.
 
 This is a connected emulator counter with cooperative in-memory backend state.

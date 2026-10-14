@@ -1,0 +1,79 @@
+{
+  "request": {
+    "state": {
+      "current": {
+        "recordedPass": 374,
+        "phaseProfiles": "automation-runtime acquisition passed; simulation acquisition running",
+        "mobile": "18 of 19 environments complete; final Android post-round evidence running"
+      },
+      "remainingCompilerContexts": {
+        "gpu": "OpenCL text VM lacks number_from_text/provider/persistent sequence/lifetime support for 101m-instruction complete compiler",
+        "realtime": "Existing native RCL monotonic release/deadline controls govern execute; compile still uses fixed Windows bootstrap outside those controls",
+        "rncs": "Frozen real RNCS candidate plan/authority/merge/rollback controls exist; compilation outside candidate plan and fixed bootstrap",
+        "game": "Existing native RCL scene/plugin/frame controller exists; compilation fixed bootstrap outside scene control",
+        "science": "Existing NumPy/SciPy checked native RCL workflow exists; compilation fixed bootstrap",
+        "ai": "Existing actual RCL MLP training/native inference advisory workflow exists; compilation fixed bootstrap"
+      }
+    },
+    "questions": {
+      "next_audit": {
+        "type": "choice",
+        "instructions": "仅对下一步只读考古优先级给出建议；优先已存在真实控制器、缺口明确、可复用动态编译器、容易验证拒绝和恢复的环境。不得授权代码更改、执行、发布或验收。",
+        "criteria": {
+          "realtime": "已有明确准入/期限/取消，补动态完整编译器且编译也受期限控制。",
+          "rncs": "已有候选计划、回滚与合并，需要增加编译器工件生命周期。",
+          "game_science_ai": "已有实际应用工作流，需逐个补完整编译器与上下文绑定。",
+          "gpu": "最大设备实现缺口，需要新增通用设备原语和内存生命周期。"
+        }
+      }
+    },
+    "min_confidence": 0.65
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"authority\": \"ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION\",\n  \"model\": \"convaiinnovations/laya-multilingual\",\n  \"revision\": \"b4a904d1a2a54c822b829e24291d4b8f280fe43e\",\n  \"device\": \"cpu\",\n  \"cold_load_seconds\": 27.587,\n  \"inference_ms\": 1874.23,\n  \"gates\": {\n    \"next_audit\": {\n      \"status\": \"ABSTAIN\",\n      \"confidence\": 0.2854,\n      \"threshold\": 0.65\n    }\n  },\n  \"result\": {\n    \"model\": \"laya-rl-agent\",\n    \"answers\": {\n      \"next_audit\": {\n        \"type\": \"choice\",\n        \"choice\": \"gpu\",\n        \"probabilities\": {\n          \"realtime\": 0.1315,\n          \"rncs\": 0.1152,\n          \"game_science_ai\": 0.0831,\n          \"gpu\": 0.6702\n        },\n        \"confidence\": 0.2854,\n        \"action\": {\n          \"act_probability\": 1.0\n        }\n      }\n    },\n    \"usage\": {\n      \"input_tokens\": 354,\n      \"output_tokens\": 0\n    }\n  }\n}"
+      }
+    ],
+    "structuredContent": {
+      "authority": "ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION",
+      "model": "convaiinnovations/laya-multilingual",
+      "revision": "b4a904d1a2a54c822b829e24291d4b8f280fe43e",
+      "device": "cpu",
+      "cold_load_seconds": 27.587,
+      "inference_ms": 1874.23,
+      "gates": {
+        "next_audit": {
+          "status": "ABSTAIN",
+          "confidence": 0.2854,
+          "threshold": 0.65
+        }
+      },
+      "result": {
+        "model": "laya-rl-agent",
+        "answers": {
+          "next_audit": {
+            "type": "choice",
+            "choice": "gpu",
+            "probabilities": {
+              "realtime": 0.1315,
+              "rncs": 0.1152,
+              "game_science_ai": 0.0831,
+              "gpu": 0.6702
+            },
+            "confidence": 0.2854,
+            "action": {
+              "act_probability": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 354,
+          "output_tokens": 0
+        }
+      }
+    },
+    "isError": false
+  }
+}

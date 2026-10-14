@@ -1,0 +1,118 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-phase",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-phase-definitions.mjs",
+  "definitionHash": "dc182d065008d592fd9b5ece428da63a1f0ba7d9385d2c9b7003783491b97da1",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "automation-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    },
+    {
+      "environment": "simulation-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    }
+  ],
+  "environments": [
+    "automation-runtime",
+    "simulation-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K359",
+    "K379"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler supplied dynamically to an actual compiler-stage native C ABI, with compilation and native VM execution admitted by the original source-bound native RCL automation or simulation controller. Each environment independently runs twenty byte-identical generations, ten sealed programs and three unchanged fresh repairs. Compile admission binds SHA256 source bytes; execution admission binds the RCL program root. Automation settles native failures; simulation commits its projected clock only after native success. Pause rejects both compilation and execution before worker invocation, denied compilation publishes no output, reversal is rejected, and bounded backpressure plus healthy recovery are observed. Compiler and stage exits expose actual zero codes; controller termination is observed but its reused session API does not expose an exit code. No JS execution/compiler fallback, physical clock/world, external automation effect, security sandbox or whole-language release claim.",
+  "contractRoot": "d1823c8923af6460f3ca9d22309b0e471859a52d3fa7df06e7778a157535e7db",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "controllerArtifacts": [
+    {
+      "environment": "automation-runtime",
+      "sourcePath": "examples/runtime-hosts/automation-gate.rcl",
+      "sourceHash": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5",
+      "bytecodeHash": "3a2e875dab331f8cfc5965f1019049313c7aaaf778c5aa4b35063882932340f0",
+      "programRoot": "4035d3c476856b5fff5191427923d16325e874d2fe5ef605f56892f7c886b116",
+      "daemonRoot": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "daemonSourceRoot": "0cc58a610bffb176ec7a292137ba15ce727015ce4bf1b5775d893353ef490426"
+    },
+    {
+      "environment": "simulation-runtime",
+      "sourcePath": "examples/runtime-hosts/simulation-clock.rcl",
+      "sourceHash": "e77d55c4e2059889c7cb74705f2cccf335feee09acf9f44bbb39c0892321f8cb",
+      "bytecodeHash": "c7ebf3790c8ee99b87dec26527af5265e03e43747659cd7b4fc99e59f3b7a021",
+      "programRoot": "3c9b6cfb1444c47801dc4db97a767976372525e940ae2df866add1d2a26de865",
+      "daemonRoot": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "daemonSourceRoot": "0cc58a610bffb176ec7a292137ba15ce727015ce4bf1b5775d893353ef490426"
+    }
+  ],
+  "frozenAt": "2026-10-14T13:05:52.551Z",
+  "runtimeControls": [
+    "twenty supplied complete compiler generations admitted by each native RCL controller",
+    "ten sealed programs and three broken/repaired compiler probes in each actual controlled environment",
+    "native automation failure settlement and no simulation clock commit on native failure",
+    "pause denies compile and execute before native call and denied compilation publishes no output",
+    "time reversal rejection, bounded backpressure, healthy compiler/program recovery and observed shutdown"
+  ]
+}

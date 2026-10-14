@@ -1,0 +1,101 @@
+{
+  "format": "rcl.phase-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_API_AND_ADMISSION",
+  "tree": "f0d4870bbf002f7371b753faede438e39b510f85",
+  "commands": [
+    {
+      "id": "public-api",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "tests/phase-compiler.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\phase-source-public-api.log",
+      "sha256": "c288f3ac28226f30271fc7bb419a9045b04384d289b943a17fd3a0485ed99b51"
+    },
+    {
+      "id": "admission",
+      "args": [
+        "scripts/k400-selfhost-phase-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\phase-source-admission.log",
+      "sha256": "f1be3d86b3dceb348c310534729c6a93fc75ccc37c424d3a39b246fa73eaed00"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\phase-source-doctor.log",
+      "sha256": "0cd4af3cd838d0d651344eb07fff58e30f5309364888e0fe95998d6d44c21fcd"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/phase-compiler-target.mjs",
+      "sha256": "c6e64d0651354e3d849402c5bd7441d013205e440fc4e524a9674ad82c1deed5"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "3d3178ec3cbd50a998d48003a6a2c2dbaa750b8cf44928ccd92cac5aeb76b758"
+    },
+    {
+      "path": "package.json",
+      "sha256": "f2fc53de3dbf6d1b7a5772081e107f1cdd5979ca74f6d0895b6a708a07bef39e"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "b4e7f42a15d1f2c31f050a3cd5cba43f7c73d1a8a307b85c0d86372ee40efcc8"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-phase.mjs",
+      "sha256": "810081285b70007acc5afa1c5126c0ed72466333a8873e0d9e4ec7a55572b86e"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-admission.mjs",
+      "sha256": "cf42799e19a6aef38dff07e2b7a51f383a9120bf68eb894f5f2133230b7cd9a7"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-definitions.mjs",
+      "sha256": "dc182d065008d592fd9b5ece428da63a1f0ba7d9385d2c9b7003783491b97da1"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-engine.mjs",
+      "sha256": "502498741dcfb5026cef62f7f81c13227faec8a6fff9fe1c5e87a184ad369cc1"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-ledger.mjs",
+      "sha256": "336659ebb7c4ce4803785751ce06ac922deffefaf3e596e5ad0445555da12cfd"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-target.mjs",
+      "sha256": "f3a91e7109b61d31f812495515e594117a16acbe47eabdb835ee5e4a0896a5fa"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-transport.mjs",
+      "sha256": "9f1f6afb2aec8d44fdefbb3b59a9a7a972114373b74f9700a4c57ec3853d6644"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-phase-proposals.mjs",
+      "sha256": "1376e168992d6c0bd6e7aaae7f405ab6b5bbb3f546bf997e5cc3130d04f8328c"
+    },
+    {
+      "path": "tests/phase-compiler.test.mjs",
+      "sha256": "cfbb20e6c08f8d164b342c24e5eba76f0b0ec4fcbe94113e912c73e81424878e"
+    },
+    {
+      "path": "tests/k400-selfhost-phase-admission.test.mjs",
+      "sha256": "02bc156008c3c597684f610c946255ac24b854be42301deef98b3d4e54eed415"
+    }
+  ],
+  "indexRoot": "ddde57ee8d87b9277e8ab2d094fe9512ea178c0cc3c86ca3cc5155891ef811e4",
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Public phase API actually executes complete compiler generations/native programs in both original native RCL controllers, checks denied compile/execute, native failure settlement, reversal, backpressure, recovery and observed shutdown. Captured K359/K379 receipts reverify. Native owners are reused unchanged, without recrediting old implementations. No fresh entire K400 acquisition, independent OS/device, physical time/world, external automation or hosted CI."
+}
