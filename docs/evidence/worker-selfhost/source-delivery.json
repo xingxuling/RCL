@@ -1,0 +1,160 @@
+{
+  "format": "rcl.worker-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_APIS_AND_ADMISSIONS",
+  "tree": "15ea869174311f1e14f9baa6adc0435d1b3ada21",
+  "commands": [
+    {
+      "id": "public-apis",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "tests/compiler-dataflow.test.mjs",
+        "tests/replicated-compiler.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\worker-source-public-apis.log",
+      "sha256": "0d378d948c8f7c08681aa032810462d1cafa530a747348c63aa25345073528d0"
+    },
+    {
+      "id": "dataflow-admission",
+      "args": [
+        "scripts/k400-selfhost-dataflow-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\worker-source-dataflow-admission.log",
+      "sha256": "0eb0578f25d16960bb6e92a8f7de0cb03341c267cbf12ec8d40b133a4acaa187"
+    },
+    {
+      "id": "replica-admission",
+      "args": [
+        "scripts/k400-selfhost-replica-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\worker-source-replica-admission.log",
+      "sha256": "271cc44f35dfbc395d3673e1715a21aab5bf461f9931c0280649f105dab101bb"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\worker-source-doctor.log",
+      "sha256": "5b01f7a9b556d4c8745017d4eb54b1240ad0af8aaabc704611220b15ce60e23e"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/compiler-dataflow-target.mjs",
+      "sha256": "6fcf64fd8beea228ca943e4645ea2391e571cacbc19e206f2494cd4f986f198e"
+    },
+    {
+      "path": "src/compiler-dataflow-worker.mjs",
+      "sha256": "69f8c4f7d21ee6dd19b0a3bf0ce73103dcb564d272e7c416a0f1f82ff05c5321"
+    },
+    {
+      "path": "src/replicated-compiler-target.mjs",
+      "sha256": "5f5a42ad25f02667e06d5219ff8694ebcc1acf629334111bbf659a7b15e80131"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "a56ae3196bd1bee2e55fc114bb53f83c5479f6197b5cfd43dae224290acbbd4a"
+    },
+    {
+      "path": "package.json",
+      "sha256": "bac258d734883a4db1deaeaea11aeb30735f53a92d2425ebace20f382fbc7a02"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "d42048768339ed9c90b19eff534cc1088ada5782401442ea78a4a9b90c9c30e3"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-dataflow.mjs",
+      "sha256": "1a394e1d154443909f41f347b0f9f61574025e2b8455fab623def06fe7ecf07c"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-replica.mjs",
+      "sha256": "a51b1f898c5800a5ce7fa0365c86597d84f803aaf0cd7eff8009b56d6c896e98"
+    },
+    {
+      "path": "scripts/k400-selfhost-dataflow-admission.mjs",
+      "sha256": "8cc486012b7d4b58055d0c374e24f6a2f90ad2227ecb5a6de13d4f23afe4fbc4"
+    },
+    {
+      "path": "scripts/k400-selfhost-dataflow-definitions.mjs",
+      "sha256": "81164b8aa0bcc48fa54c399a4df195f80d58b843c4321a5ee71512b4e3a792c9"
+    },
+    {
+      "path": "scripts/k400-selfhost-dataflow-engine.mjs",
+      "sha256": "cb0f6da4d1db2073e340a09f041cc773395b6a805606981de06dc5adc2cc6700"
+    },
+    {
+      "path": "scripts/k400-selfhost-dataflow-target.mjs",
+      "sha256": "e7c70ef9b0365fbf73239c2b5f16a039145be223953b2319c07b5b1e41f84627"
+    },
+    {
+      "path": "scripts/k400-selfhost-dataflow-transport.mjs",
+      "sha256": "7bfb952beaf65b068fed5c85a129745aa33bd2b5afaeab3efd5bd4879f481615"
+    },
+    {
+      "path": "scripts/k400-selfhost-replica-admission.mjs",
+      "sha256": "54f9d6f87dd6f0fef1ac30d4c900c6781bd836f82b71dcfb70cdac07d97689cd"
+    },
+    {
+      "path": "scripts/k400-selfhost-replica-definitions.mjs",
+      "sha256": "2827dc18f10310facbcbd398cb01cca2f03e5868458bd931825aba67706a0b4f"
+    },
+    {
+      "path": "scripts/k400-selfhost-replica-engine.mjs",
+      "sha256": "cb7037e2cae8299588dd647d6015555465b4b99e5e931c4d1bdb050eb9a6bd14"
+    },
+    {
+      "path": "scripts/k400-selfhost-replica-target.mjs",
+      "sha256": "92035e9d62830f1a6175fd1e864d9e6da3d6c5a4efbb3432a00ca225854fe10b"
+    },
+    {
+      "path": "scripts/k400-selfhost-replica-transport.mjs",
+      "sha256": "6c2adb76f4ad9bdbba8f1f9944ed3b794038f27f0800a87081e4947c0815ffe6"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-dataflow-proposals.mjs",
+      "sha256": "8b6da7c75f4179581f04cab95ec8344c7b8f01c5d2954d56e056b96f1972ee42"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-replica-proposals.mjs",
+      "sha256": "58b1f392435955ca794f31ff50dfbb110b2fd499bcb57842c04faa658de581e4"
+    },
+    {
+      "path": "tests/compiler-dataflow.test.mjs",
+      "sha256": "038575704be30d6c04b4e7417da3ef1bd6c57300fbf12212e466e727c3e57b51"
+    },
+    {
+      "path": "tests/replicated-compiler.test.mjs",
+      "sha256": "8916925b7bde8392fd814fdfd6ed021a8a805fff14b6b357d7187b3ea998face"
+    },
+    {
+      "path": "tests/k400-selfhost-dataflow-admission.test.mjs",
+      "sha256": "981dbac60647f02d8249d252bdcb8d0353e92fd60ed31256a1c72b895d32a2b5"
+    },
+    {
+      "path": "tests/k400-selfhost-replica-admission.test.mjs",
+      "sha256": "9a377038fc4e5a247e543d159211b2e813885b1d71a1e94ace1f0efcb8b1497a"
+    }
+  ],
+  "profiles": [
+    {
+      "profile": "dataflow",
+      "indexRoot": "8a3f090d3dc4725bb54eea25d40228d87c7611d149f353b51f2ff987f75f4749"
+    },
+    {
+      "profile": "replica",
+      "indexRoot": "0a8db10742bb2ecbe9b15c65b1d5465e070c5e6750b4d16aa26b68a045a45a5a"
+    }
+  ],
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Both public APIs actually execute complete compiler generations and native programs, validate graph/quorum controls and clean exits. Both captured K319/K259 profiles reverify unchanged. Existing native sources/binaries are unchanged and are not rebuilt or credited again. No fresh entire K400 acquisition, independent OS/device, multi-host deployment or hosted CI."
+}

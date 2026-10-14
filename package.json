@@ -43,6 +43,8 @@
     "test:selfhost-runtime": "node --test --test-concurrency=1 tests/resident-sequence-compiler.test.mjs tests/k400-selfhost-android-admission.test.mjs tests/k400-selfhost-embedded-admission.test.mjs tests/resident-compiler-http.test.mjs tests/k400-selfhost-http-admission.test.mjs",
     "test:selfhost-cold": "node --test --test-concurrency=1 tests/cold-compiler-http.test.mjs tests/k400-selfhost-serverless-admission.test.mjs",
     "test:selfhost-sqlite": "node --test --test-concurrency=1 tests/sqlite-compiler.test.mjs tests/k400-selfhost-sqlite-admission.test.mjs",
+    "test:selfhost-dataflow": "node --test --test-concurrency=1 tests/compiler-dataflow.test.mjs tests/k400-selfhost-dataflow-admission.test.mjs",
+    "test:selfhost-replica": "node --test --test-concurrency=1 tests/replicated-compiler.test.mjs tests/k400-selfhost-replica-admission.test.mjs",
     "pretest": "npm run build:native",
     "demo:native": "node src/cli.mjs native examples/hello-reality.rcl",
     "demo:bytecode": "node src/cli.mjs bytecode examples/hello-reality.rcl build/hello-reality.rbc && node src/cli.mjs native-run build/hello-reality.rbc",

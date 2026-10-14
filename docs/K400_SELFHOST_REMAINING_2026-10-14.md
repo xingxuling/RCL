@@ -4,7 +4,8 @@ This is a source audit and development queue, not additional K400 admission.
 Android K099, HTTP server K119 and embedded K299 now have independently verified
 full-compiler indexes. The [cold-handler continuation](K400_COLD_SELFHOST_2026-10-14.md)
 also closes K139; the [SQLite continuation](K400_SQLITE_SELFHOST_2026-10-14.md) closes K159.
-The complete collector now records 372 PASS and 28 UNTESTED. Mobile's separate nineteen-environment campaign is
+The [worker continuation](K400_WORKER_SELFHOST_2026-10-14.md) closes K319/K259.
+The complete collector now records 374 PASS and 26 UNTESTED. Mobile's separate nineteen-environment campaign is
 still partial; completed individual receipts do not supply its eighteen new
 coordinates prematurely.
 
@@ -12,8 +13,6 @@ coordinates prematurely.
 
 | Open self-hosting cell | Existing owner to adapt | Missing implementation / evidence |
 | --- | --- | --- |
-| K259 distributed | `ready-replica-target` | Actual independent worker compilation, artifact agreement and failure recovery |
-| K319 dataflow | `portable-dataflow-target` / worker threads | Dynamic resident compiler generations inside the actual worker graph |
 | K199 game, K219 science, K239 AI, K279 realtime, K359 automation, K379 simulation, K399 RNCS | Their existing source-bound native controllers and profile-specific transport owners | Full compiler compilation/execution must occur through the selected real controller; a renamed Windows process does not provide these coordinates |
 | K179 GPU | Separate GPU Text interpreter and native persistent Sequence donor | Device-side compiler capability and resource management; no CPU compiler execution substitution |
 

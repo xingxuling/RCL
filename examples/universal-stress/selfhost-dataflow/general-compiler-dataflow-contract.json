@@ -1,0 +1,83 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-dataflow",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-dataflow-definitions.mjs",
+  "definitionHash": "81164b8aa0bcc48fa54c399a4df195f80d58b843c4321a5ee71512b4e3a792c9",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "dataflow-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    }
+  ],
+  "environments": [
+    "dataflow-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K319"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler in an actual two-worker-thread compiler-to-VM dataflow graph. Twenty byte-identical C0-to-C20 generations supply preceding compiler artifacts inside the compiler-stage resident native C ABI; ten sealed programs and broken repair probes transfer actual generated artifacts directly into a distinct VM-stage native process. Three unchanged fresh independent repairs, input binding rejection before native invocation, bounded flow backpressure, malformed/corrupt recovery and clean stage/compiler/program exits. No JS compiler/execution fallback, external stream, multi-host runtime, security sandbox or whole-language release claim.",
+  "contractRoot": "f466a006e0b41f0d31f8876973b5610d0ea7e119d777569a3bab4e784ebe3fc8",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "frozenAt": "2026-10-14T12:20:19.494Z",
+  "runtimeControls": [
+    "twenty complete generations supply preceding actual compiler artifacts in the compiler-stage native C ABI",
+    "ten sealed programs and broken repair probes traverse a directly linked compiler-to-VM graph using two actual distinct stage threads",
+    "input/source binding rejection before native invocation and bounded backpressure while a healthy full generation is active",
+    "malformed/corrupt rejection followed by a healthy full compiler generation and identical fresh native program states",
+    "observed clean compiler/program exits and graceful zero-code exits of both actual stage workers"
+  ]
+}
