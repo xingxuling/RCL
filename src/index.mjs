@@ -82,3 +82,4 @@ export { createNativeUiEventRuntime } from './ui/native-event-runtime.mjs';
 export { createNativeUiWebBridge, emitNativeUiBridgeHtml } from './ui/native-web-bridge.mjs';
 export { emitNativeUiAndroidBridge } from './ui/native-android-bridge.mjs';
 export { createNativeAndroidDriver, parseAndroidHierarchy } from './ui/native-android-driver.mjs';
+export { createColdCompilerHttpTarget } from './cold-compiler-http-target.mjs';

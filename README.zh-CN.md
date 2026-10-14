@@ -2,7 +2,7 @@
 
 # RCL — Reality Compiler Language
 
-**研究预览 · K400 370/400（92.50%）· INCOMPLETE · U3**
+**研究预览 · K400 371/400（92.75%）· INCOMPLETE · U3**
 
 **把权限、状态变化和执行证据写进程序的编程语言。**
 
@@ -19,9 +19,9 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 本仓库包含语言实现、用 RCL 编写的 Native-Core 编译器、原生字节码虚拟机、Web / Android 后端与验证工具链。正式源码：`xingxuling/RCL@main`。
 
-**RCL 当前是研究预览：K400 登记 370/400 PASS、30 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
+**RCL 当前是研究预览：K400 登记 371/400 PASS、29 UNTESTED，整体为 INCOMPLETE。** 此前升到“2.0 发布”的判断超过了整门语言的成熟度证据。`2.0.0` 仅保留为现有包、原生工件与历史验收记录的编号，冻结继续升版。已验证的会话和编译器能力属于有界实现成果。见[成熟度政策](docs/governance/RCL_RESEARCH_MATURITY_POLICY.md)与[K400 通关契约](docs/K400_COMPLETION_CAMPAIGN_v0.1.md)。
 
-[RCL 原生程序](docs/K400_NEW_FAMILIES_2026-10-13.md)实现了表达式词元编译、RGB 变换与游程编码往返，以及固定步长的平台游戏规则。三者均通过十二种实际执行环境、冻结输入和原样独立修复验收；各自仍是有界能力，剩余 30 格继续开放。
+[RCL 原生程序](docs/K400_NEW_FAMILIES_2026-10-13.md)实现了表达式词元编译、RGB 变换与游程编码往返，以及固定步长的平台游戏规则。三者均通过十二种实际执行环境、冻结输入和原样独立修复验收；各自仍是有界能力，剩余 29 格继续开放。
 
 [浏览器原生批次](docs/K400_BROWSER_NATIVE_2026-10-13.md)现已在真实 Chromium 窗口中编译和执行 RCL，并检查编译字节一致性、原生错误与页面重置，新增十四个不同格子，达到 216 格。当前目标继续是完整通关 400 格。
 
@@ -49,9 +49,9 @@ RCL（Reality Compiler Language）是一门开源编程语言，面向需要明�
 
 [原生核心自举批次](docs/K400_SELFHOST_COLUMNS_2026-10-14.md)闭合 K059/K039/K019/K079，达到 364 格。独立 RCL 编译器变体修复非 BMP 字符的源码列数，Windows/Linux/WASI/Chromium 共八十代自编译字节一致；四十个冻结程序和十二次原样独立修复重放通过。原始 Unicode 失败契约保留记录并保持零计数。
 
-[GPU 文本与 UI 继续开发](docs/K400_GPU_TEXT_2026-10-14.md)闭合 K163/K164/K165，达到 367 个不同格子。GPU 直接执行 UTF-8 文本操作和数值转文本，驱动真实 Chromium 点击与 Android 原生触控；独立科学计数法编译、原生数值复核、冻结输入、原样独立修复和篡改拒绝通过。Android ATD 截图仍为黑屏，视觉像素验收保持待验证；已核验原生控件文本、触控与生命周期语义。剩余 30 格继续保持未通关。
+[GPU 文本与 UI 继续开发](docs/K400_GPU_TEXT_2026-10-14.md)闭合 K163/K164/K165，达到 367 个不同格子。GPU 直接执行 UTF-8 文本操作和数值转文本，驱动真实 Chromium 点击与 Android 原生触控；独立科学计数法编译、原生数值复核、冻结输入、原样独立修复和篡改拒绝通过。Android ATD 截图仍为黑屏，视觉像素验收保持待验证；已核验原生控件文本、触控与生命周期语义。剩余 29 格继续保持未通关。
 
-[完整编译器运行时继续开发](docs/K400_SELFHOST_RUNTIME_2026-10-14.md)独立验证了 Android K099、HTTP 服务端 K119 和嵌入式 K299：各自均保持二十代完整自编译、十个封存原生程序和三份原样独立修复。公开的常驻编译器 API 复用原生 C ABI 实例，独立鉴权 HTTP API 接收实际编译器代次并执行原生程序；40 项针对性检查通过。全部证据经总汇总器复核，达到 370/400 PASS，30 格仍未通关。
+[完整编译器运行时继续开发](docs/K400_SELFHOST_RUNTIME_2026-10-14.md)独立验证了 Android K099、HTTP 服务端 K119 和嵌入式 K299：各自均保持二十代完整自编译、十个封存原生程序和三份原样独立修复。公开的常驻编译器 API 复用原生 C ABI 实例，独立鉴权 HTTP API 接收实际编译器代次并执行原生程序；40 项针对性检查通过。新补的[冷启动完整编译器](docs/K400_COLD_SELFHOST_2026-10-14.md)通关 K139：公开 API 把实际编译器代次传入新的本地 HTTP/原生进程，并确认成功和拒绝请求后的实际退出；13 项针对性检查通过。总汇总器复核后达到 371/400 PASS，29 格仍未通关。
 
 ## 为什么使用 RCL？
 
@@ -433,7 +433,7 @@ RCL 当前长期验证主线是一张固定的：
 
 缺一个必要 Gate 就是 BLOCKED；必要 Gate 失败就是 FAIL，不能靠其它高分抵消。
 
-当前记录为 `370 PASS / 0 BLOCKED / 30 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。[原生 RCL 阶段批次](docs/K400_NATIVE_PHASES_2026-10-13.md)通过绑定源码的时钟和任务控制器新增 24 格；[表达式、媒体与游戏批次](docs/K400_NEW_FAMILIES_2026-10-13.md)将三个新 RCL 程序放入十二种实际执行环境，新增 36 格，达到 202 格，完成“至少 200 格”的开发里程碑。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
+当前记录为 `371 PASS / 0 BLOCKED / 29 UNTESTED`，成熟度 `U3`，K400 仍为 `INCOMPLETE`。PASS 仅针对冻结的有界证据 profile，不代表整个程序族或环境族均已解决。[可移植通关批次](docs/K400_EXPANSION_CAMPAIGN_2026-10-13.md)新增了 Windows/WASI/Linux/Android 模拟器执行证据。[执行环境批次](docs/K400_EXECUTION_CONTEXTS_2026-10-13.md)验证了鉴权 HTTP、持续嵌入式实例和双节点恢复，新增 35 个不同格子。[原生任务批次](docs/K400_JOB_CONTEXTS_2026-10-13.md)通过冷请求进程、SQLite 事务和工作线程数据流再新增 36 格。[原生 RCL 阶段批次](docs/K400_NATIVE_PHASES_2026-10-13.md)通过绑定源码的时钟和任务控制器新增 24 格；[表达式、媒体与游戏批次](docs/K400_NEW_FAMILIES_2026-10-13.md)将三个新 RCL 程序放入十二种实际执行环境，新增 36 格，达到 202 格，完成“至少 200 格”的开发里程碑。K233 的有界两层 Dense General MLP profile 已闭合；后续 Tensor / Autodiff 候选保留独立证据边界，见 [`CURRENT-STATUS.md`](CURRENT-STATUS.md)。
 
 ### 当前 Killer Tasks
 

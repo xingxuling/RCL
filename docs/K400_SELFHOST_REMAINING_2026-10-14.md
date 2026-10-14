@@ -2,8 +2,8 @@
 
 This is a source audit and development queue, not additional K400 admission.
 Android K099, HTTP server K119 and embedded K299 now have independently verified
-full-compiler indexes. The complete collector now records 370 PASS and 30 UNTESTED after the browser
-toolchain refresh. Mobile's separate nineteen-environment campaign is
+full-compiler indexes. The [cold-handler continuation](K400_COLD_SELFHOST_2026-10-14.md)
+also closes K139. The complete collector now records 371 PASS and 29 UNTESTED. Mobile's separate nineteen-environment campaign is
 still partial; completed individual receipts do not supply its eighteen new
 coordinates prematurely.
 
@@ -11,7 +11,6 @@ coordinates prematurely.
 
 | Open self-hosting cell | Existing owner to adapt | Missing implementation / evidence |
 | --- | --- | --- |
-| K139 serverless | `ready-serverless-target`, resident compiler ABI | Accept the supplied compiler generation in a real cold worker, then freeze and acquire its full compiler profile |
 | K159 database | `portable-database-target` | Real SQLite/compiler job binding and transaction controls for dynamic compiler artifacts |
 | K259 distributed | `ready-replica-target` | Actual independent worker compilation, artifact agreement and failure recovery |
 | K319 dataflow | `portable-dataflow-target` / worker threads | Dynamic resident compiler generations inside the actual worker graph |

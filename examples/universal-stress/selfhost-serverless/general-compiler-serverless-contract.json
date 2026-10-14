@@ -1,0 +1,82 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-serverless",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-serverless-definitions.mjs",
+  "definitionHash": "9d284cdb6ef685be84977e736c954207ce6aab14e8bed8f8fcc3b761b894ce4a",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "serverless",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    }
+  ],
+  "environments": [
+    "serverless"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K139"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler in fresh local authenticated HTTP handlers. Each compile or execute creates its own separate worker and native compiler and returns only after observed clean worker/compiler exits. Twenty byte-identical C0-to-C20 generations supply the preceding compiler artifact; ten sealed programs run in actual native VM processes. Three unchanged fresh independent repairs, unauthorized denial, malformed/corrupt rejection and fresh handler recovery. No warm reuse, JS compiler/execution fallback, cloud FaaS deployment, security sandbox or whole-language release claim.",
+  "contractRoot": "61767803b7b57b29306ca148e029db40f270bed1b62695f807c60fcdbc773d80",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "frozenAt": "2026-10-14T11:23:25.815Z",
+  "runtimeControls": [
+    "twenty generations supply actual preceding compiler artifacts in twenty fresh authenticated local HTTP worker/native compiler contexts",
+    "ten actual native VM program process executions in fresh handlers",
+    "each successful and rejected invocation returns after clean worker/compiler exits; no warm reuse",
+    "unauthorized denial leaves handler health unchanged; malformed/corrupt rejection followed by fresh full compiler recovery and identical fresh program executions"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "format": "rcl.cold-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_API_AND_ADMISSION",
+  "tree": "72490352d0ca615a6f183cbb0fd44c8d3d52bc4c",
+  "commands": [
+    {
+      "id": "public-api",
+      "args": [
+        "--test",
+        "tests/cold-compiler-http.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\cold-source-public-api.log",
+      "sha256": "3927f87410466a906fb0f3d05cffc21bd4d8b3cf59e2e23201288ca9a9dc88e0"
+    },
+    {
+      "id": "admission",
+      "args": [
+        "scripts/k400-selfhost-serverless-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\cold-source-admission.log",
+      "sha256": "56c61d4a8a6cdf9e22985dbd3127fcea3b944b74959bbadeb7df691fb24e9f67"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\cold-source-doctor.log",
+      "sha256": "f7ef6e6f8e5188d2b9f79b71ed2342d6673fac08a54ad8da95d445fa945d55e0"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/cold-compiler-http-target.mjs",
+      "sha256": "d5064da46961fbf5c2dc085cfce928f566f12cb89963618d3a0f423f48922d59"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "fdee3f3038a230cf595c43f3b582e759cc6babbfc3e1c0a12b773a56b1cfa772"
+    },
+    {
+      "path": "package.json",
+      "sha256": "405daa5892a706dcf02c75370aebc6b0a1fc6f4efcb645990845e08b93a86f8f"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "5675a175c4e1187e66fd6c6b056361e37d600af4fdd00bbdcdcfa38625bfa237"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-serverless.mjs",
+      "sha256": "2457861ed36fc367a1710d80f7c242183bcb524da04610c5e484a2e18226c2c7"
+    },
+    {
+      "path": "scripts/k400-selfhost-serverless-admission.mjs",
+      "sha256": "feea823eed7b25849df93af2757404bd9a744da572f0a14a800a29ca21e1aa1b"
+    },
+    {
+      "path": "scripts/k400-selfhost-serverless-definitions.mjs",
+      "sha256": "9d284cdb6ef685be84977e736c954207ce6aab14e8bed8f8fcc3b761b894ce4a"
+    },
+    {
+      "path": "scripts/k400-selfhost-serverless-engine.mjs",
+      "sha256": "3713ff3dc19228925852361a7e5b257840e8966c8c41dc04b3489eab13a3f3d9"
+    },
+    {
+      "path": "scripts/k400-selfhost-serverless-target.mjs",
+      "sha256": "67f3acc7d765fca6bcc7cea778af450ffb16cfbde997df83e2cb65f86d83d563"
+    },
+    {
+      "path": "scripts/k400-selfhost-serverless-transport.mjs",
+      "sha256": "2ab39757e7c201a9fa5dd300a5e11c4f09d78a12daf21dcfd5991e9f4545067c"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-serverless-proposals.mjs",
+      "sha256": "fdddc7932959623866eedf9eda2f36c1ebd003b78f82105b52aab8d1151d9696"
+    },
+    {
+      "path": "scripts/probe-cold-selfhost-compiler.mjs",
+      "sha256": "36e49f5aa24f399e999a1dac99e07b315a689fdf68260fe9e27b21bc39b9932d"
+    },
+    {
+      "path": "tests/cold-compiler-http.test.mjs",
+      "sha256": "5fbf2260db2d5a65cf4c958063194e9e50be4e301b55504f809a448194261354"
+    },
+    {
+      "path": "tests/k400-selfhost-serverless-admission.test.mjs",
+      "sha256": "2edd6455eed019f751bb982de6e9753c528afa91c7bb407bc425a9ed18caa7c0"
+    }
+  ],
+  "k139IndexRoot": "907d21d3a65c82587bf6bde935136369fb098ea3e50b8ce73495053d6e75506e",
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Its public API actually self-compiles supplied generations, executes a native program and verifies successful/rejected process exits. The captured K139 admission verifies unchanged. Existing native code/binaries are unchanged and are not rebuilt or credited again. This is not a fresh entire K400 acquisition, independent OS isolation, cloud deployment or hosted CI."
+}

@@ -117,3 +117,8 @@ not freshly reacquire Android or establish another device's support.
 The local DWAC four-mode selector chose `DEEP_DEVELOPMENT` for the full-compiler
 target bottleneck. Its decision is candidate planning evidence, not admission
 or execution authority. GitHub Actions are not used.
+
+The subsequent [cold-handler compiler continuation](K400_COLD_SELFHOST_2026-10-14.md)
+adds the public per-call API and a separate K139 profile, bringing current
+coverage to 371/400. The 370-cell measurements in this document retain their
+original acquisition scope.
