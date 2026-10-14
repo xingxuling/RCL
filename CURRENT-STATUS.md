@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 396/400 PASS (99.00%) · 4 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 397/400 PASS (99.25%) · 3 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,24 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-15 complete compiler in canonical RNCS candidate plans
+
+K399 adds one unique self-hosting coordinate, reaching **397 PASS / 3 UNTESTED**,
+U3, INCOMPLETE. The actual canonical RNCS plan provider invokes the supplied full
+compiler or native program after an actual native preview. Exact bytes or typed
+semantic results bind candidate metadata, local authority and publication. Twenty
+generations perform forty complete native compilations, with ten sealed programs
+and three unchanged fresh repairs. Injected plan failure rolls back candidate
+metadata; denied merge and stale generation reject publication after actual
+provider work. Native completed jobs remain separately recorded. Pause denies
+native calls, malformed/corrupt input settles failure, and bounded dispatch
+recovers. Thirty focused checks pass. Compiler/worker zero exits and controller
+termination are observed; controller exit code remains unavailable. Remaining
+cells: K179 GPU, K199 game and K279 soft realtime complete compiler profiles.
+No production RFE commit, human-key authority or durable artifact store is claimed.
+Version promotion stays frozen; no Actions are requested.
+See `docs/K400_RNCS_SELFHOST_2026-10-15.md`.
 
 ## 2026-10-14 complete compiler in actual application workflows
 

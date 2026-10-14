@@ -1,0 +1,97 @@
+{
+  "format": "rcl.rncs-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_API_AND_ADMISSION",
+  "tree": "08d4f63ac0ea5e3038aed1d33ea50dbc7dae77f2",
+  "commands": [
+    {
+      "id": "public-api",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "tests/rncs-compiler.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\rncs-source-public-api.log",
+      "sha256": "dcde7dce26040c43c7d46ae908bd98b710a5cca7dc4bb5a33498f1b8d0fe006b"
+    },
+    {
+      "id": "admission",
+      "args": [
+        "scripts/k400-selfhost-rncs-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\rncs-source-admission.log",
+      "sha256": "207828845c565b96466ec7c40ba5b1da45107c07ad5ffd0c73875a61a59f4d63"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\rncs-source-doctor.log",
+      "sha256": "02140a9ef125de48e3a63a706691cd926f874d934161c1b803848d181bc59875"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/rncs-compiler-target.mjs",
+      "sha256": "bc3f53fbbc5c8dfb6e662a19a1109e4fdc74b11195f96c5f0f9c3711fd2b61f4"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "456dc7e660cbded8719204885ed403cf8a02ff1154bad349a111050e2081e333"
+    },
+    {
+      "path": "package.json",
+      "sha256": "dfc3bcc8cf705b7d9f7d87d5dbead59d0797ac098ebf758021a18f75c5a29571"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "0435ba0bbb01d2457dc1ecd7cf66adecf254e23886991e1143ea8b8395889569"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-rncs.mjs",
+      "sha256": "114d3b05e308bc0990305789debe6c18fe98298fd6d284ab8545249349687acb"
+    },
+    {
+      "path": "scripts/k400-selfhost-rncs-admission.mjs",
+      "sha256": "5249554cad6a5119154675060dfefef92480fa00e6a00743d2bd03589261bddd"
+    },
+    {
+      "path": "scripts/k400-selfhost-rncs-definitions.mjs",
+      "sha256": "6ae38159ff45a36a3c7df8341021e6d537f811287beb4fb21cce9dafbea4ab9e"
+    },
+    {
+      "path": "scripts/k400-selfhost-rncs-engine.mjs",
+      "sha256": "24d9af1aeb57abd5c498992886e46af9c8ba4b250022e29c51e8068611f3cef2"
+    },
+    {
+      "path": "scripts/k400-selfhost-rncs-target.mjs",
+      "sha256": "994428807097de764013101874e06cee39303277fe50d59a50e0d0de6ca8c983"
+    },
+    {
+      "path": "scripts/k400-selfhost-rncs-transport.mjs",
+      "sha256": "f91df424f5ed448143462c4aac3c9a9f96f0d1fc8e82a6138474f8592bc18b8d"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-rncs-proposals.mjs",
+      "sha256": "4c1be6a48ba27024e185432f46e07817b1404a685b46bebf309d0e3d708450bc"
+    },
+    {
+      "path": "tests/rncs-compiler.test.mjs",
+      "sha256": "2d2c4899497f770ee89edf628aa888e78ae1dc6a6168a4fb833b900034367296"
+    },
+    {
+      "path": "tests/k400-selfhost-rncs-admission.test.mjs",
+      "sha256": "efe8a0b7d44050375baf5bf889003cfea38fd3897edcaff7f0ce85d4cf6dbb9f"
+    }
+  ],
+  "indexRoot": "66a7ade100ffc294c953a707c775ec437025cccfd7e00ef11f3de2ce5240e115",
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Public rncs API actually executes complete compiler generations/native programs in the canonical RNCS candidate workflow, checks input snapshots, actual plan-provider native work, denied dispatch, rejected merge/publication, candidate rollback and native failure settlement, backpressure, recovery and shutdown. Captured K399 receipts reverify. Native owners are reused unchanged, without recrediting old implementations. No fresh entire K400 acquisition, independent OS/device, physical time/world, external automation or hosted CI."
+}

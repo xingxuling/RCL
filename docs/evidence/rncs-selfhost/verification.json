@@ -1,0 +1,308 @@
+{
+  "format": "rcl.rncs-selfhost-verification.v1",
+  "status": "PASS_LOCAL_AND_RELOCATED_SOURCE_DELIVERY",
+  "baselineCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee",
+  "sourceTree": "08d4f63ac0ea5e3038aed1d33ea50dbc7dae77f2",
+  "k400": {
+    "passed": 397,
+    "untested": 3,
+    "verdict": "INCOMPLETE",
+    "maturity": "U3",
+    "reportRoot": "6cb249df81fd02e01d5394d012e45bed82220533f890ab6ed047991992133917"
+  },
+  "uniqueAddedCells": [
+    "K399"
+  ],
+  "indexRoot": "66a7ade100ffc294c953a707c775ec437025cccfd7e00ef11f3de2ce5240e115",
+  "profiles": [
+    {
+      "environment": "rncs-runtime",
+      "contractRoot": "c83b48e9932630fb028bc5d7806328306e3fb994531264298fa3a70193b1aeeb",
+      "runtimeRoot": "735c46b4384f607c1ba63f65d29f730bb4a22b7c618035573ab1ba74aef531a9",
+      "generations": 20,
+      "fixedPointNativeInvocations": 40,
+      "sealedPrograms": 10,
+      "unchangedRepairReplays": 3,
+      "operations": 59,
+      "controllerCommands": 228,
+      "candidateGenerations": 52,
+      "performance": {
+        "compileP95Ms": 9712.983199999988,
+        "executeP95Ms": 451.07300000000396
+      },
+      "nativeExits": 33,
+      "shutdown": {
+        "graph": {
+          "shutdown": [
+            {
+              "role": "compile",
+              "session": "5a525873-dd25-4006-9c0d-57cfde3a1a66",
+              "threadId": 1,
+              "hostPid": 58508,
+              "id": 83,
+              "flowId": "a7c2cdbc-a6c6-4685-bc06-cb791f67c905",
+              "sequence": 83,
+              "operation": "shutdown",
+              "sourceHash": null,
+              "sourceRoot": null,
+              "fromCompile": null,
+              "nativeCalled": false,
+              "compilerExit": {
+                "code": 0,
+                "signal": null,
+                "pid": 60624
+              }
+            },
+            {
+              "role": "execute",
+              "session": "5a525873-dd25-4006-9c0d-57cfde3a1a66",
+              "threadId": 2,
+              "hostPid": 58508,
+              "id": 31,
+              "flowId": "8ea28fe1-5f96-49b8-84bb-33e5175f82e6",
+              "sequence": 31,
+              "operation": "shutdown",
+              "sourceHash": null,
+              "sourceRoot": null,
+              "fromCompile": null,
+              "nativeCalled": false,
+              "compilerExit": null
+            }
+          ],
+          "exits": [
+            {
+              "role": "compile",
+              "threadId": 1,
+              "code": 0
+            },
+            {
+              "role": "execute",
+              "threadId": 2,
+              "code": 0
+            }
+          ]
+        },
+        "controller": {
+          "pid": 102120,
+          "terminationObserved": true,
+          "exitCode": "UNAVAILABLE_FROM_REUSED_SESSION_API"
+        }
+      }
+    }
+  ],
+  "checks": {
+    "localPublicApiTests": 1,
+    "localAdmissionTests": 29,
+    "localFocusedTotal": 30,
+    "relocatedPublicApiTests": 1,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "relocatedCapturedAdmissions": 1,
+    "localAndRelocatedDoctor": true,
+    "packDryRunIgnoreScripts": true,
+    "packEssentialFilesPresent": true,
+    "packagePdbExcluded": true
+  },
+  "retainedBindings": [
+    {
+      "path": "src/portable-rncs-target.mjs",
+      "sha256": "5c85cfa6adfb6a58e290b763c4a4a8bad493449b6a834ae0f876c46f85c1074b",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/portable-native-vm.mjs",
+      "sha256": "a0c287bacf8bc4ba8a27e8ec39dbb8793b2732dd04dc4ad6fc1c1afe900b441b",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/native-session.mjs",
+      "sha256": "e19b10513b9b7cca106003b99be8ccf24cfcf5eedfe3ae2db0963fc94f79becc",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/session-compiler.mjs",
+      "sha256": "2306bb4a4fc90fc5c14a96c55d96c507018302aa6dd70535e1e10b3d96ed6c1b",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/resident-sequence-compiler.mjs",
+      "sha256": "401839704383aa12075b7aef3fac452106a09e51a0943c1f34beccae87cdd5ba",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/phase-compiler-target.mjs",
+      "sha256": "c6e64d0651354e3d849402c5bd7441d013205e440fc4e524a9674ad82c1deed5",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/compiler-dataflow-target.mjs",
+      "sha256": "6fcf64fd8beea228ca943e4645ea2391e571cacbc19e206f2494cd4f986f198e",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/compiler-dataflow-worker.mjs",
+      "sha256": "69f8c4f7d21ee6dd19b0a3bf0ce73103dcb564d272e7c416a0f1f82ff05c5321",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "scripts/k400-rncs-traces.mjs",
+      "sha256": "cf749c7349856e362847bd79fd25e58b715177df60505c9e11c58024117f163f",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "scripts/k400-selfhost-phase-ledger.mjs",
+      "sha256": "336659ebb7c4ce4803785751ce06ac922deffefaf3e596e5ad0445555da12cfd",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/rclc.c",
+      "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/rclvm.c",
+      "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/rclvmd.c",
+      "sha256": "22a4ba4cac4ab289859db1a71d9fe0e2d036f17d18325884c474857c39867600",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/rclvm.exe",
+      "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/rclvmd.exe",
+      "sha256": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/native-windows-manifest.json",
+      "sha256": "64158567170171f33d69c5ae11cc797a71443b78b2d7afbeb6305bd28b2dbb33",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/sequence-compiler/compiler-daemon.c",
+      "sha256": "8f8bdc76f6c1b440eb3a3357086c809ea6d314f2eb6db243f09bac566d00c013",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "native/sequence-compiler/rclcd.exe",
+      "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "selfhost/variants/utf16-columns/compiler.rbc",
+      "sha256": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "selfhost/variants/utf16-columns/compiler.rcl",
+      "sha256": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "examples/runtime-hosts/automation-gate.rcl",
+      "sha256": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+      "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/index.mjs",
+      "sha256": "32db6de298277dcce95f48230e5b672142b4746f8e7b85809844e6f3aaa8cb7d",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/canonical.mjs",
+      "sha256": "f03cab0a980cf5b4883bc25a87e059eedbec77b55ac50fffd82480d933b3b158",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/operations.mjs",
+      "sha256": "d5384b549cb8c263f7579ecedef014773e69ea9b549ea880615379993cd7bf63",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/branching.mjs",
+      "sha256": "bf784d8c3b2a19bbc36551f3ab55bc4f31f14d5eeab57b1edf57f8646e85ce8e",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/simulation.mjs",
+      "sha256": "cf1d5a04943947e4257691bae5ba4330c6abdc83a9add2a5d87dac1c02819af5",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/comparison.mjs",
+      "sha256": "78fc53ea8469115c47e9ac5316d2ae2327390d34aae7af2c5fb79d1125d37088",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/execution.mjs",
+      "sha256": "d91c5da2771a1fb7d4433c47e0504d07eeb7c2df5aad8c9c07c3dc982aee6601",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/authority.mjs",
+      "sha256": "3d68baf499fe46a9cedad69054e58e22883dd941883d2ec120ffb4a9d66f3dd9",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/src/adapters.mjs",
+      "sha256": "417e2d4c1aed732e6975c2c5981802a300c69e7f6888f6bf0a81a5ff503fa3c6",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/LICENSE",
+      "sha256": "9bbdfeace91bd982b20f9fbd8505f82e7caa2281e02ab496a81d1558a3da3cb3",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    },
+    {
+      "path": "src/vendor/rncs-reality-branch/package.json",
+      "sha256": "0cdeb35b479d21a37ed91d2b3ea5b4fa961f0c732796d81ce1e08a15aa806235",
+      "unchangedFromCommit": "508b983a941ef4a3781dd473bf3161ffddde96ee"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/evidence/rncs-selfhost/acquisition.log",
+      "sha256": "231f13c253de2765ffa9a1c4bdf60b58aba1adf2259702b89d4af5c354b1751c"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/api.log",
+      "sha256": "098c238f1d2a23b69967d51024b9dc6c1fa1c50abae143d02648aae526d9dac5"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/admission-tests.log",
+      "sha256": "aa02773075463987b89babc0f57934aab2d7ecf7214e258aef4da7d62243a817"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/source-api.log",
+      "sha256": "dcde7dce26040c43c7d46ae908bd98b710a5cca7dc4bb5a33498f1b8d0fe006b"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/source-admission.log",
+      "sha256": "207828845c565b96466ec7c40ba5b1da45107c07ad5ffd0c73875a61a59f4d63"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/source-doctor.json",
+      "sha256": "02140a9ef125de48e3a63a706691cd926f874d934161c1b803848d181bc59875"
+    },
+    {
+      "path": "docs/evidence/rncs-selfhost/source-delivery.json",
+      "sha256": "faeedb5d6b769520a8cae1fe60e7a4831cd32abfa94523fc81167a66f7aaa666"
+    }
+  ],
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "packageVersion": "2.0.0",
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "scope": "Full collector locally reverified every admitted profile. A relocated tracked Git tree actually tests the public RNCS compiler API, revalidates captured K399 and runs doctor. Both native preview and canonical plan provider really invoke the supplied compiler/program; canonical candidate metadata is bound to their matching results. Candidate rollback does not erase completed native work. Native compiler and both workers expose zero exits; controller termination is observed, exit code unavailable from reused session API. Previous owners, RNCS upstream files, sources and binaries remain byte-identical. No fresh entire K400 acquisition in relocated tree, independent OS/device/implementation, production RFE commit, human-key authority, durable artifact store, external effect, security sandbox or whole-language release. Package dry-run checks essential files and PDB exclusion before evidence-only additions; no package publication. Product hashes match delivered sources; source tree precedes final evidence-only additions."
+}

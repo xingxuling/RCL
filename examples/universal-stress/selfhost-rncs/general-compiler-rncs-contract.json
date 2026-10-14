@@ -1,0 +1,104 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-rncs",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-rncs-definitions.mjs",
+  "definitionHash": "6ae38159ff45a36a3c7df8341021e6d537f811287beb4fb21cce9dafbea4ab9e",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "rncs-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    }
+  ],
+  "environments": [
+    "rncs-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K399"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler supplied dynamically inside the frozen canonical RNCS candidate branch/plan/provider/authority/merge workflow. Twenty byte-identical C0-to-C20 generations each perform an actual native preview and an actual plan-provider compilation, forty complete native compiler invocations in total; ten sealed programs and three unchanged fresh repairs use the same real candidate runtime. Supplied compiler/source/program bytes are snapshotted; preview/provider byte or exact semantic equality binds the candidate metadata to native output. Actual source-owned native RCL automation admission/completion supplies candidate authority. Injected plan failure rolls back candidate state and discards unpublished native output; denied merge and stale generation reject publication after actual provider execution, while native job outcomes remain recorded. Pause denies native dispatch, bounded backpressure and healthy recovery are observed. Candidate artifact metadata and returned bytes are bound; no durable artifact store, production RFE commit, human-key authority, external effect, security sandbox, independent implementation or whole-language release claim. Compiler/stage zero exits and controller termination are observed; reused controller exit code remains unavailable.",
+  "contractRoot": "c83b48e9932630fb028bc5d7806328306e3fb994531264298fa3a70193b1aeeb",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "vendor": {
+    "commit": "4cbbeae5fc5e4bad5c7b4fef6621bc3cfe6eb6f1",
+    "package": "@taowind/reality-branch-fabric",
+    "version": "0.2.0-alpha.1",
+    "provenance": {
+      "path": "src/vendor/rncs-reality-branch/PROVENANCE.json",
+      "sha256": "1a8a84cf53191f7865e3dc583af84d4baff38d8d5ddfa173c0369be63926dabd"
+    }
+  },
+  "controllerArtifacts": [
+    {
+      "environment": "rncs-runtime",
+      "sourcePath": "examples/runtime-hosts/automation-gate.rcl",
+      "sourceHash": "fda8c80427f65621ea72b8f0cf8b2e9218f0878d8ddef1189f514e8b174c3df5",
+      "bytecodeHash": "3a2e875dab331f8cfc5965f1019049313c7aaaf778c5aa4b35063882932340f0",
+      "programRoot": "4035d3c476856b5fff5191427923d16325e874d2fe5ef605f56892f7c886b116",
+      "daemonRoot": "5033e2772a03ed53cfc6f629fad0f92657051b85bd984a1edfba68c84a510fc7",
+      "daemonSourceRoot": "0cc58a610bffb176ec7a292137ba15ce727015ce4bf1b5775d893353ef490426"
+    }
+  ],
+  "frozenAt": "2026-10-14T15:50:40.457Z",
+  "runtimeControls": [
+    "twenty supplied compiler generations each perform actual native preview and actual RNCS plan-provider compilation",
+    "ten sealed programs and three broken/repaired probes bind actual plan-provider output to a local candidate",
+    "source-bound native RCL admission/completion governs each actual compiler/VM invocation",
+    "injected step-two failure rolls back candidate metadata and discards unpublished native output",
+    "denied merge and stale generation reject output publication after real provider execution",
+    "pause denies native calls, bounded backpressure, healthy recovery and compiler/stage exits with observed controller termination"
+  ]
+}
