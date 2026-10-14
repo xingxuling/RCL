@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 398/400 PASS (99.50%) · 2 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 399/400 PASS (99.75%) · 1 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,23 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-15 complete compiler under native RCL soft deadlines
+
+K279 adds one unique self-hosting coordinate, reaching **399 PASS / 1 UNTESTED**,
+U3, INCOMPLETE. Actual supplied complete compiler and native program jobs pass
+original native RCL monotonic release/admission/sample-deadline publication.
+Compiler/source/program snapshots, actual fresh compiler ABI processes, full
+compiler and native program deadline/cancellation exits, failure settlement,
+responsive host timers, expiry before dispatch, pause, clock reversal, source-root
+mismatch, malformed/corrupt input, bounded dispatch and healthy recovery pass.
+Twenty generations, ten sealed programs and three unchanged fresh repairs retain
+original budgets; 38 focused checks pass. Successful native exits are zero;
+interrupted exits honestly preserve SIGTERM/null status. Controller termination
+is observed with unavailable reused API exit code. GPU K179 remains UNTESTED.
+No resident compiler reuse, hard realtime/OS interrupt guarantee or external
+effect is claimed. Version promotion stays frozen; no hosted Actions requested.
+See `docs/K400_REALTIME_SELFHOST_2026-10-15.md`.
 
 ## 2026-10-15 complete compiler in actual native RCL game frames
 

@@ -1,0 +1,101 @@
+{
+  "format": "rcl.realtime-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_API_AND_ADMISSION",
+  "tree": "f1b8da6bf357e673997b62e423171f54cf8f4bfe",
+  "commands": [
+    {
+      "id": "public-api",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "tests/realtime-compiler.test.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\realtime-source-public-api.log",
+      "sha256": "94ed8eb01a054dceae9a9e452c6adfd2d2a23229182d8a5f9da67d6f3c5dedcf"
+    },
+    {
+      "id": "admission",
+      "args": [
+        "scripts/k400-selfhost-realtime-admission.mjs"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\realtime-source-admission.log",
+      "sha256": "38dc2579e7b21ce7030d0056eb51bea1d310b6b3f1fd73196bccff923d29334c"
+    },
+    {
+      "id": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "status": 0,
+      "log": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\realtime-source-doctor.log",
+      "sha256": "ef481d07988f492d81100fe9ca76973d8ce06afcf706c44f88dedc61fed8de2f"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/realtime-compiler-target.mjs",
+      "sha256": "37dfa872e1ebc6db086bbd0c1a880ec1b8815793c19d5557f1bfbeda0cfdc4db"
+    },
+    {
+      "path": "src/timed-sequence-compiler.mjs",
+      "sha256": "d06b33ff766cb6f92244572f52eeaecb38a9a8f88c0b0da7ec2f7eb8930584dd"
+    },
+    {
+      "path": "src/index.mjs",
+      "sha256": "af8e5301a55839ec8ad5c98de05ade80aee3da2a2b1bf0ada63318303e324912"
+    },
+    {
+      "path": "package.json",
+      "sha256": "1f5b3edecea84e9982c9b4f2d7f4886107dd5e44969b6fb87b6a5e55c119977a"
+    },
+    {
+      "path": "scripts/build-k400-evidence.mjs",
+      "sha256": "30c1a10bad7fd0dcd3083e8dc218e1cf56e9fb372210faa83a9e9bc0fa6bf2a6"
+    },
+    {
+      "path": "scripts/freeze-k400-selfhost-realtime.mjs",
+      "sha256": "a4835a63ef09d9b0c976cc754755f4a034a7cc529ffaf710f72f80b030b986c2"
+    },
+    {
+      "path": "scripts/k400-selfhost-realtime-admission.mjs",
+      "sha256": "38960dde5c0bc534687b7b3cdd54600db83adf09defed1a4db2bb90126a85770"
+    },
+    {
+      "path": "scripts/k400-selfhost-realtime-definitions.mjs",
+      "sha256": "8e1531dfb674b3f6413cee104c7bb7e1fbf511dafd4f56836cde1301d96bb82d"
+    },
+    {
+      "path": "scripts/k400-selfhost-realtime-engine.mjs",
+      "sha256": "41f1d8a2fff142772625b8fd380a63ee0f7054fc5efe9d302554e4019b0af0a2"
+    },
+    {
+      "path": "scripts/k400-selfhost-realtime-target.mjs",
+      "sha256": "3b1291df431c01ffc64cf3c4cdf3d84a0e1f60c09d881c4478ca2d8e0b6c0336"
+    },
+    {
+      "path": "scripts/k400-selfhost-realtime-transport.mjs",
+      "sha256": "adc974d261c66bffbeeca9f3edaa8e4bce02e13b445de63e039ba798252abaa0"
+    },
+    {
+      "path": "scripts/record-k400-selfhost-realtime-proposals.mjs",
+      "sha256": "0a1636dad588a5c914efa6ba277d3f3e1fde0e613c7b2bc815d6acdcf1869f90"
+    },
+    {
+      "path": "tests/realtime-compiler.test.mjs",
+      "sha256": "39c588741d3027eb6eff59a4fbdd5c79b896ab781add8329a08009becd6c4861"
+    },
+    {
+      "path": "tests/k400-selfhost-realtime-admission.test.mjs",
+      "sha256": "877a2c036160a63a0ca8e47899b2dca689250014ff29e289eb029c99d8b09dad"
+    }
+  ],
+  "indexRoot": "934bc19008c0a0e26d9b38ced380184adbf544a3f029afb92a53d497f89dd1c5",
+  "doctorOk": true,
+  "formalLanguageRelease": false,
+  "versionPromotionFrozen": true,
+  "scope": "Tracked Git tree relocated without ignored tools/output. Public realtime API actually executes complete compiler generations/native programs in the original native RCL soft realtime scheduler, checks input snapshots, monotonic native RCL scheduling, actual full-compiler/process deadline and cancellation exits, denied dispatch, unpublished failed outputs and healthy recovery, backpressure, recovery and shutdown. Captured K279 receipts reverify. Native owners are reused unchanged, without recrediting old implementations. No fresh entire K400 acquisition, independent OS/device, physical time/world, external automation or hosted CI."
+}

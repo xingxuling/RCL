@@ -1,0 +1,56 @@
+{
+  "authority": "ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION",
+  "model": "convaiinnovations/laya-multilingual",
+  "revision": "b4a904d1a2a54c822b829e24291d4b8f280fe43e",
+  "device": "cpu",
+  "cold_load_seconds": 27.587,
+  "inference_ms": 2123.07,
+  "gates": {
+    "scope": {
+      "status": "ABSTAIN",
+      "confidence": 0.2749,
+      "threshold": 0.6
+    }
+  },
+  "result": {
+    "model": "laya-rl-agent",
+    "answers": {
+      "scope": {
+        "type": "choice",
+        "choice": "bounded_soft_realtime",
+        "probabilities": {
+          "bounded_soft_realtime": 0.669,
+          "hard_os_realtime": 0.2676,
+          "version_metadata": 0.0634
+        },
+        "confidence": 0.2749,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 167,
+      "output_tokens": 0
+    }
+  },
+  "source": "mcp__laya__laya_decide actual tool response",
+  "state": {
+    "observation": "Current soft realtime environment controls actual native program execution with release timers, sampled deadline publication, cancellation and observed child exits. Complete caller-supplied compilation is still outside those controls. Proposed capability runs actual full compiler jobs through the same native RCL scheduling rules, with real child termination and recovery.",
+    "options": [
+      "bounded_soft_realtime",
+      "hard_os_realtime",
+      "version_metadata"
+    ]
+  },
+  "question": {
+    "type": "choice",
+    "instructions": "Classify the evidence scope only. This advice does not authorize actions or determine K400 acceptance.",
+    "criteria": {
+      "bounded_soft_realtime": "Observed local monotonic scheduling, actual native child stop and RCL sampled deadline gates",
+      "hard_os_realtime": "OS-level interrupt guarantees and worst-case hard realtime timing are proven",
+      "version_metadata": "Changing a release number alone establishes this capability"
+    }
+  },
+  "codexJudgment": "ABSTAIN is advisory only. Actual source and runtime establish bounded soft realtime with sampled native RCL deadline gates; no hard OS guarantee or version promotion."
+}

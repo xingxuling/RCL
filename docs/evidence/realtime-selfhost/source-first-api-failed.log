@@ -1,0 +1,28 @@
+✖ actual supplied complete compiler obeys native RCL soft scheduling, deadline/abort exits and healthy recovery (15258.1023ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15802.6142
+
+✖ failing tests:
+
+test at tests\realtime-compiler.test.mjs:10:1
+✖ actual supplied complete compiler obeys native RCL soft scheduling, deadline/abort exits and healthy recovery (15258.1023ms)
+  Error: RCL_REALTIME_DEADLINE_EXPIRED
+      at error (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/output/k4-realtime-f1b8da6b/src/realtime-compiler-target.mjs:15:48)
+      at childExecution (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/output/k4-realtime-f1b8da6b/src/realtime-compiler-target.mjs:45:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/output/k4-realtime-f1b8da6b/src/realtime-compiler-target.mjs:57:617
+      at async Object.execute (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/output/k4-realtime-f1b8da6b/src/realtime-compiler-target.mjs:64:217)
+      at async TestContext.<anonymous> (file:///C:/Users/User/.codex/.chatgpt-projects/g-p-6a437af98cc08191af8185180f66b55e/work/RCL-v2-development/output/k4-realtime-f1b8da6b/tests/realtime-compiler.test.mjs:14:596)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    code: 'RCL_REALTIME_DEADLINE_EXPIRED',
+    nativeTrace: { processPid: 84028, started: 13057.9624, ended: 15570.6602, exitObserved: true, code: null, signal: 'SIGTERM', stopRequestedAt: 15048.5112, stopSignalSent: true, stopReason: 'RCL_REALTIME_DEADLINE_EXPIRED', stdout: '', stderr: '', command: 'C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\k4-realtime-f1b8da6b\\native\\rclvm.exe', args: [ 'C:\\Users\\User\\AppData\\Local\\Temp\\rcl-realtime-compiler-1ciMH5\\input-0' ], stdoutHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', stderrHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+    compilerTrace: undefined,
+    realtimeFailure: { kind: 'execute', index: 3, nonce: '4d0c791f-caff-4f77-b3fe-66fa6d77a822', inputRoot: '2580dab383271f715014c9111313cef37283a6f3f3921b1de0a0bfe246b593d9', inputCompilerHash: null, artifactHash: '2634cddcf5a4da618bbed871a541c06a1b57682f04919e323c36e37785e62d88', nativeCalled: true, before: { format: 'rcl.governed-session.v1', backend: 'native', program: 'NativeRealtimeGate', programRoot: '6fb439dc6fce41950ece0f488a5103eb9ab262fa66e3c23ebeb8a49e83f201fc', state: [Object], stateRoot: 'be4b556b88e7d613f29e85e113ca2eb119d32925413c19e1b98cf8579cfdaaae', stateRootAlgorithm: 'rcl.semantic-state-root.v2', native: [Object] }, started: 13046.703, release: 13048.703, deadline: 15046.703, admittedAt: 13050.9292, publishedAt: null, timerCount: 2, nativeTrace: { processPid: 84028, started: 13057.9624, ended: 15570.6602, exitObserved: true, code: null, signal: 'SIGTERM', stopRequestedAt: 15048.5112, stopSignalSent: true, stopReason: 'RCL_REALTIME_DEADLINE_EXPIRED', stdout: '', stderr: '', command: 'C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\k4-realtime-f1b8da6b\\native\\rclvm.exe', args: [Array], stdoutHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', stderrHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' }, entry: { format: 'rcl.session-result.v1', program: 'NativeRealtimeGate', programRoot: '6fb439dc6fce41950ece0f488a5103eb9ab262fa66e3c23ebeb8a49e83f201fc', command: [Object], status: 'realized', beforeRoot: 'be4b556b88e7d613f29e85e113ca2eb119d32925413c19e1b98cf8579cfdaaae', afterRoot: '8a39c448499e662f2853acbed137102c357c01ddacf94f8089350715afec796a', stateRootAlgorithm: 'rcl.semantic-state-root.v2', state: [Object], transition: [Object] }, completion: null, settlement: { format: 'rcl.session-result.v1', program: 'NativeRealtimeGate', programRoot: '6fb439dc6fce41950ece0f488a5103eb9ab262fa66e3c23ebeb8a49e83f201fc', command: [Object], status: 'realized', beforeRoot: '8a39c448499e662f2853acbed137102c357c01ddacf94f8089350715afec796a', afterRoot: '247d72e9b8e806a27558376c20bc5df52617e9347113a7688739d05f0137fad9', stateRootAlgorithm: 'rcl.semantic-state-root.v2', state: [Object], transition: [Object] }, snapshot: { format: 'rcl.governed-session.v1', backend: 'native', program: 'NativeRealtimeGate', programRoot: '6fb439dc6fce41950ece0f488a5103eb9ab262fa66e3c23ebeb8a49e83f201fc', state: [Object], stateRoot: '247d72e9b8e806a27558376c20bc5df52617e9347113a7688739d05f0137fad9', stateRootAlgorithm: 'rcl.semantic-state-root.v2', native: [Object] }, ledgerRange: { start: 4, end: 6 } }
+  }

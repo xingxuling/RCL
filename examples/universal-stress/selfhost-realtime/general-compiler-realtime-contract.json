@@ -1,0 +1,107 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-realtime",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/utf16-columns/compiler.rcl",
+  "sourceHash": "b3cb7816a2d447888c8620f7513a70db1564ed79afd11afc14b6f6bc29e63e82",
+  "sourceRoot": "3ca5527a6e038b1072db8e6fa2163093efe633c00291ce1163f15696e1e45612",
+  "compilerPath": "selfhost/variants/utf16-columns/compiler.rbc",
+  "compilerHash": "55b32b42ca5ad13ec08e421511da3bc8d6af640f5fcf0268d5879c02a7c4ba48",
+  "definitionFile": "scripts/k400-selfhost-realtime-definitions.mjs",
+  "definitionHash": "8e1531dfb674b3f6413cee104c7bb7e1fbf511dafd4f56836cde1301d96bb82d",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "examples/universal-stress/selfhost-native/runtime-builds.json",
+  "buildHash": "8427b57093eff8f27dab36ae67a0ace05d4f18187dcc4a803dff4d59325e6e34",
+  "runtimeArtifacts": [
+    {
+      "environment": "realtime-runtime",
+      "compiler": {
+        "path": "native/sequence-compiler/rclcd.exe",
+        "sha256": "4df4ec8673769cc878626192a1ebc8322cfcdd9a7cfa94b8b1f85d28fc3c618f",
+        "bytes": 341504
+      },
+      "vm": {
+        "path": "native/rclvm.exe",
+        "sha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "bytes": 333824
+      }
+    }
+  ],
+  "environments": [
+    "realtime-runtime"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K279"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Actual caller-supplied complete native-core RCL compiler and native program jobs under the original native RCL monotonic soft scheduler. Twenty byte-identical C0-to-C20 generations, ten sealed native programs and three unchanged fresh repairs retain original instruction/performance budgets. Compiler/source/program inputs snapshotted before awaiting. Actual monotonic release, native RCL admission, fresh native compiler ABI process per job, sampled-deadline publication, observed native exit and failure settlement. Full compiler deadline and cancellation controls actually dispatch the frozen complete compiler, terminate/await the native child, leave output unpublished and recover with a healthy fresh complete compile. Native program timeout/cancellation likewise uses an actual frozen spin program. Paused native calls, expiry before dispatch, clock reversal, source-root mismatch, malformed/corrupt input and bounded backpressure reject. Host timer heartbeats remain responsive during full compilation. No resident compiler reuse, hard realtime/OS interrupt guarantee, external effect, security sandbox, independent implementation or whole-language release claim. Actual native zero exits on success; interrupted exits recorded honestly. Controller termination observed; reused session API exit code unavailable.",
+  "contractRoot": "ec62ef99e63d3d967c678cd039df31b23fd1c339c621eca1934b419c05077022",
+  "expectedFixedpointInstructions": 101897504,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "realtimeContract": {
+    "path": "examples/universal-stress/realtime-native/algorithm-cli-contract.json",
+    "sha256": "31d04a1689394d6a4abbcc8251486ab7851d5b8d4d1240e7ccc956ec9865ce29"
+  },
+  "spinSource": {
+    "path": "examples/runtime-hosts/realtime-spin-control.rcl",
+    "sha256": "c6eb25c9d03fea123a484a590b255ac3920562754eafc4ff5b78e3082e2609e5"
+  },
+  "frozenAt": "2026-10-14T16:45:14.728Z",
+  "runtimeOptions": {
+    "notBeforeMs": 2,
+    "compileDeadlineMs": 50000,
+    "executeDeadlineMs": 2000
+  },
+  "controlOptions": {
+    "releaseMs": 20,
+    "fullCompilerDeadlineMs": 500,
+    "cancelAfterMs": 300,
+    "spinDeadlineMs": 150,
+    "spinCancelAfterMs": 20,
+    "expiredDeadlineMs": -1
+  },
+  "runtimeControls": [
+    "full supplied compiler/program bytes captured before admission",
+    "actual native RCL monotonic release/admission/sample-deadline publication for both compile and execute",
+    "complete compiler deadline and abort dispatch real C ABI request, terminate child and wait for observed exit",
+    "real native program deadline and abort exit using frozen spin artifact",
+    "failed/expired/paused calls publish no output and settle admitted jobs",
+    "actual clock reversal rejection, bounded backpressure and healthy full compiler/program recovery",
+    "responsive host heartbeat during full compiler work",
+    "native process exits and controller termination without invented exit code"
+  ]
+}

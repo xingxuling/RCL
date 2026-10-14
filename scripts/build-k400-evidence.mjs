@@ -74,6 +74,7 @@ import { verifySelfhostProfile as verifyPhaseSelfhostProfile } from './k400-self
 import { verifySelfhostProfile as verifyApplicationSelfhostProfile } from './k400-selfhost-application-admission.mjs';
 import { verifySelfhostProfile as verifyRncsSelfhostProfile } from './k400-selfhost-rncs-admission.mjs';
 import { verifySelfhostProfile as verifyGameSelfhostProfile } from './k400-selfhost-game-admission.mjs';
+import { verifySelfhostProfile as verifyRealtimeSelfhostProfile } from './k400-selfhost-realtime-admission.mjs';
 import { verifyUiProfile as verifyGpuUiProfile } from './k400-gpu-ui-engine.mjs';
 import { verifyUiProfile as verifyGpuMobileProfile } from './k400-gpu-mobile-engine.mjs';
 
@@ -1308,7 +1309,7 @@ if(sqliteSelfhostAdmission.admitted){
   }
   evidence.sourceReceipts.push('examples/universal-stress/selfhost-sqlite/general-compiler-sqlite-runtime.json');
 }
-for(const [directory,verifyProfile] of [['dataflow',verifyDataflowSelfhostProfile],['replica',verifyReplicaSelfhostProfile],['phase',verifyPhaseSelfhostProfile],['application',verifyApplicationSelfhostProfile],['rncs',verifyRncsSelfhostProfile],['game',verifyGameSelfhostProfile]]){
+for(const [directory,verifyProfile] of [['dataflow',verifyDataflowSelfhostProfile],['replica',verifyReplicaSelfhostProfile],['phase',verifyPhaseSelfhostProfile],['application',verifyApplicationSelfhostProfile],['rncs',verifyRncsSelfhostProfile],['game',verifyGameSelfhostProfile],['realtime',verifyRealtimeSelfhostProfile]]){
   const admission=await verifyProfile();if(!admission.admitted)continue;
   for(const claim of admission.claims){if(evidence.claims.some(item=>item.id===claim.id))throw new Error('RCL_K400_WORKER_SELFHOST_COORDINATE_DUPLICATED:'+claim.id);evidence.claims.push(claim);}
   evidence.sourceReceipts.push('examples/universal-stress/selfhost-'+directory+'/general-compiler-'+directory+'-runtime.json');

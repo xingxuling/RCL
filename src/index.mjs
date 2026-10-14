@@ -90,3 +90,4 @@ export { createPhaseCompilerTarget } from './phase-compiler-target.mjs';
 export { createApplicationCompilerTarget, COMPILER_METRIC_FEATURES } from './application-compiler-target.mjs';
 export { createRncsCompilerTarget } from './rncs-compiler-target.mjs';
 export { createGameCompilerTarget, GAME_COMPILER_METRIC } from './game-compiler-target.mjs';
+export { createRealtimeCompilerTarget } from './realtime-compiler-target.mjs';
