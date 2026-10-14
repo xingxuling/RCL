@@ -1,0 +1,32 @@
+{
+  "authority": "ADVISORY_ONLY_NO_MUTATION_NO_AUTHORIZATION",
+  "source": "mcp__laya__laya_decide actual tool response",
+  "model": "convaiinnovations/laya-multilingual",
+  "revision": "b4a904d1a2a54c822b829e24291d4b8f280fe43e",
+  "device": "cpu",
+  "cold_load_seconds": 27.587,
+  "inference_ms": 431.94,
+  "state": {
+    "current": "K400 397 PASS, 3 UNTESTED. Game context runs native program hooks and native RCL physics, but compile uses a fixed bootstrap. A caller-supplied complete compiler under the existing game controller is missing.",
+    "options": ["runtime_integration_gap", "version_gap", "already_complete"]
+  },
+  "question": {
+    "type": "choice",
+    "instructions": "Classify this observed missing capability only; no commands, writes or acceptance are authorized.",
+    "criteria": {
+      "runtime_integration_gap": "Actual complete compiler generations need integration into native game admission and frames",
+      "version_gap": "Changing package version would supply the missing runtime capability",
+      "already_complete": "Existing fixed-bootstrap game compilation proves complete caller-supplied self-hosting"
+    }
+  },
+  "gate": {"status": "ABSTAIN", "confidence": 0.2196, "threshold": 0.6},
+  "answer": {
+    "type": "choice",
+    "choice": "version_gap",
+    "probabilities": {"runtime_integration_gap": 0.1877, "version_gap": 0.6716, "already_complete": 0.1407},
+    "confidence": 0.2196,
+    "action": {"act_probability": 1.0}
+  },
+  "usage": {"input_tokens": 149, "output_tokens": 0},
+  "codexJudgment": "ABSTAIN provides no qualified recommendation. Source inspection establishes a missing caller-supplied complete-compiler integration, not a version gap. Version promotion remains frozen."
+}

@@ -1,6 +1,6 @@
 # Current RCL Status: research preview, K400 incomplete
 
-**RESEARCH_PREVIEW · K400 397/400 PASS (99.25%) · 3 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 398/400 PASS (99.50%) · 2 UNTESTED · INCOMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,23 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-15 complete compiler in actual native RCL game frames
+
+K199 adds one unique self-hosting coordinate, reaching **398 PASS / 2 UNTESTED**,
+U3, INCOMPLETE. Actual supplied full compiler generations enter native frame
+authority foresee without scene writes, then bind compiler artifact metrics/hash
+to source-owned load and three actual native RCL physics frames before output.
+Programs reuse three real native hooks and the original scene projection. Input
+snapshots, paused/foreign-root denial, invalid publication, unchanged failed scenes,
+bounded dispatch and healthy recovery pass. Twenty complete generations, ten
+sealed programs and three unchanged fresh repairs preserve original budgets;
+32 focused checks pass. Compiler/hooks expose zero exits; controller termination
+is observed with unavailable reused API exit code. Remaining cells are K179 GPU
+and K279 soft realtime complete compiler profiles. No browser, physical timing,
+domain understanding or durable filesystem/scene transaction claim. Version
+promotion stays frozen; no hosted Actions requested.
+See `docs/K400_GAME_SELFHOST_2026-10-15.md`.
 
 ## 2026-10-15 complete compiler in canonical RNCS candidate plans
 

@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash,randomUUID} from 'node:crypto';
+import {performance} from 'node:perf_hooks';
+import {ROOT} from './k400-genomes/shared.mjs';
+import {createGameCompilerTarget} from '../src/game-compiler-target.mjs';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+export async function createSelfhostTarget(environment,contract,directory){
+  assert.equal(environment,'game-runtime');const service=await createGameCompilerTarget(),runtime=contract.runtimeArtifacts[0],ledger=[],exits=[];let disposed=false;assert.deepEqual(service.binding.compiler.binary,runtime.compiler);assert.equal(service.binding.game.binary.path,runtime.vm.path);assert.equal(service.binding.game.binary.sha256,runtime.vm.sha256);
+  const binding={...service.binding,session:randomUUID(),runtime,acquisitionRoot:ROOT};
+  function capture(t,n){t.nativeCompilerTrace=n;t.metrics=n.metrics;t.pid=n.metrics.pid;t.stdout=n.replyLine;t.stdoutHash=sha(t.stdout);t.replyObserved=true;if(n.metrics.status==='ok'){t.outputHash=n.artifactHash;t.outputBytes=n.metrics.bytes;}}
+  async function call(kind,args){const started=performance.now(),t={index:ledger.length,nonce:randomUUID(),session:binding.session,environment,kind,inputCompilerHash:kind==='compile'?sha(fs.readFileSync(args.compilerFile)):null,source:args.sourceFile?fs.readFileSync(args.sourceFile,'utf8'):null,sourceHash:args.sourceFile?sha(fs.readFileSync(args.sourceFile)):null,artifactHash:args.artifactFile?sha(fs.readFileSync(args.artifactFile)):null,sourceRoot:args.sourceRoot??null,options:args.options??{}};
+    try{let r;if(kind==='compile'){assert.ok(path.resolve(args.outputFile).startsWith(path.resolve(directory)+path.sep));r=await service.compile(args.compilerFile,args.sourceFile,args.outputFile,args.options);capture(t,r.compilerTrace);t.compilerGameTrace=r.gameCompilerTrace;t.outputHash=sha(r.bytecode);t.outputBytes=r.bytecode.length;}else{r=await service.execute(args.artifactFile,args.sourceRoot);t.executionGameTrace=r.gameExecutionTrace;t.runtimeTrace=r.gameTrace;t.result=r.result;t.nativeExecutionTraces=r.gameTrace.frames.map(f=>f.hookTrace);t.pid=t.nativeExecutionTraces[0].processPid;for(const n of t.nativeExecutionTraces)exits.push({kind:'execute',pid:n.processPid,code:n.status,signal:n.signal,artifactHash:t.artifactHash});}t.status=0;t.ms=performance.now()-started;ledger.push(t);return t;
+    }catch(error){if(error.compilerTrace)capture(t,error.compilerTrace);t.compilerGameTrace=error.gameCompilerFailure??null;t.executionGameTrace=error.gameExecutionFailure??null;t.status=1;t.ms=performance.now()-started;t.error={code:error.code??null,message:error.message};ledger.push(t);throw Object.assign(error,{traceIndex:t.index});}
+  }
+  const target={binding,ledger:()=>structuredClone(ledger),exits:()=>structuredClone(exits),controllerLedger:()=>service.controllerLedger(),compile:(compilerFile,sourceFile,outputFile,options)=>call('compile',{compilerFile,sourceFile,outputFile,options}),execute:(artifactFile,sourceRoot)=>call('execute',{artifactFile,sourceRoot}),
+    async compileExecute(compilerFile,sourceFile,outputFile,sourceRoot){const compiled=await target.compile(compilerFile,sourceFile,outputFile),executed=await target.execute(outputFile,sourceRoot);return{compiled,executed};},
+    async verifyLifecycle(compilerFile,sourceFile,outputFile,artifactFile,sourceRoot){const guardStart=service.controllerLedger().length;await service.pause();const paused=service.snapshotController(),deniedFile=path.join(directory,'denied-output.rbc');let deniedCompile,deniedExecute,wrongRoot,publicationDenied;
+      try{await target.compile(compilerFile,sourceFile,deniedFile);assert.fail('Paused compiler admitted');}catch(error){assert.equal(error.code,'RCL_AUTHORITY_DENIED');deniedCompile=error.traceIndex;}
+      try{await target.execute(artifactFile,sourceRoot);assert.fail('Paused native game admitted');}catch(error){assert.equal(error.code,'RCL_AUTHORITY_DENIED');deniedExecute=error.traceIndex;}await service.resume();const guardEnd=service.controllerLedger().length;
+      const before=service.snapshotController();for(const [options,code,key]of [[{admissionRoot:'f'.repeat(64)},'RCL_AUTHORITY_DENIED','root'],[{invalidPublication:true},'RCLC_GAME_PUBLICATION_NOT_ADMITTED','publication']]){try{await target.compile(compilerFile,sourceFile,deniedFile,options);assert.fail('Rejected compilation admitted');}catch(error){assert.equal(error.code,code);if(key==='root')wrongRoot=error.traceIndex;else publicationDenied=error.traceIndex;}assert.equal(service.snapshotController().stateRoot,before.stateRoot);assert.equal(fs.existsSync(deniedFile),false);}
+      const pending=target.compile(compilerFile,sourceFile,outputFile);let backpressure;try{await service.execute(artifactFile,sourceRoot);}catch(error){assert.equal(error.message,'RCLC_GAME_BACKPRESSURE');backpressure={rejected:true,message:error.message};}assert.ok(backpressure?.rejected);const recovered=await pending,first=await target.execute(artifactFile,sourceRoot),next=await target.execute(artifactFile,sourceRoot);assert.deepEqual(first.result,next.result);assert.deepEqual(first.runtimeTrace.snapshot.state,next.runtimeTrace.snapshot.state);
+      return{guardRange:{start:guardStart,end:guardEnd},pausedStateRoot:paused.stateRoot,deniedCompile,deniedExecute,wrongRoot,publicationDenied,deniedOutputPublished:false,backpressure,recovery:recovered.index,first:first.index,next:next.index};
+    },
+    async dispose(){if(disposed)return;disposed=true;const ended=await service.dispose();exits.push({...ended.compiler,kind:'compile'});target.shutdown=ended;},
+  };return target;
+}
