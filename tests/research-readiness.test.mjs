@@ -16,7 +16,7 @@ test('current research maturity comes from the K400 evidence rather than the pac
   assert.equal(report.k400.totalCells, 400);
   assert.equal(report.k400.passedCells, registeredPassCount);
   assert.equal(report.k400.statusCounts.UNTESTED, 400 - evidence.claims.length);
-  assert.equal(report.k400.verdict, 'INCOMPLETE');
+  assert.equal(report.k400.verdict, registeredPassCount === 400 ? 'COMPLETE' : 'INCOMPLETE');
   assert.equal(report.passedFraction, registeredPassCount / 400);
 });
 

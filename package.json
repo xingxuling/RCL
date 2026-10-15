@@ -50,7 +50,7 @@
     "test:selfhost-rncs": "node --test --test-concurrency=1 tests/rncs-compiler.test.mjs tests/k400-selfhost-rncs-admission.test.mjs",
     "test:selfhost-game": "node --test --test-concurrency=1 tests/game-compiler.test.mjs tests/k400-selfhost-game-admission.test.mjs",
     "test:selfhost-realtime": "node --test --test-concurrency=1 tests/realtime-compiler.test.mjs tests/k400-selfhost-realtime-admission.test.mjs",
-    "test:selfhost-gpu-candidate": "node --test --test-concurrency=1 tests/gpu-compiler.test.mjs",
+    "test:selfhost-gpu-candidate": "node --test --test-concurrency=1 tests/gpu-compiler.test.mjs tests/gpu-compiler-fusion.test.mjs",
     "build:gpu-compiler-runtime": "node scripts/build-gpu-compiler-runtime.mjs",
     "pretest": "npm run build:native",
     "demo:native": "node src/cli.mjs native examples/hello-reality.rcl",
@@ -425,7 +425,11 @@
     "demo:session": "node examples/sessions/persistent-counter-demo.mjs",
     "verify:native-core-support": "node scripts/build-native-core-support.mjs --check",
     "verify:v2-release": "node scripts/verify-v2-release.mjs",
-    "verify:session-upgrade": "node scripts/verify-session-upgrade.mjs"
+    "verify:session-upgrade": "node scripts/verify-session-upgrade.mjs",
+    "build:indexed-core-compiler": "node scripts/build-indexed-core-compiler.mjs",
+    "test:indexed-core-compiler": "node --test tests/indexed-core-compiler.test.mjs",
+    "run:k400-gpu-selfhost": "node scripts/k400-selfhost-gpu-engine.mjs run gpu",
+    "verify:k400-gpu-selfhost": "node scripts/k400-selfhost-gpu-admission.mjs"
   },
   "engines": {
     "node": ">=20"

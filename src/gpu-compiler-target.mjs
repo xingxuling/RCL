@@ -18,9 +18,10 @@ const describe=file=>{const bytes=fs.readFileSync(path.join(ROOT,file));return{p
 
 async function connect(python,timeoutMs){
   const child=spawn(python,[path.join(ROOT,runtimeFiles[0])],{stdio:['pipe','pipe','pipe'],windowsHide:true});
-  const lines=readline.createInterface({input:child.stdout});let pending,closed=false,stderr='';
+  const lines=readline.createInterface({input:child.stdout});let pending,closed=false,stderr='',dispatch;
   const fail=caught=>{if(pending){const p=pending;pending=undefined;p.clean();p.reject(caught);}};
-  child.stderr.on('data',bytes=>{stderr=(stderr+bytes).slice(-16384);});
+  const errors=readline.createInterface({input:child.stderr});
+  errors.on('line',line=>{stderr=(stderr+line+'\n').slice(-16384);try{const p=JSON.parse(line);if(dispatch&&p.progress===true&&p.nonce===dispatch.nonce){dispatch.progress.push(p);if(dispatch.progress.length>16)dispatch.progress.shift();}}catch{}});
   const exit=new Promise(resolve=>child.once('close',(code,signal)=>{closed=true;fail(err('RCL_GPU_PROCESS_EXIT',`${code}:${signal}:${stderr}`));lines.close();resolve({processPid:child.pid,code,signal,exitObserved:true});}));
   child.on('error',fail);child.stdin.on('error',fail);
   lines.on('line',line=>{if(!pending){child.kill();return;}const p=pending;pending=undefined;p.clean();try{p.resolve(JSON.parse(line));}catch(caught){p.reject(caught);child.kill();}});
@@ -37,7 +38,7 @@ async function connect(python,timeoutMs){
   }
   async function close(){if(!closed){child.stdin.end();const timer=setTimeout(()=>child.kill(),3000);try{return await exit;}finally{clearTimeout(timer);}}return await exit;}
   try{const ready=await response();if(ready.ready!==true||ready.processPid!==child.pid)throw err('RCL_GPU_READY_BINDING');return{ready,
-    async request(input,options){const wait=response(options);if(!options?.signal?.aborted)child.stdin.write(JSON.stringify(input)+'\n');try{return await wait;}catch(caught){if(caught.code==='RCL_GPU_CANCELLED'||caught.code==='RCL_GPU_REQUEST_TIMEOUT'){caught.gpuProcessExit=await exit;}throw caught;}},close};
+    async request(input,options){dispatch={processPid:child.pid,nonce:input.nonce,artifactHash:input.artifactHash,compilerSourceHash:input.compilerSourceHash??null,sentAt:null,progress:[]};const receipt=dispatch,wait=response(options);if(!options?.signal?.aborted){child.stdin.write(JSON.stringify(input)+'\n');receipt.sentAt=performance.now();}try{const result=await wait;return{...result,gpuTransport:{...receipt,returnedAt:performance.now()}};}catch(caught){if(caught.code==='RCL_GPU_CANCELLED'||caught.code==='RCL_GPU_REQUEST_TIMEOUT'){caught.gpuProcessExit=await exit;}caught.gpuTransport={...receipt,returnedAt:performance.now()};throw caught;}finally{dispatch=undefined;}},close};
   }catch(caught){child.kill();await exit;throw caught;}
 }
 
@@ -73,19 +74,24 @@ export async function createGpuCompilerTarget(options={}){
       if(!Array.isArray(observed.deviceOpcodeCounts)||observed.deviceOpcodeCounts.length!==48
         ||observed.deviceOpcodeCounts.some(n=>!Number.isSafeInteger(n)||n<0)
         ||observed.deviceOpcodeCounts.reduce((a,b)=>a+b,0)!==observed.executedInstructions)throw err('RCL_GPU_INSTRUCTION_COUNT_BINDING');
+      if(observed.instructionCountKind!=='ORIGINAL_RBC_SEMANTIC_STEPS'
+        ||!Number.isSafeInteger(observed.fusedTriples)||observed.fusedTriples<0
+        ||!Number.isSafeInteger(observed.fusedPairs)||observed.fusedPairs<0
+        ||!Number.isSafeInteger(observed.fusedSequenceGets)||observed.fusedSequenceGets<0
+        ||observed.fusedTriples*3+observed.fusedPairs*2+observed.fusedSequenceGets*2>observed.executedInstructions)throw err('RCL_GPU_FUSION_COUNT_BINDING');
       return observed;
     }catch(caught){if(caught.gpuProcessExit){exits.push(caught.gpuProcessExit);connection=null;}throw caught;}
   }
   function operate(task){busy=true;active=(async()=>{try{return await task();}finally{busy=false;}})();return active;}
   const target={binding,exits:()=>structuredClone(exits),
     compile(compilerFile,sourceFile,outputFile,control={}){
-      control={signal:control.signal,timeout:control.timeout};
+      control={signal:control.signal,timeout:control.timeout,progress:control.progress===true};
       ready();if(control.signal?.aborted)return Promise.reject(err('RCL_GPU_CANCELLED'));
       const started=performance.now(),compiler=fs.readFileSync(compilerFile),sourceBytes=fs.readFileSync(sourceFile),program=decode(compiler);
       const source=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(sourceBytes),inputCompilerHash=sha(compiler),sourceHash=sha(sourceBytes),nonce=randomUUID(),destination=path.resolve(outputFile);
       return operate(async()=>{
         const observed=await request({mode:'compile',bytecode:compiler.toString('base64'),artifactHash:inputCompilerHash,sourceRoot:program.sourceRoot,
-          compilerSource:source,compilerSourceHash:sourceHash,nonce,...(quantum?{quantum}:{})},control);
+          compilerSource:source,compilerSourceHash:sourceHash,nonce,...(control.progress?{progress:true}:{}),...(quantum?{quantum}:{})},control);
         const bytecode=Buffer.from(observed.outputBytes,'base64');if(sha(bytecode)!==observed.outputHash||bytecode.length!==observed.outputLength||observed.providerCalls!==1)throw err('RCL_GPU_COMPILER_OUTPUT_BINDING');
         const decoded=decode(bytecode);if(control.signal?.aborted)throw err('RCL_GPU_CANCELLED');
         const temporary=destination+'.gpu-'+nonce;try{fs.writeFileSync(temporary,bytecode,{flag:'wx'});fs.renameSync(temporary,destination);}finally{if(fs.existsSync(temporary))fs.unlinkSync(temporary);}
@@ -97,7 +103,7 @@ export async function createGpuCompilerTarget(options={}){
       control={signal:control.signal,timeout:control.timeout};
       ready();if(!/^[0-9a-f]{64}$/u.test(sourceRoot??''))throw err('RCL_GPU_SOURCE_ROOT_REQUIRED');if(control.signal?.aborted)return Promise.reject(err('RCL_GPU_CANCELLED'));
       const started=performance.now(),bytes=fs.readFileSync(artifactFile),artifactHash=sha(bytes),nonce=randomUUID();
-      return operate(async()=>{const observed=await request({mode:'execute',bytecode:bytes.toString('base64'),artifactHash,sourceRoot,nonce},control),result=reconstructGpuResult(observed);
+      return operate(async()=>{const observed=await request({mode:'execute',bytecode:bytes.toString('base64'),artifactHash,sourceRoot,nonce,...(quantum?{quantum}:{})},control),result=reconstructGpuResult(observed);
         return{result,ms:performance.now()-started,gpuTrace:{...observed,state:undefined,records:undefined,warrants:undefined,stateRoot:result.stateRoot,
           transactionCount:observed.records.length,transactionSnapshotsRoot:sha(JSON.stringify(observed.records))}};});
     },

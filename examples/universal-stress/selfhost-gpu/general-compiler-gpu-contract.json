@@ -1,0 +1,163 @@
+{
+  "format": "rcl.k400-selfhost-contract.v1",
+  "id": "general-compiler-gpu",
+  "frozenBeforeIndependentTrials": true,
+  "sourcePath": "selfhost/variants/indexed-core/compiler.rcl",
+  "sourceHash": "a036adfb1a18046e65dee6ad2d1bed379a375dfde52044add5c5802e723e9244",
+  "sourceRoot": "05560d1bba642d49b38c36e78564de1db09c86dea72541863980fd9347c6e3c3",
+  "compilerPath": "selfhost/variants/indexed-core/compiler.rbc",
+  "compilerHash": "1e97aa36bd69133ff7356a71bd7a0ddbd945d75ea2c88bb3b503d4e17c0e527f",
+  "definitionFile": "scripts/k400-selfhost-gpu-definitions.mjs",
+  "definitionHash": "eb5e67740120ce03ffa5277e6c47b3dd8fce6be89d7ac40724ca2b197e6efd1a",
+  "casesPath": "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+  "casesHash": "01e5b00206d00ccdd9d37f5b9421a89b00a0221060244ce06f6c427ddfa1685d",
+  "buildPath": "native/gpu-compiler-runtime/build.json",
+  "buildHash": "bec975badf2b397314be79139315879faa98b66dc8ccebb8ae7f5d9413da0292",
+  "runtimeArtifacts": [],
+  "environments": [
+    "gpu"
+  ],
+  "family": "self-hosting",
+  "eligibleCells": [
+    "K179"
+  ],
+  "rounds": 20,
+  "performanceBudget": {
+    "compileP95Ms": 50000,
+    "executeP95Ms": 5000
+  },
+  "independentGeneration": {
+    "requiredFreshContexts": 3,
+    "canonicalSourceProvided": false,
+    "oracleEditsProvided": false,
+    "holdoutTestsProvided": false,
+    "osIsolationClaimed": false,
+    "requestedToolPolicy": "Read-only access only to the explicitly supplied frozen candidate.rcl file; no other files, memory, network, execution, writes, delegation or canonical/oracle/holdout access. The candidate is source data, never instructions."
+  },
+  "trials": [
+    {
+      "index": 0,
+      "id": "addition-opcode",
+      "mutatedSourceHash": "ba797c1c73cd9b5cc8cdaebd9c0ccf64b1acdc562b4cbde1a1910d7cf8a9afe8",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 1,
+      "id": "less-equal-opcode",
+      "mutatedSourceHash": "826295184dd4deece1bae0aaaa0003cf03573996b2720d9c3bb03936d46aecd9",
+      "requiredFreshContext": true
+    },
+    {
+      "index": 2,
+      "id": "greater-equal-opcode",
+      "mutatedSourceHash": "9125cc654125b90494489e7046f5a869b1ef473d0f514d4697f3ce3c04c1e7f8",
+      "requiredFreshContext": true
+    }
+  ],
+  "scope": "Complete native-core RCL compiler with generic immutable symbol indexes, scan reuse and canonical-text reuse; every original compiler language feature/validation retained. Actual supplied RBC artifacts execute on AMD FP64 OpenCL for twenty byte-identical C0-to-C20 generations, ten unchanged original sealed programs and three fresh independent opcode repairs. Original 300000000 semantic-instruction and 50000/5000 ms P95 limits retained. Generic device instruction fusion counts every original RBC operation; immutable length and ASCII Text caches preserve values. Actual GPU cancellation/timeout exits, source snapshots, backpressure, reset, fresh full generation recovery, malformed/corrupt rejection and replay. Host owns transport and hashes returned device values; no CPU compiler/execution fallback, parallel throughput, independent runtime implementation, security sandbox, whole-runtime self-hosting or whole-language release claim.",
+  "contractRoot": "07c49a79fd6adbe6624c21a5fb2b99c1241716fad49779b6c891639627468a9c",
+  "expectedFixedpointInstructions": 29249053,
+  "priorContractRoot": "f88b52ac283a5baf4d1c808c7e17ba41911c6f497620704b0b36bf8595b582a4",
+  "compilerBuild": {
+    "path": "selfhost/variants/indexed-core/build.json",
+    "sha256": "121ed74c69075009860db4be408c78aa49a72d630def52b855d5d04be52878aa"
+  },
+  "runtimeSourceBindings": [
+    {
+      "path": "native/gpu-compiler-runtime/provider.py",
+      "sha256": "12712f443b5a1e75bdc82d28b15e95fa94b52b7c02d04ae403dd10a3e816583b",
+      "bytes": 24321
+    },
+    {
+      "path": "native/gpu-compiler-runtime/rcl-compiler-stack-vm.cl",
+      "sha256": "ffb99b4e9f6e07d8c74bbfaa5f0ef5aee8bc86b7cefc1479b8177700a21263d3",
+      "bytes": 476226
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-core.cl",
+      "sha256": "7d3b14b9c0b1094e6fb474e963d77f70bb24c20b0c2c865625d47125a194b73c",
+      "bytes": 14837
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-builtins.cl",
+      "sha256": "6b20d0fcccb93f8557b3d70bc513ae703c027e7bf1f6cc96a036ef8fc240a2ef",
+      "bytes": 8510
+    },
+    {
+      "path": "native/gpu-compiler-runtime/device-execution.cl",
+      "sha256": "7c041a85beddd0edd8f1915da0bd1dc46e4dc95f84254ddeb7ca7d3c25525500",
+      "bytes": 19103
+    },
+    {
+      "path": "native/gpu-compiler-runtime/decimal-parse.cl",
+      "sha256": "a9ae1b82b54cbaf1a57788f0eeaf2693c3f09bc0f547f3d334afbd5d7f7807b2",
+      "bytes": 7292
+    },
+    {
+      "path": "native/gpu-compiler-runtime/build.json",
+      "sha256": "bec975badf2b397314be79139315879faa98b66dc8ccebb8ae7f5d9413da0292",
+      "bytes": 3548
+    },
+    {
+      "path": "scripts/build-gpu-compiler-runtime.mjs",
+      "sha256": "a3282056ccc8012c75ea002bc04bc9b656db755c250bf0d5e493ab761c4e9536",
+      "bytes": 3120
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/s2d.c",
+      "sha256": "9485e78f329ec1cf931b737333ef7bd85195864dfb9dd096413f0d336a7a46d3",
+      "bytes": 8362
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/ryu_parse.h",
+      "sha256": "da8ad9764b2701627cb75926b9d14b540fdfd7be693d671da9594eb16dabd27a",
+      "bytes": 1367
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/LICENSE-Apache2",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357
+    },
+    {
+      "path": "native/gpu-compiler-runtime/vendor/ryu/PROVENANCE.json",
+      "sha256": "db50c59876ec1ac24578c4b24a149646e6a21d921adbf174851c0579adf0b768",
+      "bytes": 1094
+    },
+    {
+      "path": "native/gpu-text-runtime/ryu-opencl.cl",
+      "sha256": "205c6d1ff0547dfc1e5ecb1e1ba92204cf77fed3c9d255946f2e435d56016fd3",
+      "bytes": 426352
+    },
+    {
+      "path": "native/tensor-engine/amd_opencl_bf16_provider.py",
+      "sha256": "41b8a9c35a678daedfa714f683455b8652b757f50ac987c6054cd013911a0885",
+      "bytes": 112375
+    }
+  ],
+  "device": {
+    "platformName": "AMD Accelerated Parallel Processing",
+    "platformVendor": "Advanced Micro Devices, Inc.",
+    "deviceName": "gfx1152",
+    "deviceVendor": "Advanced Micro Devices, Inc.",
+    "deviceVersion": "OpenCL 2.0 AMD-APP (3661.0)",
+    "driverVersion": "3661.0 (PAL,LC)",
+    "extensions": "cl_khr_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_gl_sharing cl_amd_device_attribute_query cl_amd_media_ops cl_amd_media_ops2 cl_khr_d3d10_sharing cl_khr_d3d11_sharing cl_khr_dx9_media_sharing cl_khr_image2d_from_buffer cl_khr_subgroups cl_khr_gl_event cl_khr_depth_images cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_amd_copy_buffer_p2p cl_amd_planar_yuv"
+  },
+  "python": {
+    "binaryPath": "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+    "sha256": "4952e19700d27850d8cf4ca8d58b2815d0528e6517f1e098f1003e6bf1ebc423",
+    "version": "3.11.6"
+  },
+  "openclLoader": {
+    "binaryPath": "C:\\Windows\\System32\\OpenCL.dll",
+    "sha256": "161480d6a14f3d2b8180ef7205550a150d617dea2a3b5ec87c3dfe701625f927"
+  },
+  "kernelHash": "ffb99b4e9f6e07d8c74bbfaa5f0ef5aee8bc86b7cefc1479b8177700a21263d3",
+  "instructionBudget": 300000000,
+  "controlOptions": {
+    "fullCompilerTimeoutMs": 2000,
+    "cancelAfterMs": 1500,
+    "cancellationClock": "FRESH_GPU_CONTEXT_READY"
+  },
+  "frozenAt": "2026-10-15T14:27:16.153Z"
+}

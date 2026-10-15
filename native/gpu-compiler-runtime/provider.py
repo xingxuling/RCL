@@ -64,7 +64,7 @@ class Machine(ctypes.Structure):
         ('warrant', ctypes.c_int32 * (256 * 3)), ('change', ctypes.c_int32 * (TX_CAPACITY * 3)),
         ('need', ctypes.c_int32 * (TX_CAPACITY * 2)), ('witness', ctypes.c_int32 * TX_CAPACITY),
         ('byte_value', ctypes.c_int32 * 256), ('empty_value', ctypes.c_int32),
-        ('true_value', ctypes.c_int32), ('false_value', ctypes.c_int32)]
+        ('true_value', ctypes.c_int32), ('false_value', ctypes.c_int32), ('ascii_text', ctypes.c_int32 * 128)]
 
 
 def decode_bytecode(data):
@@ -277,9 +277,10 @@ class Runtime:
             bnvalue, bmachine = allocate(size=max(4,len(numbers)*4)),allocate(bytes(ctypes.sizeof(Machine)))
             bmeta, bindices, bscratch = allocate(bytes(128*4)),allocate(size=INDEX_CAPACITY*4),allocate(size=(VALUE_CAPACITY+4096)*4)
             brecords = allocate(size=RECORD_CAPACITY*stride*4)
+            bdecoded = allocate(size=len(instructions)*20)
             vm = kernel('rcl_execute',[bcode,transport.CLInt(len(instructions)),bnum,transport.CLInt(len(numbers)),bstrings,
                 transport.CLInt(len(strings)),btext,transport.CLInt(len(text)),transport.CLInt(source_offset),transport.CLInt(source_length),
-                bvalues,bstate,bsvalue,bnvalue,bmachine,bmeta,bindices,bscratch,brecords,transport.CLInt(quantum)])
+                bvalues,bstate,bsvalue,bnvalue,bmachine,bmeta,bindices,bscratch,brecords,transport.CLInt(quantum),bdecoded])
             batches, h, started, kernel_ms = [], {}, time.perf_counter(), 0
             while True:
                 before = time.perf_counter()
@@ -356,6 +357,7 @@ class Runtime:
             common = {'ok':True,'executedInstructions':h['steps'],'kernelMs':kernel_ms,'elapsedMs':(time.perf_counter()-started)*1000,
                 'batchCount':len(batches),'batches':batches,'sourceRoot':source_root,'artifactHash':artifact_hash,
                 'deviceOpcodeCounts':list(meta[80:128]),
+                'fusedTriples':meta[7],'fusedPairs':meta[8],'fusedSequenceGets':meta[9],'instructionCountKind':'ORIGINAL_RBC_SEMANTIC_STEPS',
                 'compilerSourceHash':input_hash,'providerCalls':meta[6],'nonce':request['nonce'],'instance':self.instance,
                 'valueArenaLive':meta[2],'valueArenaPeak':meta[3],'valueArenaBump':meta[0],
                 'textArenaUsed':meta[4],'indexArenaUsed':meta[5],'openclCalls':calls,

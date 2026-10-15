@@ -1,6 +1,6 @@
-# Current RCL Status: research preview, K400 incomplete
+# Current RCL Status: research preview, K400 complete
 
-**RESEARCH_PREVIEW · K400 399/400 PASS (99.75%) · 1 UNTESTED · INCOMPLETE · U3**
+**RESEARCH_PREVIEW · K400 400/400 PASS (100%) · 0 UNTESTED · COMPLETE · U3**
 
 The 2026-10-13 maturity correction withdraws the interpretation of the previous
 2.0 promotion as a verified whole-language release. Package/native identity
@@ -19,6 +19,12 @@ evidence. See `docs/governance/RCL_RESEARCH_MATURITY_POLICY.md`.
 - Package, native-VM, typed-reference ABI and semantic-root versions are separate governed identities. Their source-backed registry is `COMPONENT-VERSIONS.json`; component versions must not be silently relabeled as the package release version.
 - Whole-language runtime self-hosting is not claimed.
 - TaoWind Auxiliary Language Federation v0.1 is a `CANDIDATE`: its bounded zh-CN/en-US RSL -> ASIL Programming Profile -> RCL path and duplicate-owner gate pass locally, while general RSL, IAL round-trip and SNLL/CSL-to-ASIL adapters remain unverified.
+
+## 2026-10-15 complete GPU compiler profile closes K400
+
+K179 passes twenty actual C0-to-C20 complete compiler generations, ten unchanged original sealed programs and three fresh independent repairs. Compile P95 is 37.242 s under 50000 ms; execute P95 is 23.967 ms under 5000 ms. Every generation emits the same 324727 bytes after 29249053 original RBC semantic steps under the original 300000000 ceiling. Actual device progress, timeout/cancellation exits, immutable snapshots, reset/replay and fresh full-generation recovery pass. The registered total is **400 PASS / 0 UNTESTED, COMPLETE, U3**. Formal language release remains false and version promotion remains frozen. See [full evidence and scope](docs/K400_GPU_SELFHOST_2026-10-15.md).
+
+The entries below retain historical measurements and status at each preceding stage.
 
 ## 2026-10-15 GPU complete compiler optimization, K179 still open
 

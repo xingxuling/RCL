@@ -1,0 +1,125 @@
+{
+  "format": "rcl.gpu-selfhost-source-delivery.v1",
+  "status": "PASS_RELOCATED_SOURCE_NATIVE_GPU_SMOKE",
+  "implementationTree": "0ede22d002e7e4a541d4ad79ee0bfbe0d4788a17",
+  "archiveSha256": "8946258664b3bb64cf4180188681552f64d53e0f387351bcec3fba862faed196",
+  "trackedFilesVerified": 3468,
+  "ignoredToolsCopied": false,
+  "directory": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX",
+  "checkout": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\checkout",
+  "commands": [
+    {
+      "label": "doctor",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "doctor",
+        "--json"
+      ],
+      "exitCode": 0,
+      "log": "docs/evidence/gpu-selfhost-completion/delivery-doctor.log",
+      "sha256": "2f1045e923203cc467d0cc05e19be1dbeb1e334121558f02406320ad4d84cab9",
+      "originalLog": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\doctor.log"
+    },
+    {
+      "label": "version",
+      "args": [
+        "src/reality-hub-cli.mjs",
+        "version",
+        "--json"
+      ],
+      "exitCode": 0,
+      "log": "docs/evidence/gpu-selfhost-completion/delivery-version.log",
+      "sha256": "0d4a1a6979d0739c6cb4170bcfc823890d5bc45176f1ef31e3d4a018cd033ec7",
+      "originalLog": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\version.log"
+    },
+    {
+      "label": "stored-gpu-admission",
+      "args": [
+        "scripts/k400-selfhost-gpu-admission.mjs"
+      ],
+      "exitCode": 0,
+      "log": "docs/evidence/gpu-selfhost-completion/delivery-stored-gpu-admission.log",
+      "sha256": "719fd3dfd62061eaec1aea51e1e9c02bee391115ae9f2c41c6cdea40c6d78b69",
+      "originalLog": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\stored-gpu-admission.log"
+    },
+    {
+      "label": "native-compiler-compatibility",
+      "args": [
+        "--test",
+        "tests/indexed-core-compiler.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "docs/evidence/gpu-selfhost-completion/delivery-native-compiler-compatibility.log",
+      "sha256": "47daa637ce682f5ffb62b5b60c84afe0f964e7d6ea22c89cec308f6efa75e5a8",
+      "originalLog": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\native-compiler-compatibility.log"
+    },
+    {
+      "label": "live-gpu-and-readiness",
+      "args": [
+        "--input-type=module",
+        "-e",
+        "\nimport fs from 'node:fs';import assert from 'node:assert/strict';\nimport {createGpuCompilerTarget} from './src/gpu-compiler-target.mjs';import {compileRealityToBytecode,decodeBytecode} from './src/bytecode.mjs';import {runNativeBytecode} from './src/native-vm.mjs';import {getResearchReadiness} from './src/research-readiness.mjs';\nconst c=JSON.parse(fs.readFileSync('examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json','utf8')),r=getResearchReadiness();assert.equal(r.k400.verdict,'COMPLETE');assert.equal(r.k400.passedCells,400);assert.equal(r.formalLanguageRelease,false);assert.equal(r.versionPromotionFrozen,true);\nconst source='reality Delivered { facet text : Text = \"中😀\" facet count : Number = length(text) facet result : Number = 9 + 2 }',file='output/delivery-smoke.rcl',out=file+'.rbc',oracle=compileRealityToBytecode(source);fs.writeFileSync(file,source);\nconst target=await createGpuCompilerTarget({pythonPath:c.python.binaryPath});try{assert.equal(target.binding.kernelHash,c.kernelHash);const compiled=await target.compile(c.compilerPath,file,out);assert.deepEqual(compiled.bytecode,oracle);assert.equal(compiled.compilerTrace.compilationOwner,'RCL_COMPILER_RBC_GPU');assert.equal(compiled.compilerTrace.cpuExecutionFallback,false);const observed=await target.execute(out,decodeBytecode(oracle).sourceRoot),native=runNativeBytecode(oracle);assert.deepEqual(observed.result.state,native.state);assert.equal(observed.result.stateRoot,native.stateRoot);const shutdown=await target.dispose();assert.ok(shutdown.exits.every(x=>x.exitObserved&&x.code===0));console.log(JSON.stringify({status:'PASS_RELOCATED_SOURCE_NATIVE_GPU_SMOKE',kernelHash:c.kernelHash,compilerHash:c.compilerHash,compilerTraceSteps:compiled.compilerTrace.executedInstructions,compileMs:compiled.ms,executeMs:observed.ms,stateRoot:observed.result.stateRoot,k400:r.k400,evidenceRoot:r.evidenceRoot,shutdown}));}finally{await target.dispose();}\n"
+      ],
+      "exitCode": 0,
+      "log": "docs/evidence/gpu-selfhost-completion/delivery-live-gpu-and-readiness.log",
+      "sha256": "54f83b82c4eb38f0b096fe9f58db1d17070afba560ba15f862b87b7ad505d7a2",
+      "originalLog": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-v2-development\\output\\gpu-completion-source-aPZ8tX\\live-gpu-and-readiness.log"
+    }
+  ],
+  "smoke": {
+    "status": "PASS_RELOCATED_SOURCE_NATIVE_GPU_SMOKE",
+    "kernelHash": "ffb99b4e9f6e07d8c74bbfaa5f0ef5aee8bc86b7cefc1479b8177700a21263d3",
+    "compilerHash": "1e97aa36bd69133ff7356a71bd7a0ddbd945d75ea2c88bb3b503d4e17c0e527f",
+    "compilerTraceSteps": 34604,
+    "compileMs": 154.1219000000001,
+    "executeMs": 10.689000000000306,
+    "stateRoot": "1146315e6a73ab95304fc7ce1c22c4bf61cb8d049cc1503d3b3093260e1c6f10",
+    "k400": {
+      "schema": "rcl.universal-stress.k400-completion.v0.1",
+      "verdict": "COMPLETE",
+      "evidenceComplete": true,
+      "universalGrowthComplete": true,
+      "totalCells": 400,
+      "reportedCells": 400,
+      "passedCells": 400,
+      "remainingCells": 0,
+      "statusCounts": {
+        "PASS": 400,
+        "FAIL": 0,
+        "BLOCKED": 0,
+        "UNVERIFIED": 0,
+        "UNTESTED": 0,
+        "REGRESSED": 0
+      },
+      "gateBlockers": {
+        "EXPRESS": 0,
+        "COMPILE": 0,
+        "LOWER": 0,
+        "EXECUTE": 0,
+        "CORRECT": 0,
+        "ROBUST": 0,
+        "PERFORMANCE": 0,
+        "AI_GENERATE": 0,
+        "EVIDENCE": 0
+      },
+      "missingIds": [],
+      "duplicateIds": [],
+      "unknownIds": [],
+      "nextPriority": [],
+      "rule": "K400 is complete only when all 400 stable cells pass every non-compensatory gate without special-case or opaque-delegation growth credit."
+    },
+    "evidenceRoot": "5534905062923e8af2d4a8714306aa62afb5b237acd714b90279bf1e85fce858",
+    "shutdown": {
+      "closed": true,
+      "exits": [
+        {
+          "processPid": 50380,
+          "code": 0,
+          "signal": null,
+          "exitObserved": true
+        }
+      ]
+    }
+  },
+  "scope": "Every archived tracked file matches its exact Git blob. Stored GPU admission and 400-cell readiness verified from the relocated source. The relocated native compiler compatibility test and one actual GPU compilation/execution passed. The complete K400 executions and twenty-generation performance campaign were not rerun in this relocated checkout."
+}

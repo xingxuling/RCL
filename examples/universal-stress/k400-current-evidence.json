@@ -63826,6 +63826,227 @@
       }
     },
     {
+      "id": "gpu::self-hosting",
+      "environment": "gpu",
+      "programFamily": "self-hosting",
+      "coverageMode": "native-semantic",
+      "lastVerifiedDate": "2026-10-15",
+      "changes": [],
+      "knownLimits": [
+        "Complete native-core RCL compiler with generic immutable symbol indexes, scan reuse and canonical-text reuse; every original compiler language feature/validation retained. Actual supplied RBC artifacts execute on AMD FP64 OpenCL for twenty byte-identical C0-to-C20 generations, ten unchanged original sealed programs and three fresh independent opcode repairs. Original 300000000 semantic-instruction and 50000/5000 ms P95 limits retained. Generic device instruction fusion counts every original RBC operation; immutable length and ASCII Text caches preserve values. Actual GPU cancellation/timeout exits, source snapshots, backpressure, reset, fresh full generation recovery, malformed/corrupt rejection and replay. Host owns transport and hashes returned device values; no CPU compiler/execution fallback, parallel throughput, independent runtime implementation, security sandbox, whole-runtime self-hosting or whole-language release claim."
+      ],
+      "requiredGenes": [
+        "rcl-general-compiler",
+        "generic-persistent-sequence",
+        "utf16-source-column-identity",
+        "actual-c0-c20-self-compilation",
+        "indexed-full-core-compiler",
+        "gpu-owned-rbc-execution",
+        "sealed-program-byte-and-state-oracles",
+        "fresh-independent-compiler-repair"
+      ],
+      "gates": {
+        "EXPRESS": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "COMPILE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "LOWER": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EXECUTE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "CORRECT": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "ROBUST": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "PERFORMANCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "AI_GENERATE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        },
+        "EVIDENCE": {
+          "status": "PASS",
+          "evidence": [
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-contract.json",
+            "selfhost/variants/indexed-core/compiler.rcl",
+            "selfhost/variants/indexed-core/compiler.rbc",
+            "examples/universal-stress/selfhost-native/general-compiler-cases.json",
+            "native/gpu-compiler-runtime/build.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-proposals.json",
+            "examples/universal-stress/selfhost-gpu/independent-batch.json",
+            "examples/universal-stress/selfhost-gpu/general-compiler-gpu-gpu-runtime.json",
+            "scripts/k400-selfhost-gpu-admission.mjs",
+            "scripts/k400-selfhost-gpu-engine.mjs",
+            "scripts/k400-selfhost-gpu-target.mjs",
+            "scripts/k400-selfhost-gpu-transport.mjs",
+            "scripts/k400-selfhost-gpu-definitions.mjs",
+            "scripts/k400-selfhost-mutant-oracle.mjs",
+            "scripts/build-indexed-core-compiler.mjs"
+          ],
+          "note": "Actual complete native-core RCL compiler self-compilation on AMD FP64 OpenCL in the selected environment, twenty fixed-point generations, ten rooted sealed programs, exact native byte/state parity and three effective unchanged fresh repairs; real malformed/corrupt rejection and measured budgets."
+        }
+      }
+    },
+    {
       "id": "gpu::gui",
       "environment": "gpu",
       "programFamily": "gui",
@@ -64678,6 +64899,7 @@
     "examples/universal-stress/selfhost-rncs/general-compiler-rncs-runtime.json",
     "examples/universal-stress/selfhost-game/general-compiler-game-runtime.json",
     "examples/universal-stress/selfhost-realtime/general-compiler-realtime-runtime.json",
+    "examples/universal-stress/selfhost-gpu/general-compiler-gpu-runtime.json",
     "examples/universal-stress/gpu-ui/gpu-text-counter-runtime.json",
     "examples/universal-stress/gpu-mobile/gpu-text-counter-runtime.json"
   ],
