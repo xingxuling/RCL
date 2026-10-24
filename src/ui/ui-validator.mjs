@@ -10,7 +10,7 @@ import {
   UI_ROLES,
 } from './ui-schema.mjs';
 import { nativeUiRoot, nativeUiSemanticGenome } from './ui-ir.mjs';
-import { controlPropertyType, inputKind, validateInputControl } from './ui-controls.mjs';
+import { controlPropertyType, inputKind, inputOptions, isRclIsoDate, validateInputControl } from './ui-controls.mjs';
 
 function assert(condition, code) {
   if (!condition) throw new Error(code);
@@ -93,6 +93,23 @@ export function validateCanonicalNativeUi(program) {
     for (const child of node.children ?? []) walk(child, `${identityPath}/${child.id}`);
   };
   walk(program.viewTree);
+  // Validate source-declared initial state before any platform widget is constructed.
+  const initialState = new Map(program.state.map((item) => [item.id, item.initial]));
+  const verifyInitialControls = (node) => {
+    const kind = inputKind(node);
+    if (['date', 'radio'].includes(kind)) {
+      const binding = node.bindings.find((item) => item.property === 'value');
+      const expr = binding?.expression;
+      const initial = expr?.kind === 'reference' && expr.scope === 'state' ? initialState.get(expr.id)
+        : expr?.kind === 'literal' ? expr.value : undefined;
+      if (initial !== undefined) {
+        if (kind === 'date') assert(isRclIsoDate(initial), `RCL_UI_DATE_INITIAL:${node.id}`);
+        if (kind === 'radio') assert(inputOptions(node).includes(initial), `RCL_UI_RADIO_INITIAL:${node.id}`);
+      }
+    }
+    for (const child of node.children) verifyInitialControls(child);
+  };
+  verifyInitialControls(program.viewTree);
   const navigation = program.extensionPoints?.navigation ?? null;
   if (navigation === null) assert(navigationStatements.length === 0, 'RCL_UI_NAVIGATION_REQUIRED');
   else {
