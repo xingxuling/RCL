@@ -1,0 +1,52 @@
+reality NativeUITypedControlShowcase {
+  ui TypedControls {
+    state locked : Truth = false
+    state agreed : Truth = false
+    state sound : Truth = true
+    state volume : Number = 20
+    state plan : Text = "pro"
+
+    view Root {
+      layout vertical { width fill gap 12 padding 24 }
+      text Title { value "RCL Native UI - Typed Controls" }
+
+      input TermsCheck {
+        property input_kind = "checkbox"
+        accessibility_label "Accept terms"
+        bind value <- agreed
+        bind disabled <- locked
+        on change(value : Truth) { set agreed <- value }
+      }
+      input SoundSwitch {
+        property input_kind = "switch"
+        accessibility_label "Enable sound"
+        bind value <- sound
+        bind read_only <- locked
+        on change(value : Truth) { set sound <- value }
+      }
+      input VolumeSlider {
+        property input_kind = "slider"
+        property min = 0
+        property max = 100
+        property step = 5
+        accessibility_label "Volume"
+        bind value <- volume
+        bind disabled <- locked
+        on input(value : Number) { set volume <- value }
+      }
+      input PlanSelect {
+        property input_kind = "select"
+        property options = "basic|pro|enterprise"
+        accessibility_label "Subscription plan"
+        bind value <- plan
+        bind disabled <- locked
+        on change(value : Text) { set plan <- value }
+      }
+      action ToggleLock {
+        label "Toggle lock"
+        on activate { set locked <- not locked }
+      }
+      text Status { bind value <- choose(locked, "Locked", "Editable") }
+    }
+  }
+}

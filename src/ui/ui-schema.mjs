@@ -32,7 +32,7 @@ export const UI_CONTENT_PROPERTIES_BY_ROLE = Object.freeze({
   container: Object.freeze(['accessibility_label']),
   text: Object.freeze(['value', 'accessibility_label']),
   action: Object.freeze(['label', 'accessibility_label', 'disabled']),
-  input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only']),
+  input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only', 'min', 'max', 'step', 'options']),
 });
 export const UI_PROPERTY_TYPES = Object.freeze({
   value: 'Text',
@@ -40,6 +40,10 @@ export const UI_PROPERTY_TYPES = Object.freeze({
   placeholder: 'Text',
   accessibility_label: 'Text',
   input_kind: 'Text',
+  options: 'Text',
+  min: 'Number',
+  max: 'Number',
+  step: 'Number',
   disabled: 'Truth',
   read_only: 'Truth',
   foreground: 'Text',

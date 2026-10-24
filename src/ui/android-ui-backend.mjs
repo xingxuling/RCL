@@ -1,6 +1,7 @@
 import { nativeUiRoot } from './ui-ir.mjs';
 import { createNativeUiRuntime, runNativeUiSemanticTrace } from './ui-event.mjs';
 import { RCL_NATIVE_UI_ANDROID_FORMAT } from './ui-schema.mjs';
+import { inputKind, inputOptions } from './ui-controls.mjs';
 
 const ROLE_TO_VIEW = Object.freeze({ container: 'ViewGroup', text: 'TextView', action: 'Button', input: 'EditText' });
 const EVENT_TO_ANDROID = Object.freeze({
@@ -34,6 +35,7 @@ function controlExpr(node, name, event = 'event') {
 }
 function viewType(node) {
   if (node.role === 'container') return node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
+  if (node.role === 'input') return ({checkbox:'CheckBox',switch:'Switch',slider:'SeekBar',select:'Spinner'})[inputKind(node)] ?? 'EditText';
   return ROLE_TO_VIEW[node.role];
 }
 
@@ -58,9 +60,9 @@ function javaDimension(size) {
 
 function applyStyle(node, variable, lines, indent) {
   const style = node.resolvedStyle.values;
-  if (style.foreground && node.role !== 'container') lines.push(`${indent}${variable}.setTextColor(Color.parseColor(${javaString(style.foreground)}));`);
+  if (style.foreground && node.role !== 'container' && !['slider','select'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextColor(Color.parseColor(${javaString(style.foreground)}));`);
   if (style.background) lines.push(`${indent}${variable}.setBackgroundColor(Color.parseColor(${javaString(style.background)}));`);
-  if (typeof style.font_size === 'number' && node.role !== 'container') lines.push(`${indent}${variable}.setTextSize(${style.font_size}f);`);
+  if (typeof style.font_size === 'number' && node.role !== 'container' && !['slider','select'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextSize(${style.font_size}f);`);
   if (node.accessibility.label) lines.push(`${indent}${variable}.setContentDescription(${javaString(node.accessibility.label)});`);
 }
 
@@ -86,22 +88,39 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
     if (node.events.some((item) => item.type === 'activate')) lines.push(`${indent}${variable}.setOnClickListener(clicked -> dispatch(${javaString(node.id)}, "activate", new LinkedHashMap<>()));`);
   }
   if (node.role === 'input') {
-    const kind = property(node, 'input_kind') ?? 'text';
-    if (kind === 'email') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);`);
-    if (kind === 'password') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);`);
-    lines.push(`${indent}inputKeyListeners.put(${javaString(node.id)}, ${variable}.getKeyListener());`);
-    if (property(node, 'read_only') === true) lines.push(`${indent}${variable}.setKeyListener(null);`);
-    if (property(node, 'disabled') === true) lines.push(`${indent}${variable}.setEnabled(false);`);
-    const placeholder = property(node, 'placeholder');
-    if (placeholder !== undefined) lines.push(`${indent}${variable}.setHint(${javaString(placeholder)});`);
+    const kind = inputKind(node);
     const inputEvent = node.events.find((item) => item.type === 'input' || item.type === 'change');
-    if (inputEvent) {
-      lines.push(`${indent}${variable}.addTextChangedListener(new TextWatcher() {`);
-      lines.push(`${indent}  @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}`);
-      lines.push(`${indent}  @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}`);
-      lines.push(`${indent}  @Override public void afterTextChanged(Editable value) { if (!rendering) { Map<String,Object> event = new LinkedHashMap<>(); event.put("value", value.toString()); dispatch(${javaString(node.id)}, ${javaString(inputEvent.type)}, event); } }`);
-      lines.push(`${indent}});`);
+    const valueEvent = `Map<String,Object> event = new LinkedHashMap<>(); event.put("value", VALUE); dispatch(${javaString(node.id)}, ${javaString(inputEvent?.type ?? 'change')}, event);`;
+    if (['checkbox', 'switch'].includes(kind)) {
+      lines.push(`${indent}${variable}.setText(${javaString(property(node, 'accessibility_label') ?? node.id)});`);
+      if (property(node, 'value') !== undefined) lines.push(`${indent}${variable}.setChecked(${property(node, 'value') ? 'true' : 'false'});`);
+      if (inputEvent) lines.push(`${indent}${variable}.setOnCheckedChangeListener((button,checked) -> { if (!rendering) { ${valueEvent.replace('VALUE','Boolean.valueOf(checked)')} } });`);
+    } else if (kind === 'slider') {
+      const min=property(node,'min'), max=property(node,'max'),step=property(node,'step');
+      lines.push(`${indent}${variable}.setMax(${Math.round((max-min)/step)});`);
+      if (inputEvent) lines.push(`${indent}${variable}.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {`, `${indent}  @Override public void onStartTrackingTouch(SeekBar bar) {}`, `${indent}  @Override public void onStopTrackingTouch(SeekBar bar) {}`, `${indent}  @Override public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) { if (fromUser && !rendering) { ${valueEvent.replace('VALUE',`rclSliderValue(${min}, ${step}, progress)`)} } }`, `${indent}});`);
+    } else if (kind === 'select') {
+      const options = inputOptions(node);
+      lines.push(`${indent}ArrayAdapter<String> adapter_${javaIdentifier(node.id)} = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{${options.map(javaString).join(',')}});`,`${indent}adapter_${javaIdentifier(node.id)}.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);`,`${indent}${variable}.setAdapter(adapter_${javaIdentifier(node.id)});`);
+      const binding = node.bindings.find((item)=>item.property==='value');
+      const current = binding ? `String.valueOf(${emitJavaExpr(binding.expression,'state','new LinkedHashMap<>()')})` : javaString(property(node,'value') ?? '');
+      if (inputEvent) lines.push(`${indent}${variable}.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {`,`${indent}  @Override public void onNothingSelected(AdapterView<?> parent) {}`,`${indent}  @Override public void onItemSelected(AdapterView<?> parent, View selected, int position, long id) { String chosen=String.valueOf(parent.getItemAtPosition(position)); if (!rendering && !chosen.equals(${current})) { ${valueEvent.replace('VALUE','chosen')} } }`,`${indent}});`);
+    } else {
+      if (kind === 'email') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);`);
+      if (kind === 'password') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);`);
+      lines.push(`${indent}inputKeyListeners.put(${javaString(node.id)}, ${variable}.getKeyListener());`);
+      const placeholder = property(node, 'placeholder');
+      if (placeholder !== undefined) lines.push(`${indent}${variable}.setHint(${javaString(placeholder)});`);
+      if (inputEvent) {
+        lines.push(`${indent}${variable}.addTextChangedListener(new TextWatcher() {`);
+        lines.push(`${indent}  @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}`);
+        lines.push(`${indent}  @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}`);
+        lines.push(`${indent}  @Override public void afterTextChanged(Editable value) { if (!rendering) { ${valueEvent.replace('VALUE','value.toString()')} } }`);
+        lines.push(`${indent}});`);
+      }
+      if (property(node, 'read_only') === true) lines.push(`${indent}${variable}.setKeyListener(null);`);
     }
+    if (property(node, 'disabled') === true || (property(node, 'read_only') === true && ['checkbox','switch','slider','select'].includes(kind))) lines.push(`${indent}${variable}.setEnabled(false);`);
   }
   applyStyle(node, variable, lines, indent);
   for (const child of node.children) {
@@ -122,6 +141,7 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
 function emitRuntimeHelpers() {
   return `  private static Object rclPath(Map<String,Object> snapshot, String path) { if (!snapshot.containsKey(path)) throw new IllegalStateException("RCL_UI_ANDROID_STATE_MISSING:" + path); return snapshot.get(path); }
   private static boolean rclTruthy(Object value) { if (value == null) return false; if (value instanceof Boolean) return (Boolean)value; if (value instanceof Number) return ((Number)value).doubleValue()!=0d; if (value instanceof CharSequence) return ((CharSequence)value).length()>0; return true; }
+  private static Number rclSliderValue(double min,double step,int progress) { double value=min+step*progress; return Math.rint(value)==value ? Long.valueOf((long)value) : Double.valueOf(value); }
   private static boolean rclTypeMatches(Object value,String type) { if ("Number".equals(type)) return value instanceof Number; if ("Text".equals(type)) return value instanceof String; if ("Truth".equals(type)) return value instanceof Boolean; return false; }
   private static Object rclChoose(Object condition,Object whenTrue,Object whenFalse) { return rclTruthy(condition)?whenTrue:whenFalse; }
   private static Object rclUnary(String operator,Object value) { if ("not".equals(operator)) return !rclTruthy(value); if ("-".equals(operator)&&value instanceof Number) return -((Number)value).doubleValue(); throw new IllegalStateException("RCL_UI_ANDROID_UNARY:"+operator); }
@@ -147,6 +167,13 @@ function emitEventMethods(ui) {
     if (node.role === 'input' && ['input', 'change'].includes(handler.type)) lines.push(`    if (${controlExpr(node, 'read_only')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_READ_ONLY:${node.id}:${handler.type}`)});`);
     for (const parameter of handler.parameters) {
       lines.push(`    if (!event.containsKey(${javaString(parameter.id)}) || !rclTypeMatches(event.get(${javaString(parameter.id)}), ${javaString(parameter.valueType)})) throw new IllegalArgumentException(${javaString(`RCL_UI_ANDROID_EVENT_PARAMETER_TYPE:${node.id}:${handler.type}:${parameter.id}:${parameter.valueType}`)});`);
+    }
+    if (node.role === 'input' && ['change','input'].includes(handler.type) && inputKind(node) === 'slider') {
+      const min=property(node,'min'), max=property(node,'max'), step=property(node,'step');
+      lines.push(`    double value = ((Number)event.get("value")).doubleValue(); if (!Double.isFinite(value) || value < ${min}d || value > ${max}d || Math.abs((value-${min}d)/${step}d-Math.rint((value-${min}d)/${step}d))>1e-8) throw new IllegalArgumentException(${javaString(`RCL_UI_SLIDER_VALUE:${node.id}`)});`);
+    }
+    if (node.role === 'input' && ['change','input'].includes(handler.type) && inputKind(node) === 'select') {
+      lines.push(`    if (!java.util.Arrays.asList(${inputOptions(node).map(javaString).join(',')}).contains(event.get("value"))) throw new IllegalArgumentException(${javaString(`RCL_UI_SELECT_VALUE:${node.id}`)});`);
     }
     if (handler.authority === 'reality-transaction') {
       lines.push(`    throw new IllegalStateException(${javaString(`RCL_UI_ANDROID_REALITY_GATEWAY_REQUIRED:${node.id}:${handler.type}`)});`);
@@ -176,13 +203,20 @@ function emitDerived(ui) {
 
 function emitRender(ui) {
   const lines = ['  private void render() {', '    rendering = true;', '    Map<String,Object> event = new LinkedHashMap<>();'];
-  for (const node of collectNodes(ui.viewTree)) for (const binding of node.bindings) {
-    const value = emitJavaExpr(binding.expression, 'state', 'event');
-    const field = fieldName(node);
-    if (node.role === 'input' && binding.property === 'value') lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
-    else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
-    else if (binding.property === 'disabled') lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
-    else if (binding.property === 'read_only' && node.role === 'input') lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
+  for (const node of collectNodes(ui.viewTree)) {
+    const kind = inputKind(node), field=fieldName(node);
+    for (const binding of node.bindings) {
+      const value = emitJavaExpr(binding.expression,'state','event');
+      if (node.role === 'input' && binding.property === 'value') {
+        if (['checkbox','switch'].includes(kind)) lines.push(`    if (${field}.isChecked() != rclTruthy(${value})) ${field}.setChecked(rclTruthy(${value}));`);
+        else if (kind === 'slider') {const min=property(node,'min'),step=property(node,'step');lines.push(`    int progress_${javaIdentifier(node.id)}=(int)Math.round((((Number)${value}).doubleValue()-${min}d)/${step}d); if (${field}.getProgress()!=progress_${javaIdentifier(node.id)}) ${field}.setProgress(progress_${javaIdentifier(node.id)});`);}
+        else if (kind === 'select') lines.push(`    for (int i=0;i<${field}.getCount();i++) { if (String.valueOf(${field}.getItemAtPosition(i)).equals(String.valueOf(${value}))) { if (${field}.getSelectedItemPosition()!=i) ${field}.setSelection(i); break; } }`);
+        else lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
+      } else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
+      else if (binding.property === 'disabled' && (node.role !== 'input' || !['checkbox','switch','slider','select'].includes(kind))) lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
+      else if (binding.property === 'read_only' && node.role === 'input' && ['text','email','password'].includes(kind)) lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
+    }
+    if (node.role==='input' && ['checkbox','switch','slider','select'].includes(kind)) lines.push(`    ${field}.setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);
   }
   if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
@@ -262,7 +296,7 @@ export function lowerNativeUiToAndroid(ui, target = {}) {
       targetSdk: Number(target.targetSdk ?? target.compileSdk ?? 35),
       theme: target.theme ?? 'light',
     },
-    nodeMappings: collectNodes(ui.viewTree).map((node) => ({ nodeId: node.id, canonicalRole: node.role, target: ROLE_TO_VIEW[node.role] })),
+    nodeMappings: collectNodes(ui.viewTree).map((node) => ({ nodeId: node.id, canonicalRole: node.role, target: viewType(node) })),
     eventMappings: ui.eventGraph.events.map((event) => ({ nodeId: event.nodeId, canonicalEvent: event.type, targetEvent: EVENT_TO_ANDROID[event.type] ?? 'custom-event gateway' })),
     navigationMapping: ui.extensionPoints.navigation ? { strategy: 'View.VISIBLE_OR_GONE', routes: ui.extensionPoints.navigation.routes } : null,
     deviceAdaptationMapping: ui.extensionPoints.deviceAdaptation ? { axis: 'Configuration.screenWidthDp', strategy: 'activity-recreation-plus-linear-layout-orientation', profiles: ui.extensionPoints.deviceAdaptation.profiles } : null,
@@ -298,6 +332,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.Switch;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;

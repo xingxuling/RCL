@@ -10,6 +10,7 @@ import {
   UI_ROLES,
 } from './ui-schema.mjs';
 import { nativeUiRoot, nativeUiSemanticGenome } from './ui-ir.mjs';
+import { controlPropertyType, inputKind, validateInputControl } from './ui-controls.mjs';
 
 function assert(condition, code) {
   if (!condition) throw new Error(code);
@@ -46,18 +47,19 @@ export function validateCanonicalNativeUi(program) {
     nodeIds.add(node.id);
     for (const override of node.adaptiveLayouts) adaptiveLayouts.push({ nodeId: node.id, role: node.role, baseMode: node.layout?.mode, ...override });
     const propertyIds = new Set();
+    const kind = inputKind(node);
     for (const property of node.localProperties) {
       assert([...UI_STYLE_PROPERTIES, ...UI_CONTENT_PROPERTIES_BY_ROLE[node.role]].includes(property.property), `RCL_UI_SCHEMA_PROPERTY_ROLE:${node.id}:${property.property}`);
-      assert(UI_PROPERTY_TYPES[property.property] === property.valueType, `RCL_UI_SCHEMA_PROPERTY_TYPE:${node.id}:${property.property}`);
+      assert(controlPropertyType(node.role, kind, property.property, UI_PROPERTY_TYPES) === property.valueType, `RCL_UI_SCHEMA_PROPERTY_TYPE:${node.id}:${property.property}`);
       assert(!propertyIds.has(property.property), `RCL_UI_SCHEMA_PROPERTY_DUPLICATE:${node.id}:${property.property}`);
       propertyIds.add(property.property);
-      if (property.property === 'input_kind') assert(['text', 'email', 'password'].includes(property.value), `RCL_UI_INPUT_KIND:${node.id}:${property.value}`);
+
     }
     const expectedAccessibilityLabel = node.localProperties.find((property) => property.property === 'accessibility_label')?.value ?? null;
     assert(node.accessibility?.label === expectedAccessibilityLabel, `RCL_UI_SCHEMA_ACCESSIBILITY:${node.id}`);
     for (const binding of node.bindings) {
       assert(UI_BINDABLE_PROPERTIES_BY_ROLE[node.role].includes(binding.property), `RCL_UI_SCHEMA_BINDING_PROPERTY:${node.id}:${binding.property}`);
-      assert(binding.expression?.valueType === UI_PROPERTY_TYPES[binding.property], `RCL_UI_SCHEMA_BINDING_TYPE:${node.id}:${binding.property}`);
+      assert(binding.expression?.valueType === controlPropertyType(node.role, kind, binding.property, UI_PROPERTY_TYPES), `RCL_UI_SCHEMA_BINDING_TYPE:${node.id}:${binding.property}`);
     }
     for (const event of node.events ?? []) {
       assert(UI_EVENT_TYPES.includes(event.type), `RCL_UI_EVENT_TYPE:${event.type}`);
@@ -87,6 +89,7 @@ export function validateCanonicalNativeUi(program) {
       assert(navigateCount <= 1, `RCL_UI_EVENT_MULTIPLE_NAVIGATION:${node.id}:${event.type}`);
       assert(event.authority === (realityCount > 0 ? 'reality-transaction' : 'ui-local'), `RCL_UI_SCHEMA_EVENT_AUTHORITY:${node.id}:${event.type}`);
     }
+    validateInputControl(node);
     for (const child of node.children ?? []) walk(child, `${identityPath}/${child.id}`);
   };
   walk(program.viewTree);
