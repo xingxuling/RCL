@@ -74,6 +74,7 @@ function compileNode(node, context, path = []) {
   for (const item of localProperties) {
     if (!allowedLocalProperties.has(item.property)) throw new Error(`RCL_UI_NODE_PROPERTY:${node.id}:${node.role}:${item.property}`);
     if (UI_PROPERTY_TYPES[item.property] !== item.valueType) throw new Error(`RCL_UI_NODE_PROPERTY_TYPE:${node.id}:${item.property}:${item.valueType}`);
+    if (item.property === 'input_kind' && !['text', 'email', 'password'].includes(item.value)) throw new Error(`RCL_UI_INPUT_KIND:${node.id}:${item.value}`);
   }
   if (new Set(localProperties.map((item) => item.property)).size !== localProperties.length) {
     throw new Error(`RCL_UI_NODE_PROPERTY_DUPLICATE:${node.id}`);

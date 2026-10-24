@@ -3,6 +3,8 @@ import {
   RCL_NATIVE_UI_DEVICE_ADAPTATION_FORMAT,
   RCL_NATIVE_UI_NAVIGATION_FORMAT,
   UI_BINDABLE_PROPERTIES_BY_ROLE,
+  UI_CONTENT_PROPERTIES_BY_ROLE,
+  UI_STYLE_PROPERTIES,
   UI_EVENT_TYPES,
   UI_PROPERTY_TYPES,
   UI_ROLES,
@@ -43,8 +45,13 @@ export function validateCanonicalNativeUi(program) {
     assert(Array.isArray(node.adaptiveLayouts), `RCL_UI_DEVICE_ADAPTATION_LAYOUTS:${node.id}`);
     nodeIds.add(node.id);
     for (const override of node.adaptiveLayouts) adaptiveLayouts.push({ nodeId: node.id, role: node.role, baseMode: node.layout?.mode, ...override });
+    const propertyIds = new Set();
     for (const property of node.localProperties) {
+      assert([...UI_STYLE_PROPERTIES, ...UI_CONTENT_PROPERTIES_BY_ROLE[node.role]].includes(property.property), `RCL_UI_SCHEMA_PROPERTY_ROLE:${node.id}:${property.property}`);
       assert(UI_PROPERTY_TYPES[property.property] === property.valueType, `RCL_UI_SCHEMA_PROPERTY_TYPE:${node.id}:${property.property}`);
+      assert(!propertyIds.has(property.property), `RCL_UI_SCHEMA_PROPERTY_DUPLICATE:${node.id}:${property.property}`);
+      propertyIds.add(property.property);
+      if (property.property === 'input_kind') assert(['text', 'email', 'password'].includes(property.value), `RCL_UI_INPUT_KIND:${node.id}:${property.value}`);
     }
     const expectedAccessibilityLabel = node.localProperties.find((property) => property.property === 'accessibility_label')?.value ?? null;
     assert(node.accessibility?.label === expectedAccessibilityLabel, `RCL_UI_SCHEMA_ACCESSIBILITY:${node.id}`);

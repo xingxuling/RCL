@@ -82,6 +82,11 @@ export function createNativeUiRuntime(program, options = {}) {
     if (!node) throw new Error(`RCL_UI_EVENT_NODE_UNKNOWN:${nodeId}`);
     const handler = node.events.find((item) => item.type === eventType);
     if (!handler) throw new Error(`RCL_UI_EVENT_HANDLER_UNKNOWN:${nodeId}:${eventType}`);
+    // Control constraints belong to the semantic runtime, not only the visual backend.
+    const current = projection().rendered[nodeId];
+    const control = (property) => current[property] ?? node.localProperties.find((item) => item.property === property)?.value ?? false;
+    if (control('disabled')) throw new Error(`RCL_UI_EVENT_DISABLED:${nodeId}:${eventType}`);
+    if (node.role === 'input' && control('read_only') && ['input', 'change'].includes(eventType)) throw new Error(`RCL_UI_EVENT_READ_ONLY:${nodeId}:${eventType}`);
     for (const parameter of handler.parameters) {
       if (!Object.prototype.hasOwnProperty.call(payload, parameter.id)) throw new Error(`RCL_UI_EVENT_PARAMETER_MISSING:${nodeId}:${eventType}:${parameter.id}`);
       if (!matchesUiType(payload[parameter.id], parameter.valueType)) throw new Error(`RCL_UI_EVENT_PARAMETER_RUNTIME_TYPE:${nodeId}:${eventType}:${parameter.id}:${parameter.valueType}`);
