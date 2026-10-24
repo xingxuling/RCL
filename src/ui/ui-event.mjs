@@ -22,6 +22,12 @@ function nodeMap(root, map = new Map()) {
 export function createNativeUiRuntime(program, options = {}) {
   const state = Object.fromEntries(program.state.map((item) => [item.id, cloneState(item.initial)]));
   const nodes = nodeMap(program.viewTree);
+  const parents = new Map();
+  const mapParents = (node, parent = null) => {
+    parents.set(node.id, parent);
+    for (const child of node.children) mapParents(child, node.id);
+  };
+  mapParents(program.viewTree);
   const trace = [];
   const lifecycleTrace = [];
   const gateway = options.realityGateway ?? null;
@@ -85,7 +91,17 @@ export function createNativeUiRuntime(program, options = {}) {
     const handler = node.events.find((item) => item.type === eventType);
     if (!handler) throw new Error(`RCL_UI_EVENT_HANDLER_UNKNOWN:${nodeId}:${eventType}`);
     // Control constraints belong to the semantic runtime, not only the visual backend.
-    const current = projection().rendered[nodeId];
+    const rendered = projection().rendered;
+    const current = rendered[nodeId];
+    const valueOf = (candidate, property) => rendered[candidate.id]?.[property]
+      ?? candidate.localProperties.find((item) => item.property === property)?.value;
+    const ancestry = new Set();
+    for (let id = nodeId; id !== null; id = parents.get(id) ?? null) {
+      ancestry.add(id);
+      if (valueOf(nodes.get(id), 'visible') === false) throw new Error(`RCL_UI_EVENT_HIDDEN:${nodeId}:${eventType}`);
+    }
+    const activeModal = allNodes.find((candidate) => valueOf(candidate, 'modal') === true && valueOf(candidate, 'visible') === true);
+    if (activeModal && !ancestry.has(activeModal.id)) throw new Error(`RCL_UI_MODAL_BLOCKED:${nodeId}:${eventType}`);
     const control = (property) => current[property] ?? node.localProperties.find((item) => item.property === property)?.value ?? false;
     if (control('disabled')) throw new Error(`RCL_UI_EVENT_DISABLED:${nodeId}:${eventType}`);
     if (node.role === 'action' && control('require_valid_form') && eventType === 'activate') {

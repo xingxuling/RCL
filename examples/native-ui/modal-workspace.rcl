@@ -1,0 +1,40 @@
+reality NativeUIModalWorkspace {
+  ui Workspace {
+    state dialogOpen : Truth = false
+    state count : Number = 0
+    state confirmation : Text = "Pending"
+
+    view Root {
+      layout overlay { width fill height fill padding 0 }
+      view MainPanel {
+        layout vertical { width fill gap 12 padding 24 }
+        text Heading { value "RCL Modal Workspace" }
+        action Increment {
+          label "Increment background"
+          on activate { set count <- count + 1 }
+        }
+        text Count { bind value <- "Count: " + count }
+        action OpenDialog {
+          label "Open guarded dialog"
+          on activate { set dialogOpen <- true }
+        }
+      }
+      view ConfirmDialog {
+        property modal = true
+        accessibility_label "Confirmation dialog"
+        bind visible <- dialogOpen
+        layout vertical { width fill gap 16 padding 36 }
+        text DialogTitle { value "Confirm the change" }
+        text DialogDescription { value "Background actions are suspended while this modal is open." }
+        action Confirm {
+          label "Confirm"
+          on activate { set confirmation <- "Confirmed" set dialogOpen <- false }
+        }
+        action Cancel {
+          label "Cancel"
+          on activate { set dialogOpen <- false }
+        }
+      }
+    }
+  }
+}

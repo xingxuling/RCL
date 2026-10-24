@@ -74,6 +74,7 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
   if (node.role === 'container') {
     if (type === 'LinearLayout') lines.push(`${indent}${variable}.setOrientation(LinearLayout.${node.layout.mode === 'horizontal' ? 'HORIZONTAL' : 'VERTICAL'});`);
     if (type === 'GridLayout') lines.push(`${indent}${variable}.setColumnCount(${node.layout.columns});`);
+    if (property(node,'modal') === true) lines.push(`${indent}${variable}.setBackgroundColor(Color.argb(239, 17, 24, 39));`, `${indent}${variable}.setElevation(24f);`, `${indent}${variable}.setClickable(true);`, `${indent}${variable}.setFocusable(true);`, `${indent}${variable}.setContentDescription(${javaString(node.accessibility.label ?? node.id)});`);
     lines.push(`${indent}${variable}.setPadding(${node.layout.padding}, ${node.layout.padding}, ${node.layout.padding}, ${node.layout.padding});`);
     const gravity = { start: 'Gravity.START', center: 'Gravity.CENTER', end: 'Gravity.END', stretch: 'Gravity.FILL' }[node.layout.alignment];
     if (type === 'LinearLayout') lines.push(`${indent}${variable}.setGravity(${gravity});`);
@@ -143,7 +144,7 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
     if (type === 'LinearLayout') {
       lines.push(`${indent}LinearLayout.LayoutParams ${paramsName} = new LinearLayout.LayoutParams(${width}, ${height});`);
       if (node.layout.gap > 0) lines.push(`${indent}${paramsName}.setMargins(0, ${node.layout.gap}, 0, 0);`);
-    } else if (type === 'FrameLayout') lines.push(`${indent}FrameLayout.LayoutParams ${paramsName} = new FrameLayout.LayoutParams(${width}, ${height});`);
+    } else if (type === 'FrameLayout') { lines.push(`${indent}FrameLayout.LayoutParams ${paramsName} = new FrameLayout.LayoutParams(${property(child,'modal') === true ? 'ViewGroup.LayoutParams.MATCH_PARENT' : width}, ${property(child,'modal') === true ? 'ViewGroup.LayoutParams.MATCH_PARENT' : height});`); if (property(child,'modal') === true) lines.push(`${indent}${paramsName}.gravity = Gravity.CENTER;`); }
     else lines.push(`${indent}GridLayout.LayoutParams ${paramsName} = new GridLayout.LayoutParams(); ${paramsName}.width = ${width}; ${paramsName}.height = ${height};`);
     lines.push(`${indent}${variable}.addView(${childVariable}, ${paramsName});`);
   }
@@ -198,6 +199,23 @@ function emitFormValidation(ui) {
   return lines.join('\n');
 }
 
+function emitModalAndVisibilityGate(ui) {
+  const parents = new Map();
+  const walk = (node, parent = null) => { parents.set(node.id, parent); for (const child of node.children) walk(child, node); };
+  walk(ui.viewTree);
+  const modal = collectNodes(ui.viewTree).find((n) => property(n, 'modal') === true);
+  const blocks = [];
+  for (const node of collectNodes(ui.viewTree)) {
+    const chain = [];
+    for (let item = node; item; item = parents.get(item.id)) chain.push(item);
+    const invisible = chain.filter((item) => item.bindings.some((b) => b.property === 'visible') || property(item, 'visible') === false)
+      .map((item) => `!(${item.bindings.some((b) => b.property === 'visible') ? controlExpr(item, 'visible') : 'false'})`);
+    if (invisible.length) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && (${invisible.join(' || ')})) throw new IllegalStateException("RCL_UI_EVENT_HIDDEN:"+nodeId+":"+type);`);
+    if (modal && !chain.some((item) => item.id === modal.id)) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && (${controlExpr(modal, 'visible')})) throw new IllegalStateException("RCL_UI_MODAL_BLOCKED:"+nodeId+":"+type);`);
+  }
+  return `  private void assertUiInteractable(String nodeId,String type) {\n    Map<String,Object> event = new LinkedHashMap<>();\n${blocks.join('\n')}\n  }`;
+}
+
 function emitEventMethods(ui) {
   const methods = [];
   const dispatch = [];
@@ -205,7 +223,7 @@ function emitEventMethods(ui) {
   for (const node of collectNodes(ui.viewTree)) for (const handler of node.events) {
     const method = `event_${javaIdentifier(node.id)}_${javaIdentifier(handler.type)}`;
     dispatch.push(`    if (${javaString(node.id)}.equals(nodeId) && ${javaString(handler.type)}.equals(type)) { ${method}(event); return; }`);
-    const lines = [`  private void ${method}(Map<String,Object> event) {`];
+    const lines = [`  private void ${method}(Map<String,Object> event) {`, `    assertUiInteractable(${javaString(node.id)}, ${javaString(handler.type)});`];
     if (['action', 'input'].includes(node.role)) lines.push(`    if (${controlExpr(node, 'disabled')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_DISABLED:${node.id}:${handler.type}`)});`);
     if (node.role === 'action' && property(node,'require_valid_form') === true && handler.type === 'activate') lines.push(`    { String error=rclFormValidation(); if(error!=null) throw new IllegalStateException("RCL_UI_FORM_INVALID:${node.id}:"+error); }`);
     if (node.role === 'input' && ['input', 'change'].includes(handler.type)) lines.push(`    if (${controlExpr(node, 'read_only')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_READ_ONLY:${node.id}:${handler.type}`)});`);
@@ -250,6 +268,7 @@ function emitRender(ui) {
   const lines = ['  private void render() {', '    rendering = true;', '    Map<String,Object> event = new LinkedHashMap<>();'];
   for (const node of collectNodes(ui.viewTree)) {
     const kind = inputKind(node), field=fieldName(node);
+    if (node.bindings.some((b)=>b.property==='visible') || property(node,'visible') === false) lines.push(`    ${field}.setVisibility(${node.bindings.some((b)=>b.property==='visible') ? controlExpr(node,'visible') : 'false'} ? View.VISIBLE : View.GONE);`);
     for (const binding of node.bindings) {
       const value = emitJavaExpr(binding.expression,'state','event');
       if (node.role === 'input' && binding.property === 'value') {
@@ -363,7 +382,7 @@ export function emitNativeUiAndroidActivity(manifest) {
   if (manifest.schema !== RCL_NATIVE_UI_ANDROID_FORMAT) throw new Error('RCL_UI_ANDROID_MANIFEST_FORMAT');
   const ui = manifest.ui;
   const navigationTargetIds = new Set(ui.extensionPoints.navigation?.routes.map((route) => route.target) ?? []);
-  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || navigationTargetIds.has(node.id) || node.adaptiveLayouts.length > 0);
+  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || property(node,'visible') === false || property(node,'modal') === true || navigationTargetIds.has(node.id) || node.adaptiveLayouts.length > 0);
   const fieldNodeIds = new Set(fieldNodes.map((node) => node.id));
   const fields = fieldNodes.map((node) => `  private ${viewType(node)} ${fieldName(node)};`).join('\n');
   const uiLines = [];
@@ -426,6 +445,7 @@ ${fields}
   private void buildUi() {\n${uiLines.join('\n')}\n    setContentView(${root});\n  }
 
 ${emitRuntimeHelpers()}
+${emitModalAndVisibilityGate(ui)}
 ${emitDerived(ui)}
 ${events.dispatch}
 ${emitFormValidation(ui)}

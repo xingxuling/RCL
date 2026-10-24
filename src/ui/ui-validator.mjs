@@ -93,6 +93,22 @@ export function validateCanonicalNativeUi(program) {
     for (const child of node.children ?? []) walk(child, `${identityPath}/${child.id}`);
   };
   walk(program.viewTree);
+  // Bounded modal v0.6: a single labelled, state-controlled overlay that is
+  // a direct child of an overlay root. This is a real event authority boundary.
+  const modalNodes = [];
+  const inspectModal = (node, parent = null) => {
+    const modal = node.localProperties.find((item) => item.property === 'modal');
+    if (modal) {
+      assert(node.role === 'container' && modal.value === true, `RCL_UI_MODAL_ROLE:${node.id}`);
+      assert(parent === program.viewTree && parent.layout.mode === 'overlay', `RCL_UI_MODAL_PARENT:${node.id}`);
+      assert(node.accessibility.label, `RCL_UI_MODAL_LABEL_REQUIRED:${node.id}`);
+      assert(node.bindings.some((binding) => binding.property === 'visible'), `RCL_UI_MODAL_VISIBLE_BIND_REQUIRED:${node.id}`);
+      modalNodes.push(node);
+    }
+    for (const child of node.children) inspectModal(child, node);
+  };
+  inspectModal(program.viewTree);
+  assert(modalNodes.length <= 1, 'RCL_UI_MODAL_LIMIT:1');
   // Validate source-declared initial state before any platform widget is constructed.
   const initialState = new Map(program.state.map((item) => [item.id, item.initial]));
   const verifyInitialControls = (node) => {
