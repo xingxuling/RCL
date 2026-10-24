@@ -23,16 +23,16 @@ export const UI_STYLE_PROPERTIES = Object.freeze([
 ]);
 export const UI_CONTENT_PROPERTIES = Object.freeze(['value', 'label', 'placeholder', 'accessibility_label']);
 export const UI_BINDABLE_PROPERTIES_BY_ROLE = Object.freeze({
-  container: Object.freeze([]),
-  text: Object.freeze(['value']),
-  action: Object.freeze(['label', 'disabled']),
-  input: Object.freeze(['value', 'disabled', 'read_only']),
+  container: Object.freeze(['visible']),
+  text: Object.freeze(['value', 'visible']),
+  action: Object.freeze(['label', 'disabled', 'visible']),
+  input: Object.freeze(['value', 'disabled', 'read_only', 'visible']),
 });
 export const UI_CONTENT_PROPERTIES_BY_ROLE = Object.freeze({
-  container: Object.freeze(['accessibility_label']),
-  text: Object.freeze(['value', 'accessibility_label']),
-  action: Object.freeze(['label', 'accessibility_label', 'disabled', 'require_valid_form']),
-  input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only', 'min', 'max', 'step', 'options', 'required', 'min_length', 'max_length']),
+  container: Object.freeze(['accessibility_label', 'visible', 'modal']),
+  text: Object.freeze(['value', 'accessibility_label', 'visible']),
+  action: Object.freeze(['label', 'accessibility_label', 'disabled', 'visible', 'require_valid_form']),
+  input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only', 'visible', 'min', 'max', 'step', 'options', 'required', 'min_length', 'max_length']),
 });
 export const UI_PROPERTY_TYPES = Object.freeze({
   value: 'Text',
@@ -49,6 +49,8 @@ export const UI_PROPERTY_TYPES = Object.freeze({
   max: 'Number',
   step: 'Number',
   disabled: 'Truth',
+  visible: 'Truth',
+  modal: 'Truth',
   read_only: 'Truth',
   foreground: 'Text',
   background: 'Text',
