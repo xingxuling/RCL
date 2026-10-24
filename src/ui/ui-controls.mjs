@@ -23,6 +23,14 @@ export function validateInputControl(node) {
   if (!typed && ['options', 'min', 'max', 'step'].some(has)) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
   if (kind !== 'slider' && ['min', 'max', 'step'].some(has)) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
   if (!['select','radio'].includes(kind) && has('options')) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
+  if ((has('min_length') || has('max_length')) && !['text','email','password','textarea'].includes(kind)) throw new Error(`RCL_UI_FORM_LENGTH_KIND:${node.id}:${kind}`);
+  const minLength = get('min_length'), maxLength = get('max_length');
+  for (const [label, value] of [['min_length', minLength], ['max_length', maxLength]]) {
+    if (value !== undefined && (!Number.isInteger(value) || value < 0 || value > 10000)) throw new Error(`RCL_UI_FORM_LENGTH_BOUND:${node.id}:${label}`);
+  }
+  if (minLength !== undefined && maxLength !== undefined && minLength > maxLength) throw new Error(`RCL_UI_FORM_LENGTH_ORDER:${node.id}`);
+  if (has('required') && kind === 'slider') throw new Error(`RCL_UI_FORM_REQUIRED_KIND:${node.id}`);
+  if (['required','min_length','max_length'].some(has) && !node.bindings.some((x)=>x.property==='value')) throw new Error(`RCL_UI_FORM_BIND_VALUE_REQUIRED:${node.id}`);
   if (typed && !node.bindings.some((x) => x.property === 'value')) throw new Error(`RCL_UI_CONTROL_BIND_VALUE_REQUIRED:${node.id}`);
   if (typed && !node.events.some((x) => ['change', 'input'].includes(x.type))) throw new Error(`RCL_UI_CONTROL_CHANGE_REQUIRED:${node.id}`);
   if (typed && !get('accessibility_label')) throw new Error(`RCL_UI_CONTROL_LABEL_REQUIRED:${node.id}`);
@@ -63,4 +71,35 @@ export function validateControlEvent(node, type, payload) {
   }
   if (kind === 'date' && !isRclIsoDate(value)) throw new Error(`RCL_UI_DATE_VALUE:${node.id}`);
   if (['select','radio'].includes(kind) && !inputOptions(node).includes(value)) throw new Error(`RCL_UI_SELECT_VALUE:${node.id}`);
+}
+
+// Shared, deterministic, message-free validation; never echo field values into errors.
+export function formFieldError(node, value) {
+  if (node.role !== 'input') return null;
+  const prop = (name) => node.localProperties.find((item) => item.property === name)?.value;
+  const kind = inputKind(node);
+  const empty = value === '' || value === null || value === undefined || value === false;
+  if (prop('required') === true && empty) return 'required';
+  if (empty) return null;
+  if (['text', 'email', 'password', 'textarea'].includes(kind)) {
+    if (typeof value !== 'string') return 'type';
+    const length = Array.from(value).length;
+    if (prop('min_length') !== undefined && length < prop('min_length')) return 'min_length';
+    if (prop('max_length') !== undefined && length > prop('max_length')) return 'max_length';
+  }
+  if (kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'email';
+  if (kind === 'date' && !isRclIsoDate(value)) return 'date';
+  if (['select', 'radio'].includes(kind) && !inputOptions(node).includes(value)) return 'option';
+  return null;
+}
+export function formValidation(nodes, rendered) {
+  const fields = {};
+  for (const node of nodes) {
+    if (node.role !== 'input') continue;
+    const binding = rendered[node.id] ?? {};
+    const value = binding.value ?? node.localProperties.find((x) => x.property === 'value')?.value;
+    const error = formFieldError(node, value);
+    if (error) fields[node.id] = error;
+  }
+  return { valid: Object.keys(fields).length === 0, fields };
 }

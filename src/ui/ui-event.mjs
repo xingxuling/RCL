@@ -1,5 +1,5 @@
 import { evaluateUiExpression } from './ui-reactive.mjs';
-import { validateControlEvent } from './ui-controls.mjs';
+import { validateControlEvent, formValidation } from './ui-controls.mjs';
 import { projectUiAdaptiveLayouts, selectUiDeviceProfile } from './ui-device-adaptation.mjs';
 
 function cloneState(value) {
@@ -29,6 +29,7 @@ export function createNativeUiRuntime(program, options = {}) {
   const deviceAdaptation = program.extensionPoints?.deviceAdaptation ?? null;
   let availableWidth = options.availableWidth ?? null;
   let currentRoute = navigation?.initialRoute ?? null;
+  const allNodes = [...nodes.values()];
   const routeTarget = (route) => navigation?.routes.find((item) => item.id === route)?.target ?? null;
   const deviceProjection = () => {
     if (!deviceAdaptation) return null;
@@ -56,7 +57,7 @@ export function createNativeUiRuntime(program, options = {}) {
       ]));
     }
     return {
-      state: cloneState(state), derived: values, rendered,
+      state: cloneState(state), derived: values, rendered, validation: formValidation(allNodes, rendered),
       ...(navigation ? { navigation: { currentRoute, target: routeTarget(currentRoute) } } : {}),
       ...(deviceAdaptation ? { deviceAdaptation: deviceProjection() } : {}),
     };
@@ -87,6 +88,10 @@ export function createNativeUiRuntime(program, options = {}) {
     const current = projection().rendered[nodeId];
     const control = (property) => current[property] ?? node.localProperties.find((item) => item.property === property)?.value ?? false;
     if (control('disabled')) throw new Error(`RCL_UI_EVENT_DISABLED:${nodeId}:${eventType}`);
+    if (node.role === 'action' && control('require_valid_form') && eventType === 'activate') {
+      const validation = projection().validation;
+      if (!validation.valid) throw new Error(`RCL_UI_FORM_INVALID:${nodeId}:${Object.keys(validation.fields).join(',')}`);
+    }
     if (node.role === 'input' && control('read_only') && ['input', 'change'].includes(eventType)) throw new Error(`RCL_UI_EVENT_READ_ONLY:${nodeId}:${eventType}`);
     for (const parameter of handler.parameters) {
       if (!Object.prototype.hasOwnProperty.call(payload, parameter.id)) throw new Error(`RCL_UI_EVENT_PARAMETER_MISSING:${nodeId}:${eventType}:${parameter.id}`);
@@ -164,9 +169,11 @@ export function runNativeUiSemanticTrace(program, events, platform = 'canonical'
     platform,
     uiProgramRoot: program.semanticRoot,
     initialState: initial.state,
+    initialValidation: initial.validation,
     initialRenderedSemanticState: initial.rendered,
     events: cloneState(runtime.trace),
     finalState: runtime.snapshot(),
+    finalValidation: final.validation,
     finalRenderedSemanticState: final.rendered,
     lifecycle: cloneState(runtime.lifecycleTrace),
     ...(initial.navigation ? { initialNavigation: initial.navigation, finalNavigation: final.navigation } : {}),

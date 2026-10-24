@@ -85,7 +85,7 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
   if (node.role === 'action') {
     lines.push(`${indent}${variable}.setText(${javaString(property(node, 'label') ?? node.id)});`);
     if (property(node, 'disabled') === true) lines.push(`${indent}${variable}.setEnabled(false);`);
-    if (node.events.some((item) => item.type === 'activate')) lines.push(`${indent}${variable}.setOnClickListener(clicked -> dispatch(${javaString(node.id)}, "activate", new LinkedHashMap<>()));`);
+    if (node.events.some((item) => item.type === 'activate')) lines.push(`${indent}${variable}.setOnClickListener(clicked -> { try { dispatch(${javaString(node.id)}, "activate", new LinkedHashMap<>()); } catch (IllegalStateException failure) { if (failure.getMessage()!=null && failure.getMessage().startsWith("RCL_UI_FORM_INVALID:")) { formAttempted=true; android.widget.Toast.makeText(this, "Please check required fields", android.widget.Toast.LENGTH_SHORT).show(); render(); } else throw failure; } });`);
   }
   if (node.role === 'input') {
     const kind = inputKind(node);
@@ -157,6 +157,21 @@ function emitRuntimeHelpers() {
     try { if (value == null || !value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) return false; return LocalDate.parse(value).getYear() >= 1; }
     catch (Exception ignored) { return false; }
   }
+  private static String rclFieldError(Object value,String kind,boolean required,int minLength,int maxLength,String options) {
+    boolean empty=value==null || Boolean.FALSE.equals(value) || "".equals(value);
+    if (required && empty) return "required";
+    if (empty) return null;
+    if ("email".equals(kind) || "text".equals(kind) || "password".equals(kind) || "textarea".equals(kind)) {
+      if (!(value instanceof String)) return "type";
+      int length=((String)value).codePointCount(0,((String)value).length());
+      if (minLength>=0 && length<minLength) return "min_length";
+      if (maxLength>=0 && length>maxLength) return "max_length";
+    }
+    if ("email".equals(kind) && !String.valueOf(value).matches("[^\\\\s@]+@[^\\\\s@]+\\\\.[^\\\\s@]+")) return "email";
+    if ("date".equals(kind) && !rclValidDate(String.valueOf(value))) return "date";
+    if (("radio".equals(kind) || "select".equals(kind)) && !java.util.Arrays.asList(options.split("\\\\|",-1)).contains(value)) return "option";
+    return null;
+  }
   private static Number rclSliderValue(double min,double step,int progress) { double value=min+step*progress; return Math.rint(value)==value ? Long.valueOf((long)value) : Double.valueOf(value); }
   private static boolean rclTypeMatches(Object value,String type) { if ("Number".equals(type)) return value instanceof Number; if ("Text".equals(type)) return value instanceof String; if ("Truth".equals(type)) return value instanceof Boolean; return false; }
   private static Object rclChoose(Object condition,Object whenTrue,Object whenFalse) { return rclTruthy(condition)?whenTrue:whenFalse; }
@@ -171,6 +186,18 @@ function emitRuntimeHelpers() {
   }`;
 }
 
+function emitFormValidation(ui) {
+  const lines = ['  private String rclFormValidation() {','    Map<String,Object> event = new LinkedHashMap<>();'];
+  for (const node of collectNodes(ui.viewTree).filter((n) => n.role === 'input')) {
+    const binding=node.bindings.find((item)=>item.property==='value');
+    const value=binding?emitJavaExpr(binding.expression,'state','event'):javaLiteral(property(node,'value')??'');
+    const min=property(node,'min_length')??-1,max=property(node,'max_length')??-1;
+    lines.push(`    { String error = rclFieldError(${value}, ${javaString(inputKind(node))}, ${property(node,'required')===true}, ${min}, ${max}, ${javaString(property(node,'options')??'')}); if(error!=null) return ${javaString(node.id+':')}+error; }`);
+  }
+  lines.push('    return null;','  }');
+  return lines.join('\n');
+}
+
 function emitEventMethods(ui) {
   const methods = [];
   const dispatch = [];
@@ -180,6 +207,7 @@ function emitEventMethods(ui) {
     dispatch.push(`    if (${javaString(node.id)}.equals(nodeId) && ${javaString(handler.type)}.equals(type)) { ${method}(event); return; }`);
     const lines = [`  private void ${method}(Map<String,Object> event) {`];
     if (['action', 'input'].includes(node.role)) lines.push(`    if (${controlExpr(node, 'disabled')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_DISABLED:${node.id}:${handler.type}`)});`);
+    if (node.role === 'action' && property(node,'require_valid_form') === true && handler.type === 'activate') lines.push(`    { String error=rclFormValidation(); if(error!=null) throw new IllegalStateException("RCL_UI_FORM_INVALID:${node.id}:"+error); }`);
     if (node.role === 'input' && ['input', 'change'].includes(handler.type)) lines.push(`    if (${controlExpr(node, 'read_only')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_READ_ONLY:${node.id}:${handler.type}`)});`);
     for (const parameter of handler.parameters) {
       lines.push(`    if (!event.containsKey(${javaString(parameter.id)}) || !rclTypeMatches(event.get(${javaString(parameter.id)}), ${javaString(parameter.valueType)})) throw new IllegalArgumentException(${javaString(`RCL_UI_ANDROID_EVENT_PARAMETER_TYPE:${node.id}:${handler.type}:${parameter.id}:${parameter.valueType}`)});`);
@@ -236,6 +264,11 @@ function emitRender(ui) {
       else if (binding.property === 'read_only' && node.role === 'input' && ['text','email','password','textarea'].includes(kind)) lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
     }
     if (node.role==='input' && ['checkbox','switch','slider','select','radio','date'].includes(kind)) {lines.push(`    ${field}.setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);if (kind==='radio') lines.push(`    for (int i=0;i<${field}.getChildCount();i++) ${field}.getChildAt(i).setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);}
+  }
+  for (const node of collectNodes(ui.viewTree).filter((n)=>n.role==='input' && ['text','email','password','textarea'].includes(inputKind(n)))) {
+    const binding=node.bindings.find((item)=>item.property==='value');
+    const value=binding?emitJavaExpr(binding.expression,'state','event'):javaLiteral(property(node,'value')??'');
+    lines.push(`    if (formAttempted) { String issue=rclFieldError(${value}, ${javaString(inputKind(node))}, ${property(node,'required')===true}, ${property(node,'min_length')??-1}, ${property(node,'max_length')??-1}, ${javaString('')}); ${fieldName(node)}.setError(issue==null?null:issue.replace('_',' ')); }`);
   }
   if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
@@ -379,6 +412,7 @@ public final class ${manifest.application.activity} extends Activity {
   private final Map<String,android.text.method.KeyListener> inputKeyListeners = new LinkedHashMap<>();
   private final List<String> lifecycleTrace = new ArrayList<>();
   private boolean rendering = false;
+  private boolean formAttempted = false;
 ${navigation.field}
 ${adaptation.field}
 ${fields}
@@ -394,6 +428,7 @@ ${fields}
 ${emitRuntimeHelpers()}
 ${emitDerived(ui)}
 ${events.dispatch}
+${emitFormValidation(ui)}
 ${events.methods}
 ${emitRender(ui)}
 ${navigation.method}

@@ -1,0 +1,49 @@
+reality NativeUIValidatedSignup {
+  ui Signup {
+    state email : Text = ""
+    state name : Text = ""
+    state accepted : Truth = false
+    state submitted : Truth = false
+
+    view Root {
+      layout vertical { width fill gap 12 padding 24 }
+      text Heading { value "RCL Verified Signup" }
+      text Instructions { value "Submit is guarded by canonical validation." }
+
+      input FullName {
+        property input_kind = "text"
+        property required = true
+        property min_length = 2
+        property max_length = 40
+        placeholder "Your name"
+        accessibility_label "Full name"
+        bind value <- name
+        on input(value : Text) { set name <- value }
+      }
+      input EmailAddress {
+        property input_kind = "email"
+        property required = true
+        property max_length = 120
+        placeholder "name@example.com"
+        accessibility_label "Email"
+        bind value <- email
+        on input(value : Text) { set email <- value }
+      }
+      input AcceptTerms {
+        property input_kind = "checkbox"
+        property required = true
+        accessibility_label "Accept terms"
+        bind value <- accepted
+        on change(value : Truth) { set accepted <- value }
+      }
+      action SubmitForm {
+        label "Submit form"
+        property require_valid_form = true
+        on activate { set submitted <- true }
+      }
+      text SubmissionStatus {
+        bind value <- choose(submitted, "Submitted", "Pending")
+      }
+    }
+  }
+}
