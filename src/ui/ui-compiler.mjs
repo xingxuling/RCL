@@ -1,4 +1,5 @@
 import { parseReality } from '../parser.mjs';
+import { UI_INPUT_KINDS, controlPropertyType, inputValueType, inputKind, validateInputControl } from './ui-controls.mjs';
 import { sealNativeUiProgram } from './ui-ir.mjs';
 import { normalizeUILayout } from './ui-layout.mjs';
 import { normalizeUiLifecycle } from './ui-lifecycle.mjs';
@@ -71,10 +72,11 @@ function compileNode(node, context, path = []) {
     valueType: item.expression.valueType,
   }));
   const allowedLocalProperties = new Set([...UI_STYLE_PROPERTIES, ...UI_CONTENT_PROPERTIES_BY_ROLE[node.role]]);
+  const kind = inputKind({role: node.role,localProperties});
+  if (node.role === 'input' && !UI_INPUT_KINDS.includes(kind)) throw new Error(`RCL_UI_INPUT_KIND:${node.id}:${kind}`);
   for (const item of localProperties) {
     if (!allowedLocalProperties.has(item.property)) throw new Error(`RCL_UI_NODE_PROPERTY:${node.id}:${node.role}:${item.property}`);
-    if (UI_PROPERTY_TYPES[item.property] !== item.valueType) throw new Error(`RCL_UI_NODE_PROPERTY_TYPE:${node.id}:${item.property}:${item.valueType}`);
-    if (item.property === 'input_kind' && !['text', 'email', 'password'].includes(item.value)) throw new Error(`RCL_UI_INPUT_KIND:${node.id}:${item.value}`);
+    if (controlPropertyType(node.role, kind, item.property, UI_PROPERTY_TYPES) !== item.valueType) throw new Error(`RCL_UI_NODE_PROPERTY_TYPE:${node.id}:${item.property}:${item.valueType}`);
   }
   if (new Set(localProperties.map((item) => item.property)).size !== localProperties.length) {
     throw new Error(`RCL_UI_NODE_PROPERTY_DUPLICATE:${node.id}`);
@@ -89,7 +91,7 @@ function compileNode(node, context, path = []) {
     if (!UI_BINDABLE_PROPERTIES_BY_ROLE[node.role].includes(binding.property)) {
       throw new Error(`RCL_UI_BINDING_PROPERTY:${node.id}:${node.role}:${binding.property}`);
     }
-    if (binding.expression.valueType !== UI_PROPERTY_TYPES[binding.property]) {
+    if (binding.expression.valueType !== controlPropertyType(node.role, kind, binding.property, UI_PROPERTY_TYPES)) {
       throw new Error(`RCL_UI_BINDING_TYPE:${node.id}:${binding.property}:${binding.expression.valueType}`);
     }
   }
@@ -100,7 +102,7 @@ function compileNode(node, context, path = []) {
     const parameters = new Map();
     for (const parameter of event.parameters) {
       if (parameters.has(parameter.name)) throw new Error(`RCL_UI_EVENT_PARAMETER_DUPLICATE:${node.id}:${event.eventType}:${parameter.name}`);
-      const inferredType = expectedParameters?.[parameter.name] ?? null;
+      const inferredType = node.role === 'input' && ['input','change'].includes(event.eventType) && parameter.name === 'value' ? inputValueType(kind) : expectedParameters?.[parameter.name] ?? null;
       if (expectedParameters && !Object.hasOwn(expectedParameters, parameter.name)) throw new Error(`RCL_UI_EVENT_PARAMETER_UNKNOWN:${node.id}:${event.eventType}:${parameter.name}`);
       const parameterType = parameter.valueType ?? inferredType;
       if (!parameterType) throw new Error(`RCL_UI_EVENT_PARAMETER_TYPE_REQUIRED:${node.id}:${event.eventType}:${parameter.name}`);
@@ -153,6 +155,7 @@ function compileNode(node, context, path = []) {
   if (node.role === 'text' && !hasValue) throw new Error(`RCL_UI_TEXT_VALUE_REQUIRED:${node.id}`);
   if (node.role === 'action' && !hasLabel) throw new Error(`RCL_UI_ACTION_LABEL_REQUIRED:${node.id}`);
   if (node.role === 'action' && !events.some((item) => item.type === 'activate')) throw new Error(`RCL_UI_ACTION_ACTIVATE_REQUIRED:${node.id}`);
+  validateInputControl({role:node.role,id:node.id,localProperties,bindings,events});
 
   const canonical = {
     kind: 'UIViewNode',

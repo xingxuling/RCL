@@ -1,4 +1,5 @@
 import { evaluateUiExpression } from './ui-reactive.mjs';
+import { validateControlEvent } from './ui-controls.mjs';
 import { projectUiAdaptiveLayouts, selectUiDeviceProfile } from './ui-device-adaptation.mjs';
 
 function cloneState(value) {
@@ -91,6 +92,7 @@ export function createNativeUiRuntime(program, options = {}) {
       if (!Object.prototype.hasOwnProperty.call(payload, parameter.id)) throw new Error(`RCL_UI_EVENT_PARAMETER_MISSING:${nodeId}:${eventType}:${parameter.id}`);
       if (!matchesUiType(payload[parameter.id], parameter.valueType)) throw new Error(`RCL_UI_EVENT_PARAMETER_RUNTIME_TYPE:${nodeId}:${eventType}:${parameter.id}:${parameter.valueType}`);
     }
+    validateControlEvent(node, eventType, payload);
     const before = cloneState(state);
     const beforeRoute = currentRoute;
     const derived = (id) => {
