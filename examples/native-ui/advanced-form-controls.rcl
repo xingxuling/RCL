@@ -1,0 +1,42 @@
+reality NativeUIAdvancedFormControls {
+  ui AdvancedForm {
+    state locked : Truth = false
+    state date : Text = "2026-10-25"
+    state contact : Text = "email"
+    state notes : Text = "Hello from RCL"
+
+    view Root {
+      layout vertical { width fill gap 12 padding 24 }
+      text Heading { value "RCL Advanced Form Controls" }
+
+      input ContactMethod {
+        property input_kind = "radio"
+        property options = "email|phone|post"
+        accessibility_label "Contact method"
+        bind value <- contact
+        bind disabled <- locked
+        on change(value : Text) { set contact <- value }
+      }
+      input ScheduleDate {
+        property input_kind = "date"
+        accessibility_label "Schedule date"
+        bind value <- date
+        bind read_only <- locked
+        on change(value : Text) { set date <- value }
+      }
+      input NotesArea {
+        property input_kind = "textarea"
+        placeholder "Add more details"
+        accessibility_label "Notes"
+        bind value <- notes
+        bind read_only <- locked
+        on input(value : Text) { set notes <- value }
+      }
+      action ToggleLocked {
+        label "Toggle form lock"
+        on activate { set locked <- not locked }
+      }
+      text StateIndicator { bind value <- choose(locked, "Read only", "Editing") }
+    }
+  }
+}

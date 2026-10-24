@@ -35,7 +35,7 @@ function controlExpr(node, name, event = 'event') {
 }
 function viewType(node) {
   if (node.role === 'container') return node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
-  if (node.role === 'input') return ({checkbox:'CheckBox',switch:'Switch',slider:'SeekBar',select:'Spinner'})[inputKind(node)] ?? 'EditText';
+  if (node.role === 'input') return ({checkbox:'CheckBox',switch:'Switch',slider:'SeekBar',select:'Spinner',radio:'RadioGroup',date:'DatePicker'})[inputKind(node)] ?? 'EditText';
   return ROLE_TO_VIEW[node.role];
 }
 
@@ -60,9 +60,9 @@ function javaDimension(size) {
 
 function applyStyle(node, variable, lines, indent) {
   const style = node.resolvedStyle.values;
-  if (style.foreground && node.role !== 'container' && !['slider','select'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextColor(Color.parseColor(${javaString(style.foreground)}));`);
+  if (style.foreground && node.role !== 'container' && !['slider','select','radio','date'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextColor(Color.parseColor(${javaString(style.foreground)}));`);
   if (style.background) lines.push(`${indent}${variable}.setBackgroundColor(Color.parseColor(${javaString(style.background)}));`);
-  if (typeof style.font_size === 'number' && node.role !== 'container' && !['slider','select'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextSize(${style.font_size}f);`);
+  if (typeof style.font_size === 'number' && node.role !== 'container' && !['slider','select','radio','date'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextSize(${style.font_size}f);`);
   if (node.accessibility.label) lines.push(`${indent}${variable}.setContentDescription(${javaString(node.accessibility.label)});`);
 }
 
@@ -105,7 +105,19 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
       const binding = node.bindings.find((item)=>item.property==='value');
       const current = binding ? `String.valueOf(${emitJavaExpr(binding.expression,'state','new LinkedHashMap<>()')})` : javaString(property(node,'value') ?? '');
       if (inputEvent) lines.push(`${indent}${variable}.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {`,`${indent}  @Override public void onNothingSelected(AdapterView<?> parent) {}`,`${indent}  @Override public void onItemSelected(AdapterView<?> parent, View selected, int position, long id) { String chosen=String.valueOf(parent.getItemAtPosition(position)); if (!rendering && !chosen.equals(${current})) { ${valueEvent.replace('VALUE','chosen')} } }`,`${indent}});`);
+    } else if (kind === 'radio') {
+      lines.push(`${indent}${variable}.setOrientation(RadioGroup.VERTICAL);`);
+      for (const option of inputOptions(node)) {
+        lines.push(`${indent}{ RadioButton choice = new RadioButton(this); choice.setId(View.generateViewId()); choice.setText(${javaString(option)}); ${variable}.addView(choice); }`);
+      }
+      if (inputEvent) lines.push(`${indent}${variable}.setOnCheckedChangeListener((group, checkedId) -> { if (!rendering && checkedId != -1) { RadioButton chosen = (RadioButton)group.findViewById(checkedId); if (chosen != null) { ${valueEvent.replace('VALUE','chosen.getText().toString()')} } } });`);
+    } else if (kind === 'date') {
+      const binding = node.bindings.find((item)=>item.property==='value');
+      const initial = binding ? `String.valueOf(${emitJavaExpr(binding.expression,'state','new LinkedHashMap<>()')})` : javaString(property(node,'value') ?? '2000-01-01');
+      lines.push(`${indent}String initialDate_${javaIdentifier(node.id)} = ${initial};`, `${indent}LocalDate parsed_${javaIdentifier(node.id)} = LocalDate.parse(initialDate_${javaIdentifier(node.id)});`, `${indent}${variable}.init(parsed_${javaIdentifier(node.id)}.getYear(), parsed_${javaIdentifier(node.id)}.getMonthValue()-1, parsed_${javaIdentifier(node.id)}.getDayOfMonth(), null);`);
+      if (inputEvent) lines.push(`${indent}${variable}.setOnDateChangedListener((picker, year, month, day) -> { if (!rendering) { ${valueEvent.replace('VALUE','String.format(java.util.Locale.ROOT,"%04d-%02d-%02d",year,month+1,day)')} } });`);
     } else {
+      if (kind === 'textarea') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);`,`${indent}${variable}.setMinLines(3);`,`${indent}${variable}.setGravity(Gravity.TOP | Gravity.START);`);
       if (kind === 'email') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);`);
       if (kind === 'password') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);`);
       lines.push(`${indent}inputKeyListeners.put(${javaString(node.id)}, ${variable}.getKeyListener());`);
@@ -120,7 +132,7 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
       }
       if (property(node, 'read_only') === true) lines.push(`${indent}${variable}.setKeyListener(null);`);
     }
-    if (property(node, 'disabled') === true || (property(node, 'read_only') === true && ['checkbox','switch','slider','select'].includes(kind))) lines.push(`${indent}${variable}.setEnabled(false);`);
+    if (property(node, 'disabled') === true || (property(node, 'read_only') === true && ['checkbox','switch','slider','select','radio','date'].includes(kind))) lines.push(`${indent}${variable}.setEnabled(false);`);
   }
   applyStyle(node, variable, lines, indent);
   for (const child of node.children) {
@@ -141,6 +153,10 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
 function emitRuntimeHelpers() {
   return `  private static Object rclPath(Map<String,Object> snapshot, String path) { if (!snapshot.containsKey(path)) throw new IllegalStateException("RCL_UI_ANDROID_STATE_MISSING:" + path); return snapshot.get(path); }
   private static boolean rclTruthy(Object value) { if (value == null) return false; if (value instanceof Boolean) return (Boolean)value; if (value instanceof Number) return ((Number)value).doubleValue()!=0d; if (value instanceof CharSequence) return ((CharSequence)value).length()>0; return true; }
+  private static boolean rclValidDate(String value) {
+    try { if (value == null || !value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) return false; return LocalDate.parse(value).getYear() >= 1; }
+    catch (Exception ignored) { return false; }
+  }
   private static Number rclSliderValue(double min,double step,int progress) { double value=min+step*progress; return Math.rint(value)==value ? Long.valueOf((long)value) : Double.valueOf(value); }
   private static boolean rclTypeMatches(Object value,String type) { if ("Number".equals(type)) return value instanceof Number; if ("Text".equals(type)) return value instanceof String; if ("Truth".equals(type)) return value instanceof Boolean; return false; }
   private static Object rclChoose(Object condition,Object whenTrue,Object whenFalse) { return rclTruthy(condition)?whenTrue:whenFalse; }
@@ -172,9 +188,10 @@ function emitEventMethods(ui) {
       const min=property(node,'min'), max=property(node,'max'), step=property(node,'step');
       lines.push(`    double value = ((Number)event.get("value")).doubleValue(); if (!Double.isFinite(value) || value < ${min}d || value > ${max}d || Math.abs((value-${min}d)/${step}d-Math.rint((value-${min}d)/${step}d))>1e-8) throw new IllegalArgumentException(${javaString(`RCL_UI_SLIDER_VALUE:${node.id}`)});`);
     }
-    if (node.role === 'input' && ['change','input'].includes(handler.type) && inputKind(node) === 'select') {
+    if (node.role === 'input' && ['change','input'].includes(handler.type) && ['select','radio'].includes(inputKind(node))) {
       lines.push(`    if (!java.util.Arrays.asList(${inputOptions(node).map(javaString).join(',')}).contains(event.get("value"))) throw new IllegalArgumentException(${javaString(`RCL_UI_SELECT_VALUE:${node.id}`)});`);
     }
+    if (node.role === 'input' && ['change','input'].includes(handler.type) && inputKind(node) === 'date') lines.push(`    if (!rclValidDate((String)event.get("value"))) throw new IllegalArgumentException(${javaString(`RCL_UI_DATE_VALUE:${node.id}`)});`);
     if (handler.authority === 'reality-transaction') {
       lines.push(`    throw new IllegalStateException(${javaString(`RCL_UI_ANDROID_REALITY_GATEWAY_REQUIRED:${node.id}:${handler.type}`)});`);
     } else {
@@ -210,13 +227,15 @@ function emitRender(ui) {
       if (node.role === 'input' && binding.property === 'value') {
         if (['checkbox','switch'].includes(kind)) lines.push(`    if (${field}.isChecked() != rclTruthy(${value})) ${field}.setChecked(rclTruthy(${value}));`);
         else if (kind === 'slider') {const min=property(node,'min'),step=property(node,'step');lines.push(`    int progress_${javaIdentifier(node.id)}=(int)Math.round((((Number)${value}).doubleValue()-${min}d)/${step}d); if (${field}.getProgress()!=progress_${javaIdentifier(node.id)}) ${field}.setProgress(progress_${javaIdentifier(node.id)});`);}
+        else if (kind === 'radio') lines.push(`    for (int i=0;i<${field}.getChildCount();i++) { RadioButton radio = (RadioButton)${field}.getChildAt(i); if (radio.getText().toString().equals(String.valueOf(${value}))) { if (${field}.getCheckedRadioButtonId()!=radio.getId()) ${field}.check(radio.getId()); break; } }`);
+        else if (kind === 'date') lines.push(`    LocalDate parsed_${javaIdentifier(node.id)} = LocalDate.parse(String.valueOf(${value})); if (${field}.getYear()!=parsed_${javaIdentifier(node.id)}.getYear() || ${field}.getMonth()!=parsed_${javaIdentifier(node.id)}.getMonthValue()-1 || ${field}.getDayOfMonth()!=parsed_${javaIdentifier(node.id)}.getDayOfMonth()) ${field}.updateDate(parsed_${javaIdentifier(node.id)}.getYear(),parsed_${javaIdentifier(node.id)}.getMonthValue()-1,parsed_${javaIdentifier(node.id)}.getDayOfMonth());`);
         else if (kind === 'select') lines.push(`    for (int i=0;i<${field}.getCount();i++) { if (String.valueOf(${field}.getItemAtPosition(i)).equals(String.valueOf(${value}))) { if (${field}.getSelectedItemPosition()!=i) ${field}.setSelection(i); break; } }`);
         else lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
       } else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
-      else if (binding.property === 'disabled' && (node.role !== 'input' || !['checkbox','switch','slider','select'].includes(kind))) lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
-      else if (binding.property === 'read_only' && node.role === 'input' && ['text','email','password'].includes(kind)) lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
+      else if (binding.property === 'disabled' && (node.role !== 'input' || !['checkbox','switch','slider','select','radio','date'].includes(kind))) lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
+      else if (binding.property === 'read_only' && node.role === 'input' && ['text','email','password','textarea'].includes(kind)) lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
     }
-    if (node.role==='input' && ['checkbox','switch','slider','select'].includes(kind)) lines.push(`    ${field}.setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);
+    if (node.role==='input' && ['checkbox','switch','slider','select','radio','date'].includes(kind)) {lines.push(`    ${field}.setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);if (kind==='radio') lines.push(`    for (int i=0;i<${field}.getChildCount();i++) ${field}.getChildAt(i).setEnabled(!(${controlExpr(node,'disabled')} || ${controlExpr(node,'read_only')}));`);}
   }
   if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
@@ -336,6 +355,10 @@ import android.widget.CheckBox;
 import android.widget.Switch;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
+import android.widget.DatePicker;
+import java.time.LocalDate;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.EditText;

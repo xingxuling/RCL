@@ -1,5 +1,5 @@
 // Native UI typed controls. The input kind is a source-declared, immutable choice.
-export const UI_INPUT_KINDS = Object.freeze(['text', 'email', 'password', 'checkbox', 'switch', 'slider', 'select']);
+export const UI_INPUT_KINDS = Object.freeze(['text', 'email', 'password', 'checkbox', 'switch', 'slider', 'select', 'radio', 'date', 'textarea']);
 export function inputKind(node) {
   return node.role === 'input' ? node.localProperties.find((x) => x.property === 'input_kind')?.value ?? 'text' : null;
 }
@@ -19,13 +19,14 @@ export function validateInputControl(node) {
   if (!UI_INPUT_KINDS.includes(kind)) throw new Error(`RCL_UI_INPUT_KIND:${node.id}:${kind}`);
   const get = (name) => node.localProperties.find((x) => x.property === name)?.value;
   const has = (name) => node.localProperties.some((x) => x.property === name);
-  const typed = ['checkbox', 'switch', 'slider', 'select'].includes(kind);
+  const typed = ['checkbox', 'switch', 'slider', 'select', 'radio', 'date', 'textarea'].includes(kind);
   if (!typed && ['options', 'min', 'max', 'step'].some(has)) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
   if (kind !== 'slider' && ['min', 'max', 'step'].some(has)) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
-  if (kind !== 'select' && has('options')) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
+  if (!['select','radio'].includes(kind) && has('options')) throw new Error(`RCL_UI_CONTROL_PROPERTY_KIND:${node.id}:${kind}`);
   if (typed && !node.bindings.some((x) => x.property === 'value')) throw new Error(`RCL_UI_CONTROL_BIND_VALUE_REQUIRED:${node.id}`);
   if (typed && !node.events.some((x) => ['change', 'input'].includes(x.type))) throw new Error(`RCL_UI_CONTROL_CHANGE_REQUIRED:${node.id}`);
   if (typed && !get('accessibility_label')) throw new Error(`RCL_UI_CONTROL_LABEL_REQUIRED:${node.id}`);
+  if (kind === 'date' && has('value') && !isRclIsoDate(get('value'))) throw new Error(`RCL_UI_DATE_VALUE:${node.id}`);
   if (kind === 'slider') {
     const min = get('min'), max = get('max'), step = get('step');
     if (![min,max,step].every(Number.isFinite) || !(min < max && step > 0)) throw new Error(`RCL_UI_SLIDER_RANGE:${node.id}`);
@@ -33,7 +34,7 @@ export function validateInputControl(node) {
     if (!Number.isInteger(steps) && Math.abs(steps-Math.round(steps)) > 1e-9) throw new Error(`RCL_UI_SLIDER_STEP:${node.id}`);
     if (steps > 100000) throw new Error(`RCL_UI_SLIDER_STEPS_LIMIT:${node.id}`);
   }
-  if (kind === 'select') {
+  if (['select','radio'].includes(kind)) {
     const values = inputOptions(node);
     if (values.length < 2 || values.length > 64 || values.some((x) => !x || x.trim() !== x) || new Set(values).size !== values.length) throw new Error(`RCL_UI_SELECT_OPTIONS:${node.id}`);
   }
@@ -44,6 +45,13 @@ export function validateInputControl(node) {
     }
   }
 }
+export function isRclIsoDate(value) {
+  if (typeof value !== 'string' || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value)) return false;
+  const year = Number(value.slice(0,4)), month = Number(value.slice(5,7)), day = Number(value.slice(8,10));
+  if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+  const days = [31, ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28, 31,30,31,30,31,31,30,31,30,31];
+  return day <= days[month-1];
+}
 export function validateControlEvent(node, type, payload) {
   if (node.role !== 'input' || !['input', 'change'].includes(type)) return;
   const kind = inputKind(node), value = payload.value;
@@ -53,5 +61,6 @@ export function validateControlEvent(node, type, payload) {
     const index = (value-min)/step;
     if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max || Math.abs(index-Math.round(index)) > 1e-8) throw new Error(`RCL_UI_SLIDER_VALUE:${node.id}`);
   }
-  if (kind === 'select' && !inputOptions(node).includes(value)) throw new Error(`RCL_UI_SELECT_VALUE:${node.id}`);
+  if (kind === 'date' && !isRclIsoDate(value)) throw new Error(`RCL_UI_DATE_VALUE:${node.id}`);
+  if (['select','radio'].includes(kind) && !inputOptions(node).includes(value)) throw new Error(`RCL_UI_SELECT_VALUE:${node.id}`);
 }
