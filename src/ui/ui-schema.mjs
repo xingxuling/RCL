@@ -25,20 +25,23 @@ export const UI_CONTENT_PROPERTIES = Object.freeze(['value', 'label', 'placehold
 export const UI_BINDABLE_PROPERTIES_BY_ROLE = Object.freeze({
   container: Object.freeze([]),
   text: Object.freeze(['value']),
-  action: Object.freeze(['label']),
-  input: Object.freeze(['value']),
+  action: Object.freeze(['label', 'disabled']),
+  input: Object.freeze(['value', 'disabled', 'read_only']),
 });
 export const UI_CONTENT_PROPERTIES_BY_ROLE = Object.freeze({
   container: Object.freeze(['accessibility_label']),
   text: Object.freeze(['value', 'accessibility_label']),
-  action: Object.freeze(['label', 'accessibility_label']),
-  input: Object.freeze(['value', 'placeholder', 'accessibility_label']),
+  action: Object.freeze(['label', 'accessibility_label', 'disabled']),
+  input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only']),
 });
 export const UI_PROPERTY_TYPES = Object.freeze({
   value: 'Text',
   label: 'Text',
   placeholder: 'Text',
   accessibility_label: 'Text',
+  input_kind: 'Text',
+  disabled: 'Truth',
+  read_only: 'Truth',
   foreground: 'Text',
   background: 'Text',
   font_family: 'Text',

@@ -28,6 +28,10 @@ function collectNodes(root, result = []) {
 }
 function property(node, name) { return node.localProperties.find((item) => item.property === name)?.value; }
 function fieldName(node) { return `view_${javaIdentifier(node.id)}`; }
+function controlExpr(node, name, event = 'event') {
+  const bound = node.bindings.find((item) => item.property === name);
+  return bound ? `rclTruthy(${emitJavaExpr(bound.expression, 'state', event)})` : property(node, name) === true ? 'true' : 'false';
+}
 function viewType(node) {
   if (node.role === 'container') return node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
   return ROLE_TO_VIEW[node.role];
@@ -78,9 +82,16 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
   }
   if (node.role === 'action') {
     lines.push(`${indent}${variable}.setText(${javaString(property(node, 'label') ?? node.id)});`);
+    if (property(node, 'disabled') === true) lines.push(`${indent}${variable}.setEnabled(false);`);
     if (node.events.some((item) => item.type === 'activate')) lines.push(`${indent}${variable}.setOnClickListener(clicked -> dispatch(${javaString(node.id)}, "activate", new LinkedHashMap<>()));`);
   }
   if (node.role === 'input') {
+    const kind = property(node, 'input_kind') ?? 'text';
+    if (kind === 'email') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);`);
+    if (kind === 'password') lines.push(`${indent}${variable}.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);`);
+    lines.push(`${indent}inputKeyListeners.put(${javaString(node.id)}, ${variable}.getKeyListener());`);
+    if (property(node, 'read_only') === true) lines.push(`${indent}${variable}.setKeyListener(null);`);
+    if (property(node, 'disabled') === true) lines.push(`${indent}${variable}.setEnabled(false);`);
     const placeholder = property(node, 'placeholder');
     if (placeholder !== undefined) lines.push(`${indent}${variable}.setHint(${javaString(placeholder)});`);
     const inputEvent = node.events.find((item) => item.type === 'input' || item.type === 'change');
@@ -132,6 +143,8 @@ function emitEventMethods(ui) {
     const method = `event_${javaIdentifier(node.id)}_${javaIdentifier(handler.type)}`;
     dispatch.push(`    if (${javaString(node.id)}.equals(nodeId) && ${javaString(handler.type)}.equals(type)) { ${method}(event); return; }`);
     const lines = [`  private void ${method}(Map<String,Object> event) {`];
+    if (['action', 'input'].includes(node.role)) lines.push(`    if (${controlExpr(node, 'disabled')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_DISABLED:${node.id}:${handler.type}`)});`);
+    if (node.role === 'input' && ['input', 'change'].includes(handler.type)) lines.push(`    if (${controlExpr(node, 'read_only')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_READ_ONLY:${node.id}:${handler.type}`)});`);
     for (const parameter of handler.parameters) {
       lines.push(`    if (!event.containsKey(${javaString(parameter.id)}) || !rclTypeMatches(event.get(${javaString(parameter.id)}), ${javaString(parameter.valueType)})) throw new IllegalArgumentException(${javaString(`RCL_UI_ANDROID_EVENT_PARAMETER_TYPE:${node.id}:${handler.type}:${parameter.id}:${parameter.valueType}`)});`);
     }
@@ -146,7 +159,7 @@ function emitEventMethods(ui) {
       }
       lines.push('    state.clear(); state.putAll(proposed);');
       if (ui.extensionPoints.navigation) lines.push('    currentRoute = proposedRoute;');
-      lines.push(`    history.add(${javaString(`${node.id}:${handler.type}`)});`, `    Log.i(RCL_UI_LOG_TAG, "event node=${node.id} type=${handler.type} before=" + before.toString() + " after=" + state.toString()${routeLog});`, '    render();');
+      lines.push(`    history.add(${javaString(`${node.id}:${handler.type}`)});`, `    Log.i(RCL_UI_LOG_TAG, "event node=${node.id} type=${handler.type} before=" + before.keySet().toString() + " after=" + state.keySet().toString()${routeLog});`, '    render();');
     }
     lines.push('  }');
     methods.push(lines.join('\n'));
@@ -168,6 +181,8 @@ function emitRender(ui) {
     const field = fieldName(node);
     if (node.role === 'input' && binding.property === 'value') lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
     else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
+    else if (binding.property === 'disabled') lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
+    else if (binding.property === 'read_only' && node.role === 'input') lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
   }
   if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
@@ -298,17 +313,18 @@ public final class ${manifest.application.activity} extends Activity {
   private static final String RCL_UI_LOG_TAG = "RCLNativeUI";
   private final Map<String,Object> state = new LinkedHashMap<>();
   private final List<String> history = new ArrayList<>();
+  private final Map<String,android.text.method.KeyListener> inputKeyListeners = new LinkedHashMap<>();
   private final List<String> lifecycleTrace = new ArrayList<>();
   private boolean rendering = false;
 ${navigation.field}
 ${adaptation.field}
 ${fields}
 
-  @Override protected void onCreate(Bundle savedState) { super.onCreate(savedState); initializeState(); restoreState(savedState); buildUi(); render(); lifecycleTrace.add("create"); Log.i(RCL_UI_LOG_TAG, "lifecycle create uiRoot=" + RCL_UI_PROGRAM_ROOT + " state=" + state.toString()); }
-  @Override protected void onStart() { super.onStart(); lifecycleTrace.add("activate"); Log.i(RCL_UI_LOG_TAG, "lifecycle activate state=" + state.toString()); }
-  @Override protected void onResume() { super.onResume(); lifecycleTrace.add("resume"); Log.i(RCL_UI_LOG_TAG, "lifecycle resume state=" + state.toString()); }
-  @Override protected void onPause() { lifecycleTrace.add("suspend"); Log.i(RCL_UI_LOG_TAG, "lifecycle suspend state=" + state.toString()); super.onPause(); }
-  @Override protected void onDestroy() { lifecycleTrace.add("destroy"); Log.i(RCL_UI_LOG_TAG, "lifecycle destroy state=" + state.toString()); super.onDestroy(); }
+  @Override protected void onCreate(Bundle savedState) { super.onCreate(savedState); initializeState(); restoreState(savedState); buildUi(); render(); lifecycleTrace.add("create"); Log.i(RCL_UI_LOG_TAG, "lifecycle create uiRoot=" + RCL_UI_PROGRAM_ROOT + " stateKeys=" + state.keySet().toString()); }
+  @Override protected void onStart() { super.onStart(); lifecycleTrace.add("activate"); Log.i(RCL_UI_LOG_TAG, "lifecycle activate state=" + state.keySet().toString()); }
+  @Override protected void onResume() { super.onResume(); lifecycleTrace.add("resume"); Log.i(RCL_UI_LOG_TAG, "lifecycle resume state=" + state.keySet().toString()); }
+  @Override protected void onPause() { lifecycleTrace.add("suspend"); Log.i(RCL_UI_LOG_TAG, "lifecycle suspend state=" + state.keySet().toString()); super.onPause(); }
+  @Override protected void onDestroy() { lifecycleTrace.add("destroy"); Log.i(RCL_UI_LOG_TAG, "lifecycle destroy state=" + state.keySet().toString()); super.onDestroy(); }
   private void initializeState() {\n${lifecycle.init}\n  }
   private void buildUi() {\n${uiLines.join('\n')}\n    setContentView(${root});\n  }
 

@@ -1,0 +1,49 @@
+reality NativeUIComponentControls {
+  ui ComponentControls {
+    state locked : Truth = false
+    state email : Text = ""
+    state demonstration_password : Text = ""
+    state submitted : Truth = false
+
+    view Root {
+      layout vertical {
+        width fill
+        gap 12
+        padding 24
+      }
+
+      text Title { value "RCL Native UI · Component Controls" }
+
+      input EmailField {
+        property input_kind = "email"
+        placeholder "Email address"
+        bind value <- email
+        bind disabled <- locked
+        on input(value : Text) { set email <- value }
+      }
+
+      input DemoPasswordField {
+        property input_kind = "password"
+        placeholder "Demonstration only — no real secrets"
+        bind value <- demonstration_password
+        bind read_only <- locked
+        on input(value : Text) { set demonstration_password <- value }
+      }
+
+      action SubmitButton {
+        label "Submit"
+        bind disabled <- locked
+        on activate { set submitted <- true }
+      }
+
+      action ToggleLockButton {
+        label "Toggle lock"
+        on activate { set locked <- not locked }
+      }
+
+      text Status {
+        bind value <- choose(locked, "Locked", "Editable")
+      }
+    }
+  }
+}
