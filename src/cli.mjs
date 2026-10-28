@@ -12,6 +12,7 @@ import { runSuperconductorCandidateInversionDemo, writeSuperconductorCandidateIn
 import { runSandboxComputerFileTransmissionDemo, writeSandboxComputerFileTransmissionReports, buildSandboxComputerTransmissionSpec, renderSandboxComputerTransmissionRcl, readSandboxTransmissionInput } from './sandbox-computer-file-transmission-protocol.mjs';
 import { runAutonomousSandboxFileEmissionDemo, writeAutonomousSandboxFileEmissionReports, buildAutonomousSandboxFileEmissionSpec, renderAutonomousSandboxFileEmissionRcl, readAutonomousSandboxFileEmissionInput } from './autonomous-sandbox-file-emission-protocol.mjs';
 import { decodeBytecode } from './bytecode.mjs';
+import { verifyContentAddressedCache, materializeContentAddressedCache } from './package-ecosystem-runtime.mjs';
 import { runNativeBytecode } from './native-vm.mjs';
 import {
   DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
@@ -56,6 +57,22 @@ import { runAgentCivilizationFederationDemo, writeAgentCivilizationFederationRep
 import { runSoulUniverseDialogueSandboxDemo, writeSoulUniverseDialogueReports, buildSoulUniverseDialogueSpec, renderSoulUniverseDialogueRcl, readSoulUniverseDialogueInput } from './soul-universe-dialogue-sandbox.mjs';
 
 const [command, file, output, third, fourth, fifth] = process.argv.slice(2);
+if (command === 'package-cache-verify' || command === 'package-cache-materialize') {
+  try {
+    const tokens = process.argv.slice(3), count = command === 'package-cache-verify' ? 1 : 2;
+    if (tokens.length < count || tokens.slice(0, count).some(value => !value || value.startsWith('--'))) throw new Error('RCL_CACHE_CLI_ARGUMENT_INVALID');
+    const options = {}, seen = new Set();
+    for (let index = count; index < tokens.length; index += 2) {
+      const flag = tokens[index], value = tokens[index + 1];
+      if (!['--expected-cache-root', '--expected-lock-root'].includes(flag) || seen.has(flag) || !/^[0-9a-f]{64}$/u.test(value ?? '')) throw new Error('RCL_CACHE_CLI_ARGUMENT_INVALID');
+      seen.add(flag); options[flag === '--expected-cache-root' ? 'expectedCacheRoot' : 'expectedLockRoot'] = value;
+    }
+    const report = command === 'package-cache-verify' ? verifyContentAddressedCache(tokens[0], options) : materializeContentAddressedCache(tokens[0], tokens[1], options);
+    console.log(JSON.stringify(report, null, 2)); process.exit(report.ok ? 0 : 1);
+  } catch (error) {
+    console.log(JSON.stringify({ ok: false, diagnostics: [{ code: error.message, message: error.message }] }, null, 2)); process.exit(1);
+  }
+}
 if (command === 'framework-atlas') {
   console.log(JSON.stringify({
     assessment: assessRclNativeFrameworkAtlas(),
@@ -146,6 +163,8 @@ if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2',
        rcl package-lock <package-dir>
        rcl package-lock-verify <package-dir> [rcl.lock.json]
        rcl package-cache <package-dir> [cache-dir]
+       rcl package-cache-verify <cache-dir> [--expected-cache-root <sha256>]
+       rcl package-cache-materialize <cache-dir> <new-directory> [--expected-cache-root <sha256>]
        rcl package-target-matrix <package-dir> [output-dir]
        rcl package-release <package-dir> [output-dir]
        rcl package-release-verify <release-dir>
@@ -631,7 +650,9 @@ try {
   } else if (command === 'package-lock-verify') {
     console.log(JSON.stringify(verifyPackageLock(file, output), null, 2));
   } else if (command === 'package-cache') {
-    console.log(JSON.stringify(populateContentAddressedCache(file, output), null, 2));
+    const report = populateContentAddressedCache(file, output);
+    console.log(JSON.stringify(report, null, 2));
+    process.exitCode = report.ok ? 0 : 1;
   } else if (command === 'package-target-matrix') {
     console.log(JSON.stringify(await buildTargetMatrix(file, output), null, 2));
   } else if (command === 'package-release') {

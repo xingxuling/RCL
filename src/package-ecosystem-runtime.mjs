@@ -436,23 +436,133 @@ function cacheObjectPath(cacheDir, sha256) {
   return path.join(cacheDir, 'objects', 'sha256', sha256.slice(0, 2), sha256);
 }
 
+function ensureCacheObjectDirectory(cacheRoot, digest) {
+  ensureDir(cacheRoot);
+  let directory = cacheRoot;
+  for (const part of [null, 'objects', 'sha256', digest.slice(0, 2)]) {
+    if (part !== null) {
+      directory = path.join(directory, part);
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+    }
+    if (fs.lstatSync(directory).isSymbolicLink() || !fs.statSync(directory).isDirectory()) throw new Error('RCL_CACHE_DIRECTORY_INVALID');
+  }
+}
+
 export function populateContentAddressedCache(projectDir, cacheDir = null) {
   const root = path.resolve(projectDir);
   const cacheRoot = path.resolve(cacheDir ?? path.join(root, '.rcl-cache'));
+  const relativeCache = normalizeRel(path.relative(root, cacheRoot));
+  if (relativeCache === '' || (relativeCache !== '..' && !relativeCache.startsWith('../') && !path.isAbsolute(relativeCache)
+      && !['.rcl-cache', 'cache'].includes(relativeCache) && !relativeCache.startsWith('.rcl-cache/') && !relativeCache.startsWith('cache/') && !relativeCache.startsWith('release'))) throw new Error('RCL_CACHE_DIRECTORY_IN_PROJECT');
   const lockResult = buildPackageLock(root);
-  const objects = [];
-  for (const file of lockResult.lock.files) {
+  if (!lockResult.ok) return Object.freeze({ ok: false, cacheDir: cacheRoot, diagnostics: lockResult.diagnostics });
+  const portableNames = new Set();
+  const captured = lockResult.lock.files.map(file => {
+    const name = checkedCachePath(file.path);
+    if (portableNames.has(name)) throw new Error('RCL_CACHE_PATH_COLLISION');
+    portableNames.add(name);
     const source = path.join(root, file.path);
-    if (!fs.existsSync(source)) continue;
+    if (fs.lstatSync(source).isSymbolicLink()) throw new Error(`RCL_CACHE_SOURCE_INVALID:${file.path}`);
+    const bytes = fs.readFileSync(source);
+    if (bytes.length !== file.bytes || sha256Bytes(bytes) !== file.sha256) throw new Error(`RCL_CACHE_SOURCE_CHANGED:${file.path}`);
+    return { file, bytes };
+  });
+  const objects = [];
+  for (const { file, bytes } of captured) {
     const objectPath = cacheObjectPath(cacheRoot, file.sha256);
-    ensureDir(path.dirname(objectPath));
-    fs.copyFileSync(source, objectPath);
+    ensureCacheObjectDirectory(cacheRoot, file.sha256);
+    if (fs.existsSync(objectPath)) {
+      if (fs.lstatSync(objectPath).isSymbolicLink() || !fs.readFileSync(objectPath).equals(bytes)) throw new Error(`RCL_CACHE_OBJECT_MISMATCH:${file.sha256}`);
+    } else fs.writeFileSync(objectPath, bytes, { flag: 'wx' });
     objects.push({ path: file.path, sha256: file.sha256, bytes: file.bytes, object: normalizeRel(path.relative(cacheRoot, objectPath)) });
   }
   const indexBase = { format: RCL_CONTENT_ADDRESSED_CACHE_FORMAT, version: RCL_PACKAGE_ECOSYSTEM_VERSION, package: lockResult.lock.package, lockRoot: lockResult.lock.lockRoot, objectCount: objects.length, objects: objects.sort((a, b) => a.path.localeCompare(b.path)) };
   const index = { ...indexBase, cacheRoot: realityRoot(indexBase) };
-  writeJson(path.join(cacheRoot, 'cache-index.json'), index);
+  const indexPath = path.join(cacheRoot, 'cache-index.json');
+  if (fs.existsSync(indexPath) && (fs.lstatSync(indexPath).isSymbolicLink() || !fs.statSync(indexPath).isFile())) throw new Error('RCL_CACHE_INDEX_INVALID');
+  writeJson(indexPath, index);
   return Object.freeze({ ok: true, cacheDir: cacheRoot, indexPath: path.join(cacheRoot, 'cache-index.json'), index, root: index.cacheRoot });
+}
+
+function checkedCachePath(value) {
+  if (typeof value !== 'string' || !value || value.includes('\\') || value.startsWith('/')) throw new Error('RCL_CACHE_PATH_INVALID');
+  for (const part of value.split('/')) {
+    if (!part || part === '.' || part === '..' || /[<>:"|?*\x00-\x1f]/u.test(part) || /[. ]$/u.test(part)
+        || /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part)) throw new Error('RCL_CACHE_PATH_INVALID');
+  }
+  if (value === 'rcl.lock.json' || hasSecretPath(value)) throw new Error('RCL_CACHE_PATH_INVALID');
+  return value.normalize('NFC').toLowerCase();
+}
+
+function readVerifiedCache(cacheDir, options = {}) {
+  const directory = path.resolve(cacheDir), indexPath = path.join(directory, 'cache-index.json');
+  if (fs.lstatSync(directory).isSymbolicLink() || !fs.statSync(directory).isDirectory()) throw new Error('RCL_CACHE_DIRECTORY_INVALID');
+  if (fs.lstatSync(indexPath).isSymbolicLink() || !fs.statSync(indexPath).isFile() || fs.statSync(indexPath).size > 16 * 1024 * 1024) throw new Error('RCL_CACHE_INDEX_INVALID');
+  const index = readJson(indexPath);
+  if (!index || typeof index !== 'object' || Array.isArray(index)) throw new Error('RCL_CACHE_INDEX_INVALID');
+  const { cacheRoot, ...base } = index;
+  if (index.format !== RCL_CONTENT_ADDRESSED_CACHE_FORMAT || index.version !== RCL_PACKAGE_ECOSYSTEM_VERSION
+      || !index.package || typeof index.package !== 'object' || Array.isArray(index.package)
+      || !['name', 'version', 'entry'].every(key => typeof index.package[key] === 'string' && index.package[key].length > 0)
+      || !/^[0-9a-f]{64}$/u.test(cacheRoot ?? '')
+      || realityRoot(base) !== cacheRoot || !Array.isArray(index.objects) || index.objectCount !== index.objects.length
+      || typeof index.lockRoot !== 'string' || !/^[0-9a-f]{64}$/u.test(index.lockRoot)) throw new Error('RCL_CACHE_INDEX_INVALID');
+  if (options.expectedCacheRoot !== undefined && options.expectedCacheRoot !== cacheRoot) throw new Error('RCL_CACHE_EXPECTED_ROOT_MISMATCH');
+  if (options.expectedLockRoot !== undefined && options.expectedLockRoot !== index.lockRoot) throw new Error('RCL_CACHE_EXPECTED_LOCK_MISMATCH');
+  const names = new Set(), objects = new Map(), realRoot = fs.realpathSync(directory);
+  for (const item of index.objects) {
+    if (!item || typeof item.sha256 !== 'string' || !/^[0-9a-f]{64}$/u.test(item.sha256) || !Number.isSafeInteger(item.bytes) || item.bytes < 0) throw new Error('RCL_CACHE_OBJECT_INVALID');
+    const name = checkedCachePath(item.path);
+    if (names.has(name)) throw new Error('RCL_CACHE_PATH_COLLISION');
+    names.add(name);
+    const file = cacheObjectPath(directory, item.sha256);
+    if (item.object !== normalizeRel(path.relative(directory, file))) throw new Error('RCL_CACHE_OBJECT_PATH_INVALID');
+    const relative = path.relative(realRoot, fs.realpathSync(file));
+    if (!relative || path.isAbsolute(relative) || relative === '..' || relative.startsWith('..' + path.sep)
+        || fs.lstatSync(file).isSymbolicLink() || !fs.statSync(file).isFile()) throw new Error('RCL_CACHE_OBJECT_PATH_INVALID');
+    if (!objects.has(item.sha256)) objects.set(item.sha256, fs.readFileSync(file));
+    const bytes = objects.get(item.sha256);
+    if (bytes.length !== item.bytes || sha256Bytes(bytes) !== item.sha256) throw new Error('RCL_CACHE_OBJECT_MISMATCH');
+  }
+  for (const name of names) {
+    const parts = name.split('/');
+    for (let count = 1; count < parts.length; count++) if (names.has(parts.slice(0, count).join('/'))) throw new Error('RCL_CACHE_PATH_COLLISION');
+  }
+  return { index, objects, directory };
+}
+
+export function verifyContentAddressedCache(cacheDir, options = {}) {
+  try {
+    const { index, objects, directory } = readVerifiedCache(cacheDir, options);
+    return Object.freeze({ ok: true, format: 'rcl.content-addressed-cache-verification.v1', cacheDir: directory,
+      cacheRoot: index.cacheRoot, lockRoot: index.lockRoot, fileCount: index.objects.length,
+      uniqueObjectCount: objects.size, externalCacheAnchorChecked: options.expectedCacheRoot !== undefined, diagnostics: [] });
+  } catch (error) {
+    return Object.freeze({ ok: false, format: 'rcl.content-addressed-cache-verification.v1', diagnostics: [{ code: error.message?.startsWith('RCL_CACHE_') ? error.message : 'RCL_CACHE_READ_FAILED', message: error.message }] });
+  }
+}
+
+export function materializeContentAddressedCache(cacheDir, destination, options = {}) {
+  let checked;
+  try { checked = readVerifiedCache(cacheDir, options); }
+  catch (error) { return Object.freeze({ ok: false, diagnostics: [{ code: error.message?.startsWith('RCL_CACHE_') ? error.message : 'RCL_CACHE_READ_FAILED', message: error.message }] }); }
+  if (typeof destination !== 'string' || !destination) throw new Error('RCL_CACHE_DESTINATION_REQUIRED');
+  const out = path.resolve(destination);
+  // All paths and bytes are admitted before reserving a new destination.
+  // Existing destinations are never overwritten; failed restores remain partial.
+  try { fs.mkdirSync(out, { mode: 0o700 }); }
+  catch (error) { if (error.code === 'EEXIST') throw new Error('RCL_CACHE_DESTINATION_EXISTS'); throw error; }
+  for (const file of checked.index.objects) {
+    const target = resolveInside(out, file.path);
+    ensureDir(path.dirname(target));
+    fs.writeFileSync(target, checked.objects.get(file.sha256), { flag: 'wx' });
+  }
+  const lock = buildPackageLock(out, { write: false });
+  if (!lock.ok || lock.root !== checked.index.lockRoot || realityRoot(lock.lock.package) !== realityRoot(checked.index.package)) return Object.freeze({ ok: false, outputDir: out,
+    diagnostics: [{ code: 'RCL_CACHE_MATERIALIZED_LOCK_MISMATCH', expected: checked.index.lockRoot, actual: lock.root }, ...lock.diagnostics] });
+  fs.writeFileSync(path.join(out, 'rcl.lock.json'), JSON.stringify(lock.lock, null, 2) + '\n', { flag: 'wx' });
+  return Object.freeze({ ok: true, format: 'rcl.cache-materialization.v1', outputDir: out,
+    cacheRoot: checked.index.cacheRoot, lockRoot: lock.root, fileCount: checked.index.objects.length, diagnostics: [], networkAccess: false });
 }
 
 function isVolatileGeneratedPath(rel) {

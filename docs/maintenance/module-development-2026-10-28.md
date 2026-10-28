@@ -139,6 +139,21 @@ diagnostics were identical. See `lsp-facet-references-2026-10-28.md` and
 `lsp-parser-sidecar-2026-10-28.json`. The full native example-parity job remains
 live independently; its repeated full-compiler target samples are still executing.
 
+## Increment 6: verified cache materialization
+
+Package caching now includes independent integrity verification and reconstruction
+into a fresh directory. Reconstruction recompiles through the existing lock owner
+and must reproduce the original lock root and package identity. Content objects
+are immutable and reused by digest; invalid source packages cannot publish a
+successful cache. Default in-project caching remains stable across repetitions.
+External-root checks, portable path admission, object hashes and no-overwrite
+destinations apply to the new CLI and package APIs.
+
+Nine new checks plus four existing lock/cache/CLI-release regressions pass.
+See `package-cache-materialization-2026-10-28.md`. The complete native example
+parity collector is still running; no all-examples PASS is inferred from the
+bounded checks reported here.
+
 ## Remaining development queue
 
 1. Collect the running complete example-parity result and classify any actual gaps.

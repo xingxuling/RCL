@@ -1,4 +1,5 @@
 export * from './index-pre-v095-v096.mjs';
+export { verifyContentAddressedCache, materializeContentAddressedCache } from './package-ecosystem-runtime.mjs';
 export { createRealitySession } from './runtime.mjs';
 export { createNativeRealitySession } from './native-session.mjs';
 export { createPortableNativeTarget } from './portable-native-vm.mjs';
