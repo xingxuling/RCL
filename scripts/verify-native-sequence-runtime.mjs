@@ -5,14 +5,13 @@ import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {performance} from 'node:perf_hooks';
 import {compileRealityToBytecode} from '../src/bytecode.mjs';
-import {readSelfHostedCompilerSource} from '../src/selfhost-compiler.mjs';
 import {ROOT} from './k400-genomes/shared.mjs';
 const directory=path.join(ROOT,'output/native-sequence-runtime'),sha=b=>createHash('sha256').update(b).digest('hex');
 const buildPath=path.join(directory,'build.json'),build=JSON.parse(fs.readFileSync(buildPath,'utf8'));
 for(const b of [...build.sourceBindings,...build.artifacts])assert.equal(sha(fs.readFileSync(path.join(ROOT,b.path))),b.sha256);
 assert.equal(build.status,'BUILT_CANDIDATE');assert.equal(sha(fs.readFileSync(path.join(directory,'rclvm.c'))),build.generatedSourceHash);
 const binding=file=>({path:path.relative(ROOT,file).replaceAll('\\','/'),sha256:sha(fs.readFileSync(file))});
-const frozenVm=path.join(ROOT,'native/rclvm.exe'),candidateVm=path.join(directory,'rclvm.exe'),candidateCompiler=path.join(directory,'rclc.exe');
+const frozenVm=path.join(directory,'rclvm-frozen.exe'),candidateVm=path.join(directory,'rclvm.exe'),candidateCompiler=path.join(directory,'rclc.exe');
 const ledger=[];
 function invoke(binary,args,{timeout=300000}={}){
   const started=performance.now(),r=spawnSync(binary,args,{encoding:'utf8',windowsHide:true,timeout,maxBuffer:64*1024*1024,env:{...process.env,RCL_SEMANTIC_STATE_ROOT_ALGORITHM:'rcl.semantic-state-root.v2',RCLC_OUTPUT_STATE:'compiler.output'}}),ended=performance.now();
@@ -35,8 +34,13 @@ let emptyCalls=0,changed=false;for(let i=0;i<valid.readUInt32LE(28);i++){const a
 assert.ok(changed);const malformed=path.join(directory,'bad-concat.rbc');fs.writeFileSync(malformed,valid);
 const negatives=[invoke(frozenVm,[malformed]),invoke(candidateVm,[malformed])];for(const t of negatives){assert.notEqual(t.status,0);assert.match(t.stdout+t.stderr,/RCL_NATIVE_BUILTIN_TYPE/u);}
 console.log(JSON.stringify({phase:'semantic-parity',profiles:parity.length,negativeControls:negatives.length}));
-const source=readSelfHostedCompilerSource(),sourcePath=path.join(directory,'full-compiler.rcl'),c0=fs.readFileSync(path.join(ROOT,'selfhost/compiler.rbc'));
-assert.equal(sha(compileRealityToBytecode(source)),sha(c0));fs.writeFileSync(sourcePath,source);let input=path.join(directory,'generation-0.rbc');fs.writeFileSync(input,c0);
+// This reproduces the October 14 overlay. Keep its donor and compiler fixed
+// while the default runtime and general compiler continue to evolve.
+const compilerSource='examples/universal-stress/selfhost-native/general-compiler.rcl';
+const source=fs.readFileSync(path.join(ROOT,compilerSource),'utf8'),sourcePath=path.join(directory,'full-compiler.rcl'),c0=compileRealityToBytecode(source);
+assert.equal(sha(source),'07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452');
+assert.equal(sha(c0),'b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce');
+fs.writeFileSync(sourcePath,source);let input=path.join(directory,'generation-0.rbc');fs.writeFileSync(input,c0);
 const generations=[];
 for(let generation=1;generation<=20;generation++){
   const output=path.join(directory,'generation-'+generation+'.rbc'),t=invoke(candidateCompiler,[input,sourcePath,output]);assert.equal(t.status,0,t.stderr);

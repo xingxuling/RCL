@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <math.h>
 #ifdef _WIN32
 #include <fcntl.h>
@@ -185,6 +186,7 @@ struct Sequence {
   size_t count;
   Value *items;
   Sequence *prefix;
+  Sequence *suffix;
   Value *tail;
 };
 struct Token { char *token_type; char *text; Span span; };
@@ -509,40 +511,61 @@ static Sequence *sequence_clone(const Sequence *source) {
   return sequence;
 }
 
+typedef struct { const Sequence *sequence; const Value *value; } SequencePart;
+
+static void sequence_part_push(SequencePart **parts, size_t *count, size_t *capacity, const Sequence *sequence, const Value *value) {
+  if (*count == *capacity) {
+    if (*capacity > SIZE_MAX / 2 / sizeof(SequencePart)) { fprintf(stderr, "sequence is too large\n"); exit(2); }
+    size_t next_capacity = *capacity ? *capacity * 2 : 64;
+    SequencePart *grown = (SequencePart *)realloc(*parts, next_capacity * sizeof(SequencePart));
+    if (!grown) { fprintf(stderr, "out of memory\n"); exit(2); }
+    *parts = grown;
+    *capacity = next_capacity;
+  }
+  (*parts)[(*count)++] = (SequencePart){ sequence, value };
+}
+
 static void sequence_materialize(Sequence *sequence) {
-  if (!sequence || !sequence->tail) return;
-
-  size_t tail_count = 0;
-  Sequence *base = sequence;
-  while (base->tail) {
-    if (tail_count == SIZE_MAX) { fprintf(stderr, "sequence is too large\n"); exit(2); }
-    tail_count++;
-    base = base->prefix;
-  }
-  if (tail_count > SIZE_MAX / sizeof(Sequence *)) { fprintf(stderr, "out of memory\n"); exit(2); }
-  Sequence **tails = (Sequence **)malloc(tail_count * sizeof(Sequence *));
+  if (!sequence || (!sequence->tail && !sequence->suffix)) return;
+  if (sequence->count > SIZE_MAX / sizeof(Value)) { fprintf(stderr, "sequence is too large\n"); exit(2); }
   Value *items = (Value *)calloc(sequence->count ? sequence->count : 1, sizeof(Value));
-  if (!tails || !items) { free(tails); free(items); fprintf(stderr, "out of memory\n"); exit(2); }
-
-  Sequence *cursor = sequence;
-  for (size_t i = 0; i < tail_count; i++) {
-    tails[i] = cursor;
-    cursor = cursor->prefix;
+  if (!items) { fprintf(stderr, "out of memory\n"); exit(2); }
+  SequencePart *parts = NULL;
+  size_t part_count = 0, part_capacity = 0, output = 0;
+  sequence_part_push(&parts, &part_count, &part_capacity, sequence, NULL);
+  while (part_count) {
+    SequencePart part = parts[--part_count];
+    if (part.value) {
+      if (output >= sequence->count) { fprintf(stderr, "invalid persistent sequence\n"); abort(); }
+      items[output++] = value_clone(part.value);
+      continue;
+    }
+    const Sequence *node = part.sequence;
+    if (!node) continue;
+    if (node->tail) {
+      sequence_part_push(&parts, &part_count, &part_capacity, NULL, node->tail);
+      sequence_part_push(&parts, &part_count, &part_capacity, node->prefix, NULL);
+    } else if (node->suffix) {
+      sequence_part_push(&parts, &part_count, &part_capacity, node->suffix, NULL);
+      sequence_part_push(&parts, &part_count, &part_capacity, node->prefix, NULL);
+    } else {
+      if (node->count > sequence->count - output) { fprintf(stderr, "invalid persistent sequence\n"); abort(); }
+      for (size_t i = 0; i < node->count; i++) items[output++] = value_clone(&node->items[i]);
+    }
   }
-  size_t output = 0;
-  for (size_t i = 0; i < base->count; i++) items[output++] = value_clone(&base->items[i]);
-  for (size_t i = tail_count; i > 0; i--) items[output++] = value_clone(tails[i - 1]->tail);
-  free(tails);
+  free(parts);
   if (output != sequence->count) { fprintf(stderr, "invalid persistent sequence\n"); abort(); }
 
   Sequence *prefix = sequence->prefix;
+  Sequence *suffix = sequence->suffix;
   Value *tail = sequence->tail;
   sequence->items = items;
   sequence->prefix = NULL;
+  sequence->suffix = NULL;
   sequence->tail = NULL;
-  value_free(tail);
-  free(tail);
+  if (tail) { value_free(tail); free(tail); }
   sequence_free(prefix);
+  sequence_free(suffix);
 }
 
 static const Value *sequence_item(const Sequence *sequence, size_t index) {
@@ -557,6 +580,7 @@ static Value value_sequence_empty(void) {
 }
 
 static Value value_sequence_append(const Sequence *source, const Value *item) {
+  if (source && source->count >= SIZE_MAX / sizeof(Value)) return value_null();
   Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = sequence_create();
   v.sequence->count = (source ? source->count : 0) + 1;
   v.sequence->prefix = sequence_clone(source);
@@ -662,17 +686,28 @@ static int typed_record_field_index(const TypedRecord *record, const char *field
 }
 
 static void sequence_free(Sequence *sequence) {
-  while (sequence) {
+  Sequence *pending[sizeof(size_t) * CHAR_BIT + 1];
+  size_t pending_count = 0;
+  while (sequence || pending_count) {
+    if (!sequence) { sequence = pending[--pending_count]; continue; }
     if (sequence->ref_count == 0) { fprintf(stderr, "invalid sequence reference\n"); abort(); }
-    if (--sequence->ref_count > 0) return;
+    if (--sequence->ref_count > 0) { sequence = NULL; continue; }
     Sequence *prefix = sequence->prefix;
+    Sequence *suffix = sequence->suffix;
     if (sequence->items) {
       for (size_t i = 0; i < sequence->count; i++) value_free(&sequence->items[i]);
       free(sequence->items);
     }
     if (sequence->tail) { value_free(sequence->tail); free(sequence->tail); }
     free(sequence);
-    sequence = prefix;
+    if (prefix && suffix) {
+      /* Visiting the smaller branch first bounds pending branches by the bits
+         in count, independent of concatenation depth or shared child aliases. */
+      if (pending_count >= sizeof(pending) / sizeof(pending[0])) { fprintf(stderr, "invalid sequence release depth\n"); abort(); }
+      int prefix_first = prefix->count <= suffix->count;
+      pending[pending_count++] = prefix_first ? suffix : prefix;
+      sequence = prefix_first ? prefix : suffix;
+    } else sequence = prefix ? prefix : suffix;
   }
 }
 
@@ -2082,7 +2117,10 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       break;
     case BUILTIN_SEQUENCE_APPEND:
       if (argc != 2 || args[0].type != VALUE_SEQUENCE) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_append expects Sequence and value");
-      else result = value_sequence_append(args[0].sequence, &args[1]);
+      else {
+        result = value_sequence_append(args[0].sequence, &args[1]);
+        if (result.type == VALUE_NULL) vm_fail(vm, "RCL_NATIVE_OOM", "Appended Sequence is too large");
+      }
       break;
     case BUILTIN_SEQUENCE_GET: {
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_NUMBER || floor(args[1].number) != args[1].number) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_get expects Sequence and integer index"); break; }
@@ -2265,20 +2303,16 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     case BUILTIN_SEQUENCE_CONCAT:
       if (argc != 2 || args[0].type != VALUE_SEQUENCE || args[1].type != VALUE_SEQUENCE) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "sequence_concat expects two Sequences");
       else {
+        if (args[0].sequence->count > SIZE_MAX - args[1].sequence->count) { vm_fail(vm, "RCL_NATIVE_OOM", "Concatenated Sequence is too large"); break; }
+        size_t count = args[0].sequence->count + args[1].sequence->count;
+        if (count > SIZE_MAX / sizeof(Value)) { vm_fail(vm, "RCL_NATIVE_OOM", "Concatenated Sequence is too large"); break; }
+        if (!args[0].sequence->count) { result = value_clone(&args[1]); break; }
+        if (!args[1].sequence->count) { result = value_clone(&args[0]); break; }
         result.type = VALUE_SEQUENCE;
         result.sequence = sequence_create();
-        sequence_materialize(args[0].sequence);
-        sequence_materialize(args[1].sequence);
-        if (args[0].sequence->count > SIZE_MAX - args[1].sequence->count) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Concatenated Sequence is too large"); break; }
-        size_t count = args[0].sequence->count + args[1].sequence->count;
-        if (count > 0) {
-          result.sequence->items = (Value *)calloc(count, sizeof(Value));
-          if (!result.sequence->items) { sequence_free(result.sequence); result = value_null(); vm_fail(vm, "RCL_NATIVE_OOM", "Unable to allocate concatenated Sequence items"); break; }
-        }
         result.sequence->count = count;
-        size_t out = 0;
-        for (size_t i = 0; i < args[0].sequence->count; i++) result.sequence->items[out++] = value_clone(&args[0].sequence->items[i]);
-        for (size_t i = 0; i < args[1].sequence->count; i++) result.sequence->items[out++] = value_clone(&args[1].sequence->items[i]);
+        result.sequence->prefix = sequence_clone(args[0].sequence);
+        result.sequence->suffix = sequence_clone(args[1].sequence);
       }
       break;
     case BUILTIN_BYTES_U8:

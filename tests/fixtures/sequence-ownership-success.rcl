@@ -1,0 +1,9 @@
+reality OwnerSuccess {
+  reckon count(n : Number, values : Sequence) -> Number = choose(n == 0, length(values),
+    count(n - 1, sequence_concat(values, sequence_append(empty_sequence(), n))))
+  reckon share(n : Number, values : Sequence) -> Number = choose(n == 0, length(values),
+    share(n - 1, sequence_concat(values, values)))
+  facet count : Number = count(20000, empty_sequence())
+  facet logical : Number = share(40, sequence_append(empty_sequence(), 1))
+  facet values : Sequence = sequence_concat(sequence_append(empty_sequence(), "🦊"), sequence_append(empty_sequence(), 7))
+}

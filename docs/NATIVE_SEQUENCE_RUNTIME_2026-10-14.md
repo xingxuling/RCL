@@ -75,3 +75,19 @@ Evidence root:
 This is a Windows runtime candidate and grants no new K400 cell, independent
 generation authority, cross-platform acceptance or release maturity. The full
 K400 objective remains open and version advancement stays frozen.
+
+## October 28 reproduction paths
+
+The current default VM now develops a two-branch persistent concatenation
+representation. This historical one-builtin overlay still uses its exact donor,
+now preserved at `native/sequence-runtime/frozen-rclvm.c` with the SHA-256 above.
+The build also produces `output/native-sequence-runtime/rclvm-frozen.exe` for the
+original comparison. Its verifier reads the already-retained full compiler at
+`examples/universal-stress/selfhost-native/general-compiler.rcl`, asserts source
+hash `07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452`,
+and bootstrap artifact
+`b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce`.
+The resident overlay builder uses the same frozen donor and keeps its source
+bindings explicit. None of the historical evidence files above are rewritten.
+The new default-runtime work is recorded separately in
+`maintenance/native-persistent-concat-2026-10-28.md`.

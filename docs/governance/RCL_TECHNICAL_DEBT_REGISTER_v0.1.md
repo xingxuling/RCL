@@ -73,3 +73,9 @@ for UI tree/navigation and missing-warrant diagnostic locations; this scoped fix
 does not establish complete native diagnostic parity.
 
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.
+
+### 2026-10-28 reference equality discrepancy
+
+| ID | Status | Area | Debt | Closure evidence or next gate |
+|---|---|---|---|---|
+| TD-020 | ACTIVE | Reference value equality | `src/quantity.mjs` uses object identity for Sequence equality while the native VM compares elements recursively. Equal independently built `[1, 2, 1, 2]` values compare false in the reference interpreter and true in both the pre-change and current native VM. | Define shared per-value equality semantics, preserve quantity and typed-reference identity contracts, and add source-level parity and unequal-value controls. The persistent-concat change retains native equality and records ordered storage parity separately; see `docs/maintenance/native-persistent-concat-2026-10-28.json`. |

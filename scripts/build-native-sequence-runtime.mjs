@@ -6,7 +6,7 @@ import {spawnSync} from 'node:child_process';
 import {ROOT} from './k400-genomes/shared.mjs';
 
 const sha=b=>createHash('sha256').update(b).digest('hex');
-const basePath='native/rclvm.c',patchPath='native/sequence-runtime/concat-case.c';
+const basePath='native/sequence-runtime/frozen-rclvm.c',patchPath='native/sequence-runtime/concat-case.c';
 const base=fs.readFileSync(path.join(ROOT,basePath),'utf8'),patch=fs.readFileSync(path.join(ROOT,patchPath),'utf8');
 assert.equal(sha(fs.readFileSync(path.join(ROOT,basePath))),'0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156','Frozen native source must match the overlay donor');
 const start=base.indexOf('    case BUILTIN_SEQUENCE_CONCAT:'),end=base.indexOf('    case BUILTIN_BYTES_U8:',start);
@@ -20,6 +20,7 @@ const version=spawnSync(zig,['version'],{encoding:'utf8',windowsHide:true});asse
 assert.equal(process.platform,'win32','Initial candidate is Windows only');
 const common=['cc','-target','x86_64-windows-gnu','-O3','-std=c11','-Wall','-Wextra','-Wpedantic','-I',path.join(ROOT,'native')],commands=[],artifacts=[];
 for(const[name,args]of [
+  ['rclvm-frozen.exe',[path.join(ROOT,basePath)]],
   ['rclvm.exe',[sourcePath]],
   ['rclc.exe',['-DRCLVM_EMBEDDED_ONLY',path.join(ROOT,'native/rclc.c'),sourcePath]],
 ]){

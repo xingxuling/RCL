@@ -343,6 +343,20 @@ native pure-session execution. Sixty affected session/compiler/durable/backup/
 history checks pass. The public API already had reference preflight; the general
 compiler artifact remains unchanged. See `native-session-pure-profile-2026-10-28.json`.
 
+## Increment 21: persistent native Sequence concatenation
+
+The canonical C Sequence owner now shares both concat branches, materializes
+iteratively and releases structural chains with a count-bounded worklist. Nine
+targeted checks pass under the default and UBSan builds, including heap identity,
+deep chains, shared aliases and cleanup. Thirty successful and thirty failing
+embedded runs end with zero source-tracked allocations. The eight-artifact
+Windows distribution and real DLL consumer were rebuilt/verified. Session groups
+pass 69 checks; the current compiler fixed point and 195/233 eligible example
+parity remain unchanged. Historical overlay/resident reproduction now pins its
+exact preserved donor; its twenty old fixed-point generations pass. A reference
+Sequence equality discrepancy is explicitly recorded as TD-020. See
+`native-persistent-concat-2026-10-28.json` for source bindings and bounded evidence.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the

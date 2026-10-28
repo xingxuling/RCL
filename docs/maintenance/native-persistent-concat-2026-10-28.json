@@ -1,0 +1,274 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "native/rclvm.c": "faaa7ebaf14bee886ea3a2212e0d518c9d8e335ec8edd67706359bb0870d990d",
+    "native/rclvm.h": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899",
+    "native/semantic_state_v2.h": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c",
+    "native/sequence-runtime/frozen-rclvm.c": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156",
+    "native/sequence-runtime/ownership-probe.c": "a3196056ad466f9b90493712416b4dd3c6a48299859f70898479ced8b61d2453",
+    "tests/fixtures/sequence-ownership-success.rcl": "247c2a572eb892434e086f2c29b807fe9bee4717f6c3dbf51191b1675f885281",
+    "tests/fixtures/sequence-ownership-failure.rcl": "139071a5992e004044b88e28e92f628f95c3d3f2dedff379cdc41538450466dc",
+    "tests/native-persistent-concat.test.mjs": "e409a89b2a1af3235543b24a198cc32af8d09f7f713bd9b2445fa01413ec648f",
+    "scripts/verify-native-sequence-concat.mjs": "e9ed0b5d1fd3e650cee3a80c09b4cb221da6d364cc2af3280f248f364ae5fa6d",
+    "scripts/build-native-sequence-runtime.mjs": "4f97befc846d08676f9a07c1ef8be4ca2a674230263e64aca96f48c49d2f165f",
+    "scripts/verify-native-sequence-runtime.mjs": "0e41b9caaa9dcba14942d421ff4b8fb6f4aa61f9f774f3347a5c3dc1f3a14c1d",
+    "scripts/build-resident-sequence-compiler.mjs": "997f134daad6071ff7a9a07a667c10154dbac08ffca0e24104bd1f94cb5e3980",
+    "selfhost/compiler.rbc": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d"
+  },
+  "distribution": {
+    "sourceSha256": "965dca2082bda9f660402ddfab4b9a8485e00818920287cb96ac7e294435a184",
+    "artifacts": [
+      {
+        "path": "native/rclvm.exe",
+        "bytes": 334336,
+        "sha256": "ae5adb5e1ba50ea09f6b3140b6e5705cd1be2d48b788c5ab6e95421b66301276"
+      },
+      {
+        "path": "native/rclc.exe",
+        "bytes": 338944,
+        "sha256": "e9f81458751c2cf9b95652378fa82cef98d82de6f284836ce63033c6443c7f82"
+      },
+      {
+        "path": "native/rclvmd.exe",
+        "bytes": 337920,
+        "sha256": "4bf30cef25f599b361663fddda97ff5f90f77b241205177fa42a78ec1347e1ba"
+      },
+      {
+        "path": "native/provider_demo.exe",
+        "bytes": 333824,
+        "sha256": "68eb6525a5b05261861e6c72908d7c101e01fea0f190b359c3c8ccbcd111c2be"
+      },
+      {
+        "path": "native/rclfoundation.exe",
+        "bytes": 370176,
+        "sha256": "5d0881820daeae118ecdde8f71dd8b772e660e958c58da106113790ddf093fc0"
+      },
+      {
+        "path": "native/librclvm.a",
+        "bytes": 380804,
+        "sha256": "83c3e3d6849fb9b51edf336e566a3cd2a033858c53bff0dbe5373fd69c2cd7a6"
+      },
+      {
+        "path": "native/rclvm.dll",
+        "bytes": 331776,
+        "sha256": "60882fc2e57d930f8c88a4604ec5fc84f25d6aec2fb4f22bbdd3397273a9a759"
+      },
+      {
+        "path": "native/rclvm.lib",
+        "bytes": 5476,
+        "sha256": "80b9897b4167f199d73aae175396b5a317bdfef5ec94fe653be98ae54a693b6e"
+      }
+    ],
+    "manifestVerified": true
+  },
+  "checks": {
+    "targeted": {
+      "passed": 9,
+      "failed": 0
+    },
+    "ubsan": {
+      "passed": 9,
+      "failed": 0,
+      "log": "output/module-development-20261028/native-persistent-concat-ubsan-final.log"
+    },
+    "nativeAbiAttestationHeapResident": {
+      "passed": 60,
+      "failed": 0,
+      "skipped": 1,
+      "log": "output/module-development-20261028/sequence-native-regression.log"
+    },
+    "actualEmbeddingAndHttpWorker": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "initialToolchainSkipClosed": true,
+      "log": "output/module-development-20261028/sequence-native-embedding-final.log"
+    },
+    "sessionAndConcat": {
+      "passed": 69,
+      "failed": 0,
+      "log": "output/module-development-20261028/sequence-session-regression.log"
+    },
+    "allocationBalance": [
+      {
+        "ok": true,
+        "rounds": 30,
+        "expectedError": false,
+        "sourceAllocations": 2402293,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "peakAllocations": 80011,
+        "peakBytes": 41983808
+      },
+      {
+        "ok": true,
+        "rounds": 30,
+        "expectedError": true,
+        "sourceAllocations": 1390,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "peakAllocations": 53,
+        "peakBytes": 36705644
+      }
+    ],
+    "fixedPoint": {
+      "ok": true,
+      "format": "rcl.selfhost.compiler.fixed-point.v1",
+      "outputPath": "selfhost/compiler.rbc",
+      "bytes": 362965,
+      "sha256": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+      "sourceSha256": "47caf8c2c4d888439be27c7c8a4be5bbe10c8f7f994df82c215bebb9c46178e0",
+      "byteIdentical": true,
+      "generations": {
+        "c0": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+        "c1": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+        "c2": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d"
+      },
+      "native": {
+        "c0ToC1": {
+          "status": "ok",
+          "bytes": 362965,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        "c1ToC2": {
+          "status": "ok",
+          "bytes": 362965,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        }
+      }
+    },
+    "fullExampleCollection": {
+      "ok": true,
+      "format": "rcl.selfhost.example-parity.v1",
+      "artifactParity": true,
+      "compilerArtifact": "selfhost/compiler.rbc",
+      "compilerArtifactSha256": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+      "requestedSourceCount": 233,
+      "scope": "all-checked-in-example-sources",
+      "compilerTimeoutMs": 60000,
+      "budgetProfile": "original-60-second-target-budget",
+      "originalBudgetSatisfied": true,
+      "nativeCompileAttempts": 122,
+      "avoidedDuplicateCompiles": 73,
+      "evidenceBoundary": "Identical source plus bootstrap byte hashes reuse one actual native compile result within this run. This does not establish independent repeated process execution, K400 admission or publisher authenticity.",
+      "eligibleCount": 195,
+      "unsupportedCount": 38,
+      "failureCount": 0
+    },
+    "historicalOverlay": {
+      "donorSha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156",
+      "buildSha256": "04647c38a28edafb3633249b19b4a049d1d654823d5fd3fff8c627efd2fc24c0",
+      "generatedSourceHash": "594831e31a2e637d8033133f5e27a37f69f7cd23f0f912ea38f19591ebb67282",
+      "reportRoot": "8ee94d5bc185c8210539b475c6cd97a8ebb0e6909ae79d64f6623679199d931f",
+      "profiles": 3,
+      "negativeControls": 2,
+      "generations": 20,
+      "compilerArtifactHash": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce"
+    }
+  },
+  "observation": {
+    "before": {
+      "format": "rcl.native-sequence-concat-observation.v1",
+      "ok": true,
+      "vmPath": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\module-development-20261028\\native-before-sequence\\rclvm.exe",
+      "vmSha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+      "samples": [
+        {
+          "size": 4096,
+          "elapsedMs": 177.4937,
+          "matches": true,
+          "stateRoot": "12dd7fdf98d5c6a32e2315d710b48c8cb5043af4d2b12ae204c429de2432675b",
+          "sourceSha256": "f951d28a904a82f340e5b8bdfdb073e31739b9acee18a76b4ae75148713200be",
+          "bytecodeSha256": "7fe7111713b2c561d91515fa6326e1dee78a943292a99b460f09d14d1a73afd7",
+          "executedInstructions": 53271
+        },
+        {
+          "size": 16384,
+          "elapsedMs": 3782.9275,
+          "matches": true,
+          "stateRoot": "7d6b25797a4ac28f3f6cf33c0b8283e725caf8fb9e5f3af11c81c23f6e6435ff",
+          "sourceSha256": "4dfc3b9de3c325586a1ad922f306cdec41bcee809dffe435e0fdd2d3f0d698e9",
+          "bytecodeSha256": "f035d22e26222a8932181d43c0d150b45163926e9aaa03f0556b7c795df3bcee",
+          "executedInstructions": 213015
+        }
+      ],
+      "boundary": "Local observed durations and exact integer sequence/state checks; no portable latency guarantee or publisher authentication.",
+      "warmup": {
+        "elapsedMs": 36.70270000000001,
+        "matches": true
+      }
+    },
+    "after": {
+      "format": "rcl.native-sequence-concat-observation.v1",
+      "ok": true,
+      "vmPath": "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\rclvm.exe",
+      "vmSha256": "ae5adb5e1ba50ea09f6b3140b6e5705cd1be2d48b788c5ab6e95421b66301276",
+      "samples": [
+        {
+          "size": 4096,
+          "elapsedMs": 41.062700000000405,
+          "matches": true,
+          "stateRoot": "12dd7fdf98d5c6a32e2315d710b48c8cb5043af4d2b12ae204c429de2432675b",
+          "sourceSha256": "f951d28a904a82f340e5b8bdfdb073e31739b9acee18a76b4ae75148713200be",
+          "bytecodeSha256": "7fe7111713b2c561d91515fa6326e1dee78a943292a99b460f09d14d1a73afd7",
+          "executedInstructions": 53271
+        },
+        {
+          "size": 16384,
+          "elapsedMs": 74.70150000000012,
+          "matches": true,
+          "stateRoot": "7d6b25797a4ac28f3f6cf33c0b8283e725caf8fb9e5f3af11c81c23f6e6435ff",
+          "sourceSha256": "4dfc3b9de3c325586a1ad922f306cdec41bcee809dffe435e0fdd2d3f0d698e9",
+          "bytecodeSha256": "f035d22e26222a8932181d43c0d150b45163926e9aaa03f0556b7c795df3bcee",
+          "executedInstructions": 213015
+        }
+      ],
+      "boundary": "Local observed durations and exact integer sequence/state checks; no portable latency guarantee or publisher authentication.",
+      "warmup": {
+        "elapsedMs": 5182.6103,
+        "matches": true
+      }
+    },
+    "boundary": "Single paired warmed local observation; cold and warmup logs retained. No portable timing guarantee."
+  },
+  "knownEqualityDebt": {
+    "source": "reality EqualityDebt { facet a : Sequence = sequence_append(sequence_append(empty_sequence(), 1), 2) facet equal : Truth = sequence_concat(a, a) == sequence_concat(a, a) }",
+    "outputs": [
+      {
+        "vmPath": "output/module-development-20261028/native-before-sequence/rclvm.exe",
+        "vmSha256": "55c3a068f238b3dbe704a760e9f26e27af236399d0d30604bf064e9677c09c4b",
+        "ok": false,
+        "reference": false,
+        "native": true
+      },
+      {
+        "vmPath": "native/rclvm.exe",
+        "vmSha256": "ae5adb5e1ba50ea09f6b3140b6e5705cd1be2d48b788c5ab6e95421b66301276",
+        "ok": false,
+        "reference": false,
+        "native": true
+      }
+    ]
+  },
+  "rawReportBindings": {
+    "output/module-development-20261028/sequence-concat-before-warm.json": "8e42271e53d8e323f62d633abf8a11260520e6e8211e68052488ad096e21812b",
+    "output/module-development-20261028/sequence-concat-after-warm.json": "39819e214ed4d4b765521770ea1102213e5d99452047b95332cc73e5977d8a49",
+    "output/module-development-20261028/ownership-success-final.json": "d230f5f8dabeb6e6f9462753e1328700b2aa2ea57b1dfe79f1fda5cc0a1b2ee5",
+    "output/module-development-20261028/ownership-failure-final.json": "2c4c0c5e225ffab5679c6b08638e2504ad9af9c2cea60bd7c58a921ec887f531",
+    "output/module-development-20261028/sequence-equality-debt.json": "3d2d092b31164608a353bde1fbe6a617e65cc059594dd2179bad626117238205",
+    "output/module-development-20261028/sequence-compiler-fixedpoint.json": "fa502c31bd980bb263861f2f9260a57af4a05e9ffbadb5c5f2bbb1f90012afed",
+    "output/module-development-20261028/example-parity-sequence-runtime.json": "4519f7c3bab3617150e31926b2db39e8b01ef55626e71ad6e3cc66eb0e6eaaf9"
+  },
+  "limitations": [
+    "AddressSanitizer link unavailable on this Windows toolchain; not passed",
+    "Source-allocation probe excludes C runtime internal allocations",
+    "Nested value release retains existing recursion",
+    "Dense materialization retains existing process-exit OOM paths",
+    "Reference equality debt TD-020 remains open at this checkpoint",
+    "No Linux or other target runtime execution acceptance"
+  ],
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}
