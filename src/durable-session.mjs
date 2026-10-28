@@ -7,15 +7,19 @@ import { compileRealitySessionNative } from './session-compiler.mjs';
 import { createNativeRealitySession } from './native-session.mjs';
 import { createRealitySession } from './runtime.mjs';
 import { semanticStateRootV2Stable } from './semantic-state-root-v2.mjs';
-import { normalizeSessionCommand, sessionError } from './session-contract.mjs';
+import { normalizeSessionCommand, sessionError, RCL_SESSION_COMMAND_FORMAT, RCL_SESSION_RESULT_FORMAT } from './session-contract.mjs';
 
 export const RCL_DURABLE_SESSION_VERSION = '1.0.0';
-export const RCL_SESSION_JOURNAL_FORMAT = 'rcl.session-journal.v1';
+export const RCL_SESSION_JOURNAL_FORMAT = 'rcl.session-journal.v2';
+export const RCL_SESSION_COMMAND_IDENTITY_FORMAT = 'rcl.session-command-identity.v2';
 export const RCL_SESSION_BACKUP_FORMAT = 'rcl.session-backup.v1';
 export const RCL_SESSION_HISTORY_FORMAT = 'rcl.session-history-page.v1';
+export const RCL_SESSION_HISTORY_VERIFICATION_FORMAT = 'rcl.session-history-verification.v1';
 const BACKUP_FILES = ['source.rcl', 'session.rbc', 'journal.jsonl'];
-const GENESIS = 'rcl.session-journal-genesis.v1';
-const COMMAND = 'rcl.session-journal-command.v1';
+const GENESIS = 'rcl.session-journal-genesis.v2';
+const COMMAND = 'rcl.session-journal-command.v2';
+const LEGACY_GENESIS = 'rcl.session-journal-genesis.v1';
+const LEGACY_COMMAND = 'rcl.session-journal-command.v1';
 const MAX_JOURNAL_BYTES = 64 * 1024 * 1024;
 const MAX_COMMANDS = 10000;
 const hashBytes = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -86,8 +90,176 @@ function requestKey(value) {
   return value;
 }
 
-function commandIdentity(programRoot, command, expectedRevision) {
-  return root({ programRoot, command, expectedRevision });
+function commandIdentity(programRoot, command, expectedRevision, format = COMMAND) {
+  if (format === LEGACY_COMMAND) return root({ programRoot, command, expectedRevision });
+  if (format !== COMMAND) throw sessionError('RCL_SESSION_COMMAND_IDENTITY_UNSUPPORTED');
+  return root({ format: RCL_SESSION_COMMAND_IDENTITY_FORMAT, programRoot, commandFormat: command.format,
+    rule: command.rule, mode: command.mode, inputsRoot: root(command.inputs), expectedRevision });
+}
+
+function resultIdentity(programRoot, result, expectedRevision, format = COMMAND) {
+  if (format === LEGACY_COMMAND) return root(result);
+  if (format !== COMMAND) throw sessionError('RCL_SESSION_COMMAND_IDENTITY_UNSUPPORTED');
+  return root({ format: 'rcl.session-result-identity.v2', payloadRoot: root(result),
+    commandRoot: commandIdentity(programRoot, result.command, expectedRevision), stateRoot: root(result.state) });
+}
+
+function historyVerificationOptions(options) {
+  const allowed = ['expectedJournalRoot', 'expectedPageRoot', 'expectedPreviousRoot', 'expectedSessionId', 'expectedProgramRoot', 'minimumRevision'];
+  if (!options || typeof options !== 'object' || Array.isArray(options)
+      || ![Object.prototype, null].includes(Object.getPrototypeOf(options))
+      || Reflect.ownKeys(options).some(key => !allowed.includes(key))
+      || Object.values(Object.getOwnPropertyDescriptors(options)).some(item => !item.enumerable || !('value' in item))) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+  const pins = Object.fromEntries(Object.entries(structuredClone(options)).filter(([, value]) => value !== undefined));
+  for (const key of ['expectedJournalRoot', 'expectedPageRoot', 'expectedPreviousRoot', 'expectedProgramRoot']) {
+    if (pins[key] !== undefined && (typeof pins[key] !== 'string' || !/^[0-9a-f]{64}$/u.test(pins[key]))) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+  }
+  if (pins.expectedSessionId !== undefined && (typeof pins.expectedSessionId !== 'string' || !pins.expectedSessionId || pins.expectedSessionId.includes('\0'))) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+  if (pins.minimumRevision !== undefined && (!Number.isSafeInteger(pins.minimumRevision) || pins.minimumRevision < 0)) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+  return pins;
+}
+
+function verifyHistoryPage(captured, pins) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const keysAre = (value, keys) => object(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
+  const hash = value => typeof value === 'string' && /^[0-9a-f]{64}$/u.test(value);
+  const check = (condition, code = 'RCL_SESSION_HISTORY_PAGE_INVALID') => { if (!condition) throw sessionError(code); };
+  const page = structuredClone(captured);
+  check(object(page));
+  if (Object.hasOwn(page, 'ok')) { check(page.ok === true); delete page.ok; }
+  const keys = ['format', 'sessionId', 'programRoot', 'revision', 'journalRoot', 'stateRoot', 'stateRootAlgorithm', 'fromRevision', 'limit', 'previousRoot', 'nextRevision', 'entries', 'pageRoot'];
+  check(Object.keys(page).length === keys.length && keys.every(key => Object.hasOwn(page, key)));
+  check(page.format === RCL_SESSION_HISTORY_FORMAT && page.stateRootAlgorithm === 'rcl.semantic-state-root.v2'
+    && typeof page.sessionId === 'string' && page.sessionId.length > 0 && !page.sessionId.includes('\0')
+    && ['programRoot', 'journalRoot', 'stateRoot', 'previousRoot', 'pageRoot'].every(key => hash(page[key]))
+    && Number.isSafeInteger(page.revision) && page.revision >= 0 && page.revision <= MAX_COMMANDS
+    && Number.isSafeInteger(page.fromRevision) && page.fromRevision >= 1 && page.fromRevision <= page.revision + 1
+    && Number.isSafeInteger(page.limit) && page.limit >= 1 && page.limit <= 1000 && Array.isArray(page.entries));
+  const { pageRoot, ...core } = page;
+  check(root(core) === pageRoot, 'RCL_SESSION_HISTORY_PAGE_ROOT_MISMATCH');
+  const count = Math.min(page.limit, page.revision - page.fromRevision + 1), next = page.fromRevision + count;
+  check(page.entries.length === count && page.nextRevision === (next <= page.revision ? next : null));
+  for (const [option, field] of [['expectedJournalRoot', 'journalRoot'], ['expectedPageRoot', 'pageRoot'], ['expectedPreviousRoot', 'previousRoot'], ['expectedSessionId', 'sessionId'], ['expectedProgramRoot', 'programRoot']]) {
+    if (pins[option] !== undefined) check(pins[option] === page[field], 'RCL_SESSION_HISTORY_PIN_MISMATCH');
+  }
+  if (pins.minimumRevision !== undefined) check(page.revision >= pins.minimumRevision, 'RCL_SESSION_REVISION_ROLLBACK');
+  const requests = new Set();
+  let previousRoot = page.previousRoot, previousStateRoot = null, programName = null, versionFloor = 1, firstVersion = null, legacyEntries = 0;
+  for (const [index, record] of page.entries.entries()) {
+    check(keysAre(record, ['format', 'sessionId', 'sequence', 'previousRoot', 'programRoot', 'requestId', 'expectedRevision', 'command', 'commandRoot', 'beforeStateRoot', 'afterStateRoot', 'resultRoot', 'result', 'stateRootAlgorithm', 'root']));
+    verifyRecord(record);
+    const version = record.format === COMMAND ? 2 : record.format === LEGACY_COMMAND ? 1 : 0;
+    check(version >= versionFloor, 'RCL_SESSION_HISTORY_CONTINUITY_MISMATCH');
+    firstVersion ??= version; versionFloor = version; if (version === 1) legacyEntries++;
+    check(record.sequence === page.fromRevision + index && record.expectedRevision === record.sequence - 1
+      && record.previousRoot === previousRoot && record.sessionId === page.sessionId && record.programRoot === page.programRoot
+      && record.stateRootAlgorithm === page.stateRootAlgorithm && hash(record.beforeStateRoot) && hash(record.afterStateRoot), 'RCL_SESSION_HISTORY_CONTINUITY_MISMATCH');
+    const requestId = requestKey(record.requestId);
+    check(!requests.has(requestId), 'RCL_SESSION_HISTORY_DUPLICATE_REQUEST'); requests.add(requestId);
+    if (previousStateRoot !== null) check(record.beforeStateRoot === previousStateRoot, 'RCL_SESSION_HISTORY_STATE_CONTINUITY_MISMATCH');
+    const command = record.command, result = record.result;
+    check(object(command) && Object.keys(command).length === 4 && command.format === RCL_SESSION_COMMAND_FORMAT
+      && typeof command.rule === 'string' && command.rule.length > 0 && ['realize', 'foresee'].includes(command.mode) && object(command.inputs), 'RCL_SESSION_HISTORY_COMMAND_INVALID');
+    for (const [name, value] of Object.entries(command.inputs)) {
+      check(name.length > 0 && !name.includes('\0') && (typeof value === 'boolean'
+        || (typeof value === 'number' && Number.isFinite(value) && !Object.is(value, -0))
+        || (typeof value === 'string' && !value.includes('\0') && Buffer.byteLength(value, 'utf8') <= 1024 * 1024)), 'RCL_SESSION_HISTORY_COMMAND_INVALID');
+    }
+    check(record.commandRoot === commandIdentity(page.programRoot, command, record.expectedRevision, record.format), 'RCL_SESSION_HISTORY_COMMAND_INVALID');
+    check(keysAre(result, ['format', 'program', 'programRoot', 'command', 'status', 'beforeRoot', 'afterRoot', 'stateRootAlgorithm', 'state', 'transition']) && result.format === RCL_SESSION_RESULT_FORMAT && result.programRoot === page.programRoot
+      && typeof result.program === 'string' && result.program.length > 0 && (programName === null || result.program === programName)
+      && keysAre(result.command, ['format', 'rule', 'mode', 'inputs'])
+      && commandIdentity(page.programRoot, result.command, record.expectedRevision) === commandIdentity(page.programRoot, command, record.expectedRevision)
+      && result.beforeRoot === record.beforeStateRoot && result.afterRoot === record.afterStateRoot
+      && result.stateRootAlgorithm === page.stateRootAlgorithm && object(result.state) && root(result.state) === result.afterRoot
+      && record.resultRoot === resultIdentity(page.programRoot, result, record.expectedRevision, record.format), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+    programName = result.program;
+    if (result.status === 'not-triggered') check(result.transition === null && result.afterRoot === result.beforeRoot, 'RCL_SESSION_HISTORY_RESULT_INVALID');
+    else {
+      const transition = result.transition, projected = command.mode === 'foresee';
+      check(result.status === (projected ? 'projected' : 'realized') && keysAre(transition, ['rule', 'mode', 'status', 'actor', 'beforeRoot', 'afterRoot', 'stateRootAlgorithm', 'changes', 'witnesses', 'authority'])
+        && transition.rule === command.rule && transition.mode === command.mode && transition.status === result.status
+        && transition.stateRootAlgorithm === page.stateRootAlgorithm && hash(transition.beforeRoot) && hash(transition.afterRoot)
+        && Array.isArray(transition.changes) && Array.isArray(transition.witnesses) && transition.witnesses.every(item => typeof item === 'string')
+        && object(transition.authority) && Array.isArray(transition.authority.needs) && Array.isArray(transition.authority.activeWarrants)
+        && (projected ? result.afterRoot === result.beforeRoot : transition.afterRoot === result.afterRoot), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+      const decision = Object.assign(Object.create(null), result.state, projected ? command.inputs : {}), targets = new Set();
+      for (const change of transition.changes) {
+        check(keysAre(change, ['target', 'before', 'after', 'source']) && typeof change.target === 'string' && Object.hasOwn(result.state, change.target)
+          && typeof change.source === 'string' && !targets.has(change.target), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+        targets.add(change.target);
+        if (!projected) {
+          check(root(change.after) === root(result.state[change.target]), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+          decision[change.target] = change.before;
+        }
+      }
+      for (const [name, value] of Object.entries(command.inputs)) check(Object.hasOwn(decision, name) && root(decision[name]) === root(value), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+      check(root(decision) === transition.beforeRoot, 'RCL_SESSION_HISTORY_RESULT_INVALID');
+      const proposed = structuredClone(decision);
+      for (const change of transition.changes) {
+        check(root(change.before) === root(decision[change.target]), 'RCL_SESSION_HISTORY_RESULT_INVALID');
+        proposed[change.target] = change.after;
+      }
+      check(root(proposed) === transition.afterRoot, 'RCL_SESSION_HISTORY_RESULT_INVALID');
+    }
+    previousRoot = record.root; previousStateRoot = record.afterStateRoot;
+  }
+  const terminal = page.nextRevision === null;
+  if (terminal) {
+    check(previousRoot === page.journalRoot, 'RCL_SESSION_HISTORY_HEAD_MISMATCH');
+    if (previousStateRoot !== null) check(previousStateRoot === page.stateRoot, 'RCL_SESSION_HISTORY_HEAD_MISMATCH');
+  }
+  return { page, requests, previousRoot, previousStateRoot, programName, terminal, firstVersion, versionFloor, legacyEntries };
+}
+
+function historyVerificationReport(verified, pins) {
+  const first = verified[0], last = verified.at(-1), entries = verified.reduce((count, item) => count + item.page.entries.length, 0);
+  const pagePinned = verified.length === 1 && pins.expectedPageRoot !== undefined;
+  // A copied head field on an interior/empty page does not bind its content.
+  const headAnchored = pins.expectedJournalRoot !== undefined && last.terminal && last.page.entries.length > 0;
+  const legacyEntries = verified.reduce((count, item) => count + item.legacyEntries, 0), contentAnchored = (pagePinned || headAnchored) && legacyEntries === 0;
+  const report = {
+    ok: true, format: RCL_SESSION_HISTORY_VERIFICATION_FORMAT,
+    status: legacyEntries ? 'LEGACY_IDENTITY_LIMITED' : contentAnchored ? 'VERIFIED_AGAINST_PIN' : 'CONSISTENT_UNANCHORED',
+    contentAnchored, pagePinned, headAnchored, legacyCommandEntries: legacyEntries,
+    sessionId: first.page.sessionId, programRoot: first.page.programRoot, revision: first.page.revision,
+    journalRoot: first.page.journalRoot, stateRoot: first.page.stateRoot, stateRootAlgorithm: first.page.stateRootAlgorithm,
+    fromRevision: first.page.fromRevision, nextRevision: last.page.nextRevision,
+    verifiedPages: verified.length, verifiedEntries: entries, previousRoot: first.page.previousRoot,
+    lastRecordRoot: last.previousRoot, coversReportedHistory: first.page.fromRevision === 1 && last.terminal,
+    completeHistory: first.page.fromRevision === 1 && last.terminal && contentAnchored,
+    pageRoots: verified.map(item => item.page.pageRoot), pins,
+    commandReplay: false, sourceExecution: false, publisherAuthenticated: false,
+    boundary: 'Receipt, result, state-root and supplied-page continuity checks only. Nonterminal or empty pages require their own trusted page pin. Legacy v1 input identities do not establish exact input-map binding. No command replay, source execution, publisher authentication or authority grant.',
+  };
+  return { ...report, verificationRoot: root(report) };
+}
+
+export function verifyDurableRealitySessionHistoryPage(page, options = {}) {
+  const pins = historyVerificationOptions(options);
+  return historyVerificationReport([verifyHistoryPage(page, pins)], pins);
+}
+
+export function verifyDurableRealitySessionHistoryPages(pages, options = {}) {
+  const pins = historyVerificationOptions(options);
+  if (!Array.isArray(pages) || !pages.length || pages.length > MAX_COMMANDS + 1 || (pins.expectedPageRoot !== undefined && pages.length !== 1)) throw sessionError('RCL_SESSION_HISTORY_PAGES_INVALID');
+  const verified = [], requests = new Set();
+  for (const page of pages) {
+    const item = verifyHistoryPage(page, verified.length ? { ...pins, expectedPreviousRoot: undefined } : pins), previous = verified.at(-1);
+    if (previous && (previous.page.nextRevision === null || item.page.fromRevision !== previous.page.nextRevision
+        || item.page.previousRoot !== previous.previousRoot || item.page.sessionId !== previous.page.sessionId
+        || item.page.programRoot !== previous.page.programRoot || item.page.revision !== previous.page.revision
+        || item.page.journalRoot !== previous.page.journalRoot || item.page.stateRoot !== previous.page.stateRoot
+        || (item.firstVersion !== null && item.firstVersion < previous.versionFloor)
+        || (item.page.entries.length && item.page.entries[0].beforeStateRoot !== previous.previousStateRoot)
+        || (item.programName !== null && previous.programName !== null && item.programName !== previous.programName))) throw sessionError('RCL_SESSION_HISTORY_PAGES_CONTINUITY_MISMATCH');
+    for (const request of item.requests) {
+      if (requests.has(request)) throw sessionError('RCL_SESSION_HISTORY_DUPLICATE_REQUEST'); requests.add(request);
+    }
+    verified.push(item);
+  }
+  if (!verified.at(-1).terminal) throw sessionError('RCL_SESSION_HISTORY_PAGES_INCOMPLETE');
+  return historyVerificationReport(verified, pins);
 }
 
 export async function openDurableRealitySession(directory, options = {}) {
@@ -136,30 +308,36 @@ export async function openDurableRealitySession(directory, options = {}) {
     const journal = readJournal(journalPath);
     const genesis = journal.records[0];
     verifyRecord(genesis);
-    if (genesis.format !== GENESIS || genesis.journalFormat !== RCL_SESSION_JOURNAL_FORMAT
+    const legacyGenesis = genesis.format === LEGACY_GENESIS && genesis.journalFormat === 'rcl.session-journal.v1';
+    if ((!legacyGenesis && !(genesis.format === GENESIS && genesis.journalFormat === RCL_SESSION_JOURNAL_FORMAT))
         || genesis.sequence !== 0 || genesis.previousRoot !== null || typeof genesis.sessionId !== 'string'
         || genesis.sourceHash !== sourceHash || genesis.programRoot !== program.programRoot || genesis.bytecodeHash !== bytecodeHash
         || genesis.initialStateRoot !== engine.snapshot().stateRoot || genesis.stateRootAlgorithm !== 'rcl.semantic-state-root.v2') {
       throw sessionError('RCL_SESSION_GENESIS_BINDING_MISMATCH');
     }
     head = genesis; genesisRoot = genesis.root; sessionId = genesis.sessionId;
+    let versionFloor = legacyGenesis ? 1 : 2;
     for (const record of journal.records.slice(1)) {
       verifyRecord(record);
-      if (record.format !== COMMAND || record.sequence !== revision + 1 || record.previousRoot !== head.root
+      const version = record.format === COMMAND ? 2 : record.format === LEGACY_COMMAND ? 1 : 0;
+      if (version < versionFloor || record.sequence !== revision + 1 || record.previousRoot !== head.root
           || record.sessionId !== sessionId || record.programRoot !== program.programRoot
           || record.expectedRevision !== revision || record.stateRootAlgorithm !== 'rcl.semantic-state-root.v2') {
         throw sessionError('RCL_SESSION_JOURNAL_CONTINUITY_MISMATCH');
       }
+      versionFloor = version;
       const requestId = requestKey(record.requestId);
       if (requests.has(requestId)) throw sessionError('RCL_SESSION_JOURNAL_DUPLICATE_REQUEST');
       const command = normalizeSessionCommand(program, record.command);
-      if (record.commandRoot !== commandIdentity(program.programRoot, command, revision)
-          || record.resultRoot !== root(record.result) || record.beforeStateRoot !== engine.snapshot().stateRoot) {
+      if (record.commandRoot !== commandIdentity(program.programRoot, command, revision, record.format)
+          || record.resultRoot !== resultIdentity(program.programRoot, record.result, revision, record.format)
+          || commandIdentity(program.programRoot, record.result.command, revision) !== commandIdentity(program.programRoot, command, revision)
+          || root(record.result.state) !== record.afterStateRoot || record.beforeStateRoot !== engine.snapshot().stateRoot) {
         throw sessionError('RCL_SESSION_JOURNAL_COMMAND_BINDING_MISMATCH');
       }
       const result = await engine.invoke(command);
-      if (root(result) !== record.resultRoot || record.afterStateRoot !== result.afterRoot) throw sessionError('RCL_SESSION_REPLAY_MISMATCH');
-      if (reference && root(await reference.invoke(command)) !== record.resultRoot) throw sessionError('RCL_SESSION_REFERENCE_REPLAY_MISMATCH');
+      if (resultIdentity(program.programRoot, result, revision, record.format) !== record.resultRoot || record.afterStateRoot !== result.afterRoot) throw sessionError('RCL_SESSION_REPLAY_MISMATCH');
+      if (reference && resultIdentity(program.programRoot, await reference.invoke(command), revision, record.format) !== record.resultRoot) throw sessionError('RCL_SESSION_REFERENCE_REPLAY_MISMATCH');
       revision++; head = record; requests.set(requestId, record);
     }
     if (options.expectedJournalRoot !== undefined && options.expectedJournalRoot !== head.root) throw sessionError('RCL_SESSION_EXPECTED_HEAD_MISMATCH');
@@ -266,7 +444,7 @@ export async function openDurableRealitySession(directory, options = {}) {
         if (poisoned) throw sessionError('RCL_SESSION_DURABILITY_UNCERTAIN');
         const existing = requests.get(requestId);
         if (existing) {
-          if (existing.commandRoot !== commandRoot) throw sessionError('RCL_SESSION_IDEMPOTENCY_CONFLICT');
+          if (commandIdentity(program.programRoot, existing.command, existing.expectedRevision) !== commandRoot) throw sessionError('RCL_SESSION_IDEMPOTENCY_CONFLICT');
           return { receipt: structuredClone(existing), result: structuredClone(existing.result), replayed: true };
         }
         if (expectedRevision !== revision) throw sessionError('RCL_SESSION_REVISION_CONFLICT');
@@ -285,10 +463,10 @@ export async function openDurableRealitySession(directory, options = {}) {
           record = rooted({
             format: COMMAND, sessionId, sequence: revision + 1, previousRoot: head.root,
             programRoot: program.programRoot, requestId, expectedRevision, command, commandRoot,
-            beforeStateRoot, afterStateRoot: result.afterRoot, resultRoot: root(result), result,
+            beforeStateRoot, afterStateRoot: result.afterRoot, resultRoot: resultIdentity(program.programRoot, result, revision), result,
             stateRootAlgorithm: 'rcl.semantic-state-root.v2',
           });
-          if (reference && root(await reference.invoke(command)) !== record.resultRoot) throw sessionError('RCL_SESSION_REFERENCE_REPLAY_MISMATCH');
+          if (reference && resultIdentity(program.programRoot, await reference.invoke(command), revision) !== record.resultRoot) throw sessionError('RCL_SESSION_REFERENCE_REPLAY_MISMATCH');
           appendRecord(journalPath, record);
           head = record; revision++; requests.set(requestId, record);
           const acknowledged = { receipt: structuredClone(record), result: structuredClone(result), replayed: false };

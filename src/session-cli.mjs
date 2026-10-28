@@ -1,20 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { openDurableRealitySession, verifyDurableRealitySession, verifyDurableRealitySessionBackup } from './durable-session.mjs';
+import { openDurableRealitySession, verifyDurableRealitySession, verifyDurableRealitySessionBackup, verifyDurableRealitySessionHistoryPage, verifyDurableRealitySessionHistoryPages } from './durable-session.mjs';
 import { compileRealitySessionBytecode } from './bytecode.mjs';
 import { compileRealitySessionNative } from './session-compiler.mjs';
 import { sessionError } from './session-contract.mjs';
 
-const USAGE = 'Usage: rcl session init <source.rcl> <directory> | invoke <directory> <command.json> | inspect <directory> | history <directory> [--from-revision <integer>] [--limit <1..1000>] | verify <directory> [--reference] | backup <directory> <new-directory> | backup-verify <directory> [--expected-backup-root <sha256>] | recover <directory> --repair-incomplete-tail | compile <source.rcl> <output.rbc> [--bootstrap]. Existing-session commands accept --expected-root <sha256> and --minimum-revision <integer>.';
+const USAGE = 'Usage: rcl session init <source.rcl> <directory> | invoke <directory> <command.json> | inspect <directory> | history <directory> [--from-revision <integer>] [--limit <1..1000>] | history-verify <page-or-pages.json> [--expected-root <sha256>] [--expected-page-root <sha256>] [--expected-previous-root <sha256>] | verify <directory> [--reference] | backup <directory> <new-directory> | backup-verify <directory> [--expected-backup-root <sha256>] | recover <directory> --repair-incomplete-tail | compile <source.rcl> <output.rbc> [--bootstrap]. Existing-session commands accept --expected-root <sha256> and --minimum-revision <integer>.';
 
 function parseArguments(args) {
   const [operation, ...tokens] = args;
-  const counts = { init: 2, invoke: 2, inspect: 1, history: 1, verify: 1, backup: 2, 'backup-verify': 1, recover: 1, compile: 2 };
+  const counts = { init: 2, invoke: 2, inspect: 1, history: 1, 'history-verify': 1, verify: 1, backup: 2, 'backup-verify': 1, recover: 1, compile: 2 };
   const invalid = message => { throw sessionError('RCL_SESSION_CLI_ARGUMENT_INVALID', `${message}. ${USAGE}`); };
   if (!Object.hasOwn(counts, operation)) invalid('Unknown session operation');
   const count = counts[operation], positional = tokens.slice(0, count);
   if (positional.length !== count || positional.some(value => !value || value.startsWith('--'))) invalid('Missing positional arguments');
   const allowed = operation === 'compile' ? ['--bootstrap'] : operation === 'init' ? []
+    : operation === 'history-verify' ? ['--expected-root', '--expected-page-root', '--expected-previous-root', '--minimum-revision']
     : ['--expected-root', '--minimum-revision', '--reference', ...(operation === 'history' ? ['--from-revision', '--limit'] : []), ...(operation === 'backup-verify' ? ['--expected-backup-root'] : []), ...(operation === 'recover' ? ['--repair-incomplete-tail'] : [])];
   const options = {}, seen = new Set();
   const flags = tokens.slice(count);
@@ -22,10 +23,10 @@ function parseArguments(args) {
     const flag = flags[index];
     if (!allowed.includes(flag) || seen.has(flag)) invalid(`Unknown, duplicate or inappropriate argument '${flag}'`);
     seen.add(flag);
-    if (flag === '--expected-root' || flag === '--expected-backup-root') {
+    if (['--expected-root', '--expected-backup-root', '--expected-page-root', '--expected-previous-root'].includes(flag)) {
       const value = flags[++index];
       if (typeof value !== 'string' || !/^[0-9a-f]{64}$/u.test(value)) invalid(`${flag} requires a lowercase SHA-256 root`);
-      options[flag === '--expected-root' ? 'expectedJournalRoot' : 'expectedBackupRoot'] = value;
+      options[{ '--expected-root': 'expectedJournalRoot', '--expected-backup-root': 'expectedBackupRoot', '--expected-page-root': 'expectedPageRoot', '--expected-previous-root': 'expectedPreviousRoot' }[flag]] = value;
     } else if (flag === '--minimum-revision') {
       const value = flags[++index];
       if (typeof value !== 'string' || !/^(0|[1-9][0-9]*)$/u.test(value) || !Number.isSafeInteger(Number(value))) invalid('--minimum-revision requires a nonnegative safe integer');
@@ -46,6 +47,13 @@ export async function runSessionCli(args) {
   try {
     // Parse every argument before reading sources, starting a VM or writing files.
     const { operation, first, second, options } = parseArguments(args);
+    if (operation === 'history-verify') {
+      const file = path.resolve(first), stat = fs.lstatSync(file);
+      if (stat.isSymbolicLink() || !stat.isFile()) throw sessionError('RCL_SESSION_HISTORY_PAGE_FILE_INVALID');
+      if (stat.size > 128 * 1024 * 1024) throw sessionError('RCL_SESSION_HISTORY_PAGE_FILE_LIMIT');
+      const captured = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(fs.readFileSync(file)));
+      return Array.isArray(captured) ? verifyDurableRealitySessionHistoryPages(captured, options) : verifyDurableRealitySessionHistoryPage(captured, options);
+    }
     if (operation === 'compile') {
       const source = fs.readFileSync(path.resolve(first), 'utf8');
       const compiled = options.bootstrap ? { bytecode: compileRealitySessionBytecode(source), evidence: { compilerOwner: 'JavaScript bootstrap' } }

@@ -425,6 +425,18 @@ BOM and Chinese paths. A genuine Hello preview passes native/reference runtime
 parity. TaoX WHOLE_ARTIFACT routing was invoked for artifact integration. See
 `facet-rename-preview-2026-10-28.json`.
 
+## Increment 28: durable v2 identities and portable history verification
+
+The native-session reproduction exposed metadata-like user input keys being
+normalized out of v1 wrapped identities. Tagged v2 journal/command records now
+bind complete input/state maps contextually. Exact legacy retries still work;
+changed requests reject and tagged v2 append preserves every legacy byte/root.
+Version downgrades reject. Offline page/chain verification distinguishes anchored
+v2 content, unanchored pages and limited legacy identities, without VM execution.
+Sixteen new checks and all 76 affected session/CLI/backup/fault controls pass using
+the existing local C toolchain. TD-017 remains ACTIVE and TD-021 records legacy
+evidence limits. See `durable-history-v2-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the

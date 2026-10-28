@@ -104,3 +104,13 @@ now pass reference/native parity. Fourteen new controls and 144 affected checks
 pass. TD-020 stays ACTIVE: an explicit independently constructed AstNode control
 still differs, and other compiler/typed value families retain their prior policy.
 See `docs/maintenance/reference-sequence-equality-2026-10-28.json`.
+
+### 2026-10-28 durable identity and history verification
+
+| ID | Status | Area | Debt | Closure evidence or next gate |
+|---|---|---|---|---|
+| TD-021 | ACTIVE | Legacy journal provenance | The v1 wrapped identity can normalize metadata-like user input keys. Existing semantic head/page pins cannot retroactively authenticate omitted values. | Tagged v2 identities bind the complete input/state maps; exact retries, metadata corruption, legacy replay/append and downgrade controls pass. Legacy offline reports remain `LEGACY_IDENTITY_LIMITED`; use independently trusted raw backup provenance for old bytes. See `docs/maintenance/durable-history-v2-2026-10-28.json`. |
+
+The new offline verifier checks complete supplied-page continuity and explicitly
+does not execute commands. It is not checkpoint admission or compaction. TD-017
+remains ACTIVE with the original replay limits.
