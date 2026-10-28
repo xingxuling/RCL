@@ -1,0 +1,100 @@
+{
+  "status": "PASS_BOUNDED_NATIVE_PROFILE",
+  "sources": {
+    "selfhost/compiler-core.rcl": "e6f21542bc3c5c8191771a9283183b8b3d700096b5cce073628e3116d1a9f145",
+    "selfhost/compiler-main.rcl": "cc6666e8f81c4bf8a1701c4a956fdcd93c632506d6d9264ecd5500fa1ac4fe70",
+    "selfhost/session-compiler-main.rcl": "9e93ffc6c795fd6e43fb78b39dd2b2c7e5d7fc60ea91ea93851409c1ae98aaae",
+    "selfhost/compiler.rbc": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b",
+    "tests/selfhost-path-admission.test.mjs": "0524eed6db5b3bc00849154f4b922810441c072b8ea87a44ef8946e52d600f69"
+  },
+  "checks": {
+    "before": {
+      "passed": 1,
+      "failed": 16,
+      "total": 17,
+      "log": "output/module-development-20261028/path-admission-before.log"
+    },
+    "after": {
+      "passed": 17,
+      "failed": 0
+    },
+    "regression": {
+      "passed": 206,
+      "failed": 0,
+      "skipped": 0,
+      "log": "output/module-development-20261028/path-admission-final-regression.log"
+    },
+    "fixedPoint": {
+      "ok": true,
+      "format": "rcl.selfhost.compiler.fixed-point.v1",
+      "outputPath": "selfhost/compiler.rbc",
+      "bytes": 364364,
+      "sha256": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b",
+      "sourceSha256": "f8e738f99a9310f20123941d9412b76c6700a1d60e3040d9fc80bf3da5e67f04",
+      "byteIdentical": true,
+      "generations": {
+        "c0": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b",
+        "c1": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b",
+        "c2": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b"
+      },
+      "native": {
+        "c0ToC1": {
+          "status": "ok",
+          "bytes": 364364,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        "c1ToC2": {
+          "status": "ok",
+          "bytes": 364364,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        }
+      }
+    },
+    "fullExampleCollection": {
+      "ok": true,
+      "format": "rcl.selfhost.example-parity.v1",
+      "artifactParity": true,
+      "compilerArtifact": "selfhost/compiler.rbc",
+      "compilerArtifactSha256": "571f39c3265c65803c364fc03ef6cb3ac264ed8ff7c11302d4bfd41c6e54828b",
+      "requestedSourceCount": 233,
+      "scope": "all-checked-in-example-sources",
+      "compilerTimeoutMs": 60000,
+      "budgetProfile": "original-60-second-target-budget",
+      "originalBudgetSatisfied": true,
+      "nativeCompileAttempts": 122,
+      "avoidedDuplicateCompiles": 73,
+      "evidenceBoundary": "Identical source plus bootstrap byte hashes reuse one actual native compile result within this run. This does not establish independent repeated process execution, K400 admission or publisher authenticity.",
+      "eligibleCount": 195,
+      "unsupportedCount": 38,
+      "failureCount": 0
+    },
+    "independentJsBytecodeReplay": {
+      "status": "NOT_COMPLETED_BUDGET_STOP",
+      "record": {
+        "stoppedForBudget": true,
+        "parent": 75712,
+        "child": 75128,
+        "parentCommand": "\"C:\\Program Files\\nodejs\\node.exe\" --test --test-concurrency=1 tests/selfhost-path-admission.test.mjs tests/selfhost-missing-warrant-locations.test.mjs tests/k337-selfhost-warrant-static-validation.test.mjs tests/warrant-compiler-admission.test.mjs tests/selfhost-semantic-locations.test.mjs tests/session-compiler-locations.test.mjs tests/session-compiler-pure-profile.test.mjs tests/selfhost-rule-host-calls.test.mjs tests/selfhost-toolchain.test.mjs tests/selfhost-complete.test.mjs tests/general-selfhost-fixedpoint.test.mjs tests/native-ui-selfhost-tree.test.mjs tests/native-ui-selfhost-controls.test.mjs tests/native-ui-selfhost-reactivity.test.mjs",
+        "childCommand": "\"C:\\Program Files\\nodejs\\node.exe\" --use-largepages=off --trace-event-file-pattern=node_trace.${rotation}.log --v8-pool-size=4 --node-snapshot --cpu-prof-interval=1000 --report-signal=SIGUSR2 --tls-cipher-list=TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA256:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA --secure-heap=0 --secure-heap-min=2 --stack-trace-limit=10 --test-isolation=process --network-family-autoselection-attempt-timeout=250 --heapsnapshot-near-heap-limit=0 --heap-prof-interval=524288 --max-http-header-size=16384 --test-concurrency=1 --test-timeout=0 --test-coverage-branches=0 --test-coverage-functions=0 --test-coverage-lines=0 --watch-kill-signal=SIGTERM --inspect-port=127.0.0.1:9229 --inspect-publish-uid=stderr,http tests\\general-selfhost-fixedpoint.test.mjs",
+        "cpuSeconds": 336.046875,
+        "utc": "2026-10-28T16:35:08.5518093Z"
+      },
+      "nativeEvidenceIsSeparate": true
+    }
+  },
+  "rawBindings": {
+    "output/module-development-20261028/path-admission-before.log": "6517bdf29ea704917d43d0307b2b2989f383212f3c2d54c3a5991a63e8b1ebf8",
+    "output/module-development-20261028/path-admission-after.log": "8bc2df242a1cbf3767d9e2b3afd1fbc04aaee66c5b3841de1c0570f32136ca99",
+    "output/module-development-20261028/path-admission-final-regression.log": "1098d9254c5addba884d8c664bea87c05463d84f65871b06d9110ae9331e7cd6",
+    "output/module-development-20261028/path-admission-fixedpoint.json": "bc41c0f9889270538bdc22c404f925d038bc09dfe2d281016312159a09869478",
+    "output/module-development-20261028/path-admission-js-replay-budget.json": "9a6fa4614d36e10525c266a8864148fcde30e34ec40b284f3feff11504fcc696",
+    "output/module-development-20261028/example-parity-path-admission.json": "ac69def4d4fc3fab5f6350e7c6625733e5f93dbc0af1871bf5e25c3133260081"
+  },
+  "closesPriorExploratoryWildcardSourceGap": true,
+  "wholeGrammarEquivalence": false,
+  "nativeCBinariesChanged": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

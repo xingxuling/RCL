@@ -380,6 +380,18 @@ A wildcard source-grammar discrepancy found in an exploratory invalid fixture is
 recorded for follow-up, with no admitted wildcard claim. TD-019 remains ACTIVE for
 UI/control diagnostics. See `missing-warrant-locations-2026-10-28.json`.
 
+## Increment 24: native identifier and authority-clause admission
+
+The shared RCL path parser now admits identifier tokens only, including dotted
+segments, and warrant/need clauses require `on`. Sixteen previously accepted
+invalid sources now reject with real coordinates for both compiler entries.
+All 206 scoped checks pass; native C0=C1=C2 is 364364 bytes. The 233-source
+collector remains 195 matches / 38 reference rejections / zero failures at
+60000 ms. An extra full JavaScript bytecode replay was stopped after exceeding
+five minutes and remains explicitly NOT_COMPLETED_BUDGET_STOP. This closes the
+prior wildcard-source gap without adding wildcard syntax or claiming whole-
+grammar equivalence. See `native-path-admission-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the

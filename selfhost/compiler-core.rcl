@@ -141,11 +141,13 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon parse_path_tail(tokens : Sequence, index : Number, value : Text) -> Sequence =
     choose(token_text_at(tokens, index) == ".",
-      parse_path_tail(tokens, index + 2, value + "." + token_text_at(tokens, index + 1)),
+      choose(semantic_check_at(token_kind_at(tokens, index + 1) == "IDENT", "RCL_PATH_SEGMENT", token_text_at(tokens, index + 1), token_span_at(tokens, index + 1)),
+        parse_path_tail(tokens, index + 2, value + "." + token_text_at(tokens, index + 1)), empty_sequence()),
       make_text_state(index, value))
 
   reckon parse_path(tokens : Sequence, index : Number) -> Sequence =
-    parse_path_tail(tokens, index + 1, token_text_at(tokens, index))
+    choose(semantic_check_at(token_kind_at(tokens, index) == "IDENT", "RCL_PATH_NAME", token_text_at(tokens, index), token_span_at(tokens, index)),
+      parse_path_tail(tokens, index + 1, token_text_at(tokens, index)), empty_sequence())
 
   reckon literal_node(value_type : Text, value : Text) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), "LiteralExpr"), value_type), value)
@@ -336,7 +338,8 @@ reality RCLGeneralSelfHostCompiler {
       make_node_state(state_index(target_state), make_warrant(subject, capability, state_text(target_state))))
 
   reckon parse_warrant_after_capability(tokens : Sequence, subject : Text, capability_state : Sequence) -> Sequence =
-    parse_warrant_after_target(tokens, subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1))
+    choose(require_token(tokens, state_index(capability_state), "on", "RCL_WARRANT_ON"),
+      parse_warrant_after_target(tokens, subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1)), empty_sequence())
 
   reckon parse_warrant(tokens : Sequence, index : Number, subject : Text) -> Sequence =
     parse_warrant_after_capability(tokens, subject, parse_path(tokens, index + 1))
@@ -438,7 +441,8 @@ reality RCLGeneralSelfHostCompiler {
     parse_rule_body(tokens, state_index(target_state), rule_with_need(node, sequence_append(make_need(capability, state_text(target_state)), span)))
 
   reckon parse_rule_after_need_capability(tokens : Sequence, capability_state : Sequence, node : Sequence, span : Span) -> Sequence =
-    parse_rule_after_need_target(tokens, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1), node, span)
+    choose(require_token(tokens, state_index(capability_state), "on", "RCL_NEEDS_ON"),
+      parse_rule_after_need_target(tokens, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1), node, span), empty_sequence())
 
   reckon parse_rule_after_alter_expression(tokens : Sequence, target : Text, node : Sequence, expression_state : Sequence, span : Span) -> Sequence =
     parse_rule_body(tokens, state_index(expression_state), rule_with_alter(node, sequence_append(make_alter(target, state_node(expression_state)), span)))
