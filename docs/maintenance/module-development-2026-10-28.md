@@ -333,14 +333,24 @@ original 60000-ms budget now has 195 matches, 38 reference compile rejections an
 zero failures (122 native attempts, 73 reused aliases). See
 `native-rule-host-calls-2026-10-28.json`.
 
+## Increment 20: direct native session pure-profile admission
+
+The RCL-authored session entry now checks supported expressions throughout
+initializers/functions/warrants/rules, including unused functions and both choose
+branches, for provider effects. Nine missing rejections were reproduced; the ten
+new cases now pass with output retention, actual diagnostic positions and genuine
+native pure-session execution. Sixty affected session/compiler/durable/backup/
+history checks pass. The public API already had reference preflight; the general
+compiler artifact remains unchanged. See `native-session-pure-profile-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
    completed native UI tree fixed point and final-artifact checks.
-2. Continue direct native session pure-profile and compiler admission checks using
-   the existing reference contract. Rule-level host-call exclusions and the seven
-   large-source timeouts are resolved in the current source-bound collector run;
-   historical reports retain their original outcome.
+2. Continue source-bound compiler/IDE/runtime functional work using current
+   executable owners. Rule-level host-call exclusions and the seven large-source
+   timeouts are resolved in the current source-bound collector run; historical
+   reports retain their original outcome.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
    (TD-017) using their current executable owners.
 4. Prefer concrete capabilities using existing owners over new parallel services.

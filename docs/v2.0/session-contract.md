@@ -20,6 +20,12 @@ The total input frame is bounded to 2 MiB. Session state supports Number, Truth,
 Text and Sequence in the eligible native-core profile. Provider calls, external
 host effects and typed Ref operations are rejected for deterministic replay.
 
+The direct RCL-authored session compiler also checks its supported expression
+tree for provider effects, including initializers, unused function bodies,
+conditional warrants, rule guards, alterations, preserves and both choose
+branches. It retains rule-level host-effect rejection. This static profile matches
+the public API's existing reference preflight; dead branches do not admit effects.
+
 Each invocation combines the previous committed state with its observations,
 reevaluates conditional warrants, evaluates the guard and computes the proposed
 changes. A failed command, false guard or projection does not commit observations
