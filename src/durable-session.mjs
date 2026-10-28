@@ -11,6 +11,8 @@ import { normalizeSessionCommand, sessionError } from './session-contract.mjs';
 
 export const RCL_DURABLE_SESSION_VERSION = '1.0.0';
 export const RCL_SESSION_JOURNAL_FORMAT = 'rcl.session-journal.v1';
+export const RCL_SESSION_BACKUP_FORMAT = 'rcl.session-backup.v1';
+const BACKUP_FILES = ['source.rcl', 'session.rbc', 'journal.jsonl'];
 const GENESIS = 'rcl.session-journal-genesis.v1';
 const COMMAND = 'rcl.session-journal-command.v1';
 const MAX_JOURNAL_BYTES = 64 * 1024 * 1024;
@@ -75,7 +77,7 @@ function readJournal(file) {
     catch { throw sessionError('RCL_SESSION_JOURNAL_JSON_INVALID'); }
   });
   if (!records.length || records.length > MAX_COMMANDS + 1) throw sessionError('RCL_SESSION_JOURNAL_GENESIS_OR_LIMIT_INVALID');
-  return { records, completeLength, tail: bytes.subarray(completeLength) };
+  return { records, completeLength, tail: bytes.subarray(completeLength), bytes };
 }
 
 function requestKey(value) {
@@ -179,6 +181,47 @@ export async function openDurableRealitySession(directory, options = {}) {
   };
   return Object.freeze({
     snapshot,
+    backup(destination) {
+      if (poisoned || closing) return Promise.reject(sessionError('RCL_SESSION_CLOSED_OR_DURABILITY_UNCERTAIN'));
+      let target;
+      try {
+        if (typeof destination !== 'string' || !destination) throw sessionError('RCL_SESSION_BACKUP_DIRECTORY_REQUIRED');
+        const resolved = path.resolve(destination);
+        target = path.join(fs.realpathSync(path.dirname(resolved)), path.basename(resolved));
+        const relative = path.relative(fs.realpathSync(storage), target);
+        if (!relative || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith('..' + path.sep))) throw sessionError('RCL_SESSION_BACKUP_INSIDE_SOURCE');
+      } catch (error) { return Promise.reject(error); }
+      const operation = pending.then(() => {
+        if (poisoned) throw sessionError('RCL_SESSION_DURABILITY_UNCERTAIN');
+        const captured = engine.snapshot();
+        const journal = readJournal(journalPath);
+        if (journal.tail.length || journal.records.length !== revision + 1 || journal.records.at(-1).root !== head.root) throw sessionError('RCL_SESSION_BACKUP_SOURCE_CHANGED');
+        for (let index = 0; index < journal.records.length; index++) {
+          const record = journal.records[index];
+          verifyRecord(record);
+          if (record.previousRoot !== (index === 0 ? null : journal.records[index - 1].root)) throw sessionError('RCL_SESSION_BACKUP_SOURCE_CHANGED');
+        }
+        regularFile(sourcePath); regularFile(bytecodePath);
+        const assets = [fs.readFileSync(sourcePath), fs.readFileSync(bytecodePath), journal.bytes];
+        if (!assets[0].equals(sourceBytes) || !assets[1].equals(bytecode)) throw sessionError('RCL_SESSION_BACKUP_SOURCE_CHANGED');
+        const core = {
+          format: RCL_SESSION_BACKUP_FORMAT, sessionId, revision, programRoot: program.programRoot,
+          journalRoot: head.root, stateRoot: captured.stateRoot, stateRootAlgorithm: captured.stateRootAlgorithm,
+          files: Object.fromEntries(BACKUP_FILES.map((name, index) => [name, { bytes: assets[index].length, sha256: hashBytes(assets[index]) }])),
+        };
+        const manifest = { ...core, backupRoot: root(core) };
+        // Reserve a fresh directory. A failed export remains incomplete and is never
+        // acknowledged as a backup; an existing destination is never overwritten.
+        try { fs.mkdirSync(target, { mode: 0o700 }); }
+        catch (error) { if (error.code === 'EEXIST') throw sessionError('RCL_SESSION_BACKUP_TARGET_EXISTS'); throw error; }
+        for (let index = 0; index < BACKUP_FILES.length; index++) immutableAsset(path.join(target, BACKUP_FILES[index]), assets[index]);
+        immutableAsset(path.join(target, 'backup.json'), Buffer.from(JSON.stringify(manifest, null, 2) + '\n'));
+        syncDirectory(target); syncDirectory(path.dirname(target));
+        return { ...manifest, directory: target, nativeReplayVerified: false };
+      });
+      pending = operation.catch(() => {});
+      return operation;
+    },
     invoke(input) {
       if (poisoned || closing) return Promise.reject(sessionError('RCL_SESSION_CLOSED_OR_DURABILITY_UNCERTAIN'));
       let requestId, expectedRevision, command, commandRoot;
@@ -248,4 +291,38 @@ export async function verifyDurableRealitySession(directory, options = {}) {
       externalHistoryAnchorChecked: options.expectedJournalRoot !== undefined || options.minimumRevision !== undefined,
     };
   } finally { await session.close(); }
+}
+
+export async function verifyDurableRealitySessionBackup(directory, options = {}) {
+  if (typeof directory !== 'string' || !directory) throw sessionError('RCL_SESSION_BACKUP_DIRECTORY_REQUIRED');
+  const storage = path.resolve(directory), manifestPath = path.join(storage, 'backup.json');
+  if (fs.lstatSync(storage).isSymbolicLink() || !fs.statSync(storage).isDirectory()) throw sessionError('RCL_SESSION_DIRECTORY_INVALID');
+  regularFile(manifestPath);
+  if (fs.statSync(manifestPath).size > 64 * 1024) throw sessionError('RCL_SESSION_BACKUP_MANIFEST_INVALID');
+  let manifest;
+  try { manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')); }
+  catch { throw sessionError('RCL_SESSION_BACKUP_MANIFEST_INVALID'); }
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) throw sessionError('RCL_SESSION_BACKUP_MANIFEST_INVALID');
+  const { backupRoot, ...core } = manifest;
+  if (manifest.format !== RCL_SESSION_BACKUP_FORMAT || !/^[0-9a-f]{64}$/u.test(backupRoot ?? '') || root(core) !== backupRoot
+      || !Number.isSafeInteger(manifest.revision) || manifest.revision < 0 || manifest.revision > MAX_COMMANDS
+      || typeof manifest.sessionId !== 'string' || !manifest.sessionId
+      || manifest.stateRootAlgorithm !== 'rcl.semantic-state-root.v2'
+      || !['programRoot', 'journalRoot', 'stateRoot'].every(key => typeof manifest[key] === 'string' && /^[0-9a-f]{64}$/u.test(manifest[key]))
+      || !manifest.files || Object.keys(manifest.files).sort().join(',') !== [...BACKUP_FILES].sort().join(',')) throw sessionError('RCL_SESSION_BACKUP_MANIFEST_INVALID');
+  if (options.expectedBackupRoot !== undefined && options.expectedBackupRoot !== backupRoot) throw sessionError('RCL_SESSION_BACKUP_EXPECTED_ROOT_MISMATCH');
+  for (const name of BACKUP_FILES) {
+    const file = path.join(storage, name), expected = manifest.files[name];
+    regularFile(file);
+    if (!expected || !Number.isSafeInteger(expected.bytes) || expected.bytes < 0 || typeof expected.sha256 !== 'string'
+        || !/^[0-9a-f]{64}$/u.test(expected.sha256) || fs.statSync(file).size !== expected.bytes
+        || (name === 'journal.jsonl' && expected.bytes > MAX_JOURNAL_BYTES)
+        || hashBytes(fs.readFileSync(file)) !== expected.sha256) throw sessionError('RCL_SESSION_BACKUP_ASSET_MISMATCH', `Backup asset differs: ${name}`);
+  }
+  if (options.expectedJournalRoot !== undefined && options.expectedJournalRoot !== manifest.journalRoot) throw sessionError('RCL_SESSION_EXPECTED_HEAD_MISMATCH');
+  const verified = await verifyDurableRealitySession(storage, { ...options, repairIncompleteTail: false, expectedJournalRoot: manifest.journalRoot });
+  if (verified.sessionId !== manifest.sessionId || verified.revision !== manifest.revision || verified.programRoot !== manifest.programRoot || verified.stateRoot !== manifest.stateRoot) throw sessionError('RCL_SESSION_BACKUP_REPLAY_MISMATCH');
+  return { ...verified, format: 'rcl.session-backup-verification.v1', backupRoot,
+    externalHistoryAnchorChecked: options.expectedJournalRoot !== undefined || options.minimumRevision !== undefined,
+    externalBackupAnchorChecked: options.expectedBackupRoot !== undefined };
 }

@@ -133,6 +133,48 @@ database, an external-effects exactly-once protocol, a malicious-writer security
 sandbox or proof of hardware power-loss behavior. Filesystem behavior and external
 history anchors retain their separate evidence/authority boundaries.
 
+## Consistent local backups
+
+`await session.backup(newDirectory)` exports the immutable source, bytecode and
+complete journal prefix in the same queue as invocations. Commands queued before
+the export are included; later commands are excluded. The new directory must have
+an existing parent, must be outside the live store and must not already exist.
+The operation never overwrites another directory. A storage failure leaves an
+unacknowledged partial export while the live writer remains usable.
+
+`backup.json` binds the three file lengths and SHA-256 hashes, session/program
+identity, revision, journal head, state root and state-root algorithm. Its
+`backupRoot` hashes this manifest. The writer synchronizes the files and directory
+before acknowledging the export. This does not establish hardware power-loss
+behavior. Export does not copy writer locks, discard history, compact the journal
+or reset revisions and request IDs.
+
+```js
+const exported = await session.backup('./counter-backup');
+const checked = await verifyDurableRealitySessionBackup('./counter-backup', {
+  expectedBackupRoot: exported.backupRoot,
+  expectedJournalRoot: exported.journalRoot,
+  verifyReference: true,
+});
+const restored = await openDurableRealitySession('./counter-backup', {
+  expectedJournalRoot: checked.journalRoot,
+});
+```
+
+Import `verifyDurableRealitySessionBackup` from the package alongside the session
+APIs. It checks the fixed asset names and manifest before starting a native writer,
+then performs ordinary full native replay and compares the replayed identity,
+revision and state root against the manifest. Independent reference replay is
+optional. Corrupt files, missing completion manifests and false state claims fail
+verification. Keep trusted backup/history roots outside the backup directory;
+self-consistent hashes alone do not authenticate an entirely replaced history.
+
+A verified backup can be opened directly as a writable independent continuation.
+This preserves historical request-id retries and roots. Appending new commands to
+that continuation makes the original backup manifest stale; retain the original
+backup or export a new directory when a fresh frozen backup is needed. Existing
+64 MiB / 10,000-command limits continue to apply to each full-prefix journal.
+
 ## CLI and example
 
 ```text
@@ -140,6 +182,8 @@ rcl session init examples/sessions/governed-counter.rcl ./counter-state
 rcl session invoke ./counter-state examples/sessions/increment-command.json
 rcl session inspect ./counter-state
 rcl session verify ./counter-state --reference
+rcl session backup ./counter-state ./counter-backup --expected-root <trusted-journal-root>
+rcl session backup-verify ./counter-backup --expected-backup-root <trusted-backup-root> --reference
 rcl session inspect ./counter-state --expected-root <trusted-journal-root> --minimum-revision 1
 rcl session compile examples/sessions/governed-counter.rcl ./counter-session.rbc
 node examples/sessions/persistent-counter-demo.mjs
@@ -157,7 +201,9 @@ expectedJournalRoot and minimumRevision. Keep these anchors outside the session
 directory in a trusted application or record. Checking a root read from the same
 possibly rolled-back history does not supply an independent anchor. Pins refer
 to the current complete prefix before an invocation or incomplete-tail repair.
-These four operations also accept --reference for independent reference replay.
+These four operations and backup/backup-verify also accept --reference for
+independent reference replay. backup-verify additionally accepts
+--expected-backup-root; it is rejected for other operations.
 Unknown, duplicate, malformed or operation-inappropriate flags fail before any
 native execution or storage mutation; --bootstrap belongs only to compile and
 --repair-incomplete-tail belongs only to recover.

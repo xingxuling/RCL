@@ -58,10 +58,77 @@ generated Web runtime. Example: `examples/native-ui/scoped-forms.rcl`.
   is retained alongside this note as `scoped-forms-verification-2026-10-28.json`.
 - Package version and language maturity remain unchanged. No new K400 claim.
 
+## Increment 2: session bytecode feature version
+
+Commit `2a914f2` fixes a discovered native/bootstrap byte mismatch for ruleless
+sessions. The native session encoder previously forced RBC 1.3 even when emitted
+instructions only required RBC 1.1 or 1.2. It now uses the existing shared
+instruction feature detectors, while retaining the session header flag. A focused
+check passes five profiles (empty, literal, modulo, source input, transactional
+rule), including exact bootstrap bytes and actual native daemon initialization.
+The existing session/compiler/CLI/restart suite also passes 14 checks.
+
+## Increment 3: native semantic source positions
+
+The compiler now preserves a diagnostic-only Span at the end of internally parsed
+expression nodes; existing semantic fields and canonical expression emission
+retain their indexes. Parenthesized expressions retain the inner expression's
+location; binary nodes point to the operator. Synthesized nodes keep an explicit
+fallback span. Unknown alteration targets retain their target token position.
+
+Unknown names/calls, arity, literal facet mismatch, warrant result types, predicate
+operators, builtin/user argument checks and reachable user return errors propagate
+the appropriate expression span. Commit `772c0b5` passes 72 final-artifact compiler,
+location and warrant checks. The current compiler reaches native C0 == C1 == C2
+at 300389 bytes, SHA-256
+`964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098`.
+Evidence: `docs/maintenance/native-semantic-locations-2026-10-28.json`.
+
+The new Unicode diagnostic check found a column mismatch after supplementary
+Unicode text. The current core now reuses the already present UTF-16 column
+accounting from `selfhost/variants/utf16-columns/compiler.rcl` in `position_after`.
+All 27 location checks pass, including CRLF, tabs, Chinese comments, parentheses,
+operators, nested function bodies, output preservation and UTF-16 columns after
+emoji. Valid supplementary-text programs now match bootstrap bytes/roots too.
+The final self-hosted artifact includes this Unicode correction. The full checked-in
+example parity collector is running separately; its result is not yet claimed.
+
+Remaining source-position scope: UI declaration/navigation diagnostics, missing
+rule-warrant declarations and session unsupported-facet diagnostics still use
+synthetic locations. TD-019 therefore remains open. General language type-checker
+parity is not expanded by this diagnostic change.
+
+## Increment 4: consistent durable-session backups
+
+The existing native writer now exposes a queued `backup(newDirectory)` operation.
+It exports the original source/bytecode and one complete journal prefix into a
+fresh directory, followed by a rooted manifest with exact file hashes, identity,
+revision, head and state root. Writer lock files are excluded. Existing and nested
+destinations reject; interrupted exports remain unacknowledged and leave the live
+writer usable. Backup assets are captured before destination creation.
+
+`verifyDurableRealitySessionBackup` checks the manifest/assets, then reuses the
+existing full native replay with optional independent reference replay. A false
+state claim cannot be admitted merely by recomputing the manifest hash. Caller
+backup/head/revision anchors remain distinct from consistency checks derived from
+the bundle itself. A backup can be reopened as an independent writable continuation,
+preserving historical receipts and request-id retries. Appending makes its original
+backup manifest stale; frozen backups should be retained separately.
+
+Public CLI operations are `session backup` and `session backup-verify`, with strict
+argument handling and optional external anchors. Documentation is in
+`docs/v2.0/session-contract.md`. Nine new checks pass, including actual separate
+CLI processes, queued-prefix capture, branching/retry, injected storage failure,
+asset drift and manifest tampering. The existing 12 durable/CLI checks also pass
+in the scoped 20-check run before the additional separate-process smoke was added.
+Local TaoX routing again selects DEEP_DEVELOPMENT (score 0.8325 via bottleneck gate).
+TD-017 remains ACTIVE: backups retain full history and do not implement compaction.
+
 ## Remaining development queue
 
-1. Audit governed-session journal lifecycle (TD-017) and compiler diagnostics
-   (TD-019) against current executable owners before choosing the next increment.
-2. Prefer concrete capabilities using existing owners over new parallel services.
-3. Checkpoint each completed increment locally with only necessary checks.
-4. Continue until the six-hour interval finishes or the user redirects/stops it.
+1. Collect the running complete example-parity result and classify any actual gaps.
+2. Continue compiler diagnostic coverage and governed-session journal lifecycle
+   (TD-017) using their current executable owners.
+3. Prefer concrete capabilities using existing owners over new parallel services.
+4. Checkpoint each completed increment locally with only necessary checks.
+5. Continue until the six-hour interval finishes or the user redirects/stops it.
