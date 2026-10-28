@@ -263,14 +263,16 @@ protocol/namespace/coordinate checks and sixteen existing editor checks pass.
 This remains static bridge evidence, without a running editor/server claim. See
 `lsp-semantic-usage-tokens-2026-10-28.md`.
 
-## Increment 14 in progress: native UI tree admission
+## Increment 14: native UI tree admission
 
 The local TaoX FourDevelopmentModeRouter selected DEEP_DEVELOPMENT (0.905) for the
 source-audited UI tree admission bottleneck. Twenty-five native/reference cases
 reproduced twenty-two absent rejections covering node identity, content/event
 requirements, ancestor form scopes and bounded modal structure. Candidate native
-validation passes all twenty-five plus forty-six prior UI compiler checks. A new
-C0/C1/C2 build is running; final artifact admission is pending.
+validation passes all twenty-five plus forty-six prior UI compiler checks. The
+final native build has C0=C1=C2 at 349965 bytes; all 156 scoped final-artifact
+compiler/UI/location/warrant/session/tooling checks pass. See
+`native-ui-tree-admission-2026-10-28.json`.
 
 The seven distinct large-source timeout cases have now also been tested with the
 pre-development `ed28215` compiler. All seven timed out at 60000 ms. This is prior
@@ -286,12 +288,21 @@ existing runtime/style/layout/backend semantic checks pass. The affected owner i
 the canonical runtime; generated platform persistence acceptance is not claimed.
 See `ui-atomic-restore-2026-10-28.md`.
 
+## Increment 16: native session facet diagnostic locations
+
+The RCL-authored session compiler now reports its existing facet declaration
+coordinates for unsupported facet types. Six direct native rejection/location
+cases changed from FAIL to PASS; nine scoped session compiler tests pass with
+accepted target parity and daemon execution retained. The public API's bootstrap
+preflight remains distinct. See `session-compiler-locations-2026-10-28.md`.
+
 ## Remaining development queue
 
-1. Continue bounded compiler/UI diagnostic admission after the completed reactive
-   declarations fixed point and final-artifact checks.
-2. Probe the seven unique large compiler timeout cases against the prior compiler;
-   retain original-budget failures and deduplicate future repeated source work.
+1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
+   completed native UI tree fixed point and final-artifact checks.
+2. Investigate the seven unique large compiler timeout cases using their now
+   completed prior-compiler baselines; retain original-budget failures and avoid
+   repeated alias execution.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
    (TD-017) using their current executable owners.
 4. Prefer concrete capabilities using existing owners over new parallel services.

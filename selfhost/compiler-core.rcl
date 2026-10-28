@@ -2452,9 +2452,76 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon validate_ui_events(items : Sequence, index : Number, node_id : Text, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
+      choose(semantic_check(find_ui_event_index(items, 0, ui_event_type(sequence_get(items, index))) == index,
+          "RCL_UI_EVENT_DUPLICATE", node_id),
       choose(validate_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, node_id,
           ui_event_type(sequence_get(items, index)), rules, navigation),
-        validate_ui_events(items, index + 1, node_id, rules, navigation), false))
+        validate_ui_events(items, index + 1, node_id, rules, navigation), false), false))
+
+  reckon find_ui_event_index(items : Sequence, index : Number, event_type : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(ui_event_type(sequence_get(items, index)) == event_type, index,
+        find_ui_event_index(items, index + 1, event_type)))
+
+  reckon collect_ui_tree_child_ids(items : Sequence, index : Number, seen : Sequence) -> Sequence =
+    choose(index >= length(items), seen,
+      collect_ui_tree_child_ids(items, index + 1, collect_ui_tree_ids(sequence_get(items, index), seen)))
+
+  reckon collect_ui_tree_ids(node : Sequence, seen : Sequence) -> Sequence =
+    choose(semantic_check(find_text(seen, 0, ui_view_id(node)) < 0, "RCL_UI_NODE_ID_DUPLICATE", ui_view_id(node)),
+      collect_ui_tree_child_ids(ui_view_children(node), 0, sequence_append(seen, ui_view_id(node))), seen)
+
+  reckon ui_node_content_available(node : Sequence, name : Text) -> Truth =
+    ui_control_has(node, name) or length(find_ui_property(ui_view_bindings(node), 0, name)) > 0
+
+  reckon ui_container_ancestor(ancestors : Sequence, index : Number, id : Text) -> Truth =
+    choose(index >= length(ancestors), false,
+      choose(ui_view_role(sequence_get(ancestors, index)) == "container" and ui_view_id(sequence_get(ancestors, index)) == id, true,
+        ui_container_ancestor(ancestors, index + 1, id)))
+
+  reckon validate_ui_form_scope(node : Sequence, ancestors : Sequence) -> Truth =
+    choose(not ui_control_has(node, "validation_scope"), true,
+      choose(semantic_check(ui_control_text(node, "validation_scope") != "", "RCL_UI_FORM_SCOPE_TARGET", ui_view_id(node)),
+        choose(semantic_check(ui_control_text(node, "require_valid_form") == "true", "RCL_UI_FORM_SCOPE_GUARD_REQUIRED", ui_view_id(node)),
+          semantic_check(ui_container_ancestor(ancestors, 0, ui_control_text(node, "validation_scope")),
+            "RCL_UI_FORM_SCOPE_ANCESTOR", ui_view_id(node)), false), false))
+
+  reckon validate_ui_modal_node(node : Sequence, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(not ui_control_has(node, "modal"), true,
+      choose(semantic_check(ui_view_role(node) == "container" and ui_control_text(node, "modal") == "true", "RCL_UI_MODAL_ROLE", ui_view_id(node)),
+        choose(semantic_check(length(ancestors) == 1 and ui_layout_mode(ui_view_layout(root)) == "overlay", "RCL_UI_MODAL_PARENT", ui_view_id(node)),
+          choose(semantic_check(ui_control_text(node, "accessibility_label") != "", "RCL_UI_MODAL_LABEL_REQUIRED", ui_view_id(node)),
+            semantic_check(length(find_ui_property(ui_view_bindings(node), 0, "visible")) > 0, "RCL_UI_MODAL_VISIBLE_BIND_REQUIRED", ui_view_id(node)), false), false), false))
+
+  reckon validate_ui_required_content(node : Sequence) -> Truth =
+    choose(ui_view_role(node) == "text",
+      semantic_check(ui_node_content_available(node, "value"), "RCL_UI_TEXT_VALUE_REQUIRED", ui_view_id(node)),
+      choose(ui_view_role(node) == "action",
+        choose(semantic_check(ui_node_content_available(node, "label"), "RCL_UI_ACTION_LABEL_REQUIRED", ui_view_id(node)),
+          semantic_check(find_ui_event_index(ui_view_events(node), 0, "activate") >= 0, "RCL_UI_ACTION_ACTIVATE_REQUIRED", ui_view_id(node)), false), true))
+
+  reckon validate_ui_tree_children(items : Sequence, index : Number, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_ui_tree_context(sequence_get(items, index), root, ancestors),
+        validate_ui_tree_children(items, index + 1, root, ancestors), false))
+
+  reckon validate_ui_tree_context(node : Sequence, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(validate_ui_required_content(node),
+      choose(validate_ui_form_scope(node, ancestors),
+        choose(validate_ui_modal_node(node, root, ancestors),
+          validate_ui_tree_children(ui_view_children(node), 0, root, sequence_append(ancestors, node)), false), false), false)
+
+  reckon count_ui_modal_children(items : Sequence, index : Number) -> Number =
+    choose(index >= length(items), 0,
+      count_ui_modals(sequence_get(items, index)) + count_ui_modal_children(items, index + 1))
+
+  reckon count_ui_modals(node : Sequence) -> Number =
+    choose(ui_control_has(node, "modal"), 1, 0) + count_ui_modal_children(ui_view_children(node), 0)
+
+  reckon validate_ui_tree(root : Sequence) -> Truth =
+    choose(length(collect_ui_tree_ids(root, empty_sequence())) > 0,
+      choose(validate_ui_tree_context(root, root, empty_sequence()),
+        semantic_check(count_ui_modals(root) <= 1, "RCL_UI_MODAL_LIMIT", "1"), false), false)
 
   reckon validate_ui_adaptive_layouts(items : Sequence, index : Number, node_id : Text, adaptation : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -2544,7 +2611,9 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon validate_uis(items : Sequence, index : Number, rules : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(validate_ui_reactive_declarations(sequence_get(items, index)), validate_uis_admitted(items, index, rules), false))
+      choose(validate_ui_reactive_declarations(sequence_get(items, index)),
+        choose(validate_ui_tree(sequence_get(ui_views(sequence_get(items, index)), 0)),
+          validate_uis_admitted(items, index, rules), false), false))
 
   reckon validate_uis_admitted(items : Sequence, index : Number, rules : Sequence) -> Truth =
       choose(length(ui_navigation(sequence_get(items, index))) == 0,
