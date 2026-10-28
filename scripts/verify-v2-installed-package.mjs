@@ -25,6 +25,8 @@ try {
   if (metadata.version !== '2.0.0') throw new Error('RCL_V2_INSTALLED_VERSION_MISMATCH');
   const version = JSON.parse(run([cli, 'version', '--json']));
   const doctor = JSON.parse(run([cli, 'doctor']));
+  const versionContract = JSON.parse(run([path.join(packageRoot, 'scripts/verify-version-contract.mjs')]));
+  if (versionContract.ok !== true) throw new Error('RCL_V2_INSTALLED_VERSION_CONTRACT_FAILED');
   if (version.version !== '2.0.0' || doctor.ok !== true) throw new Error('RCL_V2_INSTALLED_PUBLIC_CONTRACT_FAILED');
   const example = path.join(packageRoot, 'examples/sessions/governed-counter.rcl');
   const storage = path.join(directory, 'state');
@@ -72,7 +74,7 @@ try {
   const report = {
     format: 'rcl.v2-independent-installation.v1', status: 'PASS', version: metadata.version, platform: process.platform,
     archiveSha256: hash(fs.readFileSync(archive)), installedOutsideSourceCheckout: true,
-    publicVersion: true, doctor: true, distinctCliProcesses: true, nativeReferenceApiParity: true,
+    publicVersion: true, doctor: true, versionContract: versionContract.ok, distinctCliProcesses: true, nativeReferenceApiParity: true,
     durableRestartRetry: true, nativeRclCompilation: true, sourceBound: apiResult.native.sourceBound,
     releaseVerifier: releaseVerifier.status, nativeDaemonRoot: apiResult.native.daemonRoot,
     installedSessionRoot: verified.stateRoot,
