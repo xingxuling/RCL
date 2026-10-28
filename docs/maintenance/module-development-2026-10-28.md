@@ -194,9 +194,38 @@ or new K400 evidence. Source-hash grouping is retained in
 `output/module-development-20261028/example-failure-groups.json`; the full original
 result is `output/selfhost/example-parity.json`.
 
+## Increment 9: native typed UI compiler
+
+The prior `ed28215` compiler reproduces both typed-UI parameter failures. It also
+reproduces a 60-second timeout for the native complete-compiler fixture; this
+single baseline timeout is not evidence for all seven distinct large sources.
+The probe is retained in
+`output/module-development-20261028/example-baseline-probe.json`.
+
+The candidate RCL compiler resolves input/change parameter types after the entire
+node is parsed, so property order and omitted parameter types work for Truth,
+Number and Text controls. It preserves exact bootstrap bytes for six current
+typed/form/date/modal/component fixtures. Static properties and bindings, required
+value/label/change declarations, option lists, slider ranges, form length bounds,
+Gregorian date/radio initials and UI expression operand types now have native
+admission checks. Non-ASCII TrimString whitespace at option edges is checked
+explicitly because the existing native trim builtin is ASCII-oriented.
+
+The final C0/C1/C2 build is byte-identical at 336769 bytes. All 99 final-artifact
+checks pass, including the 27 new control checks and existing location, toolchain
+and warrant admission checks. The compiler artifact is updated locally. One
+earlier owned build was deliberately stopped when the Unicode edge gap was found;
+only the subsequent successful build is evidence. See
+`native-ui-selfhost-controls-2026-10-28.json` for source hashes and scope.
+
+Native UI admission is still bounded. Source audit also identified initial-state
+and derived-declaration typing/uniqueness checks as follow-up work; full reference
+type-checker parity is not claimed by these control checks.
+
 ## Remaining development queue
 
-1. Fix the two confirmed typed-UI native compiler gaps and revalidate their exact bytes.
+1. Continue initial/derived UI declaration admission after the completed native
+   typed-control compiler fixed point and final-artifact regression.
 2. Probe the seven unique large compiler timeout cases against the prior compiler;
    retain original-budget failures and deduplicate future repeated source work.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
