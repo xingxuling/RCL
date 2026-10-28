@@ -157,7 +157,7 @@ if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2',
        rcl replay-trace <trace.json> [output-dir]
        rcl debug-session-demo
        rcl debug-session-run <file.rcl> <types-dir|file> [output-dir] [debug-config.json]
-       rcl debug-step <debug-session.json> [next|continue|reset|seq:<n>|frame:<n>] [output-dir]
+       rcl debug-step <debug-session.json> [next|previous|continue|reverse-continue|reset|seq:<n>|frame:<n>] [output-dir]
        rcl profiler-demo
        rcl profile-run <file.rcl> <types-dir|file> [output-dir] [debug-config.json]
        rcl replay-bundle <trace.json> [output-dir]

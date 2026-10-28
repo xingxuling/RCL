@@ -296,6 +296,19 @@ cases changed from FAIL to PASS; nine scoped session compiler tests pass with
 accepted target parity and daemon execution retained. The public API's bootstrap
 preflight remains distinct. See `session-compiler-locations-2026-10-28.md`.
 
+## Increment 17: bound replay cursor navigation
+
+The existing trace debugger now admits session/trace roots and reconstructed
+frame/window bindings before producing steps. A private cursor advances across
+repeated calls, supports reverse pause navigation and resumes serialized bound
+cursor checkpoints. Invalid commands/origins fail before reports or cursor
+mutation. The static DAP request plan maps stepBack/reverseContinue to these
+commands. Prototype-like facet watches no longer observe inherited properties.
+Five pre-change integrity controls failed; fifteen new and twenty-four existing
+debugger/IDE/profiler checks now pass. The public demo also passes. This is recorded
+trace navigation, with no live VM reversal or DAP server claim. See
+`debug-replay-cursor-2026-10-28.md`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the

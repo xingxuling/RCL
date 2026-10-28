@@ -1,0 +1,48 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "src/debug-session-runtime.mjs": "e7549e73a4ec7a73efe230f655015a837e6bc52c351c8c29baad7888e758eb69",
+    "src/lsp-dap-bridge-runtime.mjs": "3e89b261fc3989683637dadd53d6dc49a8f2f819fc05f8b72620a5fa895f33b9",
+    "src/index.mjs": "5d551327aa1f9bbd1b670517402382aed7e3d48db01c5a05a0a8107348eac391",
+    "src/cli.mjs": "5dd25f4b23d1bc1047f2bb1758c7ed587b26f04435df48c3796eaff998dc4c93",
+    "tests/debug-replay-cursor.test.mjs": "57569308516a9a8c4fdd5c768b5f9573b7c2dc3f594812190e6785b5f1956b12",
+    "examples/debug-session/replay-cursor-demo.mjs": "58ebf35d119a345a3055ea6af71fb078918c1385b0900c0ef6415e50f7a7bf2a"
+  },
+  "checks": {
+    "preChangeIntegrity": {
+      "passed": 0,
+      "failed": 5
+    },
+    "final": {
+      "passed": 39,
+      "failed": 0,
+      "newChecks": 15,
+      "command": "node --test --test-concurrency=1 tests/debug-replay-cursor.test.mjs tests/debug-session-runtime.test.mjs tests/lsp-dap-bridge-runtime.test.mjs tests/profiler-debug-ui-runtime.test.mjs",
+      "log": "output/module-development-20261028/debug-cursor-final.log"
+    },
+    "publicDemo": {
+      "ok": true,
+      "format": "rcl.debug-replay-cursor-demo.v1",
+      "sessionRoot": "d2de8dacc14d75a945fd6887c799e60344fc4109c30b1331dd8de2743827f7da",
+      "traceRoot": "0ccccce9e663efbc3afa9d168ce372ae9f3af27cc2058df1d66b09b6b0894b50",
+      "checkpointRoot": "a93352602fa33c1266a5c1499e00f7a62ae44eb147a16b8173a5e9ef584b37c2",
+      "frames": [
+        1,
+        2,
+        1
+      ],
+      "stepRoots": [
+        "0754feee1d83cac741f677ba0017115b4417ac035cbba749fc27e4efc9214f84",
+        "3cd88a80faf1fbecaaf8249b519fbb203b08e5933bcd443a05682e4cd0151f7d",
+        "160dfec23d103006070e9dfcc2d6c15661234e6b1404b625a5b2f0520d8268ba"
+      ],
+      "boundary": "Navigation and variable windows over admitted recorded events; no live VM pause or reverse execution."
+    }
+  },
+  "liveVmPause": false,
+  "liveReverseExecution": false,
+  "liveDapServer": false,
+  "publisherAuthentication": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

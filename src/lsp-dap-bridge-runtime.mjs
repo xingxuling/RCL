@@ -601,6 +601,8 @@ export function buildDapBridge(sessionOrPath, options = {}) {
     { seq: 8, type: 'response', request_seq: 6, command: 'variables', success: true, body: { variables } },
     { seq: 9, type: 'request', command: 'next', arguments: { threadId: 1, granularity: 'statement', bridgeCommand: 'debug-step next' } },
     { seq: 10, type: 'request', command: 'continue', arguments: { threadId: 1, bridgeCommand: 'debug-step continue' } },
+    { seq: 11, type: 'request', command: 'stepBack', arguments: { threadId: 1, bridgeCommand: 'debug-step previous' } },
+    { seq: 12, type: 'request', command: 'reverseContinue', arguments: { threadId: 1, bridgeCommand: 'debug-step reverse-continue' } },
   ];
   const bridge = {
     format: RCL_DAP_BRIDGE_FORMAT,

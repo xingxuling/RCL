@@ -6,6 +6,9 @@ import {
   DEFAULT_DEBUG_REPLAY_SOURCE,
   DEFAULT_DEBUG_REPLAY_TYPE_MODULES,
   runExecutionTrace,
+  replayTrace,
+  RCL_EXECUTION_TRACE_FORMAT,
+  RCL_DEBUG_REPLAY_VERSION,
 } from './debug-replay-runtime.mjs';
 
 export const RCL_STEP_DEBUG_VERSION = '0.39.0-alpha.1';
@@ -13,6 +16,7 @@ export const RCL_DEBUG_SESSION_FORMAT = 'rcl.debug-session.v0.39';
 export const RCL_DEBUG_STEP_REPORT_FORMAT = 'rcl.debug-step-report.v0.39';
 export const RCL_DEBUG_SESSION_RUN_REPORT_FORMAT = 'rcl.debug-session-run-report.v0.39';
 export const RCL_DEBUG_CONFIG_FORMAT = 'rcl.debug-config.v0.39';
+export const RCL_DEBUG_REPLAY_CURSOR_FORMAT = 'rcl.debug-replay-cursor.v1';
 
 function sortJson(value) {
   if (Array.isArray(value)) return value.map(sortJson);
@@ -30,6 +34,23 @@ function sha256(value) {
 
 function cloneJson(value) {
   return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+function requireDebugEvidence(condition, code) {
+  if (!condition) { const error = new Error(code); error.code = code; throw error; }
+}
+
+function admitDebugTrace(trace) {
+  requireDebugEvidence(trace?.format === RCL_EXECUTION_TRACE_FORMAT && trace.version === RCL_DEBUG_REPLAY_VERSION && Array.isArray(trace.events), 'RCL_DEBUG_TRACE_INVALID');
+  let previous = 0;
+  for (const event of trace.events) {
+    requireDebugEvidence(event && Number.isSafeInteger(event.seq) && event.seq > previous && typeof event.kind === 'string' && event.kind.length > 0, 'RCL_DEBUG_TRACE_SEQUENCE_INVALID');
+    previous = event.seq;
+  }
+  const replay = replayTrace(trace);
+  requireDebugEvidence(replay.deterministicReplay, 'RCL_DEBUG_TRACE_ROOT_MISMATCH');
+  requireDebugEvidence(trace.eventCount === trace.events.length && trace.eventKindCounts && typeof trace.eventKindCounts === 'object'
+    && !Array.isArray(trace.eventKindCounts) && sha256(trace.eventKindCounts) === sha256(replay.eventKindCounts), 'RCL_DEBUG_TRACE_COUNTS_MISMATCH');
 }
 
 function readJson(pathname, fallback = {}) {
@@ -178,7 +199,7 @@ function resolveWatchExpression(watch, event, variableIndex, frameEvents) {
 }
 
 function variableWindowForFrame(events, frame, watchExpressions) {
-  const variableIndex = {};
+  const variableIndex = Object.create(null);
   const frameEvents = [];
   for (const event of events) {
     if (event.seq > frame.seq) break;
@@ -216,9 +237,16 @@ function makeFrame({ event, frameIndex, variableIndex, breakpoints, stopOnEntry 
 }
 
 export function buildDebugSessionFromTrace(trace, config = {}) {
-  if (!trace?.events) throw new TypeError('trace with events is required');
+  admitDebugTrace(trace);
   const debugConfig = normalizeDebugConfig(config);
-  const variableIndex = {};
+  return buildAdmittedDebugSession(trace, debugConfig);
+}
+
+function buildAdmittedDebugSession(trace, debugConfig) {
+  requireDebugEvidence(Number.isSafeInteger(debugConfig.stepDefaults?.startFrameIndex) && debugConfig.stepDefaults.startFrameIndex >= 0,
+    'RCL_DEBUG_FRAME_INDEX_INVALID');
+  requireDebugEvidence(debugConfig.maxFrames === null || (Number.isSafeInteger(debugConfig.maxFrames) && debugConfig.maxFrames >= 0), 'RCL_DEBUG_MAX_FRAMES_INVALID');
+  const variableIndex = Object.create(null);
   const frames = [];
   for (const event of trace.events) {
     if (debugConfig.maxFrames != null && frames.length >= Number(debugConfig.maxFrames)) break;
@@ -300,19 +328,31 @@ export function buildDebugSessionFromTrace(trace, config = {}) {
 }
 
 function parseStepCommand(command = 'next') {
-  if (typeof command === 'number') return { op: 'goto', seq: command };
+  let parsed;
+  if (typeof command === 'number') parsed = { op: 'goto', seq: command };
   if (typeof command === 'string') {
-    if (/^seq:\d+$/.test(command)) return { op: 'goto', seq: Number(command.slice(4)) };
-    if (/^frame:\d+$/.test(command)) return { op: 'goto-frame', frameIndex: Number(command.slice(6)) };
-    if (/^\d+$/.test(command)) return { op: 'goto', seq: Number(command) };
-    return { op: command };
+    if (/^seq:\d+$/.test(command)) parsed = { op: 'goto', seq: Number(command.slice(4)) };
+    else if (/^frame:\d+$/.test(command)) parsed = { op: 'goto-frame', frameIndex: Number(command.slice(6)) };
+    else if (/^\d+$/.test(command)) parsed = { op: 'goto', seq: Number(command) };
+    else parsed = { op: command };
   }
-  return command ?? { op: 'next' };
+  if (command && typeof command === 'object' && !Array.isArray(command)) parsed = { ...command };
+  requireDebugEvidence(parsed && typeof parsed.op === 'string', 'RCL_DEBUG_STEP_COMMAND_INVALID');
+  const aliases = new Map([['stepBack', 'previous'], ['reverseContinue', 'reverse-continue']]);
+  parsed.op = aliases.get(parsed.op) ?? parsed.op;
+  requireDebugEvidence(['reset', 'next', 'step', 'step-into', 'previous', 'back', 'continue', 'reverse-continue', 'goto', 'goto-frame'].includes(parsed.op), 'RCL_DEBUG_STEP_COMMAND_INVALID');
+  const allowed = ['op', 'fromFrameIndex', ...(parsed.op === 'goto' ? ['seq'] : []), ...(parsed.op === 'goto-frame' ? ['frameIndex'] : [])];
+  requireDebugEvidence(Reflect.ownKeys(parsed).every(key => allowed.includes(key)), 'RCL_DEBUG_STEP_COMMAND_INVALID');
+  if (parsed.fromFrameIndex !== undefined) requireDebugEvidence(Number.isSafeInteger(parsed.fromFrameIndex) && parsed.fromFrameIndex >= 0, 'RCL_DEBUG_FRAME_INDEX_INVALID');
+  if (parsed.op === 'goto') requireDebugEvidence(Number.isSafeInteger(parsed.seq) && parsed.seq > 0, 'RCL_DEBUG_STEP_COMMAND_INVALID');
+  if (parsed.op === 'goto-frame') requireDebugEvidence(Number.isSafeInteger(parsed.frameIndex) && parsed.frameIndex >= 0, 'RCL_DEBUG_FRAME_INDEX_INVALID');
+  return parsed;
 }
 
 function resolveFrameForCommand(session, command = 'next') {
   const cmd = parseStepCommand(command);
   const currentIndex = Number(cmd.fromFrameIndex ?? session.cursor?.frameIndex ?? 0);
+  requireDebugEvidence(Number.isSafeInteger(currentIndex) && currentIndex >= 0 && (currentIndex < session.frames.length || (!session.frames.length && currentIndex === 0)), 'RCL_DEBUG_FRAME_INDEX_INVALID');
   if (cmd.op === 'reset') return 0;
   if (cmd.op === 'next' || cmd.op === 'step' || cmd.op === 'step-into') return Math.min(currentIndex + 1, session.frames.length - 1);
   if (cmd.op === 'previous' || cmd.op === 'back') return Math.max(currentIndex - 1, 0);
@@ -320,9 +360,14 @@ function resolveFrameForCommand(session, command = 'next') {
     const nextPause = session.pausePoints.find(point => point.frameIndex > currentIndex);
     return nextPause?.frameIndex ?? Math.max(session.frames.length - 1, 0);
   }
+  if (cmd.op === 'reverse-continue') {
+    const previousPause = session.pausePoints.filter(point => point.frameIndex < currentIndex).at(-1);
+    return previousPause?.frameIndex ?? 0;
+  }
   if (cmd.op === 'goto') {
     const exact = session.frames.find(frame => Number(frame.seq) === Number(cmd.seq));
-    return exact?.frameIndex ?? currentIndex;
+    requireDebugEvidence(Boolean(exact), 'RCL_DEBUG_SEQUENCE_NOT_FOUND');
+    return exact.frameIndex;
   }
   if (cmd.op === 'goto-frame') return Math.max(0, Math.min(Number(cmd.frameIndex), session.frames.length - 1));
   return currentIndex;
@@ -330,10 +375,31 @@ function resolveFrameForCommand(session, command = 'next') {
 
 export function stepDebugSession(sessionOrPath, options = {}) {
   const session = typeof sessionOrPath === 'string' ? JSON.parse(fs.readFileSync(sessionOrPath, 'utf8')) : sessionOrPath;
-  if (!session?.frames) throw new TypeError('debug session with frames is required');
   const trace = options.trace ?? (options.tracePath ? JSON.parse(fs.readFileSync(options.tracePath, 'utf8')) : null);
-  const command = options.command ?? 'next';
-  const beforeCursor = cloneJson(session.cursor);
+  admitDebugSession(session, trace, options);
+  return stepAdmittedDebugSession(session, trace, options);
+}
+
+function admitDebugSession(session, trace, options = {}) {
+  requireDebugEvidence(session?.format === RCL_DEBUG_SESSION_FORMAT && Array.isArray(session.frames), 'RCL_DEBUG_SESSION_INVALID');
+  const { sessionRoot, ...core } = session;
+  requireDebugEvidence(sessionRoot === sha256(core), 'RCL_DEBUG_SESSION_ROOT_MISMATCH');
+  if (options.expectedSessionRoot !== undefined) requireDebugEvidence(options.expectedSessionRoot === sessionRoot, 'RCL_DEBUG_EXPECTED_SESSION_ROOT_MISMATCH');
+  if (options.expectedTraceRoot !== undefined) requireDebugEvidence(options.expectedTraceRoot === session.traceRoot, 'RCL_DEBUG_EXPECTED_TRACE_ROOT_MISMATCH');
+  if (trace) {
+    admitDebugTrace(trace);
+    const rebuilt = buildAdmittedDebugSession(trace, session.config);
+    requireDebugEvidence(rebuilt.sessionRoot === sessionRoot, 'RCL_DEBUG_SESSION_TRACE_MISMATCH');
+  }
+}
+
+function cursorForFrame(frame) {
+  return frame ? { frameIndex: frame.frameIndex, seq: frame.seq, eventKind: frame.eventKind, stopKind: frame.stopKind } : null;
+}
+
+function stepAdmittedDebugSession(session, trace, options = {}) {
+  const command = parseStepCommand(options.command ?? 'next');
+  const beforeCursor = cursorForFrame(session.frames[command.fromFrameIndex ?? session.cursor?.frameIndex ?? 0]);
   const nextFrameIndex = resolveFrameForCommand(session, command);
   const frame = session.frames[nextFrameIndex] ?? null;
   const event = trace?.events?.find(item => item.seq === frame?.seq) ?? frame;
@@ -345,7 +411,7 @@ export function stepDebugSession(sessionOrPath, options = {}) {
     version: RCL_STEP_DEBUG_VERSION,
     sessionId: session.sessionId,
     sessionRoot: session.sessionRoot,
-    command: parseStepCommand(command),
+    command,
     beforeCursor,
     afterCursor: frame ? {
       frameIndex: frame.frameIndex,
@@ -356,6 +422,7 @@ export function stepDebugSession(sessionOrPath, options = {}) {
     } : null,
     frame,
     variableWindow,
+    traceEvidenceVerified: Boolean(trace),
     breakpointHits: frame?.breakHits ?? [],
     pausePoint: Boolean(frame?.stopKind || frame?.breakHits?.length),
     boundary: session.boundary,
@@ -363,10 +430,40 @@ export function stepDebugSession(sessionOrPath, options = {}) {
   report.stepRoot = sha256(report);
   if (options.outputDir) {
     fs.mkdirSync(options.outputDir, { recursive: true });
-    const suffix = typeof command === 'string' ? command.replace(/[^a-zA-Z0-9_.-]/g, '_') : 'command';
+    const supplied = options.command ?? 'next';
+    const suffix = typeof supplied === 'string' ? supplied.replace(/[^a-zA-Z0-9_.-]/g, '_') : 'command';
     fs.writeFileSync(path.join(options.outputDir, `debug-step-${suffix}.json`), `${JSON.stringify(report, null, 2)}\n`);
   }
   return report;
+}
+
+export function createDebugReplayCursor(sessionOrPath, options = {}) {
+  const session = cloneJson(typeof sessionOrPath === 'string' ? readJson(sessionOrPath) : sessionOrPath);
+  const trace = cloneJson(options.trace ?? (options.tracePath ? readJson(options.tracePath) : null));
+  requireDebugEvidence(Boolean(trace), 'RCL_DEBUG_CURSOR_TRACE_REQUIRED');
+  admitDebugSession(session, trace, options);
+  requireDebugEvidence(options.cursorSnapshot === undefined || options.startFrameIndex === undefined, 'RCL_DEBUG_CURSOR_SNAPSHOT_INVALID');
+  const saved = cloneJson(options.cursorSnapshot);
+  let frameIndex = saved !== undefined ? saved?.frameIndex ?? 0 : options.startFrameIndex ?? session.cursor?.frameIndex ?? 0;
+  requireDebugEvidence(Number.isSafeInteger(frameIndex) && frameIndex >= 0 && (frameIndex < session.frames.length || (!session.frames.length && frameIndex === 0)), 'RCL_DEBUG_FRAME_INDEX_INVALID');
+  const snapshot = () => {
+    const frame = session.frames[frameIndex];
+    const core = { format: RCL_DEBUG_REPLAY_CURSOR_FORMAT, sessionRoot: session.sessionRoot, traceRoot: trace.traceRoot,
+      frameIndex: frame?.frameIndex ?? null, seq: frame?.seq ?? null, done: !frame || frameIndex >= session.frames.length - 1 };
+    return { ...core, cursorRoot: sha256(core) };
+  };
+  if (saved !== undefined) requireDebugEvidence(sha256(saved) === sha256(snapshot()), 'RCL_DEBUG_CURSOR_SNAPSHOT_INVALID');
+  if (options.expectedCursorRoot !== undefined) requireDebugEvidence(saved && options.expectedCursorRoot === saved.cursorRoot, 'RCL_DEBUG_EXPECTED_CURSOR_ROOT_MISMATCH');
+  return Object.freeze({
+    step(input = 'next') {
+      const command = parseStepCommand(input);
+      requireDebugEvidence(command.fromFrameIndex === undefined, 'RCL_DEBUG_CURSOR_ORIGIN_OVERRIDE');
+      const report = stepAdmittedDebugSession(session, trace, { command: { ...command, fromFrameIndex: frameIndex } });
+      frameIndex = report.afterCursor?.frameIndex ?? 0;
+      return cloneJson(report);
+    },
+    snapshot,
+  });
 }
 
 export function runDebugSession(input = {}, options = {}) {
