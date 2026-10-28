@@ -12,6 +12,7 @@ import { normalizeSessionCommand, sessionError } from './session-contract.mjs';
 export const RCL_DURABLE_SESSION_VERSION = '1.0.0';
 export const RCL_SESSION_JOURNAL_FORMAT = 'rcl.session-journal.v1';
 export const RCL_SESSION_BACKUP_FORMAT = 'rcl.session-backup.v1';
+export const RCL_SESSION_HISTORY_FORMAT = 'rcl.session-history-page.v1';
 const BACKUP_FILES = ['source.rcl', 'session.rbc', 'journal.jsonl'];
 const GENESIS = 'rcl.session-journal-genesis.v1';
 const COMMAND = 'rcl.session-journal-command.v1';
@@ -118,7 +119,7 @@ export async function openDurableRealitySession(directory, options = {}) {
   const engine = await createNativeRealitySession(program, { ...options.native, bytecode, lockPath: path.join(storage, '.writer.lock') });
   const reference = options.verifyReference === true ? createRealitySession(program) : null;
   const requests = new Map();
-  let head, revision = 0, sessionId, recovery = null, closing = false, poisoned = false;
+  let head, genesisRoot, revision = 0, sessionId, recovery = null, closing = false, poisoned = false;
   let pending = Promise.resolve();
   try {
     immutableAsset(sourcePath, sourceBytes);
@@ -141,7 +142,7 @@ export async function openDurableRealitySession(directory, options = {}) {
         || genesis.initialStateRoot !== engine.snapshot().stateRoot || genesis.stateRootAlgorithm !== 'rcl.semantic-state-root.v2') {
       throw sessionError('RCL_SESSION_GENESIS_BINDING_MISMATCH');
     }
-    head = genesis; sessionId = genesis.sessionId;
+    head = genesis; genesisRoot = genesis.root; sessionId = genesis.sessionId;
     for (const record of journal.records.slice(1)) {
       verifyRecord(record);
       if (record.format !== COMMAND || record.sequence !== revision + 1 || record.previousRoot !== head.root
@@ -181,6 +182,35 @@ export async function openDurableRealitySession(directory, options = {}) {
   };
   return Object.freeze({
     snapshot,
+    history(options = {}) {
+      if (poisoned || closing) return Promise.reject(sessionError('RCL_SESSION_CLOSED_OR_DURABILITY_UNCERTAIN'));
+      let fromRevision, limit, expectedJournalRoot;
+      try {
+        if (!options || typeof options !== 'object' || Array.isArray(options)
+            || Reflect.ownKeys(options).some(key => !['fromRevision', 'limit', 'expectedJournalRoot'].includes(key))) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+        ({ fromRevision = 1, limit = 100, expectedJournalRoot } = options);
+        if (!Number.isSafeInteger(fromRevision) || fromRevision < 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > 1000) throw sessionError('RCL_SESSION_HISTORY_RANGE_INVALID');
+        if (expectedJournalRoot !== undefined && !/^[0-9a-f]{64}$/u.test(expectedJournalRoot)) throw sessionError('RCL_SESSION_HISTORY_OPTIONS_INVALID');
+      } catch (error) { return Promise.reject(error); }
+      const operation = pending.then(() => {
+        if (poisoned) throw sessionError('RCL_SESSION_DURABILITY_UNCERTAIN');
+        if (expectedJournalRoot !== undefined && expectedJournalRoot !== head.root) throw sessionError('RCL_SESSION_EXPECTED_HEAD_MISMATCH');
+        if (fromRevision > revision + 1) throw sessionError('RCL_SESSION_HISTORY_RANGE_INVALID');
+        const records = [...requests.values()];
+        const entries = structuredClone(records.slice(fromRevision - 1, fromRevision - 1 + limit));
+        const next = fromRevision + entries.length;
+        const core = {
+          format: RCL_SESSION_HISTORY_FORMAT, sessionId, programRoot: program.programRoot,
+          revision, journalRoot: head.root, stateRoot: engine.snapshot().stateRoot,
+          stateRootAlgorithm: 'rcl.semantic-state-root.v2', fromRevision, limit,
+          previousRoot: fromRevision === 1 ? genesisRoot : records[fromRevision - 2].root,
+          nextRevision: next <= revision ? next : null, entries,
+        };
+        return { ...core, pageRoot: root(core) };
+      });
+      pending = operation.catch(() => {});
+      return operation;
+    },
     backup(destination) {
       if (poisoned || closing) return Promise.reject(sessionError('RCL_SESSION_CLOSED_OR_DURABILITY_UNCERTAIN'));
       let target;

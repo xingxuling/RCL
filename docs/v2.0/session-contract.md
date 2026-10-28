@@ -175,12 +175,36 @@ that continuation makes the original backup manifest stale; retain the original
 backup or export a new directory when a fresh frozen backup is needed. Existing
 64 MiB / 10,000-command limits continue to apply to each full-prefix journal.
 
+## Paginated committed history
+
+`session.history({ fromRevision: 1, limit: 100, expectedJournalRoot })` queues a
+consistent page with invocations and backups. It returns full command receipts
+that this writer has replayed or acknowledged, including forecast receipts but
+without additional entries for idempotent retries. Entries are detached copies;
+reading does not append or rewrite the journal. This is the writer's admitted
+prefix, not an independent reread/replay of files on each history query.
+
+The `rcl.session-history-page.v1` result includes the current revision/head/state
+root, `previousRoot` immediately before the page, `entries`, `nextRevision` or
+null, and `pageRoot` over all other result fields. Receipt roots continue from
+previousRoot. Reuse the returned journalRoot as expectedJournalRoot for later
+pages; a concurrent committed operation then rejects the stale pin instead of
+silently combining pages from different heads. A page root computed from the
+page is a consistency checksum, not an independently trusted history anchor.
+
+Revisions begin at 1; genesis has no command receipts. A request at current
+revision plus one returns an empty terminal page. Larger offsets reject. The
+page limit is 1 through 1000, default 100. Invalid options and stale pins leave
+the writer usable. Existing full-prefix limits and writer ownership apply;
+history pagination does not implement checkpointing or journal compaction.
+
 ## CLI and example
 
 ```text
 rcl session init examples/sessions/governed-counter.rcl ./counter-state
 rcl session invoke ./counter-state examples/sessions/increment-command.json
 rcl session inspect ./counter-state
+rcl session history ./counter-state --from-revision 1 --limit 100 --expected-root <trusted-journal-root>
 rcl session verify ./counter-state --reference
 rcl session backup ./counter-state ./counter-backup --expected-root <trusted-journal-root>
 rcl session backup-verify ./counter-backup --expected-backup-root <trusted-backup-root> --reference
@@ -201,9 +225,10 @@ expectedJournalRoot and minimumRevision. Keep these anchors outside the session
 directory in a trusted application or record. Checking a root read from the same
 possibly rolled-back history does not supply an independent anchor. Pins refer
 to the current complete prefix before an invocation or incomplete-tail repair.
-These four operations and backup/backup-verify also accept --reference for
+These four operations, history and backup/backup-verify also accept --reference for
 independent reference replay. backup-verify additionally accepts
 --expected-backup-root; it is rejected for other operations.
+Only history accepts --from-revision and --limit.
 Unknown, duplicate, malformed or operation-inappropriate flags fail before any
 native execution or storage mutation; --bootstrap belongs only to compile and
 --repair-incomplete-tail belongs only to recover.

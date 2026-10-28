@@ -242,6 +242,17 @@ control checks now pass. A new native C0/C1/C2 build is running before artifact
 promotion. Shared dependency diamonds and a 36-node DAG are included; broader UI
 schema parity remains unclaimed.
 
+## Increment 12: paginated durable receipt history
+
+The durable session exposes queued history pages with receipt-chain bounds,
+current head/state roots, a page checksum and optional head pins. Forecast records
+and idempotent retries retain their established semantics. Returned entries are
+detached copies and reads do not append or rewrite the journal. The public CLI
+supports strict history-only pagination flags. Six new checks pass, including
+native restart and a separate public CLI process; seventeen existing durable and
+backup checks also passed. TD-017 remains ACTIVE. See
+`session-history-2026-10-28.md`.
+
 ## Remaining development queue
 
 1. Finish reactive UI declaration native fixed point and final-artifact checks.

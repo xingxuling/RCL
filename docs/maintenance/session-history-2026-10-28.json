@@ -1,0 +1,29 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "src/durable-session.mjs": "8fd41bd13178cb19c3bcc1adb5314144cc589f6db2ed4b085c83a57f5b5374d0",
+    "src/session-cli.mjs": "a4893190e40f10077c0191802a9131d58bdb70c761158c25c9fc809dd015107b",
+    "src/index.mjs": "738ca70532200a778eb5b1a754833a446d0b0b62de0a52c62e7e8ae457785c1a",
+    "tests/durable-session-history.test.mjs": "3be5554d5c487ee3ac32cd4c7b95afb8521ef5152d9bf7d1bfce197cd6f7debb"
+  },
+  "checks": {
+    "history": {
+      "passed": 6,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/durable-session-history.test.mjs",
+      "log": "output/module-development-20261028/session-history-focused.log"
+    },
+    "existingDurableAndBackup": {
+      "passed": 17,
+      "failed": 0,
+      "log": "output/module-development-20261028/session-history.log"
+    },
+    "correctedCheck": "The initial history subprocess test targeted src/cli.mjs instead of the package public src/reality-hub-cli.mjs entry. Only the test entry was corrected."
+  },
+  "receiptPageFormat": "rcl.session-history-page.v1",
+  "nativeProcessReplayVerified": true,
+  "independentPublisherAuthentication": false,
+  "journalCompaction": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}
