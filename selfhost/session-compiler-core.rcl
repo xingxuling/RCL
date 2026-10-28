@@ -60,5 +60,5 @@
     choose(validate_session_facets(program_facets(program), 0), program, program)
 
   reckon encode_session_rbc(program : Sequence, root : Text, strings : Sequence, numbers : Sequence, instructions : Sequence) -> Sequence =
-    sequence_concat(encode_header_with_flags(find_text(strings, 0, program_name(program)), find_text(strings, 0, root), length(strings), length(numbers), length(instructions), 3, 4),
+    sequence_concat(encode_header_with_flags(find_text(strings, 0, program_name(program)), find_text(strings, 0, root), length(strings), length(numbers), length(instructions), choose(instructions_require_v13(instructions, 0), 3, choose(instructions_require_v12(instructions, 0), 2, 1)), 4),
       sequence_concat(encode_string_pool(strings, 0, empty_sequence()), sequence_concat(encode_number_pool(numbers, 0, empty_sequence()), encode_instructions(instructions, 0, empty_sequence()))))
