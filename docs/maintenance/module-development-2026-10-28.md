@@ -404,6 +404,15 @@ roots and target bytes remain unchanged. Offset/length placeholders and other
 diagnostic families keep TD-019 ACTIVE. See
 `native-ui-tree-locations-2026-10-28.json`.
 
+## Increment 26: exact LSP symbol lookup
+
+Hover, definition and reference queries now require owned index entries. Unknown
+`__proto__`, `constructor`, `toString` and `hasOwnProperty` keys previously looked
+like successful symbols through JavaScript inheritance. Four reproduced failures
+now reject, while all four explicitly declared names remain usable after JSON
+serialization. All 28 affected LSP/IDE checks pass. Query reports remain
+serializable. See `lsp-own-symbol-lookup-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the

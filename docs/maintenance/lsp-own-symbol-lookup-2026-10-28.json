@@ -1,0 +1,30 @@
+{
+  "status": "PASS_BOUNDED_LOCAL",
+  "sources": {
+    "src/lsp-dap-bridge-runtime.mjs": "ad8d813b10c6a898fc960c47310793349dc7cad08fa03c81c6d484cd5781158d",
+    "tests/lsp-own-symbol-lookup.test.mjs": "245c6133bf645c6519f2c11f54d5740556583de90412b701bfd969df28c327ac"
+  },
+  "checks": {
+    "before": {
+      "passed": 4,
+      "failed": 4,
+      "log": "output/module-development-20261028/lsp-own-symbol-before.log"
+    },
+    "newFinal": {
+      "passed": 8,
+      "failed": 0
+    },
+    "affectedRegression": {
+      "passed": 28,
+      "failed": 0,
+      "log": "output/module-development-20261028/lsp-own-symbol-final.log"
+    }
+  },
+  "rawBindings": {
+    "output/module-development-20261028/lsp-own-symbol-before.log": "81b4337466ac3e3f449d114ebf9b81441aa1247e8f68560472e66aafd186150c",
+    "output/module-development-20261028/lsp-own-symbol-final.log": "9fdfadf3cd6721efa752f0ebf0dc1b5930035a1d6c57151e4d8bcff263e2b550"
+  },
+  "boundary": "Static protocol bridge. Exact owned-key lookup; unknown inherited properties are not symbols. No live LSP server or authentication claim.",
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

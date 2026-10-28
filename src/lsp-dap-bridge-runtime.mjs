@@ -422,6 +422,10 @@ function normalizeLspIndex(indexOrPath) {
   return typeof indexOrPath === 'string' ? readJson(indexOrPath) : indexOrPath;
 }
 
+function ownIndexEntry(table, key) {
+  return typeof key === 'string' && table && Object.hasOwn(table, key) ? table[key] : null;
+}
+
 export function queryLspIndex(indexOrPath, query = {}) {
   const index = normalizeLspIndex(indexOrPath);
   const kind = query.kind ?? query.queryKind ?? 'hover';
@@ -430,17 +434,17 @@ export function queryLspIndex(indexOrPath, query = {}) {
   let ok = true;
   if (kind === 'hover') {
     const key = query.facet ?? symbol?.data?.facet ?? null;
-    result = key ? index.hoverIndex?.[key] ?? null : (query.semanticNodeId ? index.semanticNodeHoverIndex?.[query.semanticNodeId] ?? null : null);
+    result = key ? ownIndexEntry(index.hoverIndex, key) : ownIndexEntry(index.semanticNodeHoverIndex, query.semanticNodeId);
     ok = Boolean(result);
   } else if (kind === 'definition') {
     const key = query.facet ?? symbol?.data?.facet ?? null;
-    result = key ? index.definitionIndex?.[key] ?? null : (query.semanticNodeId ? index.semanticNodeDefinitions?.[query.semanticNodeId] ?? null : null);
+    result = key ? ownIndexEntry(index.definitionIndex, key) : ownIndexEntry(index.semanticNodeDefinitions, query.semanticNodeId);
     ok = Boolean(result);
   } else if (kind === 'references') {
     const key = query.facet ?? symbol?.data?.facet ?? null;
     const includeDeclaration = query.includeDeclaration ?? query.context?.includeDeclaration ?? false;
     result = (index.facetOccurrences ?? []).filter(item => item.facet === key && (includeDeclaration || item.kind !== 'declaration')).map(({ uri, range }) => ({ uri, range }));
-    ok = Boolean(key && index.definitionIndex?.[key]);
+    ok = Boolean(key && ownIndexEntry(index.definitionIndex, key));
   } else if (kind === 'documentSymbols' || kind === 'symbols') {
     result = index.documentSymbols ?? [];
   } else if (kind === 'workspaceSymbols') {
