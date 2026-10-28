@@ -1,0 +1,252 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 349965,
+    "sha256": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6",
+    "sourceSha256": "eb5044a2999b46f2351058a34a199a885503aa4f75e727b0242dcc75f889f8d5",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6",
+      "c1": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6",
+      "c2": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 349965,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 349965,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "sources": {
+    "selfhost/compiler-core.rcl": "fb6630220da90fdf72aa9153d1ab96ac92de651c6fa7e509728956a9e810430c",
+    "selfhost/compiler-main.rcl": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d",
+    "selfhost/compiler.rbc": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6"
+  },
+  "checks": {
+    "finalRegression": {
+      "passed": 156,
+      "failed": 0,
+      "log": "output/module-development-20261028/linear-encoder-final-regression.log"
+    },
+    "fullExampleCollection": {
+      "ok": true,
+      "artifactParity": true,
+      "compilerArtifactSha256": "0b14797d50c41d672dfd797dd7b81b8b145375cf2c5d452bd62758bddedb85d6",
+      "requestedSourceCount": 233,
+      "compilerTimeoutMs": 60000,
+      "budgetProfile": "original-60-second-target-budget",
+      "originalBudgetSatisfied": true,
+      "eligibleCount": 193,
+      "unsupportedCount": 40,
+      "failureCount": 0,
+      "nativeCompileAttempts": 120,
+      "avoidedDuplicateCompiles": 73,
+      "fullReport": "output/module-development-20261028/example-parity-linear-encoder.json",
+      "fullReportSha256": "29c5c3056bd27d4043f24b3434aa54d848bad742949bbc8975c1ad3e54ba0498"
+    }
+  },
+  "performance": {
+    "pilot": [
+      {
+        "profile": "baseline",
+        "byteMatch": true,
+        "elapsedMs": 1302.7659999999998,
+        "executedInstructions": 5199565,
+        "peakStackDepth": 70,
+        "peakCallFrames": 13
+      },
+      {
+        "profile": "linear-encoder",
+        "byteMatch": true,
+        "elapsedMs": 176.82220000000007,
+        "executedInstructions": 5787781,
+        "peakStackDepth": 70,
+        "peakCallFrames": 13
+      }
+    ],
+    "phaseProfile": [
+      {
+        "phase": "source",
+        "elapsedMs": 32.1404,
+        "executedInstructions": 8,
+        "incrementalInstructions": 8,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "tokens",
+        "elapsedMs": 49.90780000000001,
+        "executedInstructions": 848351,
+        "incrementalInstructions": 848343,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "program",
+        "elapsedMs": 79.24449999999996,
+        "executedInstructions": 1998948,
+        "incrementalInstructions": 1150597,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "canonical",
+        "elapsedMs": 86.07439999999997,
+        "executedInstructions": 2653925,
+        "incrementalInstructions": 654977,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "root",
+        "elapsedMs": 103.92759999999998,
+        "executedInstructions": 3308906,
+        "incrementalInstructions": 654981,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "strings",
+        "elapsedMs": 101.20389999999998,
+        "executedInstructions": 3405406,
+        "incrementalInstructions": 96500,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "numbers",
+        "elapsedMs": 114.42920000000004,
+        "executedInstructions": 3958900,
+        "incrementalInstructions": 553494,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "instructions",
+        "elapsedMs": 127.2994000000001,
+        "executedInstructions": 5023465,
+        "incrementalInstructions": 1064565,
+        "diagnosticOnly": true
+      },
+      {
+        "phase": "output",
+        "elapsedMs": 1528.6736999999998,
+        "executedInstructions": 5199565,
+        "incrementalInstructions": 176100,
+        "diagnosticOnly": false
+      }
+    ],
+    "largeTargets": {
+      "status": "COMPLETE",
+      "compilerArtifact": "linear-encoder-compiler.rbc",
+      "timeoutMs": 60000,
+      "results": [
+        {
+          "file": "examples/universal-stress/selfhost-android/independent-candidates/0/candidate.rcl",
+          "sourceSha256": "1a5a6e5488b05b17978ff01151fd6386703d4405b2d23cc6e21c0565275027ca",
+          "aliases": 12,
+          "byteMatch": true,
+          "elapsedMs": 2247.3034000000002,
+          "executedInstructions": 108272616,
+          "bytes": 297957,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        {
+          "file": "examples/universal-stress/selfhost-android/independent-candidates/1/candidate.rcl",
+          "sourceSha256": "df56c6ed8588e157b7cf1f85b412121075f605122c791ff677dfb900e232ecdd",
+          "aliases": 12,
+          "byteMatch": true,
+          "elapsedMs": 2112.8648000000003,
+          "executedInstructions": 108272548,
+          "bytes": 297957,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        {
+          "file": "examples/universal-stress/selfhost-android/independent-candidates/2/candidate.rcl",
+          "sourceSha256": "42e0c1d2b368775c5c53701864aae32449aaf33f174f550fa09e04074131f3c2",
+          "aliases": 12,
+          "byteMatch": true,
+          "elapsedMs": 2154.2156000000004,
+          "executedInstructions": 108272548,
+          "bytes": 297957,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        {
+          "file": "examples/universal-stress/selfhost-gpu/independent-candidates/0/candidate.rcl",
+          "sourceSha256": "ba797c1c73cd9b5cc8cdaebd9c0ccf64b1acdc562b4cbde1a1910d7cf8a9afe8",
+          "aliases": 1,
+          "byteMatch": true,
+          "elapsedMs": 2185.0907000000007,
+          "executedInstructions": 99342515,
+          "bytes": 324727,
+          "peakStackDepth": 611,
+          "peakCallFrames": 170
+        },
+        {
+          "file": "examples/universal-stress/selfhost-gpu/independent-candidates/1/candidate.rcl",
+          "sourceSha256": "826295184dd4deece1bae0aaaa0003cf03573996b2720d9c3bb03936d46aecd9",
+          "aliases": 1,
+          "byteMatch": true,
+          "elapsedMs": 2120.0362999999998,
+          "executedInstructions": 99342447,
+          "bytes": 324727,
+          "peakStackDepth": 611,
+          "peakCallFrames": 170
+        },
+        {
+          "file": "examples/universal-stress/selfhost-gpu/independent-candidates/2/candidate.rcl",
+          "sourceSha256": "9125cc654125b90494489e7046f5a869b1ef473d0f514d4697f3ce3c04c1e7f8",
+          "aliases": 1,
+          "byteMatch": true,
+          "elapsedMs": 2197.3585999999996,
+          "executedInstructions": 99342447,
+          "bytes": 324727,
+          "peakStackDepth": 611,
+          "peakCallFrames": 170
+        },
+        {
+          "file": "examples/universal-stress/selfhost-native/general-compiler.rcl",
+          "sourceSha256": "07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452",
+          "aliases": 1,
+          "byteMatch": true,
+          "elapsedMs": 2142.401399999999,
+          "executedInstructions": 108243205,
+          "bytes": 297797,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        }
+      ]
+    },
+    "preOptimizationLargeDiagnostic": {
+      "compilerArtifactSha256": "3bc04ad5551c89af5234c05862d9ba844d7b72457e86d64f09c5ea86dfc45860",
+      "compilerTimeoutMs": 300000,
+      "budgetProfile": "explicit-override-not-original-target-budget",
+      "originalBudgetSatisfied": false,
+      "eligible": [
+        {
+          "file": "examples/universal-stress/selfhost-native/general-compiler.rcl",
+          "compiledSource": "examples/universal-stress/selfhost-native/general-compiler.rcl",
+          "sourceSha256": "07d7f219025ccaa848081b21e4c2d02125b64db64c35b4a58d3850a55f58e452",
+          "referenceBytecodeSha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+          "nativeBytecodeSha256": "b8474f5e2e831d39fdef0cca59c6db95aefef7e3f6b2c6e129895501e9e054ce",
+          "evidenceReused": false,
+          "elapsedMs": 113430.8497,
+          "bytes": 297797,
+          "withinOriginalTargetBudget": false
+        }
+      ]
+    },
+    "candidateArtifactMatchesFinal": true,
+    "boundary": "Local observed durations; phase probes return sentinel RBC and are not target acceptance evidence."
+  },
+  "nativeCBinariesChanged": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

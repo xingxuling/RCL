@@ -3156,11 +3156,11 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+      encode_string_pool(items, index + 1, append_all(encode_string_record(sequence_get(items, index)), output)))
 
   reckon encode_number_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_number_pool(items, index + 1, sequence_concat(output, bytes_f64le(sequence_get(items, index)))))
+      encode_number_pool(items, index + 1, append_all(bytes_f64le(sequence_get(items, index)), output)))
 
   reckon encode_instruction(node : Sequence) -> Sequence =
     sequence_concat(bytes_u8(sequence_get(node, 0)),
@@ -3171,7 +3171,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon encode_instructions(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_instructions(items, index + 1, sequence_concat(output, encode_instruction(sequence_get(items, index)))))
+      encode_instructions(items, index + 1, append_all(encode_instruction(sequence_get(items, index)), output)))
 
   reckon instruction_flags(node : Sequence) -> Number = choose(length(node) > 4, sequence_get(node, 4), 0)
 

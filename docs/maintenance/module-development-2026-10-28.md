@@ -309,13 +309,25 @@ debugger/IDE/profiler checks now pass. The public demo also passes. This is reco
 trace navigation, with no live VM reversal or DAP server claim. See
 `debug-replay-cursor-2026-10-28.md`.
 
+## Increment 18: linear compiler byte-stream accumulation
+
+Phase profiling isolated repeated whole-prefix copies in string/number/instruction
+encoding. Three calls now reuse the compiler's persistent append helper. Other
+small pilot changes were not adopted. The final native C0=C1=C2 artifact is
+349965 bytes; all 156 affected checks pass. All seven formerly timed-out complete
+compiler sources now match bootstrap bytes within roughly 2.11–2.25 seconds.
+The full 233-source collector retains the 60000-ms budget and reports 193 matches,
+40 unsupported and zero failures (120 native attempts, 73 reused alias results).
+Historical failures remain retained. See `selfhost-linear-encoder-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
    completed native UI tree fixed point and final-artifact checks.
-2. Investigate the seven unique large compiler timeout cases using their now
-   completed prior-compiler baselines; retain original-budget failures and avoid
-   repeated alias execution.
+2. Audit native rule-level host-call lowering against the two remaining explicit
+   host-call exclusions, retaining the reference rejection set and authority
+   boundaries. The seven large-source timeouts are resolved for the current
+   source-bound collector run; historical reports retain their original outcome.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
    (TD-017) using their current executable owners.
 4. Prefer concrete capabilities using existing owners over new parallel services.
