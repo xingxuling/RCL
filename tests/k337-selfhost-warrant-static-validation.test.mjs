@@ -42,7 +42,7 @@ test('K337 self-host compiler rejects missing required warrant before RBC emissi
 
     assert.equal(result.status, 1);
     assert.equal(fs.existsSync(result.outputPath), false);
-    assert.match(result.stderr, /RCL_SEMANTIC_ASSERT: authorize_candidate:maintainer:compiler\.inspect:source/u);
+    assert.match(result.stderr, /RCL_SEMANTIC_ASSERT: RCL_WARRANT_MISSING:authorize_candidate:maintainer:compiler\.inspect:source at [1-9][0-9]*:[1-9][0-9]*/u);
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -61,12 +61,14 @@ test('K337 self-host warrant semantics preserve exact and hierarchical scope gra
     assert.equal(sha256(validBytes), sha256(Buffer.from(compileRealityToBytecode(source))));
 
     const hierarchicalSource = source.replace(
-      'need compiler.inspect on source',
-      'need compiler.inspect on source.module',
+      'needs compiler.inspect on source',
+      'needs compiler.inspect on source.module',
     );
+    assert.notEqual(hierarchicalSource, source, 'the hierarchical control must change the target');
     const hierarchical = compileWith(compilerRbc, hierarchicalSource, directory, 'hierarchical');
     assert.equal(hierarchical.status, 0, hierarchical.stderr);
     assert.equal(fs.existsSync(hierarchical.outputPath), true);
+    assert.deepEqual(fs.readFileSync(hierarchical.outputPath), compileRealityToBytecode(hierarchicalSource));
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }

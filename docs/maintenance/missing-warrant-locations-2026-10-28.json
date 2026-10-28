@@ -1,0 +1,85 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "selfhost/compiler-core.rcl": "854b6502e11eb0fa0294f94d4a95571cd99c373dcbc5aaa0dff36902bdab257a",
+    "selfhost/compiler-main.rcl": "cc6666e8f81c4bf8a1701c4a956fdcd93c632506d6d9264ecd5500fa1ac4fe70",
+    "selfhost/session-compiler-main.rcl": "9e93ffc6c795fd6e43fb78b39dd2b2c7e5d7fc60ea91ea93851409c1ae98aaae",
+    "selfhost/compiler.rbc": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2",
+    "tests/selfhost-missing-warrant-locations.test.mjs": "d87270e5dbc225752d93504446c10103ee6ef8a3c385f74949a8296a7abf8d5e",
+    "tests/k337-selfhost-warrant-static-validation.test.mjs": "f7b225da6d36d7530dae5375104944f88d059e59bb94ac1da1499272dd63df1e"
+  },
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 363397,
+    "sha256": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2",
+    "sourceSha256": "69740cae028a0d36a9b359a512a977f8f1f7cb9211347809c0597c0d86f93a6f",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2",
+      "c1": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2",
+      "c2": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 363397,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 363397,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "checks": {
+    "initial": {
+      "genuineLocationFailures": 6,
+      "staleHistoricalMessageAssertions": 1,
+      "invalidExploratoryWildcardFixtures": 1,
+      "existingPasses": 1,
+      "log": "output/module-development-20261028/missing-warrant-locations-before.log"
+    },
+    "newFinalControls": {
+      "passed": 7,
+      "failed": 0
+    },
+    "affectedRegression": {
+      "passed": 111,
+      "failed": 0,
+      "log": "output/module-development-20261028/missing-warrant-locations-regression.log"
+    },
+    "fullExamples": {
+      "ok": true,
+      "format": "rcl.selfhost.example-parity.v1",
+      "artifactParity": true,
+      "compilerArtifact": "selfhost/compiler.rbc",
+      "compilerArtifactSha256": "e03b6c295360297da811dabf26b9fc39dacc53e714e2660ca4a1879a714747c2",
+      "requestedSourceCount": 233,
+      "scope": "all-checked-in-example-sources",
+      "compilerTimeoutMs": 60000,
+      "budgetProfile": "original-60-second-target-budget",
+      "originalBudgetSatisfied": true,
+      "nativeCompileAttempts": 122,
+      "avoidedDuplicateCompiles": 73,
+      "evidenceBoundary": "Identical source plus bootstrap byte hashes reuse one actual native compile result within this run. This does not establish independent repeated process execution, K400 admission or publisher authenticity.",
+      "eligibleCount": 195,
+      "unsupportedCount": 38,
+      "failureCount": 0
+    }
+  },
+  "knownGrammarGap": "Native parse_path accepted wildcard grant target rejected by reference grammar; no wildcard admission claim",
+  "rawBindings": {
+    "output/module-development-20261028/missing-warrant-locations-before.log": "69a4462b069c2a68b52b16bafb527992ebe50b6ecb86c243773c412f0be0b7e0",
+    "output/module-development-20261028/missing-warrant-locations-regression.log": "c1c52c748ade2d80c019d7e870d00807258b1147ac703926e8182981e99f6731",
+    "output/module-development-20261028/missing-warrant-fixedpoint.json": "e71dfdbb5dcdeb32a3ffac70eb626b36d2e82fbaa6a688afbe8b202e1671f66c",
+    "output/module-development-20261028/example-parity-warrant-locations.json": "99f7ba2fcfec31a17fa4db448b65b87b18ba8ea20f88572211780c1c67c3614a"
+  },
+  "nativeCBinariesChanged": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

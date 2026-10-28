@@ -74,6 +74,15 @@ does not establish complete native diagnostic parity.
 
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.
 
+### 2026-10-28 missing-warrant diagnostic progress
+
+The general and session RCL compiler entries now retain need capability spans.
+Six LF/CRLF/emergence/resonance/Unicode location cases pass for both entries, and
+111 affected checks pass. Exact/hierarchical target roots and bytes are unchanged;
+the rebuilt compiler reaches C0=C1=C2. TD-019 remains ACTIVE for UI/control and
+other uncovered diagnostics. See
+`docs/maintenance/missing-warrant-locations-2026-10-28.json`.
+
 ### 2026-10-28 reference equality discrepancy
 
 | ID | Status | Area | Debt | Closure evidence or next gate |

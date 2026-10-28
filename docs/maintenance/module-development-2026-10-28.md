@@ -369,6 +369,17 @@ TD-020 remains ACTIVE for explicitly reproduced AstNode equality and other value
 families. Native binaries and compiler artifacts remain unchanged. See
 `reference-sequence-equality-2026-10-28.json`.
 
+## Increment 23: missing-warrant capability coordinates
+
+General and session RCL compiler entries retain need spans and report the actual
+capability location for missing grants. Six real location failures now pass;
+111 affected checks pass. The stale K337 message assertion and its no-op hierarchy
+fixture were corrected with stronger output parity. C0=C1=C2 is 363397 bytes;
+195 example matches, 38 reference rejections and zero failures remain at 60000 ms.
+A wildcard source-grammar discrepancy found in an exploratory invalid fixture is
+recorded for follow-up, with no admitted wildcard claim. TD-019 remains ACTIVE for
+UI/control diagnostics. See `missing-warrant-locations-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
