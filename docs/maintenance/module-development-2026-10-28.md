@@ -154,6 +154,19 @@ See `package-cache-materialization-2026-10-28.md`. The complete native example
 parity collector is still running; no all-examples PASS is inferred from the
 bounded checks reported here.
 
+## Increment 7: release metadata and payload integrity
+
+The release verifier now reuses cache integrity checks and binds package lock,
+source TOML, cache, target matrix/platforms, target inventories, compatibility,
+SBOM and deterministic seed-envelope metadata to the declared release root.
+Malformed/missing evidence and symbolic file-tree entries reject with structured
+reports. Caller release pins and CLI nonzero failure status are supported; public
+seed checksums are explicitly not publisher authentication.
+
+Eleven new controls changed from FAIL to PASS, and all ten existing ecosystem
+checks pass, including release reproducibility and real CLI/demo assembly. See
+`release-integrity-2026-10-28.md`. Full native example collection remains live.
+
 ## Remaining development queue
 
 1. Collect the running complete example-parity result and classify any actual gaps.

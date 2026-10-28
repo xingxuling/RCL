@@ -57,6 +57,20 @@ import { runAgentCivilizationFederationDemo, writeAgentCivilizationFederationRep
 import { runSoulUniverseDialogueSandboxDemo, writeSoulUniverseDialogueReports, buildSoulUniverseDialogueSpec, renderSoulUniverseDialogueRcl, readSoulUniverseDialogueInput } from './soul-universe-dialogue-sandbox.mjs';
 
 const [command, file, output, third, fourth, fifth] = process.argv.slice(2);
+if (command === 'package-release-verify') {
+  try {
+    const tokens = process.argv.slice(3), options = {};
+    if (![1, 3].includes(tokens.length) || !tokens[0] || tokens[0].startsWith('--')) throw new Error('RCL_RELEASE_CLI_ARGUMENT_INVALID');
+    if (tokens.length === 3) {
+      if (tokens[1] !== '--expected-release-root' || !/^[0-9a-f]{64}$/u.test(tokens[2])) throw new Error('RCL_RELEASE_CLI_ARGUMENT_INVALID');
+      options.expectedReleaseRoot = tokens[2];
+    }
+    const report = verifyReleaseBundle(tokens[0], options);
+    console.log(JSON.stringify(report, null, 2)); process.exit(report.ok ? 0 : 1);
+  } catch (error) {
+    console.log(JSON.stringify({ ok: false, diagnostics: [{ code: error.message }] }, null, 2)); process.exit(1);
+  }
+}
 if (command === 'package-cache-verify' || command === 'package-cache-materialize') {
   try {
     const tokens = process.argv.slice(3), count = command === 'package-cache-verify' ? 1 : 2;
@@ -167,7 +181,7 @@ if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2',
        rcl package-cache-materialize <cache-dir> <new-directory> [--expected-cache-root <sha256>]
        rcl package-target-matrix <package-dir> [output-dir]
        rcl package-release <package-dir> [output-dir]
-       rcl package-release-verify <release-dir>
+       rcl package-release-verify <release-dir> [--expected-release-root <sha256>]
        rcl reality-compiler-demo
        rcl reality-compiler-sandbox [output-dir]
        rcl reality-compiler-spec [output-dir]

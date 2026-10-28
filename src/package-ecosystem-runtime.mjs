@@ -642,7 +642,7 @@ export function buildCompatibilityReportFromManifest(manifest, dependencies = nu
 }
 
 function buildSbom(releaseDir, lock, matrix) {
-  const files = fileInventory(releaseDir, { exclude: ['release-manifest.json', 'release-signature.json'] }).filter(item => !isVolatileGeneratedPath(item.path));
+  const files = fileInventory(releaseDir, { exclude: ['release-manifest.json', 'release-signature.json', 'sbom.json'] }).filter(item => !isVolatileGeneratedPath(item.path));
   const components = [
     { type: 'rcl-package', name: lock.package.name, version: lock.package.version, root: lock.lockRoot },
     ...lock.dependencies.map(dep => ({ type: dep.source === 'remote' ? 'remote-dependency' : 'local-dependency', name: dep.name, version: dep.resolvedVersion ?? dep.requested, source: dep.source, integrity: dep.integrity ?? dep.sha256 ?? null })),
@@ -702,34 +702,76 @@ export async function buildReleaseBundle(projectDir, outputDir = null, options =
   return Object.freeze({ ok: releaseManifest.ok, outputDir: out, releaseManifest, signature, root: releaseManifest.releaseRoot });
 }
 
-export function verifyReleaseBundle(releaseDir) {
+export function verifyReleaseBundle(releaseDir, options = {}) {
   const root = path.resolve(releaseDir);
-  const manifestPath = path.join(root, 'release-manifest.json');
-  const signaturePath = path.join(root, 'release-signature.json');
   const diagnostics = [];
-  if (!fs.existsSync(manifestPath)) diagnostics.push({ code: 'RCL_RELEASE_MANIFEST_MISSING', path: 'release-manifest.json' });
-  if (!fs.existsSync(signaturePath)) diagnostics.push({ code: 'RCL_RELEASE_SIGNATURE_MISSING', path: 'release-signature.json' });
-  if (diagnostics.length) {
-    const report = { format: 'rcl.release-verification.v0.42', ok: false, releaseDir: root, diagnostics };
-    return Object.freeze({ ...report, root: realityRoot(report) });
+  let manifest = null, signature = null;
+  const require = (condition, code) => { if (!condition) throw new Error(code); };
+  const rootedMetadata = (value, key, code, omit = []) => {
+    require(value && typeof value === 'object' && !Array.isArray(value), code);
+    const base = { ...value }; delete base[key]; for (const name of omit) delete base[name];
+    require(typeof value[key] === 'string' && /^[0-9a-f]{64}$/u.test(value[key]) && realityRoot(base) === value[key], code);
+  };
+  const metadata = name => {
+    const file = path.join(root, name);
+    require(fs.existsSync(file) && fs.statSync(file).isFile() && !fs.lstatSync(file).isSymbolicLink(), 'RCL_RELEASE_METADATA_MISSING_OR_INVALID');
+    return readJson(file);
+  };
+  try {
+    const inspect = directory => {
+      require(!fs.lstatSync(directory).isSymbolicLink() && fs.statSync(directory).isDirectory(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+        const file = path.join(directory, entry.name);
+        require(!entry.isSymbolicLink(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+        if (entry.isDirectory()) inspect(file);
+        else require(entry.isFile(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+      }
+    };
+    inspect(root);
+    manifest = metadata('release-manifest.json'); signature = metadata('release-signature.json');
+    require(manifest.format === RCL_RELEASE_BUNDLE_FORMAT && manifest.version === RCL_PACKAGE_ECOSYSTEM_VERSION && manifest.ok === true, 'RCL_RELEASE_MANIFEST_INVALID');
+    rootedMetadata(manifest, 'releaseRoot', 'RCL_RELEASE_ROOT_MISMATCH');
+    require(options.expectedReleaseRoot === undefined || options.expectedReleaseRoot === manifest.releaseRoot, 'RCL_RELEASE_EXPECTED_ROOT_MISMATCH');
+    require(typeof signature.keyId === 'string' && signature.keyId.startsWith('rcl-'), 'RCL_RELEASE_SIGNATURE_MISMATCH');
+    const expectedSignature = signRelease(manifest, signature.keyId.slice(4));
+    require(canonicalReality(signature) === canonicalReality(expectedSignature), 'RCL_RELEASE_SIGNATURE_MISMATCH');
+
+    const lock = metadata('rcl.lock.json');
+    require(lock.format === RCL_PACKAGE_ECOSYSTEM_LOCK_FORMAT && lock.ok === true, 'RCL_RELEASE_LOCK_INVALID');
+    rootedMetadata(lock, 'lockRoot', 'RCL_RELEASE_LOCK_ROOT_MISMATCH', ['ok']);
+    require(lock.lockRoot === manifest.lockRoot && realityRoot(lock.package) === realityRoot(manifest.package), 'RCL_RELEASE_LOCK_BINDING_MISMATCH');
+    const toml = parseRclToml(fs.readFileSync(path.join(root, 'rcl.toml'), 'utf8'));
+    require(realityRoot(toml) === lock.roots.manifestRoot, 'RCL_RELEASE_MANIFEST_LOCK_MISMATCH');
+    const cache = verifyContentAddressedCache(path.join(root, '.rcl-cache'), { expectedCacheRoot: manifest.cacheRoot, expectedLockRoot: manifest.lockRoot });
+    require(cache.ok, 'RCL_RELEASE_CACHE_VERIFY_FAILED');
+
+    const matrix = metadata('targets/target-matrix.json');
+    require(matrix.format === RCL_TARGET_MATRIX_FORMAT && matrix.ok === true, 'RCL_RELEASE_TARGET_MATRIX_INVALID');
+    rootedMetadata(matrix, 'targetMatrixRoot', 'RCL_RELEASE_TARGET_MATRIX_ROOT_MISMATCH');
+    require(matrix.targetMatrixRoot === manifest.targetMatrixRoot && matrix.lockRoot === manifest.lockRoot && realityRoot(matrix.package) === realityRoot(manifest.package), 'RCL_RELEASE_TARGET_MATRIX_BINDING_MISMATCH');
+    require(Array.isArray(manifest.platforms) && manifest.platforms.length === SUPPORTED_PLATFORMS.length && new Set(manifest.platforms.map(item => item.platform)).size === SUPPORTED_PLATFORMS.length, 'RCL_RELEASE_PLATFORM_INVALID');
+    for (const platform of manifest.platforms) require(SUPPORTED_PLATFORMS.includes(platform.platform) && listRclPackageTargets().includes(platform.target) && platform.status === 'verified', 'RCL_RELEASE_PLATFORM_INVALID');
+    const projection = matrix.platforms.map(({ platform, target, status, packageRoot }) => ({ platform, target, status, packageRoot }));
+    require(realityRoot(projection) === realityRoot(manifest.platforms), 'RCL_RELEASE_PLATFORM_BINDING_MISMATCH');
+    for (const platform of manifest.platforms) {
+      const targetDir = path.join(root, 'targets', platform.target);
+      require(verifyRclPackage(targetDir).status === 'verified', 'RCL_RELEASE_TARGET_VERIFY_FAILED');
+      require(targetDirectoryRoot(targetDir).fileSetRoot === platform.packageRoot, 'RCL_RELEASE_TARGET_ROOT_MISMATCH');
+    }
+    const compatibility = metadata('compatibility-report.json');
+    rootedMetadata(compatibility, 'root', 'RCL_RELEASE_COMPATIBILITY_ROOT_MISMATCH');
+    require(compatibility.root === manifest.compatibilityRoot && compatibility.ok === true
+      && buildCompatibilityReportFromManifest(toml, lock.dependencies).root === compatibility.root, 'RCL_RELEASE_COMPATIBILITY_BINDING_MISMATCH');
+    const sbom = metadata('sbom.json');
+    rootedMetadata(sbom, 'sbomRoot', 'RCL_RELEASE_SBOM_ROOT_MISMATCH');
+    require(sbom.sbomRoot === manifest.sbomRoot && buildSbom(root, lock, matrix).sbomRoot === sbom.sbomRoot, 'RCL_RELEASE_SBOM_BINDING_MISMATCH');
+  } catch (error) {
+    diagnostics.push({ code: error.message?.startsWith('RCL_RELEASE_') ? error.message : 'RCL_RELEASE_METADATA_INVALID' });
   }
-  const manifest = readJson(manifestPath);
-  const signature = readJson(signaturePath);
-  const rebuiltBase = { ...manifest };
-  delete rebuiltBase.releaseRoot;
-  const actualReleaseRoot = realityRoot(rebuiltBase);
-  if (actualReleaseRoot !== manifest.releaseRoot) diagnostics.push({ code: 'RCL_RELEASE_ROOT_MISMATCH', expected: manifest.releaseRoot, actual: actualReleaseRoot });
-  const expectedSignature = signRelease(manifest, signature.keyId?.replace(/^rcl-/, '') ?? 'deterministic-dev-seed');
-  if (signature.signature !== expectedSignature.signature) diagnostics.push({ code: 'RCL_RELEASE_SIGNATURE_MISMATCH' });
-  if (!fs.existsSync(path.join(root, 'rcl.lock.json'))) diagnostics.push({ code: 'RCL_RELEASE_LOCK_MISSING' });
-  if (!fs.existsSync(path.join(root, '.rcl-cache', 'cache-index.json'))) diagnostics.push({ code: 'RCL_RELEASE_CACHE_INDEX_MISSING' });
-  if (!fs.existsSync(path.join(root, 'targets', 'target-matrix.json'))) diagnostics.push({ code: 'RCL_RELEASE_TARGET_MATRIX_MISSING' });
-  for (const platform of manifest.platforms ?? []) {
-    const targetDir = path.join(root, 'targets', platform.target);
-    if (!fs.existsSync(targetDir)) diagnostics.push({ code: 'RCL_RELEASE_TARGET_MISSING', platform: platform.platform, target: platform.target });
-    else if (verifyRclPackage(targetDir).status !== 'verified') diagnostics.push({ code: 'RCL_RELEASE_TARGET_VERIFY_FAILED', platform: platform.platform, target: platform.target });
-  }
-  const report = { format: 'rcl.release-verification.v0.42', ok: diagnostics.length === 0, releaseDir: root, releaseRoot: manifest.releaseRoot, signatureRoot: signature.signatureRoot, diagnostics };
+  const report = { format: 'rcl.release-verification.v0.42', ok: diagnostics.length === 0, releaseDir: root,
+    releaseRoot: manifest?.releaseRoot ?? null, signatureRoot: signature?.signatureRoot ?? null,
+    externalReleaseAnchorChecked: options.expectedReleaseRoot !== undefined,
+    publisherAuthenticationVerified: false, diagnostics };
   return Object.freeze({ ...report, root: realityRoot(report) });
 }
 
