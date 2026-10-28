@@ -124,6 +124,21 @@ in the scoped 20-check run before the additional separate-process smoke was adde
 Local TaoX routing again selects DEEP_DEVELOPMENT (score 0.8325 via bottleneck gate).
 TD-017 remains ACTIVE: backups retain full history and do not implement compaction.
 
+## Increment 5: source-backed editor navigation
+
+The existing LSP bridge now indexes source-declared facet references, resolves
+definition/hover from an expression or write usage, and returns references with
+optional declaration inclusion. Names/types use actual parser token ranges rather
+than guessed keyword offsets. The parser's tooling coordinates are stored outside
+the canonical AST; parameters, match bindings, strings/comments and UI-local state
+do not become facet references. The profile remains a same-document static bridge.
+
+Thirty scoped editor/parser/selfhost checks pass. All 233 example sources were
+compared with the committed prior parser: 212 accepted ASTs and 21 rejected-source
+diagnostics were identical. See `lsp-facet-references-2026-10-28.md` and
+`lsp-parser-sidecar-2026-10-28.json`. The full native example-parity job remains
+live independently; its repeated full-compiler target samples are still executing.
+
 ## Remaining development queue
 
 1. Collect the running complete example-parity result and classify any actual gaps.

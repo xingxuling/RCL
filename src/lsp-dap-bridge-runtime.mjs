@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { buildFacetOccurrences } from './lsp-facet-occurrences.mjs';
 import {
   DEFAULT_DEBUG_REPLAY_SOURCE,
   DEFAULT_DEBUG_REPLAY_TYPE_MODULES,
@@ -106,9 +107,10 @@ function protocolLocation(uri, source, length = 1) {
 
 function containsPosition(range, position) {
   if (!range || !position) return false;
+  if (!Number.isInteger(position.line) || !Number.isInteger(position.character) || position.line < 0 || position.character < 0) return false;
   if (position.line < range.start.line || position.line > range.end.line) return false;
   if (position.line === range.start.line && position.character < range.start.character) return false;
-  if (position.line === range.end.line && position.character > range.end.character) return false;
+  if (position.line === range.end.line && position.character >= range.end.character) return false;
   return true;
 }
 
@@ -236,14 +238,26 @@ function keywordCompletionItems() {
 function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourcePath = null, sourceFile = null } = {}) {
   const uri = sourceUri(sourcePath, sourceFile ?? sourceMapRuntime.sourceFile);
   const facets = Object.values(sourceMapRuntime.facets ?? {}).sort((a, b) => a.path.localeCompare(b.path));
-  const documentSymbols = facets.map(facet => buildSymbolFromFacet(uri, facet));
+  const sourceOccurrences = sourceText ? buildFacetOccurrences(sourceText, facets, uri) : { declarations: {}, occurrences: [] };
+  const documentSymbols = facets.map(facet => {
+    const symbol = buildSymbolFromFacet(uri, facet), range = sourceOccurrences.declarations[facet.path]?.range;
+    return range ? { ...symbol, range, selectionRange: range } : symbol;
+  });
   const hoverIndex = Object.fromEntries(facets.map(facet => [facet.path, buildHoverForFacet({ sourceMapRoot: sourceMapRuntime.unifiedMapRoot }, facet)]));
   const semanticNodeHoverIndex = Object.fromEntries(facets.map(facet => [facet.semanticNodeId, hoverIndex[facet.path]]));
-  const definitionIndex = Object.fromEntries(facets.map(facet => [facet.path, protocolLocation(uri, facet.source, facet.path.length)]));
+  for (const symbol of documentSymbols) hoverIndex[symbol.name].range = symbol.range;
+  const definitionIndex = Object.fromEntries(documentSymbols.map(symbol => [symbol.name, { uri, range: symbol.selectionRange }]));
   const semanticNodeDefinitions = Object.fromEntries(facets.map(facet => [facet.semanticNodeId, definitionIndex[facet.path]]));
 
   const tokens = [];
   for (const facet of facets) {
+    const declaration = sourceOccurrences.declarations[facet.path];
+    if (declaration) {
+      for (const [range, type] of [[declaration.range, 'property'], [declaration.typeRange, 'type']]) {
+        if (range && range.start.line === range.end.line) tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character, type, 0, facet.semanticNodeId));
+      }
+      continue;
+    }
     const position = lspPosition(facet.source);
     tokens.push(semanticToken(position.line, position.character, facet.path.length, 'property', 0, facet.semanticNodeId));
     if (facet.canonicalType) {
@@ -296,6 +310,7 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
       textDocumentSync: 1,
       hoverProvider: true,
       definitionProvider: true,
+      referencesProvider: true,
       documentSymbolProvider: true,
       workspaceSymbolProvider: true,
       semanticTokensProvider: true,
@@ -313,8 +328,9 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
     semanticNodeHoverIndex,
     definitionIndex,
     semanticNodeDefinitions,
+    facetOccurrences: sourceOccurrences.occurrences,
     diagnostics: [],
-    boundary: 'LSP Index v0.41 is a static source-map-backed protocol bridge. It emits LSP-shaped symbols, hovers, definitions, semantic tokens, completions and diagnostics JSON, but it is not yet a live socket/stdio LSP server.',
+    boundary: 'Static source-backed protocol bridge with same-document facet definitions, expression/write references, symbols, hovers, semantic tokens, completions and diagnostics. Function parameters, match bindings and UI-local state are excluded from facet references; authority scopes are not indexed as value references. This is not a live socket/stdio LSP server.',
   };
   index.indexRoot = sha256(index);
   return index;
@@ -355,6 +371,7 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
         textDocumentSync: 1,
         hoverProvider: false,
         definitionProvider: false,
+        referencesProvider: false,
         documentSymbolProvider: false,
         workspaceSymbolProvider: false,
         semanticTokensProvider: false,
@@ -372,6 +389,7 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
       semanticNodeHoverIndex: {},
       definitionIndex: {},
       semanticNodeDefinitions: {},
+      facetOccurrences: [],
       diagnostics: (runtimeResult.diagnostics ?? []).map((diag, index) => diagnosticToLsp(diag, index, uri)),
       boundary: 'LSP Index v0.41 diagnostic-only mode is emitted when compilation/source-map construction fails.',
     };
@@ -384,7 +402,10 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
 function findSymbol(index, query = {}) {
   if (query.facet && index.documentSymbols) return index.documentSymbols.find(symbol => symbol.data?.facet === query.facet) ?? null;
   if (query.semanticNodeId && index.documentSymbols) return index.documentSymbols.find(symbol => symbol.data?.semanticNodeId === query.semanticNodeId) ?? null;
-  if (query.position) return index.documentSymbols.find(symbol => containsPosition(symbol.range, query.position)) ?? null;
+  if (query.position) {
+    const occurrence = index.facetOccurrences?.find(item => containsPosition(item.range, query.position));
+    return index.documentSymbols.find(symbol => occurrence ? symbol.data?.facet === occurrence.facet : containsPosition(symbol.range, query.position)) ?? null;
+  }
   return null;
 }
 
@@ -406,6 +427,11 @@ export function queryLspIndex(indexOrPath, query = {}) {
     const key = query.facet ?? symbol?.data?.facet ?? null;
     result = key ? index.definitionIndex?.[key] ?? null : (query.semanticNodeId ? index.semanticNodeDefinitions?.[query.semanticNodeId] ?? null : null);
     ok = Boolean(result);
+  } else if (kind === 'references') {
+    const key = query.facet ?? symbol?.data?.facet ?? null;
+    const includeDeclaration = query.includeDeclaration ?? query.context?.includeDeclaration ?? false;
+    result = (index.facetOccurrences ?? []).filter(item => item.facet === key && (includeDeclaration || item.kind !== 'declaration')).map(({ uri, range }) => ({ uri, range }));
+    ok = Boolean(key && index.definitionIndex?.[key]);
   } else if (kind === 'documentSymbols' || kind === 'symbols') {
     result = index.documentSymbols ?? [];
   } else if (kind === 'workspaceSymbols') {
