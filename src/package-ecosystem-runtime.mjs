@@ -615,6 +615,7 @@ export async function buildTargetMatrix(projectDir, outputDir = null) {
     package: lockResult.lock.package,
     lockRoot: lockResult.lock.lockRoot,
     platforms,
+    targetManifestRoots: Object.fromEntries(packageReport.packages.map(item => [item.target, item.semanticRoot])),
     allTargets: listRclPackageTargets(),
     legacyPackageCompiler: { format: packageReport.format, packageCount: packageReport.packageCount, verifiedPackageCount: packageReport.verifiedPackageCount },
   };
@@ -705,7 +706,7 @@ export async function buildReleaseBundle(projectDir, outputDir = null, options =
 export function verifyReleaseBundle(releaseDir, options = {}) {
   const root = path.resolve(releaseDir);
   const diagnostics = [];
-  let manifest = null, signature = null;
+  let manifest = null, signature = null, targetManifestBindingVerified = false;
   const require = (condition, code) => { if (!condition) throw new Error(code); };
   const rootedMetadata = (value, key, code, omit = []) => {
     require(value && typeof value === 'object' && !Array.isArray(value), code);
@@ -758,6 +759,15 @@ export function verifyReleaseBundle(releaseDir, options = {}) {
       require(verifyRclPackage(targetDir).status === 'verified', 'RCL_RELEASE_TARGET_VERIFY_FAILED');
       require(targetDirectoryRoot(targetDir).fileSetRoot === platform.packageRoot, 'RCL_RELEASE_TARGET_ROOT_MISMATCH');
     }
+    if (matrix.targetManifestRoots !== undefined) {
+      const targets = listRclPackageTargets();
+      require(matrix.targetManifestRoots && Object.keys(matrix.targetManifestRoots).length === targets.length && targets.every(target => Object.hasOwn(matrix.targetManifestRoots, target)), 'RCL_RELEASE_TARGET_MANIFEST_INDEX_INVALID');
+      for (const target of targets) {
+        const verified = verifyRclPackage(path.join(root, 'targets', target));
+        require(typeof matrix.targetManifestRoots[target] === 'string' && /^[0-9a-f]{64}$/u.test(matrix.targetManifestRoots[target]) && verified.status === 'verified' && verified.semanticManifestRoot === matrix.targetManifestRoots[target], 'RCL_RELEASE_TARGET_MANIFEST_MISMATCH');
+      }
+      targetManifestBindingVerified = true;
+    }
     const compatibility = metadata('compatibility-report.json');
     rootedMetadata(compatibility, 'root', 'RCL_RELEASE_COMPATIBILITY_ROOT_MISMATCH');
     require(compatibility.root === manifest.compatibilityRoot && compatibility.ok === true
@@ -771,7 +781,7 @@ export function verifyReleaseBundle(releaseDir, options = {}) {
   const report = { format: 'rcl.release-verification.v0.42', ok: diagnostics.length === 0, releaseDir: root,
     releaseRoot: manifest?.releaseRoot ?? null, signatureRoot: signature?.signatureRoot ?? null,
     externalReleaseAnchorChecked: options.expectedReleaseRoot !== undefined,
-    publisherAuthenticationVerified: false, diagnostics };
+    publisherAuthenticationVerified: false, targetManifestBindingVerified, diagnostics };
   return Object.freeze({ ...report, root: realityRoot(report) });
 }
 

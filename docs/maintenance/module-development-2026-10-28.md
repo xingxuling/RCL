@@ -167,11 +167,40 @@ Eleven new controls changed from FAIL to PASS, and all ten existing ecosystem
 checks pass, including release reproducibility and real CLI/demo assembly. See
 `release-integrity-2026-10-28.md`. Full native example collection remains live.
 
+## Increment 8: complete target manifest and payload verification
+
+New packages bind their README and complete payload inventory, validate their own
+manifest root, and independently recompile source to check bytecode identity.
+Generated aggregate/Android diagnostic files are explicitly unbound. Legacy v0.24
+packages retain a reported unbound README profile rather than a false new-profile
+claim. CLI verification now enforces caller manifest pins and nonzero rejection.
+
+Release matrices bind the semantic manifest metadata of all eight target packages,
+including the four not selected in platform rows. Informational machine paths and
+the established Android diagnostic are excluded from semantic identity, preserving
+cross-directory release reproducibility. Eight new checks and thirty package,
+RCLApp, release and CLI consumer checks pass. See
+`package-manifest-integrity-2026-10-28.md`.
+
+## Full native example collector result
+
+The original, unchanged-budget collector has finished: artifact parity true,
+151 exact matches, 40 unsupported and 42 failures across all 233 source files.
+The failures comprise two typed-UI event parameter rejections and 40 timeouts
+representing seven unique full-compiler sources. Twelve environment aliases repeat
+each of three candidate-source hashes; the other four sources occur once each.
+These are actual failures under the collector's 60-second target limit, not PASS
+or new K400 evidence. Source-hash grouping is retained in
+`output/module-development-20261028/example-failure-groups.json`; the full original
+result is `output/selfhost/example-parity.json`.
+
 ## Remaining development queue
 
-1. Collect the running complete example-parity result and classify any actual gaps.
-2. Continue compiler diagnostic coverage and governed-session journal lifecycle
+1. Fix the two confirmed typed-UI native compiler gaps and revalidate their exact bytes.
+2. Probe the seven unique large compiler timeout cases against the prior compiler;
+   retain original-budget failures and deduplicate future repeated source work.
+3. Continue compiler diagnostic coverage and governed-session journal lifecycle
    (TD-017) using their current executable owners.
-3. Prefer concrete capabilities using existing owners over new parallel services.
-4. Checkpoint each completed increment locally with only necessary checks.
-5. Continue until the six-hour interval finishes or the user redirects/stops it.
+4. Prefer concrete capabilities using existing owners over new parallel services.
+5. Checkpoint each completed increment locally with only necessary checks.
+6. Continue until the six-hour interval finishes or the user redirects/stops it.
