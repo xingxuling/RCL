@@ -148,11 +148,44 @@ function sameQuantity(left, right, operator) {
   }
 }
 
+// Sequence builtins copy their values, so equality cannot depend on array or
+// Span/Token object identity. Other domain objects retain their existing policy.
+function equalRuntimeValues(left, right) {
+  const pending = [[left, right]], compared = new WeakMap();
+  while (pending.length) {
+    const [a, b] = pending.pop();
+    if (a === b) continue;
+    if (isQuantity(a) || isQuantity(b)) {
+      if (!isQuantity(a) || !isQuantity(b) || a.type !== b.type || a.value !== b.value) return false;
+      continue;
+    }
+    if (Array.isArray(a) || Array.isArray(b)) {
+      if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+      let peers = compared.get(a);
+      if (peers?.has(b)) continue;
+      if (!peers) { peers = new WeakSet(); compared.set(a, peers); }
+      peers.add(b);
+      for (let index = 0; index < a.length; index++) pending.push([a[index], b[index]]);
+      continue;
+    }
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
+    if (a.kind === 'Span' && b.kind === 'Span') {
+      if (a.offset !== b.offset || a.line !== b.line || a.column !== b.column || a.length !== b.length) return false;
+      continue;
+    }
+    if (a.kind === 'Token' && b.kind === 'Token') {
+      if (a.tokenType !== b.tokenType || a.text !== b.text) return false;
+      pending.push([a.span, b.span]);
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+
 export function applyBinary(operator, left, right) {
   if (operator === '==' || operator === '!=') {
-    const equal = isQuantity(left) && isQuantity(right)
-      ? left.type === right.type && left.value === right.value
-      : left === right;
+    const equal = equalRuntimeValues(left, right);
     return operator === '==' ? equal : !equal;
   }
   if (['<', '<=', '>', '>='].includes(operator)) {

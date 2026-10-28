@@ -33,11 +33,10 @@ test('mixed structural branches and nested sequences preserve left-to-right orde
     facet d : Sequence = sequence_concat(c, sequence_concat(a, b))
     facet equal : Truth = sequence_concat(a, a) == sequence_concat(a, a)
   }`;
-  // Preserve the native value-equality contract. The pre-existing reference
-  // identity-comparison discrepancy is recorded separately from storage parity.
+  // The follow-up reference equality fix now admits this original discrepancy
+  // as part of full storage/state parity, including the equality result.
   assert.equal(run(source).state.equal, true);
-  const ordered = source.replace('facet equal : Truth = sequence_concat(a, a) == sequence_concat(a, a)', '');
-  const result = await verifyNativeParity(ordered, { nativeRuntime: { ...nativeOptions, stateRootAlgorithm: 'rcl.semantic-state-root.v2' } });
+  const result = await verifyNativeParity(source, { nativeRuntime: { ...nativeOptions, stateRootAlgorithm: 'rcl.semantic-state-root.v2' } });
   assert.equal(result.ok, true, JSON.stringify(result.parity));
   assert.deepEqual(result.native.state.d, [1, 2, 3, 1, 2, [1, 2, 3], 1, 2, 1, 2, 3]);
 });

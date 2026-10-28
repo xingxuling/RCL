@@ -357,6 +357,18 @@ exact preserved donor; its twenty old fixed-point generations pass. A reference
 Sequence equality discrepancy is explicitly recorded as TD-020. See
 `native-persistent-concat-2026-10-28.json` for source bindings and bounded evidence.
 
+## Increment 22: reference Sequence equality profile
+
+The existing reference equality owner now compares nested Sequence scalar,
+quantity, Span and Token values structurally using an iterative worklist. The
+original concat equality discrepancy now passes complete state/root parity.
+Guarded transitions and a native durable session with reference verification,
+reopen/replay and retry pass. Nine missing controls were reproduced; fourteen new
+controls and all 144 affected checks pass. Unknown objects retain identity, and
+TD-020 remains ACTIVE for explicitly reproduced AstNode equality and other value
+families. Native binaries and compiler artifacts remain unchanged. See
+`reference-sequence-equality-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
