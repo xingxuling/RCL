@@ -52,9 +52,10 @@
 
   reckon validate_session_facets(items : Sequence, index : Number) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check((facet_type(sequence_get(items, index)) == "Number" or facet_type(sequence_get(items, index)) == "Truth" or facet_type(sequence_get(items, index)) == "Text"
+      choose(semantic_check_at((facet_type(sequence_get(items, index)) == "Number" or facet_type(sequence_get(items, index)) == "Truth" or facet_type(sequence_get(items, index)) == "Text"
           or (facet_type(sequence_get(items, index)) == "Sequence" and not facet_input(sequence_get(items, index)))),
-          "RCL_SESSION_FACET_TYPE_UNSUPPORTED", facet_path(sequence_get(items, index))), validate_session_facets(items, index + 1), false))
+          "RCL_SESSION_FACET_TYPE_UNSUPPORTED", facet_path(sequence_get(items, index)),
+          make_span(0, facet_line(sequence_get(items, index)), facet_column(sequence_get(items, index)), 0)), validate_session_facets(items, index + 1), false))
 
   reckon validated_session_program(program : Sequence) -> Sequence =
     choose(validate_session_facets(program_facets(program), 0), program, program)

@@ -59,7 +59,17 @@ point and passes 72 targeted compiler/location/warrant checks. See
 `docs/maintenance/native-semantic-locations-2026-10-28.json`.
 
 UI declaration/navigation diagnostics, missing rule-warrant declarations and
-unsupported session-facet errors still use synthetic locations. This maintenance
+unsupported session-facet errors used synthetic locations at that checkpoint. This maintenance
 does not mark all semantic diagnostics complete or promote whole-language maturity.
+
+### 2026-10-28 session facet diagnostic progress
+
+The direct RCL-authored session compiler now reports retained facet declaration
+positions for unsupported session types. Six new location/rejection cases and
+three existing session compiler cases pass. The public session compilation API
+continues to perform reference preflight first. See
+`docs/maintenance/session-compiler-locations-2026-10-28.json`. TD-019 remains ACTIVE
+for UI tree/navigation and missing-warrant diagnostic locations; this scoped fix
+does not establish complete native diagnostic parity.
 
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.
