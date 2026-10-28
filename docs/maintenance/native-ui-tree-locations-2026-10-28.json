@@ -1,0 +1,91 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "selfhost/compiler-core.rcl": "a20f3c597eb20dc6ae804db30a51db38b804f40bf2156d885c13953300d7e5b7",
+    "selfhost/compiler-main.rcl": "cc6666e8f81c4bf8a1701c4a956fdcd93c632506d6d9264ecd5500fa1ac4fe70",
+    "selfhost/compiler.rbc": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+    "tests/native-ui-tree-locations.test.mjs": "71840a9976a2ce3d4d2060dfa45d391b3e9b0924ae2e7164521b9ce5d0a1560c"
+  },
+  "checks": {
+    "before": {
+      "passed": 0,
+      "failed": 40,
+      "total": 40,
+      "compilerBase": "76a5f2c",
+      "log": "output/module-development-20261028/ui-tree-locations-baseline-final.log"
+    },
+    "after": {
+      "passed": 40,
+      "failed": 0
+    },
+    "regression": {
+      "passed": 246,
+      "failed": 0,
+      "skipped": 0,
+      "log": "output/module-development-20261028/ui-tree-locations-final-regression.log"
+    },
+    "fixedPoint": {
+      "ok": true,
+      "format": "rcl.selfhost.compiler.fixed-point.v1",
+      "outputPath": "selfhost/compiler.rbc",
+      "bytes": 368076,
+      "sha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+      "sourceSha256": "faaec5c81a9d14c891b3e8b3d685934d15571a0782a03af9f099a8570500503c",
+      "byteIdentical": true,
+      "generations": {
+        "c0": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+        "c1": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+        "c2": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0"
+      },
+      "native": {
+        "c0ToC1": {
+          "status": "ok",
+          "bytes": 368076,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        },
+        "c1ToC2": {
+          "status": "ok",
+          "bytes": 368076,
+          "peakStackDepth": 1023,
+          "peakCallFrames": 289
+        }
+      }
+    },
+    "fullExampleCollection": {
+      "ok": true,
+      "format": "rcl.selfhost.example-parity.v1",
+      "artifactParity": true,
+      "compilerArtifact": "selfhost/compiler.rbc",
+      "compilerArtifactSha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+      "requestedSourceCount": 233,
+      "scope": "all-checked-in-example-sources",
+      "compilerTimeoutMs": 60000,
+      "budgetProfile": "original-60-second-target-budget",
+      "originalBudgetSatisfied": true,
+      "nativeCompileAttempts": 122,
+      "avoidedDuplicateCompiles": 73,
+      "evidenceBoundary": "Identical source plus bootstrap byte hashes reuse one actual native compile result within this run. This does not establish independent repeated process execution, K400 admission or publisher authenticity.",
+      "eligibleCount": 195,
+      "unsupportedCount": 38,
+      "failureCount": 0
+    }
+  },
+  "rawBindings": {
+    "output/module-development-20261028/ui-tree-locations-baseline-final.log": "51a81f9c005ac375af39478d3545aaca2d41b639aabe9167a81f99e9c3240dee",
+    "output/module-development-20261028/ui-tree-locations-final-regression.log": "5134801913e3b41fcba1d5de45482ec61ccf100512e0fa40ab4c06fff181b4cb",
+    "output/module-development-20261028/ui-tree-locations-fixedpoint.json": "06b7a71f87f7dbc821cc7e307d87d80b07980c0ced8932a1f63b0949ae2a7ec9",
+    "output/module-development-20261028/example-parity-ui-tree-locations.json": "6e070b516677e6347f2d231b26a0d0acad8f75c77fac7c902d370e15a26c5526"
+  },
+  "locationContract": {
+    "line": "actual",
+    "column": "UTF-16",
+    "offset": "existing zero placeholder",
+    "length": "existing zero placeholder"
+  },
+  "diagnosticDebt": "TD-019 ACTIVE",
+  "independentFullJsReplay": "NOT_RERUN_PREVIOUS_BUDGET_STOP_RETAINED",
+  "nativeCBinariesChanged": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

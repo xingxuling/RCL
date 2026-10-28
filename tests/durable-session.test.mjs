@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { resultIdentityForRecord } from './fixtures/durable-history-identities.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -102,7 +103,7 @@ test('valid recomputed hashes cannot substitute for native semantic replay', asy
     const record = records[1];
     record.result.state['counter.value'] = 50;
     record.result.afterRoot = root(record.result.state);
-    record.afterStateRoot = record.result.afterRoot; record.resultRoot = root(record.result);
+    record.afterStateRoot = record.result.afterRoot; record.resultRoot = resultIdentityForRecord(record);
     const { root: ignored, ...core } = record; record.root = root(core);
     fs.writeFileSync(journal, records.map(value => JSON.stringify(value)).join('\n') + '\n');
     await assert.rejects(openDurableRealitySession(directory), error => error.code === 'RCL_SESSION_REPLAY_MISMATCH');

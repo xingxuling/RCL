@@ -1,0 +1,156 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "src/durable-session.mjs": "816f6806b7b82531f5f63af94aa44be2d82e546dd59dcfedbd8cf057a422ed42",
+    "src/session-cli.mjs": "1cd023d0cd6f32bbe9e81e835bf33ab596bef285c01ca3ef5da6f0750dc803c2",
+    "src/index.mjs": "29059220def3f626f3eef16a08f66dc9f9b4440747f68c166cc0510feef881cc",
+    "src/cli-contract.mjs": "711d3bf0784d84473b6de3874a7565c729e315c44562eb890114d5a86166ed6f",
+    "tests/durable-session-history-verification.test.mjs": "b1f19460678ade0832ca378975fbee93c68481c637f6480fa78fdcdc87f6ce21",
+    "tests/durable-session-identity-v2.test.mjs": "bf37fe1b23095b38bb4411565766750d2bfd29aa308ede6f152e9f01b5c077a5",
+    "tests/durable-session.test.mjs": "aaa38f051b7a9bfa0cd016dad160c1c45bb93da72e281e86c5a99e315a092445",
+    "tests/fixtures/durable-history-identities.mjs": "34ea4df3838929b3a4106b4bf8fa4b0ce64c1605313fd8c2a3ffc0123851c6c9"
+  },
+  "mode": {
+    "phase": "durable history verification",
+    "signal": {
+      "breadth": 0.65,
+      "bottleneck_centrality": 0.9,
+      "evidence_density": 0.95,
+      "adjacent_work_count": 0,
+      "direction_stability": 0.9,
+      "urgency": 0,
+      "artifact_pressure": 0.7
+    },
+    "mode": "DEEP_DEVELOPMENT",
+    "reason": "one evidence-rich central bottleneck dominates; deepen before recompiling globally",
+    "scores": {
+      "WHOLE_ARTIFACT": 0.5575,
+      "DEEP_DEVELOPMENT": 0.8325,
+      "NORTH_STAR": 0.9325,
+      "NORTH_STAR_BURST": 0.5525
+    },
+    "authority": "advisory only"
+  },
+  "checks": {
+    "newControls": {
+      "historyVerifier": 10,
+      "versionedIdentity": 6,
+      "failed": 0
+    },
+    "affectedRegression": {
+      "passed": 76,
+      "failed": 0,
+      "skipped": 0,
+      "log": "output/module-development-20261028/history-v2-final-regression.log",
+      "existingToolchainExplicitlyConfigured": true
+    },
+    "beforeIdentityBug": {
+      "legacyRetryAccepted": true,
+      "returnedInput": "A",
+      "suppliedInput": "B",
+      "recordRootUnchanged": true,
+      "pageRootUnchanged": true,
+      "forgedPinnedReport": {
+        "ok": true,
+        "format": "rcl.session-history-verification.v1",
+        "status": "VERIFIED_AGAINST_PIN",
+        "contentAnchored": true,
+        "pagePinned": false,
+        "headAnchored": true,
+        "sessionId": "bcd2d56f-bf77-45b1-8e91-7de4896e9075",
+        "programRoot": "5a5c822764650656b54866a6c62ea1c3bf887e7af7293872fd16b7a552163a5f",
+        "revision": 1,
+        "journalRoot": "356b4ee2b0d3365095d78ef7c2e23139f308bbb30c19cb3b79be3284f762e0ce",
+        "stateRoot": "dbe48188ffba44a1293b73940d611cf3b41ec9ac302fd4c5ff1774930f7211c5",
+        "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+        "fromRevision": 1,
+        "nextRevision": null,
+        "verifiedPages": 1,
+        "verifiedEntries": 1,
+        "previousRoot": "b333611abdeec55c50dfb1594b37958c449eedf28f62b7451bcb10b35b7287b1",
+        "lastRecordRoot": "356b4ee2b0d3365095d78ef7c2e23139f308bbb30c19cb3b79be3284f762e0ce",
+        "coversReportedHistory": true,
+        "completeHistory": true,
+        "pageRoots": [
+          "94ca3497e8f78814459915a2b61448ab5e44235c3fd45306f570a437960c7a0a"
+        ],
+        "pins": {
+          "expectedJournalRoot": "356b4ee2b0d3365095d78ef7c2e23139f308bbb30c19cb3b79be3284f762e0ce"
+        },
+        "commandReplay": false,
+        "sourceExecution": false,
+        "publisherAuthenticated": false,
+        "boundary": "Receipt, result, state-root and supplied-page continuity checks only. Nonterminal or empty pages require their own trusted page pin to anchor content. No command replay, source execution, publisher authentication or authority grant.",
+        "verificationRoot": "9a7c1bd1f603f7fe00f88d42ab826e294d2ff089ff261887a98345a91d101083"
+      }
+    },
+    "actualLegacyReopenAndAppend": {
+      "sameRetry": true,
+      "changedRetryConflict": true,
+      "legacyPrefixPreserved": true,
+      "formats": [
+        "rcl.session-journal-command.v1",
+        "rcl.session-journal-command.v2"
+      ],
+      "legacyVerificationStatus": "LEGACY_IDENTITY_LIMITED",
+      "contentAnchored": false
+    },
+    "v2Demo": {
+      "ok": true,
+      "format": "rcl.session-history-verification.v1",
+      "status": "VERIFIED_AGAINST_PIN",
+      "contentAnchored": true,
+      "pagePinned": false,
+      "headAnchored": true,
+      "legacyCommandEntries": 0,
+      "sessionId": "2902d91d-f283-4163-aab8-4f9efafcb6d1",
+      "programRoot": "050437bef48d834795a0be9e80c12f916aad780b60b23fb91106fc6ba7f5c429",
+      "revision": 4,
+      "journalRoot": "c1097053dff8992e446734822146b6aa10d152d0be674dbc06bcf9a5721ddbdd",
+      "stateRoot": "95058e3359baac09c0a9ff15b229b05b52e7026f7288b3b16348f7e1138d1136",
+      "stateRootAlgorithm": "rcl.semantic-state-root.v2",
+      "fromRevision": 1,
+      "nextRevision": null,
+      "verifiedPages": 2,
+      "verifiedEntries": 4,
+      "previousRoot": "65dac5b9e5fca073a91aed6b288c663d330627ceeea9cca1ec6bf63ef68284b6",
+      "lastRecordRoot": "c1097053dff8992e446734822146b6aa10d152d0be674dbc06bcf9a5721ddbdd",
+      "coversReportedHistory": true,
+      "completeHistory": true,
+      "pageRoots": [
+        "a87ebc18d15afbb8cbeac4134a7e1cd47c269828d6f0b965675f30c6a18d3e59",
+        "1abd249c2b06755bce0789f17cad559acff8ae0c56a6871c4671d94691a25353"
+      ],
+      "pins": {
+        "expectedJournalRoot": "c1097053dff8992e446734822146b6aa10d152d0be674dbc06bcf9a5721ddbdd"
+      },
+      "commandReplay": false,
+      "sourceExecution": false,
+      "publisherAuthenticated": false,
+      "boundary": "Receipt, result, state-root and supplied-page continuity checks only. Nonterminal or empty pages require their own trusted page pin. Legacy v1 input identities do not establish exact input-map binding. No command replay, source execution, publisher authentication or authority grant.",
+      "verificationRoot": "fe33236e2cd487c713c010255330d964a0b48e68c3a2a8fdf8858a222be8d8bc"
+    }
+  },
+  "rawBindings": {
+    "output/module-development-20261028/history-verifier-mode.json": "4913eecf5e89421653df9481d2961e4cc783278df8d501d321df738ba766c88e",
+    "output/module-development-20261028/history-verifier-first.log": "5b0d2f7d4558466140be23f74b1dc1b28fb0c74b3dc149532badd711a084213c",
+    "output/module-development-20261028/history-v2-identities-first.log": "1ab95732c6c0c1086f35c1e830fcd41629fe61f703aa34e7bc665890ee223d8d",
+    "output/module-development-20261028/history-v2-final-regression.log": "1e9ff44860e26d9914971f27b72c3ffad980cdde08a4e84692d6e07b4b78bf64",
+    "output/module-development-20261028/history-metadata-before.json": "f399615c2a044b56065519f59be081361022e391f15b949dd08af568fe9c7187",
+    "output/module-development-20261028/history-metadata-after-legacy.json": "ef8863078939f973459ab0d1fe860a8ef072d23cb6158bd6e89c82132c2c4559",
+    "output/module-development-20261028/history-verifier-demo-v2-report.json": "9eddc64fe49c6d633bf73c29ee88a484cd402b077da778084e6dfe7461082e17",
+    "output/module-development-20261028/history-verifier-demo-v2/history-pages.json": "9069c1eca77d8fe58a638dc29569ef96ef5b724f5a958d4450c77822b46b1292"
+  },
+  "wireJournalVersion": 2,
+  "wireCommandRecordVersion": 2,
+  "legacyReadAndAppendSupported": true,
+  "legacyBytesRewritten": false,
+  "offlineCommandReplay": false,
+  "journalCompaction": false,
+  "nativeCBinariesChanged": false,
+  "compilerArtifactChanged": false,
+  "legacyDebt": "TD-021 ACTIVE",
+  "journalLifecycleDebt": "TD-017 ACTIVE",
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

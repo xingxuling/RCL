@@ -1,0 +1,33 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "selfhost/compiler-core.rcl": "7bcab641d2f8520647c20fc7ab4071ef1315926a470d05215b1d7091fa5920ea",
+    "selfhost/session-compiler-core.rcl": "adf775b142f8e1cbe94fe82ae666ce09d132228280402438e402e7ffcff800a7",
+    "selfhost/session-compiler-main.rcl": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4",
+    "tests/session-compiler-locations.test.mjs": "e2e73fe326b64286625fd95e885ee56cd59e4b94df14e5fb0c810522282325ac"
+  },
+  "checks": {
+    "newLocations": {
+      "before": {
+        "passed": 0,
+        "failed": 6
+      },
+      "after": {
+        "passed": 6,
+        "failed": 0
+      }
+    },
+    "final": {
+      "passed": 9,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/session-compiler-locations.test.mjs tests/session-selfhost-compiler.test.mjs tests/session-bytecode-feature-version.test.mjs",
+      "log": "output/module-development-20261028/session-compiler-locations-final.log"
+    }
+  },
+  "nativeSessionCompilerEntry": "DIRECT_NATIVE",
+  "compilerBootstrap": "JavaScript-to-RCL-bytecode",
+  "publicApiPreflightUnchanged": true,
+  "completeNativeDiagnosticParity": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

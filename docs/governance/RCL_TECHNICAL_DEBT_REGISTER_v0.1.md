@@ -47,4 +47,70 @@ source-bound local checks; hosted CI is NOT_RUN_USER_INSTRUCTION.
 
 ## Operating rule for the historical register
 
+### 2026-10-28 source-position progress
+
+TD-019 remains ACTIVE. The RCL-authored compiler now retains internal expression
+and alteration-target spans and uses them for reference/call admission, literal
+facet mismatches and conditional-warrant type diagnostics. Operator errors point
+to the operator; reachable predicate return errors point to the function body.
+UTF-16 columns after supplementary Unicode text reuse the existing column-profile
+mechanism. The current compiler reaches a byte-identical native C0/C1/C2 fixed
+point and passes 72 targeted compiler/location/warrant checks. See
+`docs/maintenance/native-semantic-locations-2026-10-28.json`.
+
+UI declaration/navigation diagnostics, missing rule-warrant declarations and
+unsupported session-facet errors used synthetic locations at that checkpoint. This maintenance
+does not mark all semantic diagnostics complete or promote whole-language maturity.
+
+### 2026-10-28 session facet diagnostic progress
+
+The direct RCL-authored session compiler now reports retained facet declaration
+positions for unsupported session types. Six new location/rejection cases and
+three existing session compiler cases pass. The public session compilation API
+continues to perform reference preflight first. See
+`docs/maintenance/session-compiler-locations-2026-10-28.json`. TD-019 remains ACTIVE
+for UI tree/navigation and missing-warrant diagnostic locations; this scoped fix
+does not establish complete native diagnostic parity.
+
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.
+
+### 2026-10-28 missing-warrant diagnostic progress
+
+The general and session RCL compiler entries now retain need capability spans.
+Six LF/CRLF/emergence/resonance/Unicode location cases pass for both entries, and
+111 affected checks pass. Exact/hierarchical target roots and bytes are unchanged;
+the rebuilt compiler reaches C0=C1=C2. TD-019 remains ACTIVE for UI/control and
+other uncovered diagnostics. See
+`docs/maintenance/missing-warrant-locations-2026-10-28.json`.
+
+### 2026-10-28 UI tree/navigation diagnostic progress
+
+Forty previously synthetic UI tree/event/navigation location controls now report
+actual declaration/reference lines and UTF-16 columns, retaining failed outputs.
+All 246 affected checks pass with unchanged accepted UI target roots/bytes and a
+new native compiler fixed point. TD-019 remains ACTIVE for zero offset/length
+placeholders and uncovered property/authority/adaptation diagnostics. See
+`docs/maintenance/native-ui-tree-locations-2026-10-28.json`.
+
+### 2026-10-28 reference equality discrepancy
+
+| ID | Status | Area | Debt | Closure evidence or next gate |
+|---|---|---|---|---|
+| TD-020 | ACTIVE | Reference value equality | `src/quantity.mjs` uses object identity for Sequence equality while the native VM compares elements recursively. Equal independently built `[1, 2, 1, 2]` values compare false in the reference interpreter and true in both the pre-change and current native VM. | Define shared per-value equality semantics, preserve quantity and typed-reference identity contracts, and add source-level parity and unequal-value controls. The persistent-concat change retains native equality and records ordered storage parity separately; see `docs/maintenance/native-persistent-concat-2026-10-28.json`. |
+
+The follow-up Sequence profile now compares nested scalar/quantity/Span/Token
+elements by value. The original discrepancy and a durable guarded-session replay
+now pass reference/native parity. Fourteen new controls and 144 affected checks
+pass. TD-020 stays ACTIVE: an explicit independently constructed AstNode control
+still differs, and other compiler/typed value families retain their prior policy.
+See `docs/maintenance/reference-sequence-equality-2026-10-28.json`.
+
+### 2026-10-28 durable identity and history verification
+
+| ID | Status | Area | Debt | Closure evidence or next gate |
+|---|---|---|---|---|
+| TD-021 | ACTIVE | Legacy journal provenance | The v1 wrapped identity can normalize metadata-like user input keys. Existing semantic head/page pins cannot retroactively authenticate omitted values. | Tagged v2 identities bind the complete input/state maps; exact retries, metadata corruption, legacy replay/append and downgrade controls pass. Legacy offline reports remain `LEGACY_IDENTITY_LIMITED`; use independently trusted raw backup provenance for old bytes. See `docs/maintenance/durable-history-v2-2026-10-28.json`. |
+
+The new offline verifier checks complete supplied-page continuity and explicitly
+does not execute commands. It is not checkpoint admission or compaction. TD-017
+remains ACTIVE with the original replay limits.

@@ -3,6 +3,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { buildFacetOccurrences } from './lsp-facet-occurrences.mjs';
+import { compileReality } from './compiler.mjs';
+import { lexReality } from './lexer.mjs';
 import {
   DEFAULT_DEBUG_REPLAY_SOURCE,
   DEFAULT_DEBUG_REPLAY_TYPE_MODULES,
@@ -21,6 +24,7 @@ export const RCL_LSP_INDEX_FORMAT = 'rcl.lsp-index.v0.41';
 export const RCL_LSP_QUERY_REPORT_FORMAT = 'rcl.lsp-query-report.v0.41';
 export const RCL_DAP_BRIDGE_FORMAT = 'rcl.dap-bridge.v0.41';
 export const RCL_IDE_BRIDGE_REPORT_FORMAT = 'rcl.ide-bridge-report.v0.41';
+export const RCL_FACET_RENAME_PREVIEW_FORMAT = 'rcl.facet-rename-preview.v1';
 
 export const RCL_LSP_SEMANTIC_TOKEN_TYPES = Object.freeze([
   'namespace',
@@ -33,6 +37,7 @@ export const RCL_LSP_SEMANTIC_TOKEN_TYPES = Object.freeze([
   'number',
   'operator',
 ]);
+export const RCL_LSP_SEMANTIC_TOKEN_MODIFIERS = Object.freeze(['declaration', 'modification']);
 
 function sortJson(value) {
   if (Array.isArray(value)) return value.map(sortJson);
@@ -106,9 +111,10 @@ function protocolLocation(uri, source, length = 1) {
 
 function containsPosition(range, position) {
   if (!range || !position) return false;
+  if (!Number.isInteger(position.line) || !Number.isInteger(position.character) || position.line < 0 || position.character < 0) return false;
   if (position.line < range.start.line || position.line > range.end.line) return false;
   if (position.line === range.start.line && position.character < range.start.character) return false;
-  if (position.line === range.end.line && position.character > range.end.character) return false;
+  if (position.line === range.end.line && position.character >= range.end.character) return false;
   return true;
 }
 
@@ -236,14 +242,34 @@ function keywordCompletionItems() {
 function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourcePath = null, sourceFile = null } = {}) {
   const uri = sourceUri(sourcePath, sourceFile ?? sourceMapRuntime.sourceFile);
   const facets = Object.values(sourceMapRuntime.facets ?? {}).sort((a, b) => a.path.localeCompare(b.path));
-  const documentSymbols = facets.map(facet => buildSymbolFromFacet(uri, facet));
+  const sourceOccurrences = sourceText ? buildFacetOccurrences(sourceText, facets, uri) : { declarations: {}, occurrences: [] };
+  const documentSymbols = facets.map(facet => {
+    const symbol = buildSymbolFromFacet(uri, facet), range = sourceOccurrences.declarations[facet.path]?.range;
+    return range ? { ...symbol, range, selectionRange: range } : symbol;
+  });
   const hoverIndex = Object.fromEntries(facets.map(facet => [facet.path, buildHoverForFacet({ sourceMapRoot: sourceMapRuntime.unifiedMapRoot }, facet)]));
   const semanticNodeHoverIndex = Object.fromEntries(facets.map(facet => [facet.semanticNodeId, hoverIndex[facet.path]]));
-  const definitionIndex = Object.fromEntries(facets.map(facet => [facet.path, protocolLocation(uri, facet.source, facet.path.length)]));
+  for (const symbol of documentSymbols) hoverIndex[symbol.name].range = symbol.range;
+  const definitionIndex = Object.fromEntries(documentSymbols.map(symbol => [symbol.name, { uri, range: symbol.selectionRange }]));
   const semanticNodeDefinitions = Object.fromEntries(facets.map(facet => [facet.semanticNodeId, definitionIndex[facet.path]]));
 
   const tokens = [];
+  const facetByPath = new Map(facets.map(facet => [facet.path, facet]));
+  for (const occurrence of sourceOccurrences.occurrences) {
+    const modifier = occurrence.kind === 'declaration' ? 1 : occurrence.kind === 'write' ? 2 : 0;
+    for (const range of occurrence.identifierRanges) {
+      tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character,
+        'property', modifier, facetByPath.get(occurrence.facet)?.semanticNodeId));
+    }
+  }
   for (const facet of facets) {
+    const declaration = sourceOccurrences.declarations[facet.path];
+    if (declaration) {
+      for (const range of declaration.typeIdentifierRanges) {
+        tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character, 'type', 0, facet.semanticNodeId));
+      }
+      continue;
+    }
     const position = lspPosition(facet.source);
     tokens.push(semanticToken(position.line, position.character, facet.path.length, 'property', 0, facet.semanticNodeId));
     if (facet.canonicalType) {
@@ -253,7 +279,7 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
   const semanticTokens = {
     legend: {
       tokenTypes: RCL_LSP_SEMANTIC_TOKEN_TYPES,
-      tokenModifiers: [],
+      tokenModifiers: RCL_LSP_SEMANTIC_TOKEN_MODIFIERS,
     },
     tokens,
     data: encodeSemanticTokens(tokens),
@@ -296,6 +322,7 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
       textDocumentSync: 1,
       hoverProvider: true,
       definitionProvider: true,
+      referencesProvider: true,
       documentSymbolProvider: true,
       workspaceSymbolProvider: true,
       semanticTokensProvider: true,
@@ -313,8 +340,9 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
     semanticNodeHoverIndex,
     definitionIndex,
     semanticNodeDefinitions,
+    facetOccurrences: sourceOccurrences.occurrences,
     diagnostics: [],
-    boundary: 'LSP Index v0.41 is a static source-map-backed protocol bridge. It emits LSP-shaped symbols, hovers, definitions, semantic tokens, completions and diagnostics JSON, but it is not yet a live socket/stdio LSP server.',
+    boundary: 'Static source-backed protocol bridge with same-document facet definitions, expression/write references, symbols, hovers, semantic tokens, completions and diagnostics. Function parameters, match bindings and UI-local state are excluded from facet references; authority scopes are not indexed as value references. This is not a live socket/stdio LSP server.',
   };
   index.indexRoot = sha256(index);
   return index;
@@ -355,6 +383,7 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
         textDocumentSync: 1,
         hoverProvider: false,
         definitionProvider: false,
+        referencesProvider: false,
         documentSymbolProvider: false,
         workspaceSymbolProvider: false,
         semanticTokensProvider: false,
@@ -372,6 +401,7 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
       semanticNodeHoverIndex: {},
       definitionIndex: {},
       semanticNodeDefinitions: {},
+      facetOccurrences: [],
       diagnostics: (runtimeResult.diagnostics ?? []).map((diag, index) => diagnosticToLsp(diag, index, uri)),
       boundary: 'LSP Index v0.41 diagnostic-only mode is emitted when compilation/source-map construction fails.',
     };
@@ -384,12 +414,19 @@ export function buildLspIndex(sourceOrOptions = {}, options = {}) {
 function findSymbol(index, query = {}) {
   if (query.facet && index.documentSymbols) return index.documentSymbols.find(symbol => symbol.data?.facet === query.facet) ?? null;
   if (query.semanticNodeId && index.documentSymbols) return index.documentSymbols.find(symbol => symbol.data?.semanticNodeId === query.semanticNodeId) ?? null;
-  if (query.position) return index.documentSymbols.find(symbol => containsPosition(symbol.range, query.position)) ?? null;
+  if (query.position) {
+    const occurrence = index.facetOccurrences?.find(item => containsPosition(item.range, query.position));
+    return index.documentSymbols.find(symbol => occurrence ? symbol.data?.facet === occurrence.facet : containsPosition(symbol.range, query.position)) ?? null;
+  }
   return null;
 }
 
 function normalizeLspIndex(indexOrPath) {
   return typeof indexOrPath === 'string' ? readJson(indexOrPath) : indexOrPath;
+}
+
+function ownIndexEntry(table, key) {
+  return typeof key === 'string' && table && Object.hasOwn(table, key) ? table[key] : null;
 }
 
 export function queryLspIndex(indexOrPath, query = {}) {
@@ -400,12 +437,17 @@ export function queryLspIndex(indexOrPath, query = {}) {
   let ok = true;
   if (kind === 'hover') {
     const key = query.facet ?? symbol?.data?.facet ?? null;
-    result = key ? index.hoverIndex?.[key] ?? null : (query.semanticNodeId ? index.semanticNodeHoverIndex?.[query.semanticNodeId] ?? null : null);
+    result = key ? ownIndexEntry(index.hoverIndex, key) : ownIndexEntry(index.semanticNodeHoverIndex, query.semanticNodeId);
     ok = Boolean(result);
   } else if (kind === 'definition') {
     const key = query.facet ?? symbol?.data?.facet ?? null;
-    result = key ? index.definitionIndex?.[key] ?? null : (query.semanticNodeId ? index.semanticNodeDefinitions?.[query.semanticNodeId] ?? null : null);
+    result = key ? ownIndexEntry(index.definitionIndex, key) : ownIndexEntry(index.semanticNodeDefinitions, query.semanticNodeId);
     ok = Boolean(result);
+  } else if (kind === 'references') {
+    const key = query.facet ?? symbol?.data?.facet ?? null;
+    const includeDeclaration = query.includeDeclaration ?? query.context?.includeDeclaration ?? false;
+    result = (index.facetOccurrences ?? []).filter(item => item.facet === key && (includeDeclaration || item.kind !== 'declaration')).map(({ uri, range }) => ({ uri, range }));
+    ok = Boolean(key && ownIndexEntry(index.definitionIndex, key));
   } else if (kind === 'documentSymbols' || kind === 'symbols') {
     result = index.documentSymbols ?? [];
   } else if (kind === 'workspaceSymbols') {
@@ -437,6 +479,102 @@ export function queryLspIndex(indexOrPath, query = {}) {
   };
   report.queryRoot = sha256(report);
   return report;
+}
+
+export function buildFacetRenamePreview(input = {}) {
+  const fail = (code, diagnostics = []) => ({ ok: false, code, diagnostics, preview: null });
+  if (!input || typeof input !== 'object' || Array.isArray(input)
+      || typeof input.source !== 'string' || typeof input.facet !== 'string' || typeof input.newName !== 'string'
+      || (input.sourceFile !== undefined && typeof input.sourceFile !== 'string')
+      || (input.typeModuleSources !== undefined && (!input.typeModuleSources || typeof input.typeModuleSources !== 'object' || Array.isArray(input.typeModuleSources)))
+      || Reflect.ownKeys(input).some(key => !['source', 'sourceFile', 'facet', 'newName', 'typeModuleSources', 'version', 'expectedTextRoot'].includes(key))
+      || (input.version !== undefined && input.version !== null && (!Number.isSafeInteger(input.version) || input.version < 0))) return fail('RCL_LSP_RENAME_INPUT_INVALID');
+  const { source, facet, newName } = input;
+  if (input.expectedTextRoot !== undefined && input.expectedTextRoot !== sha256(source)) return fail('RCL_LSP_RENAME_SOURCE_ROOT_MISMATCH');
+  let nameTokens;
+  try { nameTokens = lexReality(newName); } catch { return fail('RCL_LSP_RENAME_NAME_INVALID'); }
+  if (nameTokens.length !== 2 || nameTokens[0].type !== 'IDENT' || nameTokens[0].value !== newName) return fail('RCL_LSP_RENAME_NAME_INVALID');
+  const options = { source, sourceFile: input.sourceFile ?? 'rename-preview.rcl', typeModuleSources: input.typeModuleSources ?? {} };
+  const before = buildLspIndex(options);
+  if (!before.ok) return fail('RCL_LSP_RENAME_SOURCE_INVALID', before.diagnostics);
+  if (!ownIndexEntry(before.lspIndex.definitionIndex, facet)) return fail('RCL_LSP_RENAME_FACET_UNKNOWN');
+  const parts = facet.split('.'), oldName = parts.at(-1), newFacet = [...parts.slice(0, -1), newName].join('.');
+  if (newFacet === facet) return fail('RCL_LSP_RENAME_NO_CHANGE');
+  if (ownIndexEntry(before.lspIndex.definitionIndex, newFacet)) return fail('RCL_LSP_RENAME_COLLISION');
+  const program = compileReality(source, { typeModuleSources: options.typeModuleSources });
+  const scopes = [...program.warrants, ...program.rules.flatMap(rule => rule.needs ?? [])].map(item => item.target);
+  if (scopes.some(scope => [facet, newFacet].some(name => scope === name || scope.startsWith(name + '.')))) return fail('RCL_LSP_RENAME_AUTHORITY_DEPENDENCY');
+  const starts = text => {
+    const offsets = [0];
+    for (let index = 0; index < text.length; index++) if (text[index] === '\n') offsets.push(index + 1);
+    return offsets;
+  };
+  const beforeStarts = starts(source), offset = (position, offsets) => offsets[position.line] + position.character;
+  const ranges = new Map();
+  for (const occurrence of before.lspIndex.facetOccurrences.filter(item => item.facet === facet)) {
+    const range = occurrence.identifierRanges[occurrence.kind === 'declaration' ? occurrence.identifierRanges.length - 1 : parts.length - 1];
+    if (!range) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+    const start = offset(range.start, beforeStarts), end = offset(range.end, beforeStarts);
+    if (source.slice(start, end) !== oldName) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+    ranges.set(`${start}:${end}`, { start, end, range });
+  }
+  const edits = [...ranges.values()].sort((a, b) => a.start - b.start);
+  if (!edits.length || edits.some((edit, index) => index && edit.start < edits[index - 1].end)) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+  const chunks = [], deltas = [0];
+  let cursor = 0;
+  for (const edit of edits) {
+    chunks.push(source.slice(cursor, edit.start), newName); cursor = edit.end;
+    deltas.push(deltas.at(-1) + newName.length - (edit.end - edit.start));
+  }
+  chunks.push(source.slice(cursor));
+  const previewSource = chunks.join('');
+  const after = buildLspIndex({ ...options, source: previewSource });
+  if (!after.ok) return fail('RCL_LSP_RENAME_RESULT_INVALID', after.diagnostics);
+  const afterStarts = starts(previewSource);
+  const translated = position => {
+    const original = offset(position, beforeStarts);
+    let low = 0, high = edits.length;
+    while (low < high) {
+      const middle = (low + high) >>> 1;
+      if (edits[middle].end <= original) low = middle + 1;
+      else high = middle;
+    }
+    return original + deltas[low];
+  };
+  const expected = before.lspIndex.facetOccurrences.map(item => [item.facet === facet ? newFacet : item.facet, item.kind, translated(item.range.start), translated(item.range.end)]);
+  const actual = after.lspIndex.facetOccurrences.map(item => [item.facet, item.kind, offset(item.range.start, afterStarts), offset(item.range.end, afterStarts)]);
+  const ordered = values => values.map(value => JSON.stringify(value)).sort();
+  if (JSON.stringify(ordered(expected)) !== JSON.stringify(ordered(actual))) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+  const preview = {
+    format: RCL_FACET_RENAME_PREVIEW_FORMAT, status: 'CANDIDATE', facet, newFacet, newName,
+    sourceTextRoot: sha256(source), previewTextRoot: sha256(previewSource),
+    programRoot: before.lspIndex.programRoot, previewProgramRoot: after.lspIndex.programRoot,
+    indexRoot: before.lspIndex.indexRoot, previewIndexRoot: after.lspIndex.indexRoot,
+    workspaceEdit: { documentChanges: [{ textDocument: { uri: before.lspIndex.document.uri, version: input.version ?? null },
+      edits: edits.map(({ range }) => ({ range, newText: newName })) }] },
+    previewSource,
+    boundary: 'Same-document facet leaf rename preview with preserved namespace/owner and checked value bindings. Exact or descendant authority-scope dependencies reject. No original file mutation, live LSP rename service, external authorization or publisher authentication.',
+  };
+  preview.previewRoot = sha256(preview);
+  return { ok: true, preview };
+}
+
+export function writeFacetRenamePreview(sourcePath, facet, newName, outputDir, options = {}) {
+  if (typeof sourcePath !== 'string' || typeof outputDir !== 'string' || !outputDir) return { ok: false, code: 'RCL_LSP_RENAME_OUTPUT_REQUIRED' };
+  const bytes = fs.readFileSync(sourcePath), source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+  const result = buildFacetRenamePreview({ source, facet, newName, sourceFile: path.resolve(sourcePath),
+    typeModuleSources: options.typePath ? readTypeSources(options.typePath) : options.typeModuleSources ?? {},
+    ...(options.expectedTextRoot === undefined ? {} : { expectedTextRoot: options.expectedTextRoot }) });
+  if (!result.ok) return result;
+  if (!fs.readFileSync(sourcePath).equals(bytes)) return { ok: false, code: 'RCL_LSP_RENAME_SOURCE_CHANGED' };
+  const directory = path.resolve(outputDir);
+  try { fs.mkdirSync(directory); }
+  catch (error) { if (error.code === 'EEXIST') return { ok: false, code: 'RCL_LSP_RENAME_OUTPUT_EXISTS' }; throw error; }
+  const previewPath = path.join(directory, 'renamed.rcl'), reportPath = path.join(directory, 'rename-preview.json');
+  fs.writeFileSync(previewPath, result.preview.previewSource, { flag: 'wx' });
+  fs.writeFileSync(reportPath, JSON.stringify(result.preview, null, 2) + '\n', { flag: 'wx' });
+  return { ok: true, status: 'CANDIDATE', previewPath, reportPath, previewRoot: result.preview.previewRoot,
+    sourceTextRoot: result.preview.sourceTextRoot, previewTextRoot: result.preview.previewTextRoot, originalModified: false };
 }
 
 export function parseLspQueryArg(arg = 'hover') {
@@ -566,6 +704,8 @@ export function buildDapBridge(sessionOrPath, options = {}) {
     { seq: 8, type: 'response', request_seq: 6, command: 'variables', success: true, body: { variables } },
     { seq: 9, type: 'request', command: 'next', arguments: { threadId: 1, granularity: 'statement', bridgeCommand: 'debug-step next' } },
     { seq: 10, type: 'request', command: 'continue', arguments: { threadId: 1, bridgeCommand: 'debug-step continue' } },
+    { seq: 11, type: 'request', command: 'stepBack', arguments: { threadId: 1, bridgeCommand: 'debug-step previous' } },
+    { seq: 12, type: 'request', command: 'reverseContinue', arguments: { threadId: 1, bridgeCommand: 'debug-step reverse-continue' } },
   ];
   const bridge = {
     format: RCL_DAP_BRIDGE_FORMAT,

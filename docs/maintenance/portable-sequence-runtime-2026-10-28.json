@@ -1,0 +1,466 @@
+{
+  "status": "PASS_BOUNDED_PORTABLE_CANDIDATES",
+  "sources": {
+    "native/rclvm.c": "faaa7ebaf14bee886ea3a2212e0d518c9d8e335ec8edd67706359bb0870d990d",
+    "native/linux/rclvm": "74253ff1b54f921e8e362e195149c2e8a94c5ca2b8cb316f9f021b56b95ce6cb",
+    "native/linux/rclc": "55a16c20fc703eba2739a6ade7272dfef1339be7da8ca7e5360c4fd7a17c9fab",
+    "native/linux/build-manifest.json": "66f970905e28098ccbf287a754c085d59df4e0df87c220908ef2dc4551578a6e",
+    "native/wasi/rclvm.wasm": "3db69f002abc74702461dabf862d27052d164f4e75d4df52362a30966a5005b3",
+    "native/wasi/build-manifest.json": "8e6ab60c36ee68273b59df0b2e8a4262bf9f73c0f6973e1213d34c6b9fefaf02",
+    "native/wasi-compiler/rclc.wasm": "4b87bd16933608d8f844e1b1f56ebe4605ec5d254a77987cbd23fa32b9b2a50a",
+    "native/wasi-compiler/build-manifest.json": "285de7397cf354dd5cc092e00efa9954a6088743ae9826c3a430bd28db454274",
+    "scripts/build-native-linux.mjs": "13640f713d3422280c3207ba3d0ccdfb61d254c3e10e09bd52371abf81176a15",
+    "scripts/build-native-sequence-portable.mjs": "81500e65826948bab42ead4f21345ffea77ea40def173640ca0e7d15a3be5910",
+    "scripts/build-native-wasi-compiler.mjs": "03f5ff2b4fafccfe1f474852a6371f0663fc77377fc5fd4ec6e464c4d6c6fd32",
+    "scripts/verify-portable-sequence-runtime.mjs": "b4e5c31c4b411b385135f36903d65986e4528b6d498fdd78b8a96f806a83aaa1"
+  },
+  "checks": {
+    "portable": {
+      "format": "rcl.portable-sequence-parity.v1",
+      "ok": true,
+      "sourceSha256": "faaa7ebaf14bee886ea3a2212e0d518c9d8e335ec8edd67706359bb0870d990d",
+      "compilerArtifactSha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+      "targets": [
+        {
+          "environment": "windows",
+          "ok": true,
+          "checks": [
+            {
+              "name": "ordered",
+              "bytecodeSha256": "a9b2ab1c509fa48eb390718c0b58791bdaebe529a08bc00787f6f6ea4a512ba9",
+              "stateRoot": "5f10d4a087fc3264bcf79903f9e600552defca48cd6bf4c3836296ccaf30b390",
+              "compileMs": 33.241600000000005
+            },
+            {
+              "name": "aliases",
+              "bytecodeSha256": "60bbb1e96c973c38f439b7e2e7579e1d442ee4f5adc894b6cd3bc1526a096a94",
+              "stateRoot": "56a65c573cbc8e4115513961721ef92b6907f47f8f1d1121f212766fe3837ee6",
+              "compileMs": 32.294000000000324
+            },
+            {
+              "name": "release",
+              "bytecodeSha256": "fe58400c7b2c9a9e656733be2c304ebe7bd4fddb0f2492613378284e392695c9",
+              "stateRoot": "a35db7e8c8f8ae66cbc0bb26f378158cff3616f46e3824365755e6c578ac0b72",
+              "compileMs": 31.749500000000808
+            },
+            {
+              "name": "overflow",
+              "rejectedWith": "RCL_NATIVE_OOM"
+            },
+            {
+              "name": "divide-zero",
+              "rejectedWith": "RCL_NATIVE_DIVIDE_ZERO"
+            }
+          ],
+          "manifests": [],
+          "binding": {
+            "execution": "Windows native C VM",
+            "os": "win32",
+            "arch": "x64",
+            "compilerLocation": "Windows native host executing RCL compiler RBC",
+            "binary": {
+              "path": "native/rclvm.exe",
+              "sha256": "ae5adb5e1ba50ea09f6b3140b6e5705cd1be2d48b788c5ab6e95421b66301276"
+            },
+            "compilerBinary": {
+              "path": "native/rclc.exe",
+              "sha256": "e9f81458751c2cf9b95652378fa82cef98d82de6f284836ce63033c6443c7f82"
+            },
+            "compilerArtifact": {
+              "path": "selfhost/compiler.rbc",
+              "sha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0"
+            },
+            "securitySandboxClaimed": false
+          }
+        },
+        {
+          "environment": "wasm-vm",
+          "ok": true,
+          "checks": [
+            {
+              "name": "ordered",
+              "bytecodeSha256": "a9b2ab1c509fa48eb390718c0b58791bdaebe529a08bc00787f6f6ea4a512ba9",
+              "stateRoot": "5f10d4a087fc3264bcf79903f9e600552defca48cd6bf4c3836296ccaf30b390",
+              "compileMs": 29.623199999999997
+            },
+            {
+              "name": "aliases",
+              "bytecodeSha256": "60bbb1e96c973c38f439b7e2e7579e1d442ee4f5adc894b6cd3bc1526a096a94",
+              "stateRoot": "56a65c573cbc8e4115513961721ef92b6907f47f8f1d1121f212766fe3837ee6",
+              "compileMs": 32.84059999999954
+            },
+            {
+              "name": "release",
+              "bytecodeSha256": "fe58400c7b2c9a9e656733be2c304ebe7bd4fddb0f2492613378284e392695c9",
+              "stateRoot": "a35db7e8c8f8ae66cbc0bb26f378158cff3616f46e3824365755e6c578ac0b72",
+              "compileMs": 30.670799999999872
+            },
+            {
+              "name": "overflow",
+              "rejectedWith": "RCL_NATIVE_OOM"
+            },
+            {
+              "name": "divide-zero",
+              "rejectedWith": "RCL_NATIVE_DIVIDE_ZERO"
+            },
+            {
+              "name": "wasi-native-self-compilation-1",
+              "bytecodeSha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+              "metrics": {
+                "status": "ok",
+                "outputState": "compiler.output",
+                "bytes": 368076,
+                "executedInstructions": 140625199,
+                "instructionBudget": 300000000,
+                "peakStackDepth": 1023,
+                "peakCallFrames": 289,
+                "output": "/work/wasi-c1.rbc"
+              }
+            },
+            {
+              "name": "wasi-native-self-compilation-2",
+              "bytecodeSha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0",
+              "metrics": {
+                "status": "ok",
+                "outputState": "compiler.output",
+                "bytes": 368076,
+                "executedInstructions": 140625199,
+                "instructionBudget": 300000000,
+                "peakStackDepth": 1023,
+                "peakCallFrames": 289,
+                "output": "/work/wasi-c2.rbc"
+              }
+            }
+          ],
+          "manifests": [
+            {
+              "file": "native/wasi/build-manifest.json",
+              "sha256": "8e6ab60c36ee68273b59df0b2e8a4262bf9f73c0f6973e1213d34c6b9fefaf02"
+            },
+            {
+              "file": "native/wasi-compiler/build-manifest.json",
+              "sha256": "285de7397cf354dd5cc092e00efa9954a6088743ae9826c3a430bd28db454274"
+            }
+          ],
+          "binding": {
+            "execution": "Node WASI Preview 1, wasm32 native C VM",
+            "os": "WASI",
+            "arch": "wasm32",
+            "compilerLocation": "Windows native host executing RCL compiler RBC",
+            "binary": {
+              "path": "native/wasi/rclvm.wasm",
+              "sha256": "3db69f002abc74702461dabf862d27052d164f4e75d4df52362a30966a5005b3"
+            },
+            "compilerBinary": {
+              "path": "native/rclc.exe",
+              "sha256": "e9f81458751c2cf9b95652378fa82cef98d82de6f284836ce63033c6443c7f82"
+            },
+            "compilerArtifact": {
+              "path": "selfhost/compiler.rbc",
+              "sha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0"
+            },
+            "nodeVersion": "v24.15.0",
+            "securitySandboxClaimed": false
+          }
+        },
+        {
+          "environment": "linux",
+          "ok": true,
+          "checks": [
+            {
+              "name": "ordered",
+              "bytecodeSha256": "a9b2ab1c509fa48eb390718c0b58791bdaebe529a08bc00787f6f6ea4a512ba9",
+              "stateRoot": "5f10d4a087fc3264bcf79903f9e600552defca48cd6bf4c3836296ccaf30b390",
+              "compileMs": 296.40079999999944
+            },
+            {
+              "name": "aliases",
+              "bytecodeSha256": "60bbb1e96c973c38f439b7e2e7579e1d442ee4f5adc894b6cd3bc1526a096a94",
+              "stateRoot": "56a65c573cbc8e4115513961721ef92b6907f47f8f1d1121f212766fe3837ee6",
+              "compileMs": 231.33269999999902
+            },
+            {
+              "name": "release",
+              "bytecodeSha256": "fe58400c7b2c9a9e656733be2c304ebe7bd4fddb0f2492613378284e392695c9",
+              "stateRoot": "a35db7e8c8f8ae66cbc0bb26f378158cff3616f46e3824365755e6c578ac0b72",
+              "compileMs": 217.79420000000027
+            },
+            {
+              "name": "overflow",
+              "rejectedWith": "RCL_NATIVE_OOM"
+            },
+            {
+              "name": "divide-zero",
+              "rejectedWith": "RCL_NATIVE_DIVIDE_ZERO"
+            }
+          ],
+          "manifests": [
+            {
+              "file": "native/linux/build-manifest.json",
+              "sha256": "66f970905e28098ccbf287a754c085d59df4e0df87c220908ef2dc4551578a6e"
+            }
+          ],
+          "binding": {
+            "execution": "Linux WSL2 native C process",
+            "os": "Linux",
+            "arch": "x86_64",
+            "identity": "Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+            "distribution": "NAME=\"Alpine Linux\"\nID=alpine\nVERSION_ID=3.24.2\nPRETTY_NAME=\"Alpine Linux v3.24\"\nHOME_URL=\"https://alpinelinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.alpinelinux.org/alpine/aports/-/issues\"",
+            "compilerLocation": "Linux target executing RCL compiler RBC",
+            "binary": {
+              "path": "native/linux/rclvm",
+              "sha256": "74253ff1b54f921e8e362e195149c2e8a94c5ca2b8cb316f9f021b56b95ce6cb"
+            },
+            "compilerBinary": {
+              "path": "native/linux/rclc",
+              "sha256": "55a16c20fc703eba2739a6ade7272dfef1339be7da8ca7e5360c4fd7a17c9fab"
+            },
+            "compilerArtifact": {
+              "path": "selfhost/compiler.rbc",
+              "sha256": "00299c1a240e363a28c45e4ffe6107f898cc26c79fe4237cbd4113c6880c08e0"
+            }
+          }
+        }
+      ],
+      "boundary": "Local native/WASI/WSL execution and exact byte/state checks. No Android/device, GPU, K400-cell, portable latency, or security-sandbox acceptance."
+    },
+    "existing": {
+      "passed": 4,
+      "failed": 0,
+      "log": "output/module-development-20261028/portable-existing-regression.log"
+    },
+    "legacyBuild": {
+      "format": "rcl.native-sequence-portable-build.v1",
+      "status": "BUILT_CANDIDATE_NOT_RUNTIME_VERIFIED",
+      "generatedSourceHash": "594831e31a2e637d8033133f5e27a37f69f7cd23f0f912ea38f19591ebb67282",
+      "sourceBindings": [
+        {
+          "path": "native/sequence-runtime/frozen-rclvm.c",
+          "sha256": "0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156"
+        },
+        {
+          "path": "native/rclvm.h",
+          "sha256": "f8d9ab551ee11314e90a9f773e505e50a424de07ce51062877d9c1c383467899"
+        },
+        {
+          "path": "native/rclc.c",
+          "sha256": "441d9d6891badcbc6bf50de9e471e01870775c6d4efc3a944c9463e1553e9a3d"
+        },
+        {
+          "path": "native/semantic_state_v2.h",
+          "sha256": "fa23ce99d128b456155560682ae82eadb423732d430eb89385eda5dc56045e5c"
+        },
+        {
+          "path": "native/sequence-runtime/concat-case.c",
+          "sha256": "4ba235c9d16606ef023345af2e878afc5f32f4cfc2357863743378c460ffdf4c"
+        },
+        {
+          "path": "native/wasi-sha256.zig",
+          "sha256": "ae33a76d17c288838af95dbfb75a0a5c5162825f00fefd7529710cb968ee38f2"
+        },
+        {
+          "path": "native/wasi-compat/openssl/sha.h",
+          "sha256": "69ec337c787cc60d384f518effaefa99ab7e1b808e487bb5d1308473c4b19637"
+        },
+        {
+          "path": "native/wasi-compat/stdio-capture.c",
+          "sha256": "a1e1eb463292c5cac1f06d943e83b5fdc245d05492d032201dbd08c5ff342c6d"
+        },
+        {
+          "path": "scripts/build-native-sequence-portable.mjs",
+          "sha256": "81500e65826948bab42ead4f21345ffea77ea40def173640ca0e7d15a3be5910"
+        }
+      ],
+      "toolchain": {
+        "path": "../RCL-v2-development/_tools/zig-x86_64-windows-0.16.0/zig.exe",
+        "bytes": 177108480,
+        "sha256": "086ce9d47ba42f33a514e1a6e04eb1d4a8fa1d75e0868e0213caad447c91e864",
+        "version": "0.16.0"
+      },
+      "commands": [
+        {
+          "args": [
+            "build-obj",
+            "native/wasi-sha256.zig",
+            "-target",
+            "x86_64-linux-musl",
+            "-O",
+            "ReleaseSmall",
+            "-femit-bin=C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\linux\\sha256.o"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "args": [
+            "cc",
+            "-target",
+            "x86_64-linux-musl",
+            "-std=c11",
+            "-O2",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\rclvm.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\linux\\sha256.o",
+            "-lm",
+            "-o",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\linux\\rclvm"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "args": [
+            "cc",
+            "-target",
+            "x86_64-linux-musl",
+            "-std=c11",
+            "-O2",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat",
+            "-DRCLVM_EMBEDDED_ONLY",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\rclvm.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\rclc.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\linux\\sha256.o",
+            "-lm",
+            "-o",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\linux\\rclc"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "args": [
+            "build-obj",
+            "native/wasi-sha256.zig",
+            "-target",
+            "wasm32-wasi",
+            "-O",
+            "ReleaseSmall",
+            "-femit-bin=C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\wasi\\sha256.o"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "args": [
+            "cc",
+            "-target",
+            "wasm32-wasi",
+            "-std=c11",
+            "-O2",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\rclvm.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat\\stdio-capture.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\wasi\\sha256.o",
+            "-lm",
+            "-o",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\wasi\\rclvm.wasm"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "2ae30620ad44a5aaac6fa48b09693b05388305dd972e8c3724e2e24aa6bf179c"
+        },
+        {
+          "args": [
+            "cc",
+            "-target",
+            "wasm32-wasi",
+            "-std=c11",
+            "-O2",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native",
+            "-I",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat",
+            "-DRCLVM_EMBEDDED_ONLY",
+            "-D_WASI_EMULATED_GETPID",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\rclvm.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\rclc.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\native\\wasi-compat\\stdio-capture.c",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\wasi\\sha256.o",
+            "-lwasi-emulated-getpid",
+            "-lm",
+            "-o",
+            "C:\\Users\\User\\.codex\\.chatgpt-projects\\g-p-6a437af98cc08191af8185180f66b55e\\work\\RCL-module-development-20261028\\output\\sequence-portable\\wasi\\rclc.wasm"
+          ],
+          "status": 0,
+          "stdoutHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrHash": "2ae30620ad44a5aaac6fa48b09693b05388305dd972e8c3724e2e24aa6bf179c"
+        }
+      ],
+      "artifacts": [
+        {
+          "environment": "linux",
+          "vm": {
+            "path": "output/sequence-portable/linux/rclvm",
+            "bytes": 1853064,
+            "sha256": "4699d445021213858839bceac47e20fea898f1bfb2d313afcbec148859fe1811"
+          },
+          "compiler": {
+            "path": "output/sequence-portable/linux/rclc",
+            "bytes": 1879536,
+            "sha256": "416fd4c9c5e324afe4e05634977a8e523e5e43b64eb5f1493f0980e1650fdb14"
+          }
+        },
+        {
+          "environment": "wasi",
+          "vm": {
+            "path": "output/sequence-portable/wasi/rclvm.wasm",
+            "bytes": 1468624,
+            "sha256": "b54cd1de892c88405cf00dbf7cf7b6b515fd7c5bc8f1daa95cf6eaae85773930"
+          },
+          "compiler": {
+            "path": "output/sequence-portable/wasi/rclc.wasm",
+            "bytes": 1488016,
+            "sha256": "7bf8a4b1947f17f2f108ed3e8ffafdf621d1442d5d5fbf75c8a1e4a420243d06"
+          }
+        }
+      ],
+      "scope": "Separate Linux-musl and WASI candidates using the same generic persistent Sequence overlay; original native and WASI anchors unchanged"
+    },
+    "legacyRuntime": {
+      "ok": true,
+      "results": [
+        {
+          "environment": "wasi",
+          "ok": true,
+          "stateRoot": "31a5c49f2cfd31c93d86ce0726419189646f144c001687a63448d096aef8feef"
+        },
+        {
+          "environment": "linux-wsl",
+          "ok": true,
+          "stateRoot": "31a5c49f2cfd31c93d86ce0726419189646f144c001687a63448d096aef8feef"
+        }
+      ]
+    }
+  },
+  "rawBindings": {
+    "output/module-development-20261028/portable-legacy-before.log": "319d056ecf4b10dd881fc8a584f3b2b1bb8e71bb3cfd8eafa34d67ad90549262",
+    "output/module-development-20261028/portable-linux-build.log": "a58f34539a14f728c4248a294adaaee3b3638926be89719d070807fc693cbe9d",
+    "output/module-development-20261028/portable-wasi-build.log": "7473ddb9b2b08eb8d42a01a9c662d9b56c228a5551b5ca0f21f064752c43737e",
+    "output/module-development-20261028/portable-wasi-compiler-build.log": "0ccdd465c09f65bbd49ae3e451095bb0d4e8740218f613e33aebd1c1c15305fa",
+    "output/module-development-20261028/portable-legacy-build.log": "aae40eb4e20b882e1073777ff60f18722a6f92e9efaee6a5200e2e423246ee61",
+    "output/module-development-20261028/portable-sequence-parity.json": "2782e9f237f9677ee1d597f0e0c6bb100c52b252b427043d80fead0c18133824",
+    "output/module-development-20261028/portable-legacy-runtime.json": "11d91c4abac9551a666b8098f49c823d7f4d2afcad5f6701b98af97149dfff97",
+    "output/module-development-20261028/portable-existing-regression.log": "5a15da15688889159a1dc775fa41200374e6aec5e42e1460f459095841150b17"
+  },
+  "windowsNativeChanged": false,
+  "currentLinuxWasiBinariesRebuilt": true,
+  "historicalEvidenceRewritten": false,
+  "androidOrDeviceAcceptance": false,
+  "gpuAcceptance": false,
+  "k400Admission": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

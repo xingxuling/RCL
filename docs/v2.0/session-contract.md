@@ -20,6 +20,12 @@ The total input frame is bounded to 2 MiB. Session state supports Number, Truth,
 Text and Sequence in the eligible native-core profile. Provider calls, external
 host effects and typed Ref operations are rejected for deterministic replay.
 
+The direct RCL-authored session compiler also checks its supported expression
+tree for provider effects, including initializers, unused function bodies,
+conditional warrants, rule guards, alterations, preserves and both choose
+branches. It retains rule-level host-effect rejection. This static profile matches
+the public API's existing reference preflight; dead branches do not admit effects.
+
 Each invocation combines the previous committed state with its observations,
 reevaluates conditional warrants, evaluates the guard and computes the proposed
 changes. A failed command, false guard or projection does not commit observations
@@ -109,6 +115,15 @@ See [compiler maintenance evidence](../maintenance/warrant-compiler-admission-20
 
 ## Durable local contract
 
+New directories use `rcl.session-journal.v2`. This storage format binds complete
+input and state maps, including user facet names that resemble internal metadata.
+The durable runtime API version remains `1.0.0`; the package remains `2.0.0`.
+Current readers accept legacy v1 histories and can append tagged v2 commands
+without rewriting the legacy prefix. After v2 appears, a v1 command is rejected.
+Older readers do not accept the new v2 format. Legacy v1 identities retain their
+documented evidence limits; see
+[v2 identity and history verification evidence](../maintenance/durable-history-v2-2026-10-28.md).
+
 The directory stores immutable source.rcl/session.rbc, a hash-linked journal.jsonl
 and an OS writer lock held by the native daemon. A committed command is
 acknowledged only after appending its complete record and fsync. Startup checks
@@ -133,13 +148,81 @@ database, an external-effects exactly-once protocol, a malicious-writer security
 sandbox or proof of hardware power-loss behavior. Filesystem behavior and external
 history anchors retain their separate evidence/authority boundaries.
 
+## Consistent local backups
+
+`await session.backup(newDirectory)` exports the immutable source, bytecode and
+complete journal prefix in the same queue as invocations. Commands queued before
+the export are included; later commands are excluded. The new directory must have
+an existing parent, must be outside the live store and must not already exist.
+The operation never overwrites another directory. A storage failure leaves an
+unacknowledged partial export while the live writer remains usable.
+
+`backup.json` binds the three file lengths and SHA-256 hashes, session/program
+identity, revision, journal head, state root and state-root algorithm. Its
+`backupRoot` hashes this manifest. The writer synchronizes the files and directory
+before acknowledging the export. This does not establish hardware power-loss
+behavior. Export does not copy writer locks, discard history, compact the journal
+or reset revisions and request IDs.
+
+```js
+const exported = await session.backup('./counter-backup');
+const checked = await verifyDurableRealitySessionBackup('./counter-backup', {
+  expectedBackupRoot: exported.backupRoot,
+  expectedJournalRoot: exported.journalRoot,
+  verifyReference: true,
+});
+const restored = await openDurableRealitySession('./counter-backup', {
+  expectedJournalRoot: checked.journalRoot,
+});
+```
+
+Import `verifyDurableRealitySessionBackup` from the package alongside the session
+APIs. It checks the fixed asset names and manifest before starting a native writer,
+then performs ordinary full native replay and compares the replayed identity,
+revision and state root against the manifest. Independent reference replay is
+optional. Corrupt files, missing completion manifests and false state claims fail
+verification. Keep trusted backup/history roots outside the backup directory;
+self-consistent hashes alone do not authenticate an entirely replaced history.
+
+A verified backup can be opened directly as a writable independent continuation.
+This preserves historical request-id retries and roots. Appending new commands to
+that continuation makes the original backup manifest stale; retain the original
+backup or export a new directory when a fresh frozen backup is needed. Existing
+64 MiB / 10,000-command limits continue to apply to each full-prefix journal.
+
+## Paginated committed history
+
+`session.history({ fromRevision: 1, limit: 100, expectedJournalRoot })` queues a
+consistent page with invocations and backups. It returns full command receipts
+that this writer has replayed or acknowledged, including forecast receipts but
+without additional entries for idempotent retries. Entries are detached copies;
+reading does not append or rewrite the journal. This is the writer's admitted
+prefix, not an independent reread/replay of files on each history query.
+
+The `rcl.session-history-page.v1` result includes the current revision/head/state
+root, `previousRoot` immediately before the page, `entries`, `nextRevision` or
+null, and `pageRoot` over all other result fields. Receipt roots continue from
+previousRoot. Reuse the returned journalRoot as expectedJournalRoot for later
+pages; a concurrent committed operation then rejects the stale pin instead of
+silently combining pages from different heads. A page root computed from the
+page is a consistency checksum, not an independently trusted history anchor.
+
+Revisions begin at 1; genesis has no command receipts. A request at current
+revision plus one returns an empty terminal page. Larger offsets reject. The
+page limit is 1 through 1000, default 100. Invalid options and stale pins leave
+the writer usable. Existing full-prefix limits and writer ownership apply;
+history pagination does not implement checkpointing or journal compaction.
+
 ## CLI and example
 
 ```text
 rcl session init examples/sessions/governed-counter.rcl ./counter-state
 rcl session invoke ./counter-state examples/sessions/increment-command.json
 rcl session inspect ./counter-state
+rcl session history ./counter-state --from-revision 1 --limit 100 --expected-root <trusted-journal-root>
 rcl session verify ./counter-state --reference
+rcl session backup ./counter-state ./counter-backup --expected-root <trusted-journal-root>
+rcl session backup-verify ./counter-backup --expected-backup-root <trusted-backup-root> --reference
 rcl session inspect ./counter-state --expected-root <trusted-journal-root> --minimum-revision 1
 rcl session compile examples/sessions/governed-counter.rcl ./counter-session.rbc
 node examples/sessions/persistent-counter-demo.mjs
@@ -157,7 +240,10 @@ expectedJournalRoot and minimumRevision. Keep these anchors outside the session
 directory in a trusted application or record. Checking a root read from the same
 possibly rolled-back history does not supply an independent anchor. Pins refer
 to the current complete prefix before an invocation or incomplete-tail repair.
-These four operations also accept --reference for independent reference replay.
+These four operations, history and backup/backup-verify also accept --reference for
+independent reference replay. backup-verify additionally accepts
+--expected-backup-root; it is rejected for other operations.
+Only history accepts --from-revision and --limit.
 Unknown, duplicate, malformed or operation-inappropriate flags fail before any
 native execution or storage mutation; --bootstrap belongs only to compile and
 --repair-incomplete-tail belongs only to recover.

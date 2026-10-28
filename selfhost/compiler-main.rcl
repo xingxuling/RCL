@@ -15,8 +15,8 @@
   reckon k337_validate_rule_needs(items : Sequence, index : Number, warrants : Sequence, actor : Text, name : Text) -> Truth =
     choose(index >= length(items), true,
       choose(actor == "", k337_validate_rule_needs(items, index + 1, warrants, actor, name),
-        choose(semantic_check(k337_warrant_exists(warrants, 0, actor, sequence_get(items, index)),
-            "RCL_WARRANT_MISSING", name + ":" + actor + ":" + need_capability(sequence_get(items, index)) + ":" + need_target(sequence_get(items, index))),
+        choose(semantic_check_at(k337_warrant_exists(warrants, 0, actor, sequence_get(items, index)),
+            "RCL_WARRANT_MISSING", name + ":" + actor + ":" + need_capability(sequence_get(items, index)) + ":" + need_target(sequence_get(items, index)), need_span(sequence_get(items, index))),
           k337_validate_rule_needs(items, index + 1, warrants, actor, name), false)))
 
   reckon k337_validate_rules(items : Sequence, index : Number, warrants : Sequence) -> Truth =

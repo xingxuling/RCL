@@ -92,9 +92,18 @@ export function formFieldError(node, value) {
   if (['select', 'radio'].includes(kind) && !inputOptions(node).includes(value)) return 'option';
   return null;
 }
-export function formValidation(nodes, rendered) {
+export function formValidationNodes(nodes, scopeId = null) {
+  if (scopeId === null) return nodes;
+  const scope = nodes.find((node) => node.id === scopeId);
+  if (!scope || scope.role !== 'container') throw new Error(`RCL_UI_FORM_SCOPE_TARGET:${scopeId}`);
+  const selected = [];
+  const walk = (node) => { selected.push(node); for (const child of node.children) walk(child); };
+  walk(scope);
+  return selected;
+}
+export function formValidation(nodes, rendered, scopeId = null) {
   const fields = {};
-  for (const node of nodes) {
+  for (const node of formValidationNodes(nodes, scopeId)) {
     if (node.role !== 'input') continue;
     const binding = rendered[node.id] ?? {};
     const value = binding.value ?? node.localProperties.find((x) => x.property === 'value')?.value;

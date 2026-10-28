@@ -1,0 +1,58 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 343089,
+    "sha256": "796b12201d1fe9112c56962165997c54da41811a6cf6d6a1e5c5d07b8beaf78e",
+    "sourceSha256": "168c3e239ebab163b1bd017e9fd5d002c4a345dbef5322031438f8d75be6a3bf",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "796b12201d1fe9112c56962165997c54da41811a6cf6d6a1e5c5d07b8beaf78e",
+      "c1": "796b12201d1fe9112c56962165997c54da41811a6cf6d6a1e5c5d07b8beaf78e",
+      "c2": "796b12201d1fe9112c56962165997c54da41811a6cf6d6a1e5c5d07b8beaf78e"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 343089,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 343089,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "sources": {
+    "selfhost/compiler-core.rcl": "3e93429d1d679a6b7b8976bae1dca02a848b7ead885ddd6a53cb70c813456c1e",
+    "selfhost/compiler-main.rcl": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d",
+    "selfhost/compiler.rbc": "796b12201d1fe9112c56962165997c54da41811a6cf6d6a1e5c5d07b8beaf78e",
+    "tests/native-ui-selfhost-reactivity.test.mjs": "fb8d12972db4d2b03a3ffa433d79396b5d2785b1d3af38b15e5114fcaa94388e"
+  },
+  "checks": {
+    "newReactiveChecks": {
+      "before": {
+        "passed": 6,
+        "failed": 13
+      },
+      "after": {
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    "finalArtifactRegression": {
+      "passed": 122,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/native-ui-selfhost-reactivity.test.mjs tests/native-ui-selfhost-controls.test.mjs tests/selfhost-semantic-locations.test.mjs tests/selfhost-toolchain.test.mjs tests/warrant-compiler-admission.test.mjs tests/selfhost-example-parity-cli.test.mjs",
+      "log": "output/module-development-20261028/native-ui-reactivity-final.log"
+    }
+  },
+  "completeNativeUiParity": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

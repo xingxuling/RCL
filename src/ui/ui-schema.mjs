@@ -31,7 +31,7 @@ export const UI_BINDABLE_PROPERTIES_BY_ROLE = Object.freeze({
 export const UI_CONTENT_PROPERTIES_BY_ROLE = Object.freeze({
   container: Object.freeze(['accessibility_label', 'visible', 'modal']),
   text: Object.freeze(['value', 'accessibility_label', 'visible']),
-  action: Object.freeze(['label', 'accessibility_label', 'disabled', 'visible', 'require_valid_form']),
+  action: Object.freeze(['label', 'accessibility_label', 'disabled', 'visible', 'require_valid_form', 'validation_scope']),
   input: Object.freeze(['value', 'placeholder', 'accessibility_label', 'input_kind', 'disabled', 'read_only', 'visible', 'min', 'max', 'step', 'options', 'required', 'min_length', 'max_length']),
 });
 export const UI_PROPERTY_TYPES = Object.freeze({
@@ -43,6 +43,7 @@ export const UI_PROPERTY_TYPES = Object.freeze({
   options: 'Text',
   required: 'Truth',
   require_valid_form: 'Truth',
+  validation_scope: 'Text',
   min_length: 'Number',
   max_length: 'Number',
   min: 'Number',

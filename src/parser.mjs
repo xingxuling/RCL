@@ -8,7 +8,20 @@ const BINARY_PRECEDENCE = new Map([
 ]);
 
 class Parser {
-  constructor(tokens) { this.tokens = tokens; this.index = 0; }
+  constructor(tokens, locations = null, typeLocations = null) { this.tokens = tokens; this.index = 0; this.locations = locations; this.typeLocations = typeLocations; }
+  tokenRange(start, end) {
+    const first = this.tokens[start], last = this.tokens[Math.max(start, end - 1)];
+    return {
+      start: { line: first.line - 1, character: first.column - 1 },
+      end: { line: last.line - 1, character: last.column - 1 + String(last.value).length },
+    };
+  }
+  located(node, start, end = this.index) {
+    if (this.locations && !this.locations.has(node)) {
+      this.locations.set(node, this.tokenRange(start, end));
+    }
+    return node;
+  }
   current() { return this.tokens[this.index]; }
   at(value) { return this.current().value === value; }
   atType(type) { return this.current().type === type; }
@@ -145,12 +158,16 @@ class Parser {
   parseFacet(prefix) {
     const input = this.at('input');
     const start = this.expect(input ? 'input' : 'facet');
+    const nameStart = this.index;
     const local = this.parsePath();
+    const nameEnd = this.index;
     const path = prefix ? `${prefix}.${local}` : local;
     this.expect(':');
+    const typeStart = this.index;
     const valueType = this.parseType();
+    const typeEnd = this.index;
     this.expect('=');
-    return {
+    const node = {
       kind: 'FacetDecl',
       path,
       valueType,
@@ -159,6 +176,8 @@ class Parser {
       location: { line: start.line, column: start.column },
       ...(input ? { input: true } : {}),
     };
+    this.typeLocations?.set(node, this.tokenRange(typeStart, typeEnd));
+    return this.located(node, nameStart, nameEnd);
   }
 
   parseSubject() {
@@ -1184,11 +1203,11 @@ class Parser {
       else if (keyword === 'when') { this.advance(); rule.when = this.parseExpression(); }
       else if (keyword === 'needs') { this.advance(); const capability = this.parsePath(); this.expect('on'); rule.needs.push({ capability, target: this.parsePath() }); }
       else if (keyword === 'preserve') { this.advance(); rule.preserves.push(this.parseExpression()); }
-      else if (keyword === 'alter') { this.advance(); const target = this.parsePath(); this.expect('<-'); rule.alters.push({ target, expression: this.parseExpression() }); }
+      else if (keyword === 'alter') { this.advance(); const targetStart = this.index; const target = this.parsePath(); const targetEnd = this.index; this.expect('<-'); rule.alters.push(this.located({ target, expression: this.parseExpression() }, targetStart, targetEnd)); }
       else if (keyword === 'call') {
         this.advance(); const capability = this.parsePath(); this.expect('('); const args = [];
         if (!this.at(')')) do { args.push(this.parseExpression()); if (!this.at(',')) break; this.advance(); } while (!this.at(')'));
-        this.expect(')'); this.expect('->'); rule.calls.push({ capability, args, target: this.parsePath() });
+        this.expect(')'); this.expect('->'); const targetStart = this.index; const target = this.parsePath(); rule.calls.push(this.located({ capability, args, target }, targetStart));
       } else if (keyword === 'witness') { this.advance(); rule.witnesses.push(this.expectType('STRING', 'Expected witness text').value); }
       else throw new RCLSyntaxError(`Unknown ${ruleKind.toLowerCase()} clause '${keyword}'`, this.current());
     }
@@ -1250,6 +1269,12 @@ class Parser {
   }
 
   parsePrefix() {
+    const start = this.index;
+    const node = this.parsePrefixNode();
+    return node.kind === 'PathExpr' ? this.located(node, start) : node;
+  }
+
+  parsePrefixNode() {
     const token = this.current();
     if (token.value === 'not' || token.value === '-') { this.advance(); return { kind: 'UnaryExpr', operator: token.value, expression: this.parseExpression(7) }; }
     if (token.value === 'match') return this.parseMatchExpression();
@@ -1284,3 +1309,12 @@ class Parser {
 }
 
 export function parseReality(source) { return new Parser(lexReality(source)).parseProgram(); }
+
+// Diagnostic/tooling coordinates live outside the canonical AST and never enter
+// program roots, bytecode or serialized language data.
+export function parseRealityWithLocations(source) {
+  const locations = new WeakMap(), typeLocations = new WeakMap();
+  const tokens = lexReality(source);
+  const ast = new Parser(tokens, locations, typeLocations).parseProgram();
+  return { ast, locations, typeLocations, tokens };
+}

@@ -52,13 +52,66 @@
 
   reckon validate_session_facets(items : Sequence, index : Number) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check((facet_type(sequence_get(items, index)) == "Number" or facet_type(sequence_get(items, index)) == "Truth" or facet_type(sequence_get(items, index)) == "Text"
+      choose(semantic_check_at((facet_type(sequence_get(items, index)) == "Number" or facet_type(sequence_get(items, index)) == "Truth" or facet_type(sequence_get(items, index)) == "Text"
           or (facet_type(sequence_get(items, index)) == "Sequence" and not facet_input(sequence_get(items, index)))),
-          "RCL_SESSION_FACET_TYPE_UNSUPPORTED", facet_path(sequence_get(items, index))), validate_session_facets(items, index + 1), false))
+          "RCL_SESSION_FACET_TYPE_UNSUPPORTED", facet_path(sequence_get(items, index)),
+          make_span(0, facet_line(sequence_get(items, index)), facet_column(sequence_get(items, index)), 0)), validate_session_facets(items, index + 1), false))
+
+  reckon validate_session_rule_effects(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check(length(rule_calls(sequence_get(items, index))) == 0, "RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED", rule_name(sequence_get(items, index))),
+        validate_session_rule_effects(items, index + 1), false))
+
+  reckon session_expression_list_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(session_expression_pure(sequence_get(items, index)), session_expression_list_pure(items, index + 1), false))
+
+  reckon session_expression_pure(node : Sequence) -> Truth =
+    choose(length(node) == 0, true,
+      choose(expr_kind(node) == "CallExpr",
+        choose(semantic_check_at(expr_text(node) != "provider_call", "RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED", expr_text(node), expr_span(node)),
+          choose(semantic_check_at(expr_text(node) != "typed_ref" and expr_text(node) != "typed_deref" and expr_text(node) != "typed_ref_id",
+              "RCL_SESSION_REF_OPERATION_UNSUPPORTED", expr_text(node), expr_span(node)),
+            session_expression_list_pure(expr_args(node), 0), false), false),
+        choose(expr_kind(node) == "UnaryExpr", session_expression_pure(expr_left(node)),
+          choose(expr_kind(node) == "BinaryExpr",
+            choose(session_expression_pure(expr_left(node)), session_expression_pure(expr_right(node)), false), true))))
+
+  reckon session_facet_expressions_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(session_expression_pure(facet_expression(sequence_get(items, index))), session_facet_expressions_pure(items, index + 1), false))
+
+  reckon session_reckon_expressions_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(session_expression_pure(reckon_expression(sequence_get(items, index))), session_reckon_expressions_pure(items, index + 1), false))
+
+  reckon session_warrant_expressions_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(choose(warrant_conditional(sequence_get(items, index)), session_expression_pure(warrant_condition(sequence_get(items, index))), true),
+        session_warrant_expressions_pure(items, index + 1), false))
+
+  reckon session_alter_expressions_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(session_expression_pure(alter_expression(sequence_get(items, index))), session_alter_expressions_pure(items, index + 1), false))
+
+  reckon session_rule_expressions_pure(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(session_expression_pure(rule_when(sequence_get(items, index))),
+        choose(session_alter_expressions_pure(rule_alters(sequence_get(items, index)), 0),
+          choose(session_expression_list_pure(rule_preserves(sequence_get(items, index)), 0),
+            session_rule_expressions_pure(items, index + 1), false), false), false))
+
+  reckon session_program_expressions_pure(program : Sequence) -> Truth =
+    choose(session_facet_expressions_pure(program_facets(program), 0),
+      choose(session_reckon_expressions_pure(program_reckons(program), 0),
+        choose(session_warrant_expressions_pure(program_warrants(program), 0),
+          session_rule_expressions_pure(program_rules(program), 0), false), false), false)
 
   reckon validated_session_program(program : Sequence) -> Sequence =
-    choose(validate_session_facets(program_facets(program), 0), program, program)
+    choose(validate_session_rule_effects(program_rules(program), 0),
+      choose(session_program_expressions_pure(program),
+        choose(validate_session_facets(program_facets(program), 0), program, program), program), program)
 
   reckon encode_session_rbc(program : Sequence, root : Text, strings : Sequence, numbers : Sequence, instructions : Sequence) -> Sequence =
-    sequence_concat(encode_header_with_flags(find_text(strings, 0, program_name(program)), find_text(strings, 0, root), length(strings), length(numbers), length(instructions), 3, 4),
+    sequence_concat(encode_header_with_flags(find_text(strings, 0, program_name(program)), find_text(strings, 0, root), length(strings), length(numbers), length(instructions), choose(instructions_require_v13(instructions, 0), 3, choose(instructions_require_v12(instructions, 0), 2, 1)), 4),
       sequence_concat(encode_string_pool(strings, 0, empty_sequence()), sequence_concat(encode_number_pool(numbers, 0, empty_sequence()), encode_instructions(instructions, 0, empty_sequence()))))

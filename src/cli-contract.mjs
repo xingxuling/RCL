@@ -241,10 +241,17 @@ Persistent governed sessions:
   rcl session init <source.rcl> <directory>
   rcl session invoke <directory> <command.json>
   rcl session inspect <directory>
+  rcl session history <directory> [--from-revision <n>] [--limit <n>]
+  rcl session history-verify <page-or-pages.json> [--expected-root <sha256>]
   rcl session verify <directory> [--reference]
   rcl session recover <directory> --repair-incomplete-tail
   rcl session compile <source.rcl> <output.rbc> [--bootstrap]
   Existing sessions: --expected-root <sha256> --minimum-revision <integer>
+
+Editor previews:
+  rcl lsp-rename-preview <source.rcl> <facet> <new-leaf> <new-directory>
+                               Export renamed.rcl and a bound edit preview
+  Optional type modules: --types <directory-or-file>
 
 Use the project README for the complete advanced command catalogue.`);
 }

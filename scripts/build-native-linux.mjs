@@ -9,7 +9,7 @@ const zig = candidates.find(candidate => spawnSync(candidate, ['version'], { win
 if (!zig) throw new Error('RCL_LINUX_ZIG_MISSING');
 const output = path.resolve(ROOT, process.argv[2] ?? 'build/linux');
 fs.mkdirSync(output, { recursive: true });
-const env = { ...process.env, ZIG_GLOBAL_CACHE_DIR: path.join(ROOT, '_tools/zig-global-cache'), ZIG_LOCAL_CACHE_DIR: path.join(ROOT, '_tools/zig-local-cache') };
+const env = { ...process.env, ZIG_GLOBAL_CACHE_DIR: process.env.ZIG_GLOBAL_CACHE_DIR ?? path.join(ROOT, '_tools/zig-global-cache'), ZIG_LOCAL_CACHE_DIR: process.env.ZIG_LOCAL_CACHE_DIR ?? path.join(ROOT, '_tools/zig-local-cache') };
 const run = args => {
   const result = spawnSync(zig, args, { cwd: ROOT, env, encoding: 'utf8', timeout: 120_000, windowsHide: true });
   if (result.status !== 0) throw new Error(result.stderr || result.stdout || result.error?.message);

@@ -12,6 +12,7 @@ import { runSuperconductorCandidateInversionDemo, writeSuperconductorCandidateIn
 import { runSandboxComputerFileTransmissionDemo, writeSandboxComputerFileTransmissionReports, buildSandboxComputerTransmissionSpec, renderSandboxComputerTransmissionRcl, readSandboxTransmissionInput } from './sandbox-computer-file-transmission-protocol.mjs';
 import { runAutonomousSandboxFileEmissionDemo, writeAutonomousSandboxFileEmissionReports, buildAutonomousSandboxFileEmissionSpec, renderAutonomousSandboxFileEmissionRcl, readAutonomousSandboxFileEmissionInput } from './autonomous-sandbox-file-emission-protocol.mjs';
 import { decodeBytecode } from './bytecode.mjs';
+import { verifyContentAddressedCache, materializeContentAddressedCache } from './package-ecosystem-runtime.mjs';
 import { runNativeBytecode } from './native-vm.mjs';
 import {
   DEFAULT_GENERAL_SELFHOST_COMPILER_ARTIFACT_PATH,
@@ -56,6 +57,37 @@ import { runAgentCivilizationFederationDemo, writeAgentCivilizationFederationRep
 import { runSoulUniverseDialogueSandboxDemo, writeSoulUniverseDialogueReports, buildSoulUniverseDialogueSpec, renderSoulUniverseDialogueRcl, readSoulUniverseDialogueInput } from './soul-universe-dialogue-sandbox.mjs';
 
 const [command, file, output, third, fourth, fifth] = process.argv.slice(2);
+if (command === 'package-release-verify' || command === 'package-verify') {
+  try {
+    const tokens = process.argv.slice(3), options = {};
+    const release = command === 'package-release-verify', invalid = () => { throw new Error(release ? 'RCL_RELEASE_CLI_ARGUMENT_INVALID' : 'RCL_PACKAGE_CLI_ARGUMENT_INVALID'); };
+    if (![1, 3].includes(tokens.length) || !tokens[0] || tokens[0].startsWith('--')) invalid();
+    if (tokens.length === 3) {
+      if (tokens[1] !== (release ? '--expected-release-root' : '--expected-manifest-root') || !/^[0-9a-f]{64}$/u.test(tokens[2])) invalid();
+      options[release ? 'expectedReleaseRoot' : 'expectedManifestRoot'] = tokens[2];
+    }
+    const report = release ? verifyReleaseBundle(tokens[0], options) : verifyRclPackage(tokens[0], options);
+    console.log(JSON.stringify(report, null, 2)); process.exit((release ? report.ok : report.status === 'verified') ? 0 : 1);
+  } catch (error) {
+    console.log(JSON.stringify({ ok: false, diagnostics: [{ code: error.message }] }, null, 2)); process.exit(1);
+  }
+}
+if (command === 'package-cache-verify' || command === 'package-cache-materialize') {
+  try {
+    const tokens = process.argv.slice(3), count = command === 'package-cache-verify' ? 1 : 2;
+    if (tokens.length < count || tokens.slice(0, count).some(value => !value || value.startsWith('--'))) throw new Error('RCL_CACHE_CLI_ARGUMENT_INVALID');
+    const options = {}, seen = new Set();
+    for (let index = count; index < tokens.length; index += 2) {
+      const flag = tokens[index], value = tokens[index + 1];
+      if (!['--expected-cache-root', '--expected-lock-root'].includes(flag) || seen.has(flag) || !/^[0-9a-f]{64}$/u.test(value ?? '')) throw new Error('RCL_CACHE_CLI_ARGUMENT_INVALID');
+      seen.add(flag); options[flag === '--expected-cache-root' ? 'expectedCacheRoot' : 'expectedLockRoot'] = value;
+    }
+    const report = command === 'package-cache-verify' ? verifyContentAddressedCache(tokens[0], options) : materializeContentAddressedCache(tokens[0], tokens[1], options);
+    console.log(JSON.stringify(report, null, 2)); process.exit(report.ok ? 0 : 1);
+  } catch (error) {
+    console.log(JSON.stringify({ ok: false, diagnostics: [{ code: error.message, message: error.message }] }, null, 2)); process.exit(1);
+  }
+}
 if (command === 'framework-atlas') {
   console.log(JSON.stringify({
     assessment: assessRclNativeFrameworkAtlas(),
@@ -90,7 +122,7 @@ const commands = new Set(['compile', 'run', 'absorb', 'bytecode', 'disasm', 'nat
 if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2', 'bootstrap3', 'bootstrap4', 'bootstrap5', 'bootstrap6', 'bootstrap7', 'bootstrap8', 'bootstrap9', 'selfhost', 'android-env', 'rclapp-list', 'provider-v2-demo', 'resource-isolation-demo', 'resource-lifecycle-demo', 'resource-wal-demo', 'type-module-demo', 'type-linked-demo', 'type-constructor-demo', 'type-package-demo', 'typed-bytecode-demo', 'typed-access-demo', 'typed-heap-demo', 'typed-reference-demo', 'typed-gc-demo', 'debug-map-demo', 'debug-session-demo', 'profiler-demo', 'debug-ui-demo', 'lsp-demo', 'dap-demo', 'package-ecosystem-demo', 'package-ecosystem-init', 'reality-compiler-demo', 'reality-compiler-sandbox', 'reality-compiler-spec', 'internal-closure-demo', 'internal-closure-run', 'internal-closure-spec', 'cosmogenic-demo', 'cosmogenic-run', 'cosmogenic-spec', 'nested-universe-demo', 'nested-universe-run', 'nested-universe-spec', 'interstice-observer-demo', 'interstice-observer-run', 'interstice-observer-spec', 'empirical-grounding-demo', 'empirical-grounding-run', 'empirical-grounding-spec', 'unknown-knowledge-demo', 'unknown-knowledge-run', 'unknown-knowledge-spec', 'directed-wisher-demo', 'directed-wisher-run', 'directed-wisher-spec', 'predictive-trace-demo', 'predictive-trace-run', 'predictive-trace-spec', 'temporal-fingerprint-demo', 'temporal-fingerprint-run', 'temporal-fingerprint-spec', 'candidate-pressure-forge-demo', 'candidate-pressure-forge-run', 'candidate-pressure-forge-spec', 'ecological-phase0-demo', 'ecological-phase0-run', 'ecological-phase0-spec', 'esoteric-mechanism-demo', 'esoteric-mechanism-run', 'esoteric-mechanism-spec', 'akashic-record-demo', 'akashic-record-run', 'akashic-record-spec', 'self-akashic-record-demo', 'self-akashic-record-run', 'self-akashic-record-spec', 'future-rcl-akashic-demo', 'future-rcl-akashic-run', 'future-rcl-akashic-spec', 'experiment-design-demo', 'experiment-design-run', 'experiment-design-spec', 'mechanism-prototype-demo', 'mechanism-prototype-run', 'mechanism-prototype-spec', 'empirical-lab-notebook-demo', 'empirical-lab-notebook-run', 'empirical-lab-notebook-spec', 'civilization-tech-tree-demo', 'civilization-tech-tree-run', 'civilization-tech-tree-spec', 'rncs-execution-bridge-v2-demo', 'rncs-execution-bridge-v2-run', 'rncs-execution-bridge-v2-spec', 'human-capability-feedback-demo', 'human-capability-feedback-run', 'human-capability-feedback-spec', 'reality-product-entry-demo', 'reality-product-entry-run', 'reality-product-entry-spec', 'recursive-future-release-demo', 'recursive-future-release-run', 'recursive-future-release-spec', 'evidence-product-shell-demo', 'evidence-product-shell-run', 'evidence-product-shell-spec', 'aether-forge-pocket-bridge-demo', 'aether-forge-pocket-bridge-run', 'aether-forge-pocket-bridge-spec', 'experiment-automation-demo', 'experiment-automation-run', 'experiment-automation-spec', 'prototype-simulation-demo', 'prototype-simulation-run', 'prototype-simulation-spec', 'real-world-data-ingestion-demo', 'real-world-data-ingestion-run', 'real-world-data-ingestion-spec', 'real-world-data-ingestion-demo', 'real-world-data-ingestion-run', 'real-world-data-ingestion-spec', 'multi-agent-verification-council-demo', 'multi-agent-verification-council-run', 'multi-agent-verification-council-spec', 'living-artifact-demo', 'living-artifact-run', 'living-artifact-spec', 'recursive-governance-demo', 'recursive-governance-run', 'recursive-governance-spec', 'universal-semantic-translator-demo', 'universal-semantic-translator-run', 'universal-semantic-translator-spec', 'universe-knowledge-runtime-demo', 'universe-knowledge-runtime-run', 'universe-knowledge-runtime-spec', 'super-agent-runtime-demo', 'super-agent-runtime-run', 'super-agent-runtime-spec', 'llm-like-runtime-demo', 'llm-like-runtime-run', 'llm-like-runtime-spec', 'composite-provider-router-demo', 'composite-provider-router-run', 'composite-provider-router-spec', 'unknown-framework-gap-closure-demo', 'unknown-framework-gap-closure-run', 'unknown-framework-gap-closure-spec', 'self-upgrade-team-demo', 'self-upgrade-team-run', 'self-upgrade-team-spec', 'source-map-patch-queue-demo', 'source-map-patch-queue-run', 'source-map-patch-queue-spec', 'agent-civilization-demo', 'agent-civilization-run', 'agent-civilization-spec', 'founder-twin-agent-city-demo', 'founder-twin-agent-city-run', 'founder-twin-agent-city-spec', 'ial-civilization-product-os-demo', 'ial-civilization-product-os-run', 'ial-civilization-product-os-spec', 'memory-to-product-foundry-demo', 'memory-to-product-foundry-run', 'memory-to-product-foundry-spec', 'agent-civilization-federation-demo', 'agent-civilization-federation-run', 'agent-civilization-federation-spec', 'soul-universe-dialogue-demo', 'soul-universe-dialogue-run', 'soul-universe-dialogue-spec', 'blue-sky-worldview-blindtest-demo', 'blue-sky-worldview-blindtest-run', 'blue-sky-worldview-blindtest-spec', 'blue-sky-world-anchor-demo', 'blue-sky-world-anchor-run', 'blue-sky-world-anchor-spec', 'inner-universe-worldview-demo', 'inner-universe-worldview-run', 'inner-universe-worldview-spec', 'blue-sky-world-demo', 'blue-sky-world-run', 'blue-sky-world-spec', 'inner-universe-blind-planet-demo', 'inner-universe-blind-planet-run', 'inner-universe-blind-planet-spec', 'cosmogenic-parameter-inversion-demo', 'cosmogenic-parameter-inversion-run', 'cosmogenic-parameter-inversion-spec', 'real-universe-coordinate-blindtest-demo', 'real-universe-coordinate-blindtest-run', 'real-universe-coordinate-blindtest-spec', 'real-universe-coordinate-demo', 'real-universe-coordinate-run', 'real-universe-coordinate-spec', 'blue-sky-cosmogenic-projection-demo', 'blue-sky-cosmogenic-projection-run', 'blue-sky-cosmogenic-projection-spec', 'superconductor-candidate-inversion-demo', 'superconductor-candidate-inversion-run', 'superconductor-candidate-inversion-spec', 'sandbox-file-transmission-demo', 'sandbox-file-transmission-run', 'sandbox-file-transmission-spec', 'autonomous-file-emission-demo', 'autonomous-file-emission-run', 'autonomous-file-emission-spec'].includes(command))) {
   console.error(`Usage: rcl <compile|run|absorb|bytecode|disasm|native-run|native> <file> [output.rbc]
        rcl package <file.rcl> [target|all] [output-dir]
-       rcl package-verify <package-dir>
+       rcl package-verify <package-dir> [--expected-manifest-root <sha256>]
        rcl android-env [package-dir]
        rcl package-build-android <android-package-dir>
        rcl rclapp-install <package-dir> [store-dir]
@@ -125,7 +157,7 @@ if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2',
        rcl replay-trace <trace.json> [output-dir]
        rcl debug-session-demo
        rcl debug-session-run <file.rcl> <types-dir|file> [output-dir] [debug-config.json]
-       rcl debug-step <debug-session.json> [next|continue|reset|seq:<n>|frame:<n>] [output-dir]
+       rcl debug-step <debug-session.json> [next|previous|continue|reverse-continue|reset|seq:<n>|frame:<n>] [output-dir]
        rcl profiler-demo
        rcl profile-run <file.rcl> <types-dir|file> [output-dir] [debug-config.json]
        rcl replay-bundle <trace.json> [output-dir]
@@ -146,9 +178,11 @@ if (!command || !commands.has(command) || (!file && !['bootstrap', 'bootstrap2',
        rcl package-lock <package-dir>
        rcl package-lock-verify <package-dir> [rcl.lock.json]
        rcl package-cache <package-dir> [cache-dir]
+       rcl package-cache-verify <cache-dir> [--expected-cache-root <sha256>]
+       rcl package-cache-materialize <cache-dir> <new-directory> [--expected-cache-root <sha256>]
        rcl package-target-matrix <package-dir> [output-dir]
        rcl package-release <package-dir> [output-dir]
-       rcl package-release-verify <release-dir>
+       rcl package-release-verify <release-dir> [--expected-release-root <sha256>]
        rcl reality-compiler-demo
        rcl reality-compiler-sandbox [output-dir]
        rcl reality-compiler-spec [output-dir]
@@ -631,7 +665,9 @@ try {
   } else if (command === 'package-lock-verify') {
     console.log(JSON.stringify(verifyPackageLock(file, output), null, 2));
   } else if (command === 'package-cache') {
-    console.log(JSON.stringify(populateContentAddressedCache(file, output), null, 2));
+    const report = populateContentAddressedCache(file, output);
+    console.log(JSON.stringify(report, null, 2));
+    process.exitCode = report.ok ? 0 : 1;
   } else if (command === 'package-target-matrix') {
     console.log(JSON.stringify(await buildTargetMatrix(file, output), null, 2));
   } else if (command === 'package-release') {

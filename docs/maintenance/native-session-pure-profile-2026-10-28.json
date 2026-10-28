@@ -1,0 +1,43 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "sources": {
+    "selfhost/compiler-core.rcl": "ebce466f6bdcee7652de7593263f29daaf74266b420d915b41cec9bea2b9e71a",
+    "selfhost/session-compiler-core.rcl": "00dfe0a2e62fc4a47eefcb12799be1dc2bbac7504626b1aa74a2d347b1c59577",
+    "selfhost/session-compiler-main.rcl": "c81013ced88c7d85b74753db9e7ef146bf1d6228833f47f07f731ff55e9207a4",
+    "tests/session-compiler-pure-profile.test.mjs": "c985e2881ef82a4f6485eed4933928e8287891b2d2f90b03a8e92120e912b50f"
+  },
+  "sessionCompilerBootstrap": {
+    "owner": "JavaScript-to-RCL-bytecode",
+    "compilerSourceSha256": "a10f27374478ec087fe10ac77a5c684201dbaedf0a58ebdcb08fa2ff04ea952d",
+    "compilerArtifactSha256": "f12e0803085d84faad39b7bff69d33a0c6da053ea12e294da9bfe8b4a13342b2"
+  },
+  "checks": {
+    "newProfile": {
+      "before": {
+        "passed": 1,
+        "failed": 9
+      },
+      "after": {
+        "passed": 10,
+        "failed": 0
+      }
+    },
+    "affectedRegression": {
+      "passed": 60,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/session-compiler-pure-profile.test.mjs tests/session-compiler-locations.test.mjs tests/session-selfhost-compiler.test.mjs tests/session-bytecode-feature-version.test.mjs tests/selfhost-rule-host-calls.test.mjs tests/durable-session.test.mjs tests/durable-session-backup.test.mjs tests/durable-session-history.test.mjs",
+      "log": "output/module-development-20261028/session-pure-profile-final.log"
+    },
+    "finalDiagnosticCoordinates": {
+      "passed": 10,
+      "failed": 0,
+      "log": "output/module-development-20261028/session-pure-profile-locations.log"
+    }
+  },
+  "generalCompilerArtifactChanged": false,
+  "publicReferencePreflightAlreadyRejectedTheseEffects": true,
+  "independentSessionCompilerSelfHosting": false,
+  "externalEffectSettlementAdded": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

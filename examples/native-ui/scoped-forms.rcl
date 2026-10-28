@@ -1,0 +1,48 @@
+reality NativeUIScopedForms {
+  ui Workspace {
+    state email : Text = ""
+    state nickname : Text = ""
+    state contactSaved : Truth = false
+    state profileSaved : Truth = false
+    view Root {
+      layout vertical { width fill gap 24 padding 24 }
+      text Heading { value "Independent RCL forms" }
+      view ContactForm {
+        layout vertical { width fill gap 12 }
+        text ContactHeading { value "Contact details" }
+        input Email {
+          property input_kind = "email"
+          property required = true
+          accessibility_label "Email address"
+          bind value <- email
+          on input(value : Text) { set email <- value }
+        }
+        action SaveContact {
+          label "Save contact"
+          property require_valid_form = true
+          property validation_scope = "ContactForm"
+          on activate { set contactSaved <- true }
+        }
+        text ContactStatus { bind value <- choose(contactSaved, "Contact saved", "Contact pending") }
+      }
+      view ProfileForm {
+        layout vertical { width fill gap 12 }
+        text ProfileHeading { value "Public profile" }
+        input Nickname {
+          property required = true
+          property min_length = 2
+          accessibility_label "Nickname"
+          bind value <- nickname
+          on input(value : Text) { set nickname <- value }
+        }
+        action SaveProfile {
+          label "Save profile"
+          property require_valid_form = true
+          property validation_scope = "ProfileForm"
+          on activate { set profileSaved <- true }
+        }
+        text ProfileStatus { bind value <- choose(profileSaved, "Profile saved", "Profile pending") }
+      }
+    }
+  }
+}

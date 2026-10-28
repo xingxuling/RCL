@@ -1,0 +1,44 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "format": "rcl.session-backup-development-evidence.v1",
+  "sources": {
+    "src/durable-session.mjs": "da34a2fea3240b6edf9aab5b936feb73dabdf2bd2a9b8df659cb206d096621c4",
+    "src/session-cli.mjs": "0ac589ef2555217d057fec14d95e46450eabfad8d6bb002cdb0a02735ab1785e",
+    "src/index.mjs": "c7ea8272818b65fb5acdc7b833f287ab28c3cc38394cbd04ae74b0426fbb5a1d",
+    "tests/durable-session-backup.test.mjs": "987b134591925a628f117fe60ba80f62333121dbc21caa71d74065813301f1fe"
+  },
+  "checks": {
+    "backup": {
+      "passed": 9,
+      "failed": 0,
+      "command": "node --test tests/durable-session-backup.test.mjs",
+      "log": "output/module-development-20261028/session-backup.log"
+    },
+    "existingDurableAndCliRegression": {
+      "passed": 12,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/durable-session-backup.test.mjs tests/durable-session.test.mjs tests/session-cli-integrity.test.mjs",
+      "combinedRunBeforeExtraSmoke": {
+        "passed": 20,
+        "failed": 0
+      }
+    }
+  },
+  "features": [
+    "queued coherent journal-prefix export",
+    "fresh destination without overwrite",
+    "rooted exact asset manifest",
+    "native replay verification and optional reference replay",
+    "external backup/head/revision anchors",
+    "restored receipt and request-id identity",
+    "strict CLI backup and backup-verify"
+  ],
+  "boundaries": {
+    "compactionImplemented": false,
+    "distributedExactlyOnceClaimed": false,
+    "hardwarePowerLossProven": false,
+    "authenticationFromHashesClaimed": false,
+    "deviceAcceptanceClaimed": false
+  },
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION"
+}

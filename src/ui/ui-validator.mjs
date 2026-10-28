@@ -93,6 +93,16 @@ export function validateCanonicalNativeUi(program) {
     for (const child of node.children ?? []) walk(child, `${identityPath}/${child.id}`);
   };
   walk(program.viewTree);
+  const validateFormScopes = (node, ancestors = []) => {
+    const scope = node.localProperties.find((item) => item.property === 'validation_scope');
+    if (scope) {
+      assert(typeof scope.value === 'string' && scope.value.length > 0, `RCL_UI_FORM_SCOPE_TARGET:${node.id}`);
+      assert(node.localProperties.some((item) => item.property === 'require_valid_form' && item.value === true), `RCL_UI_FORM_SCOPE_GUARD_REQUIRED:${node.id}`);
+      assert(ancestors.some((ancestor) => ancestor.role === 'container' && ancestor.id === scope.value), `RCL_UI_FORM_SCOPE_ANCESTOR:${node.id}:${scope.value}`);
+    }
+    for (const child of node.children) validateFormScopes(child, [...ancestors, node]);
+  };
+  validateFormScopes(program.viewTree);
   // Bounded modal v0.6: a single labelled, state-controlled overlay that is
   // a direct child of an overlay root. This is a real event authority boundary.
   const modalNodes = [];

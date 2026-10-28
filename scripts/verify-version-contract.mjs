@@ -2,6 +2,7 @@ import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getResearchReadiness } from '../src/research-readiness.mjs';
+import { RCL_DURABLE_SESSION_VERSION, RCL_SESSION_JOURNAL_FORMAT } from '../src/durable-session.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -120,6 +121,10 @@ if (contractJson.claims?.nativeSemanticAuthorityRoot?.successor?.algorithm !== s
 
 if (componentContract.components?.nativeVm?.version !== nativeVmVersion) {
   errors.push(`native VM component contract drift: contract=${componentContract.components?.nativeVm?.version}; source=${nativeVmVersion}`);
+}
+if (componentContract.components?.durableSessions?.version !== RCL_DURABLE_SESSION_VERSION
+    || componentContract.components?.durableSessions?.format !== RCL_SESSION_JOURNAL_FORMAT) {
+  errors.push('durable-session component contract drift: runtime API version or journal format differs');
 }
 if (componentContract.components?.typedReferenceAbi?.version !== typedReferenceVersion
     || componentContract.components?.typedReferenceAbi?.format !== typedReferenceFormat) {

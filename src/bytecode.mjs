@@ -247,6 +247,12 @@ function validateNativeSubset(program) {
 
   for (const rule of program.rules) {
     for (const call of rule.calls ?? []) {
+      const target = program.facets.find(facet => facet.path === call.target);
+      if (target && target.valueType !== 'Text') diagnostics.push(diagnostic(
+        'RCL_NATIVE_HOST_CALL_RESPONSE_TYPE',
+        'The native provider ABI returns Text responses; host-call targets must be Text facets',
+        { rule: rule.name, target: call.target, valueType: target.valueType },
+      ));
       const separator = call.capability.indexOf('.');
       if (separator <= 0 || separator === call.capability.length - 1) diagnostics.push(diagnostic(
         'RCL_NATIVE_HOST_CALL_CAPABILITY',

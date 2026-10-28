@@ -1,0 +1,53 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 336769,
+    "sha256": "687bd7bda94e05302fb759b9b9ea67e0ad050fcd102b5720a1697050371f80eb",
+    "sourceSha256": "4efcd4ef74e916374b2d01d1f5a8dfb9226973a9574783497f95cca061f3d1ab",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "687bd7bda94e05302fb759b9b9ea67e0ad050fcd102b5720a1697050371f80eb",
+      "c1": "687bd7bda94e05302fb759b9b9ea67e0ad050fcd102b5720a1697050371f80eb",
+      "c2": "687bd7bda94e05302fb759b9b9ea67e0ad050fcd102b5720a1697050371f80eb"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 336769,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 336769,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "sources": {
+    "selfhost/compiler-core.rcl": "42c2a1e7c4f64b843cfa6a2e8a4d64fffe40dfaf08d7aae12ec9fe734e0508db",
+    "selfhost/compiler-main.rcl": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d",
+    "selfhost/compiler.rbc": "687bd7bda94e05302fb759b9b9ea67e0ad050fcd102b5720a1697050371f80eb",
+    "tests/native-ui-selfhost-controls.test.mjs": "35c12265d7c7d8b80f716fe3f1fecc7e691a6c6f6b25524dd5ae445e10645537"
+  },
+  "checks": {
+    "finalArtifactRegression": {
+      "passed": 99,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/native-ui-selfhost-controls.test.mjs tests/selfhost-semantic-locations.test.mjs tests/selfhost-toolchain.test.mjs tests/warrant-compiler-admission.test.mjs",
+      "log": "output/module-development-20261028/native-typed-ui-final.log"
+    },
+    "newControlChecks": 27
+  },
+  "remainingScope": [
+    "UI initial-state declarations",
+    "UI derived declaration typing, uniqueness and dependency validation",
+    "Complete native diagnostic locations"
+  ],
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

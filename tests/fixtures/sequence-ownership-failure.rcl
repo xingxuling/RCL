@@ -1,0 +1,5 @@
+reality OwnerFailure {
+  reckon fail(n : Number, values : Sequence) -> Number = choose(n == 0, 1 / 0,
+    fail(n - 1, sequence_concat(values, values)))
+  facet count : Number = fail(40, sequence_append(empty_sequence(), 1))
+}

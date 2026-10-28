@@ -72,13 +72,16 @@ export function createNativeUiRuntime(program, options = {}) {
   const lifecycle = (stage, snapshot = null) => {
     if (!program.lifecycle.stages.includes(stage)) throw new Error(`RCL_UI_LIFECYCLE_NOT_DECLARED:${stage}`);
     if (stage === 'create' && snapshot) {
+      const restored = [];
       for (const id of program.lifecycle.restore) {
         if (Object.prototype.hasOwnProperty.call(snapshot, id)) {
           const declaration = program.state.find((item) => item.id === id);
-          if (!matchesUiType(snapshot[id], declaration.valueType)) throw new Error(`RCL_UI_RESTORE_TYPE:${id}:${declaration.valueType}`);
-          state[id] = cloneState(snapshot[id]);
+          const value = snapshot[id];
+          if (!matchesUiType(value, declaration.valueType)) throw new Error(`RCL_UI_RESTORE_TYPE:${id}:${declaration.valueType}`);
+          restored.push([id, cloneState(value)]);
         }
       }
+      for (const [id, value] of restored) state[id] = value;
     }
     const record = { stage, state: cloneState(state) };
     lifecycleTrace.push(record);
@@ -105,7 +108,8 @@ export function createNativeUiRuntime(program, options = {}) {
     const control = (property) => current[property] ?? node.localProperties.find((item) => item.property === property)?.value ?? false;
     if (control('disabled')) throw new Error(`RCL_UI_EVENT_DISABLED:${nodeId}:${eventType}`);
     if (node.role === 'action' && control('require_valid_form') && eventType === 'activate') {
-      const validation = projection().validation;
+      const scope = node.localProperties.find((item) => item.property === 'validation_scope')?.value ?? null;
+      const validation = formValidation(allNodes, rendered, scope);
       if (!validation.valid) throw new Error(`RCL_UI_FORM_INVALID:${nodeId}:${Object.keys(validation.fields).join(',')}`);
     }
     if (node.role === 'input' && control('read_only') && ['input', 'change'].includes(eventType)) throw new Error(`RCL_UI_EVENT_READ_ONLY:${nodeId}:${eventType}`);

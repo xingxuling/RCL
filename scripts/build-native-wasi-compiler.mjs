@@ -6,7 +6,7 @@ const ROOT=path.resolve(import.meta.dirname,'..');
 const candidates=[process.env.ZIG,path.join(ROOT,'_tools/zig-x86_64-windows-0.16.0/zig.exe'),'zig'].filter(Boolean);
 const zig=candidates.find(file=>spawnSync(file,['version'],{windowsHide:true}).status===0);if(!zig)throw new Error('RCL_WASI_COMPILER_ZIG_MISSING');
 const directory=path.join(ROOT,'native/wasi-compiler');fs.mkdirSync(directory,{recursive:true});
-const env={...process.env,ZIG_GLOBAL_CACHE_DIR:path.join(ROOT,'_tools/zig-global-cache'),ZIG_LOCAL_CACHE_DIR:path.join(ROOT,'_tools/zig-local-cache')};
+const env={...process.env,ZIG_GLOBAL_CACHE_DIR:process.env.ZIG_GLOBAL_CACHE_DIR??path.join(ROOT,'_tools/zig-global-cache'),ZIG_LOCAL_CACHE_DIR:process.env.ZIG_LOCAL_CACHE_DIR??path.join(ROOT,'_tools/zig-local-cache')};
 const run=args=>{const result=spawnSync(zig,args,{cwd:ROOT,env,encoding:'utf8',timeout:120000,windowsHide:true});if(result.status!==0)throw new Error(result.stderr||result.stdout||result.error?.message);};
 const object=path.join(ROOT,'build/wasi-compiler-sha256.o');fs.mkdirSync(path.dirname(object),{recursive:true});
 run(['build-obj','native/wasi-sha256.zig','-target','wasm32-wasi','-O','ReleaseSmall','-femit-bin='+object]);

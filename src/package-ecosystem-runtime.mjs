@@ -436,23 +436,133 @@ function cacheObjectPath(cacheDir, sha256) {
   return path.join(cacheDir, 'objects', 'sha256', sha256.slice(0, 2), sha256);
 }
 
+function ensureCacheObjectDirectory(cacheRoot, digest) {
+  ensureDir(cacheRoot);
+  let directory = cacheRoot;
+  for (const part of [null, 'objects', 'sha256', digest.slice(0, 2)]) {
+    if (part !== null) {
+      directory = path.join(directory, part);
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+    }
+    if (fs.lstatSync(directory).isSymbolicLink() || !fs.statSync(directory).isDirectory()) throw new Error('RCL_CACHE_DIRECTORY_INVALID');
+  }
+}
+
 export function populateContentAddressedCache(projectDir, cacheDir = null) {
   const root = path.resolve(projectDir);
   const cacheRoot = path.resolve(cacheDir ?? path.join(root, '.rcl-cache'));
+  const relativeCache = normalizeRel(path.relative(root, cacheRoot));
+  if (relativeCache === '' || (relativeCache !== '..' && !relativeCache.startsWith('../') && !path.isAbsolute(relativeCache)
+      && !['.rcl-cache', 'cache'].includes(relativeCache) && !relativeCache.startsWith('.rcl-cache/') && !relativeCache.startsWith('cache/') && !relativeCache.startsWith('release'))) throw new Error('RCL_CACHE_DIRECTORY_IN_PROJECT');
   const lockResult = buildPackageLock(root);
-  const objects = [];
-  for (const file of lockResult.lock.files) {
+  if (!lockResult.ok) return Object.freeze({ ok: false, cacheDir: cacheRoot, diagnostics: lockResult.diagnostics });
+  const portableNames = new Set();
+  const captured = lockResult.lock.files.map(file => {
+    const name = checkedCachePath(file.path);
+    if (portableNames.has(name)) throw new Error('RCL_CACHE_PATH_COLLISION');
+    portableNames.add(name);
     const source = path.join(root, file.path);
-    if (!fs.existsSync(source)) continue;
+    if (fs.lstatSync(source).isSymbolicLink()) throw new Error(`RCL_CACHE_SOURCE_INVALID:${file.path}`);
+    const bytes = fs.readFileSync(source);
+    if (bytes.length !== file.bytes || sha256Bytes(bytes) !== file.sha256) throw new Error(`RCL_CACHE_SOURCE_CHANGED:${file.path}`);
+    return { file, bytes };
+  });
+  const objects = [];
+  for (const { file, bytes } of captured) {
     const objectPath = cacheObjectPath(cacheRoot, file.sha256);
-    ensureDir(path.dirname(objectPath));
-    fs.copyFileSync(source, objectPath);
+    ensureCacheObjectDirectory(cacheRoot, file.sha256);
+    if (fs.existsSync(objectPath)) {
+      if (fs.lstatSync(objectPath).isSymbolicLink() || !fs.readFileSync(objectPath).equals(bytes)) throw new Error(`RCL_CACHE_OBJECT_MISMATCH:${file.sha256}`);
+    } else fs.writeFileSync(objectPath, bytes, { flag: 'wx' });
     objects.push({ path: file.path, sha256: file.sha256, bytes: file.bytes, object: normalizeRel(path.relative(cacheRoot, objectPath)) });
   }
   const indexBase = { format: RCL_CONTENT_ADDRESSED_CACHE_FORMAT, version: RCL_PACKAGE_ECOSYSTEM_VERSION, package: lockResult.lock.package, lockRoot: lockResult.lock.lockRoot, objectCount: objects.length, objects: objects.sort((a, b) => a.path.localeCompare(b.path)) };
   const index = { ...indexBase, cacheRoot: realityRoot(indexBase) };
-  writeJson(path.join(cacheRoot, 'cache-index.json'), index);
+  const indexPath = path.join(cacheRoot, 'cache-index.json');
+  if (fs.existsSync(indexPath) && (fs.lstatSync(indexPath).isSymbolicLink() || !fs.statSync(indexPath).isFile())) throw new Error('RCL_CACHE_INDEX_INVALID');
+  writeJson(indexPath, index);
   return Object.freeze({ ok: true, cacheDir: cacheRoot, indexPath: path.join(cacheRoot, 'cache-index.json'), index, root: index.cacheRoot });
+}
+
+function checkedCachePath(value) {
+  if (typeof value !== 'string' || !value || value.includes('\\') || value.startsWith('/')) throw new Error('RCL_CACHE_PATH_INVALID');
+  for (const part of value.split('/')) {
+    if (!part || part === '.' || part === '..' || /[<>:"|?*\x00-\x1f]/u.test(part) || /[. ]$/u.test(part)
+        || /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part)) throw new Error('RCL_CACHE_PATH_INVALID');
+  }
+  if (value === 'rcl.lock.json' || hasSecretPath(value)) throw new Error('RCL_CACHE_PATH_INVALID');
+  return value.normalize('NFC').toLowerCase();
+}
+
+function readVerifiedCache(cacheDir, options = {}) {
+  const directory = path.resolve(cacheDir), indexPath = path.join(directory, 'cache-index.json');
+  if (fs.lstatSync(directory).isSymbolicLink() || !fs.statSync(directory).isDirectory()) throw new Error('RCL_CACHE_DIRECTORY_INVALID');
+  if (fs.lstatSync(indexPath).isSymbolicLink() || !fs.statSync(indexPath).isFile() || fs.statSync(indexPath).size > 16 * 1024 * 1024) throw new Error('RCL_CACHE_INDEX_INVALID');
+  const index = readJson(indexPath);
+  if (!index || typeof index !== 'object' || Array.isArray(index)) throw new Error('RCL_CACHE_INDEX_INVALID');
+  const { cacheRoot, ...base } = index;
+  if (index.format !== RCL_CONTENT_ADDRESSED_CACHE_FORMAT || index.version !== RCL_PACKAGE_ECOSYSTEM_VERSION
+      || !index.package || typeof index.package !== 'object' || Array.isArray(index.package)
+      || !['name', 'version', 'entry'].every(key => typeof index.package[key] === 'string' && index.package[key].length > 0)
+      || !/^[0-9a-f]{64}$/u.test(cacheRoot ?? '')
+      || realityRoot(base) !== cacheRoot || !Array.isArray(index.objects) || index.objectCount !== index.objects.length
+      || typeof index.lockRoot !== 'string' || !/^[0-9a-f]{64}$/u.test(index.lockRoot)) throw new Error('RCL_CACHE_INDEX_INVALID');
+  if (options.expectedCacheRoot !== undefined && options.expectedCacheRoot !== cacheRoot) throw new Error('RCL_CACHE_EXPECTED_ROOT_MISMATCH');
+  if (options.expectedLockRoot !== undefined && options.expectedLockRoot !== index.lockRoot) throw new Error('RCL_CACHE_EXPECTED_LOCK_MISMATCH');
+  const names = new Set(), objects = new Map(), realRoot = fs.realpathSync(directory);
+  for (const item of index.objects) {
+    if (!item || typeof item.sha256 !== 'string' || !/^[0-9a-f]{64}$/u.test(item.sha256) || !Number.isSafeInteger(item.bytes) || item.bytes < 0) throw new Error('RCL_CACHE_OBJECT_INVALID');
+    const name = checkedCachePath(item.path);
+    if (names.has(name)) throw new Error('RCL_CACHE_PATH_COLLISION');
+    names.add(name);
+    const file = cacheObjectPath(directory, item.sha256);
+    if (item.object !== normalizeRel(path.relative(directory, file))) throw new Error('RCL_CACHE_OBJECT_PATH_INVALID');
+    const relative = path.relative(realRoot, fs.realpathSync(file));
+    if (!relative || path.isAbsolute(relative) || relative === '..' || relative.startsWith('..' + path.sep)
+        || fs.lstatSync(file).isSymbolicLink() || !fs.statSync(file).isFile()) throw new Error('RCL_CACHE_OBJECT_PATH_INVALID');
+    if (!objects.has(item.sha256)) objects.set(item.sha256, fs.readFileSync(file));
+    const bytes = objects.get(item.sha256);
+    if (bytes.length !== item.bytes || sha256Bytes(bytes) !== item.sha256) throw new Error('RCL_CACHE_OBJECT_MISMATCH');
+  }
+  for (const name of names) {
+    const parts = name.split('/');
+    for (let count = 1; count < parts.length; count++) if (names.has(parts.slice(0, count).join('/'))) throw new Error('RCL_CACHE_PATH_COLLISION');
+  }
+  return { index, objects, directory };
+}
+
+export function verifyContentAddressedCache(cacheDir, options = {}) {
+  try {
+    const { index, objects, directory } = readVerifiedCache(cacheDir, options);
+    return Object.freeze({ ok: true, format: 'rcl.content-addressed-cache-verification.v1', cacheDir: directory,
+      cacheRoot: index.cacheRoot, lockRoot: index.lockRoot, fileCount: index.objects.length,
+      uniqueObjectCount: objects.size, externalCacheAnchorChecked: options.expectedCacheRoot !== undefined, diagnostics: [] });
+  } catch (error) {
+    return Object.freeze({ ok: false, format: 'rcl.content-addressed-cache-verification.v1', diagnostics: [{ code: error.message?.startsWith('RCL_CACHE_') ? error.message : 'RCL_CACHE_READ_FAILED', message: error.message }] });
+  }
+}
+
+export function materializeContentAddressedCache(cacheDir, destination, options = {}) {
+  let checked;
+  try { checked = readVerifiedCache(cacheDir, options); }
+  catch (error) { return Object.freeze({ ok: false, diagnostics: [{ code: error.message?.startsWith('RCL_CACHE_') ? error.message : 'RCL_CACHE_READ_FAILED', message: error.message }] }); }
+  if (typeof destination !== 'string' || !destination) throw new Error('RCL_CACHE_DESTINATION_REQUIRED');
+  const out = path.resolve(destination);
+  // All paths and bytes are admitted before reserving a new destination.
+  // Existing destinations are never overwritten; failed restores remain partial.
+  try { fs.mkdirSync(out, { mode: 0o700 }); }
+  catch (error) { if (error.code === 'EEXIST') throw new Error('RCL_CACHE_DESTINATION_EXISTS'); throw error; }
+  for (const file of checked.index.objects) {
+    const target = resolveInside(out, file.path);
+    ensureDir(path.dirname(target));
+    fs.writeFileSync(target, checked.objects.get(file.sha256), { flag: 'wx' });
+  }
+  const lock = buildPackageLock(out, { write: false });
+  if (!lock.ok || lock.root !== checked.index.lockRoot || realityRoot(lock.lock.package) !== realityRoot(checked.index.package)) return Object.freeze({ ok: false, outputDir: out,
+    diagnostics: [{ code: 'RCL_CACHE_MATERIALIZED_LOCK_MISMATCH', expected: checked.index.lockRoot, actual: lock.root }, ...lock.diagnostics] });
+  fs.writeFileSync(path.join(out, 'rcl.lock.json'), JSON.stringify(lock.lock, null, 2) + '\n', { flag: 'wx' });
+  return Object.freeze({ ok: true, format: 'rcl.cache-materialization.v1', outputDir: out,
+    cacheRoot: checked.index.cacheRoot, lockRoot: lock.root, fileCount: checked.index.objects.length, diagnostics: [], networkAccess: false });
 }
 
 function isVolatileGeneratedPath(rel) {
@@ -505,6 +615,7 @@ export async function buildTargetMatrix(projectDir, outputDir = null) {
     package: lockResult.lock.package,
     lockRoot: lockResult.lock.lockRoot,
     platforms,
+    targetManifestRoots: Object.fromEntries(packageReport.packages.map(item => [item.target, item.semanticRoot])),
     allTargets: listRclPackageTargets(),
     legacyPackageCompiler: { format: packageReport.format, packageCount: packageReport.packageCount, verifiedPackageCount: packageReport.verifiedPackageCount },
   };
@@ -532,7 +643,7 @@ export function buildCompatibilityReportFromManifest(manifest, dependencies = nu
 }
 
 function buildSbom(releaseDir, lock, matrix) {
-  const files = fileInventory(releaseDir, { exclude: ['release-manifest.json', 'release-signature.json'] }).filter(item => !isVolatileGeneratedPath(item.path));
+  const files = fileInventory(releaseDir, { exclude: ['release-manifest.json', 'release-signature.json', 'sbom.json'] }).filter(item => !isVolatileGeneratedPath(item.path));
   const components = [
     { type: 'rcl-package', name: lock.package.name, version: lock.package.version, root: lock.lockRoot },
     ...lock.dependencies.map(dep => ({ type: dep.source === 'remote' ? 'remote-dependency' : 'local-dependency', name: dep.name, version: dep.resolvedVersion ?? dep.requested, source: dep.source, integrity: dep.integrity ?? dep.sha256 ?? null })),
@@ -592,34 +703,85 @@ export async function buildReleaseBundle(projectDir, outputDir = null, options =
   return Object.freeze({ ok: releaseManifest.ok, outputDir: out, releaseManifest, signature, root: releaseManifest.releaseRoot });
 }
 
-export function verifyReleaseBundle(releaseDir) {
+export function verifyReleaseBundle(releaseDir, options = {}) {
   const root = path.resolve(releaseDir);
-  const manifestPath = path.join(root, 'release-manifest.json');
-  const signaturePath = path.join(root, 'release-signature.json');
   const diagnostics = [];
-  if (!fs.existsSync(manifestPath)) diagnostics.push({ code: 'RCL_RELEASE_MANIFEST_MISSING', path: 'release-manifest.json' });
-  if (!fs.existsSync(signaturePath)) diagnostics.push({ code: 'RCL_RELEASE_SIGNATURE_MISSING', path: 'release-signature.json' });
-  if (diagnostics.length) {
-    const report = { format: 'rcl.release-verification.v0.42', ok: false, releaseDir: root, diagnostics };
-    return Object.freeze({ ...report, root: realityRoot(report) });
+  let manifest = null, signature = null, targetManifestBindingVerified = false;
+  const require = (condition, code) => { if (!condition) throw new Error(code); };
+  const rootedMetadata = (value, key, code, omit = []) => {
+    require(value && typeof value === 'object' && !Array.isArray(value), code);
+    const base = { ...value }; delete base[key]; for (const name of omit) delete base[name];
+    require(typeof value[key] === 'string' && /^[0-9a-f]{64}$/u.test(value[key]) && realityRoot(base) === value[key], code);
+  };
+  const metadata = name => {
+    const file = path.join(root, name);
+    require(fs.existsSync(file) && fs.statSync(file).isFile() && !fs.lstatSync(file).isSymbolicLink(), 'RCL_RELEASE_METADATA_MISSING_OR_INVALID');
+    return readJson(file);
+  };
+  try {
+    const inspect = directory => {
+      require(!fs.lstatSync(directory).isSymbolicLink() && fs.statSync(directory).isDirectory(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+        const file = path.join(directory, entry.name);
+        require(!entry.isSymbolicLink(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+        if (entry.isDirectory()) inspect(file);
+        else require(entry.isFile(), 'RCL_RELEASE_SYMLINK_OR_ENTRY_INVALID');
+      }
+    };
+    inspect(root);
+    manifest = metadata('release-manifest.json'); signature = metadata('release-signature.json');
+    require(manifest.format === RCL_RELEASE_BUNDLE_FORMAT && manifest.version === RCL_PACKAGE_ECOSYSTEM_VERSION && manifest.ok === true, 'RCL_RELEASE_MANIFEST_INVALID');
+    rootedMetadata(manifest, 'releaseRoot', 'RCL_RELEASE_ROOT_MISMATCH');
+    require(options.expectedReleaseRoot === undefined || options.expectedReleaseRoot === manifest.releaseRoot, 'RCL_RELEASE_EXPECTED_ROOT_MISMATCH');
+    require(typeof signature.keyId === 'string' && signature.keyId.startsWith('rcl-'), 'RCL_RELEASE_SIGNATURE_MISMATCH');
+    const expectedSignature = signRelease(manifest, signature.keyId.slice(4));
+    require(canonicalReality(signature) === canonicalReality(expectedSignature), 'RCL_RELEASE_SIGNATURE_MISMATCH');
+
+    const lock = metadata('rcl.lock.json');
+    require(lock.format === RCL_PACKAGE_ECOSYSTEM_LOCK_FORMAT && lock.ok === true, 'RCL_RELEASE_LOCK_INVALID');
+    rootedMetadata(lock, 'lockRoot', 'RCL_RELEASE_LOCK_ROOT_MISMATCH', ['ok']);
+    require(lock.lockRoot === manifest.lockRoot && realityRoot(lock.package) === realityRoot(manifest.package), 'RCL_RELEASE_LOCK_BINDING_MISMATCH');
+    const toml = parseRclToml(fs.readFileSync(path.join(root, 'rcl.toml'), 'utf8'));
+    require(realityRoot(toml) === lock.roots.manifestRoot, 'RCL_RELEASE_MANIFEST_LOCK_MISMATCH');
+    const cache = verifyContentAddressedCache(path.join(root, '.rcl-cache'), { expectedCacheRoot: manifest.cacheRoot, expectedLockRoot: manifest.lockRoot });
+    require(cache.ok, 'RCL_RELEASE_CACHE_VERIFY_FAILED');
+
+    const matrix = metadata('targets/target-matrix.json');
+    require(matrix.format === RCL_TARGET_MATRIX_FORMAT && matrix.ok === true, 'RCL_RELEASE_TARGET_MATRIX_INVALID');
+    rootedMetadata(matrix, 'targetMatrixRoot', 'RCL_RELEASE_TARGET_MATRIX_ROOT_MISMATCH');
+    require(matrix.targetMatrixRoot === manifest.targetMatrixRoot && matrix.lockRoot === manifest.lockRoot && realityRoot(matrix.package) === realityRoot(manifest.package), 'RCL_RELEASE_TARGET_MATRIX_BINDING_MISMATCH');
+    require(Array.isArray(manifest.platforms) && manifest.platforms.length === SUPPORTED_PLATFORMS.length && new Set(manifest.platforms.map(item => item.platform)).size === SUPPORTED_PLATFORMS.length, 'RCL_RELEASE_PLATFORM_INVALID');
+    for (const platform of manifest.platforms) require(SUPPORTED_PLATFORMS.includes(platform.platform) && listRclPackageTargets().includes(platform.target) && platform.status === 'verified', 'RCL_RELEASE_PLATFORM_INVALID');
+    const projection = matrix.platforms.map(({ platform, target, status, packageRoot }) => ({ platform, target, status, packageRoot }));
+    require(realityRoot(projection) === realityRoot(manifest.platforms), 'RCL_RELEASE_PLATFORM_BINDING_MISMATCH');
+    for (const platform of manifest.platforms) {
+      const targetDir = path.join(root, 'targets', platform.target);
+      require(verifyRclPackage(targetDir).status === 'verified', 'RCL_RELEASE_TARGET_VERIFY_FAILED');
+      require(targetDirectoryRoot(targetDir).fileSetRoot === platform.packageRoot, 'RCL_RELEASE_TARGET_ROOT_MISMATCH');
+    }
+    if (matrix.targetManifestRoots !== undefined) {
+      const targets = listRclPackageTargets();
+      require(matrix.targetManifestRoots && Object.keys(matrix.targetManifestRoots).length === targets.length && targets.every(target => Object.hasOwn(matrix.targetManifestRoots, target)), 'RCL_RELEASE_TARGET_MANIFEST_INDEX_INVALID');
+      for (const target of targets) {
+        const verified = verifyRclPackage(path.join(root, 'targets', target));
+        require(typeof matrix.targetManifestRoots[target] === 'string' && /^[0-9a-f]{64}$/u.test(matrix.targetManifestRoots[target]) && verified.status === 'verified' && verified.semanticManifestRoot === matrix.targetManifestRoots[target], 'RCL_RELEASE_TARGET_MANIFEST_MISMATCH');
+      }
+      targetManifestBindingVerified = true;
+    }
+    const compatibility = metadata('compatibility-report.json');
+    rootedMetadata(compatibility, 'root', 'RCL_RELEASE_COMPATIBILITY_ROOT_MISMATCH');
+    require(compatibility.root === manifest.compatibilityRoot && compatibility.ok === true
+      && buildCompatibilityReportFromManifest(toml, lock.dependencies).root === compatibility.root, 'RCL_RELEASE_COMPATIBILITY_BINDING_MISMATCH');
+    const sbom = metadata('sbom.json');
+    rootedMetadata(sbom, 'sbomRoot', 'RCL_RELEASE_SBOM_ROOT_MISMATCH');
+    require(sbom.sbomRoot === manifest.sbomRoot && buildSbom(root, lock, matrix).sbomRoot === sbom.sbomRoot, 'RCL_RELEASE_SBOM_BINDING_MISMATCH');
+  } catch (error) {
+    diagnostics.push({ code: error.message?.startsWith('RCL_RELEASE_') ? error.message : 'RCL_RELEASE_METADATA_INVALID' });
   }
-  const manifest = readJson(manifestPath);
-  const signature = readJson(signaturePath);
-  const rebuiltBase = { ...manifest };
-  delete rebuiltBase.releaseRoot;
-  const actualReleaseRoot = realityRoot(rebuiltBase);
-  if (actualReleaseRoot !== manifest.releaseRoot) diagnostics.push({ code: 'RCL_RELEASE_ROOT_MISMATCH', expected: manifest.releaseRoot, actual: actualReleaseRoot });
-  const expectedSignature = signRelease(manifest, signature.keyId?.replace(/^rcl-/, '') ?? 'deterministic-dev-seed');
-  if (signature.signature !== expectedSignature.signature) diagnostics.push({ code: 'RCL_RELEASE_SIGNATURE_MISMATCH' });
-  if (!fs.existsSync(path.join(root, 'rcl.lock.json'))) diagnostics.push({ code: 'RCL_RELEASE_LOCK_MISSING' });
-  if (!fs.existsSync(path.join(root, '.rcl-cache', 'cache-index.json'))) diagnostics.push({ code: 'RCL_RELEASE_CACHE_INDEX_MISSING' });
-  if (!fs.existsSync(path.join(root, 'targets', 'target-matrix.json'))) diagnostics.push({ code: 'RCL_RELEASE_TARGET_MATRIX_MISSING' });
-  for (const platform of manifest.platforms ?? []) {
-    const targetDir = path.join(root, 'targets', platform.target);
-    if (!fs.existsSync(targetDir)) diagnostics.push({ code: 'RCL_RELEASE_TARGET_MISSING', platform: platform.platform, target: platform.target });
-    else if (verifyRclPackage(targetDir).status !== 'verified') diagnostics.push({ code: 'RCL_RELEASE_TARGET_VERIFY_FAILED', platform: platform.platform, target: platform.target });
-  }
-  const report = { format: 'rcl.release-verification.v0.42', ok: diagnostics.length === 0, releaseDir: root, releaseRoot: manifest.releaseRoot, signatureRoot: signature.signatureRoot, diagnostics };
+  const report = { format: 'rcl.release-verification.v0.42', ok: diagnostics.length === 0, releaseDir: root,
+    releaseRoot: manifest?.releaseRoot ?? null, signatureRoot: signature?.signatureRoot ?? null,
+    externalReleaseAnchorChecked: options.expectedReleaseRoot !== undefined,
+    publisherAuthenticationVerified: false, targetManifestBindingVerified, diagnostics };
   return Object.freeze({ ...report, root: realityRoot(report) });
 }
 

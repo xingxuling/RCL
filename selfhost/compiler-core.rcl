@@ -32,6 +32,9 @@ reality RCLGeneralSelfHostCompiler {
   reckon state_text(state : Sequence) -> Text = sequence_get(state, 1)
   reckon state_node(state : Sequence) -> Sequence = sequence_get(state, 1)
 
+  reckon located_node_state(state : Sequence, span : Span) -> Sequence =
+    make_node_state(state_index(state), sequence_append(state_node(state), span))
+
   reckon append_all_from(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       append_all_from(items, index + 1, sequence_append(output, sequence_get(items, index))))
@@ -94,7 +97,7 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= end, sequence_append(sequence_append(empty_sequence(), line), column),
       choose(char_at(source, index) == "\n",
         position_after(source, index + 1, end, line + 1, 1),
-        position_after(source, index + 1, end, line, column + 1)))
+        position_after(source, index + 1, end, line, column + choose(length(utf8_bytes(char_at(source, index))) == 4, 2, 1))))
 
   reckon is_two_symbol(value : Text) -> Truth =
     either(value == "<-", either(value == "->", either(value == "==", either(value == "!=", either(value == "<=", value == ">=")))))
@@ -141,11 +144,13 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon parse_path_tail(tokens : Sequence, index : Number, value : Text) -> Sequence =
     choose(token_text_at(tokens, index) == ".",
-      parse_path_tail(tokens, index + 2, value + "." + token_text_at(tokens, index + 1)),
+      choose(semantic_check_at(token_kind_at(tokens, index + 1) == "IDENT", "RCL_PATH_SEGMENT", token_text_at(tokens, index + 1), token_span_at(tokens, index + 1)),
+        parse_path_tail(tokens, index + 2, value + "." + token_text_at(tokens, index + 1)), empty_sequence()),
       make_text_state(index, value))
 
   reckon parse_path(tokens : Sequence, index : Number) -> Sequence =
-    parse_path_tail(tokens, index + 1, token_text_at(tokens, index))
+    choose(semantic_check_at(token_kind_at(tokens, index) == "IDENT", "RCL_PATH_NAME", token_text_at(tokens, index), token_span_at(tokens, index)),
+      parse_path_tail(tokens, index + 1, token_text_at(tokens, index)), empty_sequence())
 
   reckon literal_node(value_type : Text, value : Text) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), "LiteralExpr"), value_type), value)
@@ -169,6 +174,18 @@ reality RCLGeneralSelfHostCompiler {
   reckon expr_right(node : Sequence) -> Sequence = sequence_get(node, 3)
   reckon expr_args(node : Sequence) -> Sequence = sequence_get(node, 2)
 
+  reckon expr_semantic_size(node : Sequence) -> Number =
+    choose(expr_kind(node) == "PathExpr", 2, choose(expr_kind(node) == "BinaryExpr", 4, 3))
+
+  reckon expr_span(node : Sequence) -> Span =
+    choose(length(node) > expr_semantic_size(node), sequence_get(node, expr_semantic_size(node)), make_span(0, 1, 1, 0))
+
+  reckon located_expression(node : Sequence, span : Span) -> Sequence =
+    choose(length(node) > expr_semantic_size(node), node, sequence_append(node, span))
+
+  reckon located_expression_state(state : Sequence, span : Span) -> Sequence =
+    make_node_state(state_index(state), located_expression(state_node(state), span))
+
   reckon binary_precedence(operator : Text) -> Number =
     choose(operator == "or", 1,
       choose(operator == "and", 2,
@@ -187,6 +204,9 @@ reality RCLGeneralSelfHostCompiler {
       make_node_state(state_index(item_state) + 1, sequence_append(output, state_node(item_state))))
 
   reckon parse_prefix(tokens : Sequence, index : Number) -> Sequence =
+    located_expression_state(parse_prefix_unlocated(tokens, index), token_span_at(tokens, index))
+
+  reckon parse_prefix_unlocated(tokens : Sequence, index : Number) -> Sequence =
     choose(either(token_text_at(tokens, index) == not_operator(), token_text_at(tokens, index) == minus_operator()),
       parse_unary_after(tokens, index, parse_expression(tokens, index + 1, 7)),
       choose(token_kind_at(tokens, index) == "NUMBER",
@@ -221,7 +241,7 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon parse_binary_right(tokens : Sequence, left : Sequence, operator_index : Number, minimum : Number, right_state : Sequence) -> Sequence =
     parse_binary_tail(tokens,
-      binary_node(token_text_at(tokens, operator_index), left, state_node(right_state)),
+      located_expression(binary_node(token_text_at(tokens, operator_index), left, state_node(right_state)), token_span_at(tokens, operator_index)),
       state_index(right_state), minimum)
 
   reckon parse_expression(tokens : Sequence, index : Number, minimum : Number) -> Sequence =
@@ -321,7 +341,8 @@ reality RCLGeneralSelfHostCompiler {
       make_node_state(state_index(target_state), make_warrant(subject, capability, state_text(target_state))))
 
   reckon parse_warrant_after_capability(tokens : Sequence, subject : Text, capability_state : Sequence) -> Sequence =
-    parse_warrant_after_target(tokens, subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1))
+    choose(require_token(tokens, state_index(capability_state), "on", "RCL_WARRANT_ON"),
+      parse_warrant_after_target(tokens, subject, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1)), empty_sequence())
 
   reckon parse_warrant(tokens : Sequence, index : Number, subject : Text) -> Sequence =
     parse_warrant_after_capability(tokens, subject, parse_path(tokens, index + 1))
@@ -349,12 +370,16 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon need_capability(node : Sequence) -> Text = sequence_get(node, 0)
   reckon need_target(node : Sequence) -> Text = sequence_get(node, 1)
+  reckon need_span(node : Sequence) -> Span = choose(length(node) > 2, sequence_get(node, 2), make_span(0, 1, 1, 0))
 
   reckon make_alter(target : Text, expression : Sequence) -> Sequence =
     sequence_append(sequence_append(empty_sequence(), target), expression)
 
   reckon alter_target(node : Sequence) -> Text = sequence_get(node, 0)
   reckon alter_expression(node : Sequence) -> Sequence = sequence_get(node, 1)
+
+  reckon alter_span(node : Sequence) -> Span =
+    choose(length(node) > 2, sequence_get(node, 2), expr_span(alter_expression(node)))
 
   reckon make_rule(kind : Text, name : Text, cause : Text, from_subject : Text, into_subject : Text, when_expression : Sequence, needs : Sequence, preserves : Sequence, alters : Sequence, witnesses : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), kind), name), cause), from_subject), into_subject), when_expression), needs), preserves), alters), witnesses)
@@ -369,48 +394,78 @@ reality RCLGeneralSelfHostCompiler {
   reckon rule_preserves(node : Sequence) -> Sequence = sequence_get(node, 7)
   reckon rule_alters(node : Sequence) -> Sequence = sequence_get(node, 8)
   reckon rule_witnesses(node : Sequence) -> Sequence = sequence_get(node, 9)
+  reckon rule_calls(node : Sequence) -> Sequence = choose(length(node) > 10, sequence_get(node, 10), empty_sequence())
+
+  reckon retain_rule_calls(original : Sequence, updated : Sequence) -> Sequence = sequence_append(updated, rule_calls(original))
+
+  reckon make_rule_call(capability : Text, args : Sequence, target : Text, span : Span) -> Sequence =
+    sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), capability), args), target), span)
+
+  reckon rule_call_capability(node : Sequence) -> Text = sequence_get(node, 0)
+  reckon rule_call_args(node : Sequence) -> Sequence = sequence_get(node, 1)
+  reckon rule_call_target(node : Sequence) -> Text = sequence_get(node, 2)
+  reckon rule_call_span(node : Sequence) -> Span = sequence_get(node, 3)
+  reckon rule_call_provider(node : Sequence) -> Text = split_before(rule_call_capability(node), ".")
+  reckon rule_call_offer(node : Sequence) -> Text = split_after(rule_call_capability(node), ".")
+
+  reckon rule_with_call(node : Sequence, value : Sequence) -> Sequence =
+    sequence_append(make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node)), sequence_append(rule_calls(node), value))
 
   reckon rule_with_cause(node : Sequence, value : Text) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), value, rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), value, rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_from(node : Sequence, value : Text) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), value, rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), value, rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_into(node : Sequence, value : Text) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), value, rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), value, rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_when(node : Sequence, value : Sequence) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), value, rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), value, rule_needs(node), rule_preserves(node), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_need(node : Sequence, value : Sequence) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), sequence_append(rule_needs(node), value), rule_preserves(node), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), sequence_append(rule_needs(node), value), rule_preserves(node), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_preserve(node : Sequence, value : Sequence) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), sequence_append(rule_preserves(node), value), rule_alters(node), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), sequence_append(rule_preserves(node), value), rule_alters(node), rule_witnesses(node)))
 
   reckon rule_with_alter(node : Sequence, value : Sequence) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), sequence_append(rule_alters(node), value), rule_witnesses(node))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), sequence_append(rule_alters(node), value), rule_witnesses(node)))
 
   reckon rule_with_witness(node : Sequence, value : Text) -> Sequence =
-    make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), sequence_append(rule_witnesses(node), value))
+    retain_rule_calls(node, make_rule(rule_kind(node), rule_name(node), rule_cause(node), rule_from(node), rule_into(node), rule_when(node), rule_needs(node), rule_preserves(node), rule_alters(node), sequence_append(rule_witnesses(node), value)))
 
   reckon parse_rule_after_expression(tokens : Sequence, expression_state : Sequence, node : Sequence, clause : Text) -> Sequence =
     parse_rule_body(tokens, state_index(expression_state),
       choose(clause == "when", rule_with_when(node, state_node(expression_state)),
         rule_with_preserve(node, state_node(expression_state))))
 
-  reckon parse_rule_after_need_target(tokens : Sequence, capability : Text, target_state : Sequence, node : Sequence) -> Sequence =
-    parse_rule_body(tokens, state_index(target_state), rule_with_need(node, make_need(capability, state_text(target_state))))
+  reckon parse_rule_after_need_target(tokens : Sequence, capability : Text, target_state : Sequence, node : Sequence, span : Span) -> Sequence =
+    parse_rule_body(tokens, state_index(target_state), rule_with_need(node, sequence_append(make_need(capability, state_text(target_state)), span)))
 
-  reckon parse_rule_after_need_capability(tokens : Sequence, capability_state : Sequence, node : Sequence) -> Sequence =
-    parse_rule_after_need_target(tokens, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1), node)
+  reckon parse_rule_after_need_capability(tokens : Sequence, capability_state : Sequence, node : Sequence, span : Span) -> Sequence =
+    choose(require_token(tokens, state_index(capability_state), "on", "RCL_NEEDS_ON"),
+      parse_rule_after_need_target(tokens, state_text(capability_state), parse_path(tokens, state_index(capability_state) + 1), node, span), empty_sequence())
 
-  reckon parse_rule_after_alter_expression(tokens : Sequence, target : Text, node : Sequence, expression_state : Sequence) -> Sequence =
-    parse_rule_body(tokens, state_index(expression_state), rule_with_alter(node, make_alter(target, state_node(expression_state))))
+  reckon parse_rule_after_alter_expression(tokens : Sequence, target : Text, node : Sequence, expression_state : Sequence, span : Span) -> Sequence =
+    parse_rule_body(tokens, state_index(expression_state), rule_with_alter(node, sequence_append(make_alter(target, state_node(expression_state)), span)))
 
-  reckon parse_rule_after_alter_target(tokens : Sequence, target_state : Sequence, node : Sequence) -> Sequence =
+  reckon parse_rule_after_alter_target(tokens : Sequence, target_state : Sequence, node : Sequence, span : Span) -> Sequence =
     parse_rule_after_alter_expression(tokens, state_text(target_state), node,
-      parse_expression(tokens, state_index(target_state) + 1, 0))
+      parse_expression(tokens, state_index(target_state) + 1, 0), span)
+
+  reckon parse_rule_call_after_target(tokens : Sequence, target_state : Sequence, node : Sequence, capability : Text, args : Sequence, span : Span) -> Sequence =
+    parse_rule_body(tokens, state_index(target_state), rule_with_call(node, make_rule_call(capability, args, state_text(target_state), span)))
+
+  reckon parse_rule_call_after_args(tokens : Sequence, args_state : Sequence, node : Sequence, capability : Text, span : Span) -> Sequence =
+    choose(require_token(tokens, state_index(args_state) - 1, char_at(")x", 0), "RCL_HOST_CALL_CLOSE"),
+      choose(require_token(tokens, state_index(args_state), "->", "RCL_HOST_CALL_TARGET_ARROW"),
+        choose(require_kind(tokens, state_index(args_state) + 1, "IDENT", "RCL_HOST_CALL_TARGET"),
+          parse_rule_call_after_target(tokens, parse_path(tokens, state_index(args_state) + 1), node, capability, state_node(args_state), span), empty_sequence()), empty_sequence()), empty_sequence())
+
+  reckon parse_rule_call_after_capability(tokens : Sequence, capability_state : Sequence, node : Sequence, span : Span) -> Sequence =
+    choose(require_token(tokens, state_index(capability_state), "(", "RCL_HOST_CALL_OPEN"),
+      parse_rule_call_after_args(tokens, parse_call_args(tokens, state_index(capability_state) + 1, empty_sequence()), node, state_text(capability_state), span), empty_sequence())
 
   reckon parse_rule_body(tokens : Sequence, index : Number, node : Sequence) -> Sequence =
     choose(token_text_at(tokens, index) == "}", make_node_state(index + 1, node),
@@ -423,11 +478,16 @@ reality RCLGeneralSelfHostCompiler {
             choose(either(token_text_at(tokens, index) == "when", token_text_at(tokens, index) == "preserve"),
               parse_rule_after_expression(tokens, parse_expression(tokens, index + 1, 0), node, token_text_at(tokens, index)),
               choose(token_text_at(tokens, index) == "needs",
-                parse_rule_after_need_capability(tokens, parse_path(tokens, index + 1), node),
+                parse_rule_after_need_capability(tokens, parse_path(tokens, index + 1), node, token_span_at(tokens, index + 1)),
                 choose(token_text_at(tokens, index) == "alter",
-                  parse_rule_after_alter_target(tokens, parse_path(tokens, index + 1), node),
-                  parse_rule_body(tokens, index + 2,
-                    rule_with_witness(node, token_text_at(tokens, index + 1))))))))))
+                  parse_rule_after_alter_target(tokens, parse_path(tokens, index + 1), node, token_span_at(tokens, index + 1)),
+                  choose(token_text_at(tokens, index) == "call",
+                    choose(require_kind(tokens, index + 1, "IDENT", "RCL_HOST_CALL_CAPABILITY"),
+                      parse_rule_call_after_capability(tokens, parse_path(tokens, index + 1), node, token_span_at(tokens, index)), empty_sequence()),
+                    choose(token_text_at(tokens, index) == "witness",
+                      choose(require_kind(tokens, index + 1, "STRING", "RCL_RULE_WITNESS_TEXT"),
+                        parse_rule_body(tokens, index + 2, rule_with_witness(node, token_text_at(tokens, index + 1))), empty_sequence()),
+                      syntax_failure(tokens, index, "RCL_RULE_CLAUSE"))))))))))
 
   reckon parse_rule(tokens : Sequence, index : Number) -> Sequence =
     parse_rule_body(tokens, index + 3,
@@ -896,10 +956,11 @@ reality RCLGeneralSelfHostCompiler {
       choose(event_type == "navigate" and name == "destination", "Text", ""))
 
   reckon ui_parameter_value_type(event_type : Text, name : Text, declared_type : Text) -> Text =
-    choose(declared_type != "", declared_type, ui_expected_event_parameter_type(event_type, name))
+    choose(declared_type != "", declared_type,
+      choose((event_type == "input" or event_type == "change") and name == "value", "@control-value", ui_expected_event_parameter_type(event_type, name)))
 
   reckon ui_parameter_type_allowed(value_type : Text) -> Truth =
-    value_type == "Number" or value_type == "Text" or value_type == "Truth"
+    value_type == "Number" or value_type == "Text" or value_type == "Truth" or value_type == "@control-value"
 
   reckon make_ui_event(event_type : Text, parameters : Sequence, statements : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), event_type), parameters), statements)
@@ -907,11 +968,15 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_event_type(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_event_parameters(node : Sequence) -> Sequence = sequence_get(node, 1)
   reckon ui_event_statements(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon ui_event_span(node : Sequence) -> Span = choose(length(node) > 3, sequence_get(node, 3), make_span(0, 1, 1, 0))
   reckon make_ui_set(target : Text, expression : Sequence) -> Sequence =
     sequence_append(sequence_append(sequence_append(empty_sequence(), "set-state"), target), expression)
   reckon ui_statement_kind(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_set_target(node : Sequence) -> Text = sequence_get(node, 1)
   reckon ui_set_expression(node : Sequence) -> Sequence = sequence_get(node, 2)
+  reckon ui_statement_span(node : Sequence) -> Span =
+    choose(ui_statement_kind(node) == "set-state", expr_span(ui_set_expression(node)),
+      choose(length(node) > 2, sequence_get(node, 2), make_span(0, 1, 1, 0)))
 
   reckon ui_statements_have_kind(items : Sequence, index : Number, kind : Text) -> Truth =
     choose(index >= length(items), false,
@@ -941,29 +1006,29 @@ reality RCLGeneralSelfHostCompiler {
           choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_REALITY_RULE"),
             parse_ui_event_body(tokens, index + 2, event_type, parameters,
               sequence_append(statements,
-                sequence_append(sequence_append(empty_sequence(), "realize-reality"), token_text_at(tokens, index + 1)))), empty_sequence()),
+                sequence_append(sequence_append(sequence_append(empty_sequence(), "realize-reality"), token_text_at(tokens, index + 1)), token_span_at(tokens, index + 1)))), empty_sequence()),
           choose(token_text_at(tokens, index) == "navigate",
             choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_ROUTE"),
-              choose(semantic_check(not ui_statements_have_kind(statements, 0, "navigate"),
-                  "RCL_UI_EVENT_MULTIPLE_NAVIGATION", event_type),
+              choose(semantic_check_at(not ui_statements_have_kind(statements, 0, "navigate"),
+                  "RCL_UI_EVENT_MULTIPLE_NAVIGATION", event_type, token_span_at(tokens, index + 1)),
                 parse_ui_event_body(tokens, index + 2, event_type, parameters,
                   sequence_append(statements,
-                    sequence_append(sequence_append(empty_sequence(), "navigate"), token_text_at(tokens, index + 1)))), empty_sequence()), empty_sequence()),
+                    sequence_append(sequence_append(sequence_append(empty_sequence(), "navigate"), token_text_at(tokens, index + 1)), token_span_at(tokens, index + 1)))), empty_sequence()), empty_sequence()),
             syntax_failure(tokens, index, "RCL_UI_EVENT_STATEMENT")))))
 
   reckon parse_ui_event_parameter_finish(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text, declared_type : Text) -> Sequence =
     choose(semantic_check(find_ui_parameter_type(parameters, 0, name) == "", "RCL_UI_EVENT_PARAMETER_DUPLICATE", name),
       choose(semantic_check((event_type == "custom" or ui_expected_event_parameter_type(event_type, name) != "")
           and ui_parameter_type_allowed(ui_parameter_value_type(event_type, name, declared_type))
-          and (ui_expected_event_parameter_type(event_type, name) == ""
+          and (((event_type == "input" or event_type == "change") and name == "value") or ui_expected_event_parameter_type(event_type, name) == ""
             or ui_parameter_value_type(event_type, name, declared_type) == ui_expected_event_parameter_type(event_type, name)),
           "RCL_UI_EVENT_PARAMETER_TYPE", event_type + ":" + name),
         choose(token_text_at(tokens, index) == ",",
           parse_ui_event_parameters(tokens, index + 1, event_type,
-            sequence_append(parameters, make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)))),
+            sequence_append(parameters, sequence_append(make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)), token_span_at(tokens, index - 1)))),
           choose(token_text_at(tokens, index) == ")",
             make_node_state(index + 1,
-              sequence_append(parameters, make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)))),
+              sequence_append(parameters, sequence_append(make_ui_parameter(name, ui_parameter_value_type(event_type, name, declared_type)), token_span_at(tokens, index - 1)))),
             syntax_failure(tokens, index, "RCL_UI_EVENT_PARAMETER_DELIMITER"))), empty_sequence()), empty_sequence())
 
   reckon parse_ui_event_parameter_after_name(tokens : Sequence, index : Number, event_type : Text, parameters : Sequence, name : Text) -> Sequence =
@@ -981,7 +1046,7 @@ reality RCLGeneralSelfHostCompiler {
     choose(require_token(tokens, state_index(parameter_state), "{", "RCL_UI_EVENT_OPEN"),
       parse_ui_event_body(tokens, state_index(parameter_state) + 1, event_type, state_node(parameter_state), empty_sequence()), empty_sequence())
 
-  reckon parse_ui_event(tokens : Sequence, index : Number) -> Sequence =
+  reckon parse_ui_event_unlocated(tokens : Sequence, index : Number) -> Sequence =
     choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_EVENT_TYPE"),
       choose(semantic_check(ui_event_type_allowed(token_text_at(tokens, index + 1)), "RCL_UI_EVENT_TYPE", token_text_at(tokens, index + 1)),
         choose(token_text_at(tokens, index + 2) == "(",
@@ -991,8 +1056,48 @@ reality RCLGeneralSelfHostCompiler {
             parse_ui_event_body(tokens, index + 3, token_text_at(tokens, index + 1), empty_sequence(), empty_sequence()), empty_sequence())),
         empty_sequence()), empty_sequence())
 
+  reckon parse_ui_event(tokens : Sequence, index : Number) -> Sequence =
+    located_node_state(parse_ui_event_unlocated(tokens, index), token_span_at(tokens, index + 1))
+
   reckon make_ui_view(id : Text, role : Text, classes : Sequence, properties : Sequence, bindings : Sequence, events : Sequence, layout : Sequence, children : Sequence) -> Sequence =
-    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), role), classes), properties), bindings), events), layout), children)
+    sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), id), role), classes), properties), bindings), normalize_ui_control_events(events, 0, ui_control_value_type(ui_control_kind(role, properties)), empty_sequence())), layout), children)
+
+  reckon ui_control_kind(role : Text, properties : Sequence) -> Text =
+    choose(role != "input" or length(find_ui_property(properties, 0, "input_kind")) == 0, "text",
+      ui_control_kind_value(ui_property_expression(find_ui_property(properties, 0, "input_kind"))))
+
+  reckon ui_control_kind_value(node : Sequence) -> Text =
+    choose(semantic_check_at(expr_kind(node) == "LiteralExpr" and expr_text(node) == "Text", "RCL_UI_INPUT_KIND", "input_kind", expr_span(node)),
+      choose(semantic_check_at(ui_known_control_kind(expr_literal_text(node)), "RCL_UI_INPUT_KIND", "input_kind", expr_span(node)), expr_literal_text(node), ""), "")
+
+  reckon ui_known_control_kind(kind : Text) -> Truth =
+    kind == "text" or kind == "email" or kind == "password" or kind == "checkbox" or kind == "switch"
+      or kind == "slider" or kind == "select" or kind == "radio" or kind == "date" or kind == "textarea"
+
+  reckon ui_control_value_type(kind : Text) -> Text =
+    choose(kind == "checkbox" or kind == "switch", "Truth", choose(kind == "slider", "Number", "Text"))
+
+  reckon ui_parameter_span(node : Sequence) -> Span =
+    choose(length(node) > 2, sequence_get(node, 2), make_span(0, 1, 1, 0))
+
+  reckon normalized_ui_parameter(node : Sequence, expected : Text) -> Sequence =
+    choose(semantic_check_at(expected == "" or ui_parameter_type(node) == expected or ui_parameter_type(node) == "@control-value",
+        "RCL_UI_EVENT_PARAMETER_TYPE", ui_parameter_name(node), ui_parameter_span(node)),
+      make_ui_parameter(ui_parameter_name(node), choose(ui_parameter_type(node) == "@control-value", expected, ui_parameter_type(node))), empty_sequence())
+
+  reckon normalize_ui_parameters(items : Sequence, index : Number, event_type : Text, value_type : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      normalize_ui_parameters(items, index + 1, event_type, value_type,
+        sequence_append(output, normalized_ui_parameter(sequence_get(items, index),
+          choose((event_type == "input" or event_type == "change") and ui_parameter_name(sequence_get(items, index)) == "value", value_type,
+            ui_expected_event_parameter_type(event_type, ui_parameter_name(sequence_get(items, index))))))))
+
+  reckon normalize_ui_control_events(items : Sequence, index : Number, value_type : Text, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      normalize_ui_control_events(items, index + 1, value_type,
+        sequence_append(output, sequence_append(make_ui_event(ui_event_type(sequence_get(items, index)),
+          normalize_ui_parameters(ui_event_parameters(sequence_get(items, index)), 0, ui_event_type(sequence_get(items, index)), value_type, empty_sequence()),
+          ui_event_statements(sequence_get(items, index))), ui_event_span(sequence_get(items, index))))))
 
   reckon ui_view_id(node : Sequence) -> Text = sequence_get(node, 0)
   reckon ui_view_role(node : Sequence) -> Text = sequence_get(node, 1)
@@ -1004,6 +1109,11 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_view_layout(node : Sequence) -> Sequence = ui_layout_extensions_base(ui_view_layout_extensions(node))
   reckon ui_view_adaptive_layouts(node : Sequence) -> Sequence = ui_layout_extensions_adaptive(ui_view_layout_extensions(node))
   reckon ui_view_children(node : Sequence) -> Sequence = sequence_get(node, 7)
+  reckon ui_view_span(node : Sequence) -> Span = choose(length(node) > 8, sequence_get(node, 8), make_span(0, 1, 1, 0))
+
+  reckon ui_control_span(node : Sequence, name : Text) -> Span =
+    choose(length(find_ui_property(ui_view_properties(node), 0, name)) > 0,
+      expr_span(ui_property_expression(find_ui_property(ui_view_properties(node), 0, name))), ui_view_span(node))
 
   reckon parse_ui_view_after_expression(tokens : Sequence, id : Text, role : Text, classes : Sequence, properties : Sequence, bindings : Sequence, events : Sequence, layout : Sequence, children : Sequence, property : Text, binding : Truth, expression_state : Sequence) -> Sequence =
     parse_ui_view_body(tokens, state_index(expression_state), id, role, classes,
@@ -1068,7 +1178,7 @@ reality RCLGeneralSelfHostCompiler {
                       parse_ui_event(tokens, index)),
                     syntax_failure(tokens, index, "RCL_UI_NODE_CLAUSE"))))))))))
 
-  reckon parse_ui_view(tokens : Sequence, index : Number) -> Sequence =
+  reckon parse_ui_view_unlocated(tokens : Sequence, index : Number) -> Sequence =
     choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NODE_ID"),
       choose(require_token(tokens, index + 2, "{", "RCL_UI_NODE_OPEN"),
         parse_ui_view_body(tokens, index + 3, token_text_at(tokens, index + 1),
@@ -1077,26 +1187,30 @@ reality RCLGeneralSelfHostCompiler {
           empty_sequence(), empty_sequence(), empty_sequence(), empty_sequence(), default_ui_layout_extensions(), empty_sequence()),
         empty_sequence()), empty_sequence())
 
-  reckon parse_ui_navigation_body(tokens : Sequence, index : Number, initial : Text, route_ids : Sequence, route_targets : Sequence) -> Sequence =
+  reckon parse_ui_view(tokens : Sequence, index : Number) -> Sequence =
+    located_node_state(parse_ui_view_unlocated(tokens, index), token_span_at(tokens, index + 1))
+
+  reckon parse_ui_navigation_body(tokens : Sequence, index : Number, initial : Text, route_ids : Sequence, route_targets : Sequence, initial_span : Span, target_spans : Sequence, span : Span) -> Sequence =
     choose(token_text_at(tokens, index) == "}",
-      choose(semantic_check(initial != "", "RCL_UI_NAVIGATION_INITIAL_REQUIRED", "navigation"),
-        choose(semantic_check(length(route_ids) > 0, "RCL_UI_NAVIGATION_ROUTE_REQUIRED", "navigation"),
-          make_node_state(index + 1, sequence_append(sequence_append(sequence_append(empty_sequence(), initial), route_ids), route_targets)), empty_sequence()), empty_sequence()),
+      choose(semantic_check_at(initial != "", "RCL_UI_NAVIGATION_INITIAL_REQUIRED", "navigation", span),
+        choose(semantic_check_at(length(route_ids) > 0, "RCL_UI_NAVIGATION_ROUTE_REQUIRED", "navigation", span),
+          make_node_state(index + 1, sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(sequence_append(empty_sequence(), initial), route_ids), route_targets), initial_span), target_spans), span)), empty_sequence()), empty_sequence()),
       choose(token_text_at(tokens, index) == "initial",
         choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_INITIAL"),
-          choose(semantic_check(initial == "", "RCL_UI_NAVIGATION_INITIAL_DUPLICATE", token_text_at(tokens, index + 1)),
-            parse_ui_navigation_body(tokens, index + 2, token_text_at(tokens, index + 1), route_ids, route_targets), empty_sequence()), empty_sequence()),
+          choose(semantic_check_at(initial == "", "RCL_UI_NAVIGATION_INITIAL_DUPLICATE", token_text_at(tokens, index + 1), token_span_at(tokens, index + 1)),
+            parse_ui_navigation_body(tokens, index + 2, token_text_at(tokens, index + 1), route_ids, route_targets, token_span_at(tokens, index + 1), target_spans, span), empty_sequence()), empty_sequence()),
         choose(token_text_at(tokens, index) == "route",
           choose(require_kind(tokens, index + 1, "IDENT", "RCL_UI_NAVIGATION_ROUTE"),
             choose(require_token(tokens, index + 2, "->", "RCL_UI_NAVIGATION_TARGET"),
               choose(require_kind(tokens, index + 3, "IDENT", "RCL_UI_NAVIGATION_TARGET"),
-                choose(semantic_check(find_text(route_ids, 0, token_text_at(tokens, index + 1)) < 0,
-                    "RCL_UI_NAVIGATION_ROUTE_DUPLICATE", token_text_at(tokens, index + 1)),
-                  choose(semantic_check(find_text(route_targets, 0, token_text_at(tokens, index + 3)) < 0,
-                      "RCL_UI_NAVIGATION_TARGET_DUPLICATE", token_text_at(tokens, index + 3)),
+                choose(semantic_check_at(find_text(route_ids, 0, token_text_at(tokens, index + 1)) < 0,
+                    "RCL_UI_NAVIGATION_ROUTE_DUPLICATE", token_text_at(tokens, index + 1), token_span_at(tokens, index + 1)),
+                  choose(semantic_check_at(find_text(route_targets, 0, token_text_at(tokens, index + 3)) < 0,
+                      "RCL_UI_NAVIGATION_TARGET_DUPLICATE", token_text_at(tokens, index + 3), token_span_at(tokens, index + 3)),
                     parse_ui_navigation_body(tokens, index + 4, initial,
                       sequence_append(route_ids, token_text_at(tokens, index + 1)),
-                      sequence_append(route_targets, token_text_at(tokens, index + 3))),
+                      sequence_append(route_targets, token_text_at(tokens, index + 3)), initial_span,
+                      sequence_append(target_spans, token_span_at(tokens, index + 3)), span),
                     empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()), empty_sequence()),
           syntax_failure(tokens, index, "RCL_UI_NAVIGATION_CLAUSE"))))
 
@@ -1229,10 +1343,10 @@ reality RCLGeneralSelfHostCompiler {
                   parse_ui_body_after_structure(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, false,
                     parse_ui_lifecycle_body(tokens, index + 2, empty_sequence(), empty_sequence())), empty_sequence()),
                 choose(token_text_at(tokens, index) == "navigation",
-                  choose(semantic_check(length(ui_extensions_navigation(navigation)) == 0, "RCL_UI_NAVIGATION_DUPLICATE", name),
+                  choose(semantic_check_at(length(ui_extensions_navigation(navigation)) == 0, "RCL_UI_NAVIGATION_DUPLICATE", name, token_span_at(tokens, index)),
                     choose(require_token(tokens, index + 1, "{", "RCL_UI_NAVIGATION_OPEN"),
                       parse_ui_body_after_structure(tokens, name, states, derived, stages, restore, themes, styles, navigation, views, true,
-                        parse_ui_navigation_body(tokens, index + 2, "", empty_sequence(), empty_sequence())), empty_sequence()), empty_sequence()),
+                        parse_ui_navigation_body(tokens, index + 2, "", empty_sequence(), empty_sequence(), token_span_at(tokens, index), empty_sequence(), token_span_at(tokens, index))), empty_sequence()), empty_sequence()),
                   choose(token_text_at(tokens, index) == "adaptation",
                     choose(semantic_check(length(ui_extensions_adaptation(navigation)) == 0, "RCL_UI_DEVICE_ADAPTATION_DUPLICATE", name),
                       choose(require_token(tokens, index + 1, "{", "RCL_UI_DEVICE_ADAPTATION_OPEN"),
@@ -1391,12 +1505,29 @@ reality RCLGeneralSelfHostCompiler {
   reckon ui_expression_type(node : Sequence, states : Sequence, derived : Sequence, parameters : Sequence) -> Text =
     choose(expr_kind(node) == "LiteralExpr", expr_text(node),
       choose(expr_kind(node) == "PathExpr", ui_reference_type(expr_text(node), states, derived, parameters),
-        choose(expr_kind(node) == "UnaryExpr", choose(expr_text(node) == not_operator(), "Truth", "Number"),
+        choose(expr_kind(node) == "UnaryExpr", ui_checked_unary_type(expr_text(node), ui_expression_type(expr_left(node), states, derived, parameters), expr_span(node)),
           choose(expr_kind(node) == "BinaryExpr",
-            choose(expr_text(node) == "+",
-              choose(ui_expression_type(expr_left(node), states, derived, parameters) == "Text" or ui_expression_type(expr_right(node), states, derived, parameters) == "Text", "Text", "Number"),
-              choose(expr_text(node) == minus_operator() or expr_text(node) == "*" or expr_text(node) == "/" or expr_text(node) == "%", "Number", "Truth")),
-            choose(expr_text(node) == "choose", ui_expression_type(sequence_get(expr_args(node), 1), states, derived, parameters), "")))))
+            ui_checked_binary_type(expr_text(node), ui_expression_type(expr_left(node), states, derived, parameters), ui_expression_type(expr_right(node), states, derived, parameters), expr_span(node)),
+            choose(semantic_check_at(expr_kind(node) == "CallExpr" and expr_text(node) == "choose" and length(expr_args(node)) == 3,
+                "RCL_UI_EXPRESSION_UNSUPPORTED", expr_text(node), expr_span(node)),
+              ui_checked_choose_type(ui_expression_type(sequence_get(expr_args(node), 0), states, derived, parameters),
+                ui_expression_type(sequence_get(expr_args(node), 1), states, derived, parameters), ui_expression_type(sequence_get(expr_args(node), 2), states, derived, parameters), expr_span(node)), "")))))
+
+  reckon ui_checked_unary_type(operator : Text, actual : Text, span : Span) -> Text =
+    choose(semantic_check_at(actual == choose(operator == not_operator(), "Truth", "Number"), "RCL_UI_EXPRESSION_TYPE", operator, span), actual, "")
+
+  reckon ui_checked_binary_type(operator : Text, left : Text, right : Text, span : Span) -> Text =
+    choose(operator == "+" and (left == "Text" or right == "Text"), "Text",
+      choose(operator == "+" or operator == minus_operator() or operator == "*" or operator == "/" or operator == "%",
+        choose(semantic_check_at(left == "Number" and right == "Number", "RCL_UI_EXPRESSION_TYPE", operator, span), "Number", ""),
+        choose(operator == "and" or operator == "or",
+          choose(semantic_check_at(left == "Truth" and right == "Truth", "RCL_UI_EXPRESSION_TYPE", operator, span), "Truth", ""),
+          choose(operator == "==" or operator == "!=",
+            choose(semantic_check_at(left == right, "RCL_UI_EXPRESSION_TYPE", operator, span), "Truth", ""),
+            choose(semantic_check_at(left == right and (left == "Number" or left == "Text"), "RCL_UI_EXPRESSION_TYPE", operator, span), "Truth", "")))))
+
+  reckon ui_checked_choose_type(condition : Text, yes : Text, no : Text, span : Span) -> Text =
+    choose(semantic_check_at(condition == "Truth" and yes == no, "RCL_UI_EXPRESSION_TYPE", "choose", span), yes, "")
 
   reckon canonical_ui_expression_array(items : Sequence, index : Number, states : Sequence, derived : Sequence, parameters : Sequence, output : Text) -> Text =
     choose(index >= length(items), output + "]",
@@ -1581,7 +1712,160 @@ reality RCLGeneralSelfHostCompiler {
         output + choose(index > 0, ",", "") + "[" + json_quote(sequence_get(sequence_get(items, index), 0))
           + "," + json_quote(sequence_get(sequence_get(items, index), 1)) + "]"))
 
+  reckon ui_control_has(node : Sequence, name : Text) -> Truth = length(find_ui_property(ui_view_properties(node), 0, name)) > 0
+
+  reckon ui_control_text(node : Sequence, name : Text) -> Text =
+    choose(ui_control_has(node, name), expr_literal_text(ui_property_expression(find_ui_property(ui_view_properties(node), 0, name))), "")
+
+  reckon ui_control_number(node : Sequence, name : Text) -> Number = number_from_text(ui_control_text(node, name))
+
+  reckon ui_content_property_allowed(role : Text, name : Text) -> Truth =
+    name == "accessibility_label" or name == "visible" or ui_style_property(name)
+      or (role == "container" and name == "modal")
+      or (role == "text" and name == "value")
+      or (role == "action" and (name == "label" or name == "disabled" or name == "require_valid_form" or name == "validation_scope"))
+      or (role == "input" and (name == "value" or name == "placeholder" or name == "input_kind" or name == "disabled" or name == "read_only"
+        or name == "min" or name == "max" or name == "step" or name == "options" or name == "required" or name == "min_length" or name == "max_length"))
+
+  reckon ui_control_property_type(node : Sequence, name : Text) -> Text =
+    choose(name == "value" and ui_view_role(node) == "input", ui_control_value_type(ui_control_kind(ui_view_role(node), ui_view_properties(node))),
+      choose(name == "disabled" or name == "read_only" or name == "visible" or name == "required" or name == "require_valid_form" or name == "modal", "Truth",
+        choose(name == "min" or name == "max" or name == "step" or name == "min_length" or name == "max_length" or name == "font_size" or name == "corner_radius", "Number", "Text")))
+
+  reckon validate_ui_control_properties(items : Sequence, index : Number, node : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(ui_content_property_allowed(ui_view_role(node), ui_property_name(sequence_get(items, index)))
+          and length(find_ui_property(items, index + 1, ui_property_name(sequence_get(items, index)))) == 0,
+          "RCL_UI_NODE_PROPERTY_ROLE", ui_view_id(node), expr_span(ui_property_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(expr_kind(ui_property_expression(sequence_get(items, index))) == "LiteralExpr"
+            and expr_text(ui_property_expression(sequence_get(items, index))) == ui_control_property_type(node, ui_property_name(sequence_get(items, index))),
+            "RCL_UI_NODE_PROPERTY_TYPE", ui_view_id(node), expr_span(ui_property_expression(sequence_get(items, index)))),
+          validate_ui_control_properties(items, index + 1, node), false), false))
+
+  reckon ui_control_binding_allowed(role : Text, name : Text) -> Truth =
+    name == "visible" or ((role == "input" or role == "text") and name == "value")
+      or (role == "action" and (name == "label" or name == "disabled"))
+      or (role == "input" and (name == "disabled" or name == "read_only"))
+
+  reckon validate_ui_control_bindings(items : Sequence, index : Number, node : Sequence, states : Sequence, derived : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(ui_control_binding_allowed(ui_view_role(node), ui_property_name(sequence_get(items, index)))
+          and length(find_ui_property(items, index + 1, ui_property_name(sequence_get(items, index)))) == 0,
+          "RCL_UI_BINDING_PROPERTY", ui_view_id(node), expr_span(ui_property_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(ui_expression_type(ui_property_expression(sequence_get(items, index)), states, derived, empty_sequence())
+            == ui_control_property_type(node, ui_property_name(sequence_get(items, index))), "RCL_UI_BINDING_TYPE", ui_view_id(node), expr_span(ui_property_expression(sequence_get(items, index)))),
+          validate_ui_control_bindings(items, index + 1, node, states, derived), false), false))
+
+  reckon ui_text_control(kind : Text) -> Truth = kind == "text" or kind == "email" or kind == "password" or kind == "textarea"
+  reckon ui_choice_control(kind : Text) -> Truth = kind == "select" or kind == "radio"
+  reckon ui_typed_control(kind : Text) -> Truth = not (kind == "text" or kind == "email" or kind == "password")
+
+  reckon ui_control_change_events(items : Sequence, index : Number, expected : Text, typed : Truth) -> Number =
+    choose(index >= length(items), 0,
+      choose(ui_event_type(sequence_get(items, index)) == "input" or ui_event_type(sequence_get(items, index)) == "change",
+        choose(not typed, 1 + ui_control_change_events(items, index + 1, expected, typed),
+          choose(semantic_check(length(ui_event_parameters(sequence_get(items, index))) == 1, "RCL_UI_CONTROL_EVENT_VALUE_TYPE", expected),
+            choose(semantic_check(ui_parameter_name(sequence_get(ui_event_parameters(sequence_get(items, index)), 0)) == "value"
+                and ui_parameter_type(sequence_get(ui_event_parameters(sequence_get(items, index)), 0)) == expected,
+                "RCL_UI_CONTROL_EVENT_VALUE_TYPE", expected), 1 + ui_control_change_events(items, index + 1, expected, typed), 0), 0)),
+        ui_control_change_events(items, index + 1, expected, typed)))
+
+  reckon ui_control_options_valid(raw : Text, seen : Sequence) -> Truth =
+    choose(length(seen) >= 64, false,
+      choose(split_before(raw, "|") == "" or not ui_option_edges_trimmed(split_before(raw, "|")) or find_text(seen, 0, split_before(raw, "|")) >= 0, false,
+        choose(contains(raw, "|"), ui_control_options_valid(split_after(raw, "|"), sequence_append(seen, split_before(raw, "|"))), length(seen) >= 1)))
+
+  // ECMAScript TrimString non-ASCII whitespace: 00A0, 1680, 2000-200A,
+  // 2028-2029, 202F, 205F, 3000, FEFF. ASCII edges use the existing trim builtin.
+  reckon ui_option_edges_trimmed(value : Text) -> Truth =
+    trim(value) == value
+      and not contains("                 　﻿", char_at(value, 0))
+      and not contains("                 　﻿", char_at(value, length(value) - 1))
+
+  reckon ui_control_option_contains(raw : Text, value : Text) -> Truth =
+    choose(split_before(raw, "|") == value, true,
+      choose(contains(raw, "|"), ui_control_option_contains(split_after(raw, "|"), value), false))
+
+  reckon ui_control_length_bound(node : Sequence, name : Text) -> Truth =
+    choose(not ui_control_has(node, name), true,
+      semantic_check(ui_control_number(node, name) >= 0 and ui_control_number(node, name) <= 10000 and ui_control_number(node, name) % 1 == 0, "RCL_UI_FORM_LENGTH_BOUND", ui_view_id(node)))
+
+  reckon ui_date_digits(value : Text, index : Number) -> Truth =
+    choose(index >= 10, true,
+      choose(index == 4 or index == 7, ui_date_digits(value, index + 1),
+        choose(is_digit(char_at(value, index)), ui_date_digits(value, index + 1), false)))
+
+  reckon ui_date_parts_valid(year : Number, month : Number, day : Number) -> Truth =
+    year >= 1 and month >= 1 and month <= 12 and day >= 1
+      and day <= choose(month == 2, choose(year % 400 == 0 or (year % 4 == 0 and year % 100 != 0), 29, 28),
+        choose(month == 4 or month == 6 or month == 9 or month == 11, 30, 31))
+
+  reckon ui_iso_date_valid(value : Text) -> Truth =
+    choose(length(value) == 10 and char_at(value, 4) == minus_operator() and char_at(value, 7) == minus_operator() and ui_date_digits(value, 0),
+      ui_date_parts_valid(number_from_text(slice_text(value, 0, 4)), number_from_text(slice_text(value, 5, 2)), number_from_text(slice_text(value, 8, 2))), false)
+
+  reckon ui_initial_state_expression(items : Sequence, index : Number, name : Text) -> Sequence =
+    choose(index >= length(items), empty_sequence(),
+      choose(ui_state_name(sequence_get(items, index)) == name, ui_state_expression(sequence_get(items, index)), ui_initial_state_expression(items, index + 1, name)))
+
+  reckon ui_initial_control_expression(node : Sequence, states : Sequence) -> Sequence =
+    choose(expr_kind(node) == "LiteralExpr", node,
+      choose(expr_kind(node) == "PathExpr", ui_initial_state_expression(states, 0, expr_text(node)), empty_sequence()))
+
+  reckon validate_ui_initial_control(kind : Text, initial : Sequence, options : Text) -> Truth =
+    choose(length(initial) == 0, true,
+      choose(kind == "date", semantic_check_at(ui_iso_date_valid(expr_literal_text(initial)), "RCL_UI_DATE_INITIAL", "date", expr_span(initial)),
+        choose(kind == "radio", semantic_check_at(ui_control_option_contains(options, expr_literal_text(initial)), "RCL_UI_RADIO_INITIAL", "radio", expr_span(initial)), true)))
+
+  reckon validate_ui_control_range(node : Sequence) -> Truth =
+    choose(semantic_check(ui_control_has(node, "min") and ui_control_has(node, "max") and ui_control_has(node, "step"), "RCL_UI_SLIDER_RANGE", ui_view_id(node)),
+      choose(semantic_check(ui_control_number(node, "min") < ui_control_number(node, "max") and ui_control_number(node, "step") > 0, "RCL_UI_SLIDER_RANGE", ui_view_id(node)),
+        semantic_check(ui_slider_steps_valid((ui_control_number(node, "max") - ui_control_number(node, "min")) / ui_control_number(node, "step")),
+          "RCL_UI_SLIDER_STEP", ui_view_id(node)), false), false)
+
+  reckon ui_slider_steps_valid(steps : Number) -> Truth =
+    steps <= 100000 and (steps % 1 <= 1 / 1000000000 or 1 - steps % 1 <= 1 / 1000000000)
+
+  reckon validate_ui_input_control(node : Sequence, kind : Text, states : Sequence) -> Truth =
+    choose(semantic_check(kind == "slider" or not (ui_control_has(node, "min") or ui_control_has(node, "max") or ui_control_has(node, "step")), "RCL_UI_CONTROL_PROPERTY_KIND", ui_view_id(node)),
+      choose(semantic_check(ui_choice_control(kind) or not ui_control_has(node, "options"), "RCL_UI_CONTROL_PROPERTY_KIND", ui_view_id(node)),
+        choose(semantic_check(ui_text_control(kind) or not (ui_control_has(node, "min_length") or ui_control_has(node, "max_length")), "RCL_UI_FORM_LENGTH_KIND", ui_view_id(node)),
+          choose(ui_control_length_bound(node, "min_length") and ui_control_length_bound(node, "max_length"),
+            choose(semantic_check(kind != "slider" or not ui_control_has(node, "required"), "RCL_UI_FORM_REQUIRED_KIND", ui_view_id(node)),
+              validate_ui_input_control_admitted(node, kind, states), false), false), false), false), false)
+
+  reckon validate_ui_input_control_admitted(node : Sequence, kind : Text, states : Sequence) -> Truth =
+    choose(semantic_check(not (ui_control_has(node, "min_length") and ui_control_has(node, "max_length"))
+        or (ui_control_number_default(node, "min_length", 0) <= ui_control_number_default(node, "max_length", 10000)), "RCL_UI_FORM_LENGTH_ORDER", ui_view_id(node)),
+      choose(semantic_check(not (ui_typed_control(kind) or ui_control_has(node, "required") or ui_control_has(node, "min_length") or ui_control_has(node, "max_length"))
+          or length(find_ui_property(ui_view_bindings(node), 0, "value")) > 0, "RCL_UI_CONTROL_BIND_VALUE_REQUIRED", ui_view_id(node)),
+        choose(semantic_check(not ui_typed_control(kind) or (length(ui_control_text(node, "accessibility_label")) > 0
+            and ui_control_change_events(ui_view_events(node), 0, ui_control_value_type(kind), true) > 0), "RCL_UI_CONTROL_CHANGE_OR_LABEL_REQUIRED", ui_view_id(node)),
+          choose(choose(kind == "slider", validate_ui_control_range(node), true),
+            choose(choose(ui_choice_control(kind), semantic_check(ui_control_options_valid(ui_control_text(node, "options"), empty_sequence()), "RCL_UI_SELECT_OPTIONS", ui_view_id(node)), true),
+              validate_ui_control_initials(node, kind, states), false), false), false), false), false)
+
+  reckon ui_control_number_default(node : Sequence, name : Text, fallback : Number) -> Number =
+    choose(ui_control_has(node, name), ui_control_number(node, name), fallback)
+
+  reckon validate_ui_control_initials(node : Sequence, kind : Text, states : Sequence) -> Truth =
+    choose(kind == "date" and ui_control_has(node, "value"),
+      choose(semantic_check(ui_iso_date_valid(ui_control_text(node, "value")), "RCL_UI_DATE_VALUE", ui_view_id(node)), validate_ui_control_initial_binding(node, kind, states), false),
+      validate_ui_control_initial_binding(node, kind, states))
+
+  reckon validate_ui_control_initial_binding(node : Sequence, kind : Text, states : Sequence) -> Truth =
+    choose(length(find_ui_property(ui_view_bindings(node), 0, "value")) > 0,
+      validate_ui_initial_control(kind, ui_initial_control_expression(ui_property_expression(find_ui_property(ui_view_bindings(node), 0, "value")), states), ui_control_text(node, "options")), true)
+
+  reckon validate_ui_control_node(node : Sequence, states : Sequence, derived : Sequence) -> Truth =
+    choose(validate_ui_control_properties(ui_view_properties(node), 0, node),
+      choose(validate_ui_control_bindings(ui_view_bindings(node), 0, node, states, derived),
+        choose(ui_view_role(node) == "input", validate_ui_input_control(node, ui_control_kind("input", ui_view_properties(node)), states), true), false), false)
+
   reckon canonical_ui_node(node : Sequence, states : Sequence, derived : Sequence, themes : Sequence, styles : Sequence) -> Text =
+    choose(validate_ui_control_node(node, states, derived), canonical_ui_node_admitted(node, states, derived, themes, styles), "")
+
+  reckon canonical_ui_node_admitted(node : Sequence, states : Sequence, derived : Sequence, themes : Sequence, styles : Sequence) -> Text =
     "[" + json_quote(ui_view_id(node)) + "," + json_quote(ui_view_role(node)) + ","
       + canonical_ui_texts(ui_view_classes(node), 0, "[") + ","
       + canonical_ui_properties(ui_view_properties(node), 0, "[") + ","
@@ -1737,9 +2021,16 @@ reality RCLGeneralSelfHostCompiler {
       canonical_alters(items, index + 1,
         output + choose(index == 0, "", ",") + canonical_alter(sequence_get(items, index))))
 
+  reckon canonical_rule_calls(items : Sequence, index : Number, output : Text) -> Text =
+    choose(index >= length(items), output + "]",
+      canonical_rule_calls(items, index + 1,
+        output + choose(index > 0, ",", "") + "{\"args\":" + canonical_expression_array(rule_call_args(sequence_get(items, index)), 0, "[")
+          + ",\"capability\":" + json_quote(rule_call_capability(sequence_get(items, index)))
+          + ",\"target\":" + json_quote(rule_call_target(sequence_get(items, index))) + "}"))
+
   reckon canonical_rule(node : Sequence) -> Text =
     "{\"alters\":" + canonical_alters(rule_alters(node), 0, "[")
-      + ",\"calls\":[],\"cause\":" + choose(rule_cause(node) == "", "null", json_quote(rule_cause(node)))
+      + ",\"calls\":" + canonical_rule_calls(rule_calls(node), 0, "[") + ",\"cause\":" + choose(rule_cause(node) == "", "null", json_quote(rule_cause(node)))
       + ",\"from\":" + choose(rule_from(node) == "", "null", json_quote(rule_from(node)))
       + ",\"into\":" + choose(rule_into(node) == "", "null", json_quote(rule_into(node)))
       + ",\"kind\":" + json_quote(rule_kind(node)) + ",\"name\":" + json_quote(rule_name(node))
@@ -1990,6 +2281,9 @@ reality RCLGeneralSelfHostCompiler {
   reckon semantic_check(condition : Truth, code : Text, detail : Text) -> Truth =
     semantic_assert(condition, code, code + ":" + detail, make_span(0, 1, 1, 0))
 
+  reckon semantic_check_at(condition : Truth, code : Text, detail : Text, span : Span) -> Truth =
+    semantic_assert(condition, code, code + ":" + detail, span)
+
   reckon find_facet_index(items : Sequence, index : Number, path : Text) -> Number =
     choose(index >= length(items), -1,
       choose(facet_path(sequence_get(items, index)) == path, index, find_facet_index(items, index + 1, path)))
@@ -2004,16 +2298,16 @@ reality RCLGeneralSelfHostCompiler {
         validate_expression_array(items, index + 1, locals, facets, reckons), false))
 
   reckon validate_user_call(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence, reckon_index : Number) -> Truth =
-    choose(semantic_check(reckon_index >= 0, "RCL_SEMANTIC_UNKNOWN_CALL", expr_text(node)),
-      choose(semantic_check(length(expr_args(node)) == length(reckon_params(sequence_get(reckons, reckon_index))),
-          "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+    choose(semantic_check_at(reckon_index >= 0, "RCL_SEMANTIC_UNKNOWN_CALL", expr_text(node), expr_span(node)),
+      choose(semantic_check_at(length(expr_args(node)) == length(reckon_params(sequence_get(reckons, reckon_index))),
+          "RCL_SEMANTIC_CALL_ARITY", expr_text(node), expr_span(node)),
         validate_expression_array(expr_args(node), 0, locals, facets, reckons), false), false)
 
   reckon validate_expression(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(expr_kind(node) == "LiteralExpr", true,
       choose(expr_kind(node) == "PathExpr",
-        semantic_check(find_text(locals, 0, expr_text(node)) >= 0 or find_facet_index(facets, 0, expr_text(node)) >= 0,
-          "RCL_SEMANTIC_UNKNOWN_PATH", expr_text(node)),
+        semantic_check_at(find_text(locals, 0, expr_text(node)) >= 0 or find_facet_index(facets, 0, expr_text(node)) >= 0,
+          "RCL_SEMANTIC_UNKNOWN_PATH", expr_text(node), expr_span(node)),
         choose(expr_kind(node) == "UnaryExpr", validate_expression(expr_left(node), locals, facets, reckons),
           choose(expr_kind(node) == "BinaryExpr",
             choose(validate_expression(expr_left(node), locals, facets, reckons),
@@ -2021,10 +2315,10 @@ reality RCLGeneralSelfHostCompiler {
             choose(builtin_id(expr_text(node)) > 0,
               validate_expression_array(expr_args(node), 0, locals, facets, reckons),
               choose(expr_text(node) == "provider_call" or expr_text(node) == "choose",
-                choose(semantic_check(length(expr_args(node)) == 3, "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+                choose(semantic_check_at(length(expr_args(node)) == 3, "RCL_SEMANTIC_CALL_ARITY", expr_text(node), expr_span(node)),
                   validate_expression_array(expr_args(node), 0, locals, facets, reckons), false),
                 choose(expr_text(node) == "typed_ref" or expr_text(node) == "typed_deref" or expr_text(node) == "typed_ref_id",
-                  choose(semantic_check(length(expr_args(node)) == 1, "RCL_SEMANTIC_CALL_ARITY", expr_text(node)),
+                  choose(semantic_check_at(length(expr_args(node)) == 1, "RCL_SEMANTIC_CALL_ARITY", expr_text(node), expr_span(node)),
                     validate_expression_array(expr_args(node), 0, locals, facets, reckons), false),
                   validate_user_call(node, locals, facets, reckons,
                     find_reckon_index(reckons, 0, expr_text(node))))))))))
@@ -2033,8 +2327,8 @@ reality RCLGeneralSelfHostCompiler {
     actual == "Unknown" or expected == "Any" or expected == actual
       or (expected == "TextOrSequence" and (actual == "Text" or actual == "Sequence"))
 
-  reckon predicate_checked_type(actual : Text, expected : Text, code : Text, detail : Text) -> Text =
-    choose(semantic_check(predicate_accepts(expected, actual), code, detail + ":" + expected + ":" + actual), actual, actual)
+  reckon predicate_checked_type(actual : Text, expected : Text, code : Text, detail : Text, span : Span) -> Text =
+    choose(semantic_check_at(predicate_accepts(expected, actual), code, detail + ":" + expected + ":" + actual, span), actual, actual)
 
   reckon predicate_local_index(items : Sequence, index : Number, name : Text) -> Number =
     choose(index >= length(items), -1,
@@ -2092,82 +2386,82 @@ reality RCLGeneralSelfHostCompiler {
       predicate_argument_types(items, index + 1, locals, facets, reckons, visited,
         sequence_append(output, predicate_expression_type(sequence_get(items, index), locals, facets, reckons, visited))))
 
-  reckon predicate_builtin_arguments(types : Sequence, index : Number, signature : Text, name : Text) -> Truth =
-    choose(index >= length(types), semantic_check(signature == "", "RCL_CALL_ARITY", name),
-      choose(semantic_check(signature != "", "RCL_CALL_ARITY", name),
-        choose(semantic_check(predicate_accepts(split_before(signature, ","), sequence_get(types, index)), "RCL_CALL_TYPE", name + ":" + text(index)),
-          predicate_builtin_arguments(types, index + 1, choose(contains(signature, ","), split_after(signature, ","), ""), name), false), false))
+  reckon predicate_builtin_arguments(types : Sequence, index : Number, signature : Text, name : Text, span : Span) -> Truth =
+    choose(index >= length(types), semantic_check_at(signature == "", "RCL_CALL_ARITY", name, span),
+      choose(semantic_check_at(signature != "", "RCL_CALL_ARITY", name, span),
+        choose(semantic_check_at(predicate_accepts(split_before(signature, ","), sequence_get(types, index)), "RCL_CALL_TYPE", name + ":" + text(index), span),
+          predicate_builtin_arguments(types, index + 1, choose(contains(signature, ","), split_after(signature, ","), ""), name, span), false), false))
 
-  reckon predicate_builtin_type(types : Sequence, signature : Text, name : Text) -> Text =
-    choose(predicate_builtin_arguments(types, 0, split_before(signature, ":"), name), split_after(signature, ":"), "Unknown")
+  reckon predicate_builtin_type(types : Sequence, signature : Text, name : Text, span : Span) -> Text =
+    choose(predicate_builtin_arguments(types, 0, split_before(signature, ":"), name, span), split_after(signature, ":"), "Unknown")
 
-  reckon predicate_choose_type(condition : Text, yes : Text, no : Text) -> Text =
-    choose(semantic_check(predicate_accepts("Truth", condition), "RCL_TYPE_CHOOSE", "condition"),
-      choose(semantic_check(yes == no or yes == "Unknown" or no == "Unknown", "RCL_TYPE_CHOOSE", "branches"),
+  reckon predicate_choose_type(condition : Text, yes : Text, no : Text, span : Span) -> Text =
+    choose(semantic_check_at(predicate_accepts("Truth", condition), "RCL_TYPE_CHOOSE", "condition", span),
+      choose(semantic_check_at(yes == no or yes == "Unknown" or no == "Unknown", "RCL_TYPE_CHOOSE", "branches", span),
         choose(yes == "Unknown", no, yes), "Unknown"), "Unknown")
 
-  reckon predicate_special_call_type(name : Text, types : Sequence) -> Text =
+  reckon predicate_special_call_type(name : Text, types : Sequence, span : Span) -> Text =
     choose(name == "choose",
-      choose(semantic_check(length(types) == 3, "RCL_CALL_ARITY", name),
-        predicate_choose_type(sequence_get(types, 0), sequence_get(types, 1), sequence_get(types, 2)), "Unknown"),
+      choose(semantic_check_at(length(types) == 3, "RCL_CALL_ARITY", name, span),
+        predicate_choose_type(sequence_get(types, 0), sequence_get(types, 1), sequence_get(types, 2), span), "Unknown"),
       predicate_builtin_type(types,
         choose(name == "provider_call", "Text,Text,Text:Text",
-          choose(name == "typed_ref", "Any:TypedRef", choose(name == "typed_deref", "TypedRef:Unknown", "TypedRef:Number"))), name))
+          choose(name == "typed_ref", "Any:TypedRef", choose(name == "typed_deref", "TypedRef:Unknown", "TypedRef:Number"))), name, span))
 
-  reckon predicate_user_arguments(types : Sequence, params : Sequence, index : Number, name : Text) -> Truth =
-    choose(index >= length(types), semantic_check(index == length(params), "RCL_SEMANTIC_CALL_ARITY", name),
-      choose(semantic_check(index < length(params), "RCL_SEMANTIC_CALL_ARITY", name),
-        choose(semantic_check(predicate_accepts(sequence_get(sequence_get(params, index), 1), sequence_get(types, index)),
-            "RCL_CALL_TYPE", name + ":" + text(index)),
-          predicate_user_arguments(types, params, index + 1, name), false), false))
+  reckon predicate_user_arguments(types : Sequence, params : Sequence, index : Number, name : Text, span : Span) -> Truth =
+    choose(index >= length(types), semantic_check_at(index == length(params), "RCL_SEMANTIC_CALL_ARITY", name, span),
+      choose(semantic_check_at(index < length(params), "RCL_SEMANTIC_CALL_ARITY", name, span),
+        choose(semantic_check_at(predicate_accepts(sequence_get(sequence_get(params, index), 1), sequence_get(types, index)),
+            "RCL_CALL_TYPE", name + ":" + text(index), span),
+          predicate_user_arguments(types, params, index + 1, name, span), false), false))
 
   reckon predicate_function_result(actual : Text, node : Sequence) -> Text =
-    choose(semantic_check(predicate_accepts(reckon_return_type(node), actual), "RCL_RECKON_RETURN_TYPE", reckon_name(node)),
+    choose(semantic_check_at(predicate_accepts(reckon_return_type(node), actual), "RCL_RECKON_RETURN_TYPE", reckon_name(node), expr_span(reckon_expression(node))),
       reckon_return_type(node), "Unknown")
 
   reckon predicate_function_type(node : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
     choose(find_text(visited, 0, reckon_name(node)) >= 0, reckon_return_type(node),
       predicate_function_result(predicate_expression_type(reckon_expression(node), reckon_params(node), facets, reckons, sequence_append(visited, reckon_name(node))), node))
 
-  reckon predicate_user_type(types : Sequence, node : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
-    choose(predicate_user_arguments(types, reckon_params(node), 0, reckon_name(node)),
+  reckon predicate_user_type(types : Sequence, node : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence, span : Span) -> Text =
+    choose(predicate_user_arguments(types, reckon_params(node), 0, reckon_name(node), span),
       predicate_function_type(node, facets, reckons, visited), "Unknown")
 
-  reckon predicate_call_type(name : Text, types : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
-    choose(builtin_id(name) > 0, predicate_builtin_type(types, predicate_builtin_signature(builtin_id(name)), name),
+  reckon predicate_call_type(name : Text, types : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence, span : Span) -> Text =
+    choose(builtin_id(name) > 0, predicate_builtin_type(types, predicate_builtin_signature(builtin_id(name)), name, span),
       choose(name == "choose" or name == "provider_call" or name == "typed_ref" or name == "typed_deref" or name == "typed_ref_id",
-        predicate_special_call_type(name, types),
-        predicate_user_type(types, sequence_get(reckons, find_reckon_index(reckons, 0, name)), facets, reckons, visited)))
+        predicate_special_call_type(name, types, span),
+        predicate_user_type(types, sequence_get(reckons, find_reckon_index(reckons, 0, name)), facets, reckons, visited, span)))
 
-  reckon predicate_unary_type(operator : Text, actual : Text) -> Text =
+  reckon predicate_unary_type(operator : Text, actual : Text, span : Span) -> Text =
     choose(operator == not_operator(),
-      choose(semantic_check(predicate_accepts("Truth", actual), "RCL_TYPE_UNARY", operator), "Truth", "Unknown"),
-      predicate_checked_type(actual, "Number", "RCL_TYPE_UNARY", operator))
+      choose(semantic_check_at(predicate_accepts("Truth", actual), "RCL_TYPE_UNARY", operator, span), "Truth", "Unknown"),
+      predicate_checked_type(actual, "Number", "RCL_TYPE_UNARY", operator, span))
 
-  reckon predicate_binary_type(operator : Text, left : Text, right : Text) -> Text =
+  reckon predicate_binary_type(operator : Text, left : Text, right : Text, span : Span) -> Text =
     choose(operator == "and" or operator == "or",
-      choose(semantic_check(predicate_accepts("Truth", left) and predicate_accepts("Truth", right), "RCL_TYPE_LOGIC", operator), "Truth", "Unknown"),
+      choose(semantic_check_at(predicate_accepts("Truth", left) and predicate_accepts("Truth", right), "RCL_TYPE_LOGIC", operator, span), "Truth", "Unknown"),
       choose(left == "Unknown" or right == "Unknown",
         choose(operator == "==" or operator == "!=" or operator == "<" or operator == "<=" or operator == ">" or operator == ">=", "Truth", "Unknown"),
         choose(operator == "==" or operator == "!=",
-          choose(semantic_check(left == right, "RCL_TYPE_BINARY", operator), "Truth", "Unknown"),
+          choose(semantic_check_at(left == right, "RCL_TYPE_BINARY", operator, span), "Truth", "Unknown"),
           choose(operator == "<" or operator == "<=" or operator == ">" or operator == ">=",
-            choose(semantic_check(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator), "Truth", "Unknown"),
+            choose(semantic_check_at(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator, span), "Truth", "Unknown"),
             choose(operator == "+" and left == "Text" and right == "Text", "Text",
-              choose(semantic_check(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator), "Number", "Unknown"))))))
+              choose(semantic_check_at(left == "Number" and right == "Number", "RCL_TYPE_BINARY", operator, span), "Number", "Unknown"))))))
 
   reckon predicate_expression_type(node : Sequence, locals : Sequence, facets : Sequence, reckons : Sequence, visited : Sequence) -> Text =
     choose(expr_kind(node) == "LiteralExpr", expr_text(node),
       choose(expr_kind(node) == "PathExpr", predicate_path_type(expr_text(node), locals, facets, predicate_local_index(locals, 0, expr_text(node))),
-        choose(expr_kind(node) == "UnaryExpr", predicate_unary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited)),
+        choose(expr_kind(node) == "UnaryExpr", predicate_unary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited), expr_span(node)),
           choose(expr_kind(node) == "BinaryExpr",
-            predicate_binary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited), predicate_expression_type(expr_right(node), locals, facets, reckons, visited)),
-            predicate_call_type(expr_text(node), predicate_argument_types(expr_args(node), 0, locals, facets, reckons, visited, empty_sequence()), facets, reckons, visited)))))
+            predicate_binary_type(expr_text(node), predicate_expression_type(expr_left(node), locals, facets, reckons, visited), predicate_expression_type(expr_right(node), locals, facets, reckons, visited), expr_span(node)),
+            predicate_call_type(expr_text(node), predicate_argument_types(expr_args(node), 0, locals, facets, reckons, visited, empty_sequence()), facets, reckons, visited, expr_span(node))))))
 
   reckon validate_warrant_condition(node : Sequence, facets : Sequence, reckons : Sequence) -> Truth =
     choose(validate_expression(warrant_condition(node), empty_sequence(), facets, reckons),
-      semantic_check(predicate_accepts("Truth", predicate_expression_type(warrant_condition(node), empty_sequence(), facets, reckons, empty_sequence())),
-        "RCL_WARRANT_CONDITION_TYPE", warrant_subject(node) + ":" + warrant_capability(node)), false)
+      semantic_check_at(predicate_accepts("Truth", predicate_expression_type(warrant_condition(node), empty_sequence(), facets, reckons, empty_sequence())),
+        "RCL_WARRANT_CONDITION_TYPE", warrant_subject(node) + ":" + warrant_capability(node), expr_span(warrant_condition(node))), false)
 
   reckon validate_warrants(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -2177,9 +2471,9 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon validate_facets(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check(expr_kind(facet_expression(sequence_get(items, index))) != "LiteralExpr"
+      choose(semantic_check_at(expr_kind(facet_expression(sequence_get(items, index))) != "LiteralExpr"
             or facet_type(sequence_get(items, index)) == expr_text(facet_expression(sequence_get(items, index))),
-          "RCL_SEMANTIC_TYPE_MISMATCH", facet_path(sequence_get(items, index))),
+          "RCL_SEMANTIC_TYPE_MISMATCH", facet_path(sequence_get(items, index)), expr_span(facet_expression(sequence_get(items, index)))),
         choose(validate_expression(facet_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
           validate_facets(items, index + 1, facets, reckons), false), false))
 
@@ -2191,8 +2485,8 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon validate_alters(items : Sequence, index : Number, facets : Sequence, reckons : Sequence) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check(find_facet_index(facets, 0, alter_target(sequence_get(items, index))) >= 0,
-          "RCL_SEMANTIC_UNKNOWN_ALTER_TARGET", alter_target(sequence_get(items, index))),
+      choose(semantic_check_at(find_facet_index(facets, 0, alter_target(sequence_get(items, index))) >= 0,
+          "RCL_SEMANTIC_UNKNOWN_ALTER_TARGET", alter_target(sequence_get(items, index)), alter_span(sequence_get(items, index))),
         choose(validate_expression(alter_expression(sequence_get(items, index)), empty_sequence(), facets, reckons),
           validate_alters(items, index + 1, facets, reckons), false), false))
 
@@ -2210,22 +2504,89 @@ reality RCLGeneralSelfHostCompiler {
   reckon validate_ui_event_statements(items : Sequence, index : Number, node_id : Text, event_type : Text, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
       choose(ui_statement_kind(sequence_get(items, index)) == "realize-reality",
-        choose(semantic_check(find_ui_rule_index(rules, 0, sequence_get(sequence_get(items, index), 1)) >= 0,
-            "RCL_UI_REALITY_RULE_UNKNOWN", node_id + ":" + sequence_get(sequence_get(items, index), 1)),
+        choose(semantic_check_at(find_ui_rule_index(rules, 0, sequence_get(sequence_get(items, index), 1)) >= 0,
+            "RCL_UI_REALITY_RULE_UNKNOWN", node_id + ":" + sequence_get(sequence_get(items, index), 1), ui_statement_span(sequence_get(items, index))),
           validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation), false),
         choose(ui_statement_kind(sequence_get(items, index)) == "navigate",
-          choose(semantic_check(length(navigation) > 0, "RCL_UI_NAVIGATION_REQUIRED", node_id + ":" + event_type),
-            choose(semantic_check(find_text(sequence_get(navigation, 1), 0,
+          choose(semantic_check_at(length(navigation) > 0, "RCL_UI_NAVIGATION_REQUIRED", node_id + ":" + event_type, ui_statement_span(sequence_get(items, index))),
+            choose(semantic_check_at(find_text(sequence_get(navigation, 1), 0,
                   sequence_get(sequence_get(items, index), 1)) >= 0,
-                "RCL_UI_NAVIGATION_ROUTE_UNKNOWN", node_id + ":" + event_type + ":" + sequence_get(sequence_get(items, index), 1)),
+                "RCL_UI_NAVIGATION_ROUTE_UNKNOWN", node_id + ":" + event_type + ":" + sequence_get(sequence_get(items, index), 1), ui_statement_span(sequence_get(items, index))),
               validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation), false), false),
           validate_ui_event_statements(items, index + 1, node_id, event_type, rules, navigation))))
 
   reckon validate_ui_events(items : Sequence, index : Number, node_id : Text, rules : Sequence, navigation : Sequence) -> Truth =
     choose(index >= length(items), true,
+      choose(semantic_check_at(find_ui_event_index(items, 0, ui_event_type(sequence_get(items, index))) == index,
+          "RCL_UI_EVENT_DUPLICATE", node_id, ui_event_span(sequence_get(items, index))),
       choose(validate_ui_event_statements(ui_event_statements(sequence_get(items, index)), 0, node_id,
           ui_event_type(sequence_get(items, index)), rules, navigation),
-        validate_ui_events(items, index + 1, node_id, rules, navigation), false))
+        validate_ui_events(items, index + 1, node_id, rules, navigation), false), false))
+
+  reckon find_ui_event_index(items : Sequence, index : Number, event_type : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(ui_event_type(sequence_get(items, index)) == event_type, index,
+        find_ui_event_index(items, index + 1, event_type)))
+
+  reckon collect_ui_tree_child_ids(items : Sequence, index : Number, seen : Sequence) -> Sequence =
+    choose(index >= length(items), seen,
+      collect_ui_tree_child_ids(items, index + 1, collect_ui_tree_ids(sequence_get(items, index), seen)))
+
+  reckon collect_ui_tree_ids(node : Sequence, seen : Sequence) -> Sequence =
+    choose(semantic_check_at(find_text(seen, 0, ui_view_id(node)) < 0, "RCL_UI_NODE_ID_DUPLICATE", ui_view_id(node), ui_view_span(node)),
+      collect_ui_tree_child_ids(ui_view_children(node), 0, sequence_append(seen, ui_view_id(node))), seen)
+
+  reckon ui_node_content_available(node : Sequence, name : Text) -> Truth =
+    ui_control_has(node, name) or length(find_ui_property(ui_view_bindings(node), 0, name)) > 0
+
+  reckon ui_container_ancestor(ancestors : Sequence, index : Number, id : Text) -> Truth =
+    choose(index >= length(ancestors), false,
+      choose(ui_view_role(sequence_get(ancestors, index)) == "container" and ui_view_id(sequence_get(ancestors, index)) == id, true,
+        ui_container_ancestor(ancestors, index + 1, id)))
+
+  reckon validate_ui_form_scope(node : Sequence, ancestors : Sequence) -> Truth =
+    choose(not ui_control_has(node, "validation_scope"), true,
+      choose(semantic_check_at(ui_control_text(node, "validation_scope") != "", "RCL_UI_FORM_SCOPE_TARGET", ui_view_id(node), ui_control_span(node, "validation_scope")),
+        choose(semantic_check_at(ui_control_text(node, "require_valid_form") == "true", "RCL_UI_FORM_SCOPE_GUARD_REQUIRED", ui_view_id(node), ui_control_span(node, "validation_scope")),
+          semantic_check_at(ui_container_ancestor(ancestors, 0, ui_control_text(node, "validation_scope")),
+            "RCL_UI_FORM_SCOPE_ANCESTOR", ui_view_id(node), ui_control_span(node, "validation_scope")), false), false))
+
+  reckon validate_ui_modal_node(node : Sequence, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(not ui_control_has(node, "modal"), true,
+      choose(semantic_check_at(ui_view_role(node) == "container" and ui_control_text(node, "modal") == "true", "RCL_UI_MODAL_ROLE", ui_view_id(node), ui_view_span(node)),
+        choose(semantic_check_at(length(ancestors) == 1 and ui_layout_mode(ui_view_layout(root)) == "overlay", "RCL_UI_MODAL_PARENT", ui_view_id(node), ui_view_span(node)),
+          choose(semantic_check_at(ui_control_text(node, "accessibility_label") != "", "RCL_UI_MODAL_LABEL_REQUIRED", ui_view_id(node), ui_view_span(node)),
+            semantic_check_at(length(find_ui_property(ui_view_bindings(node), 0, "visible")) > 0, "RCL_UI_MODAL_VISIBLE_BIND_REQUIRED", ui_view_id(node), ui_view_span(node)), false), false), false))
+
+  reckon validate_ui_required_content(node : Sequence) -> Truth =
+    choose(ui_view_role(node) == "text",
+      semantic_check_at(ui_node_content_available(node, "value"), "RCL_UI_TEXT_VALUE_REQUIRED", ui_view_id(node), ui_view_span(node)),
+      choose(ui_view_role(node) == "action",
+        choose(semantic_check_at(ui_node_content_available(node, "label"), "RCL_UI_ACTION_LABEL_REQUIRED", ui_view_id(node), ui_view_span(node)),
+          semantic_check_at(find_ui_event_index(ui_view_events(node), 0, "activate") >= 0, "RCL_UI_ACTION_ACTIVATE_REQUIRED", ui_view_id(node), ui_view_span(node)), false), true))
+
+  reckon validate_ui_tree_children(items : Sequence, index : Number, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_ui_tree_context(sequence_get(items, index), root, ancestors),
+        validate_ui_tree_children(items, index + 1, root, ancestors), false))
+
+  reckon validate_ui_tree_context(node : Sequence, root : Sequence, ancestors : Sequence) -> Truth =
+    choose(validate_ui_required_content(node),
+      choose(validate_ui_form_scope(node, ancestors),
+        choose(validate_ui_modal_node(node, root, ancestors),
+          validate_ui_tree_children(ui_view_children(node), 0, root, sequence_append(ancestors, node)), false), false), false)
+
+  reckon count_ui_modal_children(items : Sequence, index : Number) -> Number =
+    choose(index >= length(items), 0,
+      count_ui_modals(sequence_get(items, index)) + count_ui_modal_children(items, index + 1))
+
+  reckon count_ui_modals(node : Sequence) -> Number =
+    choose(ui_control_has(node, "modal"), 1, 0) + count_ui_modal_children(ui_view_children(node), 0)
+
+  reckon validate_ui_tree(root : Sequence) -> Truth =
+    choose(length(collect_ui_tree_ids(root, empty_sequence())) > 0,
+      choose(validate_ui_tree_context(root, root, empty_sequence()),
+        semantic_check_at(count_ui_modals(root) <= 1, "RCL_UI_MODAL_LIMIT", "1", ui_view_span(root)), false), false)
 
   reckon validate_ui_adaptive_layouts(items : Sequence, index : Number, node_id : Text, adaptation : Sequence) -> Truth =
     choose(index >= length(items), true,
@@ -2249,32 +2610,145 @@ reality RCLGeneralSelfHostCompiler {
     choose(index >= length(items), -1,
       choose(ui_view_id(sequence_get(items, index)) == id, index, find_ui_direct_child(items, index + 1, id)))
 
-  reckon validate_ui_route_targets(ids : Sequence, targets : Sequence, index : Number, root : Sequence) -> Truth =
+  reckon validate_ui_route_targets(ids : Sequence, targets : Sequence, index : Number, root : Sequence, spans : Sequence) -> Truth =
     choose(index >= length(ids), true,
-      choose(semantic_check(find_ui_direct_child(ui_view_children(root), 0,
+      choose(semantic_check_at(find_ui_direct_child(ui_view_children(root), 0,
             sequence_get(targets, index)) >= 0,
-          "RCL_UI_NAVIGATION_TARGET_UNKNOWN", sequence_get(ids, index) + ":" + sequence_get(targets, index)),
-        validate_ui_route_targets(ids, targets, index + 1, root), false))
+          "RCL_UI_NAVIGATION_TARGET_UNKNOWN", sequence_get(ids, index) + ":" + sequence_get(targets, index), sequence_get(spans, index)),
+        validate_ui_route_targets(ids, targets, index + 1, root, spans), false))
+
+  reckon find_ui_state_index(items : Sequence, index : Number, name : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(ui_state_name(sequence_get(items, index)) == name, index,
+        find_ui_state_index(items, index + 1, name)))
+
+  reckon validate_ui_state_declarations(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(find_ui_state_index(items, 0, ui_state_name(sequence_get(items, index))) == index,
+          "RCL_UI_STATE_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(expr_kind(ui_state_expression(sequence_get(items, index))) == "LiteralExpr",
+            "RCL_UI_LITERAL_REQUIRED", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+          choose(semantic_check_at(ui_state_type(sequence_get(items, index)) == expr_text(ui_state_expression(sequence_get(items, index))),
+              "RCL_UI_STATE_TYPE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+            validate_ui_state_declarations(items, index + 1), false), false), false))
+
+  reckon validate_ui_derived_declarations(items : Sequence, index : Number, states : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(find_ui_state_index(items, 0, ui_state_name(sequence_get(items, index))) == index,
+          "RCL_UI_DERIVED_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(find_ui_state_index(states, 0, ui_state_name(sequence_get(items, index))) < 0,
+            "RCL_UI_REACTIVE_ID_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+          choose(semantic_check_at(ui_expression_type(ui_state_expression(sequence_get(items, index)), states, items, empty_sequence()) == ui_state_type(sequence_get(items, index)),
+              "RCL_UI_DERIVED_TYPE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+            validate_ui_derived_declarations(items, index + 1, states), false), false), false))
+
+  reckon visit_ui_derived_args(items : Sequence, index : Number, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(index >= length(items), completed,
+      visit_ui_derived_args(items, index + 1, derived, active,
+        visit_ui_derived_expression(sequence_get(items, index), derived, active, completed)))
+
+  reckon visit_ui_derived_expression(node : Sequence, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(expr_kind(node) == "PathExpr",
+      choose(find_ui_state_index(derived, 0, expr_text(node)) < 0, completed,
+        visit_ui_derived(expr_text(node), derived, active, completed)),
+      choose(expr_kind(node) == "UnaryExpr", visit_ui_derived_expression(expr_left(node), derived, active, completed),
+        choose(expr_kind(node) == "BinaryExpr",
+          visit_ui_derived_expression(expr_right(node), derived, active,
+            visit_ui_derived_expression(expr_left(node), derived, active, completed)),
+          choose(expr_kind(node) == "CallExpr", visit_ui_derived_args(expr_args(node), 0, derived, active, completed), completed))))
+
+  reckon visit_ui_derived(name : Text, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(find_text(completed, 0, name) >= 0, completed,
+      choose(semantic_check_at(find_text(active, 0, name) < 0, "RCL_UI_DERIVED_CYCLE", name,
+          expr_span(ui_state_expression(sequence_get(derived, find_ui_state_index(derived, 0, name))))),
+        sequence_append(visit_ui_derived_expression(ui_state_expression(sequence_get(derived, find_ui_state_index(derived, 0, name))),
+          derived, sequence_append(active, name), completed), name), completed))
+
+  reckon visit_ui_derived_graph(items : Sequence, index : Number, completed : Sequence) -> Sequence =
+    choose(index >= length(items), completed,
+      visit_ui_derived_graph(items, index + 1,
+        visit_ui_derived(ui_state_name(sequence_get(items, index)), items, empty_sequence(), completed)))
+
+  reckon validate_ui_reactive_declarations(node : Sequence) -> Truth =
+    choose(validate_ui_state_declarations(ui_states(node), 0),
+      choose(validate_ui_derived_declarations(ui_derived(node), 0, ui_states(node)),
+        length(visit_ui_derived_graph(ui_derived(node), 0, empty_sequence())) == length(ui_derived(node)), false), false)
 
   reckon validate_uis(items : Sequence, index : Number, rules : Sequence) -> Truth =
     choose(index >= length(items), true,
+      choose(validate_ui_reactive_declarations(sequence_get(items, index)),
+        choose(validate_ui_tree(sequence_get(ui_views(sequence_get(items, index)), 0)),
+          validate_uis_admitted(items, index, rules), false), false))
+
+  reckon validate_uis_admitted(items : Sequence, index : Number, rules : Sequence) -> Truth =
       choose(length(ui_navigation(sequence_get(items, index))) == 0,
         choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index)), ui_adaptation(sequence_get(items, index))),
           validate_uis(items, index + 1, rules), false),
-        choose(semantic_check(find_text(sequence_get(ui_navigation(sequence_get(items, index)), 1), 0,
+        choose(semantic_check_at(find_text(sequence_get(ui_navigation(sequence_get(items, index)), 1), 0,
               sequence_get(ui_navigation(sequence_get(items, index)), 0)) >= 0,
-            "RCL_UI_NAVIGATION_INITIAL_UNKNOWN", sequence_get(ui_navigation(sequence_get(items, index)), 0)),
+            "RCL_UI_NAVIGATION_INITIAL_UNKNOWN", sequence_get(ui_navigation(sequence_get(items, index)), 0), sequence_get(ui_navigation(sequence_get(items, index)), 3)),
           choose(validate_ui_route_targets(sequence_get(ui_navigation(sequence_get(items, index)), 1),
-              sequence_get(ui_navigation(sequence_get(items, index)), 2), 0, sequence_get(ui_views(sequence_get(items, index)), 0)),
+              sequence_get(ui_navigation(sequence_get(items, index)), 2), 0, sequence_get(ui_views(sequence_get(items, index)), 0), sequence_get(ui_navigation(sequence_get(items, index)), 4)),
             choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index)), ui_adaptation(sequence_get(items, index))),
-              validate_uis(items, index + 1, rules), false), false), false)))
+              validate_uis(items, index + 1, rules), false), false), false))
+
+  reckon find_rule_host(items : Sequence, index : Number, name : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(sequence_get(sequence_get(items, index), 0) == name, index, find_rule_host(items, index + 1, name)))
+
+  reckon find_rule_offer_type(items : Sequence, index : Number, offer : Text, qualified : Text) -> Text =
+    choose(index >= length(items), "",
+      choose(sequence_get(sequence_get(items, index), 0) == offer or sequence_get(sequence_get(items, index), 0) == qualified,
+        sequence_get(sequence_get(items, index), 1), find_rule_offer_type(items, index + 1, offer, qualified)))
+
+  reckon validate_rule_call_target(node : Sequence, facets : Sequence, offers : Sequence) -> Truth =
+    choose(semantic_check_at(find_rule_offer_type(offers, 0, rule_call_offer(node), rule_call_capability(node)) != "",
+        "RCL_HOST_CAPABILITY_UNKNOWN", rule_call_capability(node), rule_call_span(node)),
+      choose(semantic_check_at(find_facet_index(facets, 0, rule_call_target(node)) >= 0,
+          "RCL_CALL_TARGET_UNKNOWN", rule_call_target(node), rule_call_span(node)),
+        choose(semantic_check_at(facet_type(sequence_get(facets, find_facet_index(facets, 0, rule_call_target(node))))
+            == find_rule_offer_type(offers, 0, rule_call_offer(node), rule_call_capability(node)),
+          "RCL_CALL_TARGET_TYPE", rule_call_target(node), rule_call_span(node)),
+          semantic_check_at(facet_type(sequence_get(facets, find_facet_index(facets, 0, rule_call_target(node)))) == "Text",
+            "RCL_NATIVE_HOST_CALL_RESPONSE_TYPE", rule_call_target(node), rule_call_span(node)), false), false), false)
+
+  reckon validate_rule_call_host(node : Sequence, facets : Sequence, hosts : Sequence) -> Truth =
+    choose(semantic_check_at(find_rule_host(hosts, 0, rule_call_provider(node)) >= 0,
+        "RCL_HOST_UNKNOWN", rule_call_provider(node), rule_call_span(node)),
+      validate_rule_call_target(node, facets, sequence_get(sequence_get(hosts, find_rule_host(hosts, 0, rule_call_provider(node))), 1)), false)
+
+  reckon validate_rule_call(node : Sequence, facets : Sequence, hosts : Sequence) -> Truth =
+    choose(semantic_check_at(contains(rule_call_capability(node), ".") and rule_call_offer(node) != "",
+        "RCL_NATIVE_HOST_CALL_CAPABILITY", rule_call_capability(node), rule_call_span(node)),
+      choose(semantic_check_at(length(rule_call_args(node)) == 1, "RCL_NATIVE_HOST_CALL_REQUEST", rule_call_capability(node), rule_call_span(node)),
+        choose(semantic_check_at(expr_kind(sequence_get(rule_call_args(node), 0)) == "LiteralExpr" and expr_text(sequence_get(rule_call_args(node), 0)) == "Text",
+            "RCL_NATIVE_HOST_CALL_REQUEST_TYPE", rule_call_capability(node), rule_call_span(node)),
+          validate_rule_call_host(node, facets, hosts), false), false), false)
+
+  reckon validate_rule_calls(items : Sequence, index : Number, facets : Sequence, hosts : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_rule_call(sequence_get(items, index), facets, hosts), validate_rule_calls(items, index + 1, facets, hosts), false))
+
+  reckon validate_host_call_rules(items : Sequence, index : Number, facets : Sequence, hosts : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(validate_rule_calls(rule_calls(sequence_get(items, index)), 0, facets, hosts),
+        validate_host_call_rules(items, index + 1, facets, hosts), false))
+
+  reckon validate_host_call_directives(items : Sequence, index : Number, rules : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check(not (directive_kind(sequence_get(items, index)) == "Foresee"
+          and length(rule_calls(find_rule(rules, 0, directive_name(sequence_get(items, index))))) > 0),
+          "RCL_NATIVE_HOST_CALL_FORESEE_UNSUPPORTED", directive_name(sequence_get(items, index))),
+        validate_host_call_directives(items, index + 1, rules), false))
 
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
       choose(validate_reckons(program_reckons(program), 0, program_facets(program), program_reckons(program)),
         choose(validate_warrants(program_warrants(program), 0, program_facets(program), program_reckons(program)),
           choose(validate_rules(program_rules(program), 0, program_facets(program), program_reckons(program)),
-            validate_uis(uis(program), 0, program_rules(program)), false), false), false), false)
+            choose(validate_host_call_rules(program_rules(program), 0, program_facets(program), program_hosts(program)),
+              choose(validate_host_call_directives(program_directives(program), 0, program_rules(program)),
+                validate_uis(uis(program), 0, program_rules(program)), false), false), false), false), false), false)
 
   reckon validated_program(program : Sequence) -> Sequence =
     choose(validate_program(program), program, program)
@@ -2355,11 +2829,19 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon collect_rule_strings(node : Sequence, reckons : Sequence, output : Sequence) -> Sequence =
     collect_expression_strings_array(rule_preserves(node), 0, empty_sequence(),
+      collect_rule_call_strings(rule_calls(node), 0,
       collect_alter_strings(rule_alters(node), 0, reckons,
         collect_need_strings(rule_needs(node), 0,
           append_unique_text(
             append_unique_text(collect_expression_strings(rule_when(node), empty_sequence(), output), rule_name(node)),
-            rule_actor(node)))))
+            rule_actor(node))))))
+
+  reckon collect_rule_call_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      collect_rule_call_strings(items, index + 1,
+        append_unique_text(append_unique_text(append_unique_text(append_unique_text(output,
+          rule_call_provider(sequence_get(items, index))), rule_call_offer(sequence_get(items, index))),
+          expr_literal_text(sequence_get(rule_call_args(sequence_get(items, index)), 0))), rule_call_target(sequence_get(items, index)))))
 
   reckon collect_witness_strings(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -2558,6 +3040,7 @@ reality RCLGeneralSelfHostCompiler {
   reckon rule_instruction_count(node : Sequence) -> Number =
     expression_count(rule_when(node)) + 3 + length(rule_needs(node))
       + alter_instruction_count(rule_alters(node), 0, 0)
+      + length(rule_calls(node)) * 2
       + choose(length(rule_preserves(node)) > 0,
           preserve_instruction_count(rule_preserves(node), 0, 2), 0)
       + length(rule_witnesses(node))
@@ -2743,12 +3226,21 @@ reality RCLGeneralSelfHostCompiler {
       emit_rule_witnesses(items, index + 1, strings,
         append_all(one_instruction(28, find_text(strings, 0, sequence_get(items, index)), 0, 0), output)))
 
+  reckon emit_rule_calls(items : Sequence, index : Number, strings : Sequence, output : Sequence) -> Sequence =
+    choose(index >= length(items), output,
+      emit_rule_calls(items, index + 1, strings,
+        append_all(one_flagged_instruction(25, find_text(strings, 0, rule_call_target(sequence_get(items, index))), 0, 0, 1),
+          append_all(one_instruction(35, find_text(strings, 0, rule_call_provider(sequence_get(items, index))),
+            find_text(strings, 0, rule_call_offer(sequence_get(items, index))),
+            find_text(strings, 0, expr_literal_text(sequence_get(rule_call_args(sequence_get(items, index)), 0)))), output))))
+
   reckon emit_rule_invocation(node : Sequence, mode : Number, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number) -> Sequence =
     append_all(one_instruction(29, 0, 0, 0),
       append_all(emit_rule_witnesses(rule_witnesses(node), 0, strings, empty_sequence()),
         append_all(emit_rule_preserves(rule_preserves(node), reckons, strings, numbers, main_count,
             start + expression_count(rule_when(node)) + 2 + length(rule_needs(node))
-              + alter_instruction_count(rule_alters(node), 0, 0)),
+              + alter_instruction_count(rule_alters(node), 0, 0) + length(rule_calls(node)) * 2),
+          append_all(emit_rule_calls(rule_calls(node), 0, strings, empty_sequence()),
           append_all(emit_rule_alters(rule_alters(node), 0, reckons, strings, numbers, main_count,
               start + expression_count(rule_when(node)) + 2 + length(rule_needs(node)), empty_sequence()),
             append_all(emit_rule_needs(rule_needs(node), 0, rule_actor(node), strings, empty_sequence()),
@@ -2756,7 +3248,7 @@ reality RCLGeneralSelfHostCompiler {
                   find_text(strings, 0, rule_name(node)), find_text(strings, 0, rule_actor(node)),
                   choose(rule_kind(node) == "Resonance", 1, 0)),
                 append_all(one_instruction(21, start + rule_instruction_count(node), 0, 0),
-                  emit_expression(rule_when(node), empty_sequence(), reckons, strings, numbers, main_count, start))))))))
+                  emit_expression(rule_when(node), empty_sequence(), reckons, strings, numbers, main_count, start)))))))))
 
   reckon emit_directives(items : Sequence, index : Number, rules : Sequence, reckons : Sequence, strings : Sequence, numbers : Sequence, main_count : Number, start : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
@@ -2798,11 +3290,11 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon encode_string_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_string_pool(items, index + 1, sequence_concat(output, encode_string_record(sequence_get(items, index)))))
+      encode_string_pool(items, index + 1, append_all(encode_string_record(sequence_get(items, index)), output)))
 
   reckon encode_number_pool(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_number_pool(items, index + 1, sequence_concat(output, bytes_f64le(sequence_get(items, index)))))
+      encode_number_pool(items, index + 1, append_all(bytes_f64le(sequence_get(items, index)), output)))
 
   reckon encode_instruction(node : Sequence) -> Sequence =
     sequence_concat(bytes_u8(sequence_get(node, 0)),
@@ -2813,13 +3305,14 @@ reality RCLGeneralSelfHostCompiler {
 
   reckon encode_instructions(items : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
-      encode_instructions(items, index + 1, sequence_concat(output, encode_instruction(sequence_get(items, index)))))
+      encode_instructions(items, index + 1, append_all(encode_instruction(sequence_get(items, index)), output)))
 
   reckon instruction_flags(node : Sequence) -> Number = choose(length(node) > 4, sequence_get(node, 4), 0)
 
   reckon instructions_require_v12(items : Sequence, index : Number) -> Truth =
     choose(index >= length(items), false,
       choose(sequence_get(sequence_get(items, index), 0) == 44
+          or (sequence_get(sequence_get(items, index), 0) == 25 and instruction_flags(sequence_get(items, index)) == 1)
           or (sequence_get(sequence_get(items, index), 0) == 35 and instruction_flags(sequence_get(items, index)) == 1),
         true, instructions_require_v12(items, index + 1)))
 
