@@ -320,14 +320,27 @@ The full 233-source collector retains the 60000-ms budget and reports 193 matche
 40 unsupported and zero failures (120 native attempts, 73 reused alias results).
 Historical failures remain retained. See `selfhost-linear-encoder-2026-10-28.json`.
 
+## Increment 19: native rule host calls
+
+Rule-level host calls now retain canonical metadata, argument/target data, exact
+pool order, instruction addresses and provider-source stores through the existing
+RCL compiler. The direct RCL session compiler rejects these external effects.
+An actual pre-change Number-target run exposed native ABI type drift; bootstrap
+and RCL native admission now both require Text response targets. Eighteen new
+cases and 160 affected existing checks pass, including local provider execution.
+The final C0=C1=C2 artifact is 362965 bytes. The full 233-source collector at the
+original 60000-ms budget now has 195 matches, 38 reference compile rejections and
+zero failures (122 native attempts, 73 reused aliases). See
+`native-rule-host-calls-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
    completed native UI tree fixed point and final-artifact checks.
-2. Audit native rule-level host-call lowering against the two remaining explicit
-   host-call exclusions, retaining the reference rejection set and authority
-   boundaries. The seven large-source timeouts are resolved for the current
-   source-bound collector run; historical reports retain their original outcome.
+2. Continue direct native session pure-profile and compiler admission checks using
+   the existing reference contract. Rule-level host-call exclusions and the seven
+   large-source timeouts are resolved in the current source-bound collector run;
+   historical reports retain their original outcome.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
    (TD-017) using their current executable owners.
 4. Prefer concrete capabilities using existing owners over new parallel services.

@@ -1,0 +1,86 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 362965,
+    "sha256": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+    "sourceSha256": "47caf8c2c4d888439be27c7c8a4be5bbe10c8f7f994df82c215bebb9c46178e0",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+      "c1": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+      "c2": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 362965,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 362965,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "sources": {
+    "selfhost/compiler-core.rcl": "ebce466f6bdcee7652de7593263f29daaf74266b420d915b41cec9bea2b9e71a",
+    "selfhost/compiler-main.rcl": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d",
+    "selfhost/compiler.rbc": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+    "selfhost/session-compiler-core.rcl": "3a4746b2a3cf9b12e5e3776e53dc5aaae9fbe093fa69f40c9b1383a69fba522c",
+    "src/bytecode.mjs": "34c27bf8ab576275d4edafe17b022288a32e7601b2dc50a6a4d6a06b13afde3e",
+    "scripts/verify-selfhost-example-parity.mjs": "418a953c7b2ddc3eaa6c6b78263ac7cb7f1093184a4698ad6b0d64b8d7bb5ea2",
+    "tests/selfhost-rule-host-calls.test.mjs": "ab43feb43ec84c856c2572f8d559f0fd03fe454eb81bc5edf56606b663372b84"
+  },
+  "checks": {
+    "initialControls": {
+      "passed": 1,
+      "failed": 15,
+      "total": 16,
+      "log": "output/module-development-20261028/rule-host-call-before.log"
+    },
+    "newFinalControls": {
+      "passed": 18,
+      "failed": 0
+    },
+    "finalRegression": {
+      "passed": 178,
+      "failed": 0,
+      "log": "output/module-development-20261028/rule-host-call-final-regression.log"
+    },
+    "fullExampleCollection": {
+      "ok": true,
+      "artifactParity": true,
+      "compilerArtifactSha256": "d3b195d3931f09035fccc35120775cc40f50c61b3231e09dac1a6d83c3d3cd4d",
+      "compilerTimeoutMs": 60000,
+      "originalBudgetSatisfied": true,
+      "requestedSourceCount": 233,
+      "eligibleCount": 195,
+      "unsupportedCount": 38,
+      "failureCount": 0,
+      "nativeCompileAttempts": 122,
+      "avoidedDuplicateCompiles": 73,
+      "report": "output/module-development-20261028/example-parity-host-calls.json",
+      "reportSha256": "dfdfa397de6100c233095ceab7a57d660b25a6be846f95512ebb5edf6d1805c2"
+    },
+    "preChangeResponseAbiBug": {
+      "source": "reality ResponseType { facet reply : Number = 0 subject actor { warrant computer.invoke on echo } host echo { offers text -> Number } emergence ask { cause actor when true needs computer.invoke on echo call echo.text(\"{}\") -> reply } realize ask }",
+      "bootstrapAccepted": true,
+      "nativeExit": 0,
+      "declaredType": "Number",
+      "actualType": "string",
+      "actualValue": "{\"provider\":\"echo\",\"request\":{}}"
+    }
+  },
+  "nativeSessionRuleEffects": "REJECTED",
+  "nativeProviderResponseType": "Text",
+  "externalEffectSettlementAdded": false,
+  "nativeCBinariesChanged": false,
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}

@@ -80,17 +80,6 @@ for (const filePath of artifactParity ? files : []) {
     continue;
   }
 
-  const ruleHostCallCount = program.rules.reduce((count, rule) => count + (rule.calls?.length ?? 0), 0);
-  if (ruleHostCallCount > 0) {
-    unsupported.push({
-      file: relative,
-      code: 'RCL_SELFHOST_RULE_HOST_CALL_UNSUPPORTED',
-      message: 'The checked-in self-host compiler does not yet parse or lower rule-level host calls.',
-      ruleHostCallCount,
-    });
-    continue;
-  }
-
   const key = sha(source) + ':' + sha(reference);
   const reused = uniqueJobs.has(key);
   if (!reused) {
