@@ -72,13 +72,16 @@ export function createNativeUiRuntime(program, options = {}) {
   const lifecycle = (stage, snapshot = null) => {
     if (!program.lifecycle.stages.includes(stage)) throw new Error(`RCL_UI_LIFECYCLE_NOT_DECLARED:${stage}`);
     if (stage === 'create' && snapshot) {
+      const restored = [];
       for (const id of program.lifecycle.restore) {
         if (Object.prototype.hasOwnProperty.call(snapshot, id)) {
           const declaration = program.state.find((item) => item.id === id);
-          if (!matchesUiType(snapshot[id], declaration.valueType)) throw new Error(`RCL_UI_RESTORE_TYPE:${id}:${declaration.valueType}`);
-          state[id] = cloneState(snapshot[id]);
+          const value = snapshot[id];
+          if (!matchesUiType(value, declaration.valueType)) throw new Error(`RCL_UI_RESTORE_TYPE:${id}:${declaration.valueType}`);
+          restored.push([id, cloneState(value)]);
         }
       }
+      for (const [id, value] of restored) state[id] = value;
     }
     const record = { stage, state: cloneState(state) };
     lifecycleTrace.push(record);

@@ -24,3 +24,9 @@ Four CLI checks pass: real alias/result deduplication, explicit budget profile,
 pre-dispatch artifact mismatch rejection and strict argument rejection. The
 machine-readable evidence pins the compiler used by this particular full run;
 subsequent compiler changes require their own relevant verification.
+
+A subsequent source-bound probe of all seven distinct large sources against the
+pre-development `ed28215` compiler also observed seven 60000-ms timeouts. This
+classifies the remaining cases as reproduced baseline budget failures; it does
+not resolve them. See `selfhost-large-baseline-2026-10-28.json` and the retained raw
+report `output/module-development-20261028/large-example-baseline-probe.json`.

@@ -263,6 +263,29 @@ protocol/namespace/coordinate checks and sixteen existing editor checks pass.
 This remains static bridge evidence, without a running editor/server claim. See
 `lsp-semantic-usage-tokens-2026-10-28.md`.
 
+## Increment 14 in progress: native UI tree admission
+
+The local TaoX FourDevelopmentModeRouter selected DEEP_DEVELOPMENT (0.905) for the
+source-audited UI tree admission bottleneck. Twenty-five native/reference cases
+reproduced twenty-two absent rejections covering node identity, content/event
+requirements, ancestor form scopes and bounded modal structure. Candidate native
+validation passes all twenty-five plus forty-six prior UI compiler checks. A new
+C0/C1/C2 build is running; final artifact admission is pending.
+
+The seven distinct large-source timeout cases have now also been tested with the
+pre-development `ed28215` compiler. All seven timed out at 60000 ms. This is prior
+baseline failure evidence, not a performance fix. See the source-bound baseline
+summary and original raw report.
+
+## Increment 15: atomic canonical UI restoration
+
+Canonical lifecycle restore now stages all selected fields, reads each snapshot
+value once and commits only after complete validation. Later invalid fields or
+read exceptions cannot leave earlier fields restored. Four new checks and sixteen
+existing runtime/style/layout/backend semantic checks pass. The affected owner is
+the canonical runtime; generated platform persistence acceptance is not claimed.
+See `ui-atomic-restore-2026-10-28.md`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic admission after the completed reactive
