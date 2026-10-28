@@ -232,15 +232,16 @@ has 153 matches, 40 unsupported and 40 timeout failures, with 120 native attempt
 and 73 reused alias results. The original 151/40/42 report is retained. See
 `selfhost-parity-collection-2026-10-28.md` for interpretation and report boundaries.
 
-## Increment 11 in progress: reactive UI declarations
+## Increment 11: reactive UI declarations
 
 Nineteen native/reference checks reproduced thirteen missing rejection cases:
 state literal/type admission, reactive identity collisions, derived result types
 and dependency cycles. Candidate validation reuses existing expression typing and
 a memoized dependency traversal. The nineteen new checks plus twenty-seven prior
-control checks now pass. A new native C0/C1/C2 build is running before artifact
-promotion. Shared dependency diamonds and a 36-node DAG are included; broader UI
-schema parity remains unclaimed.
+control checks pass. The final native build has C0=C1=C2 at 343089 bytes, and all
+122 final-artifact compiler/control/location/warrant/tooling checks pass. Shared
+dependency diamonds and a 36-node DAG are included; broader UI schema parity
+remains unclaimed. See `native-ui-reactivity-2026-10-28.json`.
 
 ## Increment 12: paginated durable receipt history
 
@@ -255,7 +256,8 @@ backup checks also passed. TD-017 remains ACTIVE. See
 
 ## Remaining development queue
 
-1. Finish reactive UI declaration native fixed point and final-artifact checks.
+1. Continue bounded compiler/UI diagnostic admission after the completed reactive
+   declarations fixed point and final-artifact checks.
 2. Probe the seven unique large compiler timeout cases against the prior compiler;
    retain original-budget failures and deduplicate future repeated source work.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle

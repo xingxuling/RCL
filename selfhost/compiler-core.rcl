@@ -2485,8 +2485,68 @@ reality RCLGeneralSelfHostCompiler {
           "RCL_UI_NAVIGATION_TARGET_UNKNOWN", sequence_get(ids, index) + ":" + sequence_get(targets, index)),
         validate_ui_route_targets(ids, targets, index + 1, root), false))
 
+  reckon find_ui_state_index(items : Sequence, index : Number, name : Text) -> Number =
+    choose(index >= length(items), -1,
+      choose(ui_state_name(sequence_get(items, index)) == name, index,
+        find_ui_state_index(items, index + 1, name)))
+
+  reckon validate_ui_state_declarations(items : Sequence, index : Number) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(find_ui_state_index(items, 0, ui_state_name(sequence_get(items, index))) == index,
+          "RCL_UI_STATE_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(expr_kind(ui_state_expression(sequence_get(items, index))) == "LiteralExpr",
+            "RCL_UI_LITERAL_REQUIRED", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+          choose(semantic_check_at(ui_state_type(sequence_get(items, index)) == expr_text(ui_state_expression(sequence_get(items, index))),
+              "RCL_UI_STATE_TYPE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+            validate_ui_state_declarations(items, index + 1), false), false), false))
+
+  reckon validate_ui_derived_declarations(items : Sequence, index : Number, states : Sequence) -> Truth =
+    choose(index >= length(items), true,
+      choose(semantic_check_at(find_ui_state_index(items, 0, ui_state_name(sequence_get(items, index))) == index,
+          "RCL_UI_DERIVED_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+        choose(semantic_check_at(find_ui_state_index(states, 0, ui_state_name(sequence_get(items, index))) < 0,
+            "RCL_UI_REACTIVE_ID_DUPLICATE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+          choose(semantic_check_at(ui_expression_type(ui_state_expression(sequence_get(items, index)), states, items, empty_sequence()) == ui_state_type(sequence_get(items, index)),
+              "RCL_UI_DERIVED_TYPE", ui_state_name(sequence_get(items, index)), expr_span(ui_state_expression(sequence_get(items, index)))),
+            validate_ui_derived_declarations(items, index + 1, states), false), false), false))
+
+  reckon visit_ui_derived_args(items : Sequence, index : Number, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(index >= length(items), completed,
+      visit_ui_derived_args(items, index + 1, derived, active,
+        visit_ui_derived_expression(sequence_get(items, index), derived, active, completed)))
+
+  reckon visit_ui_derived_expression(node : Sequence, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(expr_kind(node) == "PathExpr",
+      choose(find_ui_state_index(derived, 0, expr_text(node)) < 0, completed,
+        visit_ui_derived(expr_text(node), derived, active, completed)),
+      choose(expr_kind(node) == "UnaryExpr", visit_ui_derived_expression(expr_left(node), derived, active, completed),
+        choose(expr_kind(node) == "BinaryExpr",
+          visit_ui_derived_expression(expr_right(node), derived, active,
+            visit_ui_derived_expression(expr_left(node), derived, active, completed)),
+          choose(expr_kind(node) == "CallExpr", visit_ui_derived_args(expr_args(node), 0, derived, active, completed), completed))))
+
+  reckon visit_ui_derived(name : Text, derived : Sequence, active : Sequence, completed : Sequence) -> Sequence =
+    choose(find_text(completed, 0, name) >= 0, completed,
+      choose(semantic_check_at(find_text(active, 0, name) < 0, "RCL_UI_DERIVED_CYCLE", name,
+          expr_span(ui_state_expression(sequence_get(derived, find_ui_state_index(derived, 0, name))))),
+        sequence_append(visit_ui_derived_expression(ui_state_expression(sequence_get(derived, find_ui_state_index(derived, 0, name))),
+          derived, sequence_append(active, name), completed), name), completed))
+
+  reckon visit_ui_derived_graph(items : Sequence, index : Number, completed : Sequence) -> Sequence =
+    choose(index >= length(items), completed,
+      visit_ui_derived_graph(items, index + 1,
+        visit_ui_derived(ui_state_name(sequence_get(items, index)), items, empty_sequence(), completed)))
+
+  reckon validate_ui_reactive_declarations(node : Sequence) -> Truth =
+    choose(validate_ui_state_declarations(ui_states(node), 0),
+      choose(validate_ui_derived_declarations(ui_derived(node), 0, ui_states(node)),
+        length(visit_ui_derived_graph(ui_derived(node), 0, empty_sequence())) == length(ui_derived(node)), false), false)
+
   reckon validate_uis(items : Sequence, index : Number, rules : Sequence) -> Truth =
     choose(index >= length(items), true,
+      choose(validate_ui_reactive_declarations(sequence_get(items, index)), validate_uis_admitted(items, index, rules), false))
+
+  reckon validate_uis_admitted(items : Sequence, index : Number, rules : Sequence) -> Truth =
       choose(length(ui_navigation(sequence_get(items, index))) == 0,
         choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index)), ui_adaptation(sequence_get(items, index))),
           validate_uis(items, index + 1, rules), false),
@@ -2496,7 +2556,7 @@ reality RCLGeneralSelfHostCompiler {
           choose(validate_ui_route_targets(sequence_get(ui_navigation(sequence_get(items, index)), 1),
               sequence_get(ui_navigation(sequence_get(items, index)), 2), 0, sequence_get(ui_views(sequence_get(items, index)), 0)),
             choose(validate_ui_nodes(ui_views(sequence_get(items, index)), 0, rules, ui_navigation(sequence_get(items, index)), ui_adaptation(sequence_get(items, index))),
-              validate_uis(items, index + 1, rules), false), false), false)))
+              validate_uis(items, index + 1, rules), false), false), false))
 
   reckon validate_program(program : Sequence) -> Truth =
     choose(validate_facets(program_facets(program), 0, program_facets(program), program_reckons(program)),
