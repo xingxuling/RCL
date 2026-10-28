@@ -222,10 +222,29 @@ Native UI admission is still bounded. Source audit also identified initial-state
 and derived-declaration typing/uniqueness checks as follow-up work; full reference
 type-checker parity is not claimed by these control checks.
 
+## Increment 10: source-bound parity collection
+
+The collector snapshots the admitted compiler, accepts explicit source/report/
+budget selection and reuses one actual result for identical source/reference-byte
+hashes. Alias rows identify evidence reuse and retain original-budget outcomes.
+Four scoped CLI checks pass. The completed full run on the Increment 9 compiler
+has 153 matches, 40 unsupported and 40 timeout failures, with 120 native attempts
+and 73 reused alias results. The original 151/40/42 report is retained. See
+`selfhost-parity-collection-2026-10-28.md` for interpretation and report boundaries.
+
+## Increment 11 in progress: reactive UI declarations
+
+Nineteen native/reference checks reproduced thirteen missing rejection cases:
+state literal/type admission, reactive identity collisions, derived result types
+and dependency cycles. Candidate validation reuses existing expression typing and
+a memoized dependency traversal. The nineteen new checks plus twenty-seven prior
+control checks now pass. A new native C0/C1/C2 build is running before artifact
+promotion. Shared dependency diamonds and a 36-node DAG are included; broader UI
+schema parity remains unclaimed.
+
 ## Remaining development queue
 
-1. Continue initial/derived UI declaration admission after the completed native
-   typed-control compiler fixed point and final-artifact regression.
+1. Finish reactive UI declaration native fixed point and final-artifact checks.
 2. Probe the seven unique large compiler timeout cases against the prior compiler;
    retain original-budget failures and deduplicate future repeated source work.
 3. Continue compiler diagnostic coverage and governed-session journal lifecycle
