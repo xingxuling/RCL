@@ -18,7 +18,7 @@ const run = (args, cwd = directory) => {
 };
 try {
   fs.writeFileSync(path.join(directory, 'package.json'), '{"private":true,"type":"module"}\n');
-  run([resolveNpmCli(), 'install', '--ignore-scripts', '--no-audit', '--no-fund', archive]);
+  run([resolveNpmCli(), 'install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', archive]);
   const packageRoot = path.join(directory, 'node_modules/@taowind/rcl-reality-forge');
   const cli = path.join(packageRoot, 'src/reality-hub-cli.mjs');
   const metadata = JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
@@ -37,14 +37,36 @@ try {
   if (first.result.state['counter.value'] !== 4 || !retry.replayed || verified.status !== 'PASS' || !verified.referenceReplayVerified) throw new Error('RCL_V2_INSTALLED_SESSION_FLOW_FAILED');
   const compiled = JSON.parse(run([cli, 'session', 'compile', example, path.join(directory, 'session.rbc')]));
   if (compiled.compilerOwner !== 'RCL' || !compiled.targetByteParity) throw new Error('RCL_V2_INSTALLED_RCL_COMPILATION_FAILED');
-  const apiSource = `import fs from 'node:fs'; import {createNativeRealitySession,createRealitySession,compileRealitySessionNative} from '@taowind/rcl-reality-forge';
+  if (first.receipt.format !== 'rcl.session-journal-command.v2') throw new Error('RCL_V2_INSTALLED_JOURNAL_IDENTITY_FAILED');
+  const historyFile = path.join(directory, 'history-page.json');
+  fs.writeFileSync(historyFile, run([cli, 'session', 'history', storage, '--expected-root', first.receipt.root]));
+  const historyReport = JSON.parse(run([cli, 'session', 'history-verify', historyFile, '--expected-root', first.receipt.root]));
+  if (!historyReport.contentAnchored || historyReport.commandReplay !== false) throw new Error('RCL_V2_INSTALLED_HISTORY_VERIFICATION_FAILED');
+  const hello = path.join(packageRoot, 'examples/hello-reality.rcl'), helloBytes = fs.readFileSync(hello);
+  const renameReport = JSON.parse(run([cli, 'lsp-rename-preview', hello, 'world.greeting', 'message', path.join(directory, 'rename-preview')]));
+  if (!renameReport.ok || !fs.readFileSync(hello).equals(helloBytes)) throw new Error('RCL_V2_INSTALLED_RENAME_PREVIEW_FAILED');
+  const apiSource = `import fs from 'node:fs'; import {createNativeRealitySession,createRealitySession,compileRealitySessionNative,
+    buildFacetRenamePreview,verifyDurableRealitySessionHistoryPage,verifyNativeParity,openDurableRealitySession} from '@taowind/rcl-reality-forge';
     const source=fs.readFileSync(process.argv[2],'utf8'); const compiled=compileRealitySessionNative(source);
     const native=await createNativeRealitySession(source,{bytecode:compiled.bytecode}), reference=createRealitySession(source);
+    let nativeBinding;
     try { const command={rule:'increment',inputs:{'event.delta':2}}; const n=await native.invoke(command),r=await reference.invoke(command);
-      if(n.afterRoot!==r.afterRoot||n.state['counter.value']!==2)throw Error('API parity failed'); console.log(JSON.stringify({ok:true,native:native.snapshot().native}));
-    } finally {await native.close();}`;
+      if(n.afterRoot!==r.afterRoot||n.state['counter.value']!==2)throw Error('API parity failed'); nativeBinding=native.snapshot().native;
+    } finally {await native.close();}
+    const preview=buildFacetRenamePreview({source:fs.readFileSync(process.argv[3],'utf8'),facet:'world.greeting',newName:'message'});
+    const renamed=fs.readFileSync(process.argv[5],'utf8');
+    const parity=await verifyNativeParity(renamed,{nativeRuntime:{stateRootAlgorithm:'rcl.semantic-state-root.v2'}});
+    const history=verifyDurableRealitySessionHistoryPage(JSON.parse(fs.readFileSync(process.argv[4],'utf8')),{expectedJournalRoot:process.argv[6]});
+    if(!preview.ok||preview.preview.previewSource!==renamed||!parity.ok||parity.native.state['world.message']!=='Hello, reality.'||!history.contentAnchored)throw Error('Installed new API verification failed');
+    const metadataSource='reality Metadata { input __rclKind : Text = "seed" input __rclType : Text = "seed" facet value : Number = 0 subject actor { warrant write on value } emergence observe { cause actor when false needs write on value alter value <- value + 1 } }';
+    const durable=await openDurableRealitySession('metadata-state',{source:metadataSource}); let conflict=false;
+    try {const a={requestId:'metadata',expectedRevision:0,rule:'observe',inputs:{__rclKind:'Record',__rclType:'A'}};await durable.invoke(a);
+      try {await durable.invoke({...a,inputs:{__rclKind:'Record',__rclType:'B'}});}catch(error){if(error.code!=='RCL_SESSION_IDEMPOTENCY_CONFLICT')throw error;conflict=true;}
+      if(!conflict)throw Error('Installed metadata identity guard failed');
+    }finally{await durable.close();}
+    console.log(JSON.stringify({ok:true,native:nativeBinding,facetRenamePreview:true,offlineHistoryVerification:true,metadataInputIdentity:conflict}));`;
   const api = path.join(directory, 'api-smoke.mjs'); fs.writeFileSync(api, apiSource);
-  const apiResult = JSON.parse(run([api, example]));
+  const apiResult = JSON.parse(run([api, example, hello, historyFile, renameReport.previewPath, first.receipt.root]));
   const releaseVerifier = JSON.parse(run([path.join(packageRoot, 'scripts/verify-v2-release.mjs')]));
   if (releaseVerifier.status !== 'PASS' || !apiResult.ok) throw new Error('RCL_V2_INSTALLED_RELEASE_VERIFIER_FAILED');
   const report = {
@@ -54,6 +76,10 @@ try {
     durableRestartRetry: true, nativeRclCompilation: true, sourceBound: apiResult.native.sourceBound,
     releaseVerifier: releaseVerifier.status, nativeDaemonRoot: apiResult.native.daemonRoot,
     installedSessionRoot: verified.stateRoot,
+    facetRenamePreview: apiResult.facetRenamePreview, offlineHistoryVerification: apiResult.offlineHistoryVerification,
+    metadataInputIdentity: apiResult.metadataInputIdentity, journalRecordFormat: first.receipt.format,
+    historyVerificationRoot: historyReport.verificationRoot, renamePreviewTextRoot: renameReport.previewTextRoot,
+    scope: 'Independent local Windows candidate installation; no publication or other-platform acceptance inferred.',
   };
   fs.mkdirSync(path.join(ROOT, 'output/v2.0'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'output/v2.0/independent-installation.json'), JSON.stringify(report, null, 2) + '\n');
