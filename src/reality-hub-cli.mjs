@@ -5,6 +5,19 @@ import { checkSourceFile, printPublicHelp, printVersion, runDoctor } from './cli
 const args = process.argv.slice(2);
 const command = args[0];
 
+if (command === 'lsp-rename-preview') {
+  const { writeFacetRenamePreview } = await import('./lsp-dap-bridge-runtime.mjs');
+  let result;
+  if (![5, 7].includes(args.length) || (args.length === 7 && (args[5] !== '--types' || !args[6] || args[6].startsWith('--'))) || args.slice(1, 5).some(value => !value || value.startsWith('--'))) {
+    result = { ok: false, code: 'RCL_LSP_RENAME_ARGUMENT_INVALID' };
+  } else {
+    try { result = writeFacetRenamePreview(args[1], args[2], args[3], args[4], { typePath: args[6] }); }
+    catch (error) { result = { ok: false, code: error.code ?? 'RCL_LSP_RENAME_EXPORT_FAILED', message: error.message }; }
+  }
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(result.ok ? 0 : 1);
+}
+
 if (command === 'portable-run') {
   const { runPortableCli } = await import('./portable-cli.mjs');
   const result = runPortableCli(args.slice(1));

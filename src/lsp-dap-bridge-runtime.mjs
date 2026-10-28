@@ -4,6 +4,8 @@ import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { buildFacetOccurrences } from './lsp-facet-occurrences.mjs';
+import { compileReality } from './compiler.mjs';
+import { lexReality } from './lexer.mjs';
 import {
   DEFAULT_DEBUG_REPLAY_SOURCE,
   DEFAULT_DEBUG_REPLAY_TYPE_MODULES,
@@ -22,6 +24,7 @@ export const RCL_LSP_INDEX_FORMAT = 'rcl.lsp-index.v0.41';
 export const RCL_LSP_QUERY_REPORT_FORMAT = 'rcl.lsp-query-report.v0.41';
 export const RCL_DAP_BRIDGE_FORMAT = 'rcl.dap-bridge.v0.41';
 export const RCL_IDE_BRIDGE_REPORT_FORMAT = 'rcl.ide-bridge-report.v0.41';
+export const RCL_FACET_RENAME_PREVIEW_FORMAT = 'rcl.facet-rename-preview.v1';
 
 export const RCL_LSP_SEMANTIC_TOKEN_TYPES = Object.freeze([
   'namespace',
@@ -476,6 +479,102 @@ export function queryLspIndex(indexOrPath, query = {}) {
   };
   report.queryRoot = sha256(report);
   return report;
+}
+
+export function buildFacetRenamePreview(input = {}) {
+  const fail = (code, diagnostics = []) => ({ ok: false, code, diagnostics, preview: null });
+  if (!input || typeof input !== 'object' || Array.isArray(input)
+      || typeof input.source !== 'string' || typeof input.facet !== 'string' || typeof input.newName !== 'string'
+      || (input.sourceFile !== undefined && typeof input.sourceFile !== 'string')
+      || (input.typeModuleSources !== undefined && (!input.typeModuleSources || typeof input.typeModuleSources !== 'object' || Array.isArray(input.typeModuleSources)))
+      || Reflect.ownKeys(input).some(key => !['source', 'sourceFile', 'facet', 'newName', 'typeModuleSources', 'version', 'expectedTextRoot'].includes(key))
+      || (input.version !== undefined && input.version !== null && (!Number.isSafeInteger(input.version) || input.version < 0))) return fail('RCL_LSP_RENAME_INPUT_INVALID');
+  const { source, facet, newName } = input;
+  if (input.expectedTextRoot !== undefined && input.expectedTextRoot !== sha256(source)) return fail('RCL_LSP_RENAME_SOURCE_ROOT_MISMATCH');
+  let nameTokens;
+  try { nameTokens = lexReality(newName); } catch { return fail('RCL_LSP_RENAME_NAME_INVALID'); }
+  if (nameTokens.length !== 2 || nameTokens[0].type !== 'IDENT' || nameTokens[0].value !== newName) return fail('RCL_LSP_RENAME_NAME_INVALID');
+  const options = { source, sourceFile: input.sourceFile ?? 'rename-preview.rcl', typeModuleSources: input.typeModuleSources ?? {} };
+  const before = buildLspIndex(options);
+  if (!before.ok) return fail('RCL_LSP_RENAME_SOURCE_INVALID', before.diagnostics);
+  if (!ownIndexEntry(before.lspIndex.definitionIndex, facet)) return fail('RCL_LSP_RENAME_FACET_UNKNOWN');
+  const parts = facet.split('.'), oldName = parts.at(-1), newFacet = [...parts.slice(0, -1), newName].join('.');
+  if (newFacet === facet) return fail('RCL_LSP_RENAME_NO_CHANGE');
+  if (ownIndexEntry(before.lspIndex.definitionIndex, newFacet)) return fail('RCL_LSP_RENAME_COLLISION');
+  const program = compileReality(source, { typeModuleSources: options.typeModuleSources });
+  const scopes = [...program.warrants, ...program.rules.flatMap(rule => rule.needs ?? [])].map(item => item.target);
+  if (scopes.some(scope => [facet, newFacet].some(name => scope === name || scope.startsWith(name + '.')))) return fail('RCL_LSP_RENAME_AUTHORITY_DEPENDENCY');
+  const starts = text => {
+    const offsets = [0];
+    for (let index = 0; index < text.length; index++) if (text[index] === '\n') offsets.push(index + 1);
+    return offsets;
+  };
+  const beforeStarts = starts(source), offset = (position, offsets) => offsets[position.line] + position.character;
+  const ranges = new Map();
+  for (const occurrence of before.lspIndex.facetOccurrences.filter(item => item.facet === facet)) {
+    const range = occurrence.identifierRanges[occurrence.kind === 'declaration' ? occurrence.identifierRanges.length - 1 : parts.length - 1];
+    if (!range) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+    const start = offset(range.start, beforeStarts), end = offset(range.end, beforeStarts);
+    if (source.slice(start, end) !== oldName) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+    ranges.set(`${start}:${end}`, { start, end, range });
+  }
+  const edits = [...ranges.values()].sort((a, b) => a.start - b.start);
+  if (!edits.length || edits.some((edit, index) => index && edit.start < edits[index - 1].end)) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+  const chunks = [], deltas = [0];
+  let cursor = 0;
+  for (const edit of edits) {
+    chunks.push(source.slice(cursor, edit.start), newName); cursor = edit.end;
+    deltas.push(deltas.at(-1) + newName.length - (edit.end - edit.start));
+  }
+  chunks.push(source.slice(cursor));
+  const previewSource = chunks.join('');
+  const after = buildLspIndex({ ...options, source: previewSource });
+  if (!after.ok) return fail('RCL_LSP_RENAME_RESULT_INVALID', after.diagnostics);
+  const afterStarts = starts(previewSource);
+  const translated = position => {
+    const original = offset(position, beforeStarts);
+    let low = 0, high = edits.length;
+    while (low < high) {
+      const middle = (low + high) >>> 1;
+      if (edits[middle].end <= original) low = middle + 1;
+      else high = middle;
+    }
+    return original + deltas[low];
+  };
+  const expected = before.lspIndex.facetOccurrences.map(item => [item.facet === facet ? newFacet : item.facet, item.kind, translated(item.range.start), translated(item.range.end)]);
+  const actual = after.lspIndex.facetOccurrences.map(item => [item.facet, item.kind, offset(item.range.start, afterStarts), offset(item.range.end, afterStarts)]);
+  const ordered = values => values.map(value => JSON.stringify(value)).sort();
+  if (JSON.stringify(ordered(expected)) !== JSON.stringify(ordered(actual))) return fail('RCL_LSP_RENAME_BINDING_CHANGE');
+  const preview = {
+    format: RCL_FACET_RENAME_PREVIEW_FORMAT, status: 'CANDIDATE', facet, newFacet, newName,
+    sourceTextRoot: sha256(source), previewTextRoot: sha256(previewSource),
+    programRoot: before.lspIndex.programRoot, previewProgramRoot: after.lspIndex.programRoot,
+    indexRoot: before.lspIndex.indexRoot, previewIndexRoot: after.lspIndex.indexRoot,
+    workspaceEdit: { documentChanges: [{ textDocument: { uri: before.lspIndex.document.uri, version: input.version ?? null },
+      edits: edits.map(({ range }) => ({ range, newText: newName })) }] },
+    previewSource,
+    boundary: 'Same-document facet leaf rename preview with preserved namespace/owner and checked value bindings. Exact or descendant authority-scope dependencies reject. No original file mutation, live LSP rename service, external authorization or publisher authentication.',
+  };
+  preview.previewRoot = sha256(preview);
+  return { ok: true, preview };
+}
+
+export function writeFacetRenamePreview(sourcePath, facet, newName, outputDir, options = {}) {
+  if (typeof sourcePath !== 'string' || typeof outputDir !== 'string' || !outputDir) return { ok: false, code: 'RCL_LSP_RENAME_OUTPUT_REQUIRED' };
+  const bytes = fs.readFileSync(sourcePath), source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+  const result = buildFacetRenamePreview({ source, facet, newName, sourceFile: path.resolve(sourcePath),
+    typeModuleSources: options.typePath ? readTypeSources(options.typePath) : options.typeModuleSources ?? {},
+    ...(options.expectedTextRoot === undefined ? {} : { expectedTextRoot: options.expectedTextRoot }) });
+  if (!result.ok) return result;
+  if (!fs.readFileSync(sourcePath).equals(bytes)) return { ok: false, code: 'RCL_LSP_RENAME_SOURCE_CHANGED' };
+  const directory = path.resolve(outputDir);
+  try { fs.mkdirSync(directory); }
+  catch (error) { if (error.code === 'EEXIST') return { ok: false, code: 'RCL_LSP_RENAME_OUTPUT_EXISTS' }; throw error; }
+  const previewPath = path.join(directory, 'renamed.rcl'), reportPath = path.join(directory, 'rename-preview.json');
+  fs.writeFileSync(previewPath, result.preview.previewSource, { flag: 'wx' });
+  fs.writeFileSync(reportPath, JSON.stringify(result.preview, null, 2) + '\n', { flag: 'wx' });
+  return { ok: true, status: 'CANDIDATE', previewPath, reportPath, previewRoot: result.preview.previewRoot,
+    sourceTextRoot: result.preview.sourceTextRoot, previewTextRoot: result.preview.previewTextRoot, originalModified: false };
 }
 
 export function parseLspQueryArg(arg = 'hover') {

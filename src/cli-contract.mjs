@@ -246,5 +246,10 @@ Persistent governed sessions:
   rcl session compile <source.rcl> <output.rbc> [--bootstrap]
   Existing sessions: --expected-root <sha256> --minimum-revision <integer>
 
+Editor previews:
+  rcl lsp-rename-preview <source.rcl> <facet> <new-leaf> <new-directory>
+                               Export renamed.rcl and a bound edit preview
+  Optional type modules: --types <directory-or-file>
+
 Use the project README for the complete advanced command catalogue.`);
 }

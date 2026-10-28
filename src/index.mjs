@@ -1,4 +1,5 @@
 export * from './index-pre-v095-v096.mjs';
+export { buildFacetRenamePreview, writeFacetRenamePreview, RCL_FACET_RENAME_PREVIEW_FORMAT } from './lsp-dap-bridge-runtime.mjs';
 export { createDebugReplayCursor, RCL_DEBUG_REPLAY_CURSOR_FORMAT } from './debug-session-runtime.mjs';
 export { verifyContentAddressedCache, materializeContentAddressedCache } from './package-ecosystem-runtime.mjs';
 export { createRealitySession } from './runtime.mjs';

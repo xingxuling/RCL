@@ -413,6 +413,18 @@ now reject, while all four explicitly declared names remain usable after JSON
 serialization. All 28 affected LSP/IDE checks pass. Query reports remain
 serializable. See `lsp-own-symbol-lookup-2026-10-28.json`.
 
+## Increment 27: parsed facet rename previews
+
+The existing LSP owner now exports same-document leaf rename candidates through
+the public SDK and `lsp-rename-preview` command. Recompiled previews preserve
+value bindings and reject collisions, capture, stale source pins and authority-
+scope dependencies. Fresh output directories contain renamed source and bound
+WorkspaceEdit reports; original files remain intact. Ten new controls and all
+46 affected LSP/CLI checks pass, including typed/owned references, Unicode/CRLF,
+BOM and Chinese paths. A genuine Hello preview passes native/reference runtime
+parity. TaoX WHOLE_ARTIFACT routing was invoked for artifact integration. See
+`facet-rename-preview-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
