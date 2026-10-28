@@ -4,7 +4,8 @@
 
 User requested six hours of continued RCL module development. Goal created at
 2026-10-28 20:24:13 Asia/Shanghai; requested interval ends at 2026-10-29 02:24:13.
-This checkpoint records an increment, not completion of the six-hour objective.
+This log records development increments and their evidence. Actual goal completion
+is recorded separately in `output/module-development-20261028/goal-completion.json`.
 
 - Canonical remote main inspected and fetched: `ed2821516746eb2ba5898b5084ae92cd98c788b1`.
 - Clean isolated worktree: `work/RCL-module-development-20261028` in the local project.
@@ -464,7 +465,28 @@ legacy reading, tagged v2 append and old-reader compatibility. No package or API
 version was promoted. Raw evidence: `component-contract-drift.json` in the
 ignored run evidence directory. Final archive verification is recorded separately.
 
-## Remaining development queue
+## Final candidate verification
+
+The final local archive is pinned to runtime commit
+`2791038325f3b4754b2b43de7b20dfa183940f95`, with SHA-256
+`0b3d13840d09df3845ca3f9e403a925270b8e73b3329a6b7b6b7c188842736c7`.
+It passes independent offline Windows installation, including the installed
+version-contract verifier and new SDK/CLI flows. Selected Linux and WASI files
+were extracted outside the checkout and actually compiled/executed examples.
+Linux executable modes survive packaging; wasm32 count overflow rejects. The
+archive contains exactly all 3583 tracked files at that commit, confined under
+`package/`. All 57 changed runtime/source payload digests match the Git blobs.
+One local UI source has CRLF materialization; the archive uses the exact LF Git
+blob, with both digests and the verified line-ending-only difference recorded.
+Temporary extraction directories and 2,491,269,120 bytes of intermediate raw tar
+files were removed. The three compressed archive checkpoints remain available.
+
+The current compiler fixed point, 195/233 matched-source example collection,
+bounded test groups and remaining limitations are summarized in
+`module-delivery-2026-10-28.md` and its JSON receipt. Documentation commits after
+the archive do not change its runtime payload. No Actions, push or publication ran.
+
+## Follow-up development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
    completed native UI tree fixed point and final-artifact checks.
@@ -476,4 +498,4 @@ ignored run evidence directory. Final archive verification is recorded separatel
    (TD-017) using their current executable owners.
 4. Prefer concrete capabilities using existing owners over new parallel services.
 5. Checkpoint each completed increment locally with only necessary checks.
-6. Continue until the six-hour interval finishes or the user redirects/stops it.
+6. Carry forward the bounded evidence and retained debt into any later task.
