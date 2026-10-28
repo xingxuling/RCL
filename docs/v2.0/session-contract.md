@@ -115,6 +115,15 @@ See [compiler maintenance evidence](../maintenance/warrant-compiler-admission-20
 
 ## Durable local contract
 
+New directories use `rcl.session-journal.v2`. This storage format binds complete
+input and state maps, including user facet names that resemble internal metadata.
+The durable runtime API version remains `1.0.0`; the package remains `2.0.0`.
+Current readers accept legacy v1 histories and can append tagged v2 commands
+without rewriting the legacy prefix. After v2 appears, a v1 command is rejected.
+Older readers do not accept the new v2 format. Legacy v1 identities retain their
+documented evidence limits; see
+[v2 identity and history verification evidence](../maintenance/durable-history-v2-2026-10-28.md).
+
 The directory stores immutable source.rcl/session.rbc, a hash-linked journal.jsonl
 and an OS writer lock held by the native daemon. A committed command is
 acknowledged only after appending its complete record and fsync. Startup checks

@@ -447,6 +447,23 @@ portable overlay builder now pins its preserved donor and builds/runs its two VM
 candidates again. Historical anchors are retained separately; no device/GPU/K400
 promotion is inferred. See `portable-sequence-runtime-2026-10-28.json`.
 
+## Increment 30: independent installed flows and component format contracts
+
+The offline installation harness now exercises installed SDK and CLI entrypoints
+for tagged v2 journals, metadata-like input identity conflicts, portable history
+verification and parsed facet rename previews with native/reference parity.
+The first independent Windows installation passed outside the checkout. Final
+packaging uses a tracked Git snapshot to preserve Linux executable file modes.
+
+The closing audit found the public durable-session component format still said
+v1. It now declares the actual v2 writer format. The version-contract verifier
+compares both API version and journal format with the runtime exports. Separate
+deliberate stale-format and wrong-version mutations fail that check; restoring
+the exact original bytes passes again. The public session contract documents
+legacy reading, tagged v2 append and old-reader compatibility. No package or API
+version was promoted. Raw evidence: `component-contract-drift.json` in the
+ignored run evidence directory. Final archive verification is recorded separately.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
