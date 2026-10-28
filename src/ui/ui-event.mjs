@@ -105,7 +105,8 @@ export function createNativeUiRuntime(program, options = {}) {
     const control = (property) => current[property] ?? node.localProperties.find((item) => item.property === property)?.value ?? false;
     if (control('disabled')) throw new Error(`RCL_UI_EVENT_DISABLED:${nodeId}:${eventType}`);
     if (node.role === 'action' && control('require_valid_form') && eventType === 'activate') {
-      const validation = projection().validation;
+      const scope = node.localProperties.find((item) => item.property === 'validation_scope')?.value ?? null;
+      const validation = formValidation(allNodes, rendered, scope);
       if (!validation.valid) throw new Error(`RCL_UI_FORM_INVALID:${nodeId}:${Object.keys(validation.fields).join(',')}`);
     }
     if (node.role === 'input' && control('read_only') && ['input', 'change'].includes(eventType)) throw new Error(`RCL_UI_EVENT_READ_ONLY:${nodeId}:${eventType}`);

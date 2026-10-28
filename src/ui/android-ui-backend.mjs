@@ -188,12 +188,13 @@ function emitRuntimeHelpers() {
 }
 
 function emitFormValidation(ui) {
-  const lines = ['  private String rclFormValidation() {','    Map<String,Object> event = new LinkedHashMap<>();'];
+  const lines = ['  private String rclFormValidation() { return rclFormValidation(null); }', '  private String rclFormValidation(String scope) {','    Map<String,Object> event = new LinkedHashMap<>();'];
   for (const node of collectNodes(ui.viewTree).filter((n) => n.role === 'input')) {
     const binding=node.bindings.find((item)=>item.property==='value');
     const value=binding?emitJavaExpr(binding.expression,'state','event'):javaLiteral(property(node,'value')??'');
     const min=property(node,'min_length')??-1,max=property(node,'max_length')??-1;
-    lines.push(`    { String error = rclFieldError(${value}, ${javaString(inputKind(node))}, ${property(node,'required')===true}, ${min}, ${max}, ${javaString(property(node,'options')??'')}); if(error!=null) return ${javaString(node.id+':')}+error; }`);
+    const inScope = node.identityPath.split('/').slice(0, -1).map((id) => `${javaString(id)}.equals(scope)`).join(' || ');
+    lines.push(`    if (scope == null${inScope ? ' || ' + inScope : ''}) { String error = rclFieldError(${value}, ${javaString(inputKind(node))}, ${property(node,'required')===true}, ${min}, ${max}, ${javaString(property(node,'options')??'')}); if(error!=null) return ${javaString(node.id+':')}+error; }`);
   }
   lines.push('    return null;','  }');
   return lines.join('\n');
@@ -225,7 +226,10 @@ function emitEventMethods(ui) {
     dispatch.push(`    if (${javaString(node.id)}.equals(nodeId) && ${javaString(handler.type)}.equals(type)) { ${method}(event); return; }`);
     const lines = [`  private void ${method}(Map<String,Object> event) {`, `    assertUiInteractable(${javaString(node.id)}, ${javaString(handler.type)});`];
     if (['action', 'input'].includes(node.role)) lines.push(`    if (${controlExpr(node, 'disabled')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_DISABLED:${node.id}:${handler.type}`)});`);
-    if (node.role === 'action' && property(node,'require_valid_form') === true && handler.type === 'activate') lines.push(`    { String error=rclFormValidation(); if(error!=null) throw new IllegalStateException("RCL_UI_FORM_INVALID:${node.id}:"+error); }`);
+    if (node.role === 'action' && property(node,'require_valid_form') === true && handler.type === 'activate') {
+      const scope = property(node, 'validation_scope');
+      lines.push(`    { String error=rclFormValidation(${scope === undefined ? '' : javaString(scope)}); if(error!=null) throw new IllegalStateException("RCL_UI_FORM_INVALID:${node.id}:"+error); }`);
+    }
     if (node.role === 'input' && ['input', 'change'].includes(handler.type)) lines.push(`    if (${controlExpr(node, 'read_only')}) throw new IllegalStateException(${javaString(`RCL_UI_EVENT_READ_ONLY:${node.id}:${handler.type}`)});`);
     for (const parameter of handler.parameters) {
       lines.push(`    if (!event.containsKey(${javaString(parameter.id)}) || !rclTypeMatches(event.get(${javaString(parameter.id)}), ${javaString(parameter.valueType)})) throw new IllegalArgumentException(${javaString(`RCL_UI_ANDROID_EVENT_PARAMETER_TYPE:${node.id}:${handler.type}:${parameter.id}:${parameter.valueType}`)});`);
