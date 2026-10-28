@@ -5,8 +5,9 @@ import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {ROOT} from './k400-genomes/shared.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex'),describe=file=>({path:path.relative(ROOT,file).replaceAll('\\','/'),bytes:fs.statSync(file).size,sha256:sha(fs.readFileSync(file))});
-const base=fs.readFileSync(path.join(ROOT,'native/rclvm.c'),'utf8'),patch=fs.readFileSync(path.join(ROOT,'native/sequence-runtime/concat-case.c'),'utf8');
-assert.equal(sha(fs.readFileSync(path.join(ROOT,'native/rclvm.c'))),'0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156');
+const basePath='native/sequence-runtime/frozen-rclvm.c';
+const base=fs.readFileSync(path.join(ROOT,basePath),'utf8'),patch=fs.readFileSync(path.join(ROOT,'native/sequence-runtime/concat-case.c'),'utf8');
+assert.equal(sha(fs.readFileSync(path.join(ROOT,basePath))),'0214c1715b5fcd1e275e213ee0ee0897e61f08b73ffef137e62d306761837156');
 const start=base.indexOf('    case BUILTIN_SEQUENCE_CONCAT:'),end=base.indexOf('    case BUILTIN_BYTES_U8:',start);assert.ok(start>0&&end>start);
 const directory=path.join(ROOT,'output/sequence-portable');fs.mkdirSync(directory,{recursive:true});
 const source=path.join(directory,'rclvm.c');fs.writeFileSync(source,base.slice(0,start)+patch+'\n'+base.slice(end));
@@ -24,6 +25,6 @@ for(const[target,label]of [['x86_64-linux-musl','linux'],['wasm32-wasi','wasi']]
   run([...common,'-DRCLVM_EMBEDDED_ONLY',...(label==='wasi'?['-D_WASI_EMULATED_GETPID']:[]),source,path.join(ROOT,'native/rclc.c'),...compat,object,...(label==='wasi'?['-lwasi-emulated-getpid']:[]),'-lm','-o',compiler]);
   artifacts.push({environment:label,vm:describe(vm),compiler:describe(compiler)});console.log(JSON.stringify({phase:'built',environment:label}));
 }
-const sourcePaths=['native/rclvm.c','native/rclvm.h','native/rclc.c','native/semantic_state_v2.h','native/sequence-runtime/concat-case.c','native/wasi-sha256.zig','native/wasi-compat/openssl/sha.h','native/wasi-compat/stdio-capture.c','scripts/build-native-sequence-portable.mjs'];
+const sourcePaths=[basePath,'native/rclvm.h','native/rclc.c','native/semantic_state_v2.h','native/sequence-runtime/concat-case.c','native/wasi-sha256.zig','native/wasi-compat/openssl/sha.h','native/wasi-compat/stdio-capture.c','scripts/build-native-sequence-portable.mjs'];
 const report={format:'rcl.native-sequence-portable-build.v1',status:'BUILT_CANDIDATE_NOT_RUNTIME_VERIFIED',generatedSourceHash:sha(fs.readFileSync(source)),sourceBindings:sourcePaths.map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(ROOT,p)))})),toolchain:{...describe(zig),version:version.stdout.trim()},commands,artifacts,scope:'Separate Linux-musl and WASI candidates using the same generic persistent Sequence overlay; original native and WASI anchors unchanged'};
 fs.writeFileSync(path.join(directory,'build.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,artifacts}));

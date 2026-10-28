@@ -437,6 +437,16 @@ Sixteen new checks and all 76 affected session/CLI/backup/fault controls pass us
 the existing local C toolchain. TD-017 remains ACTIVE and TD-021 records legacy
 evidence limits. See `durable-history-v2-2026-10-28.json`.
 
+## Increment 29: current portable VM candidates and retained legacy builders
+
+Linux-musl and WASI VM/compiler binaries were rebuilt from the canonical C owner.
+Seventeen actual Windows/WASI/Linux-WSL checks pass, including sequence order,
+aliases, release, negative controls and two full WASI compiler generations with
+the same 368076-byte fixed point. Four existing portable checks pass. The old
+portable overlay builder now pins its preserved donor and builds/runs its two VM
+candidates again. Historical anchors are retained separately; no device/GPU/K400
+promotion is inferred. See `portable-sequence-runtime-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
