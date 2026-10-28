@@ -478,6 +478,8 @@ archive contains exactly all 3583 tracked files at that commit, confined under
 `package/`. All 57 changed runtime/source payload digests match the Git blobs.
 One local UI source has CRLF materialization; the archive uses the exact LF Git
 blob, with both digests and the verified line-ending-only difference recorded.
+Ten targeted scoped-form and atomic-restore checks pass on that extracted UI
+payload outside the checkout, closing the materialization-specific verification.
 Temporary extraction directories and 2,491,269,120 bytes of intermediate raw tar
 files were removed. The three compressed archive checkpoints remain available.
 
