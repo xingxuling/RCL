@@ -47,4 +47,19 @@ source-bound local checks; hosted CI is NOT_RUN_USER_INSTRUCTION.
 
 ## Operating rule for the historical register
 
+### 2026-10-28 source-position progress
+
+TD-019 remains ACTIVE. The RCL-authored compiler now retains internal expression
+and alteration-target spans and uses them for reference/call admission, literal
+facet mismatches and conditional-warrant type diagnostics. Operator errors point
+to the operator; reachable predicate return errors point to the function body.
+UTF-16 columns after supplementary Unicode text reuse the existing column-profile
+mechanism. The current compiler reaches a byte-identical native C0/C1/C2 fixed
+point and passes 72 targeted compiler/location/warrant checks. See
+`docs/maintenance/native-semantic-locations-2026-10-28.json`.
+
+UI declaration/navigation diagnostics, missing rule-warrant declarations and
+unsupported session-facet errors still use synthetic locations. This maintenance
+does not mark all semantic diagnostics complete or promote whole-language maturity.
+
 No ACTIVE or RESEARCH item may be silently converted into a capability claim. Promotion requires implementation, negative controls, canonical CI and an explicit contract update.

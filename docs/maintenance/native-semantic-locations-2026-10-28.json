@@ -1,0 +1,53 @@
+{
+  "status": "PASS_BOUNDED_LOCAL_WINDOWS",
+  "fixedPoint": {
+    "ok": true,
+    "format": "rcl.selfhost.compiler.fixed-point.v1",
+    "outputPath": "selfhost/compiler.rbc",
+    "bytes": 300389,
+    "sha256": "964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098",
+    "sourceSha256": "c7b1da084466b2e2ee70661ebf9084ec49965187f8f31e7710eef0e7797d7047",
+    "byteIdentical": true,
+    "generations": {
+      "c0": "964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098",
+      "c1": "964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098",
+      "c2": "964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098"
+    },
+    "native": {
+      "c0ToC1": {
+        "status": "ok",
+        "bytes": 300389,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      },
+      "c1ToC2": {
+        "status": "ok",
+        "bytes": 300389,
+        "peakStackDepth": 1023,
+        "peakCallFrames": 289
+      }
+    }
+  },
+  "sources": {
+    "selfhost/compiler-core.rcl": "c09986fa7c754b937db07acf9d571202d37e303709f9218a1024cc7504adfdf9",
+    "selfhost/compiler-main.rcl": "cbe0c2ded3f49d75ec333bc9e0c4276fb4c61c29f4a18197c62a027f5819b75d",
+    "selfhost/compiler.rbc": "964e620258158cf0eaabf3e3e2dc0b61470f44c618a8e519e5605013ee8bc098",
+    "tests/selfhost-semantic-locations.test.mjs": "8190e9af87f407536578f3f6f9ebce9a9e2c03840e8f19dc0bd7eff0695fe684"
+  },
+  "checks": {
+    "finalArtifactCompilerRegression": {
+      "passed": 72,
+      "failed": 0,
+      "command": "node --test --test-concurrency=1 tests/selfhost-semantic-locations.test.mjs tests/selfhost-toolchain.test.mjs tests/warrant-compiler-admission.test.mjs",
+      "log": "output/module-development-20261028/compiler-regression.log"
+    },
+    "newSourceLocationChecks": 27
+  },
+  "remainingScope": [
+    "UI declaration and navigation diagnostics",
+    "missing rule-warrant declarations",
+    "unsupported session facet diagnostics"
+  ],
+  "hostedActions": "NOT_RUN_USER_INSTRUCTION",
+  "formalLanguagePromotion": false
+}
