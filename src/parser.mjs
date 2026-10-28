@@ -1314,6 +1314,7 @@ export function parseReality(source) { return new Parser(lexReality(source)).par
 // program roots, bytecode or serialized language data.
 export function parseRealityWithLocations(source) {
   const locations = new WeakMap(), typeLocations = new WeakMap();
-  const ast = new Parser(lexReality(source), locations, typeLocations).parseProgram();
-  return { ast, locations, typeLocations };
+  const tokens = lexReality(source);
+  const ast = new Parser(tokens, locations, typeLocations).parseProgram();
+  return { ast, locations, typeLocations, tokens };
 }

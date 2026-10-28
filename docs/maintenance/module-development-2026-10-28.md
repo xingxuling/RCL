@@ -254,6 +254,15 @@ native restart and a separate public CLI process; seventeen existing durable and
 backup checks also passed. TD-017 remains ACTIVE. See
 `session-history-2026-10-28.md`.
 
+## Increment 13: facet usage semantic coloring
+
+The static editor bridge now emits source-backed read/write tokens alongside
+declarations, with declaration/modification modifiers. Qualified paths use actual
+lexer fragments, including paths separated across lines or comments. Four new
+protocol/namespace/coordinate checks and sixteen existing editor checks pass.
+This remains static bridge evidence, without a running editor/server claim. See
+`lsp-semantic-usage-tokens-2026-10-28.md`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic admission after the completed reactive

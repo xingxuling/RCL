@@ -34,6 +34,7 @@ export const RCL_LSP_SEMANTIC_TOKEN_TYPES = Object.freeze([
   'number',
   'operator',
 ]);
+export const RCL_LSP_SEMANTIC_TOKEN_MODIFIERS = Object.freeze(['declaration', 'modification']);
 
 function sortJson(value) {
   if (Array.isArray(value)) return value.map(sortJson);
@@ -250,11 +251,19 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
   const semanticNodeDefinitions = Object.fromEntries(facets.map(facet => [facet.semanticNodeId, definitionIndex[facet.path]]));
 
   const tokens = [];
+  const facetByPath = new Map(facets.map(facet => [facet.path, facet]));
+  for (const occurrence of sourceOccurrences.occurrences) {
+    const modifier = occurrence.kind === 'declaration' ? 1 : occurrence.kind === 'write' ? 2 : 0;
+    for (const range of occurrence.identifierRanges) {
+      tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character,
+        'property', modifier, facetByPath.get(occurrence.facet)?.semanticNodeId));
+    }
+  }
   for (const facet of facets) {
     const declaration = sourceOccurrences.declarations[facet.path];
     if (declaration) {
-      for (const [range, type] of [[declaration.range, 'property'], [declaration.typeRange, 'type']]) {
-        if (range && range.start.line === range.end.line) tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character, type, 0, facet.semanticNodeId));
+      for (const range of declaration.typeIdentifierRanges) {
+        tokens.push(semanticToken(range.start.line, range.start.character, range.end.character - range.start.character, 'type', 0, facet.semanticNodeId));
       }
       continue;
     }
@@ -267,7 +276,7 @@ function buildLspPayloadFromRuntime(sourceMapRuntime, { sourceText = '', sourceP
   const semanticTokens = {
     legend: {
       tokenTypes: RCL_LSP_SEMANTIC_TOKEN_TYPES,
-      tokenModifiers: [],
+      tokenModifiers: RCL_LSP_SEMANTIC_TOKEN_MODIFIERS,
     },
     tokens,
     data: encodeSemanticTokens(tokens),
