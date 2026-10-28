@@ -85,6 +85,17 @@ other uncovered diagnostics. See
 
 ### 2026-10-28 reference equality discrepancy
 
+### 2026-10-28 UI tree/navigation diagnostic progress
+
+Forty previously synthetic UI tree/event/navigation location controls now report
+actual declaration/reference lines and UTF-16 columns, retaining failed outputs.
+All 246 affected checks pass with unchanged accepted UI target roots/bytes and a
+new native compiler fixed point. TD-019 remains ACTIVE for zero offset/length
+placeholders and uncovered property/authority/adaptation diagnostics. See
+`docs/maintenance/native-ui-tree-locations-2026-10-28.json`.
+
+### Reference equality scope
+
 | ID | Status | Area | Debt | Closure evidence or next gate |
 |---|---|---|---|---|
 | TD-020 | ACTIVE | Reference value equality | `src/quantity.mjs` uses object identity for Sequence equality while the native VM compares elements recursively. Equal independently built `[1, 2, 1, 2]` values compare false in the reference interpreter and true in both the pre-change and current native VM. | Define shared per-value equality semantics, preserve quantity and typed-reference identity contracts, and add source-level parity and unequal-value controls. The persistent-concat change retains native equality and records ordered storage parity separately; see `docs/maintenance/native-persistent-concat-2026-10-28.json`. |

@@ -392,6 +392,18 @@ five minutes and remains explicitly NOT_COMPLETED_BUDGET_STOP. This closes the
 prior wildcard-source gap without adding wildcard syntax or claiming whole-
 grammar equivalence. See `native-path-admission-2026-10-28.json`.
 
+## Increment 25: UI tree and navigation diagnostic coordinates
+
+Private UI node/event/navigation/reference spans now survive parsing and event
+normalization. Existing checks report actual declarations or references, with
+form scope errors using property-expression positions. All forty pre-change
+location failures now pass, including LF/CRLF and Unicode columns. All 246
+affected checks pass; C0=C1=C2 is 368076 bytes and the full collector remains
+195 matches / 38 reference rejections / zero failures at 60000 ms. Successful UI
+roots and target bytes remain unchanged. Offset/length placeholders and other
+diagnostic families keep TD-019 ACTIVE. See
+`native-ui-tree-locations-2026-10-28.json`.
+
 ## Remaining development queue
 
 1. Continue bounded compiler/UI diagnostic and lifecycle admission after the
